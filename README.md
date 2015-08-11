@@ -1,6 +1,6 @@
 # Animeflv 
 
-<p>Sirve:</p>
+<p><b><h2>Sirve:</h2></b></p>
 <p>-Obtencion de JSON de los capitulos recientes desde api oficial de Animeflv "http://animeflv.net/api.php?accion=inicio"</p>
 <p>-Parser de JSON para sacar los titulos, tipo de capitulo, numero de capitulo, ID de anime, ID de capitulo <-- probablemente necesario para pedir descarga de capitulo desde servidor</p>
 <p>-Contruccion de Link de las imagenes del anime usando el ID de anime y la direccion "http://cdn.animeflv.net/img/portada/thumb_80/" + ID de anime + .jpg</p>
@@ -9,10 +9,10 @@
 <p>-(provicional) Construir link al sitio original, sacar link a la pagina de descarga respectiva de Zippyshare, e iniciar descarga desde un explorador alternativo.</p>
 <p>-(provicional) en caso de llegar a un link de linkbucks en ves de zippyshare, simular un click al link de saltar publicidad usando javascript</p>
 
-<p>Error:
+<p><b><h2>Error:</h2></b></p>
 <p>-En la Activity de WebDescarga, no carga ningun link de animeflv, por lo q no pueden hacerse todos los comandos para decargar.
 
-<p>Falta:
+<p><b><h2>Falta:</h2></b></p>
 <p>-Obtencion de capitulos desde servidor de animeflv
 <p>-Menu lateral para todos los animes en el servidor.
 <p>-Poder ver los animes descargados haciendo click en Ver.
