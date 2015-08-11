@@ -1,5 +1,7 @@
 # Animeflv 
-
+<h3>Esta Aplicacion, aparte de ser mejor visualmente, usando Material Design, tiene el objetivo de ser una herramienta util y gratuita de fans para fans, quien pueda y guste cooperar con la programacion, prueba, y promocion de la app, asi como tambien comentarios, sugerencias, y criticas CONSTRUCTIVAS (No jodan 7-7) es bienvenido, recuerda, es una version de prueba con apenas escasos dias de programacion, pueden surgir errores, o un funcionamiento inesperado de la app, evita los malos comentarios o insultos, programar no es tan facil como parece, gracias</3>
+<p>Mi correo para cualquier duda o aclaracion: jordyamc@hotmail.com</p>
+<p></p>
 <p><b><h2>Sirve:</h2></b></p>
 <p>-Obtencion de JSON de los capitulos recientes desde api oficial de Animeflv "http://animeflv.net/api.php?accion=inicio"</p>
 <p>-Parser de JSON para sacar los titulos, tipo de capitulo, numero de capitulo, ID de anime, ID de capitulo <-- probablemente necesario para pedir descarga de capitulo desde servidor</p>
