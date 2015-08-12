@@ -114,12 +114,12 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
             String[] jsonDesc=new Parser().parseEID(s);
             String[] jsonArchivo=new Parser().parseEID(txt);
             if (!jsonDesc[0].trim().equals(jsonArchivo[0].trim())){
-                Log.d("Notificacio:","Crear");
+                Log.d("Notificacion:","Crear");
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(context)
                                 .setSmallIcon(R.drawable.ic_not_r)
-                                .setContentTitle("My notification")
-                                .setContentText("Hello World!");
+                                .setContentTitle("AnimeFLV")
+                                .setContentText("Nuevos capitulos disponibles!!!");
                 Intent resultIntent = new Intent(context, Main.class);
                 PendingIntent resultPendingIntent = PendingIntent.getActivity(context,0,resultIntent,PendingIntent.FLAG_UPDATE_CURRENT);
                 mBuilder.setContentIntent(resultPendingIntent);
