@@ -131,6 +131,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
 
     Parser parser=new Parser();
 
+    String html="<html></html>";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -169,7 +170,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         switch (view.getId()){
             case R.id.ib_descargar_cardD1:
                 url=getUrl(titulos[0], numeros[0]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 /*bundle.putString("url",url1);
                 bundle.putString("titulo", titulos[0]);
                 bundle.putString("aid",aids[0]);
@@ -177,79 +178,79 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 break;
             case R.id.ib_descargar_cardD2:
                 url=getUrl(titulos[1], numeros[1]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD3:
                 url=getUrl(titulos[2], numeros[2]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD4:
                 url=getUrl(titulos[3], numeros[3]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD5:
                 url=getUrl(titulos[4], numeros[4]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD6:
                 url=getUrl(titulos[5], numeros[5]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD7:
                 url=getUrl(titulos[6], numeros[6]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD8:
                 url=getUrl(titulos[7], numeros[7]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD9:
                 url=getUrl(titulos[8], numeros[8]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD10:
                 url=getUrl(titulos[9], numeros[9]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD11:
                 url=getUrl(titulos[10], numeros[10]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD12:
                 url=getUrl(titulos[11], numeros[11]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD13:
                 url=getUrl(titulos[12], numeros[12]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD14:
                 url=getUrl(titulos[13], numeros[13]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD15:
                 url=getUrl(titulos[14], numeros[14]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD16:
                 url=getUrl(titulos[15], numeros[15]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD17:
                 url=getUrl(titulos[16], numeros[16]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD18:
                 url=getUrl(titulos[17], numeros[17]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD19:
                 url=getUrl(titulos[18], numeros[18]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
             case R.id.ib_descargar_cardD20:
                 url=getUrl(titulos[19], numeros[19]);
-                new Requests(this,TaskType.GET_HTML).execute(url);
+                new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
         }
         intent.putExtras(bundle);
@@ -259,7 +260,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     public void setLoad(){
         scrollView=(ScrollView) findViewById(R.id.sv_inicio);
         mswipe=(SwipeRefreshLayout) findViewById(R.id.swiperefresh);
-
         imgCard1=(ImageView) findViewById(R.id.imgCardD1);
         imgCard2=(ImageView) findViewById(R.id.imgCardD2);
         imgCard3=(ImageView) findViewById(R.id.imgCardD3);
@@ -616,7 +616,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 }
             }
         }
-        if(taskType == TaskType.GET_HTML) {
+        if(taskType == TaskType.GET_HTML1) {
+            web_Links.loadUrl("about:blank");
             web_Links.loadData(data, "text/html", "UTF-8");
         }
     }
@@ -634,6 +635,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         @JavascriptInterface
         public void showHTMLD1(String html) {
+            toast(html);
             Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(html));
             startActivity(intent);
         }

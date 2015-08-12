@@ -1,10 +1,12 @@
 package knf.animeflv;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -137,6 +139,8 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                                     .setContentTitle("AnimeFLV")
                                     .setContentText("Nuevos capitulos disponibles!!!");
                     mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                    mBuilder.setAutoCancel(true);
+                    mBuilder.setLights(Color.BLUE,5000,2000);
                     Intent resultIntent = new Intent(context, Main.class);
                     PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     mBuilder.setContentIntent(resultPendingIntent);
