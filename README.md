@@ -10,6 +10,7 @@
 <p>-Cargar Nombre y numero de capitulo de anime.</p>
 <p>-(provicional) Construir link al sitio original, sacar link a la pagina de descarga respectiva de Zippyshare, e iniciar descarga desde un explorador alternativo.</p>
 <p>-(provicional) en caso de llegar a un link de linkbucks en ves de zippyshare, simular un click al link de saltar publicidad usando javascript</p>
+<p>-Servicio en segundo plano, crea una notificacion cuando hay nuevos capitulos.</p>
 
 <p><b><h2>Error:</h2></b></p>
 <p>-En la Activity de WebDescarga, no carga ningun link de animeflv, por lo q no pueden hacerse todos los comandos para decargar.
