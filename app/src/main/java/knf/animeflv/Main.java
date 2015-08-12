@@ -112,10 +112,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     String inicio="http://animeflv.net/api.php?accion=inicio";
     String json="{}";
 
+    Alarm alarm = new Alarm();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
+        alarm.SetAlarm(this);
         first=1;
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);

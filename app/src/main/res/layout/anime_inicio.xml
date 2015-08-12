@@ -14,7 +14,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="invisible"
-        android:id="@+id/sv_inicio">
+        android:id="@+id/sv_inicio"
+        android:scrollbarThumbVertical="@color/dark"
+        android:scrollbarSize="2dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
