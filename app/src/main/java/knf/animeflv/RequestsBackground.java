@@ -5,6 +5,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -71,7 +74,6 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
         reader.close();
         return sb.toString();
     }
-
     public static String getStringFromFile (String filePath) {
         String ret="";
         try {
@@ -92,6 +94,13 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
             e.printStackTrace();
         }
     }
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected() && Wifi.isConnected();
+    }
 
     @Override
     protected void onPostExecute(String s) {
@@ -105,31 +114,39 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
         }
         File file=new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt");
         String file_loc=Environment.getExternalStorageDirectory()+ "/.Animeflv/cache/inicio.txt";
-        if (!file.exists()){
-            Log.d("Archivo:", "No existe");
-            try {file.createNewFile();}catch (IOException e){Log.d("Archivo:", "Error al crear archivo");}
-            writeToFile(s,file);
-        }else {
-            String txt=getStringFromFile(file_loc);
-            String[] jsonDesc=new Parser().parseEID(s);
-            String[] jsonArchivo=new Parser().parseEID(txt);
-            if (!jsonDesc[0].trim().equals(jsonArchivo[0].trim())){
-                Log.d("Notificacion:","Crear");
-                NotificationCompat.Builder mBuilder =
-                        new NotificationCompat.Builder(context)
-                                .setSmallIcon(R.drawable.ic_not_r)
-                                .setContentTitle("AnimeFLV")
-                                .setContentText("Nuevos capitulos disponibles!!!");
-                mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                Intent resultIntent = new Intent(context, Main.class);
-                PendingIntent resultPendingIntent = PendingIntent.getActivity(context,0,resultIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-                mBuilder.setContentIntent(resultPendingIntent);
-                int mNotificationId = 001;
-                NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
-                mNotifyMgr.notify(mNotificationId, mBuilder.build());
-            }else {
-                Log.d("JSON","Es igual");
+        if (isNetworkAvailable()) {
+            Log.d("Conexion","Hay internet");
+            if (!file.exists()) {
+                Log.d("Archivo:", "No existe");
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    Log.d("Archivo:", "Error al crear archivo");
+                }
+                writeToFile(s, file);
+            } else {
+                String txt = getStringFromFile(file_loc);
+                String[] jsonDesc = new Parser().parseEID(s);
+                String[] jsonArchivo = new Parser().parseEID(txt);
+                if (!jsonDesc[0].trim().equals(jsonArchivo[0].trim())) {
+                    writeToFile(s, file);
+                    Log.d("Notificacion:", "Crear");
+                    NotificationCompat.Builder mBuilder =
+                            new NotificationCompat.Builder(context)
+                                    .setSmallIcon(R.drawable.ic_not_r)
+                                    .setContentTitle("AnimeFLV")
+                                    .setContentText("Nuevos capitulos disponibles!!!");
+                    mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                    Intent resultIntent = new Intent(context, Main.class);
+                    PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    mBuilder.setContentIntent(resultPendingIntent);
+                    int mNotificationId = 001;
+                    NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                    mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                } else {
+                    Log.d("JSON", "Es igual");
+                }
             }
-        }
+        }else {Log.d("Conexion","No hay internet");}
     }
 }

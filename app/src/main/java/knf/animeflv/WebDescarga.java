@@ -98,6 +98,7 @@ public class WebDescarga extends ActionBarActivity {
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
                 handler.proceed();
             }
+
             @Override
             public void onReceivedError(WebView view, int errorCod, String description, String failingUrl) {
                 /*Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(failingUrl));
@@ -108,8 +109,9 @@ public class WebDescarga extends ActionBarActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                webView.loadUrl("javascript:window.HtmlViewer.showHTMLD1" + "(document.getElementById('descargas_box').getElementsByTagName('a')[1].href);");
                 webView.loadUrl("javascript:window.HtmlViewer.showHTML" + "(document.getElementById('download').getElementsByTagName('a')[0].href);");
-                webView.loadUrl("javascript:(function(){" +"l=document.getElementById('btn_download');" +"e=document.createEvent('HTMLEvents');" +"e.initEvent('click',true,true);" +"l.dispatchEvent(e);" +"})()");
+                webView.loadUrl("javascript:(function(){" + "l=document.getElementById('btn_download');" +"e=document.createEvent('HTMLEvents');" +"e.initEvent('click',true,true);" + "l.dispatchEvent(e);" + "})()");
             }
         });
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -121,8 +123,7 @@ public class WebDescarga extends ActionBarActivity {
                 overridePendingTransition(R.anim.fadehold, R.anim.abc_slide_out_bottom);
             }
         });
-        webView.loadUrl("http://animeflv.net/?escritorio=2");
-        webView.loadUrl(bundle.getString("url"));
+        webView.loadData(bundle.getString("data"), "text/html", "UTF-8");
     }
     public void toastS(String text){Toast.makeText(this,text,Toast.LENGTH_SHORT).show();}
     public void toastL(String text){Toast.makeText(this,text,Toast.LENGTH_LONG).show();}
@@ -171,22 +172,10 @@ public class WebDescarga extends ActionBarActivity {
         @JavascriptInterface
         public void showHTML(String html) {
             toastL(html);
-            Intent intent=new Intent(getApplicationContext(),WebDescarga.class);
-            Bundle bundle1=new Bundle();
-            bundle1.putString("url",html);
-            bundle1.putString("titulo",bundle.getString("titulo"));
-            bundle1.putString("aid",bundle.getString("aid"));
-            bundle1.putString("enum",bundle.getString("enum"));
-            intent.putExtras(bundle1);
-            finish();
-            startActivity(intent);
         }
         @JavascriptInterface
-        public void showHTMLD(String html) {
-            showHTML(html);
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(html));
-            startActivity(browserIntent);
-            finish();
+        public void showHTMLD1(String html) {
+            toastL(html);
         }
     }
 

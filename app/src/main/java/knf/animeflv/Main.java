@@ -1,11 +1,15 @@
 package knf.animeflv;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -24,15 +29,22 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import butterknife.ButterKnife;
 
-public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
+public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,Requests.callback {
     String accion;
 
     WebView web;
     WebView web_Links;
 
-    Parser parser;
     Toolbar toolbar;
 
     Context context;
@@ -104,15 +116,20 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
 
     SwipeRefreshLayout mswipe;
 
-    int first=0;
+    int first = 0;
     String[] eids;
     String[] aids;
     String[] numeros;
     String[] titulos;
-    String inicio="http://animeflv.net/api.php?accion=inicio";
-    String json="{}";
+    String inicio = "http://animeflv.net/api.php?accion=inicio";
+    String json = "{}";
 
     Alarm alarm = new Alarm();
+
+    String ext_storage_state = Environment.getExternalStorageState();
+    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache");
+
+    Parser parser=new Parser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,17 +168,19 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         switch (view.getId()){
             case R.id.ib_descargar_cardD1:
                 String url1=getUrl(titulos[0], numeros[0]);
-                bundle.putString("url",url1);
+                new Requests(this,TaskType.GET_HTML).execute(url1);
+                /*bundle.putString("url",url1);
                 bundle.putString("titulo", titulos[0]);
                 bundle.putString("aid",aids[0]);
-                bundle.putString("enum", numeros[0]);
+                bundle.putString("enum", numeros[0]);*/
                 break;
             case R.id.ib_descargar_cardD2:
                 String url2=getUrl(titulos[1], numeros[1]);
-                bundle.putString("url",url2);
+                new Requests(this,TaskType.GET_HTML).execute(url2);
+                /*bundle.putString("url",url2);
                 bundle.putString("titulo",titulos[1]);
                 bundle.putString("aid", aids[1]);
-                bundle.putString("enum", numeros[1]);
+                bundle.putString("enum", numeros[1]);*/
                 break;
             case R.id.ib_descargar_cardD3:
                 String url3=getUrl(titulos[2], numeros[2]);
@@ -291,7 +310,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 break;
         }
         intent.putExtras(bundle);
-        startActivity(intent);
+        //startActivity(intent);
     }
     public void onCardClicked(View view){ toast("Card Click"); }
     public void setLoad(){
@@ -381,7 +400,25 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             public void onPageFinished(WebView view, String url) {
                 web_Links.loadUrl("javascript:window.HtmlViewer.showHTMLD1" + "(document.getElementById('descargas_box').getElementsByTagName('a')[1].href);");
                 web_Links.loadUrl("javascript:window.HtmlViewer.showHTMLD2" + "(document.getElementById('dlbutton').href);");
-                web_Links.loadUrl("javascript:(function(){" +"l=document.getElementById('skiplink');" +"e=document.createEvent('HTMLEvents');" +"e.initEvent('click',true,true);" +"l.dispatchEvent(e);" +"})()");
+                web_Links.loadUrl("javascript:(function(){" + "l=document.getElementById('skiplink');" + "e=document.createEvent('HTMLEvents');" + "e.initEvent('click',true,true);" + "l.dispatchEvent(e);" + "})()");
+            }
+        });
+        web_Links.setDownloadListener(new DownloadListener() {
+            public void onDownloadStart(String url, String userAgent,
+                                        String contentDisposition, String mimetype,
+                                        long contentLength) {
+                new Main().toast("Descarga Iniciada");
+                String fileName = url.substring(url.lastIndexOf("/") + 1);
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                request.setDescription("Cecyt 3");
+                request.setTitle(fileName);
+                // in order for this if to run, you must use the android 3.2 to compile your app
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+
+                // get download service and enqueue file
+                DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                manager.enqueue(request);
             }
         });
     }
@@ -391,26 +428,26 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Picasso.with(context).load(url[0]).error(R.drawable.ic_block_r).into(imgCard1);
-                Picasso.with(context).load(url[1]).error(R.drawable.ic_block_r).into(imgCard2);
-                Picasso.with(context).load(url[2]).error(R.drawable.ic_block_r).into(imgCard3);
-                Picasso.with(context).load(url[3]).error(R.drawable.ic_block_r).into(imgCard4);
-                Picasso.with(context).load(url[4]).error(R.drawable.ic_block_r).into(imgCard5);
-                Picasso.with(context).load(url[5]).error(R.drawable.ic_block_r).into(imgCard6);
-                Picasso.with(context).load(url[6]).error(R.drawable.ic_block_r).into(imgCard7);
-                Picasso.with(context).load(url[7]).error(R.drawable.ic_block_r).into(imgCard8);
-                Picasso.with(context).load(url[8]).error(R.drawable.ic_block_r).into(imgCard9);
-                Picasso.with(context).load(url[9]).error(R.drawable.ic_block_r).into(imgCard10);
-                Picasso.with(context).load(url[10]).error(R.drawable.ic_block_r).into(imgCard11);
-                Picasso.with(context).load(url[11]).error(R.drawable.ic_block_r).into(imgCard12);
-                Picasso.with(context).load(url[12]).error(R.drawable.ic_block_r).into(imgCard13);
-                Picasso.with(context).load(url[13]).error(R.drawable.ic_block_r).into(imgCard14);
-                Picasso.with(context).load(url[14]).error(R.drawable.ic_block_r).into(imgCard15);
-                Picasso.with(context).load(url[15]).error(R.drawable.ic_block_r).into(imgCard16);
-                Picasso.with(context).load(url[16]).error(R.drawable.ic_block_r).into(imgCard17);
-                Picasso.with(context).load(url[17]).error(R.drawable.ic_block_r).into(imgCard18);
-                Picasso.with(context).load(url[18]).error(R.drawable.ic_block_r).into(imgCard19);
-                Picasso.with(context).load(url[19]).error(R.drawable.ic_block_r).into(imgCard20);
+                PicassoCache.getPicassoInstance(context).load(url[0]).error(R.drawable.ic_block_r).into(imgCard1);
+                PicassoCache.getPicassoInstance(context).load(url[1]).error(R.drawable.ic_block_r).into(imgCard2);
+                PicassoCache.getPicassoInstance(context).load(url[2]).error(R.drawable.ic_block_r).into(imgCard3);
+                PicassoCache.getPicassoInstance(context).load(url[3]).error(R.drawable.ic_block_r).into(imgCard4);
+                PicassoCache.getPicassoInstance(context).load(url[4]).error(R.drawable.ic_block_r).into(imgCard5);
+                PicassoCache.getPicassoInstance(context).load(url[5]).error(R.drawable.ic_block_r).into(imgCard6);
+                PicassoCache.getPicassoInstance(context).load(url[6]).error(R.drawable.ic_block_r).into(imgCard7);
+                PicassoCache.getPicassoInstance(context).load(url[7]).error(R.drawable.ic_block_r).into(imgCard8);
+                PicassoCache.getPicassoInstance(context).load(url[8]).error(R.drawable.ic_block_r).into(imgCard9);
+                PicassoCache.getPicassoInstance(context).load(url[9]).error(R.drawable.ic_block_r).into(imgCard10);
+                PicassoCache.getPicassoInstance(context).load(url[10]).error(R.drawable.ic_block_r).into(imgCard11);
+                PicassoCache.getPicassoInstance(context).load(url[11]).error(R.drawable.ic_block_r).into(imgCard12);
+                PicassoCache.getPicassoInstance(context).load(url[12]).error(R.drawable.ic_block_r).into(imgCard13);
+                PicassoCache.getPicassoInstance(context).load(url[13]).error(R.drawable.ic_block_r).into(imgCard14);
+                PicassoCache.getPicassoInstance(context).load(url[14]).error(R.drawable.ic_block_r).into(imgCard15);
+                PicassoCache.getPicassoInstance(context).load(url[15]).error(R.drawable.ic_block_r).into(imgCard16);
+                PicassoCache.getPicassoInstance(context).load(url[16]).error(R.drawable.ic_block_r).into(imgCard17);
+                PicassoCache.getPicassoInstance(context).load(url[17]).error(R.drawable.ic_block_r).into(imgCard18);
+                PicassoCache.getPicassoInstance(context).load(url[18]).error(R.drawable.ic_block_r).into(imgCard19);
+                PicassoCache.getPicassoInstance(context).load(url[19]).error(R.drawable.ic_block_r).into(imgCard20);
             }
         });
     }
@@ -471,7 +508,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         });
     }
     public void getJson(){
-        web.loadUrl(inicio);
+        new Requests(this,TaskType.GET_INICIO).execute(inicio);
     }
     public void getlinks(String json){
         loadImg(parser.parseLinks(json));
@@ -490,6 +527,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     scrollView.setVisibility(View.VISIBLE);
                 }});
             first=0;
+        }else {
+            if (mswipe.isRefreshing()){
+                mswipe.setRefreshing(false);
+            }
         }
     }
     public void getData(String json){
@@ -515,7 +556,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 }
             }
         }
-        ftitulo=ftitulo.replace("!","");
+        ftitulo=ftitulo.replace("!", "");
+        ftitulo=ftitulo.replace("°", "");
+        ftitulo=ftitulo.replace("&deg;", "");
+        ftitulo=ftitulo.replace("(","");
+        ftitulo=ftitulo.replace(")","");
+        if (ftitulo.trim().equals("gintama")){ftitulo=ftitulo+"-2015";}
         String link="http://animeflv.net/ver/"+ftitulo+"-"+capitulo+".html";
         return link;
     }
@@ -533,10 +579,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
     @Override
     public void onRefresh() {
-        web.loadUrl(inicio);
-        if (mswipe.isRefreshing()){
-            mswipe.setRefreshing(false);
-        }
+        new Requests(this,TaskType.GET_INICIO).execute(inicio);
+
     }
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
@@ -544,14 +588,96 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
     @Override
-    public void onConfigurationChanged (Configuration newConfig)
-    {
+    public void onConfigurationChanged (Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
         if (!isXLargeScreen(getApplicationContext()) ) {
             return;
         }
     }
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
+    public static String getStringFromFile (String filePath) {
+        String ret="";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        }catch (IOException e){}catch (Exception e){}
+        return ret;
+    }
+    public  void writeToFile(String body,File file){
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file);
+            fos.write(body.getBytes());
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected() && Wifi.isConnected();
+    }
+    @Override
+    public void sendtext1(String data,TaskType taskType){
+        if(taskType == TaskType.GET_INICIO) {
+            if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                if (!mediaStorage.exists()) {
+                    mediaStorage.mkdirs();
+                }
+            }
+            File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt");
+            String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt";
+            if (isNetworkAvailable()) {
+                if (!file.exists()) {
+                    Log.d("Archivo:", "No existe");
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        Log.d("Archivo:", "Error al crear archivo");
+                    }
+                    writeToFile(data, file);
+                    getData(data);
+                } else {
+                    Log.d("Archivo", "Existe");
+                    String infile = getStringFromFile(file_loc);
+                    if (!parser.parseEID(infile)[0].trim().equals(parser.parseEID(data)[0].trim())) {
+                        Log.d("Cargar", "Json nuevo");
+                        writeToFile(data, file);
+                        getData(data);
+                    } else {
+                        Log.d("Cargar", "Json existente");
+                        getData(infile);
+                    }
+                }
+            } else {
+                if (file.exists()) {
+                    String infile = getStringFromFile(file_loc);
+                    getData(infile);
+                } else {
+                    toast("No hay datos guardados");
+                }
+            }
+        }
+        if(taskType == TaskType.GET_HTML) {
+            web_Links.loadData(data, "text/html", "UTF-8");
+        }
+    }
+
     class JavaScriptInterface {
         private Context ctx;
         JavaScriptInterface(Context ctx) {
@@ -565,10 +691,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         @JavascriptInterface
         public void showHTMLD1(String html) {
-            showHTML(html);
+            Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(html));
+            startActivity(intent);
         }
         @JavascriptInterface
         public void showHTMLD2(String html) {
-            showHTML(html);
+            toast(html);
         }}
 }
