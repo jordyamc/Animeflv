@@ -120,6 +120,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                                 .setSmallIcon(R.drawable.ic_not_r)
                                 .setContentTitle("AnimeFLV")
                                 .setContentText("Nuevos capitulos disponibles!!!");
+                mBuilder.setVibrate(new long[]{100, 200, 100, 500});
                 Intent resultIntent = new Intent(context, Main.class);
                 PendingIntent resultPendingIntent = PendingIntent.getActivity(context,0,resultIntent,PendingIntent.FLAG_UPDATE_CURRENT);
                 mBuilder.setContentIntent(resultPendingIntent);
