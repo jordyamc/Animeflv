@@ -165,148 +165,91 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     public void onDesClicked(View view){
         Bundle bundle=new Bundle();
         Intent intent=new Intent(this,WebDescarga.class);
+        String url;
         switch (view.getId()){
             case R.id.ib_descargar_cardD1:
-                String url1=getUrl(titulos[0], numeros[0]);
-                new Requests(this,TaskType.GET_HTML).execute(url1);
+                url=getUrl(titulos[0], numeros[0]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 /*bundle.putString("url",url1);
                 bundle.putString("titulo", titulos[0]);
                 bundle.putString("aid",aids[0]);
                 bundle.putString("enum", numeros[0]);*/
                 break;
             case R.id.ib_descargar_cardD2:
-                String url2=getUrl(titulos[1], numeros[1]);
-                new Requests(this,TaskType.GET_HTML).execute(url2);
-                /*bundle.putString("url",url2);
-                bundle.putString("titulo",titulos[1]);
-                bundle.putString("aid", aids[1]);
-                bundle.putString("enum", numeros[1]);*/
+                url=getUrl(titulos[1], numeros[1]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD3:
-                String url3=getUrl(titulos[2], numeros[2]);
-                bundle.putString("url",url3);
-                bundle.putString("titulo",titulos[2]);
-                bundle.putString("aid",aids[2]);
-                bundle.putString("enum",numeros[2]);
+                url=getUrl(titulos[2], numeros[2]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD4:
-                String url4=getUrl(titulos[3], numeros[3]);
-                bundle.putString("url",url4);
-                bundle.putString("titulo",titulos[3]);
-                bundle.putString("aid",aids[3]);
-                bundle.putString("enum",numeros[3]);
+                url=getUrl(titulos[3], numeros[3]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD5:
-                String url5=getUrl(titulos[4], numeros[4]);
-                bundle.putString("url",url5);
-                bundle.putString("titulo",titulos[4]);
-                bundle.putString("aid",aids[4]);
-                bundle.putString("enum",numeros[4]);
+                url=getUrl(titulos[4], numeros[4]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD6:
-                String url6=getUrl(titulos[5], numeros[5]);
-                bundle.putString("url",url6);
-                bundle.putString("titulo",titulos[5]);
-                bundle.putString("aid",aids[5]);
-                bundle.putString("enum",numeros[5]);
+                url=getUrl(titulos[5], numeros[5]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD7:
-                String url7=getUrl(titulos[6], numeros[6]);
-                bundle.putString("url",url7);
-                bundle.putString("titulo",titulos[6]);
-                bundle.putString("aid",aids[6]);
-                bundle.putString("enum",numeros[6]);
+                url=getUrl(titulos[6], numeros[6]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD8:
-                String url8=getUrl(titulos[7], numeros[7]);
-                bundle.putString("url",url8);
-                bundle.putString("titulo",titulos[7]);
-                bundle.putString("aid",aids[7]);
-                bundle.putString("enum",numeros[7]);
+                url=getUrl(titulos[7], numeros[7]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD9:
-                String url9=getUrl(titulos[8], numeros[8]);
-                bundle.putString("url",url9);
-                bundle.putString("titulo",titulos[8]);
-                bundle.putString("aid",aids[8]);
-                bundle.putString("enum",numeros[8]);
+                url=getUrl(titulos[8], numeros[8]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD10:
-                String url10=getUrl(titulos[9], numeros[9]);
-                bundle.putString("url",url10);
-                bundle.putString("titulo",titulos[9]);
-                bundle.putString("aid",aids[9]);
-                bundle.putString("enum",numeros[9]);
+                url=getUrl(titulos[9], numeros[9]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD11:
-                String url11=getUrl(titulos[10], numeros[10]);
-                bundle.putString("url",url11);
-                bundle.putString("titulo",titulos[10]);
-                bundle.putString("aid",aids[10]);
-                bundle.putString("enum",numeros[10]);
+                url=getUrl(titulos[10], numeros[10]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD12:
-                String url12=getUrl(titulos[11], numeros[11]);
-                bundle.putString("url",url12);
-                bundle.putString("titulo",titulos[11]);
-                bundle.putString("aid",aids[11]);
-                bundle.putString("enum",numeros[11]);
+                url=getUrl(titulos[11], numeros[11]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD13:
-                String url13=getUrl(titulos[12], numeros[12]);
-                bundle.putString("url",url13);
-                bundle.putString("titulo",titulos[12]);
-                bundle.putString("aid",aids[12]);
-                bundle.putString("enum",numeros[12]);
+                url=getUrl(titulos[12], numeros[12]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD14:
-                String url14=getUrl(titulos[13], numeros[13]);
-                bundle.putString("url",url14);
-                bundle.putString("titulo",titulos[13]);
-                bundle.putString("aid",aids[13]);
-                bundle.putString("enum",numeros[13]);
+                url=getUrl(titulos[13], numeros[13]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD15:
-                String url15=getUrl(titulos[14], numeros[14]);
-                bundle.putString("url",url15);
-                bundle.putString("titulo",titulos[14]);
-                bundle.putString("aid",aids[14]);
-                bundle.putString("enum",numeros[14]);
+                url=getUrl(titulos[14], numeros[14]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD16:
-                String url16=getUrl(titulos[15], numeros[15]);
-                bundle.putString("url",url16);
-                bundle.putString("titulo",titulos[15]);
-                bundle.putString("aid",aids[15]);
-                bundle.putString("enum",numeros[15]);
+                url=getUrl(titulos[15], numeros[15]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD17:
-                String url17=getUrl(titulos[16], numeros[16]);
-                bundle.putString("url",url17);
-                bundle.putString("titulo",titulos[16]);
-                bundle.putString("aid",aids[16]);
-                bundle.putString("enum",numeros[16]);
+                url=getUrl(titulos[16], numeros[16]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD18:
-                String url18=getUrl(titulos[17], numeros[17]);
-                bundle.putString("url",url18);
-                bundle.putString("titulo",titulos[17]);
-                bundle.putString("aid",aids[17]);
-                bundle.putString("enum",numeros[17]);
+                url=getUrl(titulos[17], numeros[17]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD19:
-                String url19=getUrl(titulos[18], numeros[18]);
-                bundle.putString("url",url19);
-                bundle.putString("titulo",titulos[18]);
-                bundle.putString("aid",aids[18]);
-                bundle.putString("enum",numeros[18]);
+                url=getUrl(titulos[18], numeros[18]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
             case R.id.ib_descargar_cardD20:
-                String url20=getUrl(titulos[19], numeros[19]);
-                bundle.putString("url",url20);
-                bundle.putString("titulo",titulos[19]);
-                bundle.putString("aid",aids[19]);
-                bundle.putString("enum",numeros[19]);
+                url=getUrl(titulos[19], numeros[19]);
+                new Requests(this,TaskType.GET_HTML).execute(url);
                 break;
         }
         intent.putExtras(bundle);
