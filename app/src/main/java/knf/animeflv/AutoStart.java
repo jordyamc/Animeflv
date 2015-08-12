@@ -1,8 +1,4 @@
 package knf.animeflv;
-
-/**
- * Created by Jordy on 11/08/2015.
- */
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
