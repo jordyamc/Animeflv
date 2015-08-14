@@ -31,6 +31,87 @@ public class Parser {
         return urls;
     }
 
+    public String getUrlPortada(String json){
+        String url="";
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            url = "http://cdn.animeflv.net/img/portada/"+jsonObj.getString("aid")+".jpg";
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+    public String getInfoSinopsis(String json){
+        String url="";
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            url = jsonObj.getString("sinopsis");
+            url=url.replace("&aacute;", "\u00E1");
+            url=url.replace("&eacute;","\u00E9");
+            url=url.replace("&iacute;","\u00ED");
+            url=url.replace("&oacute;","\u00F3");
+            url=url.replace("&uacute;","\u00FA");
+            url=url.replace("&Aacute;","\u00C1");
+            url=url.replace("&Eacute;","\u00C9");
+            url=url.replace("&Iacute;","\u00CD");
+            url=url.replace("&Oacute;","\u00D3");
+            url=url.replace("&Uacute;","\u00DA");
+            url=url.replace("&ntilde;","\u00F1");
+            url=url.replace("&ldquo;","\u201C");
+            url=url.replace("&rdquo;","\u201D");
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+
+    public String getInfotitulo(String json){
+        String url="";
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            url = jsonObj.getString("titulo");
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+    public String getInfoTipo(String json){
+        String url="";
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            url = jsonObj.getString("tid");
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+    public String getInfoEstado(String json){
+        String url="";
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            url = jsonObj.getString("fecha_fin");
+            if (url.trim().equals("0000-00-00")){
+                url="En emision";
+            }else {
+                url="Terminado";
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+    public String getInfoGeneros(String json){
+        String url="";
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            url = jsonObj.getString("generos");
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+
     public String[] parseTitulos(String json){
         List<String> titulosArray=new ArrayList<String>();
         String[] titulos;
@@ -114,6 +195,42 @@ public class Parser {
             eidsArray.toArray(eids);
         }
         return eids;
+    }
+    public List<String> parseNumerobyEID(String json){
+        List<String> eidsArray=new ArrayList<String>();
+        String[] eids;
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("episodios");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject childJSONObject = jsonArray.getJSONObject(i);
+                String eid = childJSONObject.getString("num");
+                eidsArray.add("Capitulo "+eid);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return eidsArray;
+    }
+    public String getAID (String json){
+        String aid="";
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            aid=jsonObj.getString("aid");
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return aid;
+    }
+    public String getTit(String json){
+        String aid="";
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            aid=jsonObj.getString("titulo");
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return aid;
     }
 
     public String[] parseAID(String json){

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone"
+    android:id="@+id/lay_info">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="230dp"
+            android:layout_weight="1"
+            android:src="@mipmap/ic_launcher"
+            android:id="@+id/info_img"
+            android:scaleType="fitCenter" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/info_descripcion"
+                android:text="Descripcion"
+                android:padding="8dp" />
+
+        </ScrollView>
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/black"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Titulo:"
+            android:padding="3dp"
+            android:maxLines="1" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="..."
+                android:id="@+id/titulo"
+                android:maxLines="1"
+                android:paddingBottom="3dp"
+                android:paddingRight="3dp"
+                android:paddingTop="3dp"
+                android:paddingLeft="3dp"
+                android:textColor="@android:color/darker_gray" />
+            </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tipo:"
+                android:padding="3dp"
+                android:maxLines="1" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="..."
+                android:id="@+id/tipo"
+                android:maxLines="1"
+                android:paddingBottom="3dp"
+                android:paddingRight="3dp"
+                android:paddingTop="3dp"
+                android:paddingLeft="3dp"
+                android:textColor="@android:color/darker_gray" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Estado:"
+                android:padding="3dp"
+                android:maxLines="1" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="..."
+                android:id="@+id/estado"
+                android:maxLines="1"
+                android:paddingBottom="3dp"
+                android:paddingRight="3dp"
+                android:paddingTop="3dp"
+                android:paddingLeft="3dp"
+                android:textColor="@android:color/darker_gray" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Generos:"
+                android:padding="3dp"
+                android:maxLines="1" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="..."
+                android:id="@+id/generos"
+                android:maxLines="1"
+                android:paddingBottom="3dp"
+                android:paddingRight="3dp"
+                android:paddingTop="3dp"
+                android:paddingLeft="3dp"
+                android:textColor="@android:color/darker_gray" />
+        </LinearLayout>
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/black"/>
+</LinearLayout>

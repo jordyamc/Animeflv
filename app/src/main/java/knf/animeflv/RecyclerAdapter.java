@@ -1,14 +1,22 @@
 package knf.animeflv;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Jordy on 08/08/2015.
@@ -16,55 +24,77 @@ import java.util.ArrayList;
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView img;
-        public TextView tv_titulo;
         public TextView tv_capitulo;
+        public ImageButton ib_ver;
+        public ImageButton ib_des;
+        public RecyclerView recyclerView;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            this.img = (ImageView) itemView.findViewById(R.id.imgCardD1);
-            this.tv_titulo = (TextView) itemView.findViewById(R.id.tv_cardD_titulo);
             this.tv_capitulo = (TextView) itemView.findViewById(R.id.tv_cardD_capitulo);
+            this.ib_ver = (ImageButton) itemView.findViewById(R.id.ib_ver_rv);
+            this.ib_des = (ImageButton) itemView.findViewById(R.id.ib_descargar_rv);
         }
     }
-    private ArrayList<AnimeCardDescarga> anime;
     private Context context;
+    List<String> capitulo;
 
-    public RecyclerAdapter(Context context, ArrayList<AnimeCardDescarga> anime) {
-        this.anime = anime;
+    public RecyclerAdapter(Context context, List<String> capitulos) {
+        this.capitulo = capitulos;
         this.context = context;
     }
 
     @Override
     public RecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(context).
-                inflate(R.layout.anime_inicio, parent, false);
+                inflate(R.layout.item_anime_descarga, parent, false);
         return new RecyclerAdapter.ViewHolder(itemView);
     }
 
-    // Involves populating data into the item through holder
     @Override
-    public void onBindViewHolder(RecyclerAdapter.ViewHolder holder, int position) {
-        AnimeCardDescarga animeC = anime.get(position);
-        holder.img.setImageBitmap(animeC.img);
-        holder.tv_titulo.setText(recnombre(animeC.nombre));
-        holder.tv_capitulo.setText("Capitulo "+animeC.Ncapitulo);
+    public void onBindViewHolder(RecyclerAdapter.ViewHolder holder, final int position) {
+        holder.tv_capitulo.setText(capitulo.get(position));
+        holder.ib_des.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String item = capitulo.get(position).substring(capitulo.get(position).length() - 1);
+                SharedPreferences sharedPreferences=context.getSharedPreferences("data", Context.MODE_PRIVATE);
+                String titulo=sharedPreferences.getString("titInfo","Error");
+                String url=getUrl(titulo, item);
+                Intent intent=new Intent(context,WebDescarga.class);
+                Bundle bundle=new Bundle();
+                bundle.putString("url",url);
+                intent.putExtras(bundle);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            }
+        });
     }
-
-    public String recnombre(String nombre){
-        String onombre=nombre;
-        String rnombre;
-        if (nombre.length()>15){
-            rnombre=onombre.substring(0,15);
-        }else {
-            rnombre=onombre;
+    public String getUrl(String titulo,String capitulo){
+        String ftitulo="";
+        String atitulo=titulo.toLowerCase();
+        for (int x=0; x < atitulo.length(); x++) {
+            if (atitulo.charAt(x) != ' ') {
+                ftitulo += atitulo.charAt(x);
+            }else {
+                if (atitulo.charAt(x) == ' ') {
+                    ftitulo += "-";
+                }
+            }
         }
-        return rnombre;
+        ftitulo=ftitulo.replace("!", "");
+        ftitulo=ftitulo.replace("°", "");
+        ftitulo=ftitulo.replace("&deg;", "");
+        ftitulo=ftitulo.replace("(","");
+        ftitulo=ftitulo.replace(")","");
+        if (ftitulo.trim().equals("gintama")){ftitulo=ftitulo+"-2015";}
+        String link="http://animeflv.net/ver/"+ftitulo+"-"+capitulo+".html";
+        return link;
     }
 
-    // Return the total count of items
     @Override
     public int getItemCount() {
-        return anime.size();
+        return capitulo.size();
     }
+
 }

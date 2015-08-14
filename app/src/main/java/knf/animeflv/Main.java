@@ -3,12 +3,13 @@ package knf.animeflv;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -27,8 +30,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,7 +38,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import butterknife.ButterKnife;
+import knf.animeflv.info.AnimeInfo;
+import knf.animeflv.info.Info;
 
 public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,Requests.callback {
     String accion;
@@ -131,11 +133,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
 
     Parser parser=new Parser();
 
+    String aidInfo;
+
     String html="<html></html>";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
+
         alarm.SetAlarm(this);
         first=1;
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
@@ -143,7 +148,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
-        toolbar=(Toolbar) findViewById(R.id.toolbar);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(getResources().getColor(R.color.dark));
+            getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
+        }
+        toolbar=(Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Recientes");
         context=getApplicationContext();
@@ -164,8 +176,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         toast("Ver click");
     }
     public void onDesClicked(View view){
-        Bundle bundle=new Bundle();
-        Intent intent=new Intent(this,WebDescarga.class);
         String url;
         switch (view.getId()){
             case R.id.ib_descargar_cardD1:
@@ -253,10 +263,129 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 new Requests(this,TaskType.GET_HTML1).execute(url);
                 break;
         }
-        intent.putExtras(bundle);
-        //startActivity(intent);
     }
-    public void onCardClicked(View view){ toast("Card Click"); }
+    public void onCardClicked(View view){
+        switch (view.getId()){
+            case R.id.card1:
+                setInfo(aids[0]);
+                break;
+            case R.id.card2:
+                setInfo(aids[1]);
+                break;
+            case R.id.card3:
+                setInfo(aids[2]);
+                break;
+            case R.id.card4:
+                setInfo(aids[3]);
+                break;
+            case R.id.card5:
+                setInfo(aids[4]);
+                break;
+            case R.id.card6:
+                setInfo(aids[5]);
+                break;
+            case R.id.card7:
+                setInfo(aids[6]);
+                break;
+            case R.id.card8:
+                setInfo(aids[7]);
+                break;
+            case R.id.card9:
+                setInfo(aids[8]);
+                break;
+            case R.id.card10:
+                setInfo(aids[9]);
+                break;
+            case R.id.card11:
+                setInfo(aids[10]);
+                break;
+            case R.id.card12:
+                setInfo(aids[11]);
+                break;
+            case R.id.card13:
+                setInfo(aids[12]);
+                break;
+            case R.id.card14:
+                setInfo(aids[13]);
+                break;
+            case R.id.card15:
+                setInfo(aids[14]);
+                break;
+            case R.id.card16:
+                setInfo(aids[15]);
+                break;
+            case R.id.card17:
+                setInfo(aids[16]);
+                break;
+            case R.id.card18:
+                setInfo(aids[17]);
+                break;
+            case R.id.card19:
+                setInfo(aids[18]);
+                break;
+            case R.id.card20:
+                setInfo(aids[19]);
+                break;
+        }
+    }
+    public void setInfo(String aid){
+        aidInfo=aid;
+        SharedPreferences sharedPreferences=getSharedPreferences("data",MODE_PRIVATE);
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        editor.putString("aid",aidInfo);
+        editor.commit();
+        new Requests(this,TaskType.GET_INFO).execute("http://animeflv.net/api.php?accion=anime&aid="+aid);
+    }
+    public void actCacheInfo(String json){
+        Bundle bundleInfo=new Bundle();
+        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+            if (!mediaStorage.exists()) {
+                mediaStorage.mkdirs();
+            }
+        }
+        File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aidInfo+".txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aidInfo+".txt";
+        if (isNetworkAvailable()) {
+            if (!file.exists()) {
+                Log.d("Archivo:", "No existe");
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    Log.d("Archivo:", "Error al crear archivo");
+                }
+                writeToFile(json, file);
+                bundleInfo.putString("aid",parser.getAID(json));
+                Intent intent=new Intent(this,Info.class);
+                intent.putExtras(bundleInfo);
+                startActivity(intent);
+            } else {
+                Log.d("Archivo", "Existe");
+                String infile = getStringFromFile(file_loc);
+                if (json.trim().equals(infile.trim())) {
+                    bundleInfo.putString("aid",parser.getAID(json));
+                    Intent intent = new Intent(this, Info.class);
+                    intent.putExtras(bundleInfo);
+                    startActivity(intent);
+                }else {
+                    writeToFile(json,file);
+                    bundleInfo.putString("aid", parser.getAID(json));
+                    Intent intent = new Intent(this, Info.class);
+                    intent.putExtras(bundleInfo);
+                    startActivity(intent);
+                }
+            }
+        } else {
+            if (file.exists()) {
+                bundleInfo.putString("aid",parser.getAID(json));
+                Intent intent = new Intent(this, Info.class);
+                intent.putExtras(bundleInfo);
+                startActivity(intent);
+            } else {
+                toast("No hay datos guardados");
+            }
+        }
+    }
+
     public void setLoad(){
         scrollView=(ScrollView) findViewById(R.id.sv_inicio);
         mswipe=(SwipeRefreshLayout) findViewById(R.id.swiperefresh);
@@ -620,6 +749,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             web_Links.loadUrl("about:blank");
             web_Links.loadData(data, "text/html", "UTF-8");
         }
+        if (taskType==TaskType.GET_INFO){
+            actCacheInfo(data);
+        }
     }
 
     class JavaScriptInterface {
@@ -635,7 +767,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         @JavascriptInterface
         public void showHTMLD1(String html) {
-            toast(html);
             Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(html));
             startActivity(intent);
         }

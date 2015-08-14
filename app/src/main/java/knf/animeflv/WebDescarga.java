@@ -30,7 +30,7 @@ import android.widget.Toast;
 /**
  * Created by Jordy on 10/08/2015.
  */
-public class WebDescarga extends ActionBarActivity {
+public class WebDescarga extends AppCompatActivity implements Requests.callback {
     WebView webView;
     Toolbar toolbar;
     Bundle bundle;
@@ -52,13 +52,6 @@ public class WebDescarga extends ActionBarActivity {
             window.setStatusBarColor(getResources().getColor(R.color.dark));
             getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
         }
-        toolbar = (Toolbar) findViewById(R.id.wv_bar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Descarga");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        toolbar.setNavigationIcon(R.drawable.ic_exit_r);
-        toolbar.inflateMenu(R.menu.menu_wv);
         bundle = getIntent().getExtras();
         webView = (WebView) findViewById(R.id.wv_global);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -110,20 +103,11 @@ public class WebDescarga extends ActionBarActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 webView.loadUrl("javascript:window.HtmlViewer.showHTMLD1" + "(document.getElementById('descargas_box').getElementsByTagName('a')[1].href);");
-                webView.loadUrl("javascript:window.HtmlViewer.showHTML" + "(document.getElementById('download').getElementsByTagName('a')[0].href);");
-                webView.loadUrl("javascript:(function(){" + "l=document.getElementById('btn_download');" +"e=document.createEvent('HTMLEvents');" +"e.initEvent('click',true,true);" + "l.dispatchEvent(e);" + "})()");
+                webView.loadUrl("javascript:window.HtmlViewer.showHTMLD2" + "(document.getElementById('dlbutton').href);");
+                webView.loadUrl("javascript:(function(){" + "l=document.getElementById('skiplink');" + "e=document.createEvent('HTMLEvents');" + "e.initEvent('click',true,true);" + "l.dispatchEvent(e);" + "})()");
             }
         });
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(webView.getUrl()));
-                startActivity(browserIntent);
-                finish();
-                overridePendingTransition(R.anim.fadehold, R.anim.abc_slide_out_bottom);
-            }
-        });
-        webView.loadData(bundle.getString("data"), "text/html", "UTF-8");
+        new Requests(this,TaskType.GET_HTML1).execute(bundle.getString("url"));
     }
     public void toastS(String text){Toast.makeText(this,text,Toast.LENGTH_SHORT).show();}
     public void toastL(String text){Toast.makeText(this,text,Toast.LENGTH_LONG).show();}
@@ -165,18 +149,28 @@ public class WebDescarga extends ActionBarActivity {
             return;
         }
     }
+    @Override
+    public void sendtext1(String data,TaskType taskType){
+        webView.loadUrl("about:blank");
+        webView.loadData(data, "text/html", "UTF-8");
+    }
     class JavaScriptInterface {
         private Context ctx;
         JavaScriptInterface(Context ctx) {
             this.ctx = ctx;}
         @JavascriptInterface
         public void showHTML(String html) {
-            toastL(html);
+
         }
         @JavascriptInterface
         public void showHTMLD1(String html) {
-            toastL(html);
+            Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(html));
+            startActivity(intent);
+            finish();
         }
-    }
+        @JavascriptInterface
+        public void showHTMLD2(String html) {
+
+        }}
 
 }

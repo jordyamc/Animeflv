@@ -28,7 +28,7 @@ public class Requests extends AsyncTask<String,String,String> {
     callback call;
     TaskType taskType;
 
-    interface callback{
+    public interface callback{
         public void sendtext1(String data,TaskType taskType);
     }
     public Requests(Context con, TaskType taskType){
@@ -41,6 +41,7 @@ public class Requests extends AsyncTask<String,String,String> {
         StringBuilder builder = new StringBuilder();
         HttpURLConnection c = null;
         try {
+            Log.d("URL",params[0]);
             URL u = new URL(params[0]);
             c = (HttpURLConnection) u.openConnection();
             c.setRequestProperty("Content-length", "0");

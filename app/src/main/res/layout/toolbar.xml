@@ -3,7 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:id="@+id/toolbar"
     android:background="@color/prim"
     android:theme="@style/toolbar"
     android:titleTextAppearance="@style/toolbar">

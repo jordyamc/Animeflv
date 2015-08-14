@@ -33,7 +33,7 @@ import java.net.URL;
  */
 public class RequestsBackground extends AsyncTask<String,String,String> {
     InputStream is;
-    String _response;
+    String _response="";
     String ext_storage_state;
     File mediaStorage;
     Context context;
@@ -45,25 +45,27 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
     protected String doInBackground(String... params) {
         StringBuilder builder = new StringBuilder();
         HttpURLConnection c = null;
-        try {
-            URL u = new URL(params[0]);
-            c = (HttpURLConnection) u.openConnection();
-            c.setRequestProperty("Content-length", "0");
-            c.setUseCaches(false);
-            c.setAllowUserInteraction(false);
-            c.connect();
-            BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-            StringBuilder sb = new StringBuilder();
-            String line="";
-            while ((line = br.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-            br.close();
-            _response = sb.toString();
-            is = c.getInputStream();
-        } catch (Exception e) {
-            Log.e("log_tag", "Error in http connection " + e.toString());
-        }
+            if (isNetworkAvailable()) {
+                try {
+                    URL u = new URL(params[0]);
+                    c = (HttpURLConnection) u.openConnection();
+                    c.setRequestProperty("Content-length", "0");
+                    c.setUseCaches(false);
+                    c.setAllowUserInteraction(false);
+                    c.connect();
+                    BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                    StringBuilder sb = new StringBuilder();
+                    String line = "";
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line + "\n");
+                    }
+                    br.close();
+                    _response = sb.toString();
+                    is = c.getInputStream();
+                } catch (Exception e) {
+                    Log.e("log_tag", "Error in http connection " + e.toString());
+                }
+            }else {Log.d("Conexion","No hay internet");}
         return _response;
     }
     public static String convertStreamToString(InputStream is) throws Exception {
