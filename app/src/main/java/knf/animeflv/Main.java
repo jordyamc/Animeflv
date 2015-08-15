@@ -619,6 +619,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     public String getUrl(String titulo,String capitulo){
         String ftitulo="";
         String atitulo=titulo.toLowerCase();
+        atitulo=atitulo.replace("*","-");
+        atitulo=atitulo.replace(":","");
+        atitulo=atitulo.replace(",","");
+        atitulo=atitulo.replace(" \u2606 ","-");
+        atitulo=atitulo.replace("\u2606","-");
+        atitulo=atitulo.replace("  ","-");
+        atitulo=atitulo.replace("@","a");
+        atitulo=atitulo.replace("/","-");
         for (int x=0; x < atitulo.length(); x++) {
             if (atitulo.charAt(x) != ' ') {
                 ftitulo += atitulo.charAt(x);
