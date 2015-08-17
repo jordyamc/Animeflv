@@ -48,7 +48,7 @@
 
                     <LinearLayout
                         android:orientation="vertical"
-                        android:layout_width="80dp"
+                        android:layout_width="95dp"
                         android:layout_height="match_parent"
                         android:weightSum="2"
                         android:gravity="center_vertical"
@@ -83,8 +83,8 @@
                         android:padding="15dp"
                         android:gravity="center_vertical|end">
                         <ImageButton
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
                             android:id="@+id/ib_ver_cardD1"
                             android:src="@drawable/ic_rep_r"
                             android:foreground="?android:attr/selectableItemBackground"
@@ -93,8 +93,8 @@
                             android:clickable="true"
                             android:onClick="onVerclicked" />
                         <ImageButton
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
                             android:id="@+id/ib_descargar_cardD1"
                             android:src="@drawable/ic_get_r"
                             android:foreground="?android:attr/selectableItemBackground"
@@ -137,7 +137,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -172,8 +172,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD2"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -182,8 +182,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD2"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -226,7 +226,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -261,8 +261,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD3"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -271,8 +271,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD3"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -315,7 +315,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -350,8 +350,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD4"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -360,8 +360,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD4"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -404,7 +404,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -439,8 +439,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD5"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -449,8 +449,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD5"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -493,7 +493,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -528,8 +528,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD6"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -538,8 +538,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD6"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -582,7 +582,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -617,8 +617,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD7"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -627,8 +627,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD7"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -671,7 +671,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -706,8 +706,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD8"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -716,8 +716,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD8"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -760,7 +760,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -795,8 +795,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD9"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -805,8 +805,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD9"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -849,7 +849,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -884,8 +884,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD10"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -894,8 +894,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD10"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -938,7 +938,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -973,8 +973,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD11"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -983,8 +983,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD11"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1027,7 +1027,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -1062,8 +1062,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD12"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1072,8 +1072,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD12"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1116,7 +1116,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -1151,8 +1151,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD13"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1161,8 +1161,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD13"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1206,7 +1206,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -1241,8 +1241,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD14"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1251,8 +1251,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD14"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1295,7 +1295,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -1330,8 +1330,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD15"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1340,8 +1340,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD15"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1384,7 +1384,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -1419,8 +1419,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD16"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1429,8 +1429,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD16"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1473,7 +1473,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -1508,8 +1508,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD17"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1518,8 +1518,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD17"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1562,7 +1562,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -1597,8 +1597,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD18"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1607,8 +1607,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD18"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1651,7 +1651,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -1686,8 +1686,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD19"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1696,8 +1696,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD19"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1740,7 +1740,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="80dp"
+                android:layout_width="95dp"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -1775,8 +1775,8 @@
                 android:padding="15dp"
                 android:gravity="center_vertical|end">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_ver_cardD20"
                     android:src="@drawable/ic_rep_r"
                     android:foreground="?android:attr/selectableItemBackground"
@@ -1785,8 +1785,8 @@
                     android:clickable="true"
                     android:onClick="onVerclicked" />
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:id="@+id/ib_descargar_cardD20"
                     android:src="@drawable/ic_get_r"
                     android:foreground="?android:attr/selectableItemBackground"
