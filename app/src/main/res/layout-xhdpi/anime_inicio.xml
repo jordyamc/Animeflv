@@ -52,7 +52,7 @@
                         android:layout_height="match_parent"
                         android:weightSum="2"
                         android:gravity="center_vertical"
-                        android:padding="15dp"
+                        android:padding="10dp"
                         android:background="@android:color/transparent">
                         <TextView
                             android:layout_width="wrap_content"
@@ -1741,7 +1741,7 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="120dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:weightSum="2"
                 android:gravity="center_vertical"
                 android:padding="15dp"
