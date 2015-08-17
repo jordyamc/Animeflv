@@ -44,6 +44,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -189,6 +190,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 .addProfiles(
                         new ProfileDrawerItem().withName("AnimeFLV").withEmail("Versión " + versionName).withIcon(getResources().getDrawable(R.mipmap.ic_launcher))
                 )
+                .withProfileImagesClickable(false)
                 .build();
         result = new DrawerBuilder()
                 .withActivity(this)
