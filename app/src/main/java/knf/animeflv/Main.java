@@ -195,7 +195,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 .withToolbar(toolbar)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName("Home").withIcon(FontAwesome.Icon.faw_home)
+                        new PrimaryDrawerItem().withName("Recientes").withIcon(FontAwesome.Icon.faw_home)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -671,6 +671,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         atitulo=atitulo.replace("  ","-");
         atitulo=atitulo.replace("@","a");
         atitulo=atitulo.replace("/","-");
+        atitulo=atitulo.replace(".","");
         for (int x=0; x < atitulo.length(); x++) {
             if (atitulo.charAt(x) != ' ') {
                 ftitulo += atitulo.charAt(x);

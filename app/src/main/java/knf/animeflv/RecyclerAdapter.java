@@ -81,6 +81,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         atitulo=atitulo.replace("  ","-");
         atitulo=atitulo.replace("@","a");
         atitulo=atitulo.replace("/","-");
+        atitulo=atitulo.replace(".","");
         for (int x=0; x < atitulo.length(); x++) {
             if (atitulo.charAt(x) != ' ') {
                 ftitulo += atitulo.charAt(x);
