@@ -130,4 +130,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/black"/>
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/rv_relacionados"/>
 </LinearLayout>

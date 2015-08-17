@@ -1,4 +1,4 @@
-package knf.animeflv;
+package knf.animeflv.Recyclers;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +12,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.List;
+
+import knf.animeflv.R;
+import knf.animeflv.WebDescarga;
 
 /**
  * Created by Jordy on 08/08/2015.

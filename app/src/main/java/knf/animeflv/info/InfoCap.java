@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,9 +21,7 @@ import java.io.InputStreamReader;
 
 import knf.animeflv.Parser;
 import knf.animeflv.R;
-import knf.animeflv.RecyclerAdapter;
-import knf.animeflv.Requests;
-import knf.animeflv.TaskType;
+import knf.animeflv.Recyclers.RecyclerAdapter;
 
 /**
  * Created by Jordy on 12/08/2015.

@@ -144,8 +144,10 @@ public class Parser {
                 String numero = childJSONObject.getString("numero");
                 if ("Anime".equals(tid)){
                     capitulosArray.add("Capitulo "+numero);
-                }else {
+                }else if ("OVA".equals(tid)){
                     capitulosArray.add("OVA "+numero);
+                }else {
+                    capitulosArray.add("Pelicula");
                 }
             }
         }catch (Exception e){
@@ -211,6 +213,58 @@ public class Parser {
             e.printStackTrace();
         }
         return eidsArray;
+    }
+    public List<String> parseTitRel(String json){
+        List<String> eidsArray=new ArrayList<String>();
+        String[] eids;
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("relacionados");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject childJSONObject = jsonArray.getJSONObject(i);
+                String tituloRel = childJSONObject.getString("titulo");
+                eidsArray.add(tituloRel);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return eidsArray;
+    }
+    public List<String> parseTiposRel(String json){
+        List<String> eidsArray=new ArrayList<String>();
+        String[] eids;
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("relacionados");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject childJSONObject = jsonArray.getJSONObject(i);
+                String rel_tipo = childJSONObject.getString("rel_tipo");
+                String tid = childJSONObject.getString("tid");
+                eidsArray.add(rel_tipo+" - "+tid);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return eidsArray;
+    }
+    public String[] urlsRel(String json){
+        List<String> urlArray=new ArrayList<String>();
+        String[] urls;
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("relacionados");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject childJSONObject = jsonArray.getJSONObject(i);
+                String url = "http://cdn.animeflv.net/img/portada/thumb_80/"+childJSONObject.getString("aid")+".jpg";
+                urlArray.add(url);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            urls = new String[urlArray.size()];
+            urlArray.toArray(urls);
+        }
+        return urls;
     }
     public String getAID (String json){
         String aid="";

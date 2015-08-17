@@ -8,6 +8,8 @@ import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,10 +26,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
+import knf.animeflv.Recyclers.AdapterRel;
+import knf.animeflv.Recyclers.RecyclerAdapter;
 import knf.animeflv.Requests;
 import knf.animeflv.TaskType;
 
@@ -48,11 +53,24 @@ public class AnimeInfo extends Fragment{
     TextView txt_estado;
     TextView txt_generos;
     LinearLayout layout;
+    RecyclerView rv_rel;
     View view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.anime_info, container, false);
+        rv_rel=(RecyclerView) view.findViewById(R.id.rv_relacionados);
+        rv_rel.setHasFixedSize(true);
+        rv_rel.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
+        String json=getJsonfromFile(true);
+        List<String> titulos=parser.parseTitRel(json);
+        List<String> tipos=parser.parseTiposRel(json);
+        String[] urls=parser.urlsRel(json);
+        if (urls.length==0){
+            rv_rel.setVisibility(View.GONE);
+        }
+        AdapterRel adapter = new AdapterRel(getActivity().getApplicationContext(), titulos,tipos,urls);
+        rv_rel.setAdapter(adapter);
         setLoad();
         getJsonfromFile();
         return view;
@@ -72,6 +90,23 @@ public class AnimeInfo extends Fragment{
                 String infile = getStringFromFile(file_loc);
                 setInfo(infile);
             }
+    }
+    public String getJsonfromFile(Boolean bool){
+        String json="{}";
+        SharedPreferences sharedPreferences=getActivity().getSharedPreferences("data",Context.MODE_PRIVATE);
+        String aid=sharedPreferences.getString("aid","");
+        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+            if (!mediaStorage.exists()) {
+                mediaStorage.mkdirs();
+            }
+        }
+        File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aid+".txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aid+".txt";
+        if (file.exists()) {
+            Log.d("Archivo", "Existe");
+            json = getStringFromFile(file_loc);
+        }
+        return json;
     }
     public static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));

@@ -1,5 +1,7 @@
 package knf.animeflv;
 
+import android.annotation.TargetApi;
+import android.app.ActivityOptions;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -18,6 +20,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
+import android.transition.Slide;
+import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.Menu;
@@ -518,7 +522,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             public void onPageFinished(WebView view, String url) {
                 web_Links.loadUrl("javascript:window.HtmlViewer.showHTMLD1" + "(document.getElementById('descargas_box').getElementsByTagName('a')[1].href);");
                 web_Links.loadUrl("javascript:window.HtmlViewer.showHTMLD2" + "(document.getElementById('dlbutton').href);");
-                web_Links.loadUrl("javascript:(function(){" + "l=document.getElementById('skiplink');" + "e=document.createEvent('HTMLEvents');" + "e.initEvent('click',true,true);" + "l.dispatchEvent(e);" + "})()");
+                if (url.contains("http://www.")) {
+                    web_Links.loadUrl("javascript:(function(){" + "l=document.getElementById('skiplink');" + "e=document.createEvent('HTMLEvents');" + "e.initEvent('click',true,true);" + "l.dispatchEvent(e);" + "})()");
+                }
             }
         });
         web_Links.setDownloadListener(new DownloadListener() {
@@ -839,6 +845,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         @JavascriptInterface
         public void showHTMLD1(String html) {
+            toast(html);
             Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(html));
             startActivity(intent);
         }

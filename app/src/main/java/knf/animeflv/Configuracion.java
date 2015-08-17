@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
+import android.transition.Slide;
+import android.transition.Transition;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -46,7 +48,7 @@ public class Configuracion extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               finish();
+                finish();
             }
         });
         getFragmentManager().beginTransaction().replace(R.id.container_conf, new Conf_fragment()).commit();
