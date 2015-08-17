@@ -1,6 +1,7 @@
 package knf.animeflv;
 
 import android.app.DownloadManager;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,10 +12,13 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.transition.Explode;
+import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,10 +29,21 @@ import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.mikepenz.iconics.typeface.FontAwesome;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
+import com.mikepenz.materialdrawer.accountswitcher.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,7 +53,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import knf.animeflv.info.AnimeInfo;
 import knf.animeflv.info.Info;
 
 public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,Requests.callback {
@@ -136,12 +150,18 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     String aidInfo;
 
     String html="<html></html>";
+    String versionName;
+
+    Drawer result;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
-
-        alarm.SetAlarm(this);
+        context=getApplicationContext();
+        Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones",true);
+        if (not) {
+            alarm.SetAlarm(this);
+        }
         first=1;
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -158,17 +178,45 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         toolbar=(Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Recientes");
-        context=getApplicationContext();
         parser=new Parser();
         setLoad();
+        try {versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;} catch (Exception e) {toast("ERROR");}
+        AccountHeader headerResult = new AccountHeaderBuilder()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.graphic)
+                .withCompactStyle(true)
+                .withSelectionListEnabled(false)
+                .addProfiles(
+                        new ProfileDrawerItem().withName("AnimeFLV").withEmail("Versión " + versionName).withIcon(getResources().getDrawable(R.mipmap.ic_launcher))
+                )
+                .build();
+        result = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withAccountHeader(headerResult)
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withName("Home").withIcon(FontAwesome.Icon.faw_home)
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
+                        switch (position) {
+                            case -1:
+                                Intent intent=new Intent(context,Configuracion.class);
+                                startActivity(intent);
+                                result.closeDrawer();
+                                result.setSelection(0);
+                        }
+                        return false;
+                    }
+                })
+                .addStickyDrawerItems(
+                        new SecondaryDrawerItem().withName("Configuracion").withIcon(FontAwesome.Icon.faw_cog)
+                )
+                .build();
         mswipe.setOnRefreshListener(this);
         getJson();
-        //RecyclerView rvAnimes = (RecyclerView) findViewById(R.id.rv_CardDownload);
-        //RecyclerAdapter adapter = new RecyclerAdapter(this, getAnimes());
-        //rvAnimes.setAdapter(adapter);
-        //rvAnimes.setLayoutManager(new LinearLayoutManager(this));
     }
-
     public void toast(String texto){
         Toast.makeText(this,texto,Toast.LENGTH_LONG).show();
     }
@@ -181,10 +229,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             case R.id.ib_descargar_cardD1:
                 url=getUrl(titulos[0], numeros[0]);
                 new Requests(this,TaskType.GET_HTML1).execute(url);
-                /*bundle.putString("url",url1);
-                bundle.putString("titulo", titulos[0]);
-                bundle.putString("aid",aids[0]);
-                bundle.putString("enum", numeros[0]);*/
                 break;
             case R.id.ib_descargar_cardD2:
                 url=getUrl(titulos[1], numeros[1]);
@@ -660,6 +704,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     @Override
     public void onRefresh() {
         new Requests(this,TaskType.GET_INICIO).execute(inicio);
+        NotificationManager notificationManager = (NotificationManager) this
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(6991);
 
     }
     public static boolean isXLargeScreen(Context context) {
@@ -706,11 +753,25 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
     }
     private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        Boolean net=false;
+        int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion","0"));
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        switch (Tcon){
+            case 0:
+                NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                net=Wifi.isConnected();
+                break;
+            case 1:
+                NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net=mobile.isConnected();
+                break;
+            case 2:
+                NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net=WifiA.isConnected()||mobileA.isConnected();
+        }
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected() && Wifi.isConnected();
+        return activeNetworkInfo != null && net;
     }
     @Override
     public void sendtext1(String data,TaskType taskType){

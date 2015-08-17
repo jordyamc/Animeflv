@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="Notificaciones">
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="true"
+            android:key="notificaciones"
+            android:title="Activar Notificaciones"/>
+        <com.lb.material_preferences_library.custom_preferences.ListPreference
+            android:defaultValue="60000"
+            android:key="tiempo"
+            android:title="Actualizaciones"
+            android:summary="Revisar actualizaciones cada %s"
+            app:dialogTitle="Revisar cada:"
+            app:entries="@array/minutos"
+            app:entryValues="@array/min_val"
+            android:enabled="true"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Conexiones">
+        <com.lb.material_preferences_library.custom_preferences.ListPreference
+            android:defaultValue="0"
+            android:key="t_conexion"
+            android:title="Usar Conexion"
+            android:summary="%s"
+            app:dialogTitle="Tipo de conexion"
+            app:entries="@array/tipos"
+            app:entryValues="@array/tipos_val" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

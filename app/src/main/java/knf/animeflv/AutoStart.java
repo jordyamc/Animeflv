@@ -2,6 +2,7 @@ package knf.animeflv;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 
 public class AutoStart extends BroadcastReceiver
 {
@@ -11,7 +12,10 @@ public class AutoStart extends BroadcastReceiver
     {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED"))
         {
-            alarm.SetAlarm(context);
+            Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones",true);
+            if (not) {
+                alarm.SetAlarm(context);
+            }
         }
     }
 }

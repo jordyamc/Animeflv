@@ -2,4 +2,5 @@
 <resources>
     <color name="prim">#ff212121</color>
     <color name="dark">#ff454545</color>
+    <color name="blanco">#fff</color>
 </resources>

@@ -98,6 +98,7 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
                 finish();
                 startActivity(intent);*/
                 toastL("Error: " + Integer.toString(errorCod));
+                finish();
             }
 
             @Override

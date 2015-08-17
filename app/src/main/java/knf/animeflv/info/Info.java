@@ -69,6 +69,8 @@ public class Info extends AppCompatActivity implements Requests.callback{
         if (file.exists()) {
             Log.d("Archivo", "Existe");
             String infile = getStringFromFile(file_loc);
+            SharedPreferences.Editor editor=getSharedPreferences("data",MODE_PRIVATE).edit();
+            editor.putString("titInfo",parser.getTit(infile)).commit();
             getSupportActionBar().setTitle(parser.getTit(infile));
         }else {
             new Requests(this, TaskType.GET_INFO).execute("http://animeflv.net/api.php?accion=anime&aid=" + aid);

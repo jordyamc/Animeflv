@@ -3,11 +3,11 @@
     android:layout_height="match_parent"
     tools:context=".Main"
     android:orientation="vertical">
-    <include layout="@layout/toolbar"/>
+    <include layout="@layout/toolbar" android:id="@+id/main_toolbar"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_CardDownload"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:id="@+id/frame"/>
 
 </LinearLayout>

@@ -63,6 +63,8 @@
                             android:id="@+id/tv_cardD_titulo1"
                             android:background="@android:color/transparent"
                             android:lines="1"
+                            android:scrollHorizontally="true"
+                            android:ellipsize="end"
                             android:maxLines="1"
                             android:layout_weight="1"/>
                         <TextView
@@ -150,6 +152,8 @@
                     android:id="@+id/tv_cardD_titulo2"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -237,6 +241,8 @@
                     android:id="@+id/tv_cardD_titulo3"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -324,6 +330,8 @@
                     android:id="@+id/tv_cardD_titulo4"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -411,6 +419,8 @@
                     android:id="@+id/tv_cardD_titulo5"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -498,6 +508,8 @@
                     android:id="@+id/tv_cardD_titulo6"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -579,12 +591,14 @@
                 android:padding="15dp"
                 android:background="@android:color/transparent">
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Titulo"
                     android:id="@+id/tv_cardD_titulo7"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -672,6 +686,8 @@
                     android:id="@+id/tv_cardD_titulo8"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -759,6 +775,8 @@
                     android:id="@+id/tv_cardD_titulo9"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -846,6 +864,8 @@
                     android:id="@+id/tv_cardD_titulo10"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -933,6 +953,8 @@
                     android:id="@+id/tv_cardD_titulo11"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -1020,6 +1042,8 @@
                     android:id="@+id/tv_cardD_titulo12"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -1107,6 +1131,8 @@
                     android:id="@+id/tv_cardD_titulo13"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -1195,6 +1221,8 @@
                     android:id="@+id/tv_cardD_titulo14"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -1282,6 +1310,8 @@
                     android:id="@+id/tv_cardD_titulo15"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -1369,6 +1399,8 @@
                     android:id="@+id/tv_cardD_titulo16"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -1456,6 +1488,8 @@
                     android:id="@+id/tv_cardD_titulo17"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -1543,6 +1577,8 @@
                     android:id="@+id/tv_cardD_titulo18"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -1630,6 +1666,8 @@
                     android:id="@+id/tv_cardD_titulo19"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView
@@ -1717,6 +1755,8 @@
                     android:id="@+id/tv_cardD_titulo20"
                     android:background="@android:color/transparent"
                     android:lines="1"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_weight="1"/>
                 <TextView

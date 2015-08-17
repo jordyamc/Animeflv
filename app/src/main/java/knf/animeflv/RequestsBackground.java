@@ -99,11 +99,25 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
         }
     }
     private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        Boolean net=false;
+        int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion","0"));
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        switch (Tcon){
+            case 0:
+                NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                net=Wifi.isConnected();
+                break;
+            case 1:
+                NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net=mobile.isConnected();
+                break;
+            case 2:
+                NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net=WifiA.isConnected()||mobileA.isConnected();
+        }
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected() && Wifi.isConnected();
+        return activeNetworkInfo != null && net;
     }
 
     @Override
@@ -146,7 +160,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                     Intent resultIntent = new Intent(context, Main.class);
                     PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     mBuilder.setContentIntent(resultPendingIntent);
-                    int mNotificationId = 001;
+                    int mNotificationId = 6991;
                     NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
                     mNotifyMgr.notify(mNotificationId, mBuilder.build());
                 } else {

@@ -1,6 +1,31 @@
 <resources>
-    <string name="app_name">Animeflv</string>
+    <string name="app_name">AnimeFLV</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
+    <string-array name="minutos">
+        <item>1 minuto</item>
+        <item>5 minutos</item>
+        <item>10 minutos</item>
+        <item>30 minutos</item>
+        <item>1 hora</item>
+    </string-array>
+    <string-array name="min_val">
+        <item>60000</item>
+        <item>300000</item>
+        <item>600000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+    </string-array>
+    <string-array name="tipos">
+        <item>WiFi</item>
+        <item>Datos Moviles</item>
+        <item>WiFi + Datos Moviles</item>
+    </string-array>
+    <string-array name="tipos_val">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>
