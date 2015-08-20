@@ -3,12 +3,16 @@ package knf.animeflv;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -148,21 +152,42 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                 String[] jsonArchivo = new Parser().parseEID(txt);
                 if (!jsonDesc[0].trim().equals(jsonArchivo[0].trim())) {
                     writeToFile(s, file);
-                    Log.d("Notificacion:", "Crear");
-                    NotificationCompat.Builder mBuilder =
-                            new NotificationCompat.Builder(context)
-                                    .setSmallIcon(R.drawable.ic_not_r)
-                                    .setContentTitle("AnimeFLV")
-                                    .setContentText("Nuevos capitulos disponibles!!!");
-                    mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                    mBuilder.setAutoCancel(true);
-                    mBuilder.setLights(Color.BLUE,5000,2000);
-                    Intent resultIntent = new Intent(context, Main.class);
-                    PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    mBuilder.setContentIntent(resultPendingIntent);
-                    int mNotificationId = 6991;
-                    NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
-                    mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                    int not=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido","0"));
+                    if (not==0) {
+                        Log.d("Notificacion:", "Crear Sonido 0");
+                        NotificationCompat.Builder mBuilder =
+                                new NotificationCompat.Builder(context)
+                                        .setSmallIcon(R.drawable.ic_not_r)
+                                        .setContentTitle("AnimeFLV")
+                                        .setContentText("Nuevos capitulos disponibles!!!");
+                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                        mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+                        mBuilder.setAutoCancel(true);
+                        mBuilder.setLights(Color.BLUE, 5000, 2000);
+                        Intent resultIntent = new Intent(context, Main.class);
+                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        mBuilder.setContentIntent(resultPendingIntent);
+                        int mNotificationId = 6991;
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                    }else {
+                        Log.d("Notificacion:", "Crear Sonido Especial");
+                        NotificationCompat.Builder mBuilder =
+                                new NotificationCompat.Builder(context)
+                                        .setSmallIcon(R.drawable.ic_not_r)
+                                        .setContentTitle("AnimeFLV")
+                                        .setContentText("Nuevos capitulos disponibles!!!");
+                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound"), AudioManager.STREAM_NOTIFICATION);
+                        mBuilder.setAutoCancel(true);
+                        mBuilder.setLights(Color.BLUE, 5000, 2000);
+                        Intent resultIntent = new Intent(context, Main.class);
+                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        mBuilder.setContentIntent(resultPendingIntent);
+                        int mNotificationId = 6991;
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                    }
                 } else {
                     Log.d("JSON", "Es igual");
                 }

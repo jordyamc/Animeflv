@@ -15,6 +15,15 @@
             app:entries="@array/minutos"
             app:entryValues="@array/min_val"
             android:enabled="true"/>
+        <com.lb.material_preferences_library.custom_preferences.ListPreference
+            android:defaultValue="0"
+            android:key="sonido"
+            android:title="Sonido de Notificacion"
+            android:summary="%s"
+            app:dialogTitle="Sonido:"
+            app:entries="@array/sonidos"
+            app:entryValues="@array/tipos_sonidos"
+            android:enabled="true"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Conexiones">
         <com.lb.material_preferences_library.custom_preferences.ListPreference

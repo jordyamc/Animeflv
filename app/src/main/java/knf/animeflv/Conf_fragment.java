@@ -2,7 +2,13 @@ package knf.animeflv;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
@@ -11,6 +17,8 @@ import android.preference.PreferenceManager;
  */
 public class Conf_fragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     Context context;
+    MediaPlayer mp;
+    Ringtone r;
     @Override
     public void onCreate(final Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -19,9 +27,14 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         Boolean activado= PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("notificaciones", true);
         if (!activado){
             getPreferenceScreen().findPreference("tiempo").setEnabled(false);
+            getPreferenceScreen().findPreference("sonido").setEnabled(false);
         }else {
             getPreferenceScreen().findPreference("tiempo").setEnabled(true);
+            getPreferenceScreen().findPreference("sonido").setEnabled(true);
         }
+        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        r = RingtoneManager.getRingtone(context, notification);
+        mp = MediaPlayer.create(context, R.raw.sound);
     }
 
     @Override
@@ -45,9 +58,11 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                Boolean activado=sharedPreferences.getBoolean(key,true);
                if (!activado){
                    getPreferenceScreen().findPreference("tiempo").setEnabled(false);
+                   getPreferenceScreen().findPreference("sonido").setEnabled(false);
                    new Alarm().CancelAlarm(context);
                }else {
                    getPreferenceScreen().findPreference("tiempo").setEnabled(true);
+                   getPreferenceScreen().findPreference("sonido").setEnabled(true);
                    new Alarm().SetAlarm(context);
                }
                break;
@@ -55,7 +70,35 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                int tiempo=Integer.parseInt(sharedPreferences.getString(key, "60000"));
                new Alarm().CancelAlarm(context);
                new Alarm().SetAlarm(context,tiempo);
+               break;
+           case "sonido":
+               int not=Integer.parseInt(sharedPreferences.getString("sonido","0"));
+               if (not==0){
+                   if (mp.isPlaying()){
+                       mp.stop();
+                   }
+                   r.play();
+               }
+               if (not==1){
+                   if (r.isPlaying()){
+                       r.stop();
+                   }
+                   mp = MediaPlayer.create(context, R.raw.sound);
+                   mp.start();
+               }
+               break;
        }
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mp.isPlaying()){
+            mp.stop();
+            mp.release();
+        }
+        if (r.isPlaying()){
+            r.stop();
+        }
     }
 }
