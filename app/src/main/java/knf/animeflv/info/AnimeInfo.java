@@ -66,17 +66,20 @@ public class AnimeInfo extends Fragment{
         List<String> titulos=parser.parseTitRel(json);
         List<String> tipos=parser.parseTiposRel(json);
         String[] urls=parser.urlsRel(json);
+        String[] aids=parser.parseAidRel(json);
         if (urls.length==0){
             rv_rel.setVisibility(View.GONE);
         }
-        AdapterRel adapter = new AdapterRel(getActivity().getApplicationContext(), titulos,tipos,urls);
+        AdapterRel adapter = new AdapterRel(getActivity().getApplicationContext(), titulos,tipos,urls,aids);
         rv_rel.setAdapter(adapter);
         setLoad();
         getJsonfromFile();
         return view;
     }
     public void getJsonfromFile(){
-        SharedPreferences sharedPreferences=getActivity().getSharedPreferences("data",Context.MODE_PRIVATE);
+        //SharedPreferences sharedPreferences=getActivity().getSharedPreferences("data",Context.MODE_PRIVATE);
+        //String aid=sharedPreferences.getString("aid","");
+        SharedPreferences sharedPreferences=getActivity().getSharedPreferences("data", Context.MODE_PRIVATE);
         String aid=sharedPreferences.getString("aid","");
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {
@@ -93,8 +96,9 @@ public class AnimeInfo extends Fragment{
     }
     public String getJsonfromFile(Boolean bool){
         String json="{}";
-        SharedPreferences sharedPreferences=getActivity().getSharedPreferences("data",Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences=getActivity().getSharedPreferences("data", Context.MODE_PRIVATE);
         String aid=sharedPreferences.getString("aid","");
+        Log.d("Info Aid",aid);
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {
                 mediaStorage.mkdirs();

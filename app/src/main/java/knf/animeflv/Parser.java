@@ -266,6 +266,25 @@ public class Parser {
         }
         return urls;
     }
+    public String[] parseAidRel(String json){
+        List<String> urlArray=new ArrayList<String>();
+        String[] urls;
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("relacionados");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject childJSONObject = jsonArray.getJSONObject(i);
+                String url = childJSONObject.getString("aid");
+                urlArray.add(url);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            urls = new String[urlArray.size()];
+            urlArray.toArray(urls);
+        }
+        return urls;
+    }
     public String getAID (String json){
         String aid="";
         try {

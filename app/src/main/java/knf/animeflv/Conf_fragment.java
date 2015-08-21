@@ -18,7 +18,8 @@ import android.preference.PreferenceManager;
 public class Conf_fragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     Context context;
     MediaPlayer mp;
-    Ringtone r;
+    MediaPlayer r;
+    //Ringtone r;
     @Override
     public void onCreate(final Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -33,7 +34,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             getPreferenceScreen().findPreference("sonido").setEnabled(true);
         }
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        r = RingtoneManager.getRingtone(context, notification);
+        r = MediaPlayer.create(context, notification);
         mp = MediaPlayer.create(context, R.raw.sound);
     }
 
@@ -77,7 +78,9 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                    if (mp.isPlaying()){
                        mp.stop();
                    }
-                   r.play();
+                   Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                   r = MediaPlayer.create(context, notification);
+                   r.start();
                }
                if (not==1){
                    if (r.isPlaying()){
@@ -99,6 +102,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         }
         if (r.isPlaying()){
             r.stop();
+            r.release();
         }
     }
 }

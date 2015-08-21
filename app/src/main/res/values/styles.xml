@@ -9,6 +9,9 @@
         <item name="android:colorBackground">@color/background_material_light</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@android:color/holo_orange_dark</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
     </style>
     <style name="toolbar" parent="AppTheme">
         <item name="android:textColorPrimary">@android:color/white</item>
@@ -20,6 +23,12 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:backgroundDimEnabled">false</item>
+    </style>
+    <style name="CustomSearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <item name="queryBackground">@color/prim</item>
+        <item name="searchIcon">@drawable/ic_buscar</item>
+        <item name="closeIcon">@drawable/ic_exit_r</item>
+
     </style>
 
 </resources>

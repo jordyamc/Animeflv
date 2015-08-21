@@ -74,7 +74,8 @@ public class Info extends AppCompatActivity implements Requests.callback{
             }
         });
         SharedPreferences sharedPreferences=getSharedPreferences("data", Context.MODE_PRIVATE);
-        String aid=sharedPreferences.getString("aid","");
+        String aid=sharedPreferences.getString("aid", "");
+        Log.d("Base Aid",aid);
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {
                 mediaStorage.mkdirs();
@@ -91,10 +92,12 @@ public class Info extends AppCompatActivity implements Requests.callback{
         }else {
             new Requests(this, TaskType.GET_INFO).execute("http://animeflv.net/api.php?accion=anime&aid=" + aid);
         }
+        Bundle bundle=new Bundle();
+        bundle.putString("aid",getIntent().getExtras().getString("aid","1"));
         FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
                 getSupportFragmentManager(), FragmentPagerItems.with(this)
-                .add("INFORMACION", AnimeInfo.class)
-                .add("EPISODIOS", InfoCap.class)
+                .add("INFORMACION", AnimeInfo.class,bundle)
+                .add("EPISODIOS", InfoCap.class,bundle)
                 .create());
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager1);
         viewPager.setAdapter(adapter);

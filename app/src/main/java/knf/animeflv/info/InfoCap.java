@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -49,6 +50,7 @@ public class InfoCap extends Fragment{
     public String getJson(){
         SharedPreferences sharedPreferences=getActivity().getSharedPreferences("data",Context.MODE_PRIVATE);
         String aid=sharedPreferences.getString("aid", "");
+        Log.d("Cap Aid",aid);
         String json="";
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {

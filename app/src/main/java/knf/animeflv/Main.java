@@ -1,7 +1,5 @@
 package knf.animeflv;
 
-import android.annotation.TargetApi;
-import android.app.ActivityOptions;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -19,10 +17,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.transition.Explode;
-import android.transition.Slide;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,22 +27,20 @@ import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mikepenz.iconics.typeface.FontAwesome;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
-import com.mikepenz.materialdrawer.accountswitcher.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -61,7 +53,6 @@ import java.io.InputStreamReader;
 import knf.animeflv.info.Info;
 
 public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,Requests.callback {
-    String accion;
 
     WebView web;
     WebView web_Links;
@@ -158,6 +149,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     String versionName;
 
     Drawer result;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -199,19 +191,22 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
+                .withActionBarDrawerToggleAnimated(true)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName("Recientes").withIcon(FontAwesome.Icon.faw_home)
+                        new PrimaryDrawerItem().withName("Recientes").withIcon(FontAwesome.Icon.faw_home).withIdentifier(0)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
-                    public boolean onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
-                        switch (position) {
+                    public boolean onItemClick(View view, int i, IDrawerItem iDrawerItem) {
+                        switch (i) {
                             case -1:
-                                Intent intent=new Intent(context,Configuracion.class);
+                                Intent intent = new Intent(context, Configuracion.class);
                                 startActivity(intent);
                                 result.closeDrawer();
                                 result.setSelection(0);
+
+                                break;
                         }
                         return false;
                     }
@@ -222,6 +217,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 .build();
         mswipe.setOnRefreshListener(this);
         getJson();
+        toolbar.inflateMenu(R.menu.menu_main);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                toast("Buscar");
+                return true;
+            }
+        });
     }
     public void toast(String texto){
         Toast.makeText(this,texto,Toast.LENGTH_LONG).show();
@@ -398,11 +401,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (isNetworkAvailable()) {
             if (!file.exists()) {
                 Log.d("Archivo:", "No existe");
-                try {
-                    file.createNewFile();
-                } catch (IOException e) {
-                    Log.d("Archivo:", "Error al crear archivo");
-                }
+                try {file.createNewFile();} catch (IOException e) {Log.d("Archivo:", "Error al crear archivo");}
                 writeToFile(json, file);
                 bundleInfo.putString("aid",parser.getAID(json));
                 Intent intent=new Intent(this,Info.class);
@@ -575,8 +574,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         });
     }
-    public void loadTitulos(String[] list){
-        final String[] titulo=list;
+
+    public void loadTitulos(String[] list) {
+        final String[] titulo = list;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -603,8 +603,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         });
     }
-    public void loadCapitulos(String[] list){
-        final String[] capitulo=list;
+
+    public void loadCapitulos(String[] list) {
+        final String[] capitulo = list;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -632,9 +633,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         });
     }
     public void getJson(){
-        new Requests(this,TaskType.GET_INICIO).execute(inicio);
+        new Requests(this, TaskType.GET_INICIO).execute(inicio);
     }
-    public void getlinks(String json){
+    public void getlinks(String json) {
         loadImg(parser.parseLinks(json));
     }
     public void gettitulos(String json){
@@ -705,11 +706,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        return super.onOptionsItemSelected(item);
-    }
+
+
     @Override
     public void onRefresh() {
         new Requests(this,TaskType.GET_INICIO).execute(inicio);

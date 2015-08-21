@@ -19,6 +19,9 @@ import java.util.List;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.WebDescarga;
+import knf.animeflv.info.AnimeInfo;
+import knf.animeflv.info.Info;
+import knf.animeflv.info.RelActInfo;
 
 /**
  * Created by Jordy on 17/08/2015.
@@ -43,12 +46,14 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
     List<String> titulosCard;
     List<String> tiposCard;
     String[] url;
+    String[] aids;
 
-    public AdapterRel(Context context, List<String> titulos, List<String> tipos, String[] urls) {
+    public AdapterRel(Context context, List<String> titulos, List<String> tipos, String[] urls, String[] aid) {
         this.context = context;
         this.titulosCard = titulos;
         this.tiposCard = tipos;
         this.url = urls;
+        this.aids=aid;
     }
 
     @Override
@@ -66,7 +71,14 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context,"Relacionados",Toast.LENGTH_LONG).show();
+                Bundle bundle=new Bundle();
+                bundle.putString("aid", aids[position]);
+                Intent intent=new Intent(context,RelActInfo.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtras(bundle);
+                SharedPreferences.Editor sharedPreferences=context.getSharedPreferences("data",Context.MODE_PRIVATE).edit();
+                sharedPreferences.putString("aid",aids[position]).commit();
+                context.startActivity(intent);
             }
         });
     }
