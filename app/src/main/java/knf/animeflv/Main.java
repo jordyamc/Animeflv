@@ -652,6 +652,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     scrollView.setVisibility(View.VISIBLE);
                 }});
             first=0;
+            NotificationManager notificationManager = (NotificationManager) this
+                    .getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.cancel(6991);
         }else {
             if (mswipe.isRefreshing()){
                 mswipe.setRefreshing(false);
