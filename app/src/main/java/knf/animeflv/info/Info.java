@@ -16,9 +16,12 @@ import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
 import android.transition.Transition;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
@@ -30,7 +33,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import knf.animeflv.Main;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Requests;
@@ -44,6 +51,9 @@ public class Info extends AppCompatActivity implements Requests.callback{
     Toolbar toolbar;
     String ext_storage_state = Environment.getExternalStorageState();
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache");
+    Boolean favBoolean=false;
+    Menu Amenu;
+    String aid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,7 +84,7 @@ public class Info extends AppCompatActivity implements Requests.callback{
             }
         });
         SharedPreferences sharedPreferences=getSharedPreferences("data", Context.MODE_PRIVATE);
-        String aid=sharedPreferences.getString("aid", "");
+        aid=sharedPreferences.getString("aid", "");
         Log.d("Base Aid",aid);
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {
@@ -93,7 +103,7 @@ public class Info extends AppCompatActivity implements Requests.callback{
             new Requests(this, TaskType.GET_INFO).execute("http://animeflv.net/api.php?accion=anime&aid=" + aid);
         }
         Bundle bundle=new Bundle();
-        bundle.putString("aid",getIntent().getExtras().getString("aid","1"));
+        bundle.putString("aid", getIntent().getExtras().getString("aid", "1"));
         FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
                 getSupportFragmentManager(), FragmentPagerItems.with(this)
                 .add("INFORMACION", AnimeInfo.class,bundle)
@@ -104,6 +114,86 @@ public class Info extends AppCompatActivity implements Requests.callback{
         SmartTabLayout viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab1);
         viewPagerTab.setViewPager(viewPager);
     }
+    public void toast(String texto){
+        Toast.makeText(this, texto, Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Amenu=menu;
+        SharedPreferences sharedPreferences=getSharedPreferences("data",MODE_PRIVATE);
+        String fav=sharedPreferences.getString("favoritos", "");
+        String[] favoritos={};
+        favoritos=fav.split(":::");
+        String tit=getSharedPreferences("data",MODE_PRIVATE).getString("titInfo","");
+        Boolean isfav=false;
+        for (String favo:favoritos){
+            if (!favo.equals("")) {
+                if (Integer.parseInt(favo) == Integer.parseInt(aid)) {
+                    getMenuInflater().inflate(R.menu.menu_fav_si, menu);
+                    isfav=true;
+                    break;
+                }
+            }
+        }
+        if (isfav){
+            Amenu.clear();
+            getMenuInflater().inflate(R.menu.menu_fav_si, menu);
+        }else {
+            Amenu.clear();
+            getMenuInflater().inflate(R.menu.menu_fav_no, menu);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.favorito_si:
+                SharedPreferences sharedPreferences=getSharedPreferences("data",MODE_PRIVATE);
+                String fav=sharedPreferences.getString("favoritos", "");
+                String[] favoritos={};
+                favoritos=fav.split(":::");
+                List<String> list=new ArrayList<String>();
+                for (String i:favoritos){
+                    if (!i.equals("")) {
+                        if (Integer.parseInt(i) != Integer.parseInt(aid)) {
+                            list.add(i);
+                        }
+                    }
+                }
+                favoritos=new String[list.size()];
+                list.toArray(favoritos);
+                StringBuilder builder = new StringBuilder();
+                for(String i : favoritos)
+                {
+                    builder.append(":::" + i);
+                }
+                toast("Favorito Eliminado");
+                getSharedPreferences("data",MODE_PRIVATE).edit().putString("favoritos",builder.toString()).commit();
+                Amenu.clear();
+                getMenuInflater().inflate(R.menu.menu_fav_no,Amenu);
+                break;
+            case R.id.favorito_no:
+                String[] favoritosNo={getSharedPreferences("data",MODE_PRIVATE).getString("favoritos","")};
+                String titNo=getSharedPreferences("data",MODE_PRIVATE).getString("aid","");
+                List<String> Listno = new ArrayList<String>(Arrays.asList(favoritosNo));
+                Listno.add(aid);
+                favoritos=new String[Listno.size()];
+                Listno.toArray(favoritos);
+                StringBuilder builderNo = new StringBuilder();
+                for(String i : favoritos)
+                {
+                    builderNo.append(":::" + i);
+                }
+                toast("Favorito Agregado");
+                getSharedPreferences("data",MODE_PRIVATE).edit().putString("favoritos",builderNo.toString()).commit();
+                Amenu.clear();
+                getMenuInflater().inflate(R.menu.menu_fav_si, Amenu);
+                break;
+        }
+        return true;
+    }
+
     @Override
     public void sendtext1(String data,TaskType taskType) {
         SharedPreferences.Editor editor=getSharedPreferences("data",MODE_PRIVATE).edit();

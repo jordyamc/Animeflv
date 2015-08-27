@@ -1,5 +1,6 @@
 package knf.animeflv;
 
+import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -12,10 +13,15 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.service.notification.NotificationListenerService;
+import android.service.notification.StatusBarNotification;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -33,6 +39,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -49,20 +56,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import knf.animeflv.Recyclers.AdapterFavs;
+import knf.animeflv.Recyclers.RecyclerAdapter;
 import knf.animeflv.info.Info;
 
-public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,Requests.callback {
-
+public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,Requests.callback,RequestFav.callback {
     WebView web;
     WebView web_Links;
-
     Toolbar toolbar;
-
     Context context;
-
     ScrollView scrollView;
-
     ImageView imgCard1;
     ImageView imgCard2;
     ImageView imgCard3;
@@ -83,7 +90,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     ImageView imgCard18;
     ImageView imgCard19;
     ImageView imgCard20;
-
     TextView txtTitulo1;
     TextView txtTitulo2;
     TextView txtTitulo3;
@@ -104,7 +110,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     TextView txtTitulo18;
     TextView txtTitulo19;
     TextView txtTitulo20;
-
     TextView txtCapitulo1;
     TextView txtCapitulo2;
     TextView txtCapitulo3;
@@ -125,9 +130,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     TextView txtCapitulo18;
     TextView txtCapitulo19;
     TextView txtCapitulo20;
-
     SwipeRefreshLayout mswipe;
-
+    RecyclerView rv_fav;
     int first = 0;
     String[] eids;
     String[] aids;
@@ -135,26 +139,23 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     String[] titulos;
     String inicio = "http://animeflv.net/api.php?accion=inicio";
     String json = "{}";
-
     Alarm alarm = new Alarm();
-
     String ext_storage_state = Environment.getExternalStorageState();
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache");
-
     Parser parser=new Parser();
-
     String aidInfo;
-
     String html="<html></html>";
     String versionName;
-
     Drawer result;
+    boolean doubleBackToExitPressedOnce = false;
+    Toolbar ltoolbar;
+    Toolbar Dtoolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
-        context=getApplicationContext();
+        context=this;
         Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones",true);
         if (not) {
             alarm.SetAlarm(this);
@@ -164,6 +165,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            ltoolbar=(Toolbar)findViewById(R.id.ltoolbar);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
@@ -188,13 +190,19 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 )
                 .withProfileImagesClickable(false)
                 .build();
+        if (isXLargeScreen(getApplicationContext())){
+            Dtoolbar=ltoolbar;
+        }else {
+            Dtoolbar=toolbar;
+        }
         result = new DrawerBuilder()
                 .withActivity(this)
-                .withToolbar(toolbar)
+                .withToolbar(Dtoolbar)
                 .withActionBarDrawerToggleAnimated(true)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName("Recientes").withIcon(FontAwesome.Icon.faw_home).withIdentifier(0)
+                        new PrimaryDrawerItem().withName("Recientes").withIcon(FontAwesome.Icon.faw_home).withIdentifier(0),
+                        new PrimaryDrawerItem().withName("Favoritos").withIcon(GoogleMaterial.Icon.gmd_star).withIdentifier(1)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -205,7 +213,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 startActivity(intent);
                                 result.closeDrawer();
                                 result.setSelection(0);
-
+                                break;
+                            case 2:
+                                result.setSelection(0);
+                                //toast("Aun en desarrollo :3");
+                                Intent in=new Intent(context,Favoritos.class);
+                                startActivity(in);
+                                //cambiaFav();
                                 break;
                         }
                         return false;
@@ -216,8 +230,18 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 )
                 .build();
         mswipe.setOnRefreshListener(this);
+        mswipe.post(new Runnable() {
+            @Override
+            public void run() {
+                mswipe.setRefreshing(true);
+            }
+        });
         getJson();
-        toolbar.inflateMenu(R.menu.menu_main);
+        if (isXLargeScreen(getApplicationContext())){
+            toolbar.inflateMenu(R.menu.menu_main_dark);
+        }else {
+            toolbar.inflateMenu(R.menu.menu_main);
+        }
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -434,7 +458,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         }
     }
-
     public void setLoad(){
         scrollView=(ScrollView) findViewById(R.id.sv_inicio);
         mswipe=(SwipeRefreshLayout) findViewById(R.id.swiperefresh);
@@ -574,7 +597,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         });
     }
-
     public void loadTitulos(String[] list) {
         final String[] titulo = list;
         runOnUiThread(new Runnable() {
@@ -603,7 +625,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         });
     }
-
     public void loadCapitulos(String[] list) {
         final String[] capitulo = list;
         runOnUiThread(new Runnable() {
@@ -651,6 +672,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 public void run() {
                     scrollView.setVisibility(View.VISIBLE);
                 }});
+            if (mswipe.isRefreshing()){mswipe.setRefreshing(false);}
             first=0;
             NotificationManager notificationManager = (NotificationManager) this
                     .getSystemService(Context.NOTIFICATION_SERVICE);
@@ -671,7 +693,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         numeros=parser.parsenumeros(json);
         isFirst();
     }
-
     public String getUrl(String titulo,String capitulo){
         String ftitulo="";
         String atitulo=titulo.toLowerCase();
@@ -702,15 +723,15 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         String link="http://animeflv.net/ver/"+ftitulo+"-"+capitulo+".html";
         return link;
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        if (isXLargeScreen(getApplicationContext())){
+            getMenuInflater().inflate(R.menu.menu_main_dark,menu);
+        }else {
+            getMenuInflater().inflate(R.menu.menu_main, menu);
+        }
         return true;
     }
-
-
-
     @Override
     public void onRefresh() {
         new Requests(this,TaskType.GET_INICIO).execute(inicio);
@@ -783,6 +804,21 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && net;
     }
+    public void cambiaFav(){
+        SharedPreferences sharedPreferences=getSharedPreferences("data", MODE_PRIVATE);
+        String fav=sharedPreferences.getString("favoritos", "");
+        String[] favoritos;
+        favoritos=fav.split(",");
+        List<String> list=new ArrayList<String>();
+        for (String i:favoritos){
+            if (!i.equals("")){
+                list.add(i);
+            }
+        }
+        favoritos=new String[list.size()];
+        list.toArray(favoritos);
+        new RequestFav(this,TaskType.GET_TITULO).execute(favoritos);
+    }
     @Override
     public void sendtext1(String data,TaskType taskType){
         if(taskType == TaskType.GET_INICIO) {
@@ -832,7 +868,62 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             actCacheInfo(data);
         }
     }
+    public void setFavs(final List<String> titulos,final List<String> aids){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                rv_fav.setHasFixedSize(true);
+                rv_fav.setLayoutManager(new LinearLayoutManager(context));
+                //AdapterFavs adapter = new AdapterFavs(context, titulos, aids);
+                //rv_fav.setAdapter(adapter);
+                mswipe.setVisibility(View.GONE);
+                rv_fav.setVisibility(View.VISIBLE);
+            }
+        });
+    }
 
+    @Override
+    public void favCall(String data, TaskType taskType) {
+        toast(data);
+        String[] titFav=data.split(",");
+        List<String> listFavTit=new ArrayList<String>();
+        for (String st:titFav){
+            if (!st.equals("")){
+                listFavTit.add(st);
+            }
+        }
+        SharedPreferences sharedPreferences=getSharedPreferences("data", MODE_PRIVATE);
+        String fav=sharedPreferences.getString("favoritos", "");
+        String[] favoritos;
+        favoritos=fav.split(",");
+        List<String> listAids=new ArrayList<String>();
+        for (String i:favoritos){
+            if (!i.equals("")){
+                listAids.add(i);
+            }
+        }
+        setFavs(listFavTit,listAids);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!result.isDrawerOpen()) {
+            if (doubleBackToExitPressedOnce) {
+                super.onBackPressed();
+                return;
+            }
+            this.doubleBackToExitPressedOnce = true;
+            Toast.makeText(this, "Precione ATRAS para salir", Toast.LENGTH_SHORT).show();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    doubleBackToExitPressedOnce = false;
+                }
+            }, 2000);
+        }else {
+            result.closeDrawer();
+        }
+    }
     class JavaScriptInterface {
         private Context ctx;
         JavaScriptInterface(Context ctx) {

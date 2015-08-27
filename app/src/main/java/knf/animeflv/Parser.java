@@ -60,6 +60,10 @@ public class Parser {
             url=url.replace("&ntilde;","\u00F1");
             url=url.replace("&ldquo;","\u201C");
             url=url.replace("&rdquo;","\u201D");
+            url=url.replace("&rsquo;","\u2019");
+            url=url.replace("&iquest;","\u00BF");
+            url=url.replace("&hellip;","\u2026");
+            url=url.replace("&#333;","\u014D");
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -71,6 +75,7 @@ public class Parser {
         try {
             JSONObject jsonObj = new JSONObject(json);
             url = jsonObj.getString("titulo");
+            url=url.replace("&#039;","!");
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -223,6 +228,7 @@ public class Parser {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject childJSONObject = jsonArray.getJSONObject(i);
                 String tituloRel = childJSONObject.getString("titulo");
+                tituloRel=tituloRel.replace("&#039;","!");
                 eidsArray.add(tituloRel);
             }
         }catch (Exception e) {

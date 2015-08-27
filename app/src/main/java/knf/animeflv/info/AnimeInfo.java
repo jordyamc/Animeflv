@@ -148,7 +148,7 @@ public class AnimeInfo extends Fragment{
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PicassoCache.getPicassoInstance(context).load(parser.getUrlPortada(jinfo)).error(R.drawable.ic_block_r).into(imageView);
+                PicassoCache.getPicassoInstance(context).load(parser.getUrlPortada(jinfo)).error(R.drawable.ic_block_r).fit().into(imageView);
                 txt_sinopsis.setText(parser.getInfoSinopsis(jinfo));
                 txt_titulo.setText(parser.getInfotitulo(jinfo));
                 txt_tipo.setText(parser.getInfoTipo(jinfo));
