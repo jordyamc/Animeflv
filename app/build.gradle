@@ -8,8 +8,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 26
-        versionName "1.9.1.6.8"
+        versionCode 27
+        versionName "1.9.1.6.9"
     }
     buildTypes {
         release {
@@ -36,6 +36,7 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
     compile 'com.squareup.okio:okio:1.5.0'
+    compile 'com.afollestad:material-dialogs:0.7.7.0'
     compile 'com.ogaclejapan.smarttablayout:library:1.2.2@aar'
     compile 'com.ogaclejapan.smarttablayout:utils-v4:1.2.2@aar'
     compile 'com.github.AndroidDeveloperLB:MaterialPreferenceLibrary:4'

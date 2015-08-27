@@ -3,11 +3,14 @@ package knf.animeflv;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -38,6 +41,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.GravityEnum;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.Drawer;
@@ -64,7 +69,7 @@ import knf.animeflv.Recyclers.AdapterFavs;
 import knf.animeflv.Recyclers.RecyclerAdapter;
 import knf.animeflv.info.Info;
 
-public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,Requests.callback,RequestFav.callback {
+public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,Requests.callback {
     WebView web;
     WebView web_Links;
     Toolbar toolbar;
@@ -150,6 +155,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     boolean doubleBackToExitPressedOnce = false;
     Toolbar ltoolbar;
     Toolbar Dtoolbar;
+    File descarga = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache","Animeflv_Nver.apk");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -216,10 +222,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 break;
                             case 2:
                                 result.setSelection(0);
-                                //toast("Aun en desarrollo :3");
                                 Intent in=new Intent(context,Favoritos.class);
                                 startActivity(in);
-                                //cambiaFav();
                                 break;
                         }
                         return false;
@@ -249,6 +253,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 return true;
             }
         });
+        if (isNetworkAvailable()){new Requests(context,TaskType.VERSION).execute("http://necrotic-neganebulus.hol.es/version.php");}
+        registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
     public void toast(String texto){
         Toast.makeText(this,texto,Toast.LENGTH_LONG).show();
@@ -785,7 +791,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
     private boolean isNetworkAvailable() {
         Boolean net=false;
-        int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion","0"));
+        int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         switch (Tcon){
             case 0:
@@ -804,23 +810,56 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && net;
     }
-    public void cambiaFav(){
-        SharedPreferences sharedPreferences=getSharedPreferences("data", MODE_PRIVATE);
-        String fav=sharedPreferences.getString("favoritos", "");
-        String[] favoritos;
-        favoritos=fav.split(",");
-        List<String> list=new ArrayList<String>();
-        for (String i:favoritos){
-            if (!i.equals("")){
-                list.add(i);
-            }
+    BroadcastReceiver onComplete=new BroadcastReceiver() {
+        public void onReceive(Context ctxt, Intent intent) {
+           if (descarga.exists()){
+               Intent promptInstall = new Intent(Intent.ACTION_VIEW)
+                       .setDataAndType(Uri.fromFile(descarga),
+                               "application/vnd.android.package-archive");
+               startActivity(promptInstall);
+           }
         }
-        favoritos=new String[list.size()];
-        list.toArray(favoritos);
-        new RequestFav(this,TaskType.GET_TITULO).execute(favoritos);
-    }
+    };
     @Override
     public void sendtext1(String data,TaskType taskType){
+        if (taskType==TaskType.VERSION){
+            String AppVersion=versionName.trim().replace(".", "");
+            String SerVersion=data.trim().replace(".", "");
+            if (Integer.parseInt(AppVersion)>=Integer.parseInt(SerVersion)){
+            }else {
+                MaterialDialog dialog = new MaterialDialog.Builder(this)
+                        .title("Nueva Version "+data.trim())
+                        .content("Hay una nueva version disponible, porfavor instala para continuar.")
+                        .titleColorRes(R.color.prim)
+                        .autoDismiss(false)
+                        .cancelable(false)
+                        .backgroundColor(Color.WHITE)
+                        .titleGravity(GravityEnum.CENTER)
+                        .positiveText("Instalar")
+                        .positiveColorRes(R.color.prim)
+                        .negativeText("Salir")
+                        .negativeColorRes(R.color.prim)
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                if (descarga.exists()){descarga.delete();}
+                                toast("Descarga Iniciada...");
+                                DownloadManager.Request request = new DownloadManager.Request(Uri.parse("https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true"));
+                                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                                request.setDescription("Descargar Actualizacion");
+                                request.setTitle("Animeflv");
+                                request.setDestinationInExternalPublicDir("/.animeflv/cache", "Animeflv_Nver.apk");
+                                DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                                manager.enqueue(request);
+                            }
+                            @Override
+                            public void onNegative(MaterialDialog dialog) {
+                                finish();
+                            }
+                        }).build();
+                dialog.show();
+            }
+        }
         if(taskType == TaskType.GET_INICIO) {
             if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                 if (!mediaStorage.exists()) {
@@ -867,42 +906,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (taskType==TaskType.GET_INFO){
             actCacheInfo(data);
         }
-    }
-    public void setFavs(final List<String> titulos,final List<String> aids){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                rv_fav.setHasFixedSize(true);
-                rv_fav.setLayoutManager(new LinearLayoutManager(context));
-                //AdapterFavs adapter = new AdapterFavs(context, titulos, aids);
-                //rv_fav.setAdapter(adapter);
-                mswipe.setVisibility(View.GONE);
-                rv_fav.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
-    @Override
-    public void favCall(String data, TaskType taskType) {
-        toast(data);
-        String[] titFav=data.split(",");
-        List<String> listFavTit=new ArrayList<String>();
-        for (String st:titFav){
-            if (!st.equals("")){
-                listFavTit.add(st);
-            }
-        }
-        SharedPreferences sharedPreferences=getSharedPreferences("data", MODE_PRIVATE);
-        String fav=sharedPreferences.getString("favoritos", "");
-        String[] favoritos;
-        favoritos=fav.split(",");
-        List<String> listAids=new ArrayList<String>();
-        for (String i:favoritos){
-            if (!i.equals("")){
-                listAids.add(i);
-            }
-        }
-        setFavs(listFavTit,listAids);
     }
 
     @Override
