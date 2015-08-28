@@ -150,7 +150,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     Parser parser=new Parser();
     String aidInfo;
     String html="<html></html>";
+    int versionCode;
     String versionName;
+
     Drawer result;
     boolean doubleBackToExitPressedOnce = false;
     Toolbar ltoolbar;
@@ -185,6 +187,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         getSupportActionBar().setTitle("Recientes");
         parser=new Parser();
         setLoad();
+        try {versionCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;} catch (Exception e) {toast("ERROR");}
         try {versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;} catch (Exception e) {toast("ERROR");}
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -740,6 +743,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
     @Override
     public void onRefresh() {
+        if (isNetworkAvailable()){
+            new Requests(context,TaskType.VERSION).execute("http://necrotic-neganebulus.hol.es/version.php");}
         new Requests(this,TaskType.GET_INICIO).execute(inicio);
         NotificationManager notificationManager = (NotificationManager) this
                 .getSystemService(Context.NOTIFICATION_SERVICE);
@@ -823,9 +828,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     @Override
     public void sendtext1(String data,TaskType taskType){
         if (taskType==TaskType.VERSION){
-            String AppVersion=versionName.trim().replace(".", "");
-            String SerVersion=data.trim().replace(".", "");
-            if (Integer.parseInt(AppVersion)>=Integer.parseInt(SerVersion)){
+            if (Integer.parseInt(data.trim())>=versionCode){
             }else {
                 MaterialDialog dialog = new MaterialDialog.Builder(this)
                         .title("Nueva Version "+data.trim())
@@ -842,7 +845,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
-                                if (descarga.exists()){descarga.delete();}
+                                if (descarga.exists()) {
+                                    descarga.delete();
+                                }
                                 toast("Descarga Iniciada...");
                                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse("https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true"));
                                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
@@ -852,6 +857,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                                 manager.enqueue(request);
                             }
+
                             @Override
                             public void onNegative(MaterialDialog dialog) {
                                 finish();

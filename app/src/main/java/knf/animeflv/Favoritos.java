@@ -2,6 +2,8 @@ package knf.animeflv;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +27,7 @@ import knf.animeflv.Recyclers.RecyclerAdapter;
 public class Favoritos extends AppCompatActivity implements RequestFav.callback{
     RecyclerView recyclerView;
     Toolbar toolbar;
+    Toolbar ltoolbar;
     List<String> aids=new ArrayList<String>();
     List<String> Naids=new ArrayList<String>();
     Context context;
@@ -33,19 +36,35 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_favs);
+        if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            ltoolbar=(Toolbar) findViewById(R.id.ltoolbar_fav);
+        }
         context=this;
         shouldExecuteOnResume = false;
         toolbar=(Toolbar) findViewById(R.id.favs_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Favoritos");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        if (isXLargeScreen(context)){
+            ltoolbar.setNavigationIcon(R.drawable.ic_back_r);
+            ltoolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        }else {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        }
         SharedPreferences sharedPreferences=getSharedPreferences("data",MODE_PRIVATE);
         String fav=sharedPreferences.getString("favoritos", "");
         String[] favoritos={};
@@ -88,6 +107,20 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback{
         Log.d("Nlinks", Integer.toString(links.size()));
         AdapterFavs adapter = new AdapterFavs(context, titulos, aids, links);
         recyclerView.setAdapter(adapter);
+    }
+    public static boolean isXLargeScreen(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+    @Override
+    public void onConfigurationChanged (Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+
+        if (!isXLargeScreen(getApplicationContext()) ) {
+            return;
+        }
     }
 
     @Override
