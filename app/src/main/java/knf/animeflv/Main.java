@@ -256,7 +256,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 return true;
             }
         });
-        if (isNetworkAvailable()){new Requests(context,TaskType.VERSION).execute("http://necrotic-neganebulus.hol.es/version.php");}
+        if (isNetworkAvailable()){new Requests(context,TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.php");}
         registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
     public void toast(String texto){
@@ -743,13 +743,15 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
     @Override
     public void onRefresh() {
-        if (isNetworkAvailable()){
-            new Requests(context,TaskType.VERSION).execute("http://necrotic-neganebulus.hol.es/version.php");}
-        new Requests(this,TaskType.GET_INICIO).execute(inicio);
+        if (isNetworkAvailable()) {
+            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.php");
+            new Requests(this, TaskType.GET_INICIO).execute(inicio);
+        }else {
+            if (mswipe.isRefreshing()){mswipe.setRefreshing(false);}
+        }
         NotificationManager notificationManager = (NotificationManager) this
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(6991);
-
     }
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout

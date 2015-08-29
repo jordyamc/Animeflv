@@ -8,11 +8,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="10">
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="4"
             android:src="@mipmap/ic_launcher"
             android:id="@+id/info_img"
             android:scaleType="centerCrop" />
@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_weight="1"
+            android:layout_weight="6"
             android:weightSum="10">
             <ScrollView
                 android:layout_width="match_parent"

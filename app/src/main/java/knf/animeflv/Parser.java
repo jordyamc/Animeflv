@@ -64,6 +64,7 @@ public class Parser {
             url=url.replace("&iquest;","\u00BF");
             url=url.replace("&hellip;","\u2026");
             url=url.replace("&#333;","\u014D");
+            url=url.replace("&quot;","\"");
         }catch (Exception e) {
             e.printStackTrace();
         }
