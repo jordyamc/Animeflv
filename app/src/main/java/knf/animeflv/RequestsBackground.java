@@ -223,7 +223,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         Intent resultIntent = new Intent(context, Main.class);
                         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         mBuilder.setContentIntent(resultPendingIntent);
-                        int mNotificationId = 6991;
+                        int mNotificationId = 1964;
                         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
                     } else {
@@ -240,7 +240,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         Intent resultIntent = new Intent(context, Main.class);
                         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         mBuilder.setContentIntent(resultPendingIntent);
-                        int mNotificationId = 6991;
+                        int mNotificationId = 1964;
                         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
                     }
