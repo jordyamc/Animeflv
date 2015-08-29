@@ -830,6 +830,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     @Override
     public void sendtext1(String data,TaskType taskType){
         if (taskType==TaskType.VERSION){
+            Log.d("Version", Integer.toString(versionCode)+ " >> "+data.trim());
             if (versionCode>=Integer.parseInt(data.trim())){
                 Log.d("Version","OK");
                 getSharedPreferences("data",MODE_PRIVATE).edit().putBoolean("notVer",false);
