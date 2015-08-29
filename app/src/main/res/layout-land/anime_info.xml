@@ -8,11 +8,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:weightSum="10">
+        android:weightSum="20">
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="4"
+            android:layout_weight="13"
             android:src="@mipmap/ic_launcher"
             android:id="@+id/info_img"
             android:scaleType="centerCrop" />
@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_weight="6"
+            android:layout_weight="7"
             android:weightSum="10">
             <ScrollView
                 android:layout_width="match_parent"
@@ -41,6 +41,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:alpha="0.12"
                     android:background="@android:color/black"/>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -133,6 +134,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:alpha="0.12"
                     android:background="@android:color/black"/>
             </LinearLayout>
             <android.support.v7.widget.RecyclerView

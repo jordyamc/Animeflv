@@ -76,7 +76,7 @@ public class Parser {
         try {
             JSONObject jsonObj = new JSONObject(json);
             url = jsonObj.getString("titulo");
-            url=url.replace("&#039;","!");
+            url=url.replace("&#039;","\u0027");
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -307,6 +307,7 @@ public class Parser {
         try {
             JSONObject jsonObj = new JSONObject(json);
             aid=jsonObj.getString("titulo");
+            aid=aid.replace("&#039;","\'");
         }catch (Exception e) {
             e.printStackTrace();
         }

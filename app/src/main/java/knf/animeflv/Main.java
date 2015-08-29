@@ -256,7 +256,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 return true;
             }
         });
-        if (isNetworkAvailable()){new Requests(context,TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.php");}
+        if (isNetworkAvailable()){new Requests(context,TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");}
         registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
     public void toast(String texto){
@@ -735,7 +735,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (isXLargeScreen(getApplicationContext())){
-            getMenuInflater().inflate(R.menu.menu_main_dark,menu);
+            getMenuInflater().inflate(R.menu.menu_main_dark, menu);
         }else {
             getMenuInflater().inflate(R.menu.menu_main, menu);
         }
@@ -744,7 +744,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     @Override
     public void onRefresh() {
         if (isNetworkAvailable()) {
-            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.php");
+            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
             new Requests(this, TaskType.GET_INICIO).execute(inicio);
         }else {
             if (mswipe.isRefreshing()){mswipe.setRefreshing(false);}
@@ -831,7 +831,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     public void sendtext1(String data,TaskType taskType){
         if (taskType==TaskType.VERSION){
             if (Integer.parseInt(data.trim())>=versionCode){
+                Log.d("Version","OK");
+                getSharedPreferences("data",MODE_PRIVATE).edit().putBoolean("notVer",false);
             }else {
+                Log.d("Version", "Actualizar");
                 MaterialDialog dialog = new MaterialDialog.Builder(this)
                         .title("Nueva Version "+data.trim())
                         .content("Hay una nueva version disponible, porfavor instala para continuar.")

@@ -41,8 +41,10 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
     String ext_storage_state;
     File mediaStorage;
     Context context;
-    public RequestsBackground(Context cont){
+    TaskType taskType;
+    public RequestsBackground(Context cont,TaskType task){
         context=cont;
+        this.taskType=task;
     }
 
         @Override
@@ -127,6 +129,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
+        if (taskType==TaskType.NOT){
         ext_storage_state = Environment.getExternalStorageState();
         mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache");
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
@@ -192,6 +195,57 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                     Log.d("JSON", "Es igual");
                 }
             }
-        }else {Log.d("Conexion","No hay internet");}
+        }else {Log.d("Conexion","No hay internet");}}
+        if (taskType==TaskType.VERSION){
+            int versionCode=0;
+            try {versionCode = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;} catch (Exception e) {Log.d("ERROR","Get Versioncode");}
+            if (Integer.parseInt(s.trim())>=versionCode){
+                Log.d("Version", "OK");
+            }else {
+                SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+                Boolean isnot = sharedPreferences.getBoolean("notVer", false);
+                if (isnot) {
+                    Log.d("Version", "Not ya existe");
+                } else {
+                    sharedPreferences.edit().putBoolean("notVer", true).commit();
+                    int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
+                    if (not == 0) {
+                        Log.d("Notificacion:", "Crear Sonido 0");
+                        NotificationCompat.Builder mBuilder =
+                                new NotificationCompat.Builder(context)
+                                        .setSmallIcon(R.drawable.ic_not_r)
+                                        .setContentTitle("AnimeFLV")
+                                        .setContentText("Nueva Version Disponible!!!");
+                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                        mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+                        mBuilder.setAutoCancel(true);
+                        mBuilder.setLights(Color.BLUE, 5000, 2000);
+                        Intent resultIntent = new Intent(context, Main.class);
+                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        mBuilder.setContentIntent(resultPendingIntent);
+                        int mNotificationId = 6991;
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                    } else {
+                        Log.d("Notificacion:", "Crear Sonido Especial");
+                        NotificationCompat.Builder mBuilder =
+                                new NotificationCompat.Builder(context)
+                                        .setSmallIcon(R.drawable.ic_not_r)
+                                        .setContentTitle("AnimeFLV")
+                                        .setContentText("Nueva Version Disponible!!!");
+                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound"), AudioManager.STREAM_NOTIFICATION);
+                        mBuilder.setAutoCancel(true);
+                        mBuilder.setLights(Color.BLUE, 5000, 2000);
+                        Intent resultIntent = new Intent(context, Main.class);
+                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        mBuilder.setContentIntent(resultPendingIntent);
+                        int mNotificationId = 6991;
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                    }
+                }
+            }
+        }
     }
 }
