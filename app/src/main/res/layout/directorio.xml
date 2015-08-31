@@ -20,6 +20,11 @@
                 android:lines="1"
                 android:hint="Buscar..."/>
     </android.support.v7.widget.Toolbar>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/LY_dir">
     <com.ogaclejapan.smarttablayout.SmartTabLayout
         android:id="@+id/viewpagertab2"
         android:layout_width="match_parent"
@@ -46,4 +51,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/viewpagertab2"/>
+    </LinearLayout>
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/rv_busqueda"
+        android:visibility="gone"/>
 </LinearLayout>

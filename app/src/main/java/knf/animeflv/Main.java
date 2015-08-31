@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -150,6 +151,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     Toolbar ltoolbar;
     Toolbar Dtoolbar;
     File descarga = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache","Animeflv_Nver.apk");
+    SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -248,12 +250,41 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                toast("Buscar");
+                Intent intent=new Intent(context,Directorio.class);
+                Bundle bundle=new Bundle();
+                bundle.putString("tipo","Busqueda");
+                intent.putExtras(bundle);
+                startActivity(intent);
                 return true;
             }
         });
         if (isNetworkAvailable()){new Requests(context,TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");}
         registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        SharedPreferences prefs = this.getSharedPreferences("data", MODE_PRIVATE);
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                if (key.equals("reload")){
+                    mswipe.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!mswipe.isRefreshing()){
+                                mswipe.setRefreshing(true);
+                            }
+                        }
+                    });
+                    if (isNetworkAvailable()) {
+                        new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
+                        new Requests(context, TaskType.GET_INICIO).execute(inicio);
+                    }else {
+                        if (mswipe.isRefreshing()){mswipe.setRefreshing(false);}
+                    }
+                    NotificationManager notificationManager = (NotificationManager) context
+                            .getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.cancel(6991);
+                }
+            }
+        };
+        prefs.registerOnSharedPreferenceChangeListener(listener);
     }
     public void toast(String texto){
         Toast.makeText(this,texto,Toast.LENGTH_LONG).show();

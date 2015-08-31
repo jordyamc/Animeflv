@@ -1,9 +1,12 @@
 package knf.animeflv;
 
+import android.support.annotation.Nullable;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -455,6 +458,123 @@ public class Parser {
             }
         }catch (Exception e){
             e.printStackTrace();
+        }
+        return linkArray;
+    }
+    public List<String> DirTitulosBusqueda(String json,@Nullable String busqueda){
+        List<String> linkArray=new ArrayList<String>();
+        if (busqueda==null) {
+            try {
+                JSONObject jsonObj = new JSONObject(json);
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String array = jsonArray.getString(i);
+                    array = array.replace("[\"", "");
+                    array = array.replace("\"]", "");
+                    array = array.replace("\",\"", ":::");
+                    array = array.replace("\\/", "/");
+                    String[] sarray = array.split(":::");
+                    linkArray.add(sarray[1]);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else {
+            try {
+                JSONObject jsonObj = new JSONObject(json);
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String array = jsonArray.getString(i);
+                    array = array.replace("[\"", "");
+                    array = array.replace("\"]", "");
+                    array = array.replace("\",\"", ":::");
+                    array = array.replace("\\/", "/");
+                    String[] sarray = array.split(":::");
+                    if (sarray[1].trim().toLowerCase().contains(busqueda.toLowerCase())){
+                        linkArray.add(sarray[1]);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return linkArray;
+    }
+    public List<String> DirIndexBusqueda(String json,@Nullable String busqueda){
+        List<String> linkArray=new ArrayList<String>();
+        if (busqueda==null) {
+            try {
+                JSONObject jsonObj = new JSONObject(json);
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String array = jsonArray.getString(i);
+                    array = array.replace("[\"", "");
+                    array = array.replace("\"]", "");
+                    array = array.replace("\",\"", ":::");
+                    array = array.replace("\\/", "/");
+                    String[] sarray = array.split(":::");
+                    linkArray.add(sarray[0]);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else {
+            try {
+                JSONObject jsonObj = new JSONObject(json);
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String array = jsonArray.getString(i);
+                    array = array.replace("[\"", "");
+                    array = array.replace("\"]", "");
+                    array = array.replace("\",\"", ":::");
+                    array = array.replace("\\/", "/");
+                    String[] sarray = array.split(":::");
+                    if (sarray[1].trim().toLowerCase().contains(busqueda.toLowerCase())){
+                        linkArray.add(sarray[0]);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return linkArray;
+    }
+    public List<String> DirTiposBusqueda(String json,@Nullable String busqueda){
+        List<String> linkArray=new ArrayList<String>();
+        if (busqueda==null) {
+            try {
+                JSONObject jsonObj = new JSONObject(json);
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String array = jsonArray.getString(i);
+                    array = array.replace("[\"", "");
+                    array = array.replace("\"]", "");
+                    array = array.replace("\",\"", ":::");
+                    array = array.replace("\\/", "/");
+                    String[] sarray = array.split(":::");
+                    linkArray.add(sarray[2]);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else {
+            try {
+                JSONObject jsonObj = new JSONObject(json);
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String array = jsonArray.getString(i);
+                    array = array.replace("[\"", "");
+                    array = array.replace("\"]", "");
+                    array = array.replace("\",\"", ":::");
+                    array = array.replace("\\/", "/");
+                    String[] sarray = array.split(":::");
+                    if (sarray[1].trim().toLowerCase().contains(busqueda.toLowerCase())){
+                        linkArray.add(sarray[2]);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return linkArray;
     }

@@ -158,6 +158,15 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                     int not=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido","0"));
                     if (not==0) {
                         Log.d("Notificacion:", "Crear Sonido 0");
+                        String act=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("reload","0");
+                        Log.d("Registrer",act);
+                        if (act.trim().equals("0")){
+                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","1").apply();
+                            Log.d("Registrer to", "1");
+                        }else {
+                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
+                            Log.d("Registrer to", "0");
+                        }
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(context)
                                         .setSmallIcon(R.drawable.ic_not_r)
@@ -176,6 +185,15 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
                     }else {
                         Log.d("Notificacion:", "Crear Sonido Especial");
+                        String act=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("reload","0");
+                        Log.d("Registrer",act);
+                        if (act.equals("0")){
+                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","1").apply();
+                            Log.d("Registrer to","1");
+                        }else {
+                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
+                            Log.d("Registrer to", "0");
+                        }
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(context)
                                         .setSmallIcon(R.drawable.ic_not_r)
