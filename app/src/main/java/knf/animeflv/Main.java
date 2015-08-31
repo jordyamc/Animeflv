@@ -285,6 +285,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(listener);
+        Bundle bundle=getIntent().getExtras();
+        if (bundle!=null){
+            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
+        }
     }
     public void toast(String texto){
         Toast.makeText(this,texto,Toast.LENGTH_LONG).show();
@@ -888,6 +892,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                Intent promptInstall = new Intent(Intent.ACTION_VIEW)
                        .setDataAndType(Uri.fromFile(descarga),
                                "application/vnd.android.package-archive");
+               finish();
                startActivity(promptInstall);
            }
         }

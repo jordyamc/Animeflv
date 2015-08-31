@@ -205,6 +205,7 @@ public class Directorio extends AppCompatActivity {
                 .add("PELICULAS", Peliculas.class)
                 .create());
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager2);
+        viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(adapter);
         SmartTabLayout viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab2);
         viewPagerTab.setViewPager(viewPager);

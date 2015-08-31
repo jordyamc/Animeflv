@@ -15,6 +15,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
@@ -245,6 +246,9 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         mBuilder.setPriority(Notification.PRIORITY_MAX);
                         mBuilder.setLights(Color.BLUE, 5000, 2000);
                         Intent resultIntent = new Intent(context, Main.class);
+                        Bundle bundle=new Bundle();
+                        bundle.putString("act","1");
+                        resultIntent.putExtras(bundle);
                         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         mBuilder.setContentIntent(resultPendingIntent);
                         int mNotificationId = 1964;
@@ -263,6 +267,9 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         mBuilder.setPriority(Notification.PRIORITY_MAX);
                         mBuilder.setLights(Color.BLUE, 5000, 2000);
                         Intent resultIntent = new Intent(context, Main.class);
+                        Bundle bundle=new Bundle();
+                        bundle.putString("act", "1");
+                        resultIntent.putExtras(bundle);
                         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         mBuilder.setContentIntent(resultPendingIntent);
                         int mNotificationId = 1964;
