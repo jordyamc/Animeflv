@@ -200,7 +200,9 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
             int versionCode=0;
             try {versionCode = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode;} catch (Exception e) {Log.d("ERROR","Get Versioncode");}
             Log.d("Version", Integer.toString(versionCode)+ " >> "+s.trim());
-            if (versionCode>=Integer.parseInt(s.trim())){
+            String data=s.trim();
+            if (data.trim().equals("")){data=Integer.toString(versionCode);}
+            if (versionCode>=Integer.parseInt(data.trim())){
                 Log.d("Version", "OK");
             }else {
                 SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);

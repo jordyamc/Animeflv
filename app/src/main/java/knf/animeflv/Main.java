@@ -1,6 +1,5 @@
 package knf.animeflv;
 
-import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -18,12 +17,9 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.service.notification.NotificationListenerService;
-import android.service.notification.StatusBarNotification;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -61,12 +57,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import knf.animeflv.Recyclers.AdapterFavs;
-import knf.animeflv.Recyclers.RecyclerAdapter;
+import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.info.Info;
 
 public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,Requests.callback {
@@ -137,7 +129,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     TextView txtCapitulo20;
     SwipeRefreshLayout mswipe;
     RecyclerView rv_fav;
-    int first = 0;
+    int first = 1;
     String[] eids;
     String[] aids;
     String[] numeros;
@@ -211,7 +203,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName("Recientes").withIcon(FontAwesome.Icon.faw_home).withIdentifier(0),
-                        new PrimaryDrawerItem().withName("Favoritos").withIcon(GoogleMaterial.Icon.gmd_star).withIdentifier(1)
+                        new PrimaryDrawerItem().withName("Favoritos").withIcon(GoogleMaterial.Icon.gmd_star).withIdentifier(1),
+                        new PrimaryDrawerItem().withName("Directorio").withIcon(GoogleMaterial.Icon.gmd_library_books).withIdentifier(2)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -228,6 +221,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 Intent in=new Intent(context,Favoritos.class);
                                 startActivity(in);
                                 break;
+                            case 3:
+                                result.setSelection(0);
+                                setDir();
                         }
                         return false;
                     }
@@ -412,6 +408,25 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             case R.id.card20:
                 setInfo(aids[19]);
                 break;
+        }
+    }
+    public void setDir(){
+        if (isNetworkAvailable()){
+            new Requests(context,TaskType.DIRECTORIO).execute("http://animeflv.net/api.php?accion=directorio");
+        }else {
+            if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                if (!mediaStorage.exists()) {
+                    mediaStorage.mkdirs();
+                }
+            }
+            File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
+            String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
+            if (file.exists()){
+                Intent intent=new Intent(context,Directorio.class);
+                startActivity(intent);
+            }else {
+                toast("No hay datos guardados");
+            }
         }
     }
     public void setInfo(String aid){
@@ -663,7 +678,23 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         });
     }
     public void getJson(){
-        new Requests(this, TaskType.GET_INICIO).execute(inicio);
+        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+            if (!mediaStorage.exists()) {
+                mediaStorage.mkdirs();
+            }
+        }
+        File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt";
+        if (isNetworkAvailable()) {
+            new Requests(this, TaskType.GET_INICIO).execute(inicio);
+        }else {
+            if (file.exists()) {
+                String infile = getStringFromFile(file_loc);
+                getData(infile);
+            } else {
+                toast("No hay datos guardados");
+            }
+        }
     }
     public void getlinks(String json) {
         loadImg(parser.parseLinks(json));
@@ -675,6 +706,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         loadCapitulos(parser.parseCapitulos(json));
     }
     public void isFirst(){
+        mswipe.post(new Runnable() {
+            @Override
+            public void run() {
+                mswipe.setRefreshing(false);
+            }
+        });
         if (first==1){
             runOnUiThread(new Runnable() {
                 @Override
@@ -686,10 +723,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             NotificationManager notificationManager = (NotificationManager) this
                     .getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.cancel(6991);
-        }else {
-            if (mswipe.isRefreshing()){
-                mswipe.setRefreshing(false);
-            }
         }
     }
     public void getData(String json){
@@ -700,6 +733,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         eids=parser.parseEID(json);
         aids=parser.parseAID(json);
         numeros=parser.parsenumeros(json);
+        mswipe.setRefreshing(false);
         isFirst();
     }
     public String getUrl(String titulo,String capitulo){
@@ -829,6 +863,41 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     };
     @Override
     public void sendtext1(String data,TaskType taskType){
+        if (taskType==TaskType.DIRECTORIO){
+            if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                if (!mediaStorage.exists()) {
+                    mediaStorage.mkdirs();
+                }
+            }
+            File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
+            String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
+            if (isNetworkAvailable()) {
+                if (!file.exists()) {
+                    Log.d("Archivo:", "No existe");
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        Log.d("Archivo:", "Error al crear archivo");
+                    }
+                    writeToFile(data, file);
+                    Intent intent=new Intent(context,Directorio.class);
+                    startActivity(intent);
+                } else {
+                    Log.d("Archivo", "Existe");
+                    String infile = getStringFromFile(file_loc);
+                    if (infile.trim().equals(data.trim())) {
+                        Log.d("Cargar", "Json nuevo");
+                        writeToFile(data, file);
+                        Intent intent=new Intent(context,Directorio.class);
+                        startActivity(intent);
+                    } else {
+                        Log.d("Cargar", "Json existente");
+                        Intent intent=new Intent(context,Directorio.class);
+                        startActivity(intent);
+                    }
+                }
+            }
+        }
         if (taskType==TaskType.VERSION){
             Log.d("Version", Integer.toString(versionCode)+ " >> "+data.trim());
             if (versionCode>=Integer.parseInt(data.trim())){
@@ -901,13 +970,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         Log.d("Cargar", "Json existente");
                         getData(infile);
                     }
-                }
-            } else {
-                if (file.exists()) {
-                    String infile = getStringFromFile(file_loc);
-                    getData(infile);
-                } else {
-                    toast("No hay datos guardados");
                 }
             }
         }
