@@ -12,6 +12,7 @@
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+
     </style>
 
     <style name="toolbar" parent="AppTheme">
@@ -20,6 +21,7 @@
     </style>
     <style name="toolbarBlanco" parent="MaterialDrawerTheme.Light">
         <item name="android:textColorPrimary">@color/dark</item>
+        <item name="colorAccent">@color/dark</item>
     </style>
     <style name="Theme.Transparent" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
@@ -34,7 +36,10 @@
         <item name="queryBackground">@color/prim</item>
         <item name="searchIcon">@drawable/ic_buscar</item>
         <item name="closeIcon">@drawable/ic_exit_r</item>
-
     </style>
-
+    <style name="CustomEdit" parent="Widget.AppCompat.EditText">
+        <item name="colorControlNormal">@color/blanco</item>
+        <item name="colorControlActivated">@color/dark</item>
+        <item name="colorControlHighlight">@color/dark</item>
+    </style>
 </resources>

@@ -11,11 +11,13 @@ import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.Preference;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Created by Jordy on 16/08/2015.

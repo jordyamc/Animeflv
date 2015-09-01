@@ -35,6 +35,16 @@
             app:entries="@array/tipos"
             app:entryValues="@array/tipos_val" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="Busqueda">
+        <com.lb.material_preferences_library.custom_preferences.ListPreference
+            android:defaultValue="0"
+            android:key="t_busqueda"
+            android:title="Tipo de busqueda"
+            android:summary="%s"
+            app:dialogTitle="Tipo de busqueda"
+            app:entries="@array/busqueda"
+            app:entryValues="@array/tipos_busqueda" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="Cache">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
@@ -42,5 +52,4 @@
             android:title="Borrar Cache"
             android:summary="Tamaño de cache: %s MB" />
     </PreferenceCategory>
-
 </PreferenceScreen>

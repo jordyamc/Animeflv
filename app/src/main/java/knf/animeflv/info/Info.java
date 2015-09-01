@@ -110,6 +110,7 @@ public class Info extends AppCompatActivity implements Requests.callback{
                 .add("EPISODIOS", InfoCap.class,bundle)
                 .create());
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager1);
+        viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(adapter);
         SmartTabLayout viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab1);
         viewPagerTab.setViewPager(viewPager);
