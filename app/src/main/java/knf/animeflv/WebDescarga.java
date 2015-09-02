@@ -73,25 +73,30 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
                         Dstorage.mkdirs();
                     }
                 }
-                String urlD=getSharedPreferences("data",MODE_PRIVATE).getString("urlD", null);
-                CookieManager cookieManager = CookieManager.getInstance();
-                String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
-                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                request.setTitle(fileName.substring(0, fileName.indexOf(".")));
-                request.setDescription("Animeflv");
-                request.addRequestHeader("cookie", cookie);
-                request.addRequestHeader("User-Agent", webView.getSettings().getUserAgentString());
-                request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
-                request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
-                request.addRequestHeader("Referer", urlD);
-                request.setMimeType("video/mp4");
-                request.allowScanningByMediaScanner();
-                request.setDestinationInExternalPublicDir(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")), fileName);
-                DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                manager.enqueue(request);
-                getSharedPreferences("data", MODE_PRIVATE).edit().putInt("sov",0).apply();
-                finish();
+                File archivo=new File(Dstorage,fileName);
+                if (!archivo.exists()){
+                    String urlD = getSharedPreferences("data", MODE_PRIVATE).getString("urlD", null);
+                    CookieManager cookieManager = CookieManager.getInstance();
+                    String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    request.setTitle(fileName.substring(0, fileName.indexOf(".")));
+                    request.setDescription("Animeflv");
+                    request.addRequestHeader("cookie", cookie);
+                    request.addRequestHeader("User-Agent", webView.getSettings().getUserAgentString());
+                    request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
+                    request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
+                    request.addRequestHeader("Referer", urlD);
+                    request.setMimeType("video/mp4");
+                    request.setDestinationInExternalPublicDir(".Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")), fileName);
+                    DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                    manager.enqueue(request);
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putInt("sov", 0).apply();
+                    finish();
+                }else {
+                    toastS("El archivo ya existe");
+                    finish();
+                }
             }
         });
         webView.setWebViewClient(new WebViewClient() {

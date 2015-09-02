@@ -290,6 +290,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (bundle!=null){
             new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
         }
+        if (descarga.exists()){descarga.delete();}
     }
     public void toast(String texto){
         Toast.makeText(this,texto,Toast.LENGTH_LONG).show();
@@ -613,6 +614,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         Dstorage.mkdirs();
                     }
                 }
+                File archivo=new File(Dstorage,fileName);
+                if (!archivo.exists()){
                 String urlD=getSharedPreferences("data",MODE_PRIVATE).getString("urlD", null);
                 CookieManager cookieManager = CookieManager.getInstance();
                 String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
@@ -626,11 +629,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
                 request.addRequestHeader("Referer", urlD);
                 request.setMimeType("video/mp4");
-                request.allowScanningByMediaScanner();
-                request.setDestinationInExternalPublicDir(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")), fileName);
+                request.setDestinationInExternalPublicDir(".Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")), fileName);
                 DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                 manager.enqueue(request);
-                getSharedPreferences("data", MODE_PRIVATE).edit().putInt("sov",0).apply();
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putInt("sov", 0).apply();
+                }else {
+                    toast("El archivo ya existe");
+                }
             }
         });
         web_Links=(WebView) findViewById(R.id.wv_inicio2);
@@ -914,7 +919,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                Intent promptInstall = new Intent(Intent.ACTION_VIEW)
                        .setDataAndType(Uri.fromFile(descarga),
                                "application/vnd.android.package-archive");
-               getSharedPreferences("data",MODE_PRIVATE).edit().putInt("isAct",0);
+               getSharedPreferences("data",MODE_PRIVATE).edit().putInt("isAct", 0);
                finish();
                startActivity(promptInstall);
            }
