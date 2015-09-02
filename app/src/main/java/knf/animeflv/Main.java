@@ -913,8 +913,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
     BroadcastReceiver onComplete=new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent intent) {
-            int isdown=getSharedPreferences("data",MODE_PRIVATE).getInt("isAct",0);
-           if (descarga.exists()&&isdown==1){
+            long isdown=getSharedPreferences("data",MODE_PRIVATE).getLong("isAct", 0);
+           if (descarga.exists()&&isdown==intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID,0)){
                Intent promptInstall = new Intent(Intent.ACTION_VIEW)
                        .setDataAndType(Uri.fromFile(descarga),
                                "application/vnd.android.package-archive");
@@ -997,10 +997,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                                 request.setDescription("Descargar Actualizacion");
                                 request.setTitle("Animeflv");
+                                request.setMimeType("application/vnd.android.package-archive");
                                 request.setDestinationInExternalPublicDir("/.animeflv/cache", "Animeflv_Nver.apk");
                                 DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                                manager.enqueue(request);
-                                getSharedPreferences("data",MODE_PRIVATE).edit().putInt("isAct",1);
+                                long enqueue=manager.enqueue(request);
+                                getSharedPreferences("data",MODE_PRIVATE).edit().putLong("isAct", enqueue);
                             }
 
                             @Override
