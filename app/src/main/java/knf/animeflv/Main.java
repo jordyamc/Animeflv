@@ -595,8 +595,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                int sov=getSharedPreferences("data",MODE_PRIVATE).getInt("sov",0);
-                if (sov==1) {
+                int sov = getSharedPreferences("data", MODE_PRIVATE).getInt("sov", 0);
+                if (sov == 1) {
                     view.loadUrl(url);
                 }
                 return true;
@@ -619,7 +619,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                 request.setTitle("Animeflv");
-                request.setDescription(fileName.substring(0,fileName.indexOf(".")));
+                request.setDescription(fileName.substring(0, fileName.indexOf(".")));
                 request.addRequestHeader("cookie", cookie);
                 request.addRequestHeader("User-Agent", web.getSettings().getUserAgentString());
                 request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
@@ -641,8 +641,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             @Override
             public void onPageFinished(WebView view, String url) {
                 //web_Links.loadUrl("javascript:window.HtmlViewer.showHTMLD1" + "(document.getElementById('descargas_box').getElementsByTagName('a')[1].href);");
-                web_Links.loadUrl("javascript:"+
-                        "var json=JSON.stringify(videos);"+
+                web_Links.loadUrl("javascript:" +
+                        "var json=JSON.stringify(videos);" +
                         "window.HtmlViewer.showHTMLD1(json);");
             }
         });
@@ -955,14 +955,20 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         }
         if (taskType==TaskType.VERSION){
-            Log.d("Version", Integer.toString(versionCode)+ " >> "+data.trim());
-            if (versionCode>=Integer.parseInt(data.trim())){
+            String vers="";
+            if (!isNetworkAvailable()){
+                vers=Integer.toString(versionCode);
+            }else {
+                vers=data;
+            }
+            Log.d("Version", Integer.toString(versionCode)+ " >> "+vers.trim());
+            if (versionCode>=Integer.parseInt(vers.trim())){
                 Log.d("Version","OK");
                 getSharedPreferences("data",MODE_PRIVATE).edit().putBoolean("notVer",false);
             }else {
                 Log.d("Version", "Actualizar");
                 MaterialDialog dialog = new MaterialDialog.Builder(this)
-                        .title("Nueva Version "+data.trim())
+                        .title("Nueva Version "+vers.trim())
                         .content("Hay una nueva version disponible, porfavor instala para continuar.")
                         .titleColorRes(R.color.prim)
                         .autoDismiss(false)
