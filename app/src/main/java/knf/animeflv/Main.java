@@ -625,6 +625,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
                 request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
                 request.addRequestHeader("Referer", urlD);
+                request.setMimeType("video/mp4");
                 request.allowScanningByMediaScanner();
                 request.setDestinationInExternalPublicDir(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")), fileName);
                 DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
@@ -908,10 +909,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
     BroadcastReceiver onComplete=new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent intent) {
-           if (descarga.exists()){
+            int isdown=getSharedPreferences("data",MODE_PRIVATE).getInt("isAct",0);
+           if (descarga.exists()&&isdown==1){
                Intent promptInstall = new Intent(Intent.ACTION_VIEW)
                        .setDataAndType(Uri.fromFile(descarga),
                                "application/vnd.android.package-archive");
+               getSharedPreferences("data",MODE_PRIVATE).edit().putInt("isAct",0);
                finish();
                startActivity(promptInstall);
            }
@@ -975,7 +978,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         .cancelable(false)
                         .backgroundColor(Color.WHITE)
                         .titleGravity(GravityEnum.CENTER)
-                        .positiveText("Instalar")
+                        .positiveText("Actualizar")
                         .positiveColorRes(R.color.prim)
                         .negativeText("Salir")
                         .negativeColorRes(R.color.prim)
@@ -993,6 +996,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 request.setDestinationInExternalPublicDir("/.animeflv/cache", "Animeflv_Nver.apk");
                                 DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                                 manager.enqueue(request);
+                                getSharedPreferences("data",MODE_PRIVATE).edit().putInt("isAct",1);
                             }
 
                             @Override

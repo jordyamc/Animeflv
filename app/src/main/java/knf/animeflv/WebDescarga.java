@@ -85,6 +85,7 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
                 request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
                 request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
                 request.addRequestHeader("Referer", urlD);
+                request.setMimeType("video/mp4");
                 request.allowScanningByMediaScanner();
                 request.setDestinationInExternalPublicDir(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")), fileName);
                 DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
