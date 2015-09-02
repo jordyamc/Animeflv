@@ -618,8 +618,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                request.setTitle("Animeflv");
-                request.setDescription(fileName.substring(0, fileName.indexOf(".")));
+                request.setTitle(fileName.substring(0, fileName.indexOf(".")));
+                request.setDescription("Animeflv");
                 request.addRequestHeader("cookie", cookie);
                 request.addRequestHeader("User-Agent", web.getSettings().getUserAgentString());
                 request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
