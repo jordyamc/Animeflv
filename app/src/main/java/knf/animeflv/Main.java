@@ -838,7 +838,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     @Override
     public void onRefresh() {
         if (isNetworkAvailable()) {
-            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
+            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version_test.html");
             new Requests(this, TaskType.GET_INICIO).execute(inicio);
         }else {
             if (mswipe.isRefreshing()){mswipe.setRefreshing(false);}
