@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
@@ -26,6 +27,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
+
+import java.io.File;
 
 /**
  * Created by Jordy on 10/08/2015.
@@ -35,7 +38,7 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
     Toolbar toolbar;
     Bundle bundle;
     int inicio=0;
-
+    String ext_storage_state = Environment.getExternalStorageState();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,8 +58,6 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
         bundle = getIntent().getExtras();
         webView = (WebView) findViewById(R.id.wv_global);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setLoadsImagesAutomatically(false);
-        webView.getSettings().setBlockNetworkLoads(true);
         webView.getSettings().setBuiltInZoomControls(true);
         webView.getSettings().setSupportZoom(true);
         webView.getSettings().setDisplayZoomControls(false);
@@ -65,26 +66,42 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
             public void onDownloadStart(String url, String userAgent,
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
-                new Main().toast("Descarga Iniciada");
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
+                File Dstorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")));
+                if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                    if (!Dstorage.exists()) {
+                        Dstorage.mkdirs();
+                    }
+                }
+                String urlD=getSharedPreferences("data",MODE_PRIVATE).getString("urlD", null);
+                CookieManager cookieManager = CookieManager.getInstance();
+                String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                request.setDescription("Cecyt 3");
-                request.setTitle(fileName);
-                // in order for this if to run, you must use the android 3.2 to compile your app
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
-
-                // get download service and enqueue file
+                request.setTitle("Animeflv");
+                request.setDescription(fileName.substring(0,fileName.indexOf(".")));
+                request.addRequestHeader("cookie", cookie);
+                request.addRequestHeader("User-Agent", webView.getSettings().getUserAgentString());
+                request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
+                request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
+                request.addRequestHeader("Referer", urlD);
+                request.allowScanningByMediaScanner();
+                request.setDestinationInExternalPublicDir(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")), fileName);
                 DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                 manager.enqueue(request);
+                getSharedPreferences("data", MODE_PRIVATE).edit().putInt("sov",0).apply();
+                finish();
             }
         });
         webView.setWebViewClient(new WebViewClient() {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                webView.loadUrl(url);
-                return false;
+                int sov=getSharedPreferences("data",MODE_PRIVATE).getInt("sov",0);
+                if (sov==1) {
+                    view.loadUrl(url);
+                }
+                return true;
             }
 
             @Override
@@ -103,9 +120,10 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                webView.loadUrl("javascript:window.HtmlViewer.showHTMLD1" + "(document.getElementById('descargas_box').getElementsByTagName('a')[1].href);");
-                webView.loadUrl("javascript:window.HtmlViewer.showHTMLD2" + "(document.getElementById('dlbutton').href);");
-                webView.loadUrl("javascript:(function(){" + "l=document.getElementById('skiplink');" + "e=document.createEvent('HTMLEvents');" + "e.initEvent('click',true,true);" + "l.dispatchEvent(e);" + "})()");
+                webView.loadUrl("javascript:"+
+                        "var json=JSON.stringify(videos);"+
+                        "window.HtmlViewer.showHTMLD1(json);");
+                webView.loadUrl("javascript:(function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);" + "})()");
             }
         });
         new Requests(this,TaskType.GET_HTML1).execute(bundle.getString("url"));
@@ -165,9 +183,18 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
         }
         @JavascriptInterface
         public void showHTMLD1(String html) {
-            Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(html));
-            startActivity(intent);
-            finish();
+            String replace=html.replace("\\/","/");
+            String cortado=replace.substring(replace.indexOf("&proxy.link=")+12);
+            cortado=cortado.substring(0,cortado.indexOf("file.html")+9).trim();
+            getSharedPreferences("data", MODE_PRIVATE).edit().putString("urlD", cortado).apply();
+            getSharedPreferences("data", MODE_PRIVATE).edit().putInt("sov",1).apply();
+            final String finalstring=cortado;
+            webView.post(new Runnable() {
+                @Override
+                public void run() {
+                    webView.loadUrl(finalstring);
+                }
+            });
         }
         @JavascriptInterface
         public void showHTMLD2(String html) {

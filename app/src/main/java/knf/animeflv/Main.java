@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -582,15 +583,53 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         txtCapitulo18=(TextView) findViewById(R.id.tv_cardD_capitulo18);
         txtCapitulo19=(TextView) findViewById(R.id.tv_cardD_capitulo19);
         txtCapitulo20=(TextView) findViewById(R.id.tv_cardD_capitulo20);
-
         web=(WebView) findViewById(R.id.wv_inicio);
         web.getSettings().setJavaScriptEnabled(true);
         web.addJavascriptInterface(new JavaScriptInterface(context), "HtmlViewer");
         web.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
-                web.loadUrl("javascript:window.HtmlViewer.showHTML" +
-                        "('<html>'+document.getElementsByTagName('body')[0].innerHTML+'</html>');");
+                //web.loadUrl("javascript:"+"var num=e();"+"window.HtmlViewer.showHTMLD2(e());");
+                web.loadUrl("javascript:(function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);" + "})()");
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                int sov=getSharedPreferences("data",MODE_PRIVATE).getInt("sov",0);
+                if (sov==1) {
+                    view.loadUrl(url);
+                }
+                return true;
+            }
+        });
+        web.setDownloadListener(new DownloadListener() {
+            public void onDownloadStart(String url, String userAgent,
+                                        String contentDisposition, String mimetype,
+                                        long contentLength) {
+                String fileName = url.substring(url.lastIndexOf("/") + 1);
+                File Dstorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")));
+                if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                    if (!Dstorage.exists()) {
+                        Dstorage.mkdirs();
+                    }
+                }
+                String urlD=getSharedPreferences("data",MODE_PRIVATE).getString("urlD", null);
+                CookieManager cookieManager = CookieManager.getInstance();
+                String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                request.setTitle("Animeflv");
+                request.setDescription(fileName.substring(0,fileName.indexOf(".")));
+                request.addRequestHeader("cookie", cookie);
+                request.addRequestHeader("User-Agent", web.getSettings().getUserAgentString());
+                request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
+                request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
+                request.addRequestHeader("Referer", urlD);
+                request.allowScanningByMediaScanner();
+                request.setDestinationInExternalPublicDir(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")), fileName);
+                DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                manager.enqueue(request);
+                getSharedPreferences("data", MODE_PRIVATE).edit().putInt("sov",0).apply();
             }
         });
         web_Links=(WebView) findViewById(R.id.wv_inicio2);
@@ -601,29 +640,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         web_Links.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
-                web_Links.loadUrl("javascript:window.HtmlViewer.showHTMLD1" + "(document.getElementById('descargas_box').getElementsByTagName('a')[1].href);");
-                web_Links.loadUrl("javascript:window.HtmlViewer.showHTMLD2" + "(document.getElementById('dlbutton').href);");
-                if (url.contains("http://www.")) {
-                    web_Links.loadUrl("javascript:(function(){" + "l=document.getElementById('skiplink');" + "e=document.createEvent('HTMLEvents');" + "e.initEvent('click',true,true);" + "l.dispatchEvent(e);" + "})()");
-                }
-            }
-        });
-        web_Links.setDownloadListener(new DownloadListener() {
-            public void onDownloadStart(String url, String userAgent,
-                                        String contentDisposition, String mimetype,
-                                        long contentLength) {
-                new Main().toast("Descarga Iniciada");
-                String fileName = url.substring(url.lastIndexOf("/") + 1);
-                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                request.setDescription("Cecyt 3");
-                request.setTitle(fileName);
-                // in order for this if to run, you must use the android 3.2 to compile your app
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
-
-                // get download service and enqueue file
-                DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                manager.enqueue(request);
+                //web_Links.loadUrl("javascript:window.HtmlViewer.showHTMLD1" + "(document.getElementById('descargas_box').getElementsByTagName('a')[1].href);");
+                web_Links.loadUrl("javascript:"+
+                        "var json=JSON.stringify(videos);"+
+                        "window.HtmlViewer.showHTMLD1(json);");
             }
         });
     }
@@ -1016,6 +1036,19 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (taskType==TaskType.GET_INFO){
             actCacheInfo(data);
         }
+        if (taskType==TaskType.GET_HTML2){
+            int a=Integer.parseInt(data.substring(data.indexOf("document.getElementById('lang-one').a = ")+40,data.indexOf("document.getElementById('lang-one').a = ") + 46).trim());
+            int b=1234567;
+            String code=Integer.toString((((a + 3) * 3) % b) + 3);
+            Log.d("Int a",Integer.toString(a));
+            Log.d("Int b",Integer.toString(b));
+            Log.d("code", code);
+            String durl=data.substring(data.indexOf("document.getElementById('dlbutton').href = ") + 45, data.indexOf(";", data.indexOf("document.getElementById('dlbutton').href = ") + 45) - 1);
+            durl=durl.replace("\"+e()+\"",code);
+            String url=getSharedPreferences("data",MODE_PRIVATE).getString("urlD",null);
+            String furl="http://"+url.substring(url.indexOf("www"),url.indexOf(".",url.indexOf("www")))+".zippyshare.com/"+durl;
+            Log.d("Final D Link",furl);
+        }
     }
 
     @Override
@@ -1050,12 +1083,24 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         @JavascriptInterface
         public void showHTMLD1(String html) {
-            toast(html);
-            Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(html));
-            startActivity(intent);
+            String replace=html.replace("\\/","/");
+            String cortado=replace.substring(replace.indexOf("&proxy.link=")+12);
+            cortado=cortado.substring(0,cortado.indexOf("file.html")+9).trim();
+            getSharedPreferences("data", MODE_PRIVATE).edit().putString("urlD", cortado).apply();
+            getSharedPreferences("data", MODE_PRIVATE).edit().putInt("sov",1).apply();
+            final String finalstring=cortado;
+            web.post(new Runnable() {
+                @Override
+                public void run() {
+                    web.loadUrl(finalstring);
+                }
+            });
+            //new Requests(context,TaskType.GET_HTML2).execute(cortado);
+            //Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(cortado));
+           //startActivity(intent);
         }
         @JavascriptInterface
         public void showHTMLD2(String html) {
-            toast(html);
+            Log.d("Zippy",html);
         }}
 }
