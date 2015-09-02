@@ -969,7 +969,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 Log.d("Version", "Actualizar");
                 MaterialDialog dialog = new MaterialDialog.Builder(this)
                         .title("Nueva Version "+vers.trim())
-                        .content("Hay una nueva version disponible, porfavor instala para continuar.")
+                        .content("Esta version ("+versionCode+") es obsoleta, porfavor actualiza para continuar.")
                         .titleColorRes(R.color.prim)
                         .autoDismiss(false)
                         .cancelable(false)
