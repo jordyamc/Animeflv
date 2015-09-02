@@ -632,7 +632,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 request.setDestinationInExternalPublicDir(".Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")), fileName);
                 DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                 manager.enqueue(request);
-                    getSharedPreferences("data", MODE_PRIVATE).edit().putInt("sov", 0).apply();
                 }else {
                     toast("El archivo ya existe");
                 }
