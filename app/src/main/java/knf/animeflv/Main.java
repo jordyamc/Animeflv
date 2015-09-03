@@ -214,20 +214,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     ImageButton IBVT;
     int indexT;
     String eidT;
-    List<String> longs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
         context=this;
         Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones",true);
-        String l=getSharedPreferences("data", MODE_PRIVATE).getString("descLongs", "");
-        String[] ls=l.split(":::");
-        for (String s:ls){
-            if (!s.trim().equals("")){
-                longs.add(s);
-            }
-        }
         if (not) {
             alarm.SetAlarm(this);
         }
@@ -745,6 +737,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         ibVer19=(ImageButton) findViewById(R.id.ib_ver_cardD19);
         ibVer20=(ImageButton) findViewById(R.id.ib_ver_cardD20);
         textoff=(TextView) findViewById(R.id.textOffline);
+        textoff.setVisibility(View.GONE);
         IBsDesList.add(ibDes1);IBsVerList.add(ibVer1);
         IBsDesList.add(ibDes2);IBsVerList.add(ibVer2);
         IBsDesList.add(ibDes3);IBsVerList.add(ibVer3);
@@ -1271,7 +1264,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt";
             if (isNetworkAvailable()&&!data.trim().equals("")) {
-                textoff.setVisibility(View.GONE);
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {
