@@ -19,6 +19,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="MODO OFFLINE"
+                android:id="@+id/textOffline"
+                android:gravity="center_vertical|center_horizontal"
+                android:textColor="@color/dark"
+                android:visibility="gone"
+                android:textSize="65px"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp" />
+
             <android.support.v7.widget.CardView
                 xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/card1"
@@ -92,7 +104,7 @@
                             android:scaleType="fitCenter"
                             android:clickable="true"
                             android:onClick="onVerclicked" />
-                        <ImageButton
+                        <pl.droidsonroids.gif.GifImageButton
                             android:layout_width="70dp"
                             android:layout_height="70dp"
                             android:id="@+id/ib_descargar_cardD1"
@@ -181,7 +193,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD2"
@@ -270,7 +282,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD3"
@@ -359,7 +371,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD4"
@@ -448,7 +460,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD5"
@@ -537,7 +549,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD6"
@@ -626,7 +638,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD7"
@@ -715,7 +727,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD8"
@@ -804,7 +816,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD9"
@@ -893,7 +905,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD10"
@@ -982,7 +994,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD11"
@@ -1071,7 +1083,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD12"
@@ -1160,7 +1172,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD13"
@@ -1250,7 +1262,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD14"
@@ -1339,7 +1351,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD15"
@@ -1428,7 +1440,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD16"
@@ -1517,7 +1529,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD17"
@@ -1606,7 +1618,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD18"
@@ -1695,7 +1707,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD19"
@@ -1784,7 +1796,7 @@
                     android:scaleType="fitCenter"
                     android:clickable="true"
                     android:onClick="onVerclicked" />
-                <ImageButton
+                <pl.droidsonroids.gif.GifImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:id="@+id/ib_descargar_cardD20"

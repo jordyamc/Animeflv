@@ -31,10 +31,14 @@
     <string-array name="sonidos">
         <item>Por Defecto</item>
         <item>Especial</item>
+        <item>Onii-chan</item>
+        <item>Onii-chan (Sam)</item>
     </string-array>
     <string-array name="tipos_sonidos">
         <item>0</item>
         <item>1</item>
+        <item>2</item>
+        <item>3</item>
     </string-array>
     <string-array name="busqueda">
         <item>Autobusqueda (Lag)</item>

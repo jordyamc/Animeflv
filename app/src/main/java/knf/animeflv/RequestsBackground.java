@@ -107,21 +107,54 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
     }
     private boolean isNetworkAvailable() {
         Boolean net=false;
-        int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion","0"));
+        int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         switch (Tcon){
             case 0:
                 NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 net=Wifi.isConnected();
+                try {
+                    Runtime runtime = Runtime.getRuntime();
+                    Process proc = runtime.exec("ping -c 1 " + "google.com");
+                    proc.waitFor();
+                    int exitCode = proc.exitValue();
+                    if(exitCode != 0) {
+                        net=false;
+                    }
+                }
+                catch (IOException e) {}
+                catch (InterruptedException e) {}
                 break;
             case 1:
                 NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                 net=mobile.isConnected();
+                try {
+                    Runtime runtime = Runtime.getRuntime();
+                    Process proc = runtime.exec("ping -c 1 " + "google.com");
+                    proc.waitFor();
+                    int exitCode = proc.exitValue();
+                    if(exitCode != 0) {
+                        net=false;
+                    }
+                }
+                catch (IOException e) {}
+                catch (InterruptedException e) {}
                 break;
             case 2:
                 NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                 net=WifiA.isConnected()||mobileA.isConnected();
+                try {
+                    Runtime runtime = Runtime.getRuntime();
+                    Process proc = runtime.exec("ping -c 1 " + "google.com");
+                    proc.waitFor();
+                    int exitCode = proc.exitValue();
+                    if(exitCode != 0) {
+                        net=false;
+                    }
+                }
+                catch (IOException e) {}
+                catch (InterruptedException e) {}
         }
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && net;
@@ -140,7 +173,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
         }
         File file=new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt");
         String file_loc=Environment.getExternalStorageDirectory()+ "/.Animeflv/cache/inicio.txt";
-        if (isNetworkAvailable()) {
+        if (isNetworkAvailable()&&!s.trim().equals("")) {
             Log.d("Conexion","Hay internet");
             if (!file.exists()) {
                 Log.d("Archivo:", "No existe");
@@ -184,7 +217,8 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         int mNotificationId = 6991;
                         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                    }else {
+                    }
+                    if (not==1){
                         Log.d("Notificacion:", "Crear Sonido Especial");
                         String act=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("reload","0");
                         Log.d("Registrer",act);
@@ -202,6 +236,62 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                                         .setContentText("Nuevos capitulos disponibles!!!");
                         mBuilder.setVibrate(new long[]{100, 200, 100, 500});
                         mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound"), AudioManager.STREAM_NOTIFICATION);
+                        mBuilder.setAutoCancel(true);
+                        mBuilder.setPriority(Notification.PRIORITY_MAX);
+                        mBuilder.setLights(Color.BLUE, 5000, 2000);
+                        Intent resultIntent = new Intent(context, Main.class);
+                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        mBuilder.setContentIntent(resultPendingIntent);
+                        int mNotificationId = 6991;
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                    }
+                    if (not==2){
+                        Log.d("Notificacion:", "Crear Sonido Onii-chan");
+                        String act=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("reload","0");
+                        Log.d("Registrer",act);
+                        if (act.equals("0")){
+                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","1").apply();
+                            Log.d("Registrer to","1");
+                        }else {
+                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
+                            Log.d("Registrer to", "0");
+                        }
+                        NotificationCompat.Builder mBuilder =
+                                new NotificationCompat.Builder(context)
+                                        .setSmallIcon(R.drawable.ic_not_r)
+                                        .setContentTitle("AnimeFLV")
+                                        .setContentText("Nuevos capitulos disponibles!!!");
+                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/onii"), AudioManager.STREAM_NOTIFICATION);
+                        mBuilder.setAutoCancel(true);
+                        mBuilder.setPriority(Notification.PRIORITY_MAX);
+                        mBuilder.setLights(Color.BLUE, 5000, 2000);
+                        Intent resultIntent = new Intent(context, Main.class);
+                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        mBuilder.setContentIntent(resultPendingIntent);
+                        int mNotificationId = 6991;
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                    }
+                    if (not==3){
+                        Log.d("Notificacion:", "Crear Sonido Sam");
+                        String act=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("reload","0");
+                        Log.d("Registrer",act);
+                        if (act.equals("0")){
+                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","1").apply();
+                            Log.d("Registrer to","1");
+                        }else {
+                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
+                            Log.d("Registrer to", "0");
+                        }
+                        NotificationCompat.Builder mBuilder =
+                                new NotificationCompat.Builder(context)
+                                        .setSmallIcon(R.drawable.ic_not_r)
+                                        .setContentTitle("AnimeFLV")
+                                        .setContentText("Nuevos capitulos disponibles!!!");
+                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sam"), AudioManager.STREAM_NOTIFICATION);
                         mBuilder.setAutoCancel(true);
                         mBuilder.setPriority(Notification.PRIORITY_MAX);
                         mBuilder.setLights(Color.BLUE, 5000, 2000);
@@ -254,7 +344,8 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         int mNotificationId = 1964;
                         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                    } else {
+                    }
+                    if (not==1){
                         Log.d("Notificacion:", "Crear Sonido Especial");
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(context)
@@ -263,6 +354,50 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                                         .setContentText("Nueva Version Disponible!!!");
                         mBuilder.setVibrate(new long[]{100, 200, 100, 500});
                         mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound"), AudioManager.STREAM_NOTIFICATION);
+                        mBuilder.setAutoCancel(true);
+                        mBuilder.setPriority(Notification.PRIORITY_MAX);
+                        mBuilder.setLights(Color.BLUE, 5000, 2000);
+                        Intent resultIntent = new Intent(context, Main.class);
+                        Bundle bundle=new Bundle();
+                        bundle.putString("act", "1");
+                        resultIntent.putExtras(bundle);
+                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        mBuilder.setContentIntent(resultPendingIntent);
+                        int mNotificationId = 1964;
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                    }
+                    if (not==2){
+                        Log.d("Notificacion:", "Crear Sonido Onii-chan");
+                        NotificationCompat.Builder mBuilder =
+                                new NotificationCompat.Builder(context)
+                                        .setSmallIcon(R.drawable.ic_not_r)
+                                        .setContentTitle("AnimeFLV")
+                                        .setContentText("Nueva Version Disponible!!!");
+                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/onii"), AudioManager.STREAM_NOTIFICATION);
+                        mBuilder.setAutoCancel(true);
+                        mBuilder.setPriority(Notification.PRIORITY_MAX);
+                        mBuilder.setLights(Color.BLUE, 5000, 2000);
+                        Intent resultIntent = new Intent(context, Main.class);
+                        Bundle bundle=new Bundle();
+                        bundle.putString("act", "1");
+                        resultIntent.putExtras(bundle);
+                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        mBuilder.setContentIntent(resultPendingIntent);
+                        int mNotificationId = 1964;
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                    }
+                    if (not==3){
+                        Log.d("Notificacion:", "Crear Sonido Sam");
+                        NotificationCompat.Builder mBuilder =
+                                new NotificationCompat.Builder(context)
+                                        .setSmallIcon(R.drawable.ic_not_r)
+                                        .setContentTitle("AnimeFLV")
+                                        .setContentText("Nueva Version Disponible!!!");
+                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sam"), AudioManager.STREAM_NOTIFICATION);
                         mBuilder.setAutoCancel(true);
                         mBuilder.setPriority(Notification.PRIORITY_MAX);
                         mBuilder.setLights(Color.BLUE, 5000, 2000);

@@ -9,7 +9,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 41
-        versionName "1.9.1.8.3"
+        versionName "1.9.1.8.4"
     }
     buildTypes {
         release {
@@ -43,6 +43,9 @@ dependencies {
     compile 'com.github.mmin18.layoutcast:library:1.+@aar'
     compile 'com.mikepenz:google-material-typeface:1.2.0@aar'
     compile 'com.mikepenz:fontawesome-typeface:4.4.0@aar'
+    compile 'com.github.panwrona:DownloadProgressBar:1.1'
+    compile 'com.mani:thindownloadmanager:1.0.0'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
     compile('com.mikepenz:materialdrawer:4.0.0@aar') {
         transitive = true
     }

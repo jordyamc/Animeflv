@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -23,6 +24,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.test.UiThreadTest;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +37,7 @@ import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -51,6 +55,10 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.panwrona.downloadprogressbar.library.DownloadProgressBar;
+import com.thin.downloadmanager.DownloadRequest;
+import com.thin.downloadmanager.DownloadStatusListener;
+import com.thin.downloadmanager.ThinDownloadManager;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -59,9 +67,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.info.Info;
+import pl.droidsonroids.gif.GifImageButton;
 
 public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,Requests.callback {
     WebView web;
@@ -129,6 +141,50 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     TextView txtCapitulo18;
     TextView txtCapitulo19;
     TextView txtCapitulo20;
+    GifImageButton ibDes1;
+    GifImageButton ibDes2;
+    GifImageButton ibDes3;
+    GifImageButton ibDes4;
+    GifImageButton ibDes5;
+    GifImageButton ibDes6;
+    GifImageButton ibDes7;
+    GifImageButton ibDes8;
+    GifImageButton ibDes9;
+    GifImageButton ibDes10;
+    GifImageButton ibDes11;
+    GifImageButton ibDes12;
+    GifImageButton ibDes13;
+    GifImageButton ibDes14;
+    GifImageButton ibDes15;
+    GifImageButton ibDes16;
+    GifImageButton ibDes17;
+    GifImageButton ibDes18;
+    GifImageButton ibDes19;
+    GifImageButton ibDes20;
+    ImageButton ibVer1;
+    ImageButton ibVer2;
+    ImageButton ibVer3;
+    ImageButton ibVer4;
+    ImageButton ibVer5;
+    ImageButton ibVer6;
+    ImageButton ibVer7;
+    ImageButton ibVer8;
+    ImageButton ibVer9;
+    ImageButton ibVer10;
+    ImageButton ibVer11;
+    ImageButton ibVer12;
+    ImageButton ibVer13;
+    ImageButton ibVer14;
+    ImageButton ibVer15;
+    ImageButton ibVer16;
+    ImageButton ibVer17;
+    ImageButton ibVer18;
+    ImageButton ibVer19;
+    ImageButton ibVer20;
+    TextView textoff;
+    ArrayList<GifImageButton> IBsDesList=new ArrayList<GifImageButton>();
+    ArrayList<ImageButton> IBsVerList=new ArrayList<ImageButton>();
+    List<Boolean> isDesc=new ArrayList<Boolean>();
     SwipeRefreshLayout mswipe;
     RecyclerView rv_fav;
     int first = 1;
@@ -153,13 +209,25 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     Toolbar Dtoolbar;
     File descarga = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache","Animeflv_Nver.apk");
     SharedPreferences.OnSharedPreferenceChangeListener listener;
-
+    boolean descargando=false;
+    GifImageButton GIBT;
+    ImageButton IBVT;
+    int indexT;
+    String eidT;
+    List<String> longs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
         context=this;
         Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones",true);
+        String l=getSharedPreferences("data", MODE_PRIVATE).getString("descLongs", "");
+        String[] ls=l.split(":::");
+        for (String s:ls){
+            if (!s.trim().equals("")){
+                longs.add(s);
+            }
+        }
         if (not) {
             alarm.SetAlarm(this);
         }
@@ -260,7 +328,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         });
         if (isNetworkAvailable()){new Requests(context,TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");}
-        registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        //registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         SharedPreferences prefs = this.getSharedPreferences("data", MODE_PRIVATE);
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
@@ -296,91 +364,141 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         Toast.makeText(this,texto,Toast.LENGTH_LONG).show();
     }
     public void onVerclicked(View view){
-        toast("Ver click");
+        String id=view.getResources().getResourceName(view.getId());
+        int index=Integer.parseInt(id.substring(id.lastIndexOf("D") + 1))-1;
+        List<String> a= Arrays.asList(aids);
+        List<String> n=Arrays.asList(numeros);
+        File file=new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+a.get(index)+"/"+a.get(index)+"_"+n.get(a.indexOf(a.get(index)))+".mp4");
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(file));
+        intent.setDataAndType(Uri.fromFile(file), "video/mp4");
+        startActivity(intent);
     }
     public void onDesClicked(View view){
         String url;
-        switch (view.getId()){
-            case R.id.ib_descargar_cardD1:
-                url=getUrl(titulos[0], numeros[0]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD2:
-                url=getUrl(titulos[1], numeros[1]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD3:
-                url=getUrl(titulos[2], numeros[2]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD4:
-                url=getUrl(titulos[3], numeros[3]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD5:
-                url=getUrl(titulos[4], numeros[4]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD6:
-                url=getUrl(titulos[5], numeros[5]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD7:
-                url=getUrl(titulos[6], numeros[6]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD8:
-                url=getUrl(titulos[7], numeros[7]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD9:
-                url=getUrl(titulos[8], numeros[8]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD10:
-                url=getUrl(titulos[9], numeros[9]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD11:
-                url=getUrl(titulos[10], numeros[10]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD12:
-                url=getUrl(titulos[11], numeros[11]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD13:
-                url=getUrl(titulos[12], numeros[12]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD14:
-                url=getUrl(titulos[13], numeros[13]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD15:
-                url=getUrl(titulos[14], numeros[14]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD16:
-                url=getUrl(titulos[15], numeros[15]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD17:
-                url=getUrl(titulos[16], numeros[16]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD18:
-                url=getUrl(titulos[17], numeros[17]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD19:
-                url=getUrl(titulos[18], numeros[18]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
-            case R.id.ib_descargar_cardD20:
-                url=getUrl(titulos[19], numeros[19]);
-                new Requests(this,TaskType.GET_HTML1).execute(url);
-                break;
+        GifImageButton imageButton=(GifImageButton) view;
+        String id=view.getResources().getResourceName(view.getId());
+        int index=Integer.parseInt(id.substring(id.lastIndexOf("D") + 1))-1;
+        if (isDesc.get(index)){
+            List<String> a= Arrays.asList(aids);
+            List<String> n=Arrays.asList(numeros);
+            File file=new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+a.get(index)+"/"+a.get(index)+"_"+n.get(a.indexOf(a.get(index)))+".mp4");
+            if (file.exists()) {
+                if (file.delete()) {
+                    isDesc.add(index, false);
+                    imageButton.setImageResource(R.drawable.ic_get_r);
+                    IBsVerList.get(index).setImageResource(R.drawable.ic_ver_no);
+                    IBsVerList.get(index).setEnabled(false);
+                    long l=Long.parseLong(getSharedPreferences("data",MODE_PRIVATE).getString(eids[index],"0"));
+                    if (l!=0) {
+                        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                        manager.remove(l);
+                    }
+                    toast("Archivo Eliminado");
+                }
+            }else {
+                isDesc.add(index, false);
+                imageButton.setScaleType(ImageView.ScaleType.FIT_END);
+                imageButton.setImageResource(R.drawable.ic_get_r);
+                IBsVerList.get(index).setImageResource(R.drawable.ic_ver_no);
+                IBsVerList.get(index).setEnabled(false);
+                toast("El archivo ya no existe");
+            }
+        }else {
+            if (!descargando) {
+                imageButton.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                imageButton.setImageResource(R.drawable.cargando);
+                imageButton.setEnabled(false);
+                GIBT=imageButton;
+                IBVT=IBsVerList.get(index);
+                isDesc.add(index,true);
+                descargando = true;
+                indexT=index;
+                eidT=eids[index];
+                switch (view.getId()) {
+                    case R.id.ib_descargar_cardD1:
+                        url = getUrl(titulos[0], numeros[0]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD2:
+                        url = getUrl(titulos[1], numeros[1]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD3:
+                        url = getUrl(titulos[2], numeros[2]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD4:
+                        url = getUrl(titulos[3], numeros[3]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD5:
+                        url = getUrl(titulos[4], numeros[4]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD6:
+                        url = getUrl(titulos[5], numeros[5]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD7:
+                        url = getUrl(titulos[6], numeros[6]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD8:
+                        url = getUrl(titulos[7], numeros[7]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD9:
+                        url = getUrl(titulos[8], numeros[8]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD10:
+                        url = getUrl(titulos[9], numeros[9]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD11:
+                        url = getUrl(titulos[10], numeros[10]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD12:
+                        url = getUrl(titulos[11], numeros[11]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD13:
+                        url = getUrl(titulos[12], numeros[12]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD14:
+                        url = getUrl(titulos[13], numeros[13]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD15:
+                        url = getUrl(titulos[14], numeros[14]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD16:
+                        url = getUrl(titulos[15], numeros[15]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD17:
+                        url = getUrl(titulos[16], numeros[16]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD18:
+                        url = getUrl(titulos[17], numeros[17]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD19:
+                        url = getUrl(titulos[18], numeros[18]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                    case R.id.ib_descargar_cardD20:
+                        url = getUrl(titulos[19], numeros[19]);
+                        new Requests(this, TaskType.GET_HTML1).execute(url);
+                        break;
+                }
+            }else {
+                toast("Por favor espera...");
+            }
         }
     }
     public void onCardClicked(View view){
@@ -584,6 +702,69 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         txtCapitulo18=(TextView) findViewById(R.id.tv_cardD_capitulo18);
         txtCapitulo19=(TextView) findViewById(R.id.tv_cardD_capitulo19);
         txtCapitulo20=(TextView) findViewById(R.id.tv_cardD_capitulo20);
+
+        ibDes1=(GifImageButton) findViewById(R.id.ib_descargar_cardD1);
+        ibDes2=(GifImageButton) findViewById(R.id.ib_descargar_cardD2);
+        ibDes3=(GifImageButton) findViewById(R.id.ib_descargar_cardD3);
+        ibDes4=(GifImageButton) findViewById(R.id.ib_descargar_cardD4);
+        ibDes5=(GifImageButton) findViewById(R.id.ib_descargar_cardD5);
+        ibDes6=(GifImageButton) findViewById(R.id.ib_descargar_cardD6);
+        ibDes7=(GifImageButton) findViewById(R.id.ib_descargar_cardD7);
+        ibDes8=(GifImageButton) findViewById(R.id.ib_descargar_cardD8);
+        ibDes9=(GifImageButton) findViewById(R.id.ib_descargar_cardD9);
+        ibDes10=(GifImageButton) findViewById(R.id.ib_descargar_cardD10);
+        ibDes11=(GifImageButton) findViewById(R.id.ib_descargar_cardD11);
+        ibDes12=(GifImageButton) findViewById(R.id.ib_descargar_cardD12);
+        ibDes13=(GifImageButton) findViewById(R.id.ib_descargar_cardD13);
+        ibDes14=(GifImageButton) findViewById(R.id.ib_descargar_cardD14);
+        ibDes15=(GifImageButton) findViewById(R.id.ib_descargar_cardD15);
+        ibDes16=(GifImageButton) findViewById(R.id.ib_descargar_cardD16);
+        ibDes17=(GifImageButton) findViewById(R.id.ib_descargar_cardD17);
+        ibDes18=(GifImageButton) findViewById(R.id.ib_descargar_cardD18);
+        ibDes19=(GifImageButton) findViewById(R.id.ib_descargar_cardD19);
+        ibDes20=(GifImageButton) findViewById(R.id.ib_descargar_cardD20);
+
+        ibVer1=(ImageButton) findViewById(R.id.ib_ver_cardD1);
+        ibVer2=(ImageButton) findViewById(R.id.ib_ver_cardD2);
+        ibVer3=(ImageButton) findViewById(R.id.ib_ver_cardD3);
+        ibVer4=(ImageButton) findViewById(R.id.ib_ver_cardD4);
+        ibVer5=(ImageButton) findViewById(R.id.ib_ver_cardD5);
+        ibVer6=(ImageButton) findViewById(R.id.ib_ver_cardD6);
+        ibVer7=(ImageButton) findViewById(R.id.ib_ver_cardD7);
+        ibVer8=(ImageButton) findViewById(R.id.ib_ver_cardD8);
+        ibVer9=(ImageButton) findViewById(R.id.ib_ver_cardD9);
+        ibVer10=(ImageButton) findViewById(R.id.ib_ver_cardD10);
+        ibVer11=(ImageButton) findViewById(R.id.ib_ver_cardD11);
+        ibVer12=(ImageButton) findViewById(R.id.ib_ver_cardD12);
+        ibVer13=(ImageButton) findViewById(R.id.ib_ver_cardD13);
+        ibVer14=(ImageButton) findViewById(R.id.ib_ver_cardD14);
+        ibVer15=(ImageButton) findViewById(R.id.ib_ver_cardD15);
+        ibVer16=(ImageButton) findViewById(R.id.ib_ver_cardD16);
+        ibVer17=(ImageButton) findViewById(R.id.ib_ver_cardD17);
+        ibVer18=(ImageButton) findViewById(R.id.ib_ver_cardD18);
+        ibVer19=(ImageButton) findViewById(R.id.ib_ver_cardD19);
+        ibVer20=(ImageButton) findViewById(R.id.ib_ver_cardD20);
+        textoff=(TextView) findViewById(R.id.textOffline);
+        IBsDesList.add(ibDes1);IBsVerList.add(ibVer1);
+        IBsDesList.add(ibDes2);IBsVerList.add(ibVer2);
+        IBsDesList.add(ibDes3);IBsVerList.add(ibVer3);
+        IBsDesList.add(ibDes4);IBsVerList.add(ibVer4);
+        IBsDesList.add(ibDes5);IBsVerList.add(ibVer5);
+        IBsDesList.add(ibDes6);IBsVerList.add(ibVer6);
+        IBsDesList.add(ibDes7);IBsVerList.add(ibVer7);
+        IBsDesList.add(ibDes8);IBsVerList.add(ibVer8);
+        IBsDesList.add(ibDes9);IBsVerList.add(ibVer9);
+        IBsDesList.add(ibDes10);IBsVerList.add(ibVer10);
+        IBsDesList.add(ibDes11);IBsVerList.add(ibVer11);
+        IBsDesList.add(ibDes12);IBsVerList.add(ibVer12);
+        IBsDesList.add(ibDes13);IBsVerList.add(ibVer13);
+        IBsDesList.add(ibDes14);IBsVerList.add(ibVer14);
+        IBsDesList.add(ibDes15);IBsVerList.add(ibVer15);
+        IBsDesList.add(ibDes16);IBsVerList.add(ibVer16);
+        IBsDesList.add(ibDes17);IBsVerList.add(ibVer17);
+        IBsDesList.add(ibDes18);IBsVerList.add(ibVer18);
+        IBsDesList.add(ibDes19);IBsVerList.add(ibVer19);
+        IBsDesList.add(ibDes20);IBsVerList.add(ibVer20);
         web=(WebView) findViewById(R.id.wv_inicio);
         web.getSettings().setJavaScriptEnabled(true);
         web.addJavascriptInterface(new JavaScriptInterface(context), "HtmlViewer");
@@ -596,10 +777,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                int sov = getSharedPreferences("data", MODE_PRIVATE).getInt("sov", 0);
-                if (sov == 1) {
                     view.loadUrl(url);
-                }
                 return true;
             }
         });
@@ -614,14 +792,19 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         Dstorage.mkdirs();
                     }
                 }
-                File archivo=new File(Dstorage,fileName);
-                if (!archivo.exists()){
+                File archivo=new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_"))+"/"+fileName);
+                if (!archivo.exists()&&descargando){
+                    GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+                    GIBT.setImageResource(R.drawable.ic_borrar_r);
+                    GIBT.setEnabled(true);
+                    IBVT.setImageResource(R.drawable.ic_rep_r);
+                    IBVT.setEnabled(true);
                 String urlD=getSharedPreferences("data",MODE_PRIVATE).getString("urlD", null);
                 CookieManager cookieManager = CookieManager.getInstance();
                 String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                request.setTitle(fileName.substring(0, fileName.indexOf(".")));
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    request.setTitle(fileName.substring(0, fileName.indexOf(".")));
                 request.setDescription("Animeflv");
                 request.addRequestHeader("cookie", cookie);
                 request.addRequestHeader("User-Agent", web.getSettings().getUserAgentString());
@@ -629,11 +812,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
                 request.addRequestHeader("Referer", urlD);
                 request.setMimeType("video/mp4");
-                request.setDestinationInExternalPublicDir(".Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")), fileName);
+                    request.setDestinationInExternalPublicDir(".Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")), fileName);
                 DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                manager.enqueue(request);
+                long l=manager.enqueue(request);
+                    descargando=false;
+                    web.loadUrl("about:blank");
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putString(eidT,Long.toString(l)).apply();
                 }else {
-                    toast("El archivo ya existe");
+                    web.loadUrl("about:blank");
                 }
             }
         });
@@ -746,9 +932,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt");
         String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt";
         if (isNetworkAvailable()) {
+            textoff.setVisibility(View.GONE);
             new Requests(this, TaskType.GET_INICIO).execute(inicio);
         }else {
             if (file.exists()) {
+                textoff.setVisibility(View.VISIBLE);
                 String infile = getStringFromFile(file_loc);
                 getData(infile);
             } else {
@@ -794,7 +982,28 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         aids=parser.parseAID(json);
         numeros=parser.parsenumeros(json);
         mswipe.setRefreshing(false);
+        checkButtons(aids,numeros,eids);
         isFirst();
+    }
+    public void checkButtons(String[] aids,String[] numeros,String[] eids){
+        List<String> a= Arrays.asList(aids);
+        List<String> n=Arrays.asList(numeros);
+        List<String> e=Arrays.asList(eids);
+        for (String s:e){
+            Log.i("dir", Environment.getExternalStorageDirectory() + "/.Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
+            int index=e.indexOf(s);
+            File file=new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+a.get(e.indexOf(s))+"/"+a.get(e.indexOf(s))+"_"+n.get(e.indexOf(s))+".mp4");
+            Log.i("Existe",String.valueOf(file.exists()));
+            if (file.exists()){
+                IBsDesList.get(index).setImageResource(R.drawable.ic_borrar_r);
+                //if (ibDes0!=null){ibDes0.setImageResource(R.drawable.cargando);}
+                isDesc.add(true);
+            }else {
+                IBsVerList.get(index).setEnabled(false);
+                IBsVerList.get(index).setImageResource(R.drawable.ic_ver_no);
+                isDesc.add(false);
+            }
+        }
     }
     public String getUrl(String titulo,String capitulo){
         String ftitulo="";
@@ -838,9 +1047,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     @Override
     public void onRefresh() {
         if (isNetworkAvailable()) {
-            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version_test.html");
+            textoff.setVisibility(View.GONE);
+            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
             new Requests(this, TaskType.GET_INICIO).execute(inicio);
         }else {
+            textoff.setVisibility(View.VISIBLE);
             if (mswipe.isRefreshing()){mswipe.setRefreshing(false);}
         }
         NotificationManager notificationManager = (NotificationManager) this
@@ -898,32 +1109,52 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             case 0:
                 NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 net=Wifi.isConnected();
+                try {
+                    Runtime runtime = Runtime.getRuntime();
+                    Process proc = runtime.exec("ping -c 1 " + "google.com");
+                    proc.waitFor();
+                    int exitCode = proc.exitValue();
+                    if(exitCode != 0) {
+                       net=false;
+                    }
+                }
+                catch (IOException e) {}
+                catch (InterruptedException e) {}
                 break;
             case 1:
                 NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                 net=mobile.isConnected();
+                try {
+                    Runtime runtime = Runtime.getRuntime();
+                    Process proc = runtime.exec("ping -c 1 " + "google.com");
+                    proc.waitFor();
+                    int exitCode = proc.exitValue();
+                    if(exitCode != 0) {
+                        net=false;
+                    }
+                }
+                catch (IOException e) {}
+                catch (InterruptedException e) {}
                 break;
             case 2:
                 NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                 net=WifiA.isConnected()||mobileA.isConnected();
+                try {
+                    Runtime runtime = Runtime.getRuntime();
+                    Process proc = runtime.exec("ping -c 1 " + "google.com");
+                    proc.waitFor();
+                    int exitCode = proc.exitValue();
+                    if(exitCode != 0) {
+                        net=false;
+                    }
+                }
+                catch (IOException e) {}
+                catch (InterruptedException e) {}
         }
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && net;
     }
-    BroadcastReceiver onComplete=new BroadcastReceiver() {
-        public void onReceive(Context ctxt, Intent intent) {
-            long isdown=getSharedPreferences("data",MODE_PRIVATE).getLong("isAct", 0);
-           if (descarga.exists()&&isdown==intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID,0)){
-               Intent promptInstall = new Intent(Intent.ACTION_VIEW)
-                       .setDataAndType(Uri.fromFile(descarga),
-                               "application/vnd.android.package-archive");
-               getSharedPreferences("data",MODE_PRIVATE).edit().putInt("isAct", 0);
-               finish();
-               startActivity(promptInstall);
-           }
-        }
-    };
     @Override
     public void sendtext1(String data,TaskType taskType){
         if (taskType==TaskType.DIRECTORIO){
@@ -975,8 +1206,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }else {
                 Log.d("Version", "Actualizar");
                 MaterialDialog dialog = new MaterialDialog.Builder(this)
-                        .title("Nueva Version "+vers.trim())
-                        .content("Esta version ("+versionCode+") es obsoleta, porfavor actualiza para continuar.")
+                        .title("Nueva Version " + vers.trim())
+                        .customView(R.layout.text_d_act, false)
                         .titleColorRes(R.color.prim)
                         .autoDismiss(false)
                         .cancelable(false)
@@ -992,16 +1223,33 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 if (descarga.exists()) {
                                     descarga.delete();
                                 }
-                                toast("Descarga Iniciada...");
-                                DownloadManager.Request request = new DownloadManager.Request(Uri.parse("https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true"));
-                                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                                request.setDescription("Descargar Actualizacion");
-                                request.setTitle("Animeflv");
-                                request.setMimeType("application/vnd.android.package-archive");
-                                request.setDestinationInExternalPublicDir("/.animeflv/cache", "Animeflv_Nver.apk");
-                                DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                                long enqueue=manager.enqueue(request);
-                                getSharedPreferences("data",MODE_PRIVATE).edit().putLong("isAct", enqueue);
+                                final TextView textView=(TextView)dialog.getCustomView().findViewById(R.id.tv_progress);
+                                textView.setVisibility(View.VISIBLE);
+                                Uri download = Uri.parse("https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true");
+                                DownloadRequest downloadRequest = new DownloadRequest(download)
+                                        .setDestinationURI(Uri.fromFile(descarga))
+                                        .setDownloadListener(new DownloadStatusListener() {
+                                            @Override
+                                            public void onDownloadComplete(int i) {
+                                                Intent promptInstall = new Intent(Intent.ACTION_VIEW)
+                                                        .setDataAndType(Uri.fromFile(descarga),
+                                                                "application/vnd.android.package-archive");
+                                                finish();
+                                                startActivity(promptInstall);
+                                            }
+
+                                            @Override
+                                            public void onDownloadFailed(int i, int i1, String s) {
+                                                textView.setText("Error al descargar: "+s);
+                                            }
+
+                                            @Override
+                                            public void onProgress(int i, long l, int i1) {
+                                                textView.setText(Integer.toString(i1)+"%");
+                                            }
+                                        });
+                                ThinDownloadManager downloadManager=new ThinDownloadManager();
+                                downloadManager.add(downloadRequest);
                             }
 
                             @Override
@@ -1009,6 +1257,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 finish();
                             }
                         }).build();
+                TextView textView=(TextView) dialog.getCustomView().findViewById(R.id.tv_dialog);
+                textView.setText("Esta version (" + versionCode + ") es obsoleta, porfavor actualiza para continuar.");
                 dialog.show();
             }
         }
@@ -1020,7 +1270,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
             File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt";
-            if (isNetworkAvailable()) {
+            if (isNetworkAvailable()&&!data.trim().equals("")) {
+                textoff.setVisibility(View.GONE);
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {

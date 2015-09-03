@@ -26,6 +26,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     Context context;
     MediaPlayer mp;
     MediaPlayer r;
+    MediaPlayer oni;
+    MediaPlayer sam;
     //Ringtone r;
     @Override
     public void onCreate(final Bundle savedInstanceState){
@@ -43,6 +45,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         r = MediaPlayer.create(context, notification);
         mp = MediaPlayer.create(context, R.raw.sound);
+        oni = MediaPlayer.create(context, R.raw.onii);
+        sam = MediaPlayer.create(context, R.raw.sam);
         long size = 0;
         File[] files = context.getCacheDir().listFiles();
         File[] mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache").listFiles();
@@ -103,19 +107,41 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
            case "sonido":
                int not=Integer.parseInt(sharedPreferences.getString("sonido","0"));
                if (not==0){
-                   if (mp.isPlaying()){
-                       mp.stop();
+                   if (mp.isPlaying()||oni.isPlaying()||sam.isPlaying()){
+                       if (mp.isPlaying())mp.stop();
+                       if (oni.isPlaying())oni.stop();
+                       if (sam.isPlaying())sam.stop();
                    }
                    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                    r = MediaPlayer.create(context, notification);
                    r.start();
                }
                if (not==1){
-                   if (r.isPlaying()){
-                       r.stop();
+                   if (r.isPlaying()||oni.isPlaying()||sam.isPlaying()){
+                       if (r.isPlaying())r.stop();
+                       if (oni.isPlaying())oni.stop();
+                       if (sam.isPlaying())sam.stop();
                    }
                    mp = MediaPlayer.create(context, R.raw.sound);
                    mp.start();
+               }
+               if (not==2){
+                   if (r.isPlaying()||mp.isPlaying()||sam.isPlaying()){
+                       if (r.isPlaying())r.stop();
+                       if (mp.isPlaying())mp.stop();
+                       if (sam.isPlaying())sam.stop();
+                   }
+                   oni = MediaPlayer.create(context, R.raw.onii);
+                   oni.start();
+               }
+               if (not==3){
+                   if (r.isPlaying()||mp.isPlaying()||sam.isPlaying()){
+                       if (r.isPlaying())r.stop();
+                       if (mp.isPlaying())mp.stop();
+                       if (oni.isPlaying())oni.stop();
+                   }
+                   sam = MediaPlayer.create(context, R.raw.sam);
+                   sam.start();
                }
                break;
            case "b_cache":
@@ -169,6 +195,14 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         if (r.isPlaying()){
             r.stop();
             r.release();
+        }
+        if (oni.isPlaying()){
+            oni.stop();
+            oni.release();
+        }
+        if (sam.isPlaying()){
+            sam.stop();
+            sam.release();
         }
     }
 }

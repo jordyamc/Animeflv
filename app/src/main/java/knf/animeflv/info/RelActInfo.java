@@ -87,15 +87,48 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
             case 0:
                 NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 net=Wifi.isConnected();
+                try {
+                    Runtime runtime = Runtime.getRuntime();
+                    Process proc = runtime.exec("ping -c 1 " + "google.com");
+                    proc.waitFor();
+                    int exitCode = proc.exitValue();
+                    if(exitCode != 0) {
+                        net=false;
+                    }
+                }
+                catch (IOException e) {}
+                catch (InterruptedException e) {}
                 break;
             case 1:
                 NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                 net=mobile.isConnected();
+                try {
+                    Runtime runtime = Runtime.getRuntime();
+                    Process proc = runtime.exec("ping -c 1 " + "google.com");
+                    proc.waitFor();
+                    int exitCode = proc.exitValue();
+                    if(exitCode != 0) {
+                        net=false;
+                    }
+                }
+                catch (IOException e) {}
+                catch (InterruptedException e) {}
                 break;
             case 2:
                 NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                 net=WifiA.isConnected()||mobileA.isConnected();
+                try {
+                    Runtime runtime = Runtime.getRuntime();
+                    Process proc = runtime.exec("ping -c 1 " + "google.com");
+                    proc.waitFor();
+                    int exitCode = proc.exitValue();
+                    if(exitCode != 0) {
+                        net=false;
+                    }
+                }
+                catch (IOException e) {}
+                catch (InterruptedException e) {}
         }
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && net;
