@@ -201,11 +201,19 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
                             Log.d("Registrer to", "0");
                         }
+                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+1;
+                        context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putInt("nCaps",nCaps).apply();
+                        String mess="";
+                        if (nCaps==1){
+                            mess="Hay "+Integer.toString(nCaps)+" nuevo capitulo disponible!!!";
+                        }else {
+                            mess="Hay "+Integer.toString(nCaps)+" nuevos capitulos disponibles!!!";
+                        }
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(context)
                                         .setSmallIcon(R.drawable.ic_not_r)
                                         .setContentTitle("AnimeFLV")
-                                        .setContentText("Nuevos capitulos disponibles!!!");
+                                        .setContentText(mess);
                         mBuilder.setVibrate(new long[]{100, 200, 100, 500});
                         mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
                         mBuilder.setAutoCancel(true);
@@ -216,6 +224,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         mBuilder.setContentIntent(resultPendingIntent);
                         int mNotificationId = 6991;
                         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.cancel(mNotificationId);
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
                     }
                     if (not==1){
@@ -229,11 +238,19 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
                             Log.d("Registrer to", "0");
                         }
+                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+1;
+                        context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putInt("nCaps",nCaps).apply();
+                        String mess="";
+                        if (nCaps==1){
+                            mess="Hay "+Integer.toString(nCaps)+" nuevo capitulo disponible!!!";
+                        }else {
+                            mess="Hay "+Integer.toString(nCaps)+" nuevos capitulos disponibles!!!";
+                        }
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(context)
                                         .setSmallIcon(R.drawable.ic_not_r)
                                         .setContentTitle("AnimeFLV")
-                                        .setContentText("Nuevos capitulos disponibles!!!");
+                                        .setContentText(mess);
                         mBuilder.setVibrate(new long[]{100, 200, 100, 500});
                         mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound"), AudioManager.STREAM_NOTIFICATION);
                         mBuilder.setAutoCancel(true);
@@ -244,6 +261,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         mBuilder.setContentIntent(resultPendingIntent);
                         int mNotificationId = 6991;
                         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.cancel(mNotificationId);
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
                     }
                     if (not==2){
@@ -257,11 +275,19 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
                             Log.d("Registrer to", "0");
                         }
+                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+1;
+                        context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putInt("nCaps",nCaps).apply();
+                        String mess="";
+                        if (nCaps==1){
+                            mess="Hay "+Integer.toString(nCaps)+" nuevo capitulo disponible!!!";
+                        }else {
+                            mess="Hay "+Integer.toString(nCaps)+" nuevos capitulos disponibles!!!";
+                        }
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(context)
                                         .setSmallIcon(R.drawable.ic_not_r)
                                         .setContentTitle("AnimeFLV")
-                                        .setContentText("Nuevos capitulos disponibles!!!");
+                                        .setContentText(mess);
                         mBuilder.setVibrate(new long[]{100, 200, 100, 500});
                         mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/onii"), AudioManager.STREAM_NOTIFICATION);
                         mBuilder.setAutoCancel(true);
@@ -272,6 +298,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         mBuilder.setContentIntent(resultPendingIntent);
                         int mNotificationId = 6991;
                         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.cancel(mNotificationId);
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
                     }
                     if (not==3){
@@ -285,11 +312,19 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
                             Log.d("Registrer to", "0");
                         }
+                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+1;
+                        context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putInt("nCaps",nCaps).apply();
+                        String mess="";
+                        if (nCaps==1){
+                            mess="Hay "+Integer.toString(nCaps)+" nuevo capitulo disponible!!!";
+                        }else {
+                            mess="Hay "+Integer.toString(nCaps)+" nuevos capitulos disponibles!!!";
+                        }
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(context)
                                         .setSmallIcon(R.drawable.ic_not_r)
                                         .setContentTitle("AnimeFLV")
-                                        .setContentText("Nuevos capitulos disponibles!!!");
+                                        .setContentText(mess);
                         mBuilder.setVibrate(new long[]{100, 200, 100, 500});
                         mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sam"), AudioManager.STREAM_NOTIFICATION);
                         mBuilder.setAutoCancel(true);
@@ -300,6 +335,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         mBuilder.setContentIntent(resultPendingIntent);
                         int mNotificationId = 6991;
                         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.cancel(mNotificationId);
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
                     }
                 } else {
@@ -321,7 +357,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                 if (isnot) {
                     Log.d("Version", "Not ya existe");
                 } else {
-                    sharedPreferences.edit().putBoolean("notVer", true).commit();
+                    sharedPreferences.edit().putBoolean("notVer", true).apply();
                     int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
                     if (not == 0) {
                         Log.d("Notificacion:", "Crear Sonido 0");

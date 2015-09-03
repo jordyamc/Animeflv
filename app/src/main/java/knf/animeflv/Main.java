@@ -219,7 +219,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
         context=this;
-        Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones",true);
+        getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
+        getSharedPreferences("data",MODE_PRIVATE).edit().putBoolean("notVer",false).apply();
+        Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
         if (not) {
             alarm.SetAlarm(this);
         }
@@ -320,15 +322,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         });
         if (isNetworkAvailable()){new Requests(context,TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");}
-        //registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         SharedPreferences prefs = this.getSharedPreferences("data", MODE_PRIVATE);
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-                if (key.equals("reload")){
+                if (key.equals("reload")) {
                     mswipe.post(new Runnable() {
                         @Override
                         public void run() {
-                            if (!mswipe.isRefreshing()){
+                            if (!mswipe.isRefreshing()) {
                                 mswipe.setRefreshing(true);
                             }
                         }
@@ -339,9 +340,15 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     }else {
                         if (mswipe.isRefreshing()){mswipe.setRefreshing(false);}
                     }
-                    NotificationManager notificationManager = (NotificationManager) context
-                            .getSystemService(Context.NOTIFICATION_SERVICE);
-                    notificationManager.cancel(6991);
+                    getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            NotificationManager notificationManager = (NotificationManager) context
+                                    .getSystemService(Context.NOTIFICATION_SERVICE);
+                            notificationManager.cancel(6991);
+                        }
+                    },200);
                 }
             }
         };
