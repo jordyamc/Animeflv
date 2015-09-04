@@ -45,11 +45,16 @@
             app:entries="@array/busqueda"
             app:entryValues="@array/tipos_busqueda" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="Cache">
+    <PreferenceCategory android:title="Espacio">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="b_cache"
             android:title="Borrar Cache"
             android:summary="Tamaño de cache: %s MB" />
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="0"
+            android:key="b_video"
+            android:title="Borrar todos los videos"
+            android:summary="Espacio usado: %s MB" />
     </PreferenceCategory>
 </PreferenceScreen>

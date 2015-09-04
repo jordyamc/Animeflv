@@ -214,11 +214,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     ImageButton IBVT;
     int indexT;
     String eidT;
+    boolean shouldExecuteOnResume;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
         context=this;
+        shouldExecuteOnResume = false;
         getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
         getSharedPreferences("data",MODE_PRIVATE).edit().putBoolean("notVer",false).apply();
         Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
@@ -982,7 +984,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         aids=parser.parseAID(json);
         numeros=parser.parsenumeros(json);
         mswipe.setRefreshing(false);
-        checkButtons(aids,numeros,eids);
+        checkButtons(aids, numeros, eids);
+        String teids="";
+        for (String s:eids){
+            teids+=":::"+s;
+        }
+        getSharedPreferences("data",MODE_PRIVATE).edit().putString("teids",teids).apply();
         isFirst();
     }
     public void checkButtons(String[] aids,String[] numeros,String[] eids){
@@ -999,6 +1006,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 //if (ibDes0!=null){ibDes0.setImageResource(R.drawable.cargando);}
                 isDesc.add(true);
             }else {
+                IBsDesList.get(index).setImageResource(R.drawable.ic_get_r);
                 IBsVerList.get(index).setEnabled(false);
                 IBsVerList.get(index).setImageResource(R.drawable.ic_ver_no);
                 isDesc.add(false);
@@ -1313,6 +1321,15 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             String url=getSharedPreferences("data",MODE_PRIVATE).getString("urlD",null);
             String furl="http://"+url.substring(url.indexOf("www"),url.indexOf(".",url.indexOf("www")))+".zippyshare.com/"+durl;
             Log.d("Final D Link",furl);
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(shouldExecuteOnResume){
+            checkButtons(aids,numeros,eids);
+        } else{
+            shouldExecuteOnResume = true;
         }
     }
 

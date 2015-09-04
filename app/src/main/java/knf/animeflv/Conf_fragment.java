@@ -1,5 +1,6 @@
 package knf.animeflv;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
@@ -17,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -47,6 +49,45 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         mp = MediaPlayer.create(context, R.raw.sound);
         oni = MediaPlayer.create(context, R.raw.onii);
         sam = MediaPlayer.create(context, R.raw.sam);
+        final File file = new File(Environment.getExternalStorageDirectory()+"/.Animeflv/download");
+        long size = getcachesize();
+        long dirsize=getFileSize(file);
+        String tamano=formatSize(size);
+        String vidsize=formatSize(dirsize);
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_cache",tamano).commit();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_video",vidsize).commit();
+        getPreferenceScreen().findPreference("b_cache").setSummary("Tamaño de cache: " + tamano);
+        getPreferenceScreen().findPreference("b_cache").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                clearApplicationData();
+                String s=formatSize(getcachesize());
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_cache", s).commit();
+                getPreferenceScreen().findPreference("b_cache").setSummary("Tamaño de cache: "+s);
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("b_video").setSummary("Espacio usado: " + vidsize);
+        getPreferenceScreen().findPreference("b_video").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                deleteDownload(file);
+                DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                String[] eids=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("teids","").split(":::");
+                for (String s:eids){
+                    if (!s.trim().equals("")){
+                        long l=Long.parseLong(context.getSharedPreferences("data",Context.MODE_PRIVATE).getString(s,"0"));
+                        manager.remove(l);
+                    }
+                }
+                String si=formatSize(getFileSize(file));
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_video", si).commit();
+                getPreferenceScreen().findPreference("b_video").setSummary("Espacio usado: " + si);
+                return false;
+            }
+        });
+    }
+    public long getcachesize(){
         long size = 0;
         File[] files = context.getCacheDir().listFiles();
         File[] mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache").listFiles();
@@ -56,20 +97,16 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         for (File f1:mediaStorage){
             size = size+f1.length();
         }
-        String tamano=formatSize(size);
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_cache",tamano).commit();
-        getPreferenceScreen().findPreference("b_cache").setSummary("Tamaño de cache: "+tamano);
-        getPreferenceScreen().findPreference("b_cache").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                clearApplicationData();
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_cache", "0").commit();
-                getPreferenceScreen().findPreference("b_cache").setSummary("Tamaño de cache: 0 B");
-                return false;
-            }
-        });
+        return size;
     }
-
+    public void deleteDownload(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i=0; i<children.length; i++) {
+                deleteDir(new File(dir, children[i]));
+            }
+        }
+    }
     @Override
     public void onResume() {
         super.onResume();
@@ -185,6 +222,31 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         }
         return dir.delete();
     }
+    public static long getFileSize(final File file) {
+        if(file==null||!file.exists())
+            return 0;
+        if(!file.isDirectory())
+            return file.length();
+        final List<File> dirs=new LinkedList<File>();
+        dirs.add(file);
+        long result=0;
+        while(!dirs.isEmpty()) {
+            final File dir=dirs.remove(0);
+            if(!dir.exists())
+                continue;
+            final File[] listFiles=dir.listFiles();
+            if(listFiles==null||listFiles.length==0)
+                continue;
+            for(final File child : listFiles)
+            {
+                result+=child.length();
+                if(child.isDirectory())
+                    dirs.add(child);
+            }
+        }
+        return result;
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
