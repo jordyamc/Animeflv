@@ -17,6 +17,7 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -31,7 +32,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Created by Jordy on 11/08/2015.
@@ -105,6 +109,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
             e.printStackTrace();
         }
     }
+
     private boolean isNetworkAvailable() {
         Boolean net=false;
         int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
@@ -113,48 +118,16 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
             case 0:
                 NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 net=Wifi.isConnected();
-                try {
-                    Runtime runtime = Runtime.getRuntime();
-                    Process proc = runtime.exec("ping -c 1 " + "google.com");
-                    proc.waitFor();
-                    int exitCode = proc.exitValue();
-                    if(exitCode != 0) {
-                        net=false;
-                    }
-                }
-                catch (IOException e) {}
-                catch (InterruptedException e) {}
                 break;
             case 1:
                 NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                 net=mobile.isConnected();
-                try {
-                    Runtime runtime = Runtime.getRuntime();
-                    Process proc = runtime.exec("ping -c 1 " + "google.com");
-                    proc.waitFor();
-                    int exitCode = proc.exitValue();
-                    if(exitCode != 0) {
-                        net=false;
-                    }
-                }
-                catch (IOException e) {}
-                catch (InterruptedException e) {}
                 break;
             case 2:
                 NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                 net=WifiA.isConnected()||mobileA.isConnected();
-                try {
-                    Runtime runtime = Runtime.getRuntime();
-                    Process proc = runtime.exec("ping -c 1 " + "google.com");
-                    proc.waitFor();
-                    int exitCode = proc.exitValue();
-                    if(exitCode != 0) {
-                        net=false;
-                    }
-                }
-                catch (IOException e) {}
-                catch (InterruptedException e) {}
+                break;
         }
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && net;
@@ -201,7 +174,17 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
                             Log.d("Registrer to", "0");
                         }
-                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+1;
+                        int num=0;
+                        loop:{
+                            for (String st : jsonDesc) {
+                                if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                    num += 1;
+                                }else {
+                                    break loop;
+                                }
+                            }
+                        }
+                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+num;
                         context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putInt("nCaps",nCaps).apply();
                         String mess="";
                         if (nCaps==1){
@@ -238,7 +221,17 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
                             Log.d("Registrer to", "0");
                         }
-                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+1;
+                        int num=0;
+                        loop:{
+                            for (String st : jsonDesc) {
+                                if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                    num += 1;
+                                }else {
+                                    break loop;
+                                }
+                            }
+                        }
+                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+num;
                         context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putInt("nCaps",nCaps).apply();
                         String mess="";
                         if (nCaps==1){
@@ -275,7 +268,17 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
                             Log.d("Registrer to", "0");
                         }
-                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+1;
+                        int num=0;
+                        loop:{
+                            for (String st : jsonDesc) {
+                                if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                    num += 1;
+                                }else {
+                                    break loop;
+                                }
+                            }
+                        }
+                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+num;
                         context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putInt("nCaps",nCaps).apply();
                         String mess="";
                         if (nCaps==1){
@@ -312,7 +315,17 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
                             Log.d("Registrer to", "0");
                         }
-                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+1;
+                        int num=0;
+                        loop:{
+                            for (String st : jsonDesc) {
+                                if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                    num += 1;
+                                }else {
+                                    break loop;
+                                }
+                            }
+                        }
+                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+num;
                         context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putInt("nCaps",nCaps).apply();
                         String mess="";
                         if (nCaps==1){

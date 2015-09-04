@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,6 +21,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import knf.animeflv.Parser;
 import knf.animeflv.Requests;
@@ -87,48 +94,16 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
             case 0:
                 NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 net=Wifi.isConnected();
-                try {
-                    Runtime runtime = Runtime.getRuntime();
-                    Process proc = runtime.exec("ping -c 1 " + "google.com");
-                    proc.waitFor();
-                    int exitCode = proc.exitValue();
-                    if(exitCode != 0) {
-                        net=false;
-                    }
-                }
-                catch (IOException e) {}
-                catch (InterruptedException e) {}
                 break;
             case 1:
                 NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                 net=mobile.isConnected();
-                try {
-                    Runtime runtime = Runtime.getRuntime();
-                    Process proc = runtime.exec("ping -c 1 " + "google.com");
-                    proc.waitFor();
-                    int exitCode = proc.exitValue();
-                    if(exitCode != 0) {
-                        net=false;
-                    }
-                }
-                catch (IOException e) {}
-                catch (InterruptedException e) {}
                 break;
             case 2:
                 NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                 net=WifiA.isConnected()||mobileA.isConnected();
-                try {
-                    Runtime runtime = Runtime.getRuntime();
-                    Process proc = runtime.exec("ping -c 1 " + "google.com");
-                    proc.waitFor();
-                    int exitCode = proc.exitValue();
-                    if(exitCode != 0) {
-                        net=false;
-                    }
-                }
-                catch (IOException e) {}
-                catch (InterruptedException e) {}
+                break;
         }
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && net;

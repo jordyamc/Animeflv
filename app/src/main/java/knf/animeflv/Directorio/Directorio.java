@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -200,62 +201,68 @@ public class Directorio extends AppCompatActivity {
         editText=(EditText) findViewById(R.id.et_busqueda);
         editText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void afterTextChanged(Editable s) {
-                if (t_busqueda==0) {
-                    if (s.length() > 0) {
-                        menuGlobal.clear();
-                        if (!isXLargeScreen(context)) {
-                            getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
+            public void afterTextChanged(final Editable s) {
+                Handler handler=new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (t_busqueda==0) {
+                            if (s.length() > 0) {
+                                menuGlobal.clear();
+                                if (!isXLargeScreen(context)) {
+                                    getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
+                                }else {
+                                    getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
+                                }
+                            } else {
+                                menuGlobal.clear();
+                                if (!isXLargeScreen(context)) {
+                                    getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
+                                }else {
+                                    getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                                }
+                            }
+                            List<String> titulos = parser.DirTitulosBusqueda(json, s.toString());
+                            List<String> tipos = parser.DirTiposBusqueda(json, s.toString());
+                            List<String> index = parser.DirIndexBusqueda(json, s.toString());
+                            List<String> titOrd = parser.DirTitulosBusqueda(json, s.toString());
+                            Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
+                            List<String> indexOrd = new ArrayList<String>();
+                            List<String> tiposOrd = new ArrayList<String>();
+                            List<String> links = new ArrayList<String>();
+                            for (String si : titOrd) {
+                                String indexn = index.get(titulos.indexOf(si));
+                                indexOrd.add(indexn);
+                            }
+                            for (String so : titOrd) {
+                                String tipon = tipos.get(titulos.indexOf(so));
+                                tiposOrd.add(tipon);
+                            }
+                            for (String st : indexOrd) {
+                                String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + st + ".jpg";
+                                links.add(link);
+                            }
+                            AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);
+                            recyclerView.setAdapter(adapterBusqueda);
                         }else {
-                            getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
-                        }
-                    } else {
-                        menuGlobal.clear();
-                        if (!isXLargeScreen(context)) {
-                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                        }else {
-                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
-                        }
-                    }
-                    List<String> titulos = parser.DirTitulosBusqueda(json, s.toString());
-                    List<String> tipos = parser.DirTiposBusqueda(json, s.toString());
-                    List<String> index = parser.DirIndexBusqueda(json, s.toString());
-                    List<String> titOrd = parser.DirTitulosBusqueda(json, s.toString());
-                    Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
-                    List<String> indexOrd = new ArrayList<String>();
-                    List<String> tiposOrd = new ArrayList<String>();
-                    List<String> links = new ArrayList<String>();
-                    for (String si : titOrd) {
-                        String indexn = index.get(titulos.indexOf(si));
-                        indexOrd.add(indexn);
-                    }
-                    for (String so : titOrd) {
-                        String tipon = tipos.get(titulos.indexOf(so));
-                        tiposOrd.add(tipon);
-                    }
-                    for (String st : indexOrd) {
-                        String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + st + ".jpg";
-                        links.add(link);
-                    }
-                    AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);
-                    recyclerView.setAdapter(adapterBusqueda);
-                }else {
-                    if (s.length() > 0) {
-                        menuGlobal.clear();
-                        if (!isXLargeScreen(context)) {
-                            getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
-                        }else {
-                            getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
-                        }
-                    } else {
-                        menuGlobal.clear();
-                        if (!isXLargeScreen(context)) {
-                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                        }else {
-                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                            if (s.length() > 0) {
+                                menuGlobal.clear();
+                                if (!isXLargeScreen(context)) {
+                                    getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
+                                }else {
+                                    getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
+                                }
+                            } else {
+                                menuGlobal.clear();
+                                if (!isXLargeScreen(context)) {
+                                    getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
+                                }else {
+                                    getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                                }
+                            }
                         }
                     }
-                }
+                },1000);
             }
 
             @Override

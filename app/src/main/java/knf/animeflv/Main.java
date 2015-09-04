@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
@@ -60,6 +61,7 @@ import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListener;
 import com.thin.downloadmanager.ThinDownloadManager;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -67,9 +69,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.info.Info;
@@ -215,6 +222,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     int indexT;
     String eidT;
     boolean shouldExecuteOnResume;
+    int esperando=0;
+    boolean login=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -290,7 +299,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 break;
                             case 3:
                                 result.setSelection(0);
-                                setDir();
+                                setDir(false);
                         }
                         return false;
                     }
@@ -315,11 +324,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                Intent intent=new Intent(context,Directorio.class);
-                Bundle bundle=new Bundle();
-                bundle.putString("tipo","Busqueda");
-                intent.putExtras(bundle);
-                startActivity(intent);
+                setDir(true);
                 return true;
             }
         });
@@ -406,96 +411,100 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         }else {
             if (!descargando) {
-                imageButton.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-                imageButton.setImageResource(R.drawable.cargando);
-                imageButton.setEnabled(false);
-                GIBT=imageButton;
-                IBVT=IBsVerList.get(index);
-                isDesc.add(index,true);
-                descargando = true;
-                indexT=index;
-                eidT=eids[index];
-                switch (view.getId()) {
-                    case R.id.ib_descargar_cardD1:
-                        url = getUrl(titulos[0], numeros[0]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD2:
-                        url = getUrl(titulos[1], numeros[1]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD3:
-                        url = getUrl(titulos[2], numeros[2]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD4:
-                        url = getUrl(titulos[3], numeros[3]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD5:
-                        url = getUrl(titulos[4], numeros[4]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD6:
-                        url = getUrl(titulos[5], numeros[5]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD7:
-                        url = getUrl(titulos[6], numeros[6]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD8:
-                        url = getUrl(titulos[7], numeros[7]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD9:
-                        url = getUrl(titulos[8], numeros[8]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD10:
-                        url = getUrl(titulos[9], numeros[9]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD11:
-                        url = getUrl(titulos[10], numeros[10]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD12:
-                        url = getUrl(titulos[11], numeros[11]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD13:
-                        url = getUrl(titulos[12], numeros[12]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD14:
-                        url = getUrl(titulos[13], numeros[13]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD15:
-                        url = getUrl(titulos[14], numeros[14]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD16:
-                        url = getUrl(titulos[15], numeros[15]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD17:
-                        url = getUrl(titulos[16], numeros[16]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD18:
-                        url = getUrl(titulos[17], numeros[17]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD19:
-                        url = getUrl(titulos[18], numeros[18]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
-                    case R.id.ib_descargar_cardD20:
-                        url = getUrl(titulos[19], numeros[19]);
-                        new Requests(this, TaskType.GET_HTML1).execute(url);
-                        break;
+                if (isNetworkAvailable()) {
+                    imageButton.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                    imageButton.setImageResource(R.drawable.cargando);
+                    imageButton.setEnabled(false);
+                    GIBT = imageButton;
+                    IBVT = IBsVerList.get(index);
+                    isDesc.add(index, true);
+                    descargando = true;
+                    indexT = index;
+                    eidT = eids[index];
+                    switch (view.getId()) {
+                        case R.id.ib_descargar_cardD1:
+                            url = getUrl(titulos[0], numeros[0]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD2:
+                            url = getUrl(titulos[1], numeros[1]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD3:
+                            url = getUrl(titulos[2], numeros[2]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD4:
+                            url = getUrl(titulos[3], numeros[3]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD5:
+                            url = getUrl(titulos[4], numeros[4]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD6:
+                            url = getUrl(titulos[5], numeros[5]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD7:
+                            url = getUrl(titulos[6], numeros[6]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD8:
+                            url = getUrl(titulos[7], numeros[7]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD9:
+                            url = getUrl(titulos[8], numeros[8]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD10:
+                            url = getUrl(titulos[9], numeros[9]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD11:
+                            url = getUrl(titulos[10], numeros[10]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD12:
+                            url = getUrl(titulos[11], numeros[11]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD13:
+                            url = getUrl(titulos[12], numeros[12]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD14:
+                            url = getUrl(titulos[13], numeros[13]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD15:
+                            url = getUrl(titulos[14], numeros[14]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD16:
+                            url = getUrl(titulos[15], numeros[15]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD17:
+                            url = getUrl(titulos[16], numeros[16]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD18:
+                            url = getUrl(titulos[17], numeros[17]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD19:
+                            url = getUrl(titulos[18], numeros[18]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                        case R.id.ib_descargar_cardD20:
+                            url = getUrl(titulos[19], numeros[19]);
+                            new Requests(this, TaskType.GET_HTML1).execute(url);
+                            break;
+                    }
+                }else {
+                    toast("No hay conexion.");
                 }
             }else {
                 toast("Por favor espera...");
@@ -566,22 +575,45 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 break;
         }
     }
-    public void setDir(){
-        if (isNetworkAvailable()){
-            new Requests(context,TaskType.DIRECTORIO).execute("http://animeflv.net/api.php?accion=directorio");
-        }else {
-            if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-                if (!mediaStorage.exists()) {
-                    mediaStorage.mkdirs();
+    public void setDir(Boolean busqueda){
+        if (!busqueda) {
+            if (isNetworkAvailable()) {
+                new Requests(context, TaskType.DIRECTORIO).execute("http://animeflv.net/api.php?accion=directorio");
+            } else {
+                if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                    if (!mediaStorage.exists()) {
+                        mediaStorage.mkdirs();
+                    }
+                }
+                File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
+                String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
+                if (file.exists()) {
+                    Intent intent = new Intent(context, Directorio.class);
+                    startActivity(intent);
+                } else {
+                    toast("No hay datos guardados");
                 }
             }
-            File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
-            String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
-            if (file.exists()){
-                Intent intent=new Intent(context,Directorio.class);
-                startActivity(intent);
-            }else {
-                toast("No hay datos guardados");
+        }else {
+            if (isNetworkAvailable()) {
+                new Requests(context, TaskType.DIRECTORIO1).execute("http://animeflv.net/api.php?accion=directorio");
+            } else {
+                if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                    if (!mediaStorage.exists()) {
+                        mediaStorage.mkdirs();
+                    }
+                }
+                File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
+                String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
+                if (file.exists()) {
+                    Intent intent=new Intent(context,Directorio.class);
+                    Bundle bundle=new Bundle();
+                    bundle.putString("tipo","Busqueda");
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                } else {
+                    toast("No hay datos guardados");
+                }
             }
         }
     }
@@ -1055,6 +1087,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     @Override
     public void onRefresh() {
         if (isNetworkAvailable()) {
+            getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
             textoff.setVisibility(View.GONE);
             new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
             new Requests(this, TaskType.GET_INICIO).execute(inicio);
@@ -1117,48 +1150,16 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             case 0:
                 NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 net=Wifi.isConnected();
-                try {
-                    Runtime runtime = Runtime.getRuntime();
-                    Process proc = runtime.exec("ping -c 1 " + "google.com");
-                    proc.waitFor();
-                    int exitCode = proc.exitValue();
-                    if(exitCode != 0) {
-                       net=false;
-                    }
-                }
-                catch (IOException e) {}
-                catch (InterruptedException e) {}
                 break;
             case 1:
                 NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                 net=mobile.isConnected();
-                try {
-                    Runtime runtime = Runtime.getRuntime();
-                    Process proc = runtime.exec("ping -c 1 " + "google.com");
-                    proc.waitFor();
-                    int exitCode = proc.exitValue();
-                    if(exitCode != 0) {
-                        net=false;
-                    }
-                }
-                catch (IOException e) {}
-                catch (InterruptedException e) {}
                 break;
             case 2:
                 NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
                 net=WifiA.isConnected()||mobileA.isConnected();
-                try {
-                    Runtime runtime = Runtime.getRuntime();
-                    Process proc = runtime.exec("ping -c 1 " + "google.com");
-                    proc.waitFor();
-                    int exitCode = proc.exitValue();
-                    if(exitCode != 0) {
-                        net=false;
-                    }
-                }
-                catch (IOException e) {}
-                catch (InterruptedException e) {}
+                break;
         }
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && net;
@@ -1195,6 +1196,50 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     } else {
                         Log.d("Cargar", "Json existente");
                         Intent intent=new Intent(context,Directorio.class);
+                        startActivity(intent);
+                    }
+                }
+            }
+        }
+        if (taskType==TaskType.DIRECTORIO1){
+            if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                if (!mediaStorage.exists()) {
+                    mediaStorage.mkdirs();
+                }
+            }
+            File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
+            String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
+            if (isNetworkAvailable()) {
+                if (!file.exists()) {
+                    Log.d("Archivo:", "No existe");
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        Log.d("Archivo:", "Error al crear archivo");
+                    }
+                    writeToFile(data, file);
+                    Intent intent=new Intent(context,Directorio.class);
+                    Bundle bundle=new Bundle();
+                    bundle.putString("tipo", "Busqueda");
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                } else {
+                    Log.d("Archivo", "Existe");
+                    String infile = getStringFromFile(file_loc);
+                    if (infile.trim().equals(data.trim())) {
+                        Log.d("Cargar", "Json nuevo");
+                        writeToFile(data, file);
+                        Intent intent=new Intent(context,Directorio.class);
+                        Bundle bundle=new Bundle();
+                        bundle.putString("tipo", "Busqueda");
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    } else {
+                        Log.d("Cargar", "Json existente");
+                        Intent intent=new Intent(context,Directorio.class);
+                        Bundle bundle=new Bundle();
+                        bundle.putString("tipo","Busqueda");
+                        intent.putExtras(bundle);
                         startActivity(intent);
                     }
                 }
@@ -1327,7 +1372,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     protected void onResume() {
         super.onResume();
         if(shouldExecuteOnResume){
-            checkButtons(aids,numeros,eids);
+            checkButtons(aids, numeros, eids);
         } else{
             shouldExecuteOnResume = true;
         }
@@ -1352,6 +1397,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             result.closeDrawer();
         }
     }
+
     class JavaScriptInterface {
         private Context ctx;
         JavaScriptInterface(Context ctx) {
@@ -1383,6 +1429,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         @JavascriptInterface
         public void showHTMLD2(String html) {
-            Log.d("Zippy",html);
+            Log.d("Zippy", html);
         }}
 }

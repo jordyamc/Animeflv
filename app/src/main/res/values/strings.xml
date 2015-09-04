@@ -41,7 +41,7 @@
         <item>3</item>
     </string-array>
     <string-array name="busqueda">
-        <item>Autobusqueda (Lag)</item>
+        <item>Autobusqueda</item>
         <item>Enter</item>
     </string-array>
     <string-array name="tipos_busqueda">

@@ -1,8 +1,10 @@
 package knf.animeflv;
 
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -15,7 +17,11 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+
+import com.afollestad.materialdialogs.GravityEnum;
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -30,6 +36,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     MediaPlayer r;
     MediaPlayer oni;
     MediaPlayer sam;
+    private FragmentActivity myContext;
     //Ringtone r;
     @Override
     public void onCreate(final Bundle savedInstanceState){
@@ -61,9 +68,9 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 clearApplicationData();
-                String s=formatSize(getcachesize());
+                String s = formatSize(getcachesize());
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_cache", s).commit();
-                getPreferenceScreen().findPreference("b_cache").setSummary("Tamaño de cache: "+s);
+                getPreferenceScreen().findPreference("b_cache").setSummary("Tamaño de cache: " + s);
                 return false;
             }
         });
@@ -73,16 +80,25 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             public boolean onPreferenceClick(Preference preference) {
                 deleteDownload(file);
                 DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-                String[] eids=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("teids","").split(":::");
-                for (String s:eids){
-                    if (!s.trim().equals("")){
-                        long l=Long.parseLong(context.getSharedPreferences("data",Context.MODE_PRIVATE).getString(s,"0"));
+                String[] eids = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("teids", "").split(":::");
+                for (String s : eids) {
+                    if (!s.trim().equals("")) {
+                        long l = Long.parseLong(context.getSharedPreferences("data", Context.MODE_PRIVATE).getString(s, "0"));
                         manager.remove(l);
                     }
                 }
-                String si=formatSize(getFileSize(file));
+                String si = formatSize(getFileSize(file));
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_video", si).commit();
                 getPreferenceScreen().findPreference("b_video").setSummary("Espacio usado: " + si);
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("b_log").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                ChangelogDialog.create()
+                        .show(myContext.getSupportFragmentManager(), "changelog");
+
                 return false;
             }
         });
@@ -266,5 +282,10 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             sam.stop();
             sam.release();
         }
+    }
+    @Override
+    public void onAttach(Activity activity) {
+        myContext=(FragmentActivity) activity;
+        super.onAttach(activity);
     }
 }
