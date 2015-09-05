@@ -257,6 +257,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         setLoad();
         try {versionCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;} catch (Exception e) {toast("ERROR");}
         try {versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;} catch (Exception e) {toast("ERROR");}
+        int change=getSharedPreferences("data",MODE_PRIVATE).getInt(Integer.toString(versionCode),0);
+        if (change==0){
+            ChangelogDialog.create()
+                    .show(getSupportFragmentManager(), "changelog");
+            getSharedPreferences("data",MODE_PRIVATE).edit().putInt(Integer.toString(versionCode),1).apply();
+        }
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.graphic)
