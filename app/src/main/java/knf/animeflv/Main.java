@@ -1072,6 +1072,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 }
             }
         }
+        ftitulo=ftitulo.replace("!!!","-3");
         ftitulo=ftitulo.replace("!", "");
         ftitulo=ftitulo.replace("°", "");
         ftitulo=ftitulo.replace("&deg;", "");
@@ -1378,7 +1379,18 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     protected void onResume() {
         super.onResume();
         if(shouldExecuteOnResume){
-            checkButtons(aids, numeros, eids);
+            if (isNetworkAvailable()) {
+                getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
+                textoff.setVisibility(View.GONE);
+                new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
+                new Requests(this, TaskType.GET_INICIO).execute(inicio);
+            }else {
+                textoff.setVisibility(View.VISIBLE);
+                if (mswipe.isRefreshing()){mswipe.setRefreshing(false);}
+            }
+            NotificationManager notificationManager = (NotificationManager) this
+                    .getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.cancel(6991);
         } else{
             shouldExecuteOnResume = true;
         }
