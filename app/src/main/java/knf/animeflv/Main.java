@@ -224,6 +224,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     boolean shouldExecuteOnResume;
     int esperando=0;
     boolean login=false;
+    boolean version=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1280,10 +1281,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
+                                if (!version) {
+                                    version = true;
                                 if (descarga.exists()) {
                                     descarga.delete();
                                 }
-                                final TextView textView=(TextView)dialog.getCustomView().findViewById(R.id.tv_progress);
+                                final TextView textView = (TextView) dialog.getCustomView().findViewById(R.id.tv_progress);
                                 textView.setVisibility(View.VISIBLE);
                                 Uri download = Uri.parse("https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true");
                                 DownloadRequest downloadRequest = new DownloadRequest(download)
@@ -1300,16 +1303,17 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
 
                                             @Override
                                             public void onDownloadFailed(int i, int i1, String s) {
-                                                textView.setText("Error al descargar: "+s);
+                                                textView.setText("Error al descargar: " + s);
                                             }
 
                                             @Override
                                             public void onProgress(int i, long l, int i1) {
-                                                textView.setText(Integer.toString(i1)+"%");
+                                                textView.setText(Integer.toString(i1) + "%");
                                             }
                                         });
-                                ThinDownloadManager downloadManager=new ThinDownloadManager();
+                                ThinDownloadManager downloadManager = new ThinDownloadManager();
                                 downloadManager.add(downloadRequest);
+                                }
                             }
 
                             @Override
