@@ -36,6 +36,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     MediaPlayer r;
     MediaPlayer oni;
     MediaPlayer sam;
+    MediaPlayer dango;
     private FragmentActivity myContext;
     //Ringtone r;
     @Override
@@ -56,6 +57,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         mp = MediaPlayer.create(context, R.raw.sound);
         oni = MediaPlayer.create(context, R.raw.onii);
         sam = MediaPlayer.create(context, R.raw.sam);
+        dango = MediaPlayer.create(context, R.raw.dango);
         final File file = new File(Environment.getExternalStorageDirectory()+"/.Animeflv/download");
         long size = getcachesize();
         long dirsize=getFileSize(file);
@@ -160,17 +162,18 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
            case "sonido":
                int not=Integer.parseInt(sharedPreferences.getString("sonido","0"));
                if (not==0){
-                   if (mp.isPlaying()||oni.isPlaying()||sam.isPlaying()){
+                   if (mp.isPlaying()||oni.isPlaying()||sam.isPlaying()||dango.isPlaying()){
                        if (mp.isPlaying())mp.stop();
                        if (oni.isPlaying())oni.stop();
                        if (sam.isPlaying())sam.stop();
+                       if (dango.isPlaying())dango.stop();
                    }
                    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                    r = MediaPlayer.create(context, notification);
                    r.start();
                }
                if (not==1){
-                   if (r.isPlaying()||oni.isPlaying()||sam.isPlaying()){
+                   if (r.isPlaying()||oni.isPlaying()||sam.isPlaying()||dango.isPlaying()){
                        if (r.isPlaying())r.stop();
                        if (oni.isPlaying())oni.stop();
                        if (sam.isPlaying())sam.stop();
@@ -179,22 +182,34 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                    mp.start();
                }
                if (not==2){
-                   if (r.isPlaying()||mp.isPlaying()||sam.isPlaying()){
+                   if (r.isPlaying()||mp.isPlaying()||sam.isPlaying()||dango.isPlaying()){
                        if (r.isPlaying())r.stop();
                        if (mp.isPlaying())mp.stop();
                        if (sam.isPlaying())sam.stop();
+                       if (dango.isPlaying())dango.stop();
                    }
                    oni = MediaPlayer.create(context, R.raw.onii);
                    oni.start();
                }
                if (not==3){
-                   if (r.isPlaying()||mp.isPlaying()||sam.isPlaying()){
+                   if (r.isPlaying()||mp.isPlaying()||oni.isPlaying()||dango.isPlaying()){
                        if (r.isPlaying())r.stop();
                        if (mp.isPlaying())mp.stop();
                        if (oni.isPlaying())oni.stop();
+                       if (dango.isPlaying())dango.stop();
                    }
                    sam = MediaPlayer.create(context, R.raw.sam);
                    sam.start();
+               }
+               if (not==4){
+                   if (r.isPlaying()||mp.isPlaying()||sam.isPlaying()||oni.isPlaying()){
+                       if (r.isPlaying())r.stop();
+                       if (mp.isPlaying())mp.stop();
+                       if (oni.isPlaying())oni.stop();
+                       if (sam.isPlaying())sam.stop();
+                   }
+                   dango = MediaPlayer.create(context, R.raw.dango);
+                   dango.start();
                }
                break;
            case "b_cache":
@@ -281,6 +296,10 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         if (sam.isPlaying()){
             sam.stop();
             sam.release();
+        }
+        if (dango.isPlaying()){
+            dango.stop();
+            dango.release();
         }
     }
     @Override

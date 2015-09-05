@@ -351,6 +351,53 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         mNotifyMgr.cancel(mNotificationId);
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
                     }
+                    if (not==4){
+                        Log.d("Notificacion:", "Crear Sonido Dango");
+                        String act=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("reload","0");
+                        Log.d("Registrer",act);
+                        if (act.equals("0")){
+                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","1").apply();
+                            Log.d("Registrer to","1");
+                        }else {
+                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
+                            Log.d("Registrer to", "0");
+                        }
+                        int num=0;
+                        loop:{
+                            for (String st : jsonDesc) {
+                                if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                    num += 1;
+                                }else {
+                                    break loop;
+                                }
+                            }
+                        }
+                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+num;
+                        context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putInt("nCaps",nCaps).apply();
+                        String mess="";
+                        if (nCaps==1){
+                            mess="Hay "+Integer.toString(nCaps)+" nuevo capitulo disponible!!!";
+                        }else {
+                            mess="Hay "+Integer.toString(nCaps)+" nuevos capitulos disponibles!!!";
+                        }
+                        NotificationCompat.Builder mBuilder =
+                                new NotificationCompat.Builder(context)
+                                        .setSmallIcon(R.drawable.ic_not_r)
+                                        .setContentTitle("AnimeFLV")
+                                        .setContentText(mess);
+                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango"), AudioManager.STREAM_NOTIFICATION);
+                        mBuilder.setAutoCancel(true);
+                        mBuilder.setPriority(Notification.PRIORITY_MAX);
+                        mBuilder.setLights(Color.BLUE, 5000, 2000);
+                        Intent resultIntent = new Intent(context, Main.class);
+                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        mBuilder.setContentIntent(resultPendingIntent);
+                        int mNotificationId = 6991;
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.cancel(mNotificationId);
+                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                    }
                 } else {
                     Log.d("JSON", "Es igual");
                 }
