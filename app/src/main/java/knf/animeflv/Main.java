@@ -1323,12 +1323,22 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                             dialog.dismiss();
                                         }
                                         if (!mensaje[4].trim().toLowerCase().equals("salir") || !mensaje[4].trim().toLowerCase().equals("cerrar")) {
-                                            Interpreter interpreter = new Interpreter();
-                                            try {
-                                                interpreter.set("context", this);
-                                                interpreter.eval(mensaje[5]);
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
+                                            if (mensaje[5].trim().equals("toast")){
+                                                toast(mensaje[6]);
+                                            }
+                                            if (mensaje[5].trim().equals("toast&notshow")){
+                                                toast(mensaje[6]);
+                                                disM=true;
+                                            }
+                                            if (mensaje[5].trim().equals("finish")){
+                                                finish();
+                                            }
+                                            if (mensaje[5].trim().equals("dismiss")){
+                                                dialog.dismiss();
+                                            }
+                                            if (mensaje[5].trim().equals("dismiss&notshow")){
+                                                disM = true;
+                                                dialog.dismiss();
                                             }
                                         }
                                     }
@@ -1404,7 +1414,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 }
                             }).build();
                     TextView textView = (TextView) dialog.getCustomView().findViewById(R.id.tv_dialog);
-                    textView.setText("Esta version (" + versionCode + ") es obsoleta, porfavor actualiza para continuar.");
+                textView.setText("Esta version (" + versionCode + ") es obsoleta, porfavor actualiza para continuar.");
                     dialog.show();
             }
         }
