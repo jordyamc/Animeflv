@@ -1103,7 +1103,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (isNetworkAvailable()) {
             getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
             textoff.setVisibility(View.GONE);
-            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
+            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version_test.html");
             new Requests(this, TaskType.GET_INICIO).execute(inicio);
         }else {
             textoff.setVisibility(View.VISIBLE);
@@ -1268,70 +1268,91 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
             Log.d("Version", Integer.toString(versionCode)+ " >> "+vers.trim());
             if (versionCode>=Integer.parseInt(vers.trim())){
-                Log.d("Version","OK");
-                verOk=true;
-                getSharedPreferences("data",MODE_PRIVATE).edit().putBoolean("notVer",false);
+                if (Integer.parseInt(vers.trim())==0){
+                    MaterialDialog dialog = new MaterialDialog.Builder(this)
+                            .title("Aplicacion desactivada")
+                            .content("La aplicacion ah sido desactivada por algun motivo, espera por mas informacion...")
+                            .titleColorRes(R.color.prim)
+                            .autoDismiss(false)
+                            .cancelable(false)
+                            .backgroundColor(Color.WHITE)
+                            .titleGravity(GravityEnum.CENTER)
+                            .positiveText("Cerrar")
+                            .positiveColorRes(R.color.prim)
+                            .callback(new MaterialDialog.ButtonCallback() {
+                                @Override
+                                public void onPositive(MaterialDialog dialog) {finish();}
+
+                                @Override
+                                public void onNegative(MaterialDialog dialog) {finish();}
+                            }).build();
+                    dialog.show();
+                }else {
+                    Log.d("Version", "OK");
+                    verOk = true;
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("notVer", false);
+                }
             }else {
-                Log.d("Version", "Actualizar");
-                verOk=false;
-                MaterialDialog dialog = new MaterialDialog.Builder(this)
-                        .title("Nueva Version " + vers.trim())
-                        .customView(R.layout.text_d_act, false)
-                        .titleColorRes(R.color.prim)
-                        .autoDismiss(false)
-                        .cancelable(false)
-                        .backgroundColor(Color.WHITE)
-                        .titleGravity(GravityEnum.CENTER)
-                        .positiveText("Actualizar")
-                        .positiveColorRes(R.color.prim)
-                        .negativeText("Salir")
-                        .negativeColorRes(R.color.prim)
-                        .callback(new MaterialDialog.ButtonCallback() {
-                            @Override
-                            public void onPositive(MaterialDialog dialog) {
-                                if (!version) {
-                                    version = true;
-                                if (descarga.exists()) {
-                                    descarga.delete();
+                    Log.d("Version", "Actualizar");
+                    verOk = false;
+                    MaterialDialog dialog = new MaterialDialog.Builder(this)
+                            .title("Nueva Version " + vers.trim())
+                            .customView(R.layout.text_d_act, false)
+                            .titleColorRes(R.color.prim)
+                            .autoDismiss(false)
+                            .cancelable(false)
+                            .backgroundColor(Color.WHITE)
+                            .titleGravity(GravityEnum.CENTER)
+                            .positiveText("Actualizar")
+                            .positiveColorRes(R.color.prim)
+                            .negativeText("Salir")
+                            .negativeColorRes(R.color.prim)
+                            .callback(new MaterialDialog.ButtonCallback() {
+                                @Override
+                                public void onPositive(MaterialDialog dialog) {
+                                    if (!version) {
+                                        version = true;
+                                        if (descarga.exists()) {
+                                            descarga.delete();
+                                        }
+                                        final TextView textView = (TextView) dialog.getCustomView().findViewById(R.id.tv_progress);
+                                        textView.setVisibility(View.VISIBLE);
+                                        Uri download = Uri.parse("https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true");
+                                        DownloadRequest downloadRequest = new DownloadRequest(download)
+                                                .setDestinationURI(Uri.fromFile(descarga))
+                                                .setDownloadListener(new DownloadStatusListener() {
+                                                    @Override
+                                                    public void onDownloadComplete(int i) {
+                                                        Intent promptInstall = new Intent(Intent.ACTION_VIEW)
+                                                                .setDataAndType(Uri.fromFile(descarga),
+                                                                        "application/vnd.android.package-archive");
+                                                        finish();
+                                                        startActivity(promptInstall);
+                                                    }
+
+                                                    @Override
+                                                    public void onDownloadFailed(int i, int i1, String s) {
+                                                        textView.setText("Error al descargar: " + s);
+                                                    }
+
+                                                    @Override
+                                                    public void onProgress(int i, long l, int i1) {
+                                                        textView.setText(Integer.toString(i1) + "%");
+                                                    }
+                                                });
+                                        ThinDownloadManager downloadManager = new ThinDownloadManager();
+                                        downloadManager.add(downloadRequest);
+                                    }
                                 }
-                                final TextView textView = (TextView) dialog.getCustomView().findViewById(R.id.tv_progress);
-                                textView.setVisibility(View.VISIBLE);
-                                Uri download = Uri.parse("https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true");
-                                DownloadRequest downloadRequest = new DownloadRequest(download)
-                                        .setDestinationURI(Uri.fromFile(descarga))
-                                        .setDownloadListener(new DownloadStatusListener() {
-                                            @Override
-                                            public void onDownloadComplete(int i) {
-                                                Intent promptInstall = new Intent(Intent.ACTION_VIEW)
-                                                        .setDataAndType(Uri.fromFile(descarga),
-                                                                "application/vnd.android.package-archive");
-                                                finish();
-                                                startActivity(promptInstall);
-                                            }
 
-                                            @Override
-                                            public void onDownloadFailed(int i, int i1, String s) {
-                                                textView.setText("Error al descargar: " + s);
-                                            }
-
-                                            @Override
-                                            public void onProgress(int i, long l, int i1) {
-                                                textView.setText(Integer.toString(i1) + "%");
-                                            }
-                                        });
-                                ThinDownloadManager downloadManager = new ThinDownloadManager();
-                                downloadManager.add(downloadRequest);
+                                @Override
+                                public void onNegative(MaterialDialog dialog) {
+                                    finish();
                                 }
-                            }
-
-                            @Override
-                            public void onNegative(MaterialDialog dialog) {
-                                finish();
-                            }
-                        }).build();
-                TextView textView=(TextView) dialog.getCustomView().findViewById(R.id.tv_dialog);
-                textView.setText("Esta version (" + versionCode + ") es obsoleta, porfavor actualiza para continuar.");
-                dialog.show();
+                            }).build();
+                    TextView textView = (TextView) dialog.getCustomView().findViewById(R.id.tv_dialog);
+                    textView.setText("Esta version (" + versionCode + ") es obsoleta, porfavor actualiza para continuar.");
+                    dialog.show();
             }
         }
         if(taskType == TaskType.GET_INICIO) {
