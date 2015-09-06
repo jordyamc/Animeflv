@@ -1325,7 +1325,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         if (!mensaje[2].trim().toLowerCase().equals("salir")||!mensaje[2].trim().toLowerCase().equals("cerrar")){
                                             Interpreter interpreter = new Interpreter();
                                             try {
-                                                interpreter.set("context", this);//set any variable, you can refer to it directly from string
+                                                interpreter.set("context", this);
+                                                interpreter.set("dialog", dialog);
                                                 interpreter.eval(mensaje[3]);
                                             }
                                             catch (Exception e){
