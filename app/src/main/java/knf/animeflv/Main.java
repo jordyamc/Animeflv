@@ -420,6 +420,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }else {
             if (!descargando) {
                 if (isNetworkAvailable()&&verOk) {
+                    new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
                     imageButton.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                     imageButton.setImageResource(R.drawable.cargando);
                     imageButton.setEnabled(false);
@@ -839,7 +840,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     }
                 }
                 File archivo=new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_"))+"/"+fileName);
-                if (!archivo.exists()&&descargando){
+                if (!archivo.exists()&&descargando&verOk){
                     GIBT.setScaleType(ImageView.ScaleType.FIT_END);
                     GIBT.setImageResource(R.drawable.ic_borrar_r);
                     GIBT.setEnabled(true);
@@ -866,6 +867,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     getSharedPreferences("data", MODE_PRIVATE).edit().putString(eidT,Long.toString(l)).apply();
                 }else {
                     web.loadUrl("about:blank");
+                    GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+                    GIBT.setImageResource(R.drawable.ic_get_r);
+                    GIBT.setEnabled(true);
+                    IBVT.setImageResource(R.drawable.ic_ver_no);
+                    IBVT.setEnabled(false);
                 }
             }
         });
@@ -1269,6 +1275,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             Log.d("Version", Integer.toString(versionCode)+ " >> "+vers.trim());
             if (versionCode>=Integer.parseInt(vers.trim())){
                 if (Integer.parseInt(vers.trim())==0){
+                    verOk=false;
                     MaterialDialog dialog = new MaterialDialog.Builder(this)
                             .title("Aplicacion desactivada")
                             .content("La aplicacion ah sido desactivada por algun motivo, espera por mas informacion...")
