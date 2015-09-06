@@ -1306,30 +1306,28 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 .title(mensaje[0])
                                 .content(mensaje[1])
                                 .titleColorRes(R.color.prim)
-                                .autoDismiss(false)
-                                .cancelable(false)
+                                .autoDismiss(Boolean.valueOf(mensaje[2].trim()))
+                                .cancelable(Boolean.valueOf(mensaje[3].trim()))
                                 .backgroundColor(Color.WHITE)
                                 .titleGravity(GravityEnum.CENTER)
-                                .positiveText(mensaje[2])
+                                .positiveText(mensaje[4])
                                 .positiveColorRes(R.color.prim)
                                 .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
                                     public void onPositive(MaterialDialog dialog) {
-                                        if (mensaje[2].trim().toLowerCase().equals("salir")) {
+                                        if (mensaje[4].trim().toLowerCase().equals("salir")) {
                                             finish();
                                         }
-                                        if (mensaje[2].trim().toLowerCase().equals("cerrar")){
+                                        if (mensaje[4].trim().toLowerCase().equals("cerrar")) {
                                             disM = true;
                                             dialog.dismiss();
                                         }
-                                        if (!mensaje[2].trim().toLowerCase().equals("salir")||!mensaje[2].trim().toLowerCase().equals("cerrar")){
+                                        if (!mensaje[4].trim().toLowerCase().equals("salir") || !mensaje[4].trim().toLowerCase().equals("cerrar")) {
                                             Interpreter interpreter = new Interpreter();
                                             try {
                                                 interpreter.set("context", this);
-                                                interpreter.set("dialog", dialog);
-                                                interpreter.eval(mensaje[3]);
-                                            }
-                                            catch (Exception e){
+                                                interpreter.eval(mensaje[5]);
+                                            } catch (Exception e) {
                                                 e.printStackTrace();
                                             }
                                         }
