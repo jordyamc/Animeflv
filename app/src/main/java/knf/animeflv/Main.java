@@ -77,9 +77,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.net.ssl.HttpsURLConnection;
 
-import bsh.Interpreter;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.info.Info;
 import pl.droidsonroids.gif.GifImageButton;
@@ -1113,7 +1111,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (isNetworkAvailable()) {
             getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
             textoff.setVisibility(View.GONE);
-            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version_test.html");
+            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
             new Requests(this, TaskType.GET_INICIO).execute(inicio);
         }else {
             textoff.setVisibility(View.VISIBLE);
@@ -1324,10 +1322,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         }
                                         if (!mensaje[4].trim().toLowerCase().equals("salir") || !mensaje[4].trim().toLowerCase().equals("cerrar")) {
                                             if (mensaje[5].trim().equals("toast")){
-                                                toast(mensaje[6]);
+                                                toast(mensaje[6].trim());
                                             }
                                             if (mensaje[5].trim().equals("toast&notshow")){
-                                                toast(mensaje[6]);
+                                                toast(mensaje[6].trim());
                                                 disM=true;
                                             }
                                             if (mensaje[5].trim().equals("finish")){
