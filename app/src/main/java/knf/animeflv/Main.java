@@ -1109,7 +1109,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (isNetworkAvailable()) {
             getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
             textoff.setVisibility(View.GONE);
-            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
+            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version_test.html");
             new Requests(this, TaskType.GET_INICIO).execute(inicio);
         }else {
             textoff.setVisibility(View.VISIBLE);
@@ -1161,6 +1161,18 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    public static boolean isNumeric(String str) {
+        if (str == null) {
+            return false;
+        }
+        int sz = str.length();
+        for (int i = 0; i < sz; i++) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
     private boolean isNetworkAvailable() {
         Boolean net=false;
@@ -1270,7 +1282,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             if (!isNetworkAvailable()){
                 vers=Integer.toString(versionCode);
             }else {
-                vers=data;
+                if (isNumeric(data)) {
+                    vers = data;
+                }else {
+                    vers = "0";
+                }
             }
             Log.d("Version", Integer.toString(versionCode)+ " >> "+vers.trim());
             if (versionCode>=Integer.parseInt(vers.trim())){
@@ -1278,7 +1294,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     verOk=false;
                     MaterialDialog dialog = new MaterialDialog.Builder(this)
                             .title("Aplicacion desactivada")
-                            .content("La aplicacion ah sido desactivada por algun motivo, espera por mas informacion...")
+                            .content(data)
                             .titleColorRes(R.color.prim)
                             .autoDismiss(false)
                             .cancelable(false)
@@ -1455,7 +1471,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             result.closeDrawer();
         }
     }
-
     class JavaScriptInterface {
         private Context ctx;
         JavaScriptInterface(Context ctx) {
