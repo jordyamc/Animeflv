@@ -225,6 +225,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     int esperando=0;
     boolean login=false;
     boolean version=false;
+    boolean verOk=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -418,7 +419,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         }else {
             if (!descargando) {
-                if (isNetworkAvailable()) {
+                if (isNetworkAvailable()&&verOk) {
                     imageButton.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                     imageButton.setImageResource(R.drawable.cargando);
                     imageButton.setEnabled(false);
@@ -976,6 +977,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             textoff.setVisibility(View.GONE);
             new Requests(this, TaskType.GET_INICIO).execute(inicio);
         }else {
+            verOk=false;
             if (file.exists()) {
                 textoff.setVisibility(View.VISIBLE);
                 String infile = getStringFromFile(file_loc);
@@ -1263,9 +1265,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             Log.d("Version", Integer.toString(versionCode)+ " >> "+vers.trim());
             if (versionCode>=Integer.parseInt(vers.trim())){
                 Log.d("Version","OK");
+                verOk=true;
                 getSharedPreferences("data",MODE_PRIVATE).edit().putBoolean("notVer",false);
             }else {
                 Log.d("Version", "Actualizar");
+                verOk=false;
                 MaterialDialog dialog = new MaterialDialog.Builder(this)
                         .title("Nueva Version " + vers.trim())
                         .customView(R.layout.text_d_act, false)
