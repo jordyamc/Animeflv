@@ -512,7 +512,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             break;
                     }
                 }else {
-                    toast("No hay conexion.");
+                    if (!verOk) {
+                        toast("Error en version");
+                    }else {
+                        toast("No hay conexion");
+                    }
                 }
             }else {
                 toast("Por favor espera...");
