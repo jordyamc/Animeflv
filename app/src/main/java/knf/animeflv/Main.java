@@ -72,12 +72,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import bsh.Interpreter;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.info.Info;
 import pl.droidsonroids.gif.GifImageButton;
@@ -226,6 +228,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     boolean login=false;
     boolean version=false;
     boolean verOk=false;
+    String[] mensaje;
+    boolean disM=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1162,13 +1166,18 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             e.printStackTrace();
         }
     }
-    public static boolean isNumeric(String str) {
-        if (str == null) {
-            return false;
-        }
-        int sz = str.length();
-        for (int i = 0; i < sz; i++) {
-            if (!Character.isDigit(str.charAt(i))) {
+    public static boolean isNumeric( String str ) {
+        DecimalFormatSymbols currentLocaleSymbols = DecimalFormatSymbols.getInstance();
+        char localeMinusSign = currentLocaleSymbols.getMinusSign();
+        if ( !Character.isDigit( str.charAt( 0 ) ) && str.charAt( 0 ) != localeMinusSign ) return false;
+        boolean isDecimalSeparatorFound = false;
+        char localeDecimalSeparator = currentLocaleSymbols.getDecimalSeparator();
+        for ( char c : str.substring( 1 ).toCharArray() ) {
+            if ( !Character.isDigit( c ) ) {
+                if ( c == localeDecimalSeparator && !isDecimalSeparatorFound ) {
+                    isDecimalSeparatorFound = true;
+                    continue;
+                }
                 return false;
             }
         }
@@ -1282,34 +1291,56 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             if (!isNetworkAvailable()){
                 vers=Integer.toString(versionCode);
             }else {
-                if (isNumeric(data)) {
+                if (isNumeric(data.trim())) {
                     vers = data;
                 }else {
                     vers = "0";
+                    mensaje=data.split(":::");
                 }
             }
             Log.d("Version", Integer.toString(versionCode)+ " >> "+vers.trim());
             if (versionCode>=Integer.parseInt(vers.trim())){
                 if (Integer.parseInt(vers.trim())==0){
-                    verOk=false;
-                    MaterialDialog dialog = new MaterialDialog.Builder(this)
-                            .title("Aplicacion desactivada")
-                            .content(data)
-                            .titleColorRes(R.color.prim)
-                            .autoDismiss(false)
-                            .cancelable(false)
-                            .backgroundColor(Color.WHITE)
-                            .titleGravity(GravityEnum.CENTER)
-                            .positiveText("Cerrar")
-                            .positiveColorRes(R.color.prim)
-                            .callback(new MaterialDialog.ButtonCallback() {
-                                @Override
-                                public void onPositive(MaterialDialog dialog) {finish();}
+                    if (!disM) {
+                        MaterialDialog dialog = new MaterialDialog.Builder(this)
+                                .title(mensaje[0])
+                                .content(mensaje[1])
+                                .titleColorRes(R.color.prim)
+                                .autoDismiss(false)
+                                .cancelable(false)
+                                .backgroundColor(Color.WHITE)
+                                .titleGravity(GravityEnum.CENTER)
+                                .positiveText(mensaje[2])
+                                .positiveColorRes(R.color.prim)
+                                .callback(new MaterialDialog.ButtonCallback() {
+                                    @Override
+                                    public void onPositive(MaterialDialog dialog) {
+                                        if (mensaje[2].trim().toLowerCase().equals("salir")) {
+                                            finish();
+                                        }
+                                        if (mensaje[2].trim().toLowerCase().equals("cerrar")){
+                                            disM = true;
+                                            dialog.dismiss();
+                                        }
+                                        if (!mensaje[2].trim().toLowerCase().equals("salir")||!mensaje[2].trim().toLowerCase().equals("cerrar")){
+                                            Interpreter interpreter = new Interpreter();
+                                            try {
+                                                interpreter.set("context", this);//set any variable, you can refer to it directly from string
+                                                interpreter.eval(mensaje[3]);
+                                            }
+                                            catch (Exception e){
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
 
-                                @Override
-                                public void onNegative(MaterialDialog dialog) {finish();}
-                            }).build();
-                    dialog.show();
+                                    @Override
+                                    public void onNegative(MaterialDialog dialog) {
+                                        finish();
+                                    }
+                                }).build();
+                        dialog.show();
+                    }
                 }else {
                     Log.d("Version", "OK");
                     verOk = true;
