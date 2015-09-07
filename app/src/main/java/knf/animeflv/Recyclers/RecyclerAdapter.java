@@ -55,7 +55,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         holder.ib_des.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String item = capitulo.get(position).substring(capitulo.get(position).length() - 1);
+                String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
                 SharedPreferences sharedPreferences=context.getSharedPreferences("data", Context.MODE_PRIVATE);
                 String titulo=sharedPreferences.getString("titInfo","Error");
                 String url=getUrl(titulo, item);
@@ -89,6 +89,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 }
             }
         }
+        ftitulo=ftitulo.replace("!!!","-3");
         ftitulo=ftitulo.replace("!", "");
         ftitulo=ftitulo.replace("°", "");
         ftitulo=ftitulo.replace("&deg;", "");

@@ -1049,6 +1049,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         List<String> a= Arrays.asList(aids);
         List<String> n=Arrays.asList(numeros);
         List<String> e=Arrays.asList(eids);
+        isDesc=new ArrayList<Boolean>();
         for (String s:e){
             Log.i("dir", Environment.getExternalStorageDirectory() + "/.Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
             int index=e.indexOf(s);
@@ -1056,7 +1057,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             Log.i("Existe",String.valueOf(file.exists()));
             if (file.exists()){
                 IBsDesList.get(index).setImageResource(R.drawable.ic_borrar_r);
-                //if (ibDes0!=null){ibDes0.setImageResource(R.drawable.cargando);}
                 isDesc.add(true);
             }else {
                 IBsDesList.get(index).setImageResource(R.drawable.ic_get_r);

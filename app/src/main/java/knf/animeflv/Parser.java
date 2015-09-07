@@ -82,8 +82,28 @@ public class Parser {
         try {
             JSONObject jsonObj = new JSONObject(json);
             url = jsonObj.getString("titulo");
-            url=url.replace("&#039;", "\u0027");
+            url=url.replace("&#039;", "\'");
+            url=url.replace("&iacute;","í");
             url=url.replace("&deg;","°");
+            url=url.replace("&amp;","&");
+            url=url.replace("&acirc;","\u00C2");
+            url=url.replace("&egrave;","\u00E8");
+            url=url.replace("&middot;","\u00B7");
+            url=url.replace("&#333;", "\u014D");
+            url=url.replace("&#9834;", "\u266A");
+            url=url.replace("&aacute;","á");
+            url=url.replace("&oacute;","ó");
+            url=url.replace("&uuml;","\u00FC");
+            url=url.replace("&szlig;","\u00DF");
+            url=url.replace("&radic;","\u221A");
+            url=url.replace("&dagger;", "\u2020");
+            url=url.replace("&hearts;","\u2665");
+            url=url.replace("\u00c3\u0097","\u00D7");
+            url=url.replace("\u00c2\u00bd","\u00BD");
+            url=url.replace("\u00c3\u00b1","\u00F1");
+            url=url.replace("\u00c3\u00a4","\u00E4");
+            url=url.replace("\u00c3\u00a9","\u00E9");
+            url=url.replace("\u00c2\u0096","\u0096");
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -134,7 +154,22 @@ public class Parser {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject childJSONObject = jsonArray.getJSONObject(i);
                 String titulo = childJSONObject.getString("titulo");
+                titulo=titulo.replace("&#039;","\'");
+                titulo=titulo.replace("&iacute;","í");
                 titulo=titulo.replace("&deg;","°");
+                titulo=titulo.replace("&amp;","&");
+                titulo=titulo.replace("&acirc;","\u00C2");
+                titulo=titulo.replace("&egrave;","\u00E8");
+                titulo=titulo.replace("&middot;","\u00B7");
+                titulo=titulo.replace("&#333;", "\u014D");
+                titulo=titulo.replace("&#9834;", "\u266A");
+                titulo=titulo.replace("&aacute;","á");
+                titulo=titulo.replace("&oacute;","ó");
+                titulo=titulo.replace("&uuml;","\u00FC");
+                titulo=titulo.replace("&szlig;","\u00DF");
+                titulo=titulo.replace("&radic;","\u221A");
+                titulo=titulo.replace("&dagger;", "\u2020");
+                titulo=titulo.replace("&hearts;","\u2665");
                 titulosArray.add(titulo);
             }
         }catch (Exception e){
@@ -237,8 +272,22 @@ public class Parser {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject childJSONObject = jsonArray.getJSONObject(i);
                 String tituloRel = childJSONObject.getString("titulo");
-                tituloRel=tituloRel.replace("&#039;","!");
+                tituloRel=tituloRel.replace("&#039;","\'");
+                tituloRel=tituloRel.replace("&iacute;","í");
                 tituloRel=tituloRel.replace("&deg;","°");
+                tituloRel=tituloRel.replace("&amp;","&");
+                tituloRel=tituloRel.replace("&acirc;","\u00C2");
+                tituloRel=tituloRel.replace("&egrave;","\u00E8");
+                tituloRel=tituloRel.replace("&middot;","\u00B7");
+                tituloRel=tituloRel.replace("&#333;", "\u014D");
+                tituloRel=tituloRel.replace("&#9834;", "\u266A");
+                tituloRel=tituloRel.replace("&aacute;","á");
+                tituloRel=tituloRel.replace("&oacute;","ó");
+                tituloRel=tituloRel.replace("&uuml;","\u00FC");
+                tituloRel=tituloRel.replace("&szlig;","\u00DF");
+                tituloRel=tituloRel.replace("&radic;","\u221A");
+                tituloRel=tituloRel.replace("&dagger;", "\u2020");
+                tituloRel=tituloRel.replace("&hearts;","\u2665");
                 eidsArray.add(tituloRel);
             }
         }catch (Exception e) {
@@ -317,6 +366,21 @@ public class Parser {
             JSONObject jsonObj = new JSONObject(json);
             aid=jsonObj.getString("titulo");
             aid=aid.replace("&#039;", "\'");
+            aid=aid.replace("&iacute;","í");
+            aid=aid.replace("&deg;","°");
+            aid=aid.replace("&amp;","&");
+            aid=aid.replace("&acirc;","\u00C2");
+            aid=aid.replace("&egrave;","\u00E8");
+            aid=aid.replace("&middot;","\u00B7");
+            aid=aid.replace("&#333;", "\u014D");
+            aid=aid.replace("&#9834;", "\u266A");
+            aid=aid.replace("&aacute;","á");
+            aid=aid.replace("&oacute;","ó");
+            aid=aid.replace("&uuml;","\u00FC");
+            aid=aid.replace("&szlig;","\u00DF");
+            aid=aid.replace("&radic;","\u221A");
+            aid=aid.replace("&dagger;", "\u2020");
+            aid=aid.replace("&hearts;","\u2665");
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -353,6 +417,22 @@ public class Parser {
                 array=array.replace("\"]","");
                 array=array.replace("\",\"",":::");
                 array=array.replace("\\/","/");
+                array=array.replace("&#039;","\'");
+                array=array.replace("&iacute;","í");
+                array=array.replace("&deg;","°");
+                array=array.replace("&amp;","&");
+                array=array.replace("&acirc;","\u00C2");
+                array=array.replace("&egrave;","\u00E8");
+                array=array.replace("&middot;","\u00B7");
+                array=array.replace("&#333;", "\u014D");
+                array=array.replace("&#9834;", "\u266A");
+                array=array.replace("&aacute;","á");
+                array=array.replace("&oacute;","ó");
+                array=array.replace("&uuml;","\u00FC");
+                array=array.replace("&szlig;","\u00DF");
+                array=array.replace("&radic;","\u221A");
+                array=array.replace("&dagger;", "\u2020");
+                array=array.replace("&hearts;", "\u2665");
                 String[] sarray=array.split(":::");
                 if (sarray[2].trim().equals("Anime")) {
                     linkArray.add(sarray[1]);
@@ -393,7 +473,23 @@ public class Parser {
                 array=array.replace("[\"","");
                 array=array.replace("\"]","");
                 array=array.replace("\",\"",":::");
-                array=array.replace("\\/", "/");
+                array=array.replace("\\/","/");
+                array=array.replace("&#039;","\'");
+                array=array.replace("&iacute;","í");
+                array=array.replace("&deg;","°");
+                array=array.replace("&amp;","&");
+                array=array.replace("&acirc;","\u00C2");
+                array=array.replace("&egrave;","\u00E8");
+                array=array.replace("&middot;","\u00B7");
+                array=array.replace("&#333;", "\u014D");
+                array=array.replace("&#9834;", "\u266A");
+                array=array.replace("&aacute;","á");
+                array=array.replace("&oacute;","ó");
+                array=array.replace("&uuml;","\u00FC");
+                array=array.replace("&szlig;","\u00DF");
+                array=array.replace("&radic;","\u221A");
+                array=array.replace("&dagger;", "\u2020");
+                array=array.replace("&hearts;","\u2665");
                 String[] sarray=array.split(":::");
                 if (sarray[2].trim().equals("OVA")) {
                     linkArray.add(sarray[1]);
@@ -436,6 +532,21 @@ public class Parser {
                 array=array.replace("\",\"",":::");
                 array=array.replace("\\/","/");
                 array=array.replace("&#039;","\'");
+                array=array.replace("&iacute;","í");
+                array=array.replace("&deg;","°");
+                array=array.replace("&amp;","&");
+                array=array.replace("&acirc;","\u00C2");
+                array=array.replace("&egrave;","\u00E8");
+                array=array.replace("&middot;","\u00B7");
+                array=array.replace("&#333;", "\u014D");
+                array=array.replace("&#9834;", "\u266A");
+                array=array.replace("&aacute;","á");
+                array=array.replace("&oacute;","ó");
+                array=array.replace("&uuml;","\u00FC");
+                array=array.replace("&szlig;","\u00DF");
+                array=array.replace("&radic;","\u221A");
+                array=array.replace("&dagger;", "\u2020");
+                array=array.replace("&hearts;","\u2665");
                 array=array.replace("\u00c3\u00b1","ñ");
                 String[] sarray=array.split(":::");
                 if (sarray[2].trim().equals("Pelicula")) {
@@ -475,10 +586,26 @@ public class Parser {
                 JSONArray jsonArray = jsonObj.getJSONArray("lista");
                 for (int i = 0; i < jsonArray.length(); i++) {
                     String array = jsonArray.getString(i);
-                    array = array.replace("[\"", "");
-                    array = array.replace("\"]", "");
-                    array = array.replace("\",\"", ":::");
-                    array = array.replace("\\/", "/");
+                    array=array.replace("[\"","");
+                    array=array.replace("\"]","");
+                    array=array.replace("\",\"",":::");
+                    array=array.replace("\\/","/");
+                    array=array.replace("&#039;","\'");
+                    array=array.replace("&iacute;","í");
+                    array=array.replace("&deg;","°");
+                    array=array.replace("&amp;","&");
+                    array=array.replace("&acirc;","\u00C2");
+                    array=array.replace("&egrave;","\u00E8");
+                    array=array.replace("&middot;","\u00B7");
+                    array=array.replace("&#333;", "\u014D");
+                    array=array.replace("&#9834;", "\u266A");
+                    array=array.replace("&aacute;","á");
+                    array=array.replace("&oacute;","ó");
+                    array=array.replace("&uuml;","\u00FC");
+                    array=array.replace("&szlig;","\u00DF");
+                    array=array.replace("&radic;","\u221A");
+                    array=array.replace("&dagger;", "\u2020");
+                    array=array.replace("&hearts;","\u2665");
                     String[] sarray = array.split(":::");
                     linkArray.add(sarray[1]);
                 }
@@ -491,10 +618,28 @@ public class Parser {
                 JSONArray jsonArray = jsonObj.getJSONArray("lista");
                 for (int i = 0; i < jsonArray.length(); i++) {
                     String array = jsonArray.getString(i);
-                    array = array.replace("[\"", "");
-                    array = array.replace("\"]", "");
-                    array = array.replace("\",\"", ":::");
-                    array = array.replace("\\/", "/");
+                    array=array.replace("[\"","");
+                    array=array.replace("\"]","");
+                    array=array.replace("\",\"",":::");
+                    array=array.replace("\\/","/");
+                    array=array.replace("&#039;","\'");
+                    array=array.replace("&iacute;","í");
+                    array=array.replace("&iacute;","í");
+                    array=array.replace("&deg;","°");
+                    array=array.replace("&amp;","&");
+                    array=array.replace("&acirc;","\u00C2");
+                    array=array.replace("&egrave;","\u00E8");
+                    array=array.replace("&middot;","\u00B7");
+                    array=array.replace("&#333;", "\u014D");
+                    array=array.replace("&#9834;", "\u266A");
+                    array=array.replace("&aacute;","á");
+                    array=array.replace("&oacute;","ó");
+                    array=array.replace("&uuml;","\u00FC");
+                    array=array.replace("&szlig;","\u00DF");
+                    array=array.replace("&radic;","\u221A");
+                    array=array.replace("&dagger;", "\u2020");
+                    array=array.replace("&hearts;","\u2665");
+
                     String[] sarray = array.split(":::");
                     if (sarray[1].trim().toLowerCase().contains(busqueda.toLowerCase())){
                         linkArray.add(sarray[1]);
