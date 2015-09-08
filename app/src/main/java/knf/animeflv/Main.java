@@ -843,7 +843,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     }
                 }
                 File archivo=new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_"))+"/"+fileName);
-                if (!archivo.exists()&&descargando&verOk){
+                if (!archivo.exists()&&descargando&&verOk){
                     GIBT.setScaleType(ImageView.ScaleType.FIT_END);
                     GIBT.setImageResource(R.drawable.ic_borrar_r);
                     GIBT.setEnabled(true);
