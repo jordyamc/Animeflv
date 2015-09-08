@@ -1058,6 +1058,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             Log.i("Existe",String.valueOf(file.exists()));
             if (file.exists()){
                 IBsDesList.get(index).setImageResource(R.drawable.ic_borrar_r);
+                IBsVerList.get(index).setEnabled(true);
+                IBsVerList.get(index).setImageResource(R.drawable.ic_rep_r);
                 isDesc.add(true);
             }else {
                 IBsDesList.get(index).setImageResource(R.drawable.ic_get_r);
