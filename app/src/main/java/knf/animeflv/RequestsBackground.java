@@ -71,10 +71,18 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         sb.append(line + "\n");
                     }
                     br.close();
-                    _response = sb.toString();
+                    Log.d("URL Normal", u.toString());
+                    if (c.getURL()!=u){
+                        Log.d("URL Actual", c.getURL().toString());
+                        _response="";
+                    }else {
+                        Log.d("URL Actual",c.getURL().toString());
+                        _response = sb.toString();
+                    }
                     is = c.getInputStream();
                 } catch (Exception e) {
                     Log.e("log_tag", "Error in http connection " + e.toString());
+                    _response="";
                 }
             }else {Log.d("Conexion","No hay internet");}
         return _response;
@@ -164,7 +172,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                     writeToFile(s, file);
                     int not=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido","0"));
                     if (not==0) {
-                        Log.d("Notificacion:", "Crear Sonido 0");
+                        Log.d("Notificacion:", "Crear Sonido Def");
                         String act=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("reload","0");
                         Log.d("Registrer",act);
                         if (act.trim().equals("0")){

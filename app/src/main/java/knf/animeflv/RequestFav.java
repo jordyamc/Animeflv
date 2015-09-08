@@ -23,6 +23,7 @@ public class RequestFav extends AsyncTask<String,String,String> {
     Parser parser=new Parser();
     StringBuilder builder = new StringBuilder();
     HttpURLConnection c = null;
+    URL u;
     public interface callback{
         public void favCall(String data,TaskType taskType);
     }
@@ -37,7 +38,7 @@ public class RequestFav extends AsyncTask<String,String,String> {
         for (String i:params) {
             try {
                 Log.d("aid", i);
-                URL u = new URL("http://animeflv.net/api.php?accion=anime&aid="+i);
+                u = new URL("http://animeflv.net/api.php?accion=anime&aid="+i);
                 c = (HttpURLConnection) u.openConnection();
                 c.setRequestProperty("Content-length", "0");
                 c.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");
@@ -63,7 +64,14 @@ public class RequestFav extends AsyncTask<String,String,String> {
         for(String i : favoritos) {
             builder.append(":::" + i);
         }
-        _response=builder.toString();
+        Log.d("URL Normal", u.toString());
+        if (c.getURL()!=u){
+            Log.d("URL Actual", c.getURL().toString());
+            _response="";
+        }else {
+            Log.d("URL Actual",c.getURL().toString());
+            _response=builder.toString();
+        }
         return _response;
     }
 

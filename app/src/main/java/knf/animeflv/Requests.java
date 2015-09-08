@@ -58,7 +58,14 @@ public class Requests extends AsyncTask<String,String,String> {
                 sb.append(line + "\n");
             }
             br.close();
-            _response = sb.toString();
+            Log.d("URL Normal", u.toString());
+            if (c.getURL()!=u){
+                Log.d("URL Actual", c.getURL().toString());
+                _response="";
+            }else {
+                Log.d("URL Actual",c.getURL().toString());
+                _response = sb.toString();
+            }
         } catch (Exception e) {
             Log.e("log_tag", "Error in http connection " + e.toString());
             _response="";

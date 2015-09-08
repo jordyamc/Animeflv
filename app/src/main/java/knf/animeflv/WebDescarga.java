@@ -1,6 +1,7 @@
 package knf.animeflv;
 
 import android.app.DownloadManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +12,7 @@ import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -38,6 +40,8 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
     Toolbar toolbar;
     Bundle bundle;
     int inicio=0;
+    boolean descargando=false;
+    ProgressDialog progress;
     String ext_storage_state = Environment.getExternalStorageState();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,14 +71,15 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
-                File Dstorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")));
+                File Dstorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")));
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!Dstorage.exists()) {
                         Dstorage.mkdirs();
                     }
                 }
-                File archivo=new File(Dstorage,fileName);
-                if (!archivo.exists()){
+                File archivo = new File(Dstorage, fileName);
+                if (!archivo.exists() && !descargando) {
+                    descargando = true;
                     String urlD = getSharedPreferences("data", MODE_PRIVATE).getString("urlD", null);
                     CookieManager cookieManager = CookieManager.getInstance();
                     String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
@@ -88,23 +93,24 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
                     request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
                     request.addRequestHeader("Referer", urlD);
                     request.setMimeType("video/mp4");
-                    request.setDestinationInExternalPublicDir(".Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")), fileName);
+                    request.setDestinationInExternalPublicDir(".Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")), fileName);
                     DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                     manager.enqueue(request);
                     getSharedPreferences("data", MODE_PRIVATE).edit().putInt("sov", 0).apply();
+                    progress.dismiss();
                     finish();
-                }else {
+                } else {
                     toastS("El archivo ya existe");
+                    progress.dismiss();
                     finish();
                 }
             }
         });
         webView.setWebViewClient(new WebViewClient() {
-
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                int sov=getSharedPreferences("data",MODE_PRIVATE).getInt("sov",0);
-                if (sov==1) {
+                int sov = getSharedPreferences("data", MODE_PRIVATE).getInt("sov", 0);
+                if (sov == 1) {
                     view.loadUrl(url);
                 }
                 return true;
@@ -126,13 +132,24 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                webView.loadUrl("javascript:"+
-                        "var json=JSON.stringify(videos);"+
+                webView.loadUrl("javascript:" +
+                        "var json=JSON.stringify(videos);" +
                         "window.HtmlViewer.showHTMLD1(json);");
                 webView.loadUrl("javascript:(function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);" + "})()");
             }
         });
+        progress = ProgressDialog.show(this, "Obteniendo Link",
+                "Por favor espere...", true);
         new Requests(this,TaskType.GET_HTML1).execute(bundle.getString("url"));
+        Handler handler=new Handler();
+                handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progress.dismiss();
+                toastS("Error al descargar");
+                finish();
+            }
+        },20000);
     }
     public void toastS(String text){Toast.makeText(this,text,Toast.LENGTH_SHORT).show();}
     public void toastL(String text){Toast.makeText(this,text,Toast.LENGTH_LONG).show();}
@@ -178,6 +195,7 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
     public void sendtext1(String data,TaskType taskType){
         webView.loadUrl("about:blank");
         webView.loadData(data, "text/html", "UTF-8");
+        descargando=false;
     }
     class JavaScriptInterface {
         private Context ctx;

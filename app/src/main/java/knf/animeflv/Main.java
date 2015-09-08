@@ -228,6 +228,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     boolean verOk=false;
     String[] mensaje;
     boolean disM=false;
+    boolean pause=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -342,7 +343,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         SharedPreferences prefs = this.getSharedPreferences("data", MODE_PRIVATE);
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-                if (key.equals("reload")) {
+                if (key.equals("reload")&&!pause) {
                     mswipe.post(new Runnable() {
                         @Override
                         public void run() {
@@ -1213,7 +1214,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
             File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
-            if (isNetworkAvailable()) {
+            if (isNetworkAvailable()&&!data.trim().equals("")) {
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {
@@ -1248,7 +1249,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
             File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
-            if (isNetworkAvailable()) {
+            if (isNetworkAvailable()&&!data.trim().equals("")) {
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {
@@ -1286,7 +1287,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         if (taskType==TaskType.VERSION){
             String vers="";
-            if (!isNetworkAvailable()){
+            if (!isNetworkAvailable()||data.trim().equals("")){
                 vers=Integer.toString(versionCode);
             }else {
                 if (isNumeric(data.trim())) {
@@ -1370,7 +1371,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             .negativeColorRes(R.color.prim)
                             .callback(new MaterialDialog.ButtonCallback() {
                                 @Override
-                                public void onPositive(MaterialDialog dialog) {
+                                public void onPositive(final MaterialDialog dialog) {
                                     if (!version) {
                                         version = true;
                                         if (descarga.exists()) {
@@ -1387,6 +1388,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                         Intent promptInstall = new Intent(Intent.ACTION_VIEW)
                                                                 .setDataAndType(Uri.fromFile(descarga),
                                                                         "application/vnd.android.package-archive");
+                                                        dialog.dismiss();
                                                         finish();
                                                         startActivity(promptInstall);
                                                     }
@@ -1408,6 +1410,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
 
                                 @Override
                                 public void onNegative(MaterialDialog dialog) {
+                                    dialog.dismiss();
                                     finish();
                                 }
                             }).build();
@@ -1472,6 +1475,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     @Override
     protected void onResume() {
         super.onResume();
+        pause=false;
         if(shouldExecuteOnResume){
             if (isNetworkAvailable()) {
                 getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
@@ -1488,6 +1492,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         } else{
             shouldExecuteOnResume = true;
         }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        pause=true;
     }
 
     @Override

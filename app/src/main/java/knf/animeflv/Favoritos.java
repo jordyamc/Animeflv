@@ -88,25 +88,29 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback{
     }
     @Override
     public void favCall(String data,TaskType taskType){
-        String[] crop = data.split(":::");
-        List<String> titulos = new ArrayList<String>();
-        for (String i : crop) {
-           if (!i.trim().equals("")) {
-               titulos.add(i);
+        if (!data.trim().equals("")) {
+            String[] crop = data.split(":::");
+            List<String> titulos = new ArrayList<String>();
+            for (String i : crop) {
+                if (!i.trim().equals("")) {
+                    titulos.add(i);
+                }
             }
+            List<String> links = new ArrayList<String>();
+            for (String aid : aids) {
+                links.add("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg");
+            }
+            for (String tit : links) {
+                Log.d("URL IMG", tit);
+            }
+            Log.d("Ntitulos", Integer.toString(titulos.size()));
+            Log.d("Naids", Integer.toString(aids.size()));
+            Log.d("Nlinks", Integer.toString(links.size()));
+            AdapterFavs adapter = new AdapterFavs(context, titulos, aids, links);
+            recyclerView.setAdapter(adapter);
+        }else {
+            Toast.makeText(context,"Error de red",Toast.LENGTH_SHORT).show();
         }
-        List<String> links = new ArrayList<String>();
-        for (String aid : aids) {
-           links.add("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg");
-        }
-        for (String tit : links) {
-           Log.d("URL IMG", tit);
-        }
-        Log.d("Ntitulos", Integer.toString(titulos.size()));
-        Log.d("Naids", Integer.toString(aids.size()));
-        Log.d("Nlinks", Integer.toString(links.size()));
-        AdapterFavs adapter = new AdapterFavs(context, titulos, aids, links);
-        recyclerView.setAdapter(adapter);
     }
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout

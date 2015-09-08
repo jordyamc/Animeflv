@@ -464,7 +464,6 @@ public class Directorio extends AppCompatActivity {
         }
     }
     public void cancelar() {
-        if (editText.getText().length() >= 0) {
             editText.setText("");
             editText.setVisibility(View.GONE);
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -484,7 +483,7 @@ public class Directorio extends AppCompatActivity {
                 viewPager.setVisibility(View.VISIBLE);
                 viewPagerTab.setVisibility(View.VISIBLE);
             }
-            List<String> titulos = parser.DirTitulosBusqueda(json, null);
+            /*List<String> titulos = parser.DirTitulosBusqueda(json, null);
             List<String> tipos = parser.DirTiposBusqueda(json, null);
             List<String> index = parser.DirIndexBusqueda(json, null);
             List<String> titOrd = parser.DirTitulosBusqueda(json, null);
@@ -505,7 +504,6 @@ public class Directorio extends AppCompatActivity {
                 links.add(link);
             }
             AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);
-            recyclerView.setAdapter(adapterBusqueda);
-        }
+            recyclerView.setAdapter(adapterBusqueda);*/
     }
 }
