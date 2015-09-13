@@ -379,7 +379,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                 cancelPost=true;
                                                 mat.dismiss();
                                             }
+
                                         })
+                                        .cancelable(false)
                                         .build();
                                 AccountManager manager = (AccountManager) getSystemService(ACCOUNT_SERVICE);
                                 Account[] list = manager.getAccounts();
