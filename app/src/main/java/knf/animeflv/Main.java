@@ -242,6 +242,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     WebView webViewFeed;
     MaterialDialog mat;
     Boolean cancelPost=false;
+    Boolean showact=true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1466,6 +1467,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("notVer", false);
                 }
             }else {
+                if (showact) {
+                    showact=false;
                     Log.d("Version", "Actualizar");
                     verOk = false;
                     MaterialDialog dialog = new MaterialDialog.Builder(this)
@@ -1517,7 +1520,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                         textView.setText(Integer.toString(i1) + "%");
                                                     }
                                                 });
-                                        actdown=downloadManager.add(downloadRequest);
+                                        actdown = downloadManager.add(downloadRequest);
                                     }
                                 }
 
@@ -1528,8 +1531,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 }
                             }).build();
                     TextView textView = (TextView) dialog.getCustomView().findViewById(R.id.tv_dialog);
-                textView.setText("Esta version (" + versionCode + ") es obsoleta, porfavor actualiza para continuar.");
+                    textView.setText("Esta version (" + versionCode + ") es obsoleta, porfavor actualiza para continuar.");
                     dialog.show();
+                }
             }
         }
         if(taskType == TaskType.GET_INICIO) {
