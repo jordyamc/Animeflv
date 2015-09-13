@@ -229,6 +229,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     String[] mensaje;
     boolean disM=false;
     boolean pause=false;
+    int actdown;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1381,8 +1382,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         }
                                         final TextView textView = (TextView) dialog.getCustomView().findViewById(R.id.tv_progress);
                                         textView.setVisibility(View.VISIBLE);
+                                        final ThinDownloadManager downloadManager = new ThinDownloadManager();
                                         Uri download = Uri.parse("https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true");
-                                        DownloadRequest downloadRequest = new DownloadRequest(download)
+                                        final DownloadRequest downloadRequest = new DownloadRequest(download)
                                                 .setDestinationURI(Uri.fromFile(descarga))
                                                 .setDownloadListener(new DownloadStatusListener() {
                                                     @Override
@@ -1397,7 +1399,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
 
                                                     @Override
                                                     public void onDownloadFailed(int i, int i1, String s) {
-                                                        textView.setText("Error al descargar: " + s);
+                                                        toast(s);
+                                                        dialog.dismiss();
+                                                        finish();
                                                     }
 
                                                     @Override
@@ -1405,8 +1409,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                         textView.setText(Integer.toString(i1) + "%");
                                                     }
                                                 });
-                                        ThinDownloadManager downloadManager = new ThinDownloadManager();
-                                        downloadManager.add(downloadRequest);
+                                        actdown=downloadManager.add(downloadRequest);
                                     }
                                 }
 

@@ -47,7 +47,7 @@ public class Requests extends AsyncTask<String,String,String> {
             c.setRequestProperty("Content-length", "0");
             c.setRequestProperty( "User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4" );
             c.setUseCaches(false);
-            c.setConnectTimeout(10000);
+            c.setConnectTimeout(15000);
             c.setAllowUserInteraction(false);
             c.connect();
             BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));

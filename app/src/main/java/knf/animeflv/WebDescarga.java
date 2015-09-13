@@ -3,6 +3,7 @@ package knf.animeflv;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -43,6 +44,9 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
     boolean descargando=false;
     ProgressDialog progress;
     String ext_storage_state = Environment.getExternalStorageState();
+    boolean doubleBackToExitPressedOnce = false;
+    boolean closed=false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +82,7 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
                     }
                 }
                 File archivo = new File(Dstorage, fileName);
-                if (!archivo.exists() && !descargando) {
+                if (!archivo.exists() && !descargando && !closed) {
                     descargando = true;
                     String urlD = getSharedPreferences("data", MODE_PRIVATE).getString("urlD", null);
                     CookieManager cookieManager = CookieManager.getInstance();
@@ -99,10 +103,14 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
                     getSharedPreferences("data", MODE_PRIVATE).edit().putInt("sov", 0).apply();
                     progress.dismiss();
                     finish();
+                    closed=true;
                 } else {
-                    toastS("El archivo ya existe");
-                    progress.dismiss();
-                    finish();
+                    if (!closed) {
+                        toastS("El archivo ya existe");
+                        progress.dismiss();
+                        finish();
+                        closed=true;
+                    }
                 }
             }
         });
@@ -128,6 +136,7 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
                 startActivity(intent);*/
                 toastL("Error: " + Integer.toString(errorCod));
                 finish();
+                closed=true;
             }
 
             @Override
@@ -139,17 +148,28 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
             }
         });
         progress = ProgressDialog.show(this, "Obteniendo Link",
-                "Por favor espere...", true);
+                "Por favor espere...", true, true, new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        dialog.dismiss();
+                        toastS("Descarga cancelada");
+                        finish();
+                        closed=true;
+                    }
+                });
         new Requests(this,TaskType.GET_HTML1).execute(bundle.getString("url"));
         Handler handler=new Handler();
                 handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                progress.dismiss();
-                toastS("Error al descargar");
-                finish();
+                if (!closed) {
+                    progress.dismiss();
+                    toastS("Error al descargar");
+                    finish();
+                    closed=true;
+                }
             }
-        },20000);
+        },30000);
     }
     public void toastS(String text){Toast.makeText(this,text,Toast.LENGTH_SHORT).show();}
     public void toastL(String text){Toast.makeText(this,text,Toast.LENGTH_LONG).show();}

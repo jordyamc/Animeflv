@@ -44,6 +44,7 @@ public class RequestFav extends AsyncTask<String,String,String> {
                 c.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");
                 c.setUseCaches(false);
                 c.setAllowUserInteraction(false);
+                c.setConnectTimeout(15000);
                 c.connect();
                 BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
                 //c.disconnect();
@@ -56,6 +57,7 @@ public class RequestFav extends AsyncTask<String,String,String> {
                 list.add(parser.getTit(sb.toString()));
             } catch (Exception e) {
                 Log.e("log_tag", "Error in http connection " + e.toString());
+                list.add("");
             }
         }
         String[] favoritos=new String[list.size()];

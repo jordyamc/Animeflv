@@ -34,6 +34,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -63,6 +64,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                     c.setRequestProperty("Content-length", "0");
                     c.setUseCaches(false);
                     c.setAllowUserInteraction(false);
+                    c.setConnectTimeout(15000);
                     c.connect();
                     BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
                     StringBuilder sb = new StringBuilder();

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="prim">#ff212121</color>
+    <color name="prim">#212121</color>
     <color name="dark">#ff454545</color>
     <color name="blanco">#fff</color>
 </resources>
