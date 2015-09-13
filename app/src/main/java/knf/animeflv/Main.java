@@ -407,7 +407,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 });
                                 List<String> emails=new ArrayList<String>();
                                 for (Account account:list){
-                                    if (account.name.contains("@")){
+                                    if (account.name.contains("@")&&!emails.contains(account.name)){
                                         Log.d("Agregar",account.name);
                                         emails.add(account.name);
                                     }
