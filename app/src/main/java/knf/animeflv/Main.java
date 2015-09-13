@@ -41,6 +41,7 @@ import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
@@ -239,10 +240,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     int actdown;
     Spinner etEmail;
     EditText etSug;
+    EditText cuenta;
     WebView webViewFeed;
     MaterialDialog mat;
     Boolean cancelPost=false;
     Boolean showact=true;
+    Spinner contactoS;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -276,7 +279,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         setLoad();
         try {versionCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;} catch (Exception e) {toast("ERROR");}
         try {versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;} catch (Exception e) {toast("ERROR");}
-        int change=getSharedPreferences("data",MODE_PRIVATE).getInt(Integer.toString(versionCode),0);
+        final int change=getSharedPreferences("data",MODE_PRIVATE).getInt(Integer.toString(versionCode),0);
         if (change==0){
             ChangelogDialog.create()
                     .show(getSupportFragmentManager(), "changelog");
@@ -345,33 +348,62 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                 super.onPositive(dialog);
                                                 String email=etEmail.getSelectedItem().toString();
                                                 String feedback=etSug.getText().toString();
-                                                if (!feedback.trim().equals("")) {
-                                                    if (isNetworkAvailable()) {
-                                                        webViewFeed.loadUrl("http://necrotic-neganebulus.hol.es/feedback.php?nombre=" + email + "&data=" + feedback.replace(" ", "_"));
-                                                        new Handler().postDelayed(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                if (!cancelPost) {
-                                                                    toast("Esto se esta tardando");
+                                                String Scuenta=cuenta.getText().toString();
+                                                String type=contactoS.getSelectedItem().toString().toLowerCase().trim();
+                                                int tipo;
+                                                if (type.equals("email")){
+                                                    tipo=0;
+                                                }else {
+                                                    tipo=1;
+                                                }
+                                                boolean ok=false;
+                                                if (tipo==0){
+                                                    ok=true;
+                                                }
+                                                if (tipo==1){
+                                                    ok=!Scuenta.trim().equals("");
+                                                }
+                                                if (ok) {
+                                                    if (!feedback.trim().equals("")) {
+                                                        if (isNetworkAvailable()) {
+                                                            if (tipo==0) {
+                                                                webViewFeed.loadUrl("http://necrotic-neganebulus.hol.es/feedback.php?tipo="+type+"&cuenta="+email+"&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
+                                                            }else {
+                                                                if (type.equals("twitter")&&!Scuenta.startsWith("@")){
+                                                                    Scuenta="@"+Scuenta;
                                                                 }
+                                                                webViewFeed.loadUrl("http://necrotic-neganebulus.hol.es/feedback.php?tipo="+type+"&cuenta="+Scuenta.replace(" ","_")+"&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
                                                             }
-                                                        }, 5000);
-                                                        new Handler().postDelayed(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                if (!cancelPost) {
-                                                                    webViewFeed.loadUrl("about:blank");
-                                                                    toast("Error, porfavor intentalo de nuevo");
-                                                                    mat.dismiss();
+                                                            new Handler().postDelayed(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    if (!cancelPost) {
+                                                                        toast("Esto se esta tardando");
+                                                                    }
                                                                 }
-                                                            }
-                                                        }, 15000);
+                                                            }, 5000);
+                                                            new Handler().postDelayed(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    if (!cancelPost) {
+                                                                        webViewFeed.loadUrl("about:blank");
+                                                                        toast("Error, porfavor intentalo de nuevo");
+                                                                        mat.dismiss();
+                                                                    }
+                                                                }
+                                                            }, 10000);
+                                                        } else {
+                                                            toast("No hay conexion");
+                                                            mat.dismiss();
+                                                        }
                                                     } else {
-                                                        toast("No hay conexion");
-                                                        mat.dismiss();
+                                                        etSug.setError("Por favor escribe algo");
                                                     }
                                                 }else {
-                                                    etSug.setError("Por favor escribe algo");
+                                                    cuenta.setError("Cuenta necesaria");
+                                                    if (feedback.trim().equals("")){
+                                                        etSug.setError("Por favor escribe algo");
+                                                    }
                                                 }
                                             }
                                             @Override
@@ -388,6 +420,34 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 Account[] list = manager.getAccounts();
                                 etEmail=(Spinner) mat.getCustomView().findViewById(R.id.et_correo);
                                 etSug=(EditText) mat.getCustomView().findViewById(R.id.et_sug);
+                                cuenta=(EditText) mat.getCustomView().findViewById(R.id.cuenta);
+                                cuenta.setTextColor(getResources().getColor(R.color.prim));
+                                contactoS=(Spinner) mat.getCustomView().findViewById(R.id.et_contacto);
+                                contactoS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                    @Override
+                                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                        switch (position){
+                                            case 0:
+                                                cuenta.setVisibility(View.GONE);
+                                                etSug.requestFocus();
+                                                break;
+                                            case 1:
+                                                cuenta.setHint("Nombre");
+                                                cuenta.setVisibility(View.VISIBLE);
+                                                cuenta.requestFocus();
+                                                break;
+                                            case 2:
+                                                cuenta.setHint("@Cuenta");
+                                                cuenta.setVisibility(View.VISIBLE);
+                                                cuenta.requestFocus();
+                                                break;
+                                        }
+                                    }
+                                    @Override
+                                    public void onNothingSelected(AdapterView<?> parent) {
+
+                                    }
+                                });
                                 webViewFeed=(WebView) mat.getCustomView().findViewById(R.id.wv_feedback);
                                 webViewFeed.setWebViewClient(new WebViewClient() {
                                     @Override
@@ -414,10 +474,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 }
                                 String[] mails=new String[emails.size()];
                                 emails.toArray(mails);
+                                String[] contacto={"Email","Facebook","Twitter"};
                                 if (list.length>0) {
                                     ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, mails);
                                     etEmail.setAdapter(arrayAdapter);
                                 }
+                                ArrayAdapter<String> adapter=new ArrayAdapter<String>(context,android.R.layout.simple_list_item_1,contacto);
+                                contactoS.setAdapter(adapter);
                                 cancelPost=false;
                                 mat.show();
                                 break;
