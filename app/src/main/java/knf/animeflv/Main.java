@@ -1,5 +1,7 @@
 package knf.animeflv;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -30,6 +32,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -38,9 +41,13 @@ import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -230,6 +237,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     boolean disM=false;
     boolean pause=false;
     int actdown;
+    Spinner etEmail;
+    EditText etSug;
+    WebView webViewFeed;
+    MaterialDialog mat;
+    Boolean cancelPost=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -292,7 +304,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName("Recientes").withIcon(FontAwesome.Icon.faw_home).withIdentifier(0),
                         new PrimaryDrawerItem().withName("Favoritos").withIcon(GoogleMaterial.Icon.gmd_star).withIdentifier(1),
-                        new PrimaryDrawerItem().withName("Directorio").withIcon(GoogleMaterial.Icon.gmd_library_books).withIdentifier(2)
+                        new PrimaryDrawerItem().withName("Directorio").withIcon(GoogleMaterial.Icon.gmd_library_books).withIdentifier(2),
+                        new PrimaryDrawerItem().withName("Sugerencias").withIcon(GoogleMaterial.Icon.gmd_assignment).withIdentifier(3)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -312,6 +325,99 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             case 3:
                                 result.setSelection(0);
                                 setDir(false);
+                                break;
+                            case 4:
+                                result.closeDrawer();
+                                result.setSelection(0);
+                                mat=new MaterialDialog.Builder(context)
+                                        .title("Sugerencias")
+                                        .titleColor(getResources().getColor(R.color.prim))
+                                        .customView(R.layout.feedback,true)
+                                        .positiveText("Enviar")
+                                        .positiveColor(getResources().getColor(R.color.prim))
+                                        .negativeText("Cancelar")
+                                        .autoDismiss(false)
+                                        .negativeColor(getResources().getColor(R.color.prim))
+                                        .callback(new MaterialDialog.ButtonCallback() {
+                                            @Override
+                                            public void onPositive(MaterialDialog dialog) {
+                                                super.onPositive(dialog);
+                                                String email=etEmail.getSelectedItem().toString();
+                                                String feedback=etSug.getText().toString();
+                                                if (!feedback.trim().equals("")) {
+                                                    if (isNetworkAvailable()) {
+                                                        webViewFeed.loadUrl("http://necrotic-neganebulus.hol.es/feedback.php?nombre=" + email + "&data=" + feedback.replace(" ", "_"));
+                                                        new Handler().postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                if (!cancelPost) {
+                                                                    toast("Esto se esta tardando");
+                                                                }
+                                                            }
+                                                        }, 5000);
+                                                        new Handler().postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                if (!cancelPost) {
+                                                                    webViewFeed.loadUrl("about:blank");
+                                                                    toast("Error, porfavor intentalo de nuevo");
+                                                                    mat.dismiss();
+                                                                }
+                                                            }
+                                                        }, 15000);
+                                                    } else {
+                                                        toast("No hay conexion");
+                                                        mat.dismiss();
+                                                    }
+                                                }else {
+                                                    etSug.setError("Por favor escribe algo");
+                                                }
+                                            }
+                                            @Override
+                                            public void onNegative(MaterialDialog dialog) {
+                                                super.onPositive(dialog);
+                                                cancelPost=true;
+                                                mat.dismiss();
+                                            }
+                                        })
+                                        .build();
+                                AccountManager manager = (AccountManager) getSystemService(ACCOUNT_SERVICE);
+                                Account[] list = manager.getAccounts();
+                                etEmail=(Spinner) mat.getCustomView().findViewById(R.id.et_correo);
+                                etSug=(EditText) mat.getCustomView().findViewById(R.id.et_sug);
+                                webViewFeed=(WebView) mat.getCustomView().findViewById(R.id.wv_feedback);
+                                webViewFeed.setWebViewClient(new WebViewClient() {
+                                    @Override
+                                    public void onPageFinished(WebView view, String url) {
+                                        if (url.trim().equals("http://necrotic-neganebulus.hol.es/feedback.php?ok=ok")&&!cancelPost){
+                                            view.loadUrl("about:blank");
+                                            cancelPost=true;
+                                            toast("Sugerencia enviada");
+                                            mat.dismiss();
+                                        }
+                                    }
+                                    @Override
+                                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                                        view.loadUrl(url);
+                                        return true;
+                                    }
+                                });
+                                List<String> emails=new ArrayList<String>();
+                                for (Account account:list){
+                                    if (account.name.contains("@")){
+                                        Log.d("Agregar",account.name);
+                                        emails.add(account.name);
+                                    }
+                                }
+                                String[] mails=new String[emails.size()];
+                                emails.toArray(mails);
+                                if (list.length>0) {
+                                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, mails);
+                                    etEmail.setAdapter(arrayAdapter);
+                                }
+                                cancelPost=false;
+                                mat.show();
+                                break;
                         }
                         return false;
                     }
