@@ -19,6 +19,8 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -38,6 +40,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     MediaPlayer sam;
     MediaPlayer dango;
     private FragmentActivity myContext;
+    MaterialDialog dialog;
     //Ringtone r;
     @Override
     public void onCreate(final Bundle savedInstanceState){
@@ -63,8 +66,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         long dirsize=getFileSize(file);
         String tamano=formatSize(size);
         String vidsize=formatSize(dirsize);
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_cache",tamano).commit();
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_video",vidsize).commit();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_cache", tamano).commit();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_video", vidsize).commit();
         getPreferenceScreen().findPreference("b_cache").setSummary("Tamaño de cache: " + tamano);
         getPreferenceScreen().findPreference("b_cache").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override

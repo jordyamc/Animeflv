@@ -18,6 +18,7 @@
                 android:maxLines="1"
                 android:inputType="text"
                 android:lines="1"
+                android:imeOptions="actionSearch"
                 android:hint="Buscar..."/>
     </android.support.v7.widget.Toolbar>
     <LinearLayout

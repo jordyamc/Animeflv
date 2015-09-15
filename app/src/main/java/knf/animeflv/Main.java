@@ -4,35 +4,29 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.test.UiThreadTest;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -43,7 +37,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -64,12 +57,11 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.panwrona.downloadprogressbar.library.DownloadProgressBar;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListener;
 import com.thin.downloadmanager.ThinDownloadManager;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -77,13 +69,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 
 import knf.animeflv.Directorio.Directorio;
@@ -246,6 +237,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     Boolean cancelPost=false;
     Boolean showact=true;
     Spinner contactoS;
+    AccountHeader headerResult;
+    String headerTit;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -285,15 +278,23 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     .show(getSupportFragmentManager(), "changelog");
             getSharedPreferences("data",MODE_PRIVATE).edit().putInt(Integer.toString(versionCode),1).apply();
         }
-        AccountHeader headerResult = new AccountHeaderBuilder()
+        headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
-                .withHeaderBackground(R.drawable.graphic)
+                .withHeaderBackground(getHDraw(false))
                 .withCompactStyle(true)
                 .withSelectionListEnabled(false)
                 .addProfiles(
-                        new ProfileDrawerItem().withName("AnimeFLV").withEmail("Versión " + versionName).withIcon(getResources().getDrawable(R.mipmap.ic_launcher))
+                        new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName).withIcon(getResources().getDrawable(R.mipmap.ic_launcher)).withIdentifier(9)
                 )
-                .withProfileImagesClickable(false)
+                .withProfileImagesClickable(true)
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean current) {
+                        result.closeDrawer();
+                        cambiarColor();
+                        return false;
+                    }
+                })
                 .build();
         if (isXLargeScreen(getApplicationContext())){
             Dtoolbar=ltoolbar;
@@ -363,45 +364,61 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                 if (tipo==1){
                                                     ok=!Scuenta.trim().equals("");
                                                 }
-                                                if (ok) {
-                                                    if (!feedback.trim().equals("")) {
-                                                        if (isNetworkAvailable()) {
-                                                            if (tipo==0) {
-                                                                webViewFeed.loadUrl("http://necrotic-neganebulus.hol.es/feedback.php?tipo="+type+"&cuenta="+email+"&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
-                                                            }else {
-                                                                if (type.equals("twitter")&&!Scuenta.startsWith("@")){
-                                                                    Scuenta="@"+Scuenta;
+                                                feedback=feedback
+                                                        .replace("á", "&aacute;")
+                                                        .replace("é", "&eacute")
+                                                        .replace("í","&iacute")
+                                                        .replace("ó","&oacute")
+                                                        .replace("ú","&uacute")
+                                                        .replace(".","")
+                                                        .replace(":::","")
+                                                        .replace("&","");
+                                                if (!type.equals("selecciona")) {
+                                                    if (ok) {
+                                                        if (!feedback.trim().equals("")) {
+                                                            if (isNetworkAvailable()) {
+                                                                if (tipo == 0) {
+                                                                    webViewFeed.loadUrl("http://necrotic-neganebulus.hol.es/feedback.php?tipo=" + type + "&cuenta=" + email + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
+                                                                } else {
+                                                                    if (type.equals("twitter") && !Scuenta.startsWith("@")) {
+                                                                        Scuenta = "@" + Scuenta;
+                                                                    }
+                                                                    webViewFeed.loadUrl("http://necrotic-neganebulus.hol.es/feedback.php?tipo=" + type + "&cuenta=" + Scuenta.replace(" ", "_") + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
                                                                 }
-                                                                webViewFeed.loadUrl("http://necrotic-neganebulus.hol.es/feedback.php?tipo="+type+"&cuenta="+Scuenta.replace(" ","_")+"&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
+                                                                new Handler().postDelayed(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        if (!cancelPost) {
+                                                                            toast("Esto se esta tardando");
+                                                                        }
+                                                                    }
+                                                                }, 5000);
+                                                                new Handler().postDelayed(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        if (!cancelPost) {
+                                                                            webViewFeed.loadUrl("about:blank");
+                                                                            toast("Error, porfavor intentalo de nuevo");
+                                                                            mat.dismiss();
+                                                                        }
+                                                                    }
+                                                                }, 10000);
+                                                            } else {
+                                                                toast("No hay conexion");
+                                                                mat.dismiss();
                                                             }
-                                                            new Handler().postDelayed(new Runnable() {
-                                                                @Override
-                                                                public void run() {
-                                                                    if (!cancelPost) {
-                                                                        toast("Esto se esta tardando");
-                                                                    }
-                                                                }
-                                                            }, 5000);
-                                                            new Handler().postDelayed(new Runnable() {
-                                                                @Override
-                                                                public void run() {
-                                                                    if (!cancelPost) {
-                                                                        webViewFeed.loadUrl("about:blank");
-                                                                        toast("Error, porfavor intentalo de nuevo");
-                                                                        mat.dismiss();
-                                                                    }
-                                                                }
-                                                            }, 10000);
                                                         } else {
-                                                            toast("No hay conexion");
-                                                            mat.dismiss();
+                                                            etSug.setError("Por favor escribe algo");
                                                         }
                                                     } else {
-                                                        etSug.setError("Por favor escribe algo");
+                                                        cuenta.setError("Cuenta necesaria");
+                                                        if (feedback.trim().equals("")) {
+                                                            etSug.setError("Por favor escribe algo");
+                                                        }
                                                     }
                                                 }else {
-                                                    cuenta.setError("Cuenta necesaria");
-                                                    if (feedback.trim().equals("")){
+                                                    toast("Selecciona medio de contacto");
+                                                    if (feedback.trim().equals("")) {
                                                         etSug.setError("Por favor escribe algo");
                                                     }
                                                 }
@@ -429,14 +446,16 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         switch (position){
                                             case 0:
                                                 cuenta.setVisibility(View.GONE);
+                                            case 1:
+                                                cuenta.setVisibility(View.GONE);
                                                 etSug.requestFocus();
                                                 break;
-                                            case 1:
+                                            case 2:
                                                 cuenta.setHint("Nombre");
                                                 cuenta.setVisibility(View.VISIBLE);
                                                 cuenta.requestFocus();
                                                 break;
-                                            case 2:
+                                            case 3:
                                                 cuenta.setHint("@Cuenta");
                                                 cuenta.setVisibility(View.VISIBLE);
                                                 cuenta.requestFocus();
@@ -474,7 +493,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 }
                                 String[] mails=new String[emails.size()];
                                 emails.toArray(mails);
-                                String[] contacto={"Email","Facebook","Twitter"};
+                                String[] contacto={"Selecciona","Email","Facebook","Twitter"};
                                 if (list.length>0) {
                                     ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, mails);
                                     etEmail.setAdapter(arrayAdapter);
@@ -549,6 +568,39 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
         }
         if (descarga.exists()){descarga.delete();}
+    }
+    public int getHDraw (final Boolean set){
+        int color=getSharedPreferences("data", Context.MODE_PRIVATE).getInt("color", 0);
+        int drawable=R.drawable.cargando;
+        switch (color){
+            case 0:
+                drawable=R.drawable.naranja;
+                headerTit="Animeflv";
+                break;
+            case 1:
+                drawable=R.drawable.amarillo;
+                headerTit="Animeflv";
+                break;
+            case 2:
+                drawable=R.drawable.rojo;
+                headerTit="Animeflv";
+                break;
+            case 3:
+                drawable=R.drawable.rosa;
+                headerTit="Animeflv";
+                break;
+            case 4:
+                drawable=R.drawable.alnek;
+                headerTit="";
+                break;
+        }
+                if (set){
+                    ArrayList<IProfile> profile=new ArrayList<IProfile>();
+                    profile.add(new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName).withIcon(getResources().getDrawable(R.mipmap.ic_launcher)).withIdentifier(9));
+                    headerResult.setBackgroundRes(drawable);
+                    headerResult.setProfiles(profile);
+                }
+        return drawable;
     }
     public void toast(String texto){
         Toast.makeText(this,texto,Toast.LENGTH_LONG).show();
@@ -995,12 +1047,17 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             @Override
             public void onPageFinished(WebView view, String url) {
                 //web.loadUrl("javascript:"+"var num=e();"+"window.HtmlViewer.showHTMLD2(e());");
-                web.loadUrl("javascript:(function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);" + "})()");
+                if (!url.startsWith("http://necrotic-neganebulus.hol.es/contador.php?id=")) {
+                    web.loadUrl("javascript:(function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);" + "})()");
+                }else {
+                    getSharedPreferences("data",MODE_PRIVATE).edit().putBoolean("reg",true).apply();
+                    toast("ID de telefono registrado");
+                }
             }
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    view.loadUrl(url);
+                view.loadUrl(url);
                 return true;
             }
         });
@@ -1009,39 +1066,39 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
-                File Dstorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_")));
+                File Dstorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")));
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!Dstorage.exists()) {
                         Dstorage.mkdirs();
                     }
                 }
-                File archivo=new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+url.substring(url.lastIndexOf("/") + 1,url.lastIndexOf("_"))+"/"+fileName);
-                if (!archivo.exists()&&descargando&&verOk){
+                File archivo = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")) + "/" + fileName);
+                if (!archivo.exists() && descargando && verOk) {
                     GIBT.setScaleType(ImageView.ScaleType.FIT_END);
                     GIBT.setImageResource(R.drawable.ic_borrar_r);
                     GIBT.setEnabled(true);
                     IBVT.setImageResource(R.drawable.ic_rep_r);
                     IBVT.setEnabled(true);
-                String urlD=getSharedPreferences("data",MODE_PRIVATE).getString("urlD", null);
-                CookieManager cookieManager = CookieManager.getInstance();
-                String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
-                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                    String urlD = getSharedPreferences("data", MODE_PRIVATE).getString("urlD", null);
+                    CookieManager cookieManager = CookieManager.getInstance();
+                    String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                     request.setTitle(fileName.substring(0, fileName.indexOf(".")));
-                request.setDescription("Animeflv");
-                request.addRequestHeader("cookie", cookie);
-                request.addRequestHeader("User-Agent", web.getSettings().getUserAgentString());
-                request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
-                request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
-                request.addRequestHeader("Referer", urlD);
-                request.setMimeType("video/mp4");
+                    request.setDescription("Animeflv");
+                    request.addRequestHeader("cookie", cookie);
+                    request.addRequestHeader("User-Agent", web.getSettings().getUserAgentString());
+                    request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
+                    request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
+                    request.addRequestHeader("Referer", urlD);
+                    request.setMimeType("video/mp4");
                     request.setDestinationInExternalPublicDir(".Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")), fileName);
-                DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                long l=manager.enqueue(request);
-                    descargando=false;
+                    DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                    long l = manager.enqueue(request);
+                    descargando = false;
                     web.loadUrl("about:blank");
-                    getSharedPreferences("data", MODE_PRIVATE).edit().putString(eidT,Long.toString(l)).apply();
-                }else {
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putString(eidT, Long.toString(l)).apply();
+                } else {
                     web.loadUrl("about:blank");
                     GIBT.setScaleType(ImageView.ScaleType.FIT_END);
                     GIBT.setImageResource(R.drawable.ic_get_r);
@@ -1051,6 +1108,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 }
             }
         });
+        Boolean registrado=getSharedPreferences("data",MODE_PRIVATE).getBoolean("reg",false);
+        if (!registrado) {
+            String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+            Log.d("Registrar",androidID);
+            web.loadUrl("http://necrotic-neganebulus.hol.es/contador.php?id=" + androidID.trim());
+        }
         web_Links=(WebView) findViewById(R.id.wv_inicio2);
         web_Links.getSettings().setJavaScriptEnabled(true);
         web_Links.getSettings().setLoadsImagesAutomatically(false);
@@ -1060,9 +1123,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             @Override
             public void onPageFinished(WebView view, String url) {
                 //web_Links.loadUrl("javascript:window.HtmlViewer.showHTMLD1" + "(document.getElementById('descargas_box').getElementsByTagName('a')[1].href);");
-                web_Links.loadUrl("javascript:" +
-                        "var json=JSON.stringify(videos);" +
-                        "window.HtmlViewer.showHTMLD1(json);");
+                    web_Links.loadUrl("javascript:" +
+                            "var json=JSON.stringify(videos);" +
+                            "window.HtmlViewer.showHTMLD1(json);");
             }
         });
     }
@@ -1309,6 +1372,58 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (!isXLargeScreen(getApplicationContext()) ) {
             return;
         }
+    }
+    public void cambiarColor(){
+            final MaterialDialog dialog = new MaterialDialog.Builder(context)
+                    .title("Selecciona un color:")
+                    .customView(R.layout.dialog_colores, false)
+                    .build();
+            ImageButton naranja = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_naranja);
+            ImageButton amarillo = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_amarillo);
+            ImageButton rojo = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_rojo);
+            ImageButton rosa = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_rosa);
+            ImageButton alnek = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_AlNek);
+            naranja.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 0).apply();
+                    getHDraw(true);
+                    dialog.dismiss();
+                }
+            });
+            amarillo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 1).apply();
+                    getHDraw(true);
+                    dialog.dismiss();
+                }
+            });
+            rojo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 2).apply();
+                    getHDraw(true);
+                    dialog.dismiss();
+                }
+            });
+            rosa.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 3).apply();
+                    getHDraw(true);
+                    dialog.dismiss();
+                }
+            });
+            alnek.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 4).apply();
+                    getHDraw(true);
+                    dialog.dismiss();
+                }
+            });
+            dialog.show();
     }
     public static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
