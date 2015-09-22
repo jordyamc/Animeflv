@@ -75,7 +75,7 @@ public class WebDescarga extends AppCompatActivity implements Requests.callback 
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
-                File Dstorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")));
+                File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")));
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!Dstorage.exists()) {
                         Dstorage.mkdirs();

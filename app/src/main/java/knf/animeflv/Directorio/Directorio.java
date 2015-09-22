@@ -25,8 +25,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,7 +66,7 @@ public class Directorio extends AppCompatActivity {
     RecyclerView recyclerView;
     LinearLayout linearLayout;
     String ext_storage_state = Environment.getExternalStorageState();
-    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache");
+    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
     Parser parser=new Parser();
     String json="";
     Context context;
@@ -71,12 +74,14 @@ public class Directorio extends AppCompatActivity {
     int t_busqueda;
     ViewPager viewPager;
     SmartTabLayout viewPagerTab;
+    Spinner generosS;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.directorio);
         json=getJson();
         context=this;
+        generosS=(Spinner) findViewById(R.id.spinner_generos);
         final Bundle bundle=getIntent().getExtras();
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -175,6 +180,7 @@ public class Directorio extends AppCompatActivity {
                     case R.id.search:
                         getSupportActionBar().setTitle("");
                         editText.setVisibility(View.VISIBLE);
+                        generosS.setVisibility(View.GONE);
                         editText.setText("");
                         editText.requestFocus();
                         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -329,6 +335,7 @@ public class Directorio extends AppCompatActivity {
         if (t_busqueda==1){
             editText.setHint("Presiona Enter...");
         }
+        getSharedPreferences("data",MODE_PRIVATE).edit().putInt("genero",0).apply();
         linearLayout=(LinearLayout) findViewById(R.id.LY_dir);
         recyclerView=(RecyclerView)findViewById(R.id.rv_busqueda);
         recyclerView.setHasFixedSize(true);
@@ -344,6 +351,63 @@ public class Directorio extends AppCompatActivity {
         viewPager.setAdapter(adapter);
         viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab2);
         viewPagerTab.setViewPager(viewPager);
+        String[] generos={
+                "Todos",
+                "Acción",
+                "Aventuras",
+                "Carreras",
+                "Comedia",
+                "Cyberpunk",
+                "Deportes",
+                "Drama",
+                "Ecchi",
+                "Escolares",
+                "Fantasía",
+                "Ciencia Ficción",
+                "Gore",
+                "Harem",
+                "Horror",
+                "Josei",
+                "Lucha",
+                "Magia",
+                "Mecha",
+                "Militar",
+                "Misterio",
+                "Música",
+                "Parodias",
+                "Psicologico",
+                "Recuerdos de la vida",
+                "Romance",
+                "Seinen",
+                "Shojo",
+                "Shonen",
+                "Vampiros",
+                "Yaoi",
+                "Yuri",
+                "Sobrenatural"};
+        if (isXLargeScreen(context)){
+            ArrayAdapter<String> spinerA=new ArrayAdapter<String>(context,R.layout.spinner_generos_blanco,generos);
+            generosS.setAdapter(spinerA);
+        }else {
+            ArrayAdapter<String> spinerA=new ArrayAdapter<String>(context,R.layout.spinner_generos_normal,generos);
+            generosS.setAdapter(spinerA);
+        }
+        generosS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                getSharedPreferences("data", MODE_PRIVATE).edit().putInt("genero", position).apply();
+                FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
+                        getSupportFragmentManager(), FragmentPagerItems.with(context)
+                        .add("ANIMES", Animes.class)
+                        .add("OVAS", Ovas.class)
+                        .add("PELICULAS", Peliculas.class)
+                        .create());
+                viewPager.setAdapter(adapter);
+            }
+
+            public void onNothingSelected(AdapterView<?> arg0) {
+
+            }
+        });
         if (bundle!=null){
             if (!isXLargeScreen(context)) {
                 linearLayout.setVisibility(View.GONE);
@@ -383,6 +447,7 @@ public class Directorio extends AppCompatActivity {
         Bundle bundle=getIntent().getExtras();
         if (bundle==null){
             editText.setVisibility(View.GONE);
+            generosS.setVisibility(View.VISIBLE);
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
             menuGlobal.clear();
@@ -422,8 +487,8 @@ public class Directorio extends AppCompatActivity {
                 mediaStorage.mkdirs();
             }
         }
-        File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
         if (file.exists()) {
             Log.d("Archivo", "Existe");
             json = getStringFromFile(file_loc);
@@ -466,6 +531,7 @@ public class Directorio extends AppCompatActivity {
     public void cancelar() {
             editText.setText("");
             editText.setVisibility(View.GONE);
+        generosS.setVisibility(View.VISIBLE);
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
             menuGlobal.clear();

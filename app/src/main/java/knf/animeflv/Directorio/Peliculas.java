@@ -1,5 +1,6 @@
 package knf.animeflv.Directorio;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -34,7 +35,7 @@ public class Peliculas extends Fragment {
     Parser parser=new Parser();
 
     String ext_storage_state = Environment.getExternalStorageState();
-    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache");
+    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.directorio_peliculas,container,false);
@@ -42,9 +43,10 @@ public class Peliculas extends Fragment {
         rvAnimes.setHasFixedSize(true);
         rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         String json=getJson();
-        List<String> titulosPeliculas=parser.DirTitulosPelicula(json);
-        List<String> indexes=parser.DirIntsPelicula(json);
-        List<String> titOrdPeliculas= parser.DirTitulosPelicula(json);
+        int genero=getActivity().getSharedPreferences("data", Context.MODE_PRIVATE).getInt("genero", 0);
+        List<String> titulosPeliculas=parser.DirTitulosPelicula(json,genero);
+        List<String> indexes=parser.DirIntsPelicula(json,genero);
+        List<String> titOrdPeliculas= parser.DirTitulosPelicula(json,genero);
         List<String> indexOrd=new ArrayList<String>();
         List<String> links=new ArrayList<String>();
         Collections.sort(titOrdPeliculas, String.CASE_INSENSITIVE_ORDER);
@@ -67,8 +69,8 @@ public class Peliculas extends Fragment {
                 mediaStorage.mkdirs();
             }
         }
-        File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
         if (file.exists()) {
             Log.d("Archivo", "Existe");
             json = getStringFromFile(file_loc);

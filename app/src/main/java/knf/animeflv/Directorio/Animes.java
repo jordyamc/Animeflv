@@ -44,7 +44,7 @@ public class Animes extends Fragment{
     Parser parser=new Parser();
 
     String ext_storage_state = Environment.getExternalStorageState();
-    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache");
+    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.directorio_animes,container,false);
@@ -52,9 +52,10 @@ public class Animes extends Fragment{
         rvAnimes.setHasFixedSize(true);
         rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         String json=getJson();
-        List<String> titulosAnime=parser.DirTitulosAnime(json);
-        List<String> indexes=parser.DirIntsAnime(json);
-        List<String> titOrdAnime= parser.DirTitulosAnime(json);
+        int genero=getActivity().getSharedPreferences("data",Context.MODE_PRIVATE).getInt("genero",0);
+        List<String> titulosAnime=parser.DirTitulosAnime(json,genero);
+        List<String> indexes=parser.DirIntsAnime(json,genero);
+        List<String> titOrdAnime= parser.DirTitulosAnime(json,genero);
         List<String> indexOrd=new ArrayList<String>();
         List<String> links=new ArrayList<String>();
         Collections.sort(titOrdAnime, String.CASE_INSENSITIVE_ORDER);
@@ -77,8 +78,8 @@ public class Animes extends Fragment{
                 mediaStorage.mkdirs();
             }
         }
-        File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
         if (file.exists()) {
             Log.d("Archivo", "Existe");
             json = getStringFromFile(file_loc);

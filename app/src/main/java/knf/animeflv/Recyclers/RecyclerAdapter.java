@@ -95,6 +95,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         ftitulo=ftitulo.replace("&deg;", "");
         ftitulo=ftitulo.replace("(","");
         ftitulo=ftitulo.replace(")","");
+        ftitulo=ftitulo.replace("2nd-season","2");
         if (ftitulo.trim().equals("gintama")){ftitulo=ftitulo+"-2015";}
         String link="http://animeflv.net/ver/"+ftitulo+"-"+capitulo+".html";
         return link;

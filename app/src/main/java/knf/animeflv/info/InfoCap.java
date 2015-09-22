@@ -32,7 +32,7 @@ public class InfoCap extends Fragment{
     Parser parser=new Parser();
 
     String ext_storage_state = Environment.getExternalStorageState();
-    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache");
+    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
 
     View view;
     RecyclerView rvAnimes;
@@ -57,8 +57,8 @@ public class InfoCap extends Fragment{
                 mediaStorage.mkdirs();
             }
         }
-        File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aid+".txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aid+".txt";
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aid+".txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aid+".txt";
         if (file.exists()) {
             Log.d("Archivo", "Existe");
             json=getStringFromFile(file_loc);

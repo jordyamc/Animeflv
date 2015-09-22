@@ -61,7 +61,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         oni = MediaPlayer.create(context, R.raw.onii);
         sam = MediaPlayer.create(context, R.raw.sam);
         dango = MediaPlayer.create(context, R.raw.dango);
-        final File file = new File(Environment.getExternalStorageDirectory()+"/.Animeflv/download");
+        final File file = new File(Environment.getExternalStorageDirectory()+"/Animeflv/download");
         long size = getcachesize();
         long dirsize=getFileSize(file);
         String tamano=formatSize(size);
@@ -111,7 +111,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     public long getcachesize(){
         long size = 0;
         File[] files = context.getCacheDir().listFiles();
-        File[] mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache").listFiles();
+        File[] mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache").listFiles();
         for (File f:files) {
             size = size+f.length();
         }
@@ -235,7 +235,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 }
             }
         }
-        File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache");
+        File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
         if (mediaStorage.isDirectory()) {
             String[] children = mediaStorage.list();
             for (int i = 0; i < children.length; i++) {

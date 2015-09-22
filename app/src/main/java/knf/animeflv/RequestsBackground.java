@@ -148,14 +148,14 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
         super.onPostExecute(s);
         if (taskType==TaskType.NOT){
         ext_storage_state = Environment.getExternalStorageState();
-        mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache");
+        mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {
                 mediaStorage.mkdirs();
             }
         }
-        File file=new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt");
-        String file_loc=Environment.getExternalStorageDirectory()+ "/.Animeflv/cache/inicio.txt";
+        File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt");
+        String file_loc=Environment.getExternalStorageDirectory()+ "/Animeflv/cache/inicio.txt";
         if (isNetworkAvailable()&&!s.trim().equals("")) {
             Log.d("Conexion","Hay internet");
             if (!file.exists()) {

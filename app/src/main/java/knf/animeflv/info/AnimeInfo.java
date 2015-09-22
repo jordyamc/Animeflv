@@ -44,7 +44,7 @@ public class AnimeInfo extends Fragment{
     Parser parser=new Parser();
 
     String ext_storage_state = Environment.getExternalStorageState();
-    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache");
+    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
 
     ImageView imageView;
     TextView txt_sinopsis;
@@ -86,8 +86,8 @@ public class AnimeInfo extends Fragment{
                 mediaStorage.mkdirs();
             }
         }
-        File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aid+".txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aid+".txt";
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aid+".txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aid+".txt";
             if (file.exists()) {
                 Log.d("Archivo", "Existe");
                 String infile = getStringFromFile(file_loc);
@@ -104,8 +104,8 @@ public class AnimeInfo extends Fragment{
                 mediaStorage.mkdirs();
             }
         }
-        File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aid+".txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aid+".txt";
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aid+".txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aid+".txt";
         if (file.exists()) {
             Log.d("Archivo", "Existe");
             json = getStringFromFile(file_loc);

@@ -53,6 +53,12 @@
         android:layout_height="?attr/actionBarSize"
         android:theme="@style/toolbarBlanco"
         android:background="@color/blanco">
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/spinner_generos"
+            android:layout_gravity="right"
+            android:visibility="gone"/>
         <EditText
             android:id="@+id/et_busqueda"
             android:layout_width="match_parent"

@@ -202,7 +202,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     String json = "{}";
     Alarm alarm = new Alarm();
     String ext_storage_state = Environment.getExternalStorageState();
-    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache");
+    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
     Parser parser=new Parser();
     String aidInfo;
     String html="<html></html>";
@@ -213,7 +213,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     boolean doubleBackToExitPressedOnce = false;
     Toolbar ltoolbar;
     Toolbar Dtoolbar;
-    File descarga = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache","Animeflv_Nver.apk");
+    File descarga = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache","Animeflv_Nver.apk");
     SharedPreferences.OnSharedPreferenceChangeListener listener;
     boolean descargando=false;
     GifImageButton GIBT;
@@ -273,10 +273,18 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         try {versionCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;} catch (Exception e) {toast("ERROR");}
         try {versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;} catch (Exception e) {toast("ERROR");}
         final int change=getSharedPreferences("data",MODE_PRIVATE).getInt(Integer.toString(versionCode),0);
+        int regver = getSharedPreferences("data",MODE_PRIVATE).getInt("reg"+Integer.toString(versionCode),0);
         if (change==0){
             ChangelogDialog.create()
                     .show(getSupportFragmentManager(), "changelog");
             getSharedPreferences("data",MODE_PRIVATE).edit().putInt(Integer.toString(versionCode),1).apply();
+        }
+        if (isNetworkAvailable()){
+            if (regver==0){
+                String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+                Log.d("Registrar", androidID);
+                web.loadUrl("http://necrotic-neganebulus.hol.es/contador.php?id=" + androidID.trim());
+            }
         }
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -365,14 +373,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                     ok=!Scuenta.trim().equals("");
                                                 }
                                                 feedback=feedback
+                                                        .replace("&","")
                                                         .replace("á", "&aacute;")
                                                         .replace("é", "&eacute")
                                                         .replace("í","&iacute")
                                                         .replace("ó","&oacute")
                                                         .replace("ú","&uacute")
                                                         .replace(".","")
-                                                        .replace(":::","")
-                                                        .replace("&","");
+                                                        .replace(":::","");
                                                 if (!type.equals("selecciona")) {
                                                     if (ok) {
                                                         if (!feedback.trim().equals("")) {
@@ -610,33 +618,52 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         int index=Integer.parseInt(id.substring(id.lastIndexOf("D") + 1))-1;
         List<String> a= Arrays.asList(aids);
         List<String> n=Arrays.asList(numeros);
-        File file=new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+a.get(index)+"/"+a.get(index)+"_"+n.get(a.indexOf(a.get(index)))+".mp4");
+        File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+a.get(index)+"/"+a.get(index)+"_"+n.get(a.indexOf(a.get(index)))+".mp4");
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(file));
         intent.setDataAndType(Uri.fromFile(file), "video/mp4");
         startActivity(intent);
     }
     public void onDesClicked(View view){
         String url;
-        GifImageButton imageButton=(GifImageButton) view;
+        final GifImageButton imageButton=(GifImageButton) view;
         String id=view.getResources().getResourceName(view.getId());
-        int index=Integer.parseInt(id.substring(id.lastIndexOf("D") + 1))-1;
+        final int index=Integer.parseInt(id.substring(id.lastIndexOf("D") + 1))-1;
         if (isDesc.get(index)){
             List<String> a= Arrays.asList(aids);
             List<String> n=Arrays.asList(numeros);
-            File file=new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+a.get(index)+"/"+a.get(index)+"_"+n.get(a.indexOf(a.get(index)))+".mp4");
+            final File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+a.get(index)+"/"+a.get(index)+"_"+n.get(a.indexOf(a.get(index)))+".mp4");
             if (file.exists()) {
-                if (file.delete()) {
-                    isDesc.add(index, false);
-                    imageButton.setImageResource(R.drawable.ic_get_r);
-                    IBsVerList.get(index).setImageResource(R.drawable.ic_ver_no);
-                    IBsVerList.get(index).setEnabled(false);
-                    long l=Long.parseLong(getSharedPreferences("data",MODE_PRIVATE).getString(eids[index],"0"));
-                    if (l!=0) {
-                        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                        manager.remove(l);
-                    }
-                    toast("Archivo Eliminado");
-                }
+                MaterialDialog borrar=new MaterialDialog.Builder(context)
+                        .title("Eliminar")
+                        .titleGravity(GravityEnum.CENTER)
+                        .content("Desea eliminar el capitulo "+n.get(a.indexOf(a.get(index)))+" de "+titulos[index]+"?")
+                        .positiveText("Eliminar")
+                        .negativeText("Cancelar")
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                if (file.delete()) {
+                                    isDesc.add(index, false);
+                                    imageButton.setImageResource(R.drawable.ic_get_r);
+                                    IBsVerList.get(index).setImageResource(R.drawable.ic_ver_no);
+                                    IBsVerList.get(index).setEnabled(false);
+                                    long l=Long.parseLong(getSharedPreferences("data",MODE_PRIVATE).getString(eids[index],"0"));
+                                    if (l!=0) {
+                                        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                                        manager.remove(l);
+                                    }
+                                    toast("Archivo Eliminado");
+                                }
+                            }
+                            @Override
+                            public void onNegative(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                dialog.dismiss();
+                            }
+                        })
+                        .build();
+                borrar.show();
             }else {
                 isDesc.add(index, false);
                 imageButton.setScaleType(ImageView.ScaleType.FIT_END);
@@ -826,8 +853,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         mediaStorage.mkdirs();
                     }
                 }
-                File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
-                String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
+                File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+                String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
                 if (file.exists()) {
                     Intent intent = new Intent(context, Directorio.class);
                     startActivity(intent);
@@ -844,8 +871,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         mediaStorage.mkdirs();
                     }
                 }
-                File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
-                String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
+                File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+                String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
                 if (file.exists()) {
                     Intent intent=new Intent(context,Directorio.class);
                     Bundle bundle=new Bundle();
@@ -873,8 +900,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 mediaStorage.mkdirs();
             }
         }
-        File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aidInfo+".txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aidInfo+".txt";
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aidInfo+".txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aidInfo+".txt";
         if (isNetworkAvailable()) {
             if (!file.exists()) {
                 Log.d("Archivo:", "No existe");
@@ -1050,8 +1077,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 if (!url.startsWith("http://necrotic-neganebulus.hol.es/contador.php?id=")) {
                     web.loadUrl("javascript:(function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);" + "})()");
                 }else {
-                    getSharedPreferences("data",MODE_PRIVATE).edit().putBoolean("reg",true).apply();
-                    toast("ID de telefono registrado");
+                    getSharedPreferences("data",MODE_PRIVATE).edit().putInt("reg" + Integer.toString(versionCode), 1);
                 }
             }
 
@@ -1066,13 +1092,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
-                File Dstorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")));
+                File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")));
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!Dstorage.exists()) {
                         Dstorage.mkdirs();
                     }
                 }
-                File archivo = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")) + "/" + fileName);
+                File archivo = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")) + "/" + fileName);
                 if (!archivo.exists() && descargando && verOk) {
                     GIBT.setScaleType(ImageView.ScaleType.FIT_END);
                     GIBT.setImageResource(R.drawable.ic_borrar_r);
@@ -1092,7 +1118,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
                     request.addRequestHeader("Referer", urlD);
                     request.setMimeType("video/mp4");
-                    request.setDestinationInExternalPublicDir(".Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")), fileName);
+                    request.setDestinationInExternalPublicDir("Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")), fileName);
                     DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                     long l = manager.enqueue(request);
                     descargando = false;
@@ -1108,12 +1134,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 }
             }
         });
-        Boolean registrado=getSharedPreferences("data",MODE_PRIVATE).getBoolean("reg",false);
-        if (!registrado) {
-            String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-            Log.d("Registrar",androidID);
-            web.loadUrl("http://necrotic-neganebulus.hol.es/contador.php?id=" + androidID.trim());
-        }
+
         web_Links=(WebView) findViewById(R.id.wv_inicio2);
         web_Links.getSettings().setJavaScriptEnabled(true);
         web_Links.getSettings().setLoadsImagesAutomatically(false);
@@ -1220,8 +1241,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 mediaStorage.mkdirs();
             }
         }
-        File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt";
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
         if (isNetworkAvailable()) {
             textoff.setVisibility(View.GONE);
             new Requests(this, TaskType.GET_INICIO).execute(inicio);
@@ -1288,9 +1309,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         List<String> e=Arrays.asList(eids);
         isDesc=new ArrayList<Boolean>();
         for (String s:e){
-            Log.i("dir", Environment.getExternalStorageDirectory() + "/.Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
+            Log.i("dir", Environment.getExternalStorageDirectory() + "/Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
             int index=e.indexOf(s);
-            File file=new File(Environment.getExternalStorageDirectory() + "/.Animeflv/download/"+a.get(e.indexOf(s))+"/"+a.get(e.indexOf(s))+"_"+n.get(e.indexOf(s))+".mp4");
+            File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+a.get(e.indexOf(s))+"/"+a.get(e.indexOf(s))+"_"+n.get(e.indexOf(s))+".mp4");
             Log.i("Existe",String.valueOf(file.exists()));
             if (file.exists()){
                 IBsDesList.get(index).setImageResource(R.drawable.ic_borrar_r);
@@ -1332,6 +1353,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         ftitulo=ftitulo.replace("&deg;", "");
         ftitulo=ftitulo.replace("(","");
         ftitulo=ftitulo.replace(")","");
+        ftitulo=ftitulo.replace("2nd-season","2");
         if (ftitulo.trim().equals("gintama")){ftitulo=ftitulo+"-2015";}
         String link="http://animeflv.net/ver/"+ftitulo+"-"+capitulo+".html";
         return link;
@@ -1502,8 +1524,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     mediaStorage.mkdirs();
                 }
             }
-            File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
-            String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
+            File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+            String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
             if (isNetworkAvailable()&&!data.trim().equals("")) {
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
@@ -1537,8 +1559,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     mediaStorage.mkdirs();
                 }
             }
-            File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt");
-            String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/directorio.txt";
+            File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+            String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
             if (isNetworkAvailable()&&!data.trim().equals("")) {
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
@@ -1720,8 +1742,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     mediaStorage.mkdirs();
                 }
             }
-            File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt");
-            String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/inicio.txt";
+            File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt");
+            String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
             if (isNetworkAvailable()&&!data.trim().equals("")) {
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");

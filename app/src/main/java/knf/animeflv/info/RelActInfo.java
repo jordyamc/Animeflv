@@ -37,7 +37,7 @@ import knf.animeflv.TaskType;
 public class RelActInfo extends AppCompatActivity implements Requests.callback {
     String aidInfo;
     String ext_storage_state = Environment.getExternalStorageState();
-    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache");
+    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
 
     Parser parser=new Parser();
     Context context;
@@ -115,8 +115,8 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
                 mediaStorage.mkdirs();
             }
         }
-        File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aidInfo+".txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aidInfo+".txt";
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aidInfo+".txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aidInfo+".txt";
         if (isNetworkAvailable()) {
             if (!file.exists()) {
                 Log.d("Archivo:", "No existe");

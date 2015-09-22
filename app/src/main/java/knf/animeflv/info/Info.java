@@ -50,7 +50,7 @@ public class Info extends AppCompatActivity implements Requests.callback{
     Parser parser=new Parser();
     Toolbar toolbar;
     String ext_storage_state = Environment.getExternalStorageState();
-    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache");
+    File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
     Boolean favBoolean=false;
     Menu Amenu;
     String aid;
@@ -91,8 +91,8 @@ public class Info extends AppCompatActivity implements Requests.callback{
                 mediaStorage.mkdirs();
             }
         }
-        File file = new File(Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aid+".txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/.Animeflv/cache/"+aid+".txt";
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aid+".txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aid+".txt";
         if (file.exists()) {
             Log.d("Archivo", "Existe");
             String infile = getStringFromFile(file_loc);
