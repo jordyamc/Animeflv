@@ -1878,11 +1878,16 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         @JavascriptInterface
         public void showHTMLD1(String html) {
-            String replace=html.replace("\\/","/");
-            String cortado=replace.substring(replace.indexOf("&proxy.link=")+12);
-            cortado=cortado.substring(0,cortado.indexOf("file.html")+9).trim();
-            getSharedPreferences("data", MODE_PRIVATE).edit().putString("urlD", cortado).apply();
-            getSharedPreferences("data", MODE_PRIVATE).edit().putInt("sov",1).apply();
+            String replace=html.replace("\\/", "/");
+            String cortado;
+            if (replace.trim().contains("zippyshare.com")) {
+                cortado = replace.substring(replace.indexOf("&proxy.link=") + 12);
+                cortado = cortado.substring(0, cortado.indexOf("file.html") + 9).trim();
+                getSharedPreferences("data", MODE_PRIVATE).edit().putString("urlD", cortado).apply();
+                getSharedPreferences("data", MODE_PRIVATE).edit().putInt("sov", 1).apply();
+            }else {
+                cortado = "http://error-al-descargar.com";
+            }
             final String finalstring=cortado;
             web.post(new Runnable() {
                 @Override
