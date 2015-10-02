@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -229,6 +230,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     boolean disM=false;
     boolean pause=false;
     int actdown;
+    int Tindex;
     Spinner etEmail;
     EditText etSug;
     EditText cuenta;
@@ -318,7 +320,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         new PrimaryDrawerItem().withName("Recientes").withIcon(FontAwesome.Icon.faw_home).withIdentifier(0),
                         new PrimaryDrawerItem().withName("Favoritos").withIcon(GoogleMaterial.Icon.gmd_star).withIdentifier(1),
                         new PrimaryDrawerItem().withName("Directorio").withIcon(GoogleMaterial.Icon.gmd_library_books).withIdentifier(2),
-                        new PrimaryDrawerItem().withName("Sugerencias").withIcon(GoogleMaterial.Icon.gmd_assignment).withIdentifier(3)
+                        new PrimaryDrawerItem().withName("Sugerencias").withIcon(GoogleMaterial.Icon.gmd_assignment).withIdentifier(3),
+                        new PrimaryDrawerItem().withName("Pagina oficial").withIcon(FontAwesome.Icon.faw_facebook_f).withIdentifier(4)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -511,6 +514,17 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 cancelPost=false;
                                 mat.show();
                                 break;
+                            case 5:
+                                String facebookUrl = "https://www.facebook.com/animeflv.app.jordy";
+                                Uri uri;
+                                try {
+                                    getPackageManager().getPackageInfo("com.facebook.katana", 0);
+                                    uri = Uri.parse("fb://facewebmodal/f?href=" + facebookUrl);
+                                } catch (PackageManager.NameNotFoundException e) {
+                                    uri = Uri.parse(facebookUrl);
+                                }
+                                startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                                break;
                         }
                         return false;
                     }
@@ -679,6 +693,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     imageButton.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                     imageButton.setImageResource(R.drawable.cargando);
                     imageButton.setEnabled(false);
+                    Tindex=index;
                     GIBT = imageButton;
                     IBVT = IBsVerList.get(index);
                     isDesc.add(index, true);
@@ -891,7 +906,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putString("aid",aidInfo);
         editor.commit();
-        new Requests(this,TaskType.GET_INFO).execute("http://animeflv.net/api.php?accion=anime&aid="+aid);
+        new Requests(this,TaskType.GET_INFO).execute("http://animeflv.net/api.php?accion=anime&aid=" + aid);
     }
     public void actCacheInfo(String json){
         Bundle bundleInfo=new Bundle();
@@ -1075,7 +1090,18 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             public void onPageFinished(WebView view, String url) {
                 //web.loadUrl("javascript:"+"var num=e();"+"window.HtmlViewer.showHTMLD2(e());");
                 if (!url.startsWith("http://necrotic-neganebulus.hol.es/contador.php?id=")) {
-                    web.loadUrl("javascript:(function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);" + "})()");
+                    if (url.contains("zippyshare.com")||url.contains("blank")) {
+                        web.loadUrl("javascript:("
+                                + "function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);}"
+                                + ")()");
+                    }else {
+                        isDesc.add(Tindex, false);
+                        GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+                        GIBT.setImageResource(R.drawable.ic_get_r);
+                        IBsVerList.get(Tindex).setImageResource(R.drawable.ic_ver_no);
+                        IBsVerList.get(Tindex).setEnabled(false);
+                        toast("Error al descargar");
+                    }
                 }else {
                     getSharedPreferences("data",MODE_PRIVATE).edit().putInt("reg" + Integer.toString(versionCode), 1);
                 }
@@ -1092,6 +1118,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
+                //Log.d("Descarga",url+" " + fileName);
                 File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")));
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!Dstorage.exists()) {
@@ -1110,8 +1137,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                    request.setTitle(fileName.substring(0, fileName.indexOf(".")));
-                    request.setDescription("Animeflv");
+                    //request.setTitle(fileName.substring(0, fileName.indexOf(".")));
+                    request.setTitle(titulos[indexT]);
+                    request.setDescription("Capitulo "+numeros[Tindex]);
                     request.addRequestHeader("cookie", cookie);
                     request.addRequestHeader("User-Agent", web.getSettings().getUserAgentString());
                     request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
@@ -1354,7 +1382,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         ftitulo=ftitulo.replace("(","");
         ftitulo=ftitulo.replace(")","");
         ftitulo=ftitulo.replace("2nd-season","2");
+        ftitulo=ftitulo.replace("'","");
         if (ftitulo.trim().equals("gintama")){ftitulo=ftitulo+"-2015";}
+        if (ftitulo.trim().equals("miss-monochrome-the-animation-2")){ftitulo="miss-monochrome-the-animation-2nd-season";}
         String link="http://animeflv.net/ver/"+ftitulo+"-"+capitulo+".html";
         return link;
     }
@@ -1868,4 +1898,5 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         public void showHTMLD2(String html) {
             Log.d("Zippy", html);
         }}
+
 }
