@@ -46,7 +46,7 @@ public class Requests extends AsyncTask<String,String,String> {
             c = (HttpURLConnection) u.openConnection();
             c.setRequestProperty("Content-length", "0");
             c.setRequestProperty( "User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4" );
-            c.setUseCaches(false);
+            c.setUseCaches(true);
             c.setConnectTimeout(15000);
             c.setAllowUserInteraction(false);
             c.connect();
@@ -66,6 +66,8 @@ public class Requests extends AsyncTask<String,String,String> {
                 Log.d("URL Actual",c.getURL().toString());
                 _response = sb.toString();
             }
+
+            //String fullPage = page.asXml();
         } catch (Exception e) {
             Log.e("log_tag", "Error in http connection " + e.toString());
             _response="";

@@ -8,6 +8,8 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -21,6 +23,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -41,6 +44,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     MediaPlayer dango;
     private FragmentActivity myContext;
     MaterialDialog dialog;
+    Login login;
     //Ringtone r;
     @Override
     public void onCreate(final Bundle savedInstanceState){
@@ -107,6 +111,24 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
+        String login_email=PreferenceManager.getDefaultSharedPreferences(context).getString("login_email","null");
+        if (!login_email.equals("null")){
+            getPreferenceScreen().findPreference("login").setSummary(login_email);
+        }
+        getPreferenceScreen().findPreference("login").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                //Login.create().show(myContext.getSupportFragmentManager(),"Login");
+                //Login.create().show(myContext.getSupportFragmentManager(), "login");
+                if (isNetworkAvailable()) {
+                    login = Login.create();
+                    login.show(myContext.getSupportFragmentManager(), "login");
+                }else {
+                    Toast.makeText(getActivity(),"Necesitas Internet!!!",Toast.LENGTH_SHORT).show();
+                }
+                return false;
+            }
+        });
     }
     public long getcachesize(){
         long size = 0;
@@ -144,6 +166,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.d("Preference", key);
        switch (key){
            case "notificaciones":
                Boolean activado=sharedPreferences.getBoolean(key,true);
@@ -180,6 +203,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                        if (r.isPlaying())r.stop();
                        if (oni.isPlaying())oni.stop();
                        if (sam.isPlaying())sam.stop();
+                       if (dango.isPlaying())dango.stop();
                    }
                    mp = MediaPlayer.create(context, R.raw.sound);
                    mp.start();
@@ -217,7 +241,95 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                break;
            case "b_cache":
                break;
+           case "nCuenta_Status":
+               String status=sharedPreferences.getString("nCuenta_Status","NULL");
+               switch (status){
+                   case "exito":
+                       sharedPreferences.edit().putString("nCuenta_Status","NEUTRAL").apply();
+                       login.dismiss();
+                       Toast.makeText(getActivity(), "Usuario Creado!!", Toast.LENGTH_SHORT).show();
+                       String login_email=PreferenceManager.getDefaultSharedPreferences(context).getString("login_email","null");
+                       getPreferenceScreen().findPreference("login").setSummary(login_email);
+                       break;
+                   case "error":
+                       sharedPreferences.edit().putString("nCuenta_Status","NEUTRAL").apply();
+                       login.dismiss();
+                       Toast.makeText(getActivity(),"Error!!",Toast.LENGTH_SHORT).show();
+                       break;
+                   case "existe":
+                       sharedPreferences.edit().putString("nCuenta_Status","NEUTRAL").apply();
+                       login.dismiss();
+                       Toast.makeText(getActivity(),"Usuario ya existe!!",Toast.LENGTH_SHORT).show();
+                       break;
+               }
+               break;
+           case "GET_Status":
+               String state=sharedPreferences.getString("GET_Status","NEUTRAL");
+               Log.d("GET_STATUS",state);
+               switch (state.trim()){
+                   case "contraseña":
+                       login.LoginErrors(1);
+                       break;
+                   case "noexiste":
+                       login.LoginErrors(2);
+                       break;
+               }
+               break;
+           case "cCorreo_Status":
+               String Cstate=sharedPreferences.getString("cCorreo_Status","NEUTRAL");
+               Log.d("cCorreo_STATUS",Cstate);
+               switch (Cstate.trim()){
+                   case "contraseña":
+                       login.cCorreoErrors(1);
+                       break;
+                   case "noexiste":
+                       login.cCorreoErrors(2);
+                       break;
+               }
+               break;
+           case "cPass_Status":
+               String CPstate=sharedPreferences.getString("cPass_Status","NEUTRAL");
+               Log.d("cPass_STATUS",CPstate);
+               switch (CPstate.trim()){
+                   case "contraseña":
+                       login.cPassErrors(1);
+                       break;
+                   case "noexiste":
+                       login.cPassErrors(2);
+                       break;
+               }
+               break;
+           case "login_email":
+               String login_email=PreferenceManager.getDefaultSharedPreferences(context).getString("login_email","null");
+               if (!login_email.equals("null")) {
+                   getPreferenceScreen().findPreference("login").setSummary(login_email);
+               }else {
+                   getPreferenceScreen().findPreference("login").setSummary("Iniciar Sesion");
+               }
+               break;
        }
+    }
+    private boolean isNetworkAvailable() {
+        Boolean net=false;
+        int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        switch (Tcon){
+            case 0:
+                NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                net=Wifi.isConnected();
+                break;
+            case 1:
+                NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net=mobile.isConnected();
+                break;
+            case 2:
+                NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net=WifiA.isConnected()||mobileA.isConnected();
+                break;
+        }
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && net;
     }
     public static String formatSize(long v) {
         if (v < 1024) return v + " B";

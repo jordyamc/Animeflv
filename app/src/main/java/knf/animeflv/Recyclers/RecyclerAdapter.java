@@ -1,8 +1,10 @@
 package knf.animeflv.Recyclers;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -36,10 +38,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     }
     private Context context;
     List<String> capitulo;
+    String id;
 
-    public RecyclerAdapter(Context context, List<String> capitulos) {
+    public RecyclerAdapter(Context context, List<String> capitulos,String aid) {
         this.capitulo = capitulos;
         this.context = context;
+        this.id=aid;
     }
 
     @Override
@@ -55,7 +59,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         holder.ib_des.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
+                /*String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
                 SharedPreferences sharedPreferences=context.getSharedPreferences("data", Context.MODE_PRIVATE);
                 String titulo=sharedPreferences.getString("titInfo","Error");
                 String url=getUrl(titulo, item);
@@ -64,7 +68,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 bundle.putString("url",url);
                 intent.putExtras(bundle);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
+                context.startActivity(intent);*/
+                String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse("http://subidas.com/files/" + id + "/"+item+".mp4"));
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                //request.setTitle(fileName.substring(0, fileName.indexOf(".")));
+                SharedPreferences sharedPreferences=context.getSharedPreferences("data", Context.MODE_PRIVATE);
+                String titulo=sharedPreferences.getString("titInfo", "Error");
+                request.setTitle(titulo);
+                request.setDescription("Capitulo " + item);
+                request.setMimeType("video/mp4");
+                request.setDestinationInExternalPublicDir("Animeflv/download/" + id, id+"_"+item+".mp4");
+                DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                long l = manager.enqueue(request);
             }
         });
     }
@@ -96,7 +112,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         ftitulo=ftitulo.replace("(","");
         ftitulo=ftitulo.replace(")","");
         ftitulo=ftitulo.replace("2nd-season","2");
+        ftitulo=ftitulo.replace("'","");
         if (ftitulo.trim().equals("gintama")){ftitulo=ftitulo+"-2015";}
+        if (ftitulo.trim().equals("miss-monochrome-the-animation-2")){ftitulo="miss-monochrome-the-animation-2nd-season";}
         String link="http://animeflv.net/ver/"+ftitulo+"-"+capitulo+".html";
         return link;
     }

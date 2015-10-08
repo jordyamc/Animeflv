@@ -2,9 +2,13 @@ package knf.animeflv;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -57,7 +61,12 @@ public class RequestFav extends AsyncTask<String,String,String> {
                 list.add(parser.getTit(sb.toString()));
             } catch (Exception e) {
                 Log.e("log_tag", "Error in http connection " + e.toString());
-                list.add("");
+                File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+i+".txt");
+                String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+i+".txt";
+                if (file.exists()){
+                    list.add(parser.getTit(getStringFromFile(file_loc)));
+                }
+                //list.add("");
             }
         }
         String[] favoritos=new String[list.size()];
@@ -76,7 +85,26 @@ public class RequestFav extends AsyncTask<String,String,String> {
         }
         return _response;
     }
-
+    public static String getStringFromFile (String filePath) {
+        String ret="";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        }catch (IOException e){}catch (Exception e){}
+        return ret;
+    }
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);

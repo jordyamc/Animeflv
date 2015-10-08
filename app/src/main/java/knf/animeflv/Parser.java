@@ -93,6 +93,7 @@ public class Parser {
             url=url.replace("&#9834;", "\u266A");
             url=url.replace("&aacute;","á");
             url=url.replace("&oacute;","ó");
+            url=url.replace("&quot;","\"");
             url=url.replace("&uuml;","\u00FC");
             url=url.replace("&szlig;","\u00DF");
             url=url.replace("&radic;","\u221A");
@@ -165,6 +166,7 @@ public class Parser {
                 titulo=titulo.replace("&#9834;", "\u266A");
                 titulo=titulo.replace("&aacute;","á");
                 titulo=titulo.replace("&oacute;","ó");
+                titulo=titulo.replace("&quot;","\"");
                 titulo=titulo.replace("&uuml;","\u00FC");
                 titulo=titulo.replace("&szlig;","\u00DF");
                 titulo=titulo.replace("&radic;","\u221A");
@@ -283,6 +285,7 @@ public class Parser {
                 tituloRel=tituloRel.replace("&#9834;", "\u266A");
                 tituloRel=tituloRel.replace("&aacute;","á");
                 tituloRel=tituloRel.replace("&oacute;","ó");
+                tituloRel=tituloRel.replace("&quot;","\"");
                 tituloRel=tituloRel.replace("&uuml;","\u00FC");
                 tituloRel=tituloRel.replace("&szlig;","\u00DF");
                 tituloRel=tituloRel.replace("&radic;","\u221A");
@@ -366,7 +369,7 @@ public class Parser {
             JSONObject jsonObj = new JSONObject(json);
             aid=jsonObj.getString("titulo");
             aid=aid.replace("&#039;", "\'");
-            aid=aid.replace("&iacute;","í");
+            aid=aid.replace("&iacute;", "í");
             aid=aid.replace("&deg;","°");
             aid=aid.replace("&amp;","&");
             aid=aid.replace("&acirc;","\u00C2");
@@ -376,6 +379,7 @@ public class Parser {
             aid=aid.replace("&#9834;", "\u266A");
             aid=aid.replace("&aacute;","á");
             aid=aid.replace("&oacute;","ó");
+            aid=aid.replace("&quot;","\"");
             aid=aid.replace("&uuml;","\u00FC");
             aid=aid.replace("&szlig;","\u00DF");
             aid=aid.replace("&radic;","\u221A");
@@ -430,6 +434,7 @@ public class Parser {
                         array=array.replace("&#9834;", "\u266A");
                         array=array.replace("&aacute;","á");
                         array=array.replace("&oacute;","ó");
+                        array=array.replace("&quot;","\"");
                         array=array.replace("&uuml;","\u00FC");
                         array=array.replace("&szlig;","\u00DF");
                         array=array.replace("&radic;","\u221A");
@@ -465,6 +470,7 @@ public class Parser {
                         array=array.replace("&#9834;", "\u266A");
                         array=array.replace("&aacute;","á");
                         array=array.replace("&oacute;","ó");
+                        array=array.replace("&quot;","\"");
                         array=array.replace("&uuml;","\u00FC");
                         array=array.replace("&szlig;","\u00DF");
                         array=array.replace("&radic;","\u221A");
@@ -548,6 +554,7 @@ public class Parser {
                         array=array.replace("&#9834;", "\u266A");
                         array=array.replace("&aacute;","á");
                         array=array.replace("&oacute;","ó");
+                        array=array.replace("&quot;","\"");
                         array=array.replace("&uuml;","\u00FC");
                         array=array.replace("&szlig;","\u00DF");
                         array=array.replace("&radic;","\u221A");
@@ -583,6 +590,7 @@ public class Parser {
                         array=array.replace("&#9834;", "\u266A");
                         array=array.replace("&aacute;","á");
                         array=array.replace("&oacute;","ó");
+                        array=array.replace("&quot;","\"");
                         array=array.replace("&uuml;","\u00FC");
                         array=array.replace("&szlig;","\u00DF");
                         array=array.replace("&radic;","\u221A");
@@ -667,6 +675,7 @@ public class Parser {
                         array=array.replace("&#9834;", "\u266A");
                         array=array.replace("&aacute;","á");
                         array=array.replace("&oacute;","ó");
+                        array=array.replace("&quot;","\"");
                         array=array.replace("&uuml;","\u00FC");
                         array=array.replace("&szlig;","\u00DF");
                         array=array.replace("&radic;","\u221A");
@@ -696,6 +705,7 @@ public class Parser {
                         array=array.replace("&iacute;","í");
                         array=array.replace("&deg;","°");
                         array=array.replace("&amp;","&");
+                        array=array.replace("&quot;","\"");
                         array=array.replace("&acirc;","\u00C2");
                         array=array.replace("&egrave;","\u00E8");
                         array=array.replace("&middot;","\u00B7");
@@ -779,6 +789,7 @@ public class Parser {
                     array=array.replace("&iacute;","í");
                     array=array.replace("&deg;","°");
                     array=array.replace("&amp;","&");
+                    array=array.replace("&quot;","\"");
                     array=array.replace("&acirc;","\u00C2");
                     array=array.replace("&egrave;","\u00E8");
                     array=array.replace("&middot;","\u00B7");
@@ -812,6 +823,7 @@ public class Parser {
                     array=array.replace("&iacute;","í");
                     array=array.replace("&deg;","°");
                     array=array.replace("&amp;","&");
+                    array=array.replace("&quot;","\"");
                     array=array.replace("&acirc;","\u00C2");
                     array=array.replace("&egrave;","\u00E8");
                     array=array.replace("&middot;","\u00B7");
@@ -824,7 +836,6 @@ public class Parser {
                     array=array.replace("&radic;","\u221A");
                     array=array.replace("&dagger;", "\u2020");
                     array=array.replace("&hearts;","\u2665");
-
                     String[] sarray = array.split(":::");
                     if (sarray[1].trim().toLowerCase().contains(busqueda.toLowerCase())){
                         linkArray.add(sarray[1]);

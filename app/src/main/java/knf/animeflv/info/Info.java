@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import knf.animeflv.LoginServer;
 import knf.animeflv.Main;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
@@ -148,6 +150,8 @@ public class Info extends AppCompatActivity implements Requests.callback{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        String email_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
+        String pass_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
         switch (item.getItemId()){
             case R.id.favorito_si:
                 SharedPreferences sharedPreferences=getSharedPreferences("data",MODE_PRIVATE);
@@ -171,6 +175,9 @@ public class Info extends AppCompatActivity implements Requests.callback{
                 }
                 toast("Favorito Eliminado");
                 getSharedPreferences("data",MODE_PRIVATE).edit().putString("favoritos",builder.toString()).commit();
+                if (!email_coded.equals("null")&&!email_coded.equals("null")) {
+                    new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString());
+                }
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_no,Amenu);
                 break;
@@ -188,6 +195,9 @@ public class Info extends AppCompatActivity implements Requests.callback{
                 }
                 toast("Favorito Agregado");
                 getSharedPreferences("data",MODE_PRIVATE).edit().putString("favoritos",builderNo.toString()).commit();
+                if (!email_coded.equals("null")&&!email_coded.equals("null")) {
+                    new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString());
+                }
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_si, Amenu);
                 break;
@@ -197,7 +207,7 @@ public class Info extends AppCompatActivity implements Requests.callback{
 
     @Override
     public void sendtext1(String data,TaskType taskType) {
-        SharedPreferences.Editor editor=getSharedPreferences("data",MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor=getSharedPreferences("data", MODE_PRIVATE).edit();
         editor.putString("titInfo",parser.getTit(data)).commit();
         getSupportActionBar().setTitle(parser.getTit(data));
     }

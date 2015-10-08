@@ -4,7 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -86,6 +91,28 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback{
             new RequestFav(this, TaskType.GET_INFO).execute(favoritos);
         }
     }
+    private boolean isNetworkAvailable() {
+        Boolean net=false;
+        int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        switch (Tcon){
+            case 0:
+                NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                net=Wifi.isConnected();
+                break;
+            case 1:
+                NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net=mobile.isConnected();
+                break;
+            case 2:
+                NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net=WifiA.isConnected()||mobileA.isConnected();
+                break;
+        }
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && net;
+    }
     @Override
     public void favCall(String data,TaskType taskType){
         if (!data.trim().equals("")) {
@@ -98,7 +125,14 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback{
             }
             List<String> links = new ArrayList<String>();
             for (String aid : aids) {
-                links.add("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg");
+                if (isNetworkAvailable()) {
+                    links.add("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg");
+                }else {
+                    File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aid+".txt");
+                    if (file.exists()){
+                        links.add("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg");
+                    }
+                }
             }
             for (String tit : links) {
                 Log.d("URL IMG", tit);
