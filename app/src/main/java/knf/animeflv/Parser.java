@@ -86,7 +86,7 @@ public class Parser {
             url=url.replace("&iacute;","í");
             url=url.replace("&deg;","°");
             url=url.replace("&amp;","&");
-            url=url.replace("&acirc;","\u00C2");
+            url=url.replace("&acirc;", "\u00C2");
             url=url.replace("&egrave;","\u00E8");
             url=url.replace("&middot;","\u00B7");
             url=url.replace("&#333;", "\u014D");
@@ -259,6 +259,22 @@ public class Parser {
                 JSONObject childJSONObject = jsonArray.getJSONObject(i);
                 String eid = childJSONObject.getString("num");
                 eidsArray.add("Capitulo "+eid);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return eidsArray;
+    }
+    public List<String> parseEidsbyEID(String json){
+        List<String> eidsArray=new ArrayList<String>();
+        String[] eids;
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("episodios");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject childJSONObject = jsonArray.getJSONObject(i);
+                String eid = childJSONObject.getString("eid");
+                eidsArray.add(eid);
             }
         }catch (Exception e) {
             e.printStackTrace();

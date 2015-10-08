@@ -19,7 +19,8 @@ public enum TaskType {
     LIST_USERS(13),
     cCorreo(14),
     GET_FAV_SL(15),
-    cPass(16);
+    cPass(16),
+    CONTAR(17);
 
     int value;
 

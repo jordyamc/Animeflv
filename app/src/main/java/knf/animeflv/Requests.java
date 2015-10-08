@@ -70,7 +70,7 @@ public class Requests extends AsyncTask<String,String,String> {
             //String fullPage = page.asXml();
         } catch (Exception e) {
             Log.e("log_tag", "Error in http connection " + e.toString());
-            _response="";
+            _response="error";
         }
         return _response;
     }

@@ -44,7 +44,7 @@ public class InfoCap extends Fragment{
         rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         SharedPreferences sharedPreferences=getActivity().getSharedPreferences("data",Context.MODE_PRIVATE);
         String aid=sharedPreferences.getString("aid", "");
-        RecyclerAdapter adapter = new RecyclerAdapter(getActivity().getApplicationContext(), parser.parseNumerobyEID(getJson()),aid);
+        RecyclerAdapter adapter = new RecyclerAdapter(getActivity(), parser.parseNumerobyEID(getJson()),aid,parser.parseEidsbyEID(getJson()));
         rvAnimes.setAdapter(adapter);
 
         return view;

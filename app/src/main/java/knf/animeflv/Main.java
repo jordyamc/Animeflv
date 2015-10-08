@@ -286,18 +286,17 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         try {versionCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;} catch (Exception e) {toast("ERROR");}
         try {versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;} catch (Exception e) {toast("ERROR");}
         final int change=getSharedPreferences("data",MODE_PRIVATE).getInt(Integer.toString(versionCode),0);
-        int regver = getSharedPreferences("data",MODE_PRIVATE).getInt("reg"+Integer.toString(versionCode),0);
         if (change==0){
             ChangelogDialog.create()
                     .show(getSupportFragmentManager(), "changelog");
             getSharedPreferences("data",MODE_PRIVATE).edit().putInt(Integer.toString(versionCode),1).apply();
+            if (versionName.trim().equals("1.9.2.1")){PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("streaming",false).apply();}
         }
         if (isNetworkAvailable()){
-            if (regver==0){
-                String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-                Log.d("Registrar", androidID);
-                web.loadUrl("http://necrotic-neganebulus.hol.es/contador.php?id=" + androidID.trim());
-            }
+            String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+            Log.d("Registrar", androidID);
+            //web.loadUrl("http://necrotic-neganebulus.hol.es/contador.php?id=" + androidID.trim());
+            new Requests(context,TaskType.CONTAR).execute("http://necrotic-neganebulus.hol.es/contador.php?id=" + androidID.trim());
         }
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -648,6 +647,93 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         intent.setDataAndType(Uri.fromFile(file), "video/mp4");
         startActivity(intent);
     }
+    public void DescargarInbyID(int position){
+        if (isNetworkAvailable()) {
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse("http://subidas.com/files/" + aids[position] + "/" + numeros[position] + ".mp4"));
+            Log.d("DURL", "http://subidas.com/files/" + aids[position] + "/" + numeros[position] + ".mp4");
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            //request.setTitle(fileName.substring(0, fileName.indexOf(".")));
+            request.setTitle(titulos[position]);
+            request.setDescription("Capitulo " + numeros[position]);
+            request.setMimeType("video/mp4");
+            request.setDestinationInExternalPublicDir("Animeflv/download/" + aids[position], aids[position] + "_" + numeros[position] + ".mp4");
+            DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+            long l = manager.enqueue(request);
+            getSharedPreferences("data", MODE_PRIVATE).edit().putString(eidT, Long.toString(l)).apply();
+            GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+            GIBT.setImageResource(R.drawable.ic_borrar_r);
+            GIBT.setEnabled(true);
+            IBVT.setImageResource(R.drawable.ic_rep_r);
+            IBVT.setEnabled(true);
+            descargando = false;
+        }else {
+            toast("No hay conexion a internet");
+            GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+            GIBT.setImageResource(R.drawable.ic_get_r);
+            GIBT.setEnabled(true);
+            IBVT.setImageResource(R.drawable.ic_ver_no);
+            IBVT.setEnabled(false);
+            descargando = false;
+        }
+    }
+    public void StreamInbyID(int position){
+        if (isNetworkAvailable()) {
+            Streaming = false;
+            GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+            GIBT.setImageResource(R.drawable.ic_get_r);
+            GIBT.setEnabled(true);
+            IBVT.setImageResource(R.drawable.ic_ver_no);
+            IBVT.setEnabled(false);
+            descargando = false;
+            List<ApplicationInfo> packages;
+            PackageManager pm;
+            pm = getPackageManager();
+            packages = pm.getInstalledApplications(0);
+            String pack = "null";
+            for (ApplicationInfo packageInfo : packages) {
+                if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
+                    pack = "com.mxtech.videoplayer.pro";
+                    break;
+                }
+                if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
+                    pack = "com.mxtech.videoplayer.ad";
+                    break;
+                }
+            }
+            switch (pack) {
+                case "com.mxtech.videoplayer.pro":
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    Uri videoUri = Uri.parse("http://subidas.com/files/" + aids[position] + "/" + numeros[position] + ".mp4");
+                    intent.setDataAndType(videoUri, "application/mp4");
+                    intent.setPackage("com.mxtech.videoplayer.pro");
+                    intent.putExtra("title", titulos[position] + " " + numeros[position]);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    break;
+                case "com.mxtech.videoplayer.ad":
+                    Intent intentad = new Intent(Intent.ACTION_VIEW);
+                    Uri videoUriad = Uri.parse("http://subidas.com/files/" + aids[position] + "/" + numeros[position] + ".mp4");
+                    intentad.setDataAndType(videoUriad, "application/mp4");
+                    intentad.setPackage("com.mxtech.videoplayer.ad");
+                    intentad.putExtra("title", titulos[position] + " " + numeros[position]);
+                    intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intentad);
+                    break;
+                default:
+                    toast("MX player no instalado");
+                    break;
+            }
+        }else {
+            toast("No hay conexion a internet");
+            Streaming = false;
+            GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+            GIBT.setImageResource(R.drawable.ic_get_r);
+            GIBT.setEnabled(true);
+            IBVT.setImageResource(R.drawable.ic_ver_no);
+            IBVT.setEnabled(false);
+            descargando = false;
+        }
+    }
     public void onDesClicked(final View view){
         final GifImageButton imageButton=(GifImageButton) view;
         String id=view.getResources().getResourceName(view.getId());
@@ -711,7 +797,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         descargando = true;
                         indexT = index;
                         eidT = eids[index];
-                        switch (view.getId()) {
+                        DescargarInbyID(index);
+                        /*switch (view.getId()) {
                             case R.id.ib_descargar_cardD1:
                                 url = getUrl(titulos[0], numeros[0]);
                                 new Requests(this, TaskType.GET_HTML1).execute(url);
@@ -792,17 +879,17 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 url = getUrl(titulos[19], numeros[19]);
                                 new Requests(this, TaskType.GET_HTML1).execute(url);
                                 break;
-                        }
+                        }*/
                     }else {
                         ndialog=new MaterialDialog.Builder(context)
-                                .title("DESCARGAR?")
+                                .title(titulos[index])
                                 .titleGravity(GravityEnum.CENTER)
-                                .content("Que deseas hacer?")
+                                .content("Desea descargar el capitulo "+numeros[index]+"?")
                                 .autoDismiss(false)
                                 .cancelable(false)
-                                .positiveText("DESCARGAR")
-                                .negativeText("ATRAS")
-                                .neutralText("STREAM")
+                                .positiveText("DESCARGA")
+                                .negativeText("STREAMING")
+                                .neutralText("ATRAS")
                                 .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
                                     public void onPositive(MaterialDialog dialog) {
@@ -818,92 +905,93 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         descargando = true;
                                         indexT = index;
                                         eidT = eids[index];
-                                        switch (view.getId()) {
-                                            case R.id.ib_descargar_cardD1:
-                                                url = getUrl(titulos[0], numeros[0]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD2:
-                                                url = getUrl(titulos[1], numeros[1]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD3:
-                                                url = getUrl(titulos[2], numeros[2]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD4:
-                                                url = getUrl(titulos[3], numeros[3]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD5:
-                                                url = getUrl(titulos[4], numeros[4]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD6:
-                                                url = getUrl(titulos[5], numeros[5]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD7:
-                                                url = getUrl(titulos[6], numeros[6]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD8:
-                                                url = getUrl(titulos[7], numeros[7]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD9:
-                                                url = getUrl(titulos[8], numeros[8]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD10:
-                                                url = getUrl(titulos[9], numeros[9]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD11:
-                                                url = getUrl(titulos[10], numeros[10]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD12:
-                                                url = getUrl(titulos[11], numeros[11]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD13:
-                                                url = getUrl(titulos[12], numeros[12]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD14:
-                                                url = getUrl(titulos[13], numeros[13]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD15:
-                                                url = getUrl(titulos[14], numeros[14]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD16:
-                                                url = getUrl(titulos[15], numeros[15]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD17:
-                                                url = getUrl(titulos[16], numeros[16]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD18:
-                                                url = getUrl(titulos[17], numeros[17]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD19:
-                                                url = getUrl(titulos[18], numeros[18]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD20:
-                                                url = getUrl(titulos[19], numeros[19]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                        }
+                                        DescargarInbyID(index);
+                        /*switch (view.getId()) {
+                            case R.id.ib_descargar_cardD1:
+                                url = getUrl(titulos[0], numeros[0]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD2:
+                                url = getUrl(titulos[1], numeros[1]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD3:
+                                url = getUrl(titulos[2], numeros[2]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD4:
+                                url = getUrl(titulos[3], numeros[3]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD5:
+                                url = getUrl(titulos[4], numeros[4]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD6:
+                                url = getUrl(titulos[5], numeros[5]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD7:
+                                url = getUrl(titulos[6], numeros[6]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD8:
+                                url = getUrl(titulos[7], numeros[7]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD9:
+                                url = getUrl(titulos[8], numeros[8]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD10:
+                                url = getUrl(titulos[9], numeros[9]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD11:
+                                url = getUrl(titulos[10], numeros[10]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD12:
+                                url = getUrl(titulos[11], numeros[11]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD13:
+                                url = getUrl(titulos[12], numeros[12]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD14:
+                                url = getUrl(titulos[13], numeros[13]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD15:
+                                url = getUrl(titulos[14], numeros[14]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD16:
+                                url = getUrl(titulos[15], numeros[15]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD17:
+                                url = getUrl(titulos[16], numeros[16]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD18:
+                                url = getUrl(titulos[17], numeros[17]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD19:
+                                url = getUrl(titulos[18], numeros[18]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD20:
+                                url = getUrl(titulos[19], numeros[19]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                        }*/
                                         ndialog.dismiss();
                                     }
                                     @Override
-                                    public void onNeutral(MaterialDialog dialog) {
+                                    public void onNegative(MaterialDialog dialog) {
                                         super.onPositive(dialog);
                                         new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
                                         imageButton.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
@@ -917,93 +1005,94 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         indexT = index;
                                         eidT = eids[index];
                                         Streaming=true;
-                                        switch (view.getId()) {
-                                            case R.id.ib_descargar_cardD1:
-                                                url = getUrl(titulos[0], numeros[0]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD2:
-                                                url = getUrl(titulos[1], numeros[1]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD3:
-                                                url = getUrl(titulos[2], numeros[2]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD4:
-                                                url = getUrl(titulos[3], numeros[3]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD5:
-                                                url = getUrl(titulos[4], numeros[4]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD6:
-                                                url = getUrl(titulos[5], numeros[5]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD7:
-                                                url = getUrl(titulos[6], numeros[6]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD8:
-                                                url = getUrl(titulos[7], numeros[7]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD9:
-                                                url = getUrl(titulos[8], numeros[8]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD10:
-                                                url = getUrl(titulos[9], numeros[9]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD11:
-                                                url = getUrl(titulos[10], numeros[10]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD12:
-                                                url = getUrl(titulos[11], numeros[11]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD13:
-                                                url = getUrl(titulos[12], numeros[12]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD14:
-                                                url = getUrl(titulos[13], numeros[13]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD15:
-                                                url = getUrl(titulos[14], numeros[14]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD16:
-                                                url = getUrl(titulos[15], numeros[15]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD17:
-                                                url = getUrl(titulos[16], numeros[16]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD18:
-                                                url = getUrl(titulos[17], numeros[17]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD19:
-                                                url = getUrl(titulos[18], numeros[18]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                            case R.id.ib_descargar_cardD20:
-                                                url = getUrl(titulos[19], numeros[19]);
-                                                new Requests(context, TaskType.GET_HTML1).execute(url);
-                                                break;
-                                        }
+                                        StreamInbyID(index);
+                        /*switch (view.getId()) {
+                            case R.id.ib_descargar_cardD1:
+                                url = getUrl(titulos[0], numeros[0]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD2:
+                                url = getUrl(titulos[1], numeros[1]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD3:
+                                url = getUrl(titulos[2], numeros[2]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD4:
+                                url = getUrl(titulos[3], numeros[3]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD5:
+                                url = getUrl(titulos[4], numeros[4]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD6:
+                                url = getUrl(titulos[5], numeros[5]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD7:
+                                url = getUrl(titulos[6], numeros[6]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD8:
+                                url = getUrl(titulos[7], numeros[7]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD9:
+                                url = getUrl(titulos[8], numeros[8]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD10:
+                                url = getUrl(titulos[9], numeros[9]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD11:
+                                url = getUrl(titulos[10], numeros[10]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD12:
+                                url = getUrl(titulos[11], numeros[11]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD13:
+                                url = getUrl(titulos[12], numeros[12]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD14:
+                                url = getUrl(titulos[13], numeros[13]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD15:
+                                url = getUrl(titulos[14], numeros[14]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD16:
+                                url = getUrl(titulos[15], numeros[15]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD17:
+                                url = getUrl(titulos[16], numeros[16]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD18:
+                                url = getUrl(titulos[17], numeros[17]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD19:
+                                url = getUrl(titulos[18], numeros[18]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                            case R.id.ib_descargar_cardD20:
+                                url = getUrl(titulos[19], numeros[19]);
+                                new Requests(this, TaskType.GET_HTML1).execute(url);
+                                break;
+                        }*/
                                         ndialog.dismiss();
                                     }
 
                                     @Override
-                                    public void onNegative(MaterialDialog dialog) {
+                                    public void onNeutral(MaterialDialog dialog) {
                                         super.onNegative(dialog);
                                         GIBT.setScaleType(ImageView.ScaleType.FIT_END);
                                         GIBT.setImageResource(R.drawable.ic_borrar_r);
@@ -1468,14 +1557,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         "window.HtmlViewer.showHTMLD1(json);");
             }
         });
-        web_gets=(WebView)findViewById(R.id.gets);
-        client=new WebViewClient(){
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-
-            }
-        };
     }
 
     public void loadImg(String[] list){
@@ -1860,7 +1941,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-            if (isNetworkAvailable()&&!data.trim().equals("")) {
+            if (isNetworkAvailable()&&!data.trim().equals("error")) {
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {
@@ -1895,7 +1976,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-            if (isNetworkAvailable()&&!data.trim().equals("")) {
+            if (isNetworkAvailable()&&!data.trim().equals("error")) {
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {
@@ -1933,7 +2014,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         if (taskType==TaskType.VERSION){
             String vers="";
-            if (!isNetworkAvailable()||data.trim().equals("")){
+            if (!isNetworkAvailable()||data.trim().equals("error")){
                 vers=Integer.toString(versionCode);
             }else {
                 if (isNumeric(data.trim())) {
@@ -2078,7 +2159,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
-            if (isNetworkAvailable()&&!data.trim().equals("")) {
+            if (isNetworkAvailable()&&!data.trim().equals("error")) {
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {
@@ -2099,6 +2180,25 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         Log.d("Cargar", "Json existente");
                         getData(infile);
                     }
+                }
+            }else {
+                if (!file.exists()) {
+                    Log.d("Archivo:", "No existe");
+                    if (data.trim().equals("error")) {
+                        toast("Error en servidor, sin cache para mostrar");
+                        if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
+                    }
+                    if (!isNetworkAvailable()){
+                        toast("Sin cache para mostrar");
+                        if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
+                    }
+                } else {
+                    Log.d("Archivo", "Existe");
+                    String infile = getStringFromFile(file_loc);
+                    if (data.trim().equals("error"))toast("Error en servidor, cargando desde cache");
+                    if (!isNetworkAvailable())toast("Cargando desde cache");
+                    Log.d("Cargar", "Json existente");
+                    getData(infile);
                 }
             }
         }

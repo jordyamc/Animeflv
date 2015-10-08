@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -19,6 +21,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -307,7 +310,32 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                    getPreferenceScreen().findPreference("login").setSummary("Iniciar Sesion");
                }
                break;
+           case "streaming":
+               com.lb.material_preferences_library.custom_preferences.SwitchPreference switchPreference=(com.lb.material_preferences_library.custom_preferences.SwitchPreference)findPreference("streaming");
+               if (!isMXInstaled()&&sharedPreferences.getBoolean("streaming",false)){
+                   sharedPreferences.edit().putBoolean("streaming",false).apply();
+                   switchPreference.setChecked(false);
+                   Toast.makeText(context,"MX Player no esta instalado",Toast.LENGTH_SHORT).show();
+               }
        }
+    }
+    public Boolean isMXInstaled(){
+        Boolean is=false;
+        List<ApplicationInfo> packages;
+        PackageManager pm;
+        pm = context.getPackageManager();
+        packages = pm.getInstalledApplications(0);
+        for (ApplicationInfo packageInfo : packages) {
+            if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
+                is=true;
+                break;
+            }
+            if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
+                is=true;
+                break;
+            }
+        }
+        return is;
     }
     private boolean isNetworkAvailable() {
         Boolean net=false;
