@@ -10,7 +10,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +38,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         public TextView tv_capitulo;
         public ImageButton ib_ver;
         public ImageButton ib_des;
+        public CardView card;
         public RecyclerView recyclerView;
 
         public ViewHolder(View itemView) {
@@ -43,6 +46,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             this.tv_capitulo = (TextView) itemView.findViewById(R.id.tv_cardD_capitulo);
             this.ib_ver = (ImageButton) itemView.findViewById(R.id.ib_ver_rv);
             this.ib_des = (ImageButton) itemView.findViewById(R.id.ib_descargar_rv);
+            this.card = (CardView) itemView.findViewById(R.id.card_descargas_info);
         }
     }
     private Context context;
@@ -66,7 +70,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final RecyclerAdapter.ViewHolder holder, final int position) {
-        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
+        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
         final File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+id+"/"+id+"_"+item+".mp4");
         if (file.exists()){
             holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
@@ -74,12 +78,17 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             holder.ib_ver.setImageResource(R.drawable.ic_ver_no);
         }
         holder.tv_capitulo.setText(capitulo.get(position));
+        Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto"+id + "_" + item, false);
+        holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
+        if (vistos){
+            holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+        }
         holder.ib_des.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!file.exists()) {
                     if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("streaming", false)) {
-                        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
+                        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
                         DownloadManager.Request request = new DownloadManager.Request(Uri.parse("http://subidas.com/files/" + id + "/" + item + ".mp4"));
                         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                         //request.setTitle(fileName.substring(0, fileName.indexOf(".")));
@@ -94,13 +103,21 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString(eids.get(position), Long.toString(l)).apply();
                         holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
                         holder.ib_ver.setImageResource(R.drawable.ic_rep_r);
+                        Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+                        if (!vistos){
+                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
+                            String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
+                            Svistos=Svistos+"visto" + id + "_" + item+":::";
+                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                            holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+                        }
                     } else {
                         MaterialDialog dialog = new MaterialDialog.Builder(context)
                                 .title("Descargar?")
                                 .titleGravity(GravityEnum.CENTER)
                                 .content("Desea descargar el capitulo?")
                                 .autoDismiss(false)
-                                .cancelable(false)
+                                .cancelable(true)
                                 .positiveText("DESCARGAR")
                                 .negativeText("STREAMING")
                                 .neutralText("ATRAS")
@@ -123,6 +140,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                         context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString(eids.get(position), Long.toString(l)).apply();
                                         holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
                                         holder.ib_ver.setImageResource(R.drawable.ic_rep_r);
+                                        Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+                                        if (!vistos){
+                                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
+                                            String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
+                                            Svistos=Svistos+"visto" + id + "_" + item+":::";
+                                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                                            holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+                                        }
                                         dialog.dismiss();
                                     }
 
@@ -144,7 +169,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                                 break;
                                             }
                                         }
-                                        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
+                                        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
                                         switch (pack) {
                                             case "com.mxtech.videoplayer.pro":
                                                 Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -153,6 +178,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                                 intent.setPackage("com.mxtech.videoplayer.pro");
                                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                                 context.startActivity(intent);
+                                                Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+                                                if (!vistos){
+                                                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
+                                                    String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
+                                                    Svistos=Svistos+"visto" + id + "_" + item+":::";
+                                                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                                                    holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+                                                }
                                                 dialog.dismiss();
                                                 break;
                                             case "com.mxtech.videoplayer.ad":
@@ -162,6 +195,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                                 intentad.setPackage("com.mxtech.videoplayer.ad");
                                                 intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                                 context.startActivity(intentad);
+                                                Boolean vistosad=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+                                                if (!vistosad){
+                                                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
+                                                    String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
+                                                    Svistos=Svistos+"visto" + id + "_" + item+":::";
+                                                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                                                    holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+                                                }
                                                 dialog.dismiss();
                                                 break;
                                             default:
@@ -180,7 +221,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         dialog.show();
                     }
                 } else {
-                    String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
+                    String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
                     MaterialDialog borrar = new MaterialDialog.Builder(context)
                             .title("Eliminar")
                             .titleGravity(GravityEnum.CENTER)
@@ -231,6 +272,28 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(file));
                     intent.setDataAndType(Uri.fromFile(file), "video/mp4");
                     context.startActivity(intent);
+                }else {
+                    Toast.makeText(context,"El archivo no existe",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        holder.card.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
+                Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+                if (!vistos){
+                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
+                    String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
+                    Svistos=Svistos+"visto" + id + "_" + item+":::";
+                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                    holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+                }else {
+                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, false).apply();
+                    String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
+                    Svistos=Svistos.replace("visto" + id + "_" + item+":::","");
+                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                    holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
                 }
             }
         });

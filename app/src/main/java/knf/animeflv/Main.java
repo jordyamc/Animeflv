@@ -666,6 +666,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             IBVT.setImageResource(R.drawable.ic_rep_r);
             IBVT.setEnabled(true);
             descargando = false;
+            String vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
+            if (!vistos.contains(eids[position].trim())){
+                vistos=vistos+eids[position].trim()+":::";
+                context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos",vistos).apply();
+            }
         }else {
             toast("No hay conexion a internet");
             GIBT.setScaleType(ImageView.ScaleType.FIT_END);
@@ -709,6 +714,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     intent.putExtra("title", titulos[position] + " " + numeros[position]);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
+                    String vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
+                    if (!vistos.contains(eids[position].trim())){
+                        vistos=vistos+eids[position].trim()+":::";
+                        context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos",vistos).apply();
+                    }
                     break;
                 case "com.mxtech.videoplayer.ad":
                     Intent intentad = new Intent(Intent.ACTION_VIEW);
@@ -718,6 +728,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     intentad.putExtra("title", titulos[position] + " " + numeros[position]);
                     intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intentad);
+                    String vistosad=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
+                    if (!vistosad.contains(eids[position].trim())){
+                        vistosad=vistosad+eids[position].trim()+":::";
+                        context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos",vistosad).apply();
+                    }
                     break;
                 default:
                     toast("MX player no instalado");

@@ -2,9 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:icon="@drawable/ic_comment"
+        android:id="@+id/comentarios"
+        android:orderInCategory="100"
+        android:title="Comentarios"
+        app:showAsAction="always"/>
+    <item
         android:icon="@drawable/ic_fav_lleno"
         android:id="@+id/favorito_si"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:title="Favoritos"
         app:showAsAction="always"/>
 </menu>

@@ -132,6 +132,19 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
+        getPreferenceScreen().findPreference("b_vistos").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                String vistos=context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos","");
+                String[] array=vistos.split(":::");
+                for (String s:array){
+                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean(s, false).apply();
+                }
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos","");
+                Toast.makeText(getActivity(), "Historial Borrado!!", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
     }
     public long getcachesize(){
         long size = 0;

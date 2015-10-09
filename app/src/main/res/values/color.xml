@@ -3,4 +3,5 @@
     <color name="prim">#212121</color>
     <color name="dark">#ff454545</color>
     <color name="blanco">#fff</color>
+    <color name="rojo">#F20000</color>
 </resources>

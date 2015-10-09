@@ -22,8 +22,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.WebView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.GravityEnum;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
@@ -56,6 +62,11 @@ public class Info extends AppCompatActivity implements Requests.callback{
     Boolean favBoolean=false;
     Menu Amenu;
     String aid;
+    String titulo="";
+    String id="";
+    MaterialDialog dialog;
+    Spinner spinner;
+    WebView webView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +112,8 @@ public class Info extends AppCompatActivity implements Requests.callback{
             SharedPreferences.Editor editor=getSharedPreferences("data",MODE_PRIVATE).edit();
             editor.putString("titInfo",parser.getTit(infile)).commit();
             getSupportActionBar().setTitle(parser.getTit(infile));
+            titulo=parser.getTit(infile);
+            id=parser.getAID(infile);
         }else {
             new Requests(this, TaskType.GET_INFO).execute("http://animeflv.net/api.php?accion=anime&aid=" + aid);
         }
@@ -119,6 +132,21 @@ public class Info extends AppCompatActivity implements Requests.callback{
     }
     public void toast(String texto){
         Toast.makeText(this, texto, Toast.LENGTH_SHORT).show();
+    }
+    public String getJson() {
+        String json="";
+        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+            if (!mediaStorage.exists()) {
+                mediaStorage.mkdirs();
+            }
+        }
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + id + ".txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + id + ".txt";
+        if (file.exists()) {
+            Log.d("Archivo", "Existe");
+            json = getStringFromFile(file_loc);
+        }
+        return json;
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -201,6 +229,37 @@ public class Info extends AppCompatActivity implements Requests.callback{
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_si, Amenu);
                 break;
+            case R.id.comentarios:
+                dialog=new MaterialDialog.Builder(this)
+                        .title("COMENTARIOS")
+                        .titleGravity(GravityEnum.CENTER)
+                        .customView(R.layout.comentarios,false)
+                        .positiveText("SALIR")
+                        .build();
+                spinner=(Spinner)dialog.getCustomView().findViewById(R.id.comentarios_box_cap);
+                final List<String> caps=parser.parseNumerobyEID(getJson());
+                String[] array=new String[caps.size()];
+                caps.toArray(array);
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,array );
+                spinner.setAdapter(arrayAdapter);
+                webView=(WebView)dialog.getCustomView().findViewById(R.id.comentarios_box);
+                webView.getSettings().setJavaScriptEnabled(true);
+                webView.getSettings().setUseWideViewPort(true);
+                webView.setHorizontalScrollBarEnabled(true);
+                webView.loadUrl("https://m.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2FYKPvjVoWVGb.js%3Fversion%3D41%23cb%3Df1381b3cd4%26domain%3Danimeflv.net%26origin%3Dhttp%253A%252F%252Fanimeflv.net%252Ff15a10f4e8%26relation%3Dparent.parent&href=http%3A%2F%2Fanimeflv.net%2Fver%2F" + getUrl(titulo, caps.get(0).substring(caps.get(0).lastIndexOf(" ") + 1)) + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000");
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        webView.loadUrl("https://m.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2FYKPvjVoWVGb.js%3Fversion%3D41%23cb%3Df1381b3cd4%26domain%3Danimeflv.net%26origin%3Dhttp%253A%252F%252Fanimeflv.net%252Ff15a10f4e8%26relation%3Dparent.parent&href=http%3A%2F%2Fanimeflv.net%2Fver%2F" + getUrl(titulo, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1)) + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000");
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+                dialog.show();
+                break;
         }
         return true;
     }
@@ -210,6 +269,8 @@ public class Info extends AppCompatActivity implements Requests.callback{
         SharedPreferences.Editor editor=getSharedPreferences("data", MODE_PRIVATE).edit();
         editor.putString("titInfo",parser.getTit(data)).commit();
         getSupportActionBar().setTitle(parser.getTit(data));
+        titulo=parser.getTit(data);
+        id=parser.getAID(data);
     }
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
@@ -244,5 +305,43 @@ public class Info extends AppCompatActivity implements Requests.callback{
             fin.close();
         }catch (IOException e){}catch (Exception e){}
         return ret;
+    }
+    public String getUrl(String titulo,String capitulo){
+        String ftitulo="";
+        String atitulo=titulo.toLowerCase();
+        atitulo=atitulo.replace("*","-");
+        atitulo=atitulo.replace(":","");
+        atitulo=atitulo.replace(",","");
+        atitulo=atitulo.replace(" \u2606 ","-");
+        atitulo=atitulo.replace("\u2606","-");
+        atitulo=atitulo.replace("  ","-");
+        atitulo=atitulo.replace("@","a");
+        atitulo=atitulo.replace("/","-");
+        atitulo=atitulo.replace(".","");
+        atitulo=atitulo.replace("\"","");
+        atitulo=atitulo.replace("♥","-");
+        for (int x=0; x < atitulo.length(); x++) {
+            if (atitulo.charAt(x) != ' ') {
+                ftitulo += atitulo.charAt(x);
+            }else {
+                if (atitulo.charAt(x) == ' ') {
+                    ftitulo += "-";
+                }
+            }
+        }
+        ftitulo=ftitulo.replace("!!!","-3");
+        ftitulo=ftitulo.replace("!", "");
+        ftitulo=ftitulo.replace("°", "");
+        ftitulo=ftitulo.replace("&deg;", "");
+        ftitulo=ftitulo.replace("(","");
+        ftitulo=ftitulo.replace(")","");
+        ftitulo=ftitulo.replace("2nd-season","2");
+        ftitulo=ftitulo.replace("'","");
+        if (ftitulo.trim().equals("gintama")){ftitulo=ftitulo+"-2015";}
+        if (ftitulo.trim().equals("miss-monochrome-the-animation-2")){ftitulo="miss-monochrome-the-animation-2nd-season";}
+        if (ftitulo.trim().equals("ore-ga-ojousama-gakkou-ni-shomin-sample-toshite-gets-sareta-ken")){ftitulo="ore-ga-ojousama-gakkou-ni-shomin-sample-toshite-gets-sareta-";}
+        if (ftitulo.trim().equals("diabolik-lovers-moreblood")){ftitulo="diabolik-lovers-more-blood";}
+        String link=ftitulo+"-"+capitulo+".html";
+        return link;
     }
 }
