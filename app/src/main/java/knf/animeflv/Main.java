@@ -298,7 +298,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
             Log.d("Registrar", androidID);
             //web.loadUrl("http://necrotic-neganebulus.hol.es/contador.php?id=" + androidID.trim());
-            new Requests(context,TaskType.CONTAR).execute("http://necrotic-neganebulus.hol.es/contador.php?id=" + androidID.trim());
+            new Requests(context,TaskType.CONTAR).execute("http://necrotic-neganebulus.hol.es/contador.php?id=" + androidID.trim()+"&version="+Integer.toString(versionCode));
         }
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
