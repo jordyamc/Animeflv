@@ -51,7 +51,7 @@ public class Parser {
             JSONObject jsonObj = new JSONObject(json);
             url = jsonObj.getString("sinopsis");
             url=url.replace("&aacute;", "\u00E1");
-            url=url.replace("&eacute;","\u00E9");
+            url=url.replace("&eacute;", "\u00E9");
             url=url.replace("&iacute;","\u00ED");
             url=url.replace("&oacute;","\u00F3");
             url=url.replace("&uacute;","\u00FA");
@@ -67,6 +67,7 @@ public class Parser {
             url=url.replace("&iquest;","\u00BF");
             url=url.replace("&hellip;","\u2026");
             url=url.replace("&#333;","\u014D");
+            url=url.replace("&iexcl;","¡");
             url=url.replace("&quot;","\"");
             if (url.trim().equals("")){
                 url="Sin Sinopsis.";

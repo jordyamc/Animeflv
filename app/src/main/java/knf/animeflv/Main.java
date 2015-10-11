@@ -63,6 +63,7 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.nullwire.trace.ExceptionHandler;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListener;
 import com.thin.downloadmanager.ThinDownloadManager;
@@ -256,6 +257,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
+        ExceptionHandler.register(this, "http://necrotic-neganebulus.hol.es/server.php");
         context=this;
         shouldExecuteOnResume = false;
         getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
@@ -304,7 +306,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 .withCompactStyle(true)
                 .withSelectionListEnabled(false)
                 .addProfiles(
-                        new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName).withIcon(getResources().getDrawable(R.mipmap.ic_launcher)).withIdentifier(9)
+                        new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " ("+Integer.toString(versionCode)+")").withIcon(getResources().getDrawable(R.mipmap.ic_launcher)).withIdentifier(9)
                 )
                 .withProfileImagesClickable(true)
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
@@ -387,11 +389,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                 }
                                                 feedback=feedback
                                                         .replace("&","")
-                                                        .replace("á", "&aacute;")
-                                                        .replace("é", "&eacute")
-                                                        .replace("í","&iacute")
-                                                        .replace("ó","&oacute")
-                                                        .replace("ú","&uacute")
+                                                        .replace("=","")
+                                                        .replace("?","")
+                                                        .replace("á", "%aacute#")
+                                                        .replace("é", "%eacute#")
+                                                        .replace("í","%iacute#")
+                                                        .replace("ó","%oacute#")
+                                                        .replace("ú","%uacute#")
                                                         .replace(".","")
                                                         .replace(":::","");
                                                 if (!type.equals("selecciona")) {
@@ -628,7 +632,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
                 if (set){
                     ArrayList<IProfile> profile=new ArrayList<IProfile>();
-                    profile.add(new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName).withIcon(getResources().getDrawable(R.mipmap.ic_launcher)).withIdentifier(9));
+                    profile.add(new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " ("+Integer.toString(versionCode)+")").withIcon(getResources().getDrawable(R.mipmap.ic_launcher)).withIdentifier(9));
                     headerResult.setBackgroundRes(drawable);
                     headerResult.setProfiles(profile);
                 }
@@ -649,17 +653,27 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
     public void DescargarInbyID(int position){
         if (isNetworkAvailable()) {
-            DownloadManager.Request request = new DownloadManager.Request(Uri.parse("http://subidas.com/files/" + aids[position] + "/" + numeros[position] + ".mp4"));
-            Log.d("DURL", "http://subidas.com/files/" + aids[position] + "/" + numeros[position] + ".mp4");
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            //request.setTitle(fileName.substring(0, fileName.indexOf(".")));
-            request.setTitle(titulos[position]);
-            request.setDescription("Capitulo " + numeros[position]);
-            request.setMimeType("video/mp4");
-            request.setDestinationInExternalPublicDir("Animeflv/download/" + aids[position], aids[position] + "_" + numeros[position] + ".mp4");
-            DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-            long l = manager.enqueue(request);
-            getSharedPreferences("data", MODE_PRIVATE).edit().putString(eidT, Long.toString(l)).apply();
+            File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aids[position]);
+            if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                if (!Dstorage.exists()) {
+                    if (!Dstorage.mkdirs())toast("Error al crear carpeta");
+                }
+            }
+            try {
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse("http://subidas.com/files/" + aids[position] + "/" + numeros[position] + ".mp4"));
+                Log.d("DURL", "http://subidas.com/files/" + aids[position] + "/" + numeros[position] + ".mp4");
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                //request.setTitle(fileName.substring(0, fileName.indexOf(".")));
+                request.setTitle(titulos[position]);
+                request.setDescription("Capitulo " + numeros[position]);
+                request.setMimeType("video/mp4");
+                request.setDestinationInExternalPublicDir("Animeflv/download/" + aids[position], aids[position] + "_" + numeros[position] + ".mp4");
+                DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                long l = manager.enqueue(request);
+                getSharedPreferences("data", MODE_PRIVATE).edit().putString(eidT, Long.toString(l)).apply();
+            }catch (Exception e){
+                toast("Error "+e.getMessage());
+            }
             GIBT.setScaleType(ImageView.ScaleType.FIT_END);
             GIBT.setImageResource(R.drawable.ic_borrar_r);
             GIBT.setEnabled(true);
@@ -1109,12 +1123,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     @Override
                                     public void onNeutral(MaterialDialog dialog) {
                                         super.onNegative(dialog);
-                                        GIBT.setScaleType(ImageView.ScaleType.FIT_END);
-                                        GIBT.setImageResource(R.drawable.ic_borrar_r);
-                                        GIBT.setEnabled(true);
-                                        IBVT.setImageResource(R.drawable.ic_rep_r);
-                                        IBVT.setEnabled(true);
-                                        descargando = false;
                                         ndialog.dismiss();
                                     }
                                 })

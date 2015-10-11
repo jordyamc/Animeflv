@@ -53,6 +53,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     List<String> capitulo;
     String id;
     List<String> eids;
+    String ext_storage_state = Environment.getExternalStorageState();
 
     public RecyclerAdapter(Context context, List<String> capitulos,String aid,List<String> eid) {
         this.capitulo = capitulos;
@@ -88,6 +89,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             public void onClick(View v) {
                 if (!file.exists()) {
                     if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("streaming", false)) {
+                        File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + id);
+                        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                            if (!Dstorage.exists()) {
+                                Dstorage.mkdirs();
+                            }
+                        }
                         String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
                         DownloadManager.Request request = new DownloadManager.Request(Uri.parse("http://subidas.com/files/" + id + "/" + item + ".mp4"));
                         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
@@ -125,6 +132,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                     @Override
                                     public void onPositive(MaterialDialog dialog) {
                                         super.onPositive(dialog);
+                                        File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + id);
+                                        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                                            if (!Dstorage.exists()) {
+                                                Dstorage.mkdirs();
+                                            }
+                                        }
                                         String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
                                         DownloadManager.Request request = new DownloadManager.Request(Uri.parse("http://subidas.com/files/" + id + "/" + item + ".mp4"));
                                         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);

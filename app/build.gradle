@@ -8,8 +8,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 63
-        versionName "1.9.2.3"
+        versionCode 64
+        versionName "1.9.2.4"
     }
     buildTypes {
         release {
@@ -51,4 +51,5 @@ dependencies {
     compile('com.mikepenz:materialdrawer:4.0.0@aar') {
         transitive = true
     }
+    compile files('src/trace.jar')
 }
