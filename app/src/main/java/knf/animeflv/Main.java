@@ -26,6 +26,7 @@ import android.provider.Settings;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -196,10 +197,31 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     ImageButton ibVer18;
     ImageButton ibVer19;
     ImageButton ibVer20;
+    CardView card1;
+    CardView card2;
+    CardView card3;
+    CardView card4;
+    CardView card5;
+    CardView card6;
+    CardView card7;
+    CardView card8;
+    CardView card9;
+    CardView card10;
+    CardView card11;
+    CardView card12;
+    CardView card13;
+    CardView card14;
+    CardView card15;
+    CardView card16;
+    CardView card17;
+    CardView card18;
+    CardView card19;
+    CardView card20;
     WebViewClient client;
     TextView textoff;
     ArrayList<GifImageButton> IBsDesList=new ArrayList<GifImageButton>();
     ArrayList<ImageButton> IBsVerList=new ArrayList<ImageButton>();
+    ArrayList<CardView> Cards=new ArrayList<CardView>();
     List<Boolean> isDesc=new ArrayList<Boolean>();
     SwipeRefreshLayout mswipe;
     RecyclerView rv_fav;
@@ -1429,6 +1451,36 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         IBsDesList.add(ibDes18);IBsVerList.add(ibVer18);
         IBsDesList.add(ibDes19);IBsVerList.add(ibVer19);
         IBsDesList.add(ibDes20);IBsVerList.add(ibVer20);
+        card1=(CardView) findViewById(R.id.card1);
+        card2=(CardView) findViewById(R.id.card2);
+        card3=(CardView) findViewById(R.id.card3);
+        card4=(CardView) findViewById(R.id.card4);
+        card5=(CardView) findViewById(R.id.card5);
+        card6=(CardView) findViewById(R.id.card6);
+        card7=(CardView) findViewById(R.id.card7);
+        card8=(CardView) findViewById(R.id.card8);
+        card9=(CardView) findViewById(R.id.card9);
+        card10=(CardView) findViewById(R.id.card10);
+        card11=(CardView) findViewById(R.id.card11);
+        card12=(CardView) findViewById(R.id.card12);
+        card13=(CardView) findViewById(R.id.card13);
+        card14=(CardView) findViewById(R.id.card14);
+        card15=(CardView) findViewById(R.id.card15);
+        card16=(CardView) findViewById(R.id.card16);
+        card17=(CardView) findViewById(R.id.card17);
+        card18=(CardView) findViewById(R.id.card18);
+        card19=(CardView) findViewById(R.id.card19);
+        card20=(CardView) findViewById(R.id.card20);
+        Cards.add(card1);Cards.add(card2);
+        Cards.add(card3);Cards.add(card4);
+        Cards.add(card5);Cards.add(card6);
+        Cards.add(card7);Cards.add(card8);
+        Cards.add(card9);Cards.add(card10);
+        Cards.add(card11);Cards.add(card12);
+        Cards.add(card13);Cards.add(card14);
+        Cards.add(card15);Cards.add(card16);
+        Cards.add(card17);Cards.add(card18);
+        Cards.add(card19);Cards.add(card20);
         web=(WebView) findViewById(R.id.wv_inicio);
         web.getSettings().setJavaScriptEnabled(true);
         web.addJavascriptInterface(new JavaScriptInterface(context), "HtmlViewer");
@@ -1718,10 +1770,39 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             notificationManager.cancel(6991);
         }
     }
+    public void checkForNew(String[] capitulos){
+        List<String> caps=Arrays.asList(capitulos);
+        checkCards(caps.get(0),Cards.get(0));
+        checkCards(caps.get(1),Cards.get(1));
+        checkCards(caps.get(2),Cards.get(2));
+        checkCards(caps.get(3),Cards.get(3));
+        checkCards(caps.get(4),Cards.get(4));
+        checkCards(caps.get(5),Cards.get(5));
+        checkCards(caps.get(6),Cards.get(6));
+        checkCards(caps.get(7),Cards.get(7));
+        checkCards(caps.get(8),Cards.get(8));
+        checkCards(caps.get(9),Cards.get(9));
+        checkCards(caps.get(10),Cards.get(10));
+        checkCards(caps.get(11),Cards.get(11));
+        checkCards(caps.get(12),Cards.get(12));
+        checkCards(caps.get(13),Cards.get(13));
+        checkCards(caps.get(14),Cards.get(14));
+        checkCards(caps.get(15),Cards.get(15));
+        checkCards(caps.get(16),Cards.get(16));
+        checkCards(caps.get(17),Cards.get(17));
+        checkCards(caps.get(18),Cards.get(18));
+        checkCards(caps.get(19),Cards.get(19));
+    }
+    public void checkCards(String capitulo,CardView card){
+        if (capitulo.trim().equals("Capitulo 1") || capitulo.trim().equals("OVA 1") || capitulo.trim().contains("Pelicula")){
+            card.setCardBackgroundColor(Color.argb(100,253, 250, 93));
+        }
+    }
     public void getData(String json){
         getlinks(json);
         gettitulos(json);
         getCapitulos(json);
+        checkForNew(parser.parseCapitulos(json));
         titulos=parser.parseTitulos(json);
         eids=parser.parseEID(json);
         aids=parser.parseAID(json);
@@ -1978,7 +2059,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 } else {
                     Log.d("Archivo", "Existe");
                     String infile = getStringFromFile(file_loc);
-                    if (infile.trim().equals(data.trim())) {
+                    if (!infile.trim().equals(data.trim())) {
                         Log.d("Cargar", "Json nuevo");
                         writeToFile(data, file);
                         Intent intent=new Intent(context,Directorio.class);
@@ -1988,6 +2069,20 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         Intent intent=new Intent(context,Directorio.class);
                         startActivity(intent);
                     }
+                }
+            }else{
+                if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                    if (!mediaStorage.exists()) {
+                        mediaStorage.mkdirs();
+                    }
+                }
+                File fileoff = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+                String file_loc_off = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+                if (fileoff.exists()) {
+                    Intent intent = new Intent(context, Directorio.class);
+                    startActivity(intent);
+                } else {
+                    toast("Servidor fallando y no hay datos en cache");
                 }
             }
         }
@@ -2016,7 +2111,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 } else {
                     Log.d("Archivo", "Existe");
                     String infile = getStringFromFile(file_loc);
-                    if (infile.trim().equals(data.trim())) {
+                    if (!infile.trim().equals(data.trim())) {
                         Log.d("Cargar", "Json nuevo");
                         writeToFile(data, file);
                         Intent intent=new Intent(context,Directorio.class);
