@@ -354,8 +354,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         new PrimaryDrawerItem().withName("Recientes").withIcon(FontAwesome.Icon.faw_home).withIdentifier(0),
                         new PrimaryDrawerItem().withName("Favoritos").withIcon(GoogleMaterial.Icon.gmd_star).withIdentifier(1),
                         new PrimaryDrawerItem().withName("Directorio").withIcon(GoogleMaterial.Icon.gmd_library_books).withIdentifier(2),
-                        new PrimaryDrawerItem().withName("Sugerencias").withIcon(GoogleMaterial.Icon.gmd_assignment).withIdentifier(3),
-                        new PrimaryDrawerItem().withName("Pagina oficial").withIcon(FontAwesome.Icon.faw_facebook_f).withIdentifier(4)
+                        new PrimaryDrawerItem().withName("Descargas").withIcon(GoogleMaterial.Icon.gmd_file_download).withIdentifier(3),
+                        new PrimaryDrawerItem().withName("Sugerencias").withIcon(GoogleMaterial.Icon.gmd_assignment).withIdentifier(4),
+                        new PrimaryDrawerItem().withName("Pagina oficial").withIcon(FontAwesome.Icon.faw_facebook_f).withIdentifier(5)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -377,6 +378,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 setDir(false);
                                 break;
                             case 4:
+                                result.setSelection(0);
+                                Intent intent2=new Intent(context,Descargas.class);
+                                startActivity(intent2);
+                                break;
+                            case 5:
                                 result.closeDrawer();
                                 result.setSelection(0);
                                 mat=new MaterialDialog.Builder(context)
@@ -550,7 +556,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 cancelPost=false;
                                 mat.show();
                                 break;
-                            case 5:
+                            case 6:
                                 String facebookUrl = "https://www.facebook.com/animeflv.app.jordy";
                                 Uri uri;
                                 try {
@@ -693,6 +699,18 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                 long l = manager.enqueue(request);
                 getSharedPreferences("data", MODE_PRIVATE).edit().putString(eidT, Long.toString(l)).apply();
+                String descargados=getSharedPreferences("data",MODE_PRIVATE).getString("eids_descarga","");
+                String epID=getSharedPreferences("data",MODE_PRIVATE).getString("epIDS_descarga","");
+                if (descargados.contains(eidT)){
+                    getSharedPreferences("data",MODE_PRIVATE).edit().putString("eids_descarga",descargados.replace(eidT+":::","")).apply();
+                    getSharedPreferences("data",MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(aids[position] + "_" + numeros[position] + ":::", "")).apply();
+                }
+                descargados=getSharedPreferences("data",MODE_PRIVATE).getString("eids_descarga","");
+                getSharedPreferences("data",MODE_PRIVATE).edit().putString("eids_descarga",descargados+eidT+":::").apply();
+                String tits=getSharedPreferences("data",MODE_PRIVATE).getString("titulos_descarga","");
+                epID=getSharedPreferences("data",MODE_PRIVATE).getString("epIDS_descarga","");
+                getSharedPreferences("data",MODE_PRIVATE).edit().putString("titulos_descarga",tits+aids[position]+":::").apply();
+                getSharedPreferences("data",MODE_PRIVATE).edit().putString("epIDS_descarga",epID+aids[position]+"_"+numeros[position]+":::").apply();
             }catch (Exception e){
                 toast("Error "+e.getMessage());
             }
@@ -813,6 +831,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     if (l!=0) {
                                         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                                         manager.remove(l);
+                                        String descargados=getSharedPreferences("data",MODE_PRIVATE).getString("eids_descarga","");
+                                        getSharedPreferences("data",MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eids[index]+":::","")).apply();
+                                        String tits=getSharedPreferences("data",MODE_PRIVATE).getString("titulos_descarga","");
+                                        String epID=getSharedPreferences("data",MODE_PRIVATE).getString("epIDS_descarga","");
+                                        getSharedPreferences("data",MODE_PRIVATE).edit().putString("titulos_descarga", tits.replace(titulos[index] + ":::", "")).apply();
+                                        getSharedPreferences("data",MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(aids[index] + "_" + numeros[index] + ":::", "")).apply();
                                     }
                                     toast("Archivo Eliminado");
                                 }
@@ -1772,7 +1796,17 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
     public void checkForNew(String[] capitulos){
         List<String> caps=Arrays.asList(capitulos);
-        checkCards(caps.get(0),Cards.get(0));
+        Cards.get(0).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(1).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(2).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(3).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(4).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(5).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(6).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(7).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(8).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(9).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(10).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(11).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(12).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(13).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(14).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(15).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(16).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(17).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(18).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(19).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        checkCards(caps.get(0), Cards.get(0));
         checkCards(caps.get(1),Cards.get(1));
         checkCards(caps.get(2),Cards.get(2));
         checkCards(caps.get(3),Cards.get(3));
@@ -1795,7 +1829,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
     public void checkCards(String capitulo,CardView card){
         if (capitulo.trim().equals("Capitulo 1") || capitulo.trim().equals("OVA 1") || capitulo.trim().contains("Pelicula")){
-            card.setCardBackgroundColor(Color.argb(100,253, 250, 93));
+            card.setCardBackgroundColor(Color.argb(100, 253, 250, 93));
         }
     }
     public void getData(String json){

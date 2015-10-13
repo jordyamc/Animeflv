@@ -41,6 +41,8 @@
             android:label="@string/app_name" />
         <activity android:name=".Directorio.Directorio"
             android:label="@string/app_name"/>
+        <activity android:name=".Descargas"
+            android:label="@string/app_name"/>
         <activity
             android:name=".info.RelActInfo"
             android:label="@string/app_name"

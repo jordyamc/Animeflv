@@ -108,6 +108,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                         long l = manager.enqueue(request);
                         context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString(eids.get(position), Long.toString(l)).apply();
+                        String descargados=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("eids_descarga","");
+                        context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("eids_descarga",descargados+eids.get(position)+":::").apply();
+                        String tits=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("titulos_descarga","");
+                        String epID=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("epIDS_descarga", "");
+                        context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("titulos_descarga",tits+id+":::").apply();
+                        context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID + id + "_" + item + ":::").apply();
                         holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
                         holder.ib_ver.setImageResource(R.drawable.ic_rep_r);
                         Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
@@ -151,6 +157,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                                         long l = manager.enqueue(request);
                                         context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString(eids.get(position), Long.toString(l)).apply();
+                                        String descargados=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("eids_descarga","");
+                                        context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("eids_descarga",descargados+eids.get(position)+":::").apply();
+                                        String tits=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("titulos_descarga","");
+                                        String epID=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("epIDS_descarga", "");
+                                        context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("titulos_descarga",tits+id+":::").apply();
+                                        context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("epIDS_descarga",epID+id+"_"+item+":::").apply();
                                         holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
                                         holder.ib_ver.setImageResource(R.drawable.ic_rep_r);
                                         Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
@@ -234,7 +246,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         dialog.show();
                     }
                 } else {
-                    String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
+                    final String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
                     MaterialDialog borrar = new MaterialDialog.Builder(context)
                             .title("Eliminar")
                             .titleGravity(GravityEnum.CENTER)
@@ -252,6 +264,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                         if (l != 0) {
                                             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                                             manager.remove(l);
+                                            String descargados=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("eids_descarga","");
+                                            context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eids.get(position)+":::","")).apply();
+                                            String tits=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("titulos_descarga","");
+                                            String epID=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("epIDS_descarga","");
+                                            context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("titulos_descarga",tits.replace(id+":::","")).apply();
+                                            context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("epIDS_descarga",epID.replace(id+"_"+item+":::","")).apply();
                                         }
                                         Toast.makeText(context, "Archivo Eliminado", Toast.LENGTH_SHORT).show();
                                     }
