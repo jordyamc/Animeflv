@@ -45,6 +45,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
         public ImageButton ib_ver;
         public ImageButton ib_des;
         public ProgressBar progress;
+        public CardView cardView;
         public RecyclerView recyclerView;
 
         public ViewHolder(View itemView) {
@@ -55,6 +56,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
             this.ib_ver = (ImageButton) itemView.findViewById(R.id.ib_ver_download);
             this.ib_des = (ImageButton) itemView.findViewById(R.id.ib_descargar_download);
             this.progress=(ProgressBar) itemView.findViewById(R.id.progress_download);
+            this.cardView=(CardView) itemView.findViewById(R.id.card_descargas);
         }
     }
     private Context context;
@@ -85,8 +87,19 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final DownloadAdapter.ViewHolder holder, final int position) {
-        holder.tv_titulo.setText(titulo.get(position));
-        holder.tv_numero.setText("Cap "+capitulo.get(position));
+        try {
+            holder.tv_titulo.setText(titulo.get(position));
+            holder.tv_numero.setText("Cap " + capitulo.get(position));
+            holder.ib_des.setClickable(true);
+            holder.ib_ver.setClickable(true);
+        }catch (Exception e){
+            holder.cardView.setVisibility(View.GONE);
+        }
+        if (titulo.get(0).equals("Sin Descargas")){
+            holder.tv_numero.setVisibility(View.GONE);
+            holder.ib_des.setVisibility(View.GONE);
+            holder.ib_ver.setVisibility(View.GONE);
+        }
         holder.ib_des.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,16 +131,16 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
                         cursor.close();
                         break;
                     case DownloadManager.STATUS_RUNNING:
-                        Borrar(position);
+                        Borrar(position,holder.cardView);
                         break;
                     case DownloadManager.STATUS_SUCCESSFUL:
-                        Borrar(position);
+                        Borrar(position,holder.cardView);
                         break;
                     case DownloadManager.STATUS_PAUSED:
-                        Borrar(position);
+                        Borrar(position,holder.cardView);
                         break;
                     case DownloadManager.STATUS_PENDING:
-                        Borrar(position);
+                        Borrar(position,holder.cardView);
                         break;
                 }
             }
@@ -205,58 +218,71 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
         });
         final DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         DownloadManager.Query q = new DownloadManager.Query();
-        q.setFilterById(id.get(position));
+        String fileT="";
+        Long l=Long.parseLong("0");
+        try {
+            fileT = file.get(position);
+            l=id.get(position);
+        }catch (Exception e){
+
+        }
+        q.setFilterById(l);
         Cursor cursor = manager.query(q);
-        cursor.moveToFirst();
-        String fileT=file.get(position);
-        if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
-            File file1=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+fileT.substring(0,fileT.indexOf("_"))+"/"+fileT+".mp4");
-            if (file1.exists()) {
-                holder.progress.setVisibility(View.GONE);
-                holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
-                holder.tv_capitulo.setText("COMPLETADO");
-            }else {
-                Borrar(position);
-            }
-        } else {
-            if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_RUNNING) {
-                int bytes_downloaded = cursor.getInt(cursor
-                        .getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-                int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-                final int dl_progress = (int) ((bytes_downloaded * 100l) / bytes_total);
-                holder.progress.setProgress(dl_progress);
-                holder.ib_des.setImageResource(R.drawable.ic_block_r);
-                holder.tv_capitulo.setText("DESCARGANDO");
-            }else {
-                if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_FAILED) {
-                    holder.progress.setIndeterminate(true);
-                    holder.tv_capitulo.setText("ERROR");
-                    holder.ib_des.setImageResource(R.drawable.ic_refresh);
-                    holder.ib_ver.setImageResource(R.drawable.ic_block_r);
-                }else {
-                    if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_PENDING) {
-                        holder.progress.setIndeterminate(true);
-                        holder.tv_capitulo.setText("PENDIENTE");
+        if (cursor != null&&cursor.moveToFirst()&&l!=0) {
+            try {
+                if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
+                    File file1 = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")) + "/" + fileT + ".mp4");
+                    if (file1.exists()) {
+                        holder.progress.setVisibility(View.GONE);
+                        holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
+                        holder.tv_capitulo.setText("COMPLETADO");
+                    } else {
+                        Borrar(position,holder.cardView);
+                    }
+                } else {
+                    if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_RUNNING) {
+                        int bytes_downloaded = cursor.getInt(cursor
+                                .getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                        int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                        final int dl_progress = (int) ((bytes_downloaded * 100l) / bytes_total);
+                        holder.progress.setProgress(dl_progress);
                         holder.ib_des.setImageResource(R.drawable.ic_block_r);
-                        holder.ib_ver.setVisibility(View.INVISIBLE);
-                    }else {
-                        if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_PAUSED) {
-                            File file1=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+fileT.substring(0,fileT.indexOf("_"))+"/"+fileT+".mp4");
-                            if (file1.exists()) {
+                        holder.tv_capitulo.setText("DESCARGANDO");
+                    } else {
+                        if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_FAILED) {
+                            holder.progress.setIndeterminate(true);
+                            holder.tv_capitulo.setText("ERROR");
+                            holder.ib_des.setImageResource(R.drawable.ic_refresh);
+                            holder.ib_ver.setImageResource(R.drawable.ic_block_r);
+                        } else {
+                            if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_PENDING) {
                                 holder.progress.setIndeterminate(true);
-                                holder.tv_capitulo.setText("REANUNDANDO");
+                                holder.tv_capitulo.setText("PENDIENTE");
                                 holder.ib_des.setImageResource(R.drawable.ic_block_r);
-                            }else {
-                                Borrar(position);
+                                holder.ib_ver.setVisibility(View.INVISIBLE);
+                            } else {
+                                if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_PAUSED) {
+                                    File file1 = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")) + "/" + fileT + ".mp4");
+                                    if (file1.exists()) {
+                                        holder.progress.setIndeterminate(true);
+                                        holder.tv_capitulo.setText("REANUNDANDO");
+                                        holder.ib_des.setImageResource(R.drawable.ic_block_r);
+                                    } else {
+                                        Borrar(position,holder.cardView);
+                                    }
+                                }
                             }
                         }
                     }
                 }
+                cursor.close();
+            }catch (Exception e){
+
             }
         }
-        cursor.close();
+
     }
-    public void Borrar(final int position){
+    public void Borrar(final int position, final CardView card){
         MaterialDialog dialog=new MaterialDialog.Builder(context)
                 .title("ELIMINAR")
                 .titleGravity(GravityEnum.CENTER)
@@ -267,6 +293,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
+                        card.setVisibility(View.GONE);
                         String fileT=file.get(position);
                         DownloadManager manager0 = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                         manager0.remove(id.get(position));
@@ -280,6 +307,9 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
                         if (file.delete()){
                             Toast.makeText(context,"Descarga Eliminada",Toast.LENGTH_SHORT).show();
                         }
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(0,titulo.size());
+                        notifyDataSetChanged();
                     }
                 })
                 .build();

@@ -6,7 +6,7 @@
     android:layout_gravity="center">
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/card_descargas_info"
+        android:id="@+id/card_descargas"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -82,7 +82,7 @@
                     android:foreground="?android:attr/selectableItemBackground"
                     style="?android:attr/borderlessButtonStyle"
                     android:scaleType="fitCenter"
-                    android:clickable="true"
+                    android:clickable="false"
                     android:longClickable="true" />
                 <ImageButton
                     android:layout_width="70dp"
@@ -92,7 +92,7 @@
                     android:foreground="?android:attr/selectableItemBackground"
                     style="?android:attr/borderlessButtonStyle"
                     android:scaleType="fitEnd"
-                    android:clickable="true"
+                    android:clickable="false"
                     android:longClickable="true" />
 
             </LinearLayout>

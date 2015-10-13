@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,7 +80,7 @@ public class Descargas extends AppCompatActivity implements RequestDownload.call
                 List<String> aids=new ArrayList<>();
                 numeros=new ArrayList<>();
                 Dids=new ArrayList<>();
-                if (LepIDS.size()>=2) {
+                if (LepIDS.size()!=0&&!epID.trim().equals("")) {
                     for (String ep : LepIDS) {
                         String[] array = ep.split("_");
                         aids.add(array[0]);
@@ -97,7 +98,7 @@ public class Descargas extends AppCompatActivity implements RequestDownload.call
                 aids.toArray(getTit);
                 new RequestDownload(context,TaskType.CONTAR).execute(getTit);
             }
-        }, 0, 3000);
+        }, 0, 1500);
     }
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
@@ -128,6 +129,18 @@ public class Descargas extends AppCompatActivity implements RequestDownload.call
                 @Override
                 public void run() {
                     DownloadAdapter adapter = new DownloadAdapter(context, titulos, numeros, Dids, LepIDS, Leids);
+                    adapter.notifyDataSetChanged();
+                    recyclerView.setAdapter(adapter);
+                }
+            });
+        }else {
+            final List<String> titulosOff = new ArrayList<>();
+            titulosOff.add("Sin Descargas");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    DownloadAdapter adapter = new DownloadAdapter(context, titulosOff, numeros, Dids, LepIDS, Leids);
+                    adapter.notifyDataSetChanged();
                     recyclerView.setAdapter(adapter);
                 }
             });
