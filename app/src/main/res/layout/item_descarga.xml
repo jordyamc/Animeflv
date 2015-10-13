@@ -30,7 +30,7 @@
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="200dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:weightSum="2"
                 android:gravity="center_vertical"
@@ -38,7 +38,7 @@
                 android:background="@android:color/transparent">
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="horizontal"
                     android:layout_weight="1">
                 <TextView
@@ -59,8 +59,8 @@
                         android:layout_marginLeft="1dp" />
                 </LinearLayout>
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:text="N Capitulo"
                     android:id="@+id/tv_cardDownload_capitulo"
                     android:background="@android:color/transparent"
@@ -69,6 +69,10 @@
                     android:layout_weight="1" />
 
             </LinearLayout>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="wrap_content"

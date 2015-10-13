@@ -1828,7 +1828,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         checkCards(caps.get(19),Cards.get(19));
     }
     public void checkCards(String capitulo,CardView card){
-        if (capitulo.trim().equals("Capitulo 1") || capitulo.trim().equals("OVA 1") || capitulo.trim().contains("Pelicula")){
+        Boolean resaltar=PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar",true);
+        if (capitulo.trim().equals("Capitulo 1") || capitulo.trim().contains("OVA") || capitulo.trim().contains("Pelicula")){
+            if (resaltar)
             card.setCardBackgroundColor(Color.argb(100, 253, 250, 93));
         }
     }

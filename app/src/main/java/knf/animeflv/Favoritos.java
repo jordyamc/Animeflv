@@ -35,6 +35,8 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback{
     Toolbar ltoolbar;
     List<String> aids=new ArrayList<String>();
     List<String> Naids=new ArrayList<String>();
+    String fav;
+    String[] favoritos={};
     Context context;
     boolean shouldExecuteOnResume;
     @Override
@@ -70,9 +72,8 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback{
                 }
             });
         }
-        SharedPreferences sharedPreferences=getSharedPreferences("data",MODE_PRIVATE);
-        String fav=sharedPreferences.getString("favoritos", "");
-        String[] favoritos={};
+        SharedPreferences sharedPreferences=getSharedPreferences("data", MODE_PRIVATE);
+        fav=sharedPreferences.getString("favoritos", "");
         favoritos=fav.split(":::");
         aids=new ArrayList<String>();
         for (String i:favoritos){
@@ -140,6 +141,10 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback{
             Log.d("Ntitulos", Integer.toString(titulos.size()));
             Log.d("Naids", Integer.toString(aids.size()));
             Log.d("Nlinks", Integer.toString(links.size()));
+            if (!isNetworkAvailable()){
+                if (favoritos.length!=links.size())
+                Toast.makeText(context,"Sin conexion, cargando favoritos con cache disponible",Toast.LENGTH_SHORT).show();
+            }
             AdapterFavs adapter = new AdapterFavs(context, titulos, aids, links);
             recyclerView.setAdapter(adapter);
         }else {
