@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
     <translate
         android:duration="500"
-        android:fromYDelta="100%p"
-        android:toYDelta="0%p"
+        android:fromXDelta="100%p"
+        android:toXDelta="0%p"
         android:interpolator="@android:interpolator/decelerate_quint"
         tools:targetApi="11" />
 </set>

@@ -2,6 +2,7 @@ package knf.animeflv;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -29,6 +30,7 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Slide;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -279,10 +281,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
-        ExceptionHandler.register(this, "http://necrotic-neganebulus.hol.es/server.php");
+        ExceptionHandler.register(this, "http://necrotic-neganebulus.hol.es/errors/server.php");
         context=this;
         shouldExecuteOnResume = false;
-        if (getSharedPreferences("data",MODE_PRIVATE).getBoolean("intro",false)) {
+        if (!getSharedPreferences("data",MODE_PRIVATE).getBoolean("intro",false)) {
             startActivity(new Intent(this, Intro.class));
         }
         getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
@@ -635,6 +637,16 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
         }
         if (descarga.exists()){descarga.delete();}
+        ActualizarFavoritos();
+    }
+    public void ActualizarFavoritos(){
+        if (isNetworkAvailable()) {
+            String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
+            String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
+            if (!email_coded.equals("null") && !email_coded.equals("null")) {
+                new Requests(this, TaskType.GET_FAV).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
+            }
+        }
     }
     public int getHDraw (final Boolean set){
         int color=getSharedPreferences("data", Context.MODE_PRIVATE).getInt("color", 0);
@@ -1842,6 +1854,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         gettitulos(json);
         getCapitulos(json);
         checkForNew(parser.parseCapitulos(json));
+        ActualizarFavoritos();
         titulos=parser.parseTitulos(json);
         eids=parser.parseEID(json);
         aids=parser.parseAID(json);
@@ -2378,6 +2391,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             String url=getSharedPreferences("data",MODE_PRIVATE).getString("urlD",null);
             String furl="http://"+url.substring(url.indexOf("www"),url.indexOf(".",url.indexOf("www")))+".zippyshare.com/"+durl;
             Log.d("Final D Link",furl);
+        }
+        if (taskType==TaskType.GET_FAV){
+            if (data.contains(":::")){
+                getSharedPreferences("data",MODE_PRIVATE).edit().putString("favoritos",data.trim()).commit();
+            }
         }
     }
     @Override
