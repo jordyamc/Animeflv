@@ -282,6 +282,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         ExceptionHandler.register(this, "http://necrotic-neganebulus.hol.es/server.php");
         context=this;
         shouldExecuteOnResume = false;
+        if (getSharedPreferences("data",MODE_PRIVATE).getBoolean("intro",false)) {
+            startActivity(new Intent(this, Intro.class));
+        }
         getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
         getSharedPreferences("data",MODE_PRIVATE).edit().putBoolean("notVer",false).apply();
         Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);

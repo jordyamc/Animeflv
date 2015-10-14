@@ -8,8 +8,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 69
-        versionName "1.9.2.7"
+        versionCode 70
+        versionName "1.9.2.8"
     }
     buildTypes {
         release {
@@ -48,6 +48,7 @@ dependencies {
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
     compile 'com.github.recruit-lifestyle:WaveSwipeRefreshLayout:1.2'
     compile 'se.simbio.encryption:library:1.2.0'
+    compile 'com.github.paolorotolo:appintro:3.2.0'
     compile('com.mikepenz:materialdrawer:4.0.0@aar') {
         transitive = true
     }
