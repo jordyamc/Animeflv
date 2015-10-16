@@ -18,6 +18,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.nullwire.trace.ExceptionHandler;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,6 +46,7 @@ public class Descargas extends AppCompatActivity implements RequestDownload.call
         super.onCreate(savedInstanceState);
         setContentView(R.layout.descargas);
         context=this;
+        ExceptionHandler.register(this, "http://necrotic-neganebulus.hol.es/errors/server.php");
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {

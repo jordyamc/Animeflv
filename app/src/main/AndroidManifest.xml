@@ -46,6 +46,11 @@
         <activity android:name=".Intro"
             android:label="@string/app_name"/>
         <activity
+            android:name=".Move"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Transparent">
+        </activity>
+        <activity
             android:name=".info.RelActInfo"
             android:label="@string/app_name"
             android:theme="@style/Theme.Transparent">

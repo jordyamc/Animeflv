@@ -80,5 +80,9 @@
             android:key="b_vistos"
             android:title="Capitulos vistos"
             android:summary="Borrar historial de capitulos vistos" />
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="0"
+            android:key="b_move"
+            android:title="Mover videos a SD" />
     </PreferenceCategory>
 </PreferenceScreen>

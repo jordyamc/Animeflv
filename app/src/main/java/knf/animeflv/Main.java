@@ -684,15 +684,53 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     public void toast(String texto){
         Toast.makeText(this,texto,Toast.LENGTH_LONG).show();
     }
+    public String getSD1(){
+        String sSDpath = null;
+        File   fileCur = null;
+        for( String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard")) {
+            fileCur = new File( "/mnt/", sPathCur);
+            if( fileCur.isDirectory() && fileCur.canWrite()) {
+                sSDpath = fileCur.getAbsolutePath();
+                break;
+            }
+            if( sSDpath == null)  {
+                fileCur = new File( "/storage/", sPathCur);
+                if( fileCur.isDirectory() && fileCur.canWrite())
+                {
+                    sSDpath = fileCur.getAbsolutePath();
+                    break;
+                }
+            }
+            if( sSDpath == null)  {
+                fileCur = new File( "/storage/emulated", sPathCur);
+                if( fileCur.isDirectory() && fileCur.canWrite())
+                {
+                    sSDpath = fileCur.getAbsolutePath();
+                    Log.e("path",sSDpath);
+                    break;
+                }
+            }
+        }
+        return sSDpath;
+    }
     public void onVerclicked(View view){
         String id=view.getResources().getResourceName(view.getId());
         int index=Integer.parseInt(id.substring(id.lastIndexOf("D") + 1))-1;
         List<String> a= Arrays.asList(aids);
         List<String> n=Arrays.asList(numeros);
         File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+a.get(index)+"/"+a.get(index)+"_"+n.get(a.indexOf(a.get(index)))+".mp4");
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(file));
-        intent.setDataAndType(Uri.fromFile(file), "video/mp4");
-        startActivity(intent);
+        File sd=new File(getSD1()+ "/Animeflv/download/"+a.get(index)+"/"+a.get(index)+"_"+n.get(a.indexOf(a.get(index)))+".mp4");
+        if (file.exists()){
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(file));
+            intent.setDataAndType(Uri.fromFile(file), "video/mp4");
+            startActivity(intent);
+        }else {
+            if (sd.exists()) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(sd));
+                intent.setDataAndType(Uri.fromFile(sd), "video/mp4");
+                startActivity(intent);
+            }
+        }
     }
     public void DescargarInbyID(int position){
         if (isNetworkAvailable()) {
@@ -826,7 +864,15 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             List<String> a= Arrays.asList(aids);
             List<String> n=Arrays.asList(numeros);
             final File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+a.get(index)+"/"+a.get(index)+"_"+n.get(a.indexOf(a.get(index)))+".mp4");
-            if (file.exists()) {
+            final File sd=new File(getSD1() + "/Animeflv/download/"+a.get(index)+"/"+a.get(index)+"_"+n.get(a.indexOf(a.get(index)))+".mp4");
+            File del=new File("");
+            if (file.exists()){
+                del=file;
+            }
+            if (sd.exists()){
+                del=sd;
+            }
+            if (del.exists()) {
                 MaterialDialog borrar=new MaterialDialog.Builder(context)
                         .title("Eliminar")
                         .titleGravity(GravityEnum.CENTER)
@@ -837,7 +883,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             @Override
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-                                if (file.delete()) {
+                                File del=new File("");
+                                if (file.exists()){
+                                    del=file;
+                                }
+                                if (sd.exists()){
+                                    del=sd;
+                                }
+                                if (del.delete()) {
                                     isDesc.add(index, false);
                                     imageButton.setImageResource(R.drawable.ic_get_r);
                                     IBsVerList.get(index).setImageResource(R.drawable.ic_ver_no);
@@ -1877,8 +1930,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             Log.i("dir", Environment.getExternalStorageDirectory() + "/Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
             int index=e.indexOf(s);
             File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+a.get(e.indexOf(s))+"/"+a.get(e.indexOf(s))+"_"+n.get(e.indexOf(s))+".mp4");
+            File fileSD=new File(getSD1() + "/Animeflv/download/"+a.get(e.indexOf(s))+"/"+a.get(e.indexOf(s))+"_"+n.get(e.indexOf(s))+".mp4");
             Log.i("Existe",String.valueOf(file.exists()));
-            if (file.exists()){
+            if (file.exists()||fileSD.exists()){
                 IBsDesList.get(index).setImageResource(R.drawable.ic_borrar_r);
                 IBsVerList.get(index).setEnabled(true);
                 IBsVerList.get(index).setImageResource(R.drawable.ic_rep_r);

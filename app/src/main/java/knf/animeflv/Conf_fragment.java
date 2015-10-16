@@ -2,10 +2,13 @@ package knf.animeflv;
 
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -32,6 +35,12 @@ import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -53,7 +62,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     public void onCreate(final Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferencias);
-        context=getActivity().getApplicationContext();
+        context=getActivity();
         Boolean activado= PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("notificaciones", true);
         if (!activado){
             getPreferenceScreen().findPreference("tiempo").setEnabled(false);
@@ -142,6 +151,28 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 }
                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos","");
                 Toast.makeText(getActivity(), "Historial Borrado!!", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+        if (getSD1()==null){
+            getPreferenceScreen().findPreference("b_move").setEnabled(false);
+            getPreferenceScreen().findPreference("b_move").setSummary("Tarjeta SD no encontrada");
+        }
+        getPreferenceScreen().findPreference("b_move").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                DownloadManager downloadManager=(DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                Cursor c = downloadManager.query(new DownloadManager.Query()
+                        .setFilterByStatus(DownloadManager.STATUS_PAUSED
+                                | DownloadManager.STATUS_RUNNING));
+                    if (getSD1()!=null) {
+                        //try {MoveFiles();} catch (IOException e) {Toast.makeText(context, "Error " + e.getMessage(), Toast.LENGTH_LONG).show();}
+                        Toast.makeText(context, "No descargues ni reproduzcas anime hasta que la operacion se complete (No hay problema con Streaming))", Toast.LENGTH_LONG).show();
+                        new MoveFiles(context).execute();
+                        //context.startActivity(new Intent(context,Move.class));
+                    } else {
+                        Toast.makeText(context, "No se detecta tarjeta SD", Toast.LENGTH_LONG).show();
+                    }
                 return false;
             }
         });
@@ -432,6 +463,110 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             }
         }
         return result;
+    }
+    public String getSD(){
+        String sd = Environment.getExternalStorageDirectory().getAbsolutePath();
+        if (android.os.Build.DEVICE.contains("samsung") || android.os.Build.MANUFACTURER.contains("samsung")) {
+            File f = new File(Environment.getExternalStorageDirectory().getParent() + "/extSdCard");
+            if (f.exists() && f.isDirectory()) {
+                sd = Environment.getExternalStorageDirectory().getParent() + "/extSdCard";
+            } else {
+                f = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/external_sd");
+                if (f.exists() && f.isDirectory()) {
+                    sd = Environment.getExternalStorageDirectory().getAbsolutePath() + "/external_sd";
+                }else {
+                    f = new File(Environment.getExternalStorageDirectory().getParent() + "/sdcard1");
+                    if (f.exists() && f.isDirectory()) {
+                        sd = Environment.getExternalStorageDirectory().getParent() + "/sdcard1";
+                    }else {
+                        sd="NoSD";
+                    }
+                }
+            }
+        }else {
+            File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/external_sd");
+            if (f.exists() && f.isDirectory()) {
+                sd = Environment.getExternalStorageDirectory().getAbsolutePath() + "/external_sd";
+            }else {
+                f = new File(Environment.getExternalStorageDirectory().getParent() + "/sdcard1");
+                if (f.exists() && f.isDirectory()) {
+                    sd = Environment.getExternalStorageDirectory().getParent() + "/sdcard1";
+                }else {
+                    sd="NoSD";
+                }
+            }
+        }
+        Toast.makeText(context,sd,Toast.LENGTH_LONG).show();
+        return sd;
+    }
+    public String getSD1(){
+        String sSDpath = null;
+        File   fileCur = null;
+        for( String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard")) {
+            fileCur = new File( "/mnt/", sPathCur);
+            if( fileCur.isDirectory() && fileCur.canWrite()) {
+                sSDpath = fileCur.getAbsolutePath();
+                break;
+            }
+            if( sSDpath == null)  {
+                fileCur = new File( "/storage/", sPathCur);
+                if( fileCur.isDirectory() && fileCur.canWrite())
+                {
+                    sSDpath = fileCur.getAbsolutePath();
+                    break;
+                }
+            }
+            if( sSDpath == null)  {
+                fileCur = new File( "/storage/emulated", sPathCur);
+                if( fileCur.isDirectory() && fileCur.canWrite())
+                {
+                    sSDpath = fileCur.getAbsolutePath();
+                    Log.e("path",sSDpath);
+                    break;
+                }
+            }
+        }
+        return sSDpath;
+    }
+    public void MoveFiles() throws IOException {
+        File sourceLocation=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download");
+        File targetLocation=new File(getSD() + "/Animeflv/download");
+        ProgressDialog dialog=ProgressDialog.show(context,"","Por favor espere...",true,false);
+        if (sourceLocation.isDirectory()) {
+            if (!targetLocation.exists() && !targetLocation.mkdirs()) {
+                throw new IOException("Cannot create dir " + targetLocation.getAbsolutePath());
+            }
+            String[] children = sourceLocation.list();
+            for (String i:children) {
+                File scan=new File(sourceLocation,i);
+                if (scan.isDirectory()) {
+                    String[] archivos = scan.list();
+                    for (String mp4:archivos){
+                        File inSD=new File(targetLocation,i);
+                        if (!inSD.exists()){
+                            scan.mkdir();
+                        }
+                        InputStream in = new FileInputStream(new File(scan,mp4));
+                        OutputStream out = new FileOutputStream(new File(inSD,mp4));
+                        byte[] buf = new byte[1024];
+                        int len;
+                        while ((len = in.read(buf)) > 0) {
+                            out.write(buf, 0, len);
+                        }
+                        in.close();
+                        out.close();
+                        File file=new File(inSD,mp4);
+                        if (file.exists()){
+                            if (new File(scan,mp4).delete()){
+                                Log.d("Move ok",mp4);
+                            }
+                        }
+                    }
+
+                }
+            }
+            dialog.dismiss();
+        }
     }
 
     @Override
