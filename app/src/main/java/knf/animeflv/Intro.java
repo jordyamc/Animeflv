@@ -44,6 +44,10 @@ public class Intro extends AppIntro2 {
                 "Muchas configuraciones a modificar",
                 R.drawable.int5,
                 Color.parseColor("#E8E117")));
+        addSlide(AppIntroFragment.newInstance("Sin Publicidad",
+                "100% libre de publicidad, una app de fans para fans ;)",
+                R.drawable.block,
+                Color.parseColor("#732100")));
         addSlide(AppIntroFragment.newInstance("Listo",
                 "Has terminado la introduccion, puedes empezar a utilizar la app :)",
                 R.drawable.listo,

@@ -424,11 +424,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                         .replace("&","")
                                                         .replace("=","")
                                                         .replace("?","")
-                                                        .replace("á", "%aacute#")
-                                                        .replace("é", "%eacute#")
-                                                        .replace("í","%iacute#")
-                                                        .replace("ó","%oacute#")
-                                                        .replace("ú","%uacute#")
+                                                        .replace("á", "%a")
+                                                        .replace("é", "%e")
+                                                        .replace("í","%i")
+                                                        .replace("ó","%o")
+                                                        .replace("ú","%u")
                                                         .replace(".","")
                                                         .replace(":::","");
                                                 if (!type.equals("selecciona")) {
