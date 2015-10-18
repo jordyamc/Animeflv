@@ -92,7 +92,7 @@ import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.info.Info;
 import pl.droidsonroids.gif.GifImageButton;
 
-public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,Requests.callback {
+public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,Requests.callback,CheckVideo.callback {
     WebView web;
     WebView web_Links;
     WebView web_gets;
@@ -277,6 +277,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     AccountHeader headerResult;
     String headerTit;
     MaterialDialog ndialog;
+    int posT;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -940,7 +941,19 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         descargando = true;
                         indexT = index;
                         eidT = eids[index];
-                        DescargarInbyID(index);
+                        //DescargarInbyID(index);
+                        if (isNetworkAvailable()) {
+                            new CheckVideo(context, TaskType.CHECK_DOWN, index).execute("http://subidas.com/files/" + aids[index] + "/" + numeros[index] + ".mp4");
+                        }else {
+                        toast("No hay conexion a internet");
+                        Streaming = false;
+                        GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+                        GIBT.setImageResource(R.drawable.ic_get_r);
+                        GIBT.setEnabled(true);
+                        IBVT.setImageResource(R.drawable.ic_ver_no);
+                        IBVT.setEnabled(false);
+                        descargando = false;
+                        }
                         /*switch (view.getId()) {
                             case R.id.ib_descargar_cardD1:
                                 url = getUrl(titulos[0], numeros[0]);
@@ -1048,7 +1061,19 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         descargando = true;
                                         indexT = index;
                                         eidT = eids[index];
-                                        DescargarInbyID(index);
+                                        //DescargarInbyID(index);
+                                        if (isNetworkAvailable()){
+                                            new CheckVideo(context,TaskType.CHECK_DOWN,index).execute("http://subidas.com/files/" + aids[index] + "/" + numeros[index] + ".mp4");
+                                        }else {
+                                            toast("No hay conexion a internet");
+                                            Streaming = false;
+                                            GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+                                            GIBT.setImageResource(R.drawable.ic_get_r);
+                                            GIBT.setEnabled(true);
+                                            IBVT.setImageResource(R.drawable.ic_ver_no);
+                                            IBVT.setEnabled(false);
+                                            descargando = false;
+                                        }
                         /*switch (view.getId()) {
                             case R.id.ib_descargar_cardD1:
                                 url = getUrl(titulos[0], numeros[0]);
@@ -1148,7 +1173,19 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         indexT = index;
                                         eidT = eids[index];
                                         Streaming=true;
-                                        StreamInbyID(index);
+                                        //StreamInbyID(index);
+                                        if (isNetworkAvailable()){
+                                            new CheckVideo(context,TaskType.CHECK_STREAM,index).execute("http://subidas.com/files/" + aids[index] + "/" + numeros[index] + ".mp4");
+                                        }else {
+                                            toast("No hay conexion a internet");
+                                            Streaming = false;
+                                            GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+                                            GIBT.setImageResource(R.drawable.ic_get_r);
+                                            GIBT.setEnabled(true);
+                                            IBVT.setImageResource(R.drawable.ic_ver_no);
+                                            IBVT.setEnabled(false);
+                                            descargando = false;
+                                        }
                         /*switch (view.getId()) {
                             case R.id.ib_descargar_cardD1:
                                 url = getUrl(titulos[0], numeros[0]);
@@ -1642,9 +1679,26 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         request.setDestinationInExternalPublicDir("Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")), fileName);
                         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                         long l = manager.enqueue(request);
+                        getSharedPreferences("data", MODE_PRIVATE).edit().putString(eidT, Long.toString(l)).apply();
+                        String descargados=getSharedPreferences("data",MODE_PRIVATE).getString("eids_descarga","");
+                        String epID=getSharedPreferences("data",MODE_PRIVATE).getString("epIDS_descarga","");
+                        if (descargados.contains(eidT)){
+                            getSharedPreferences("data",MODE_PRIVATE).edit().putString("eids_descarga",descargados.replace(eidT+":::","")).apply();
+                            getSharedPreferences("data",MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(aids[posT] + "_" + numeros[posT] + ":::", "")).apply();
+                        }
+                        descargados=getSharedPreferences("data",MODE_PRIVATE).getString("eids_descarga","");
+                        getSharedPreferences("data",MODE_PRIVATE).edit().putString("eids_descarga",descargados+eidT+":::").apply();
+                        String tits=getSharedPreferences("data",MODE_PRIVATE).getString("titulos_descarga","");
+                        epID=getSharedPreferences("data",MODE_PRIVATE).getString("epIDS_descarga","");
+                        getSharedPreferences("data",MODE_PRIVATE).edit().putString("titulos_descarga",tits+aids[posT]+":::").apply();
+                        getSharedPreferences("data",MODE_PRIVATE).edit().putString("epIDS_descarga",epID+aids[posT]+"_"+numeros[posT]+":::").apply();
+                        String vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
+                        if (!vistos.contains(eids[posT].trim())){
+                            vistos=vistos+eids[posT].trim()+":::";
+                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos",vistos).apply();
+                        }
                         descargando = false;
                         web.loadUrl("about:blank");
-                        getSharedPreferences("data", MODE_PRIVATE).edit().putString(eidT, Long.toString(l)).apply();
                     } else {
                         web.loadUrl("about:blank");
                         GIBT.setScaleType(ImageView.ScaleType.FIT_END);
@@ -1691,6 +1745,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             String[] headers = {"cookie", cookie, "User-Agent", web.getSettings().getUserAgentString(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", urlD};
                             intent.putExtra("headers", headers);
                             startActivity(intent);
+                            String vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
+                            if (!vistos.contains(eids[posT].trim())){
+                                vistos=vistos+eids[posT].trim()+":::";
+                                context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos",vistos).apply();
+                            }
                             break;
                         case "com.mxtech.videoplayer.ad":
                             Intent intentad = new Intent(Intent.ACTION_VIEW);
@@ -1701,6 +1760,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             String[] headersad = {"cookie", cookie, "User-Agent", web.getSettings().getUserAgentString(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", urlD};
                             intentad.putExtra("headers", headersad);
                             startActivity(intentad);
+                            String vistosad=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
+                            if (!vistosad.contains(eids[posT].trim())){
+                                vistosad=vistosad+eids[posT].trim()+":::";
+                                context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos",vistosad).apply();
+                            }
                             break;
                         default:
                             toast("MX player no instalado");
@@ -2498,6 +2562,32 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             result.closeDrawer();
         }
     }
+
+    @Override
+    public void sendtext1(String data, TaskType taskType, int position) {
+        if (taskType==TaskType.CHECK_DOWN){
+            if (data.trim().equals("ok")){
+                DescargarInbyID(position);
+            }else {
+                toast("Error en descarga, intentando modo alternativo");
+                posT=position;
+                String urlDes = getUrl(titulos[position], numeros[position]);
+                new Requests(this, TaskType.GET_HTML1).execute(urlDes);
+            }
+        }
+        if (taskType==TaskType.CHECK_STREAM){
+            if (data.trim().equals("ok")){
+                StreamInbyID(position);
+            }else {
+                toast("Error, intentando modo alternativo");
+                posT=position;
+                Streaming=true;
+                String urlStream = getUrl(titulos[position], numeros[position]);
+                new Requests(this, TaskType.GET_HTML1).execute(urlStream);
+            }
+        }
+    }
+
     class JavaScriptInterface {
         private Context ctx;
         JavaScriptInterface(Context ctx) {

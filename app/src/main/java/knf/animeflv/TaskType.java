@@ -20,7 +20,9 @@ public enum TaskType {
     cCorreo(14),
     GET_FAV_SL(15),
     cPass(16),
-    CONTAR(17);
+    CONTAR(17),
+    CHECK_DOWN(18),
+    CHECK_STREAM(19);
 
     int value;
 

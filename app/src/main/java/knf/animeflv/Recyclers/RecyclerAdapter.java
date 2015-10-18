@@ -24,6 +24,7 @@ import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import knf.animeflv.R;
@@ -73,10 +74,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public void onBindViewHolder(final RecyclerAdapter.ViewHolder holder, final int position) {
         String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
         final File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+id+"/"+id+"_"+item+".mp4");
-        if (file.exists()){
+        final File sd=new File(getSD1() + "/Animeflv/download/"+id+"/"+id+"_"+item+".mp4");
+        if (file.exists()||sd.exists()){
             holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
         }else {
             holder.ib_ver.setImageResource(R.drawable.ic_ver_no);
+            holder.ib_ver.setEnabled(false);
         }
         holder.tv_capitulo.setText(capitulo.get(position));
         Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto"+id + "_" + item, false);
@@ -87,7 +90,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         holder.ib_des.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!file.exists()) {
+                if (!file.exists()&&!sd.exists()) {
                     if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("streaming", false)) {
                         File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + id);
                         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
@@ -116,6 +119,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID + id + "_" + item + ":::").apply();
                         holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
                         holder.ib_ver.setImageResource(R.drawable.ic_rep_r);
+                        holder.ib_ver.setEnabled(true);
                         Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
                         if (!vistos){
                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
@@ -165,6 +169,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                         context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("epIDS_descarga",epID+id+"_"+item+":::").apply();
                                         holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
                                         holder.ib_ver.setImageResource(R.drawable.ic_rep_r);
+                                        holder.ib_ver.setEnabled(true);
                                         Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
                                         if (!vistos){
                                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
@@ -273,6 +278,22 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                         }
                                         Toast.makeText(context, "Archivo Eliminado", Toast.LENGTH_SHORT).show();
                                     }
+                                    if (sd.delete()) {
+                                        holder.ib_des.setImageResource(R.drawable.ic_get_r);
+                                        holder.ib_ver.setImageResource(R.drawable.ic_ver_no);
+                                        long l = Long.parseLong(context.getSharedPreferences("data", context.MODE_PRIVATE).getString(eids.get(position), "0"));
+                                        if (l != 0) {
+                                            DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                                            manager.remove(l);
+                                            String descargados=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("eids_descarga","");
+                                            context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eids.get(position)+":::","")).apply();
+                                            String tits=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("titulos_descarga","");
+                                            String epID=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("epIDS_descarga","");
+                                            context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("titulos_descarga",tits.replace(id+":::","")).apply();
+                                            context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("epIDS_descarga",epID.replace(id+"_"+item+":::","")).apply();
+                                        }
+                                        Toast.makeText(context, "Archivo Eliminado", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
 
                                 @Override
@@ -304,7 +325,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     intent.setDataAndType(Uri.fromFile(file), "video/mp4");
                     context.startActivity(intent);
                 }else {
-                    Toast.makeText(context,"El archivo no existe",Toast.LENGTH_SHORT).show();
+                    if (sd.exists()){
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(sd));
+                        intent.setDataAndType(Uri.fromFile(sd), "video/mp4");
+                        context.startActivity(intent);
+                    }else {
+                        Toast.makeText(context, "El archivo no existe", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -362,6 +389,35 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         if (ftitulo.trim().equals("miss-monochrome-the-animation-2")){ftitulo="miss-monochrome-the-animation-2nd-season";}
         String link="http://animeflv.net/ver/"+ftitulo+"-"+capitulo+".html";
         return link;
+    }
+    public String getSD1(){
+        String sSDpath = null;
+        File   fileCur = null;
+        for( String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard")) {
+            fileCur = new File( "/mnt/", sPathCur);
+            if( fileCur.isDirectory() && fileCur.canWrite()) {
+                sSDpath = fileCur.getAbsolutePath();
+                break;
+            }
+            if( sSDpath == null)  {
+                fileCur = new File( "/storage/", sPathCur);
+                if( fileCur.isDirectory() && fileCur.canWrite())
+                {
+                    sSDpath = fileCur.getAbsolutePath();
+                    break;
+                }
+            }
+            if( sSDpath == null)  {
+                fileCur = new File( "/storage/emulated", sPathCur);
+                if( fileCur.isDirectory() && fileCur.canWrite())
+                {
+                    sSDpath = fileCur.getAbsolutePath();
+                    Log.e("path",sSDpath);
+                    break;
+                }
+            }
+        }
+        return sSDpath;
     }
 
     @Override
