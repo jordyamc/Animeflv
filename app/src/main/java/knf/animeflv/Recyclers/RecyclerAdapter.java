@@ -387,7 +387,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         ftitulo=ftitulo.replace("'","");
         if (ftitulo.trim().equals("gintama")){ftitulo=ftitulo+"-2015";}
         if (ftitulo.trim().equals("miss-monochrome-the-animation-2")){ftitulo="miss-monochrome-the-animation-2nd-season";}
-        String link="http://animeflv.net/ver/"+ftitulo+"-"+capitulo+".html";
+        String link="http://animeflv.com/ver/"+ftitulo+"-"+capitulo+".html";
         return link;
     }
     public String getSD1(){

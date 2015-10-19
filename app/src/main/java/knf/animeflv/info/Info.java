@@ -115,7 +115,7 @@ public class Info extends AppCompatActivity implements Requests.callback{
             titulo=parser.getTit(infile);
             id=parser.getAID(infile);
         }else {
-            new Requests(this, TaskType.GET_INFO).execute("http://animeflv.net/api.php?accion=anime&aid=" + aid);
+            new Requests(this, TaskType.GET_INFO).execute("http://animeflv.com/api.php?accion=anime&aid=" + aid);
         }
         Bundle bundle=new Bundle();
         bundle.putString("aid", getIntent().getExtras().getString("aid", "1"));
@@ -246,11 +246,11 @@ public class Info extends AppCompatActivity implements Requests.callback{
                 webView.getSettings().setJavaScriptEnabled(true);
                 String newUA= "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
                 webView.getSettings().setUserAgentString(newUA);
-                webView.loadUrl("https:/www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2FYKPvjVoWVGb.js%3Fversion%3D41%23cb%3Df1381b3cd4%26domain%3Danimeflv.net%26origin%3Dhttp%253A%252F%252Fanimeflv.net%252Ff15a10f4e8%26relation%3Dparent.parent&href=http%3A%2F%2Fanimeflv.net%2Fver%2F" + getUrl(titulo, caps.get(0).substring(caps.get(0).lastIndexOf(" ") + 1)) + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000");
+                webView.loadUrl("https:/www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2FYKPvjVoWVGb.js%3Fversion%3D41%23cb%3Df1381b3cd4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff15a10f4e8%26relation%3Dparent.parent&href=http%3A%2F%2Fanimeflv.com%2Fver%2F" + getUrl(titulo, caps.get(0).substring(caps.get(0).lastIndexOf(" ") + 1)) + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000");
                 spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        webView.loadUrl("https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2FYKPvjVoWVGb.js%3Fversion%3D41%23cb%3Df1381b3cd4%26domain%3Danimeflv.net%26origin%3Dhttp%253A%252F%252Fanimeflv.net%252Ff15a10f4e8%26relation%3Dparent.parent&href=http%3A%2F%2Fanimeflv.net%2Fver%2F" + getUrl(titulo, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1)) + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000");
+                        webView.loadUrl("https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2FYKPvjVoWVGb.js%3Fversion%3D41%23cb%3Df1381b3cd4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff15a10f4e8%26relation%3Dparent.parent&href=http%3A%2F%2Fanimeflv.com%2Fver%2F" + getUrl(titulo, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1)) + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000");
                     }
 
                     @Override
