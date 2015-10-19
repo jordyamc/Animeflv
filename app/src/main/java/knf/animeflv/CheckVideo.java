@@ -45,7 +45,7 @@ public class CheckVideo extends AsyncTask<String,String,String> {
             c.connect();
             //c.disconnect();
             Log.d("URL Normal", u.toString());
-            if (c.getResponseCode()==HttpURLConnection.HTTP_OK){
+            if (c.getResponseCode()!=HttpURLConnection.HTTP_NOT_FOUND){
                 if (c.getURL()!=u){
                     Log.d("URL Actual", c.getURL().toString());
                     _response="error";

@@ -61,12 +61,15 @@ public class Requests extends AsyncTask<String,String,String> {
             Log.d("URL Normal", u.toString());
             if (c.getURL()!=u){
                 Log.d("URL Actual", c.getURL().toString());
-                _response="";
+                _response="error";
             }else {
                 Log.d("URL Actual",c.getURL().toString());
-                _response = sb.toString();
+                if (c.getResponseCode()==HttpURLConnection.HTTP_OK) {
+                    _response = sb.toString();
+                }else{
+                    _response="error";
+                }
             }
-
             //String fullPage = page.asXml();
         } catch (Exception e) {
             Log.e("log_tag", "Error in http connection " + e.toString());

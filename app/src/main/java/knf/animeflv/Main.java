@@ -71,6 +71,10 @@ import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListener;
 import com.thin.downloadmanager.ThinDownloadManager;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -233,7 +237,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     String[] numeros;
     String[] titulos;
     String url;
-    String inicio = "http://animeflv.net/api.php?accion=inicio";
+    String inicio = "http://animeflv.com/api.php?accion=inicio";
     String json = "{}";
     Alarm alarm = new Alarm();
     String ext_storage_state = Environment.getExternalStorageState();
@@ -1359,7 +1363,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     public void setDir(Boolean busqueda){
         if (!busqueda) {
             if (isNetworkAvailable()) {
-                new Requests(context, TaskType.DIRECTORIO).execute("http://animeflv.net/api.php?accion=directorio");
+                new Requests(context, TaskType.DIRECTORIO).execute("http://animeflv.com/api.php?accion=directorio");
             } else {
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!mediaStorage.exists()) {
@@ -1377,7 +1381,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         }else {
             if (isNetworkAvailable()) {
-                new Requests(context, TaskType.DIRECTORIO1).execute("http://animeflv.net/api.php?accion=directorio");
+                new Requests(context, TaskType.DIRECTORIO1).execute("http://animeflv.com/api.php?accion=directorio");
             } else {
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!mediaStorage.exists()) {
@@ -1404,7 +1408,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putString("aid",aidInfo);
         editor.commit();
-        new Requests(this,TaskType.GET_INFO).execute("http://animeflv.net/api.php?accion=anime&aid=" + aid);
+        new Requests(this,TaskType.GET_INFO).execute("http://animeflv.com/api.php?accion=anime&aid=" + aid);
     }
     public void actCacheInfo(String json){
         Bundle bundleInfo=new Bundle();
@@ -2044,7 +2048,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (ftitulo.trim().equals("miss-monochrome-the-animation-2")){ftitulo="miss-monochrome-the-animation-2nd-season";}
         if (ftitulo.trim().equals("ore-ga-ojousama-gakkou-ni-shomin-sample-toshite-gets-sareta-ken")){ftitulo="ore-ga-ojousama-gakkou-ni-shomin-sample-toshite-gets-sareta-";}
         if (ftitulo.trim().equals("diabolik-lovers-moreblood")){ftitulo="diabolik-lovers-more-blood";}
-        String link="http://animeflv.net/ver/"+ftitulo+"-"+capitulo+".html";
+        String link="http://animeflv.com/ver/"+ftitulo+"-"+capitulo+".html";
         return link;
     }
     @Override
@@ -2450,6 +2454,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             if (isNetworkAvailable()&&!data.trim().equals("error")) {
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
+                    Log.d("Json",data);
                     try {
                         file.createNewFile();
                     } catch (IOException e) {
@@ -2460,14 +2465,20 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 } else {
                     Log.d("Archivo", "Existe");
                     String infile = getStringFromFile(file_loc);
-                    if (!parser.parseEID(infile)[0].trim().equals(parser.parseEID(data)[0].trim())) {
-                        Log.d("Cargar", "Json nuevo");
-                        writeToFile(data, file);
-                        getData(data);
-                    } else {
-                        Log.d("Cargar", "Json existente");
-                        getData(infile);
-                    }
+                    //if (isJSONValid(infile)&&isJSONValid(data)) {
+                        if (!parser.parseEID(infile)[0].trim().equals(parser.parseEID(data)[0].trim())) {
+                            Log.d("Cargar", "Json nuevo");
+                            writeToFile(data, file);
+                            getData(data);
+                        } else {
+                            Log.d("Cargar", "Json existente");
+                            getData(infile);
+                        }
+                    /*}else {
+                        file.delete();
+                        toast("Error en cache, volviendo a cargar");
+                        new Requests(context,TaskType.GET_INICIO).execute(inicio);
+                    }*/
                 }
             }else {
                 if (!file.exists()) {
@@ -2516,6 +2527,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         }
     }
+
     @Override
     protected void onResume() {
         super.onResume();
