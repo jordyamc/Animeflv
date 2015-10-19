@@ -75,10 +75,10 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                     br.close();
                     Log.d("URL Normal", u.toString());
                     if (c.getURL()!=u){
-                        Log.d("URL Actual", c.getURL().toString());
+                        Log.d("URL ERROR", c.getURL().toString());
                         _response="";
                     }else {
-                        Log.d("URL Actual",c.getURL().toString());
+                        Log.d("URL OK",c.getURL().toString());
                         _response = sb.toString();
                     }
                     is = c.getInputStream();
