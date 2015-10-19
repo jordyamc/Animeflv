@@ -2465,7 +2465,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 } else {
                     Log.d("Archivo", "Existe");
                     String infile = getStringFromFile(file_loc);
-                    //if (isJSONValid(infile)&&isJSONValid(data)) {
+                    if (isJSONValid(infile)&&isJSONValid(data)) {
                         if (!parser.parseEID(infile)[0].trim().equals(parser.parseEID(data)[0].trim())) {
                             Log.d("Cargar", "Json nuevo");
                             writeToFile(data, file);
@@ -2474,11 +2474,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             Log.d("Cargar", "Json existente");
                             getData(infile);
                         }
-                    /*}else {
+                    }else {
                         file.delete();
                         toast("Error en cache, volviendo a cargar");
                         new Requests(context,TaskType.GET_INICIO).execute(inicio);
-                    }*/
+                    }
                 }
             }else {
                 if (!file.exists()) {
@@ -2527,7 +2527,20 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         }
     }
-
+        public boolean isJSONValid(String test) {
+            try {
+                new JSONObject(test);
+            } catch (JSONException ex) {
+                // edited, to include @Arthur's comment
+                // e.g. in case JSONArray is valid as well...
+                try {
+                    new JSONArray(test);
+                } catch (JSONException ex1) {
+                    return false;
+                }
+            }
+            return true;
+        }
     @Override
     protected void onResume() {
         super.onResume();
