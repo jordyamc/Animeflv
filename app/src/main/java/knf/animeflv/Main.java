@@ -282,6 +282,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     String headerTit;
     MaterialDialog ndialog;
     int posT;
+    Boolean tbool;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1361,6 +1362,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
     }
     public void setDir(Boolean busqueda){
+        tbool=busqueda;
         if (!busqueda) {
             if (isNetworkAvailable()) {
                 new Requests(context, TaskType.DIRECTORIO).execute("http://animeflv.com/api.php?accion=directorio");
@@ -1373,8 +1375,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
                 String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
                 if (file.exists()) {
-                    Intent intent = new Intent(context, Directorio.class);
-                    startActivity(intent);
+                    if (isJSONValid(getStringFromFile(file_loc))) {
+                        Intent intent = new Intent(context, Directorio.class);
+                        startActivity(intent);
+                    }else {
+                        file.delete();
+                        setDir(tbool);
+                    }
                 } else {
                     toast("No hay datos guardados");
                 }
@@ -1391,11 +1398,16 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
                 String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
                 if (file.exists()) {
-                    Intent intent=new Intent(context,Directorio.class);
-                    Bundle bundle=new Bundle();
-                    bundle.putString("tipo","Busqueda");
-                    intent.putExtras(bundle);
-                    startActivity(intent);
+                    if (isJSONValid(file_loc)) {
+                        Intent intent = new Intent(context, Directorio.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("tipo", "Busqueda");
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    }else {
+                        file.delete();
+                        setDir(tbool);
+                    }
                 } else {
                     toast("No hay datos guardados");
                 }
@@ -2227,21 +2239,37 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     } catch (IOException e) {
                         Log.d("Archivo:", "Error al crear archivo");
                     }
-                    writeToFile(data, file);
-                    Intent intent=new Intent(context,Directorio.class);
-                    startActivity(intent);
+                    if (isJSONValid(data)) {
+                        writeToFile(data, file);
+                        Intent intent = new Intent(context, Directorio.class);
+                        startActivity(intent);
+                    }else {
+                        toast("Error en Servidor");
+                    }
                 } else {
                     Log.d("Archivo", "Existe");
                     String infile = getStringFromFile(file_loc);
                     if (!infile.trim().equals(data.trim())) {
-                        Log.d("Cargar", "Json nuevo");
-                        writeToFile(data, file);
-                        Intent intent=new Intent(context,Directorio.class);
-                        startActivity(intent);
+                        if (isJSONValid(infile)) {
+                            Log.d("Cargar", "Json nuevo");
+                            writeToFile(data, file);
+                            Intent intent = new Intent(context, Directorio.class);
+                            startActivity(intent);
+                        }else {
+                            file.delete();
+                            setDir(tbool);
+                            toast("Error en cache, recargando");
+                        }
                     } else {
-                        Log.d("Cargar", "Json existente");
-                        Intent intent=new Intent(context,Directorio.class);
-                        startActivity(intent);
+                        if (isJSONValid(infile)) {
+                            Log.d("Cargar", "Json existente");
+                            Intent intent = new Intent(context, Directorio.class);
+                            startActivity(intent);
+                        }else {
+                            file.delete();
+                            setDir(tbool);
+                            toast("Error en cache, recargando");
+                        }
                     }
                 }
             }else{
@@ -2252,7 +2280,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 }
                 File fileoff = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
                 String file_loc_off = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-                if (fileoff.exists()) {
+                if (fileoff.exists()&&isJSONValid(getStringFromFile(file_loc_off))) {
                     Intent intent = new Intent(context, Directorio.class);
                     startActivity(intent);
                 } else {
@@ -2523,7 +2551,18 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         if (taskType==TaskType.GET_FAV){
             if (data.contains(":::")){
-                getSharedPreferences("data",MODE_PRIVATE).edit().putString("favoritos",data.trim()).commit();
+                Log.d("Favoritos",data);
+                if (!data.contains(":;:")) {
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", data.trim()).commit();
+                }else{
+                    String[] datas=data.trim().split(":;:");
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", datas[0]).commit();
+                    getSharedPreferences("data",MODE_PRIVATE).edit().putString("vistos",datas[1]).commit();
+                    String[] v=datas[1].split(";;;");
+                    for (String s : v) {
+                        getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean(s,true).apply();
+                    }
+                }
             }
         }
     }

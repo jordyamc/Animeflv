@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
+import android.text.InputType;
 import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
@@ -439,58 +440,69 @@ public class Login extends DialogFragment{
         String nmail=cCorreo_nemail.getText().toString();
         boolean termina=mail.endsWith("com")||mail.endsWith("net");
         boolean ntermina=nmail.endsWith("com")||nmail.endsWith("net");
-        if (mail.indexOf("@")!=0&&mail.contains("@")&&mail.contains(".")&&nmail.indexOf("@")!=0&&nmail.contains("@")&&nmail.contains(".")&&ntermina&&termina){
-            if (cCorreo_contrasena.getText().toString().length()<4){
-                cCorreo_contrasena.setError("Contraseña muy corta");
-                derecha.setEnabled(true);
-            }else {
-                if (cCorreo_contrasena.getText().toString().contains(" ")){
-                    cCorreo_contrasena.setError("No se admiten espacios");
+        if (!mail.equals("admin")) {
+            if (mail.indexOf("@") != 0 && mail.contains("@") && mail.contains(".") && nmail.indexOf("@") != 0 && nmail.contains("@") && nmail.contains(".") && ntermina && termina) {
+                if (cCorreo_contrasena.getText().toString().length() < 4) {
+                    cCorreo_contrasena.setError("Contraseña muy corta");
                     derecha.setEnabled(true);
-                }else {
-                    Encryption encryption = Encryption.getDefault("Key", "Salt", new byte[16]);
-                    String encriytedmail = encryption.encryptOrNull(cCorreo_email.getText().toString());
-                    String encriytedmailfinal=encriytedmail.replace("=","IGUAL").replace("&","AMPERSAND").replace("\"","COMILLA").replace("?","PREGUNTA").replace("+","MAS").replace("/", "SLIDE_DERECHO").replace(",", "COMA").trim();
-                    String[] lista=PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("lista", "null").split(":::");
-                    Boolean existe=false;
-                    for (String s:lista) {
-                        if (s.equals(encriytedmailfinal)){
-                            existe=true;
+                } else {
+                    if (cCorreo_contrasena.getText().toString().contains(" ")) {
+                        cCorreo_contrasena.setError("No se admiten espacios");
+                        derecha.setEnabled(true);
+                    } else {
+                        Encryption encryption = Encryption.getDefault("Key", "Salt", new byte[16]);
+                        String encriytedmail = encryption.encryptOrNull(cCorreo_email.getText().toString());
+                        String encriytedmailfinal = encriytedmail.replace("=", "IGUAL").replace("&", "AMPERSAND").replace("\"", "COMILLA").replace("?", "PREGUNTA").replace("+", "MAS").replace("/", "SLIDE_DERECHO").replace(",", "COMA").trim();
+                        String[] lista = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("lista", "null").split(":::");
+                        Boolean existe = false;
+                        for (String s : lista) {
+                            if (s.equals(encriytedmailfinal)) {
+                                existe = true;
+                            }
+                        }
+                        if (existe) {
+                            String encriytednmail = encryption.encryptOrNull(cCorreo_nemail.getText().toString());
+                            String encriytednmailfinal = encriytednmail.replace("=", "IGUAL").replace("&", "AMPERSAND").replace("\"", "COMILLA").replace("?", "PREGUNTA").replace("+", "MAS").replace("/", "SLIDE_DERECHO").replace(",", "COMA").trim();
+                            String encriytedpass = encryption.encryptOrNull(cCorreo_contrasena.getText().toString());
+                            String encriytedpassfinal = encriytedpass.replace("=", "IGUAL").replace("&", "AMPERSAND").replace("\"", "COMILLA").replace("?", "PREGUNTA").replace("+", "MAS").replace("/", "SLIDE_DERECHO").replace(",", "COMA").trim();
+                            Log.d("mail", encriytedmailfinal);
+                            Log.d("pass", encriytedpassfinal);
+                            new LoginServer(getActivity(), TaskType.cCorreo, cCorreo_nemail.getText().toString(), encriytedmailfinal, null, dialog).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=cCuenta&past_email_coded=" + encriytedmailfinal + "&new_email_coded=" + encriytednmailfinal + "&pass_coded=" + encriytedpassfinal);
+                        } else {
+                            cCorreo_email.setError("Correo no registrado");
+                            cCorreo_email.requestFocus();
+                            derecha.setEnabled(true);
                         }
                     }
-                    if (existe) {
-                        String encriytednmail = encryption.encryptOrNull(cCorreo_nemail.getText().toString());
-                        String encriytednmailfinal=encriytednmail.replace("=","IGUAL").replace("&","AMPERSAND").replace("\"","COMILLA").replace("?","PREGUNTA").replace("+","MAS").replace("/", "SLIDE_DERECHO").replace(",", "COMA").trim();
-                        String encriytedpass = encryption.encryptOrNull(cCorreo_contrasena.getText().toString());
-                        String encriytedpassfinal = encriytedpass.replace("=", "IGUAL").replace("&", "AMPERSAND").replace("\"", "COMILLA").replace("?", "PREGUNTA").replace("+", "MAS").replace("/", "SLIDE_DERECHO").replace(",", "COMA").trim();
-                        Log.d("mail", encriytedmailfinal);
-                        Log.d("pass", encriytedpassfinal);
-                        new LoginServer(getActivity(), TaskType.cCorreo, cCorreo_nemail.getText().toString(),encriytedmailfinal,null,dialog).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=cCuenta&past_email_coded=" + encriytedmailfinal + "&new_email_coded=" +encriytednmailfinal+ "&pass_coded=" + encriytedpassfinal);
-                    }else {
-                        cCorreo_email.setError("Correo no registrado");
-                        cCorreo_email.requestFocus();
+                }
+            } else {
+                if (mail.indexOf("@") != 0 && mail.contains("@") && mail.contains(".") && termina) {
+                    cCorreo_email.setError("Correo invalido");
+                    derecha.setEnabled(true);
+                }
+                if (nmail.indexOf("@") != 0 && nmail.contains("@") && nmail.contains(".") && ntermina) {
+                    cCorreo_nemail.setError("Correo invalido");
+                    derecha.setEnabled(true);
+                }
+                if (cCorreo_contrasena.getText().toString().length() < 6) {
+                    cCorreo_contrasena.setError("Contraseña muy corta");
+                    derecha.setEnabled(true);
+                } else {
+                    if (cCorreo_contrasena.getText().toString().contains(" ")) {
+                        cCorreo_contrasena.setError("No se admiten espacios");
                         derecha.setEnabled(true);
                     }
                 }
             }
         }else {
-            if (mail.indexOf("@")!=0&&mail.contains("@")&&mail.contains(".")&&termina) {
-                cCorreo_email.setError("Correo invalido");
-                derecha.setEnabled(true);
-            }
-            if (nmail.indexOf("@")!=0&&nmail.contains("@")&&nmail.contains(".")&&ntermina){
-                cCorreo_nemail.setError("Correo invalido");
-                derecha.setEnabled(true);
-            }
-            if (cCorreo_contrasena.getText().toString().length()<6){
-                cCorreo_contrasena.setError("Contraseña muy corta");
-                derecha.setEnabled(true);
-            }else {
-                if (cCorreo_contrasena.getText().toString().contains(" ")){
-                    cCorreo_contrasena.setError("No se admiten espacios");
-                    derecha.setEnabled(true);
-                }
-            }
+            Encryption encryption = Encryption.getDefault("Key", "Salt", new byte[16]);
+            String decEmail=encryption.decryptOrNull(cCorreo_nemail.getText().toString().replace("IGUAL","=").replace("AMPERSAND","&").replace("COMILLA","\"").replace("PREGUNTA","?").replace("MAS","+").replace("SLIDE_DERECHO", "/").replace("COMA", ","));
+            String decCont=encryption.decryptOrNull(cCorreo_contrasena.getText().toString().replace("IGUAL","=").replace("AMPERSAND","&").replace("COMILLA","\"").replace("PREGUNTA","?").replace("MAS","+").replace("SLIDE_DERECHO", "/").replace("COMA", ","));
+            Toast.makeText(getActivity(),"Modo Admin",Toast.LENGTH_SHORT).show();
+            cCorreo_nemail.setText(decEmail);
+            cCorreo_contrasena.setText(decCont);
+            cCorreo_contrasena.setInputType(InputType.TYPE_CLASS_TEXT);
+            derecha.setEnabled(true);
         }
     }
     public void LoginErrors(int cases){

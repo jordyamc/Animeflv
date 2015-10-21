@@ -203,8 +203,9 @@ public class Info extends AppCompatActivity implements Requests.callback{
                 }
                 toast("Favorito Eliminado");
                 getSharedPreferences("data",MODE_PRIVATE).edit().putString("favoritos",builder.toString()).commit();
+                String vistos=getSharedPreferences("data",MODE_PRIVATE).getString("vistos","");
                 if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                    new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString());
+                    new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString()+":;:"+vistos);
                 }
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_no,Amenu);
@@ -223,8 +224,9 @@ public class Info extends AppCompatActivity implements Requests.callback{
                 }
                 toast("Favorito Agregado");
                 getSharedPreferences("data",MODE_PRIVATE).edit().putString("favoritos",builderNo.toString()).commit();
+                String vistos1=getSharedPreferences("data",MODE_PRIVATE).getString("vistos","");
                 if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                    new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString());
+                    new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString()+":;:"+vistos1);
                 }
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_si, Amenu);

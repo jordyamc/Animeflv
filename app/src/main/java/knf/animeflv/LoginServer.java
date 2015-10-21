@@ -76,7 +76,6 @@ public class LoginServer extends AsyncTask<String,String,String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        Log.d("LoginServer state", s.toLowerCase().trim());
         String state=s.toLowerCase().trim();
         if (taskType==TaskType.NEW_USER) {
             if (s.toLowerCase().trim().equals("exito")) {
@@ -96,9 +95,17 @@ public class LoginServer extends AsyncTask<String,String,String> {
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email", email).apply();
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", email_coded).apply();
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", pass_coded).apply();
-                SharedPreferences sharedPreferences=context.getSharedPreferences("data", context.MODE_PRIVATE);
-                sharedPreferences.edit().putString("favoritos", s.trim()).apply();
-                defsharedPreferences.edit().putString("GET_Status", "exito").apply();
+                if (!s.toLowerCase().trim().contains(":;:")) {
+                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", context.MODE_PRIVATE);
+                    sharedPreferences.edit().putString("favoritos", s.trim()).apply();
+                    defsharedPreferences.edit().putString("GET_Status", "exito").apply();
+                }else {
+                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", context.MODE_PRIVATE);
+                    String[] separar=s.trim().split(":;:");
+                    sharedPreferences.edit().putString("favoritos", separar[0]).apply();
+                    sharedPreferences.edit().putString("vistos", separar[1]).apply();
+                    defsharedPreferences.edit().putString("GET_Status", "exito").apply();
+                }
                 materialDialog.dismiss();
                 Toast.makeText(context, "Sesion Iniciada!!", Toast.LENGTH_SHORT).show();
             }
@@ -109,9 +116,17 @@ public class LoginServer extends AsyncTask<String,String,String> {
             //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
             defsharedPreferences.edit().putString("GETSL_Status", state).apply();
             if (s.toLowerCase().trim().contains(":::")||s.toLowerCase().trim().equals("")) {
-                SharedPreferences sharedPreferences=context.getSharedPreferences("data", context.MODE_PRIVATE);
-                sharedPreferences.edit().putString("favoritos", s.trim()).apply();
-                defsharedPreferences.edit().putString("GETSL_Status", "exito").apply();
+                if (!s.toLowerCase().trim().contains(":;:")) {
+                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", context.MODE_PRIVATE);
+                    sharedPreferences.edit().putString("favoritos", s.trim()).apply();
+                    defsharedPreferences.edit().putString("GETSL_Status", "exito").apply();
+                }else {
+                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", context.MODE_PRIVATE);
+                    String[] separar=s.trim().split(":;:");
+                    sharedPreferences.edit().putString("favoritos", separar[0]).apply();
+                    sharedPreferences.edit().putString("vistos", separar[1]).apply();
+                    defsharedPreferences.edit().putString("GETSL_Status", "exito").apply();
+                }
             }
         }
         if (taskType==TaskType.LIST_USERS){

@@ -27,7 +27,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import knf.animeflv.LoginServer;
 import knf.animeflv.R;
+import knf.animeflv.TaskType;
 import knf.animeflv.WebDescarga;
 
 /**
@@ -75,6 +77,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
         final File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+id+"/"+id+"_"+item+".mp4");
         final File sd=new File(getSD1() + "/Animeflv/download/"+id+"/"+id+"_"+item+".mp4");
+        final String email_coded=PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
+        final String pass_coded=PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
         if (file.exists()||sd.exists()){
             holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
         }else {
@@ -124,8 +128,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         if (!vistos){
                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
                             String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                            Svistos=Svistos+"visto" + id + "_" + item+":::";
+                            Svistos=Svistos+";;;"+"visto" + id + "_" + item;
                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                            String favoritos=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("favoritos", "");
+                            if (!email_coded.equals("null")&&!email_coded.equals("null")) {
+                                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                            }
                             holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                         }
                     } else {
@@ -174,8 +182,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                         if (!vistos){
                                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
                                             String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                                            Svistos=Svistos+"visto" + id + "_" + item+":::";
+                                            Svistos=Svistos+";;;"+"visto" + id + "_" + item;
                                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                                            String favoritos=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("favoritos", "");
+                                            if (!email_coded.equals("null")&&!email_coded.equals("null")) {
+                                                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                                            }
                                             holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                                         }
                                         dialog.dismiss();
@@ -212,8 +224,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                                 if (!vistos){
                                                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
                                                     String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                                                    Svistos=Svistos+"visto" + id + "_" + item+":::";
+                                                    Svistos=Svistos+";;;"+"visto" + id + "_" + item;
                                                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                                                    String favoritos=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("favoritos", "");
+                                                    if (!email_coded.equals("null")&&!email_coded.equals("null")) {
+                                                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                                                    }
                                                     holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                                                 }
                                                 dialog.dismiss();
@@ -229,8 +245,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                                 if (!vistosad){
                                                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
                                                     String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                                                    Svistos=Svistos+"visto" + id + "_" + item+":::";
+                                                    Svistos=Svistos+";;;"+"visto" + id + "_" + item;
                                                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                                                    String favoritos=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("favoritos", "");
+                                                    if (!email_coded.equals("null")&&!email_coded.equals("null")) {
+                                                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                                                    }
                                                     holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                                                 }
                                                 dialog.dismiss();
@@ -339,18 +359,26 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             @Override
             public void onClick(View v) {
                 String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
-                Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+                Boolean vistos=context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
                 if (!vistos){
                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
                     String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                    Svistos=Svistos+"visto" + id + "_" + item+":::";
-                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                    Svistos=Svistos+";;;"+"visto" + id + "_" + item;
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                    String favoritos=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("favoritos", "");
+                    if (!email_coded.equals("null")&&!email_coded.equals("null")) {
+                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                    }
                     holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                 }else {
                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, false).apply();
                     String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                    Svistos=Svistos.replace("visto" + id + "_" + item+":::","");
+                    Svistos=Svistos.replace(";;;"+"visto" + id + "_" + item,"");
                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                    String favoritos=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("favoritos", "");
+                    if (!email_coded.equals("null")&&!email_coded.equals("null")) {
+                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                    }
                     holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
                 }
             }
