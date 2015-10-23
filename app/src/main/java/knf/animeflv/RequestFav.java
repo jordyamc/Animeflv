@@ -64,6 +64,11 @@ public class RequestFav extends AsyncTask<String,String,String> {
                     if (c.getURL()==u){
                         writeToFile(sb.toString(),file);
                         list.add(parser.getTit(sb.toString()));
+                    }else {
+                        if (c.getURL().toString().trim().startsWith("http://animeflv")){
+                            writeToFile(sb.toString(),file);
+                            list.add(parser.getTit(sb.toString()));
+                        }
                     }
                 } catch (Exception e) {
                     Log.e("log_tag", "Error in http connection " + e.toString());

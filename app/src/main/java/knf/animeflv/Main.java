@@ -2584,9 +2584,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     protected void onResume() {
         super.onResume();
         pause=false;
+        getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
         if(shouldExecuteOnResume){
             if (isNetworkAvailable()) {
-                getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
+                //getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
                 textoff.setVisibility(View.GONE);
                 new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
                 new Requests(this, TaskType.GET_INICIO).execute(inicio);

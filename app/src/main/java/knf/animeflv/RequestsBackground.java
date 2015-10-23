@@ -73,12 +73,17 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         sb.append(line + "\n");
                     }
                     br.close();
-                    Log.d("URL Normal", u.toString());
+                    Log.d("Back URL Normal", u.toString());
                     if (c.getURL()!=u){
-                        Log.d("URL ERROR", c.getURL().toString());
-                        _response="";
+                        if (!c.getURL().toString().trim().startsWith("http://animeflv")) {
+                            Log.d("Back URL ERROR", c.getURL().toString());
+                            _response = "";
+                        }else {
+                            Log.d("Back URL OK",c.getURL().toString());
+                            _response = sb.toString();
+                        }
                     }else {
-                        Log.d("URL OK",c.getURL().toString());
+                        Log.d("Back URL OK",c.getURL().toString());
                         _response = sb.toString();
                     }
                     is = c.getInputStream();

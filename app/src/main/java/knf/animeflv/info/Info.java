@@ -129,6 +129,13 @@ public class Info extends AppCompatActivity implements Requests.callback{
         viewPager.setAdapter(adapter);
         SmartTabLayout viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab1);
         viewPagerTab.setViewPager(viewPager);
+        final String email_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
+        final String pass_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
+        String Svistos=getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
+        String favoritos=getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
+        if (!email_coded.equals("null")&&!email_coded.equals("null")) {
+            new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+        }
     }
     public void toast(String texto){
         Toast.makeText(this, texto, Toast.LENGTH_SHORT).show();
@@ -355,6 +362,18 @@ public class Info extends AppCompatActivity implements Requests.callback{
         }
         String link = ftitulo + "-" + capitulo + ".html";
         return link;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        final String email_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
+        final String pass_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
+        String Svistos=getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
+        String favoritos=getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
+        if (!email_coded.equals("null")&&!email_coded.equals("null")) {
+            new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+        }
     }
 
     @Override

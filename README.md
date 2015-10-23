@@ -11,11 +11,6 @@
 <p>-(provicional) Construir link al sitio original, sacar link a la pagina de descarga respectiva de Zippyshare, e iniciar descarga desde un explorador alternativo.</p>
 <p>-(provicional) en caso de llegar a un link de linkbucks en ves de zippyshare, simular un click al link de saltar publicidad usando javascript</p>
 <p>-Servicio en segundo plano, crea una notificacion cuando hay nuevos capitulos.</p>
-
-<p><b><h2>Error:</h2></b></p>
-<p>-En la Activity de WebDescarga, no carga ningun link de animeflv, por lo q no pueden hacerse todos los comandos para decargar.
-
-<p><b><h2>Falta:</h2></b></p>
 <p>-Obtencion de capitulos desde servidor de animeflv
 <p>-Menu lateral para todos los animes en el servidor.
 <p>-Poder ver los animes descargados haciendo click en Ver.
@@ -23,3 +18,11 @@
 <p>-Diseñar parser para los codigos de directorio, informacion de anime.
 <p>-Guardar JSONs en SharedPreference o Base de datos para abrir app sin conexion.
 <p>-Metodo de obtencion de JSON basado en URLConection, en ves de cargar y obtener datos desde webview (carga de informacion mas rapida, y con menos errores)
+
+<p><b><h2>Error:</h2></b></p>
+<p>-</p>
+
+<p><b><h2>Falta:</h2></b></p>
+<p>Sonido Zukistrukis</p>
+<p>Contestar sugerencias directo en app</p>
+
