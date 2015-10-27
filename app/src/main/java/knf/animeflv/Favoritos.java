@@ -33,7 +33,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback{
     RecyclerView recyclerView;
     Toolbar toolbar;
     Toolbar ltoolbar;
-    List<String> aids=new ArrayList<String>();
+    List<String> aids;
     List<String> Naids=new ArrayList<String>();
     String fav;
     String[] favoritos={};
@@ -72,9 +72,13 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback{
                 }
             });
         }
+        init();
+    }
+    public void init(){
         SharedPreferences sharedPreferences=getSharedPreferences("data", MODE_PRIVATE);
         fav=sharedPreferences.getString("favoritos", "");
         favoritos=fav.split(":::");
+        Log.d("favoritos",fav);
         aids=new ArrayList<String>();
         for (String i:favoritos){
             if (!i.equals("")) {
@@ -170,7 +174,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback{
     protected void onResume() {
         super.onResume();
         if(shouldExecuteOnResume){
-            recreate();
+            init();
         } else{
             shouldExecuteOnResume = true;
         }

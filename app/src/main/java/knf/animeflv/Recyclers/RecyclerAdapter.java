@@ -367,7 +367,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
                     String favoritos=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("favoritos", "");
                     if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                        //new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
                     }
                     holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                 }else {
@@ -377,7 +377,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
                     String favoritos=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("favoritos", "");
                     if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                        //new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
                     }
                     holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
                 }

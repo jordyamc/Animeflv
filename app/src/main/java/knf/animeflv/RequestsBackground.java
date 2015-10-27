@@ -23,6 +23,10 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -147,6 +151,20 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && net;
     }
+    public boolean isJSONValid(String test) {
+        try {
+            new JSONObject(test);
+        } catch (JSONException ex) {
+            // edited, to include @Arthur's comment
+            // e.g. in case JSONArray is valid as well...
+            try {
+                new JSONArray(test);
+            } catch (JSONException ex1) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     @Override
     protected void onPostExecute(String s) {
@@ -175,246 +193,256 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                 String txt = getStringFromFile(file_loc);
                 String[] jsonDesc = new Parser().parseEID(s);
                 String[] jsonArchivo = new Parser().parseEID(txt);
-                if (!jsonDesc[0].trim().equals(jsonArchivo[0].trim())) {
-                    writeToFile(s, file);
-                    int not=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido","0"));
-                    if (not==0) {
-                        Log.d("Notificacion:", "Crear Sonido Def");
-                        String act=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("reload","0");
-                        Log.d("Registrer",act);
-                        if (act.trim().equals("0")){
-                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","1").apply();
-                            Log.d("Registrer to", "1");
-                        }else {
-                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
-                            Log.d("Registrer to", "0");
-                        }
-                        int num=0;
-                        loop:{
-                            for (String st : jsonDesc) {
-                                if (!st.trim().equals(jsonArchivo[0].trim())) {
-                                    num += 1;
-                                }else {
-                                    break loop;
+                if (isJSONValid(txt) && isJSONValid(s)){
+                    if (!jsonDesc[0].trim().equals(jsonArchivo[0].trim())) {
+                        writeToFile(s, file);
+                        int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
+                        if (not == 0) {
+                            Log.d("Notificacion:", "Crear Sonido Def");
+                            String act = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("reload", "0");
+                            Log.d("Registrer", act);
+                            if (act.trim().equals("0")) {
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "1").apply();
+                                Log.d("Registrer to", "1");
+                            } else {
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "0").apply();
+                                Log.d("Registrer to", "0");
+                            }
+                            int num = 0;
+                            loop:
+                            {
+                                for (String st : jsonDesc) {
+                                    if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                        num += 1;
+                                    } else {
+                                        break loop;
+                                    }
                                 }
                             }
+                            int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
+                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
+                            String mess = "";
+                            if (nCaps == 1) {
+                                mess = "Hay " + Integer.toString(nCaps) + " nuevo capitulo disponible!!!";
+                            } else {
+                                mess = "Hay " + Integer.toString(nCaps) + " nuevos capitulos disponibles!!!";
+                            }
+                            NotificationCompat.Builder mBuilder =
+                                    new NotificationCompat.Builder(context)
+                                            .setSmallIcon(R.drawable.ic_not_r)
+                                            .setContentTitle("AnimeFLV")
+                                            .setContentText(mess);
+                            mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                            mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+                            mBuilder.setAutoCancel(true);
+                            mBuilder.setPriority(Notification.PRIORITY_MAX);
+                            mBuilder.setLights(Color.BLUE, 5000, 2000);
+                            Intent resultIntent = new Intent(context, Main.class);
+                            PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                            mBuilder.setContentIntent(resultPendingIntent);
+                            int mNotificationId = 6991;
+                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                            mNotifyMgr.cancel(mNotificationId);
+                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
                         }
-                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+num;
-                        context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putInt("nCaps",nCaps).apply();
-                        String mess="";
-                        if (nCaps==1){
-                            mess="Hay "+Integer.toString(nCaps)+" nuevo capitulo disponible!!!";
-                        }else {
-                            mess="Hay "+Integer.toString(nCaps)+" nuevos capitulos disponibles!!!";
-                        }
-                        NotificationCompat.Builder mBuilder =
-                                new NotificationCompat.Builder(context)
-                                        .setSmallIcon(R.drawable.ic_not_r)
-                                        .setContentTitle("AnimeFLV")
-                                        .setContentText(mess);
-                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                        mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
-                        mBuilder.setAutoCancel(true);
-                        mBuilder.setPriority(Notification.PRIORITY_MAX);
-                        mBuilder.setLights(Color.BLUE, 5000, 2000);
-                        Intent resultIntent = new Intent(context, Main.class);
-                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                        mBuilder.setContentIntent(resultPendingIntent);
-                        int mNotificationId = 6991;
-                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
-                        mNotifyMgr.cancel(mNotificationId);
-                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                    }
-                    if (not==1){
-                        Log.d("Notificacion:", "Crear Sonido Especial");
-                        String act=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("reload","0");
-                        Log.d("Registrer",act);
-                        if (act.equals("0")){
-                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","1").apply();
-                            Log.d("Registrer to","1");
-                        }else {
-                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
-                            Log.d("Registrer to", "0");
-                        }
-                        int num=0;
-                        loop:{
-                            for (String st : jsonDesc) {
-                                if (!st.trim().equals(jsonArchivo[0].trim())) {
-                                    num += 1;
-                                }else {
-                                    break loop;
+                        if (not == 1) {
+                            Log.d("Notificacion:", "Crear Sonido Especial");
+                            String act = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("reload", "0");
+                            Log.d("Registrer", act);
+                            if (act.equals("0")) {
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "1").apply();
+                                Log.d("Registrer to", "1");
+                            } else {
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "0").apply();
+                                Log.d("Registrer to", "0");
+                            }
+                            int num = 0;
+                            loop:
+                            {
+                                for (String st : jsonDesc) {
+                                    if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                        num += 1;
+                                    } else {
+                                        break loop;
+                                    }
                                 }
                             }
+                            int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
+                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
+                            String mess = "";
+                            if (nCaps == 1) {
+                                mess = "Hay " + Integer.toString(nCaps) + " nuevo capitulo disponible!!!";
+                            } else {
+                                mess = "Hay " + Integer.toString(nCaps) + " nuevos capitulos disponibles!!!";
+                            }
+                            NotificationCompat.Builder mBuilder =
+                                    new NotificationCompat.Builder(context)
+                                            .setSmallIcon(R.drawable.ic_not_r)
+                                            .setContentTitle("AnimeFLV")
+                                            .setContentText(mess);
+                            mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                            mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound"), AudioManager.STREAM_NOTIFICATION);
+                            mBuilder.setAutoCancel(true);
+                            mBuilder.setPriority(Notification.PRIORITY_MAX);
+                            mBuilder.setLights(Color.BLUE, 5000, 2000);
+                            Intent resultIntent = new Intent(context, Main.class);
+                            PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                            mBuilder.setContentIntent(resultPendingIntent);
+                            int mNotificationId = 6991;
+                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                            mNotifyMgr.cancel(mNotificationId);
+                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
                         }
-                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+num;
-                        context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putInt("nCaps",nCaps).apply();
-                        String mess="";
-                        if (nCaps==1){
-                            mess="Hay "+Integer.toString(nCaps)+" nuevo capitulo disponible!!!";
-                        }else {
-                            mess="Hay "+Integer.toString(nCaps)+" nuevos capitulos disponibles!!!";
-                        }
-                        NotificationCompat.Builder mBuilder =
-                                new NotificationCompat.Builder(context)
-                                        .setSmallIcon(R.drawable.ic_not_r)
-                                        .setContentTitle("AnimeFLV")
-                                        .setContentText(mess);
-                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound"), AudioManager.STREAM_NOTIFICATION);
-                        mBuilder.setAutoCancel(true);
-                        mBuilder.setPriority(Notification.PRIORITY_MAX);
-                        mBuilder.setLights(Color.BLUE, 5000, 2000);
-                        Intent resultIntent = new Intent(context, Main.class);
-                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                        mBuilder.setContentIntent(resultPendingIntent);
-                        int mNotificationId = 6991;
-                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
-                        mNotifyMgr.cancel(mNotificationId);
-                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                    }
-                    if (not==2){
-                        Log.d("Notificacion:", "Crear Sonido Onii-chan");
-                        String act=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("reload","0");
-                        Log.d("Registrer",act);
-                        if (act.equals("0")){
-                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","1").apply();
-                            Log.d("Registrer to","1");
-                        }else {
-                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
-                            Log.d("Registrer to", "0");
-                        }
-                        int num=0;
-                        loop:{
-                            for (String st : jsonDesc) {
-                                if (!st.trim().equals(jsonArchivo[0].trim())) {
-                                    num += 1;
-                                }else {
-                                    break loop;
+                        if (not == 2) {
+                            Log.d("Notificacion:", "Crear Sonido Onii-chan");
+                            String act = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("reload", "0");
+                            Log.d("Registrer", act);
+                            if (act.equals("0")) {
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "1").apply();
+                                Log.d("Registrer to", "1");
+                            } else {
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "0").apply();
+                                Log.d("Registrer to", "0");
+                            }
+                            int num = 0;
+                            loop:
+                            {
+                                for (String st : jsonDesc) {
+                                    if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                        num += 1;
+                                    } else {
+                                        break loop;
+                                    }
                                 }
                             }
+                            int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
+                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
+                            String mess = "";
+                            if (nCaps == 1) {
+                                mess = "Hay " + Integer.toString(nCaps) + " nuevo capitulo disponible!!!";
+                            } else {
+                                mess = "Hay " + Integer.toString(nCaps) + " nuevos capitulos disponibles!!!";
+                            }
+                            NotificationCompat.Builder mBuilder =
+                                    new NotificationCompat.Builder(context)
+                                            .setSmallIcon(R.drawable.ic_not_r)
+                                            .setContentTitle("AnimeFLV")
+                                            .setContentText(mess);
+                            mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                            mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/onii"), AudioManager.STREAM_NOTIFICATION);
+                            mBuilder.setAutoCancel(true);
+                            mBuilder.setPriority(Notification.PRIORITY_MAX);
+                            mBuilder.setLights(Color.BLUE, 5000, 2000);
+                            Intent resultIntent = new Intent(context, Main.class);
+                            PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                            mBuilder.setContentIntent(resultPendingIntent);
+                            int mNotificationId = 6991;
+                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                            mNotifyMgr.cancel(mNotificationId);
+                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
                         }
-                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+num;
-                        context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putInt("nCaps",nCaps).apply();
-                        String mess="";
-                        if (nCaps==1){
-                            mess="Hay "+Integer.toString(nCaps)+" nuevo capitulo disponible!!!";
-                        }else {
-                            mess="Hay "+Integer.toString(nCaps)+" nuevos capitulos disponibles!!!";
-                        }
-                        NotificationCompat.Builder mBuilder =
-                                new NotificationCompat.Builder(context)
-                                        .setSmallIcon(R.drawable.ic_not_r)
-                                        .setContentTitle("AnimeFLV")
-                                        .setContentText(mess);
-                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/onii"), AudioManager.STREAM_NOTIFICATION);
-                        mBuilder.setAutoCancel(true);
-                        mBuilder.setPriority(Notification.PRIORITY_MAX);
-                        mBuilder.setLights(Color.BLUE, 5000, 2000);
-                        Intent resultIntent = new Intent(context, Main.class);
-                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                        mBuilder.setContentIntent(resultPendingIntent);
-                        int mNotificationId = 6991;
-                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
-                        mNotifyMgr.cancel(mNotificationId);
-                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                    }
-                    if (not==3){
-                        Log.d("Notificacion:", "Crear Sonido Sam");
-                        String act=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("reload","0");
-                        Log.d("Registrer",act);
-                        if (act.equals("0")){
-                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","1").apply();
-                            Log.d("Registrer to","1");
-                        }else {
-                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
-                            Log.d("Registrer to", "0");
-                        }
-                        int num=0;
-                        loop:{
-                            for (String st : jsonDesc) {
-                                if (!st.trim().equals(jsonArchivo[0].trim())) {
-                                    num += 1;
-                                }else {
-                                    break loop;
+                        if (not == 3) {
+                            Log.d("Notificacion:", "Crear Sonido Sam");
+                            String act = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("reload", "0");
+                            Log.d("Registrer", act);
+                            if (act.equals("0")) {
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "1").apply();
+                                Log.d("Registrer to", "1");
+                            } else {
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "0").apply();
+                                Log.d("Registrer to", "0");
+                            }
+                            int num = 0;
+                            loop:
+                            {
+                                for (String st : jsonDesc) {
+                                    if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                        num += 1;
+                                    } else {
+                                        break loop;
+                                    }
                                 }
                             }
+                            int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
+                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
+                            String mess = "";
+                            if (nCaps == 1) {
+                                mess = "Hay " + Integer.toString(nCaps) + " nuevo capitulo disponible!!!";
+                            } else {
+                                mess = "Hay " + Integer.toString(nCaps) + " nuevos capitulos disponibles!!!";
+                            }
+                            NotificationCompat.Builder mBuilder =
+                                    new NotificationCompat.Builder(context)
+                                            .setSmallIcon(R.drawable.ic_not_r)
+                                            .setContentTitle("AnimeFLV")
+                                            .setContentText(mess);
+                            mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                            mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sam"), AudioManager.STREAM_NOTIFICATION);
+                            mBuilder.setAutoCancel(true);
+                            mBuilder.setPriority(Notification.PRIORITY_MAX);
+                            mBuilder.setLights(Color.BLUE, 5000, 2000);
+                            Intent resultIntent = new Intent(context, Main.class);
+                            PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                            mBuilder.setContentIntent(resultPendingIntent);
+                            int mNotificationId = 6991;
+                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                            mNotifyMgr.cancel(mNotificationId);
+                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
                         }
-                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+num;
-                        context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putInt("nCaps",nCaps).apply();
-                        String mess="";
-                        if (nCaps==1){
-                            mess="Hay "+Integer.toString(nCaps)+" nuevo capitulo disponible!!!";
-                        }else {
-                            mess="Hay "+Integer.toString(nCaps)+" nuevos capitulos disponibles!!!";
-                        }
-                        NotificationCompat.Builder mBuilder =
-                                new NotificationCompat.Builder(context)
-                                        .setSmallIcon(R.drawable.ic_not_r)
-                                        .setContentTitle("AnimeFLV")
-                                        .setContentText(mess);
-                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sam"), AudioManager.STREAM_NOTIFICATION);
-                        mBuilder.setAutoCancel(true);
-                        mBuilder.setPriority(Notification.PRIORITY_MAX);
-                        mBuilder.setLights(Color.BLUE, 5000, 2000);
-                        Intent resultIntent = new Intent(context, Main.class);
-                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                        mBuilder.setContentIntent(resultPendingIntent);
-                        int mNotificationId = 6991;
-                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
-                        mNotifyMgr.cancel(mNotificationId);
-                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                    }
-                    if (not==4){
-                        Log.d("Notificacion:", "Crear Sonido Dango");
-                        String act=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("reload","0");
-                        Log.d("Registrer",act);
-                        if (act.equals("0")){
-                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","1").apply();
-                            Log.d("Registrer to","1");
-                        }else {
-                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("reload","0").apply();
-                            Log.d("Registrer to", "0");
-                        }
-                        int num=0;
-                        loop:{
-                            for (String st : jsonDesc) {
-                                if (!st.trim().equals(jsonArchivo[0].trim())) {
-                                    num += 1;
-                                }else {
-                                    break loop;
+                        if (not == 4) {
+                            Log.d("Notificacion:", "Crear Sonido Dango");
+                            String act = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("reload", "0");
+                            Log.d("Registrer", act);
+                            if (act.equals("0")) {
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "1").apply();
+                                Log.d("Registrer to", "1");
+                            } else {
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "0").apply();
+                                Log.d("Registrer to", "0");
+                            }
+                            int num = 0;
+                            loop:
+                            {
+                                for (String st : jsonDesc) {
+                                    if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                        num += 1;
+                                    } else {
+                                        break loop;
+                                    }
                                 }
                             }
+                            int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
+                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
+                            String mess = "";
+                            if (nCaps == 1) {
+                                mess = "Hay " + Integer.toString(nCaps) + " nuevo capitulo disponible!!!";
+                            } else {
+                                mess = "Hay " + Integer.toString(nCaps) + " nuevos capitulos disponibles!!!";
+                            }
+                            NotificationCompat.Builder mBuilder =
+                                    new NotificationCompat.Builder(context)
+                                            .setSmallIcon(R.drawable.ic_not_r)
+                                            .setContentTitle("AnimeFLV")
+                                            .setContentText(mess);
+                            mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                            mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango"), AudioManager.STREAM_NOTIFICATION);
+                            mBuilder.setAutoCancel(true);
+                            mBuilder.setPriority(Notification.PRIORITY_MAX);
+                            mBuilder.setLights(Color.BLUE, 5000, 2000);
+                            Intent resultIntent = new Intent(context, Main.class);
+                            PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                            mBuilder.setContentIntent(resultPendingIntent);
+                            int mNotificationId = 6991;
+                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                            mNotifyMgr.cancel(mNotificationId);
+                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
                         }
-                        int nCaps=context.getSharedPreferences("data",Context.MODE_PRIVATE).getInt("nCaps",0)+num;
-                        context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putInt("nCaps",nCaps).apply();
-                        String mess="";
-                        if (nCaps==1){
-                            mess="Hay "+Integer.toString(nCaps)+" nuevo capitulo disponible!!!";
-                        }else {
-                            mess="Hay "+Integer.toString(nCaps)+" nuevos capitulos disponibles!!!";
-                        }
-                        NotificationCompat.Builder mBuilder =
-                                new NotificationCompat.Builder(context)
-                                        .setSmallIcon(R.drawable.ic_not_r)
-                                        .setContentTitle("AnimeFLV")
-                                        .setContentText(mess);
-                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango"), AudioManager.STREAM_NOTIFICATION);
-                        mBuilder.setAutoCancel(true);
-                        mBuilder.setPriority(Notification.PRIORITY_MAX);
-                        mBuilder.setLights(Color.BLUE, 5000, 2000);
-                        Intent resultIntent = new Intent(context, Main.class);
-                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                        mBuilder.setContentIntent(resultPendingIntent);
-                        int mNotificationId = 6991;
-                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
-                        mNotifyMgr.cancel(mNotificationId);
-                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                    } else {
+                        Log.d("JSON", "Es igual");
                     }
-                } else {
-                    Log.d("JSON", "Es igual");
+                }else {
+                    Log.d("Error","Borrar archivo");
+                    new File(file_loc).delete();
                 }
             }
         }else {Log.d("Conexion","No hay internet");}}

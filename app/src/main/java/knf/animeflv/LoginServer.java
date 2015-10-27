@@ -61,14 +61,14 @@ public class LoginServer extends AsyncTask<String,String,String> {
             Log.d("URL Normal", u.toString());
             if (c.getURL()!=u){
                 Log.d("URL Actual", c.getURL().toString());
-                _response="";
+                _response="error";
             }else {
                 Log.d("URL Actual",c.getURL().toString());
                 _response = sb.toString();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            _response="";
+            _response="error";
         }
         return _response;
     }
