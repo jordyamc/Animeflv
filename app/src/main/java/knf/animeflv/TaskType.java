@@ -22,8 +22,8 @@ public enum TaskType {
     cPass(16),
     CONTAR(17),
     CHECK_DOWN(18),
-    CHECK_STREAM(19);
-
+    CHECK_STREAM(19),
+    UPDATE(20);
     int value;
 
     private TaskType(int value) {
