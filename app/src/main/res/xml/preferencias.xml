@@ -62,7 +62,7 @@
             android:defaultValue="true"
             android:key="resaltar"
             android:title="Resaltar"
-            android:summary="Animes, OVAS y Peliculas nuevas"/>
+            android:summary="Animes, OVAS, Peliculas nuevas, y Animes en favoritos"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Almacenamiento">
         <com.lb.material_preferences_library.custom_preferences.Preference

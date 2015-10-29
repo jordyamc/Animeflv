@@ -79,8 +79,11 @@ public class RequestDownload extends AsyncTask<String,String,String> {
             }
             //Log.d("URL Normal", u.toString());
             if (c.getURL() != u) {
-                //Log.d("URL Actual", c.getURL().toString());
-                _response = "";
+                if (!c.getURL().toString().trim().startsWith("http://animeflv")) {
+                    _response = "";
+                }else {
+                    _response = builder.toString();
+                }
             } else {
                 //Log.d("URL Actual",c.getURL().toString());
                 _response = builder.toString();

@@ -41,7 +41,6 @@ public class LoginServer extends AsyncTask<String,String,String> {
         StringBuilder builder = new StringBuilder();
         HttpURLConnection c = null;
         try {
-            Log.d("URL",params[0]);
             URL u = new URL(params[0]);
             c = (HttpURLConnection) u.openConnection();
             c.setRequestProperty("Content-length", "0");
@@ -60,10 +59,8 @@ public class LoginServer extends AsyncTask<String,String,String> {
             br.close();
             Log.d("URL Normal", u.toString());
             if (c.getURL()!=u){
-                Log.d("URL Actual", c.getURL().toString());
                 _response="error";
             }else {
-                Log.d("URL Actual",c.getURL().toString());
                 _response = sb.toString();
             }
         } catch (Exception e) {

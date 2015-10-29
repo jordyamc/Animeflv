@@ -410,7 +410,7 @@ public class Directorio extends AppCompatActivity {
         });
         if (bundle!=null){
             if (!isXLargeScreen(context)) {
-                linearLayout.setVisibility(View.GONE);
+                try {linearLayout.setVisibility(View.GONE);}catch (NullPointerException e) {Toast.makeText(context,"Esta vista se hizo para tablets, por favor desactiva el modo landscape",Toast.LENGTH_SHORT).show();}
                 recyclerView.setVisibility(View.VISIBLE);
             }else {
                 viewPager.setVisibility(View.GONE);

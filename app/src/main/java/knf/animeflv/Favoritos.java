@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -72,7 +73,17 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback{
                 }
             });
         }
-        init();
+        final String email_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
+        final String pass_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
+        if (!email_coded.equals("null")&&!email_coded.equals("null")) {
+            new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
+        }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                init();
+            }
+        },500);
     }
     public void init(){
         SharedPreferences sharedPreferences=getSharedPreferences("data", MODE_PRIVATE);

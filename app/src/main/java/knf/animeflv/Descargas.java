@@ -93,9 +93,13 @@ public class Descargas extends AppCompatActivity implements RequestDownload.call
                     numeros.add("");
                 }
                 for (String lon:Leids){
-                    String id=getSharedPreferences("data", MODE_PRIVATE).getString(lon,"");
-                    if (!id.equals(""))
-                        Dids.add(Long.parseLong(id));
+                    try {
+                        String id=getSharedPreferences("data", MODE_PRIVATE).getString(lon,"");
+                        if (!id.equals(""))
+                            Dids.add(Long.parseLong(id));
+                    }catch (ClassCastException e){
+
+                    }
                 }
                 String[] getTit=new String[aids.size()];
                 aids.toArray(getTit);

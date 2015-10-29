@@ -1942,8 +1942,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             notificationManager.cancel(6991);
         }
     }
-    public void checkForNew(String[] capitulos){
+    public void checkForNew(String[] capitulos,String[] aids){
         List<String> caps=Arrays.asList(capitulos);
+        List<String> aid=Arrays.asList(aids);
         Cards.get(0).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(1).setCardBackgroundColor(getResources().getColor(R.color.blanco));
         Cards.get(2).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(3).setCardBackgroundColor(getResources().getColor(R.color.blanco));
         Cards.get(4).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(5).setCardBackgroundColor(getResources().getColor(R.color.blanco));
@@ -1954,39 +1955,45 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         Cards.get(14).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(15).setCardBackgroundColor(getResources().getColor(R.color.blanco));
         Cards.get(16).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(17).setCardBackgroundColor(getResources().getColor(R.color.blanco));
         Cards.get(18).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(19).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        checkCards(caps.get(0), Cards.get(0));
-        checkCards(caps.get(1),Cards.get(1));
-        checkCards(caps.get(2),Cards.get(2));
-        checkCards(caps.get(3),Cards.get(3));
-        checkCards(caps.get(4),Cards.get(4));
-        checkCards(caps.get(5),Cards.get(5));
-        checkCards(caps.get(6),Cards.get(6));
-        checkCards(caps.get(7),Cards.get(7));
-        checkCards(caps.get(8),Cards.get(8));
-        checkCards(caps.get(9),Cards.get(9));
-        checkCards(caps.get(10),Cards.get(10));
-        checkCards(caps.get(11),Cards.get(11));
-        checkCards(caps.get(12),Cards.get(12));
-        checkCards(caps.get(13),Cards.get(13));
-        checkCards(caps.get(14),Cards.get(14));
-        checkCards(caps.get(15),Cards.get(15));
-        checkCards(caps.get(16),Cards.get(16));
-        checkCards(caps.get(17),Cards.get(17));
-        checkCards(caps.get(18),Cards.get(18));
-        checkCards(caps.get(19),Cards.get(19));
+        checkCards(caps.get(0),aid.get(0),Cards.get(0));
+        checkCards(caps.get(1),aid.get(1),Cards.get(1));
+        checkCards(caps.get(2),aid.get(2),Cards.get(2));
+        checkCards(caps.get(3),aid.get(3),Cards.get(3));
+        checkCards(caps.get(4),aid.get(4),Cards.get(4));
+        checkCards(caps.get(5),aid.get(5),Cards.get(5));
+        checkCards(caps.get(6),aid.get(6),Cards.get(6));
+        checkCards(caps.get(7),aid.get(7),Cards.get(7));
+        checkCards(caps.get(8),aid.get(8),Cards.get(8));
+        checkCards(caps.get(9),aid.get(9),Cards.get(9));
+        checkCards(caps.get(10),aid.get(10),Cards.get(10));
+        checkCards(caps.get(11),aid.get(11),Cards.get(11));
+        checkCards(caps.get(12),aid.get(12),Cards.get(12));
+        checkCards(caps.get(13),aid.get(13),Cards.get(13));
+        checkCards(caps.get(14),aid.get(14),Cards.get(14));
+        checkCards(caps.get(15),aid.get(15),Cards.get(15));
+        checkCards(caps.get(16),aid.get(16),Cards.get(16));
+        checkCards(caps.get(17),aid.get(17),Cards.get(17));
+        checkCards(caps.get(18),aid.get(18),Cards.get(18));
+        checkCards(caps.get(19),aid.get(19),Cards.get(19));
     }
-    public void checkCards(String capitulo,CardView card){
+    public void checkCards(String capitulo, String aid, CardView card){
         Boolean resaltar=PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar",true);
         if (capitulo.trim().equals("Capitulo 1") || capitulo.trim().contains("OVA") || capitulo.trim().contains("Pelicula")){
             if (resaltar)
-            card.setCardBackgroundColor(Color.argb(100, 253, 250, 93));
+                card.setCardBackgroundColor(Color.argb(100, 253, 250, 93));
         }
+        String favoritos=getSharedPreferences("data",MODE_PRIVATE).getString("favoritos","");
+        if (favoritos.contains(aid)){
+            if (resaltar)
+                card.setCardBackgroundColor(Color.argb(100, 26, 206, 246));
+        }
+
     }
     public void getData(String json){
         getlinks(json);
         gettitulos(json);
         getCapitulos(json);
-        checkForNew(parser.parseCapitulos(json));
+        checkForNew(parser.parseCapitulos(json),parser.parseAID(json));
         ActualizarFavoritos();
         titulos=parser.parseTitulos(json);
         eids=parser.parseEID(json);
@@ -2551,7 +2558,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         if (taskType==TaskType.GET_FAV){
             if (data.contains(":::")){
-                Log.d("Favoritos",data);
                 if (!data.contains(":;:")) {
                     getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", data.trim()).commit();
                 }else{
