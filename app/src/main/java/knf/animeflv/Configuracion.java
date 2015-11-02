@@ -20,7 +20,7 @@ import android.view.WindowManager;
 /**
  * Created by Jordy on 16/08/2015.
  */
-public class Configuracion extends AppCompatActivity {
+public class Configuracion extends AppCompatActivity implements LoginServer.callback {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +58,12 @@ public class Configuracion extends AppCompatActivity {
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
                 >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
+
+    @Override
+    public void response(String data, TaskType taskType) {
+
+    }
+
     @Override
     public void onConfigurationChanged (Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
