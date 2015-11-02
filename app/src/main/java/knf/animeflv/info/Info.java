@@ -54,7 +54,7 @@ import knf.animeflv.TaskType;
 /**
  * Created by Jordy on 12/08/2015.
  */
-public class Info extends AppCompatActivity implements Requests.callback{
+public class Info extends AppCompatActivity implements Requests.callback, LoginServer.callback {
     Parser parser=new Parser();
     Toolbar toolbar;
     String ext_storage_state = Environment.getExternalStorageState();
@@ -362,6 +362,11 @@ public class Info extends AppCompatActivity implements Requests.callback{
         }
         String link = ftitulo + "-" + capitulo + ".html";
         return link;
+    }
+
+    @Override
+    public void response(String data, TaskType taskType) {
+
     }
 
     @Override

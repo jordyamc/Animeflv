@@ -2,7 +2,6 @@ package knf.animeflv;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -10,27 +9,23 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.transition.Slide;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,7 +35,6 @@ import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
@@ -57,10 +51,10 @@ import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
@@ -82,21 +76,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.info.Info;
 import pl.droidsonroids.gif.GifImageButton;
 
-public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,Requests.callback,CheckVideo.callback {
+public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, Requests.callback, CheckVideo.callback {
     WebView web;
     WebView web_Links;
     WebView web_gets;
@@ -225,10 +214,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     CardView card20;
     WebViewClient client;
     TextView textoff;
-    ArrayList<GifImageButton> IBsDesList=new ArrayList<GifImageButton>();
-    ArrayList<ImageButton> IBsVerList=new ArrayList<ImageButton>();
-    ArrayList<CardView> Cards=new ArrayList<CardView>();
-    List<Boolean> isDesc=new ArrayList<Boolean>();
+    ArrayList<GifImageButton> IBsDesList = new ArrayList<GifImageButton>();
+    ArrayList<ImageButton> IBsVerList = new ArrayList<ImageButton>();
+    ArrayList<CardView> Cards = new ArrayList<CardView>();
+    List<Boolean> isDesc = new ArrayList<Boolean>();
     SwipeRefreshLayout mswipe;
     RecyclerView rv_fav;
     int first = 1;
@@ -242,32 +231,32 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     Alarm alarm = new Alarm();
     String ext_storage_state = Environment.getExternalStorageState();
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
-    Parser parser=new Parser();
+    Parser parser = new Parser();
     String aidInfo;
-    String html="<html></html>";
+    String html = "<html></html>";
     int versionCode;
     String versionName;
-    Boolean Streaming=false;
+    Boolean Streaming = false;
 
     Drawer result;
     boolean doubleBackToExitPressedOnce = false;
     Toolbar ltoolbar;
     Toolbar Dtoolbar;
-    File descarga = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache","Animeflv_Nver.apk");
+    File descarga = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "Animeflv_Nver.apk");
     SharedPreferences.OnSharedPreferenceChangeListener listener;
-    boolean descargando=false;
+    boolean descargando = false;
     GifImageButton GIBT;
     ImageButton IBVT;
     int indexT;
-    String eidT;
+    String eidT = "0";
     boolean shouldExecuteOnResume;
-    int esperando=0;
-    boolean login=false;
-    boolean version=false;
-    boolean verOk=false;
+    int esperando = 0;
+    boolean login = false;
+    boolean version = false;
+    boolean verOk = false;
     String[] mensaje;
-    boolean disM=false;
-    boolean pause=false;
+    boolean disM = false;
+    boolean pause = false;
     int actdown;
     int Tindex;
     Spinner etEmail;
@@ -275,36 +264,40 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     EditText cuenta;
     WebView webViewFeed;
     MaterialDialog mat;
-    Boolean cancelPost=false;
-    Boolean showact=true;
+    Boolean cancelPost = false;
+    Boolean showact = true;
     Spinner contactoS;
     AccountHeader headerResult;
     String headerTit;
     MaterialDialog ndialog;
     int posT;
     Boolean tbool;
+    int APP = 1;
+    int CHAT = 2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
         ExceptionHandler.register(this, "http://necrotic-neganebulus.hol.es/errors/server.php");
-        context=this;
+        context = this;
         shouldExecuteOnResume = false;
-        if (!getSharedPreferences("data",MODE_PRIVATE).getBoolean("intro",false)) {
+        if (!getSharedPreferences("data", MODE_PRIVATE).getBoolean("intro", false)) {
             startActivity(new Intent(this, Intro.class));
         }
-        getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
-        getSharedPreferences("data",MODE_PRIVATE).edit().putBoolean("notVer",false).apply();
-        Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
+        String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        checkBan(APP);
+        getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
+        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("notVer", false).apply();
+        Boolean not = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
         if (not) {
             alarm.SetAlarm(this);
         }
-        first=1;
+        first = 1;
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            ltoolbar=(Toolbar)findViewById(R.id.ltoolbar);
+            ltoolbar = (Toolbar) findViewById(R.id.ltoolbar);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
@@ -313,25 +306,34 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             window.setStatusBarColor(getResources().getColor(R.color.dark));
             getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
         }
-        toolbar=(Toolbar) findViewById(R.id.main_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Recientes");
-        parser=new Parser();
+        parser = new Parser();
         setLoad();
-        try {versionCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;} catch (Exception e) {toast("ERROR");}
-        try {versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;} catch (Exception e) {toast("ERROR");}
-        final int change=getSharedPreferences("data",MODE_PRIVATE).getInt(Integer.toString(versionCode),0);
-        if (change==0){
+        try {
+            versionCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+        } catch (Exception e) {
+            toast("ERROR");
+        }
+        try {
+            versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (Exception e) {
+            toast("ERROR");
+        }
+        final int change = getSharedPreferences("data", MODE_PRIVATE).getInt(Integer.toString(versionCode), 0);
+        if (change == 0) {
             ChangelogDialog.create()
                     .show(getSupportFragmentManager(), "changelog");
-            getSharedPreferences("data",MODE_PRIVATE).edit().putInt(Integer.toString(versionCode),1).apply();
-            if (versionName.trim().equals("1.9.2.1")){PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("streaming",false).apply();}
+            getSharedPreferences("data", MODE_PRIVATE).edit().putInt(Integer.toString(versionCode), 1).apply();
+            if (versionName.trim().equals("1.9.2.1")) {
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("streaming", false).apply();
+            }
         }
-        if (isNetworkAvailable()){
-            String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        if (isNetworkAvailable()) {
             Log.d("Registrar", androidID);
             //web.loadUrl("http://necrotic-neganebulus.hol.es/contador.php?id=" + androidID.trim());
-            new Requests(context,TaskType.CONTAR).execute("http://necrotic-neganebulus.hol.es/contador.php?id=" + androidID.trim()+"&version="+Integer.toString(versionCode));
+            new Requests(context, TaskType.CONTAR).execute("http://necrotic-neganebulus.hol.es/contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode));
         }
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -339,7 +341,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 .withCompactStyle(true)
                 .withSelectionListEnabled(false)
                 .addProfiles(
-                        new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " ("+Integer.toString(versionCode)+")").withIcon(getResources().getDrawable(R.mipmap.ic_launcher)).withIdentifier(9)
+                        new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withIcon(getResources().getDrawable(R.mipmap.ic_launcher)).withIdentifier(9)
                 )
                 .withProfileImagesClickable(true)
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
@@ -351,10 +353,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     }
                 })
                 .build();
-        if (isXLargeScreen(getApplicationContext())){
-            Dtoolbar=ltoolbar;
-        }else {
-            Dtoolbar=toolbar;
+        if (isXLargeScreen(getApplicationContext())) {
+            Dtoolbar = ltoolbar;
+        } else {
+            Dtoolbar = toolbar;
         }
         result = new DrawerBuilder()
                 .withActivity(this)
@@ -367,7 +369,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         new PrimaryDrawerItem().withName("Directorio").withIcon(GoogleMaterial.Icon.gmd_library_books).withIdentifier(2),
                         new PrimaryDrawerItem().withName("Descargas").withIcon(GoogleMaterial.Icon.gmd_file_download).withIdentifier(3),
                         new PrimaryDrawerItem().withName("Sugerencias").withIcon(GoogleMaterial.Icon.gmd_assignment).withIdentifier(4),
-                        new PrimaryDrawerItem().withName("Pagina oficial").withIcon(FontAwesome.Icon.faw_facebook_f).withIdentifier(5)
+                        new PrimaryDrawerItem().withName("Pagina oficial").withIcon(FontAwesome.Icon.faw_facebook_f).withIdentifier(5),
+                        new PrimaryDrawerItem().withName("Chat").withIcon(GoogleMaterial.Icon.gmd_message).withIdentifier(6)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -381,7 +384,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 break;
                             case 2:
                                 result.setSelection(0);
-                                Intent in=new Intent(context,Favoritos.class);
+                                Intent in = new Intent(context, Favoritos.class);
                                 startActivity(in);
                                 break;
                             case 3:
@@ -390,16 +393,16 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 break;
                             case 4:
                                 result.setSelection(0);
-                                Intent intent2=new Intent(context,Descargas.class);
+                                Intent intent2 = new Intent(context, Descargas.class);
                                 startActivity(intent2);
                                 break;
                             case 5:
                                 result.closeDrawer();
                                 result.setSelection(0);
-                                mat=new MaterialDialog.Builder(context)
+                                mat = new MaterialDialog.Builder(context)
                                         .title("Sugerencias")
                                         .titleColor(getResources().getColor(R.color.prim))
-                                        .customView(R.layout.feedback,true)
+                                        .customView(R.layout.feedback, true)
                                         .positiveText("Enviar")
                                         .positiveColor(getResources().getColor(R.color.prim))
                                         .negativeText("Cancelar")
@@ -409,34 +412,34 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                             @Override
                                             public void onPositive(MaterialDialog dialog) {
                                                 super.onPositive(dialog);
-                                                String email=etEmail.getSelectedItem().toString();
-                                                String feedback=etSug.getText().toString();
-                                                String Scuenta=cuenta.getText().toString();
-                                                String type=contactoS.getSelectedItem().toString().toLowerCase().trim();
+                                                String email = etEmail.getSelectedItem().toString();
+                                                String feedback = etSug.getText().toString();
+                                                String Scuenta = cuenta.getText().toString();
+                                                String type = contactoS.getSelectedItem().toString().toLowerCase().trim();
                                                 int tipo;
-                                                if (type.equals("email")){
-                                                    tipo=0;
-                                                }else {
-                                                    tipo=1;
+                                                if (type.equals("email")) {
+                                                    tipo = 0;
+                                                } else {
+                                                    tipo = 1;
                                                 }
-                                                boolean ok=false;
-                                                if (tipo==0){
-                                                    ok=true;
+                                                boolean ok = false;
+                                                if (tipo == 0) {
+                                                    ok = true;
                                                 }
-                                                if (tipo==1){
-                                                    ok=!Scuenta.trim().equals("");
+                                                if (tipo == 1) {
+                                                    ok = !Scuenta.trim().equals("");
                                                 }
-                                                feedback=feedback
-                                                        .replace("&","")
-                                                        .replace("=","")
-                                                        .replace("?","")
+                                                feedback = feedback
+                                                        .replace("&", "")
+                                                        .replace("=", "")
+                                                        .replace("?", "")
                                                         .replace("á", "%a")
                                                         .replace("é", "%e")
-                                                        .replace("í","%i")
-                                                        .replace("ó","%o")
-                                                        .replace("ú","%u")
-                                                        .replace(".","")
-                                                        .replace(":::","");
+                                                        .replace("í", "%i")
+                                                        .replace("ó", "%o")
+                                                        .replace("ú", "%u")
+                                                        .replace(".", "")
+                                                        .replace(":::", "");
                                                 if (!type.equals("selecciona")) {
                                                     if (ok) {
                                                         if (!feedback.trim().equals("")) {
@@ -480,17 +483,18 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                             etSug.setError("Por favor escribe algo");
                                                         }
                                                     }
-                                                }else {
+                                                } else {
                                                     toast("Selecciona medio de contacto");
                                                     if (feedback.trim().equals("")) {
                                                         etSug.setError("Por favor escribe algo");
                                                     }
                                                 }
                                             }
+
                                             @Override
                                             public void onNegative(MaterialDialog dialog) {
                                                 super.onPositive(dialog);
-                                                cancelPost=true;
+                                                cancelPost = true;
                                                 mat.dismiss();
                                             }
 
@@ -499,15 +503,15 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         .build();
                                 AccountManager manager = (AccountManager) getSystemService(ACCOUNT_SERVICE);
                                 Account[] list = manager.getAccounts();
-                                etEmail=(Spinner) mat.getCustomView().findViewById(R.id.et_correo);
-                                etSug=(EditText) mat.getCustomView().findViewById(R.id.et_sug);
-                                cuenta=(EditText) mat.getCustomView().findViewById(R.id.cuenta);
+                                etEmail = (Spinner) mat.getCustomView().findViewById(R.id.et_correo);
+                                etSug = (EditText) mat.getCustomView().findViewById(R.id.et_sug);
+                                cuenta = (EditText) mat.getCustomView().findViewById(R.id.cuenta);
                                 cuenta.setTextColor(getResources().getColor(R.color.prim));
-                                contactoS=(Spinner) mat.getCustomView().findViewById(R.id.et_contacto);
+                                contactoS = (Spinner) mat.getCustomView().findViewById(R.id.et_contacto);
                                 contactoS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                     @Override
                                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                        switch (position){
+                                        switch (position) {
                                             case 0:
                                                 cuenta.setVisibility(View.GONE);
                                             case 1:
@@ -526,45 +530,47 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                 break;
                                         }
                                     }
+
                                     @Override
                                     public void onNothingSelected(AdapterView<?> parent) {
 
                                     }
                                 });
-                                webViewFeed=(WebView) mat.getCustomView().findViewById(R.id.wv_feedback);
+                                webViewFeed = (WebView) mat.getCustomView().findViewById(R.id.wv_feedback);
                                 webViewFeed.setWebViewClient(new WebViewClient() {
                                     @Override
                                     public void onPageFinished(WebView view, String url) {
-                                        if (url.trim().equals("http://necrotic-neganebulus.hol.es/feedback.php?ok=ok")&&!cancelPost){
+                                        if (url.trim().equals("http://necrotic-neganebulus.hol.es/feedback.php?ok=ok") && !cancelPost) {
                                             view.loadUrl("about:blank");
-                                            cancelPost=true;
+                                            cancelPost = true;
                                             toast("Sugerencia enviada");
                                             mat.dismiss();
                                         }
                                     }
+
                                     @Override
                                     public boolean shouldOverrideUrlLoading(WebView view, String url) {
                                         view.loadUrl(url);
                                         return true;
                                     }
                                 });
-                                List<String> emails=new ArrayList<String>();
-                                for (Account account:list){
-                                    if (account.name.contains("@")&&!emails.contains(account.name)){
-                                        Log.d("Agregar",account.name);
+                                List<String> emails = new ArrayList<String>();
+                                for (Account account : list) {
+                                    if (account.name.contains("@") && !emails.contains(account.name)) {
+                                        Log.d("Agregar", account.name);
                                         emails.add(account.name);
                                     }
                                 }
-                                String[] mails=new String[emails.size()];
+                                String[] mails = new String[emails.size()];
                                 emails.toArray(mails);
-                                String[] contacto={"Selecciona","Email","Facebook","Twitter"};
-                                if (list.length>0) {
+                                String[] contacto = {"Selecciona", "Email", "Facebook", "Twitter"};
+                                if (list.length > 0) {
                                     ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, mails);
                                     etEmail.setAdapter(arrayAdapter);
                                 }
-                                ArrayAdapter<String> adapter=new ArrayAdapter<String>(context,android.R.layout.simple_list_item_1,contacto);
+                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, contacto);
                                 contactoS.setAdapter(adapter);
-                                cancelPost=false;
+                                cancelPost = false;
                                 mat.show();
                                 break;
                             case 6:
@@ -577,6 +583,17 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     uri = Uri.parse(facebookUrl);
                                 }
                                 startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                                result.setSelection(0);
+                                result.closeDrawer();
+                                break;
+                            case 7:
+                                if (isNetworkAvailable()) {
+                                    checkBan(CHAT);
+                                } else {
+                                    toast("Se necesita internet");
+                                }
+                                result.setSelection(0);
+                                result.closeDrawer();
                                 break;
                         }
                         return false;
@@ -594,9 +611,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         });
         getJson();
-        if (isXLargeScreen(getApplicationContext())){
+        if (isXLargeScreen(getApplicationContext())) {
             toolbar.inflateMenu(R.menu.menu_main_dark);
-        }else {
+        } else {
             toolbar.inflateMenu(R.menu.menu_main);
         }
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -606,11 +623,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 return true;
             }
         });
-        if (isNetworkAvailable()){new Requests(context,TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");}
+        if (isNetworkAvailable()) {
+            new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
+        }
         SharedPreferences prefs = this.getSharedPreferences("data", MODE_PRIVATE);
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-                if (key.equals("reload")&&!pause) {
+                if (key.equals("reload") && !pause) {
                     mswipe.post(new Runnable() {
                         @Override
                         public void run() {
@@ -622,10 +641,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     if (isNetworkAvailable()) {
                         new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
                         new Requests(context, TaskType.GET_INICIO).execute(inicio);
-                    }else {
-                        if (mswipe.isRefreshing()){mswipe.setRefreshing(false);}
+                    } else {
+                        if (mswipe.isRefreshing()) {
+                            mswipe.setRefreshing(false);
+                        }
                     }
-                    getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -633,19 +654,22 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     .getSystemService(Context.NOTIFICATION_SERVICE);
                             notificationManager.cancel(6991);
                         }
-                    },200);
+                    }, 200);
                 }
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(listener);
-        Bundle bundle=getIntent().getExtras();
-        if (bundle!=null){
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
             new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
         }
-        if (descarga.exists()){descarga.delete();}
+        if (descarga.exists()) {
+            descarga.delete();
+        }
         ActualizarFavoritos();
     }
-    public void ActualizarFavoritos(){
+
+    public void ActualizarFavoritos() {
         if (isNetworkAvailable()) {
             String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
             String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
@@ -654,83 +678,85 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         }
     }
-    public int getHDraw (final Boolean set){
-        int color=getSharedPreferences("data", Context.MODE_PRIVATE).getInt("color", 0);
-        int drawable=R.drawable.cargando;
-        switch (color){
+
+    public int getHDraw(final Boolean set) {
+        int color = getSharedPreferences("data", Context.MODE_PRIVATE).getInt("color", 0);
+        int drawable = R.drawable.cargando;
+        switch (color) {
             case 0:
-                drawable=R.drawable.naranja;
-                headerTit="Animeflv";
+                drawable = R.drawable.naranja;
+                headerTit = "Animeflv";
                 break;
             case 1:
-                drawable=R.drawable.amarillo;
-                headerTit="Animeflv";
+                drawable = R.drawable.amarillo;
+                headerTit = "Animeflv";
                 break;
             case 2:
-                drawable=R.drawable.rojo;
-                headerTit="Animeflv";
+                drawable = R.drawable.rojo;
+                headerTit = "Animeflv";
                 break;
             case 3:
-                drawable=R.drawable.rosa;
-                headerTit="Animeflv";
+                drawable = R.drawable.rosa;
+                headerTit = "Animeflv";
                 break;
             case 4:
-                drawable=R.drawable.alnek;
-                headerTit="";
+                drawable = R.drawable.alnek;
+                headerTit = "";
                 break;
         }
-                if (set){
-                    ArrayList<IProfile> profile=new ArrayList<IProfile>();
-                    profile.add(new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " ("+Integer.toString(versionCode)+")").withIcon(getResources().getDrawable(R.mipmap.ic_launcher)).withIdentifier(9));
-                    headerResult.setBackgroundRes(drawable);
-                    headerResult.setProfiles(profile);
-                }
+        if (set) {
+            ArrayList<IProfile> profile = new ArrayList<IProfile>();
+            profile.add(new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withIcon(getResources().getDrawable(R.mipmap.ic_launcher)).withIdentifier(9));
+            headerResult.setBackgroundRes(drawable);
+            headerResult.setProfiles(profile);
+        }
         return drawable;
     }
-    public void toast(String texto){
-        Toast.makeText(this,texto,Toast.LENGTH_LONG).show();
+
+    public void toast(String texto) {
+        Toast.makeText(this, texto, Toast.LENGTH_LONG).show();
     }
-    public String getSD1(){
+
+    public String getSD1() {
         String sSDpath = null;
-        File   fileCur = null;
-        for( String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard")) {
-            fileCur = new File( "/mnt/", sPathCur);
-            if( fileCur.isDirectory() && fileCur.canWrite()) {
+        File fileCur = null;
+        for (String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard")) {
+            fileCur = new File("/mnt/", sPathCur);
+            if (fileCur.isDirectory() && fileCur.canWrite()) {
                 sSDpath = fileCur.getAbsolutePath();
                 break;
             }
-            if( sSDpath == null)  {
-                fileCur = new File( "/storage/", sPathCur);
-                if( fileCur.isDirectory() && fileCur.canWrite())
-                {
+            if (sSDpath == null) {
+                fileCur = new File("/storage/", sPathCur);
+                if (fileCur.isDirectory() && fileCur.canWrite()) {
                     sSDpath = fileCur.getAbsolutePath();
                     break;
                 }
             }
-            if( sSDpath == null)  {
-                fileCur = new File( "/storage/emulated", sPathCur);
-                if( fileCur.isDirectory() && fileCur.canWrite())
-                {
+            if (sSDpath == null) {
+                fileCur = new File("/storage/emulated", sPathCur);
+                if (fileCur.isDirectory() && fileCur.canWrite()) {
                     sSDpath = fileCur.getAbsolutePath();
-                    Log.e("path",sSDpath);
+                    Log.e("path", sSDpath);
                     break;
                 }
             }
         }
         return sSDpath;
     }
-    public void onVerclicked(View view){
-        String id=view.getResources().getResourceName(view.getId());
-        int index=Integer.parseInt(id.substring(id.lastIndexOf("D") + 1))-1;
-        List<String> a= Arrays.asList(aids);
-        List<String> n=Arrays.asList(numeros);
-        File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+a.get(index)+"/"+a.get(index)+"_"+n.get(a.indexOf(a.get(index)))+".mp4");
-        File sd=new File(getSD1()+ "/Animeflv/download/"+a.get(index)+"/"+a.get(index)+"_"+n.get(a.indexOf(a.get(index)))+".mp4");
-        if (file.exists()){
+
+    public void onVerclicked(View view) {
+        String id = view.getResources().getResourceName(view.getId());
+        int index = Integer.parseInt(id.substring(id.lastIndexOf("D") + 1)) - 1;
+        List<String> a = Arrays.asList(aids);
+        List<String> n = Arrays.asList(numeros);
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + a.get(index) + "/" + a.get(index) + "_" + n.get(a.indexOf(a.get(index))) + ".mp4");
+        File sd = new File(getSD1() + "/Animeflv/download/" + a.get(index) + "/" + a.get(index) + "_" + n.get(a.indexOf(a.get(index))) + ".mp4");
+        if (file.exists()) {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(file));
             intent.setDataAndType(Uri.fromFile(file), "video/mp4");
             startActivity(intent);
-        }else {
+        } else {
             if (sd.exists()) {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(sd));
                 intent.setDataAndType(Uri.fromFile(sd), "video/mp4");
@@ -738,15 +764,17 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         }
     }
-    public void DescargarInbyID(int position){
+
+    public void DescargarInbyID(int position) {
         if (isNetworkAvailable()) {
             File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aids[position]);
             if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                 if (!Dstorage.exists()) {
-                    if (!Dstorage.mkdirs())toast("Error al crear carpeta");
+                    if (!Dstorage.mkdirs()) toast("Error al crear carpeta");
                 }
             }
             try {
+                checkBan(APP);
                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse("http://subidas.com/files/" + aids[position] + "/" + numeros[position] + ".mp4"));
                 Log.d("DURL", "http://subidas.com/files/" + aids[position] + "/" + numeros[position] + ".mp4");
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
@@ -758,20 +786,20 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                 long l = manager.enqueue(request);
                 getSharedPreferences("data", MODE_PRIVATE).edit().putString(eidT, Long.toString(l)).apply();
-                String descargados=getSharedPreferences("data",MODE_PRIVATE).getString("eids_descarga","");
-                String epID=getSharedPreferences("data",MODE_PRIVATE).getString("epIDS_descarga","");
-                if (descargados.contains(eidT)){
-                    getSharedPreferences("data",MODE_PRIVATE).edit().putString("eids_descarga",descargados.replace(eidT+":::","")).apply();
-                    getSharedPreferences("data",MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(aids[position] + "_" + numeros[position] + ":::", "")).apply();
+                String descargados = getSharedPreferences("data", MODE_PRIVATE).getString("eids_descarga", "");
+                String epID = getSharedPreferences("data", MODE_PRIVATE).getString("epIDS_descarga", "");
+                if (descargados.contains(eidT)) {
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eidT + ":::", "")).apply();
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(aids[position] + "_" + numeros[position] + ":::", "")).apply();
                 }
-                descargados=getSharedPreferences("data",MODE_PRIVATE).getString("eids_descarga","");
-                getSharedPreferences("data",MODE_PRIVATE).edit().putString("eids_descarga",descargados+eidT+":::").apply();
-                String tits=getSharedPreferences("data",MODE_PRIVATE).getString("titulos_descarga","");
-                epID=getSharedPreferences("data",MODE_PRIVATE).getString("epIDS_descarga","");
-                getSharedPreferences("data",MODE_PRIVATE).edit().putString("titulos_descarga",tits+aids[position]+":::").apply();
-                getSharedPreferences("data",MODE_PRIVATE).edit().putString("epIDS_descarga",epID+aids[position]+"_"+numeros[position]+":::").apply();
-            }catch (Exception e){
-                toast("Error "+e.getMessage());
+                descargados = getSharedPreferences("data", MODE_PRIVATE).getString("eids_descarga", "");
+                getSharedPreferences("data", MODE_PRIVATE).edit().putString("eids_descarga", descargados + eidT + ":::").apply();
+                String tits = getSharedPreferences("data", MODE_PRIVATE).getString("titulos_descarga", "");
+                epID = getSharedPreferences("data", MODE_PRIVATE).getString("epIDS_descarga", "");
+                getSharedPreferences("data", MODE_PRIVATE).edit().putString("titulos_descarga", tits + aids[position] + ":::").apply();
+                getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID + aids[position] + "_" + numeros[position] + ":::").apply();
+            } catch (Exception e) {
+                toast("Error " + e.getMessage());
             }
             GIBT.setScaleType(ImageView.ScaleType.FIT_END);
             GIBT.setImageResource(R.drawable.ic_borrar_r);
@@ -779,12 +807,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             IBVT.setImageResource(R.drawable.ic_rep_r);
             IBVT.setEnabled(true);
             descargando = false;
-            String vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-            if (!vistos.contains(eids[position].trim())){
-                vistos=vistos+eids[position].trim()+":::";
-                context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos",vistos).apply();
+            String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+            if (!vistos.contains(eids[position].trim())) {
+                vistos = vistos + eids[position].trim() + ":::";
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
             }
-        }else {
+        } else {
             toast("No hay conexion a internet");
             GIBT.setScaleType(ImageView.ScaleType.FIT_END);
             GIBT.setImageResource(R.drawable.ic_get_r);
@@ -794,8 +822,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             descargando = false;
         }
     }
-    public void StreamInbyID(int position){
+
+    public void StreamInbyID(int position) {
         if (isNetworkAvailable()) {
+            checkBan(APP);
             Streaming = false;
             GIBT.setScaleType(ImageView.ScaleType.FIT_END);
             GIBT.setImageResource(R.drawable.ic_get_r);
@@ -827,10 +857,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     intent.putExtra("title", titulos[position] + " " + numeros[position]);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
-                    String vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                    if (!vistos.contains(eids[position].trim())){
-                        vistos=vistos+eids[position].trim()+":::";
-                        context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos",vistos).apply();
+                    String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                    if (!vistos.contains(eids[position].trim())) {
+                        vistos = vistos + eids[position].trim() + ":::";
+                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
                     }
                     break;
                 case "com.mxtech.videoplayer.ad":
@@ -841,17 +871,17 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     intentad.putExtra("title", titulos[position] + " " + numeros[position]);
                     intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intentad);
-                    String vistosad=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                    if (!vistosad.contains(eids[position].trim())){
-                        vistosad=vistosad+eids[position].trim()+":::";
-                        context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos",vistosad).apply();
+                    String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                    if (!vistosad.contains(eids[position].trim())) {
+                        vistosad = vistosad + eids[position].trim() + ":::";
+                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
                     }
                     break;
                 default:
                     toast("MX player no instalado");
                     break;
             }
-        }else {
+        } else {
             toast("No hay conexion a internet");
             Streaming = false;
             GIBT.setScaleType(ImageView.ScaleType.FIT_END);
@@ -862,59 +892,61 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             descargando = false;
         }
     }
-    public void onDesClicked(final View view){
-        final GifImageButton imageButton=(GifImageButton) view;
-        String id=view.getResources().getResourceName(view.getId());
-        final int index=Integer.parseInt(id.substring(id.lastIndexOf("D") + 1))-1;
-        if (isDesc.get(index)){
-            List<String> a= Arrays.asList(aids);
-            List<String> n=Arrays.asList(numeros);
-            final File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+a.get(index)+"/"+a.get(index)+"_"+n.get(a.indexOf(a.get(index)))+".mp4");
-            final File sd=new File(getSD1() + "/Animeflv/download/"+a.get(index)+"/"+a.get(index)+"_"+n.get(a.indexOf(a.get(index)))+".mp4");
-            File del=new File("");
-            if (file.exists()){
-                del=file;
+
+    public void onDesClicked(final View view) {
+        final GifImageButton imageButton = (GifImageButton) view;
+        String id = view.getResources().getResourceName(view.getId());
+        final int index = Integer.parseInt(id.substring(id.lastIndexOf("D") + 1)) - 1;
+        if (isDesc.get(index)) {
+            List<String> a = Arrays.asList(aids);
+            List<String> n = Arrays.asList(numeros);
+            final File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + a.get(index) + "/" + a.get(index) + "_" + n.get(a.indexOf(a.get(index))) + ".mp4");
+            final File sd = new File(getSD1() + "/Animeflv/download/" + a.get(index) + "/" + a.get(index) + "_" + n.get(a.indexOf(a.get(index))) + ".mp4");
+            File del = new File("");
+            if (file.exists()) {
+                del = file;
             }
-            if (sd.exists()){
-                del=sd;
+            if (sd.exists()) {
+                del = sd;
             }
             if (del.exists()) {
-                MaterialDialog borrar=new MaterialDialog.Builder(context)
+                MaterialDialog borrar = new MaterialDialog.Builder(context)
                         .title("Eliminar")
                         .titleGravity(GravityEnum.CENTER)
-                        .content("Desea eliminar el capitulo "+n.get(a.indexOf(a.get(index)))+" de "+titulos[index]+"?")
+                        .content("Desea eliminar el capitulo " + n.get(a.indexOf(a.get(index))) + " de " + titulos[index] + "?")
                         .positiveText("Eliminar")
                         .negativeText("Cancelar")
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
                                 super.onPositive(dialog);
-                                File del=new File("");
-                                if (file.exists()){
-                                    del=file;
+                                File del = new File("");
+                                if (file.exists()) {
+                                    del = file;
                                 }
-                                if (sd.exists()){
-                                    del=sd;
+                                if (sd.exists()) {
+                                    del = sd;
                                 }
                                 if (del.delete()) {
                                     isDesc.add(index, false);
                                     imageButton.setImageResource(R.drawable.ic_get_r);
                                     IBsVerList.get(index).setImageResource(R.drawable.ic_ver_no);
                                     IBsVerList.get(index).setEnabled(false);
-                                    long l=Long.parseLong(getSharedPreferences("data",MODE_PRIVATE).getString(eids[index],"0"));
-                                    if (l!=0) {
+                                    long l = Long.parseLong(getSharedPreferences("data", MODE_PRIVATE).getString(eids[index], "0"));
+                                    if (l != 0) {
                                         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                                         manager.remove(l);
-                                        String descargados=getSharedPreferences("data",MODE_PRIVATE).getString("eids_descarga","");
-                                        getSharedPreferences("data",MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eids[index]+":::","")).apply();
-                                        String tits=getSharedPreferences("data",MODE_PRIVATE).getString("titulos_descarga","");
-                                        String epID=getSharedPreferences("data",MODE_PRIVATE).getString("epIDS_descarga","");
-                                        getSharedPreferences("data",MODE_PRIVATE).edit().putString("titulos_descarga", tits.replace(titulos[index] + ":::", "")).apply();
-                                        getSharedPreferences("data",MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(aids[index] + "_" + numeros[index] + ":::", "")).apply();
+                                        String descargados = getSharedPreferences("data", MODE_PRIVATE).getString("eids_descarga", "");
+                                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eids[index] + ":::", "")).apply();
+                                        String tits = getSharedPreferences("data", MODE_PRIVATE).getString("titulos_descarga", "");
+                                        String epID = getSharedPreferences("data", MODE_PRIVATE).getString("epIDS_descarga", "");
+                                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("titulos_descarga", tits.replace(titulos[index] + ":::", "")).apply();
+                                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(aids[index] + "_" + numeros[index] + ":::", "")).apply();
                                     }
                                     toast("Archivo Eliminado");
                                 }
                             }
+
                             @Override
                             public void onNegative(MaterialDialog dialog) {
                                 super.onPositive(dialog);
@@ -923,7 +955,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         })
                         .build();
                 borrar.show();
-            }else {
+            } else {
                 isDesc.add(index, false);
                 imageButton.setScaleType(ImageView.ScaleType.FIT_END);
                 imageButton.setImageResource(R.drawable.ic_get_r);
@@ -931,10 +963,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 IBsVerList.get(index).setEnabled(false);
                 toast("El archivo ya no existe");
             }
-        }else {
+        } else {
             if (!descargando) {
-                if (isNetworkAvailable()&&verOk) {
-                    if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("streaming",false)) {
+                if (isNetworkAvailable() && verOk) {
+                    if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("streaming", false)) {
                         new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
                         imageButton.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
                         imageButton.setImageResource(R.drawable.cargando);
@@ -949,15 +981,15 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         //DescargarInbyID(index);
                         if (isNetworkAvailable()) {
                             new CheckVideo(context, TaskType.CHECK_DOWN, index).execute("http://subidas.com/files/" + aids[index] + "/" + numeros[index] + ".mp4");
-                        }else {
-                        toast("No hay conexion a internet");
-                        Streaming = false;
-                        GIBT.setScaleType(ImageView.ScaleType.FIT_END);
-                        GIBT.setImageResource(R.drawable.ic_get_r);
-                        GIBT.setEnabled(true);
-                        IBVT.setImageResource(R.drawable.ic_ver_no);
-                        IBVT.setEnabled(false);
-                        descargando = false;
+                        } else {
+                            toast("No hay conexion a internet");
+                            Streaming = false;
+                            GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+                            GIBT.setImageResource(R.drawable.ic_get_r);
+                            GIBT.setEnabled(true);
+                            IBVT.setImageResource(R.drawable.ic_ver_no);
+                            IBVT.setEnabled(false);
+                            descargando = false;
                         }
                         /*switch (view.getId()) {
                             case R.id.ib_descargar_cardD1:
@@ -1041,11 +1073,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 new Requests(this, TaskType.GET_HTML1).execute(url);
                                 break;
                         }*/
-                    }else {
-                        ndialog=new MaterialDialog.Builder(context)
+                    } else {
+                        ndialog = new MaterialDialog.Builder(context)
                                 .title(titulos[index])
                                 .titleGravity(GravityEnum.CENTER)
-                                .content("Desea descargar el capitulo "+numeros[index]+"?")
+                                .content("Desea descargar el capitulo " + numeros[index] + "?")
                                 .autoDismiss(false)
                                 .cancelable(false)
                                 .positiveText("DESCARGA")
@@ -1067,9 +1099,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         indexT = index;
                                         eidT = eids[index];
                                         //DescargarInbyID(index);
-                                        if (isNetworkAvailable()){
-                                            new CheckVideo(context,TaskType.CHECK_DOWN,index).execute("http://subidas.com/files/" + aids[index] + "/" + numeros[index] + ".mp4");
-                                        }else {
+                                        if (isNetworkAvailable()) {
+                                            new CheckVideo(context, TaskType.CHECK_DOWN, index).execute("http://subidas.com/files/" + aids[index] + "/" + numeros[index] + ".mp4");
+                                        } else {
                                             toast("No hay conexion a internet");
                                             Streaming = false;
                                             GIBT.setScaleType(ImageView.ScaleType.FIT_END);
@@ -1163,6 +1195,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         }*/
                                         ndialog.dismiss();
                                     }
+
                                     @Override
                                     public void onNegative(MaterialDialog dialog) {
                                         super.onPositive(dialog);
@@ -1177,11 +1210,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         descargando = true;
                                         indexT = index;
                                         eidT = eids[index];
-                                        Streaming=true;
+                                        Streaming = true;
                                         //StreamInbyID(index);
-                                        if (isNetworkAvailable()){
-                                            new CheckVideo(context,TaskType.CHECK_STREAM,index).execute("http://subidas.com/files/" + aids[index] + "/" + numeros[index] + ".mp4");
-                                        }else {
+                                        if (isNetworkAvailable()) {
+                                            new CheckVideo(context, TaskType.CHECK_STREAM, index).execute("http://subidas.com/files/" + aids[index] + "/" + numeros[index] + ".mp4");
+                                        } else {
                                             toast("No hay conexion a internet");
                                             Streaming = false;
                                             GIBT.setScaleType(ImageView.ScaleType.FIT_END);
@@ -1285,20 +1318,21 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 .build();
                         ndialog.show();
                     }
-                }else {
+                } else {
                     if (!verOk) {
                         toast("Error en version");
-                    }else {
+                    } else {
                         toast("No hay conexion");
                     }
                 }
-            }else {
+            } else {
                 toast("Por favor espera...");
             }
         }
     }
-    public void onCardClicked(View view){
-        switch (view.getId()){
+
+    public void onCardClicked(View view) {
+        switch (view.getId()) {
             case R.id.card1:
                 setInfo(aids[0]);
                 break;
@@ -1361,8 +1395,26 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 break;
         }
     }
-    public void setDir(Boolean busqueda){
-        tbool=busqueda;
+
+    public void checkBan(int Type) {
+        String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        switch (Type) {
+            case 1:
+                if (isNetworkAvailable()) {
+                    new Requests(context, TaskType.APP_BAN).execute("http://necrotic-neganebulus.hol.es/ban-hammer.php?type=get&id=" + androidID);
+                } else if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("appBanned", false)) {
+                    toast("Has sido baneado de la app :(");
+                    finish();
+                }
+                break;
+            case 2:
+                new Requests(context, TaskType.CHAT_BAN).execute("http://necrotic-neganebulus.hol.es/ban-hammer.php?type=get&id=" + androidID);
+                break;
+        }
+    }
+
+    public void setDir(Boolean busqueda) {
+        tbool = busqueda;
         if (!busqueda) {
             if (isNetworkAvailable()) {
                 new Requests(context, TaskType.DIRECTORIO).execute("http://animeflv.com/api.php?accion=directorio");
@@ -1378,7 +1430,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     if (isJSONValid(getStringFromFile(file_loc))) {
                         Intent intent = new Intent(context, Directorio.class);
                         startActivity(intent);
-                    }else {
+                    } else {
                         file.delete();
                         setDir(tbool);
                     }
@@ -1386,7 +1438,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     toast("No hay datos guardados");
                 }
             }
-        }else {
+        } else {
             if (isNetworkAvailable()) {
                 new Requests(context, TaskType.DIRECTORIO1).execute("http://animeflv.com/api.php?accion=directorio");
             } else {
@@ -1404,7 +1456,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         bundle.putString("tipo", "Busqueda");
                         intent.putExtras(bundle);
                         startActivity(intent);
-                    }else {
+                    } else {
                         file.delete();
                         setDir(tbool);
                     }
@@ -1414,42 +1466,48 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         }
     }
-    public void setInfo(String aid){
-        aidInfo=aid;
-        SharedPreferences sharedPreferences=getSharedPreferences("data",MODE_PRIVATE);
-        SharedPreferences.Editor editor=sharedPreferences.edit();
-        editor.putString("aid",aidInfo);
+
+    public void setInfo(String aid) {
+        aidInfo = aid;
+        SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("aid", aidInfo);
         editor.commit();
-        new Requests(this,TaskType.GET_INFO).execute("http://animeflv.com/api.php?accion=anime&aid=" + aid);
+        new Requests(this, TaskType.GET_INFO).execute("http://animeflv.com/api.php?accion=anime&aid=" + aid);
     }
-    public void actCacheInfo(String json){
-        Bundle bundleInfo=new Bundle();
+
+    public void actCacheInfo(String json) {
+        Bundle bundleInfo = new Bundle();
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {
                 mediaStorage.mkdirs();
             }
         }
-        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aidInfo+".txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aidInfo+".txt";
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + aidInfo + ".txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + aidInfo + ".txt";
         if (isNetworkAvailable()) {
             if (!file.exists()) {
                 Log.d("Archivo:", "No existe");
-                try {file.createNewFile();} catch (IOException e) {Log.d("Archivo:", "Error al crear archivo");}
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    Log.d("Archivo:", "Error al crear archivo");
+                }
                 writeToFile(json, file);
-                bundleInfo.putString("aid",parser.getAID(json));
-                Intent intent=new Intent(this,Info.class);
+                bundleInfo.putString("aid", parser.getAID(json));
+                Intent intent = new Intent(this, Info.class);
                 intent.putExtras(bundleInfo);
                 startActivity(intent);
             } else {
                 Log.d("Archivo", "Existe");
                 String infile = getStringFromFile(file_loc);
                 if (json.trim().equals(infile.trim())) {
-                    bundleInfo.putString("aid",parser.getAID(json));
+                    bundleInfo.putString("aid", parser.getAID(json));
                     Intent intent = new Intent(this, Info.class);
                     intent.putExtras(bundleInfo);
                     startActivity(intent);
-                }else {
-                    writeToFile(json,file);
+                } else {
+                    writeToFile(json, file);
                     bundleInfo.putString("aid", parser.getAID(json));
                     Intent intent = new Intent(this, Info.class);
                     intent.putExtras(bundleInfo);
@@ -1458,7 +1516,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         } else {
             if (file.exists()) {
-                bundleInfo.putString("aid",parser.getAID(json));
+                bundleInfo.putString("aid", parser.getAID(json));
                 Intent intent = new Intent(this, Info.class);
                 intent.putExtras(bundleInfo);
                 startActivity(intent);
@@ -1467,166 +1525,197 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         }
     }
-    public void setLoad(){
-        scrollView=(ScrollView) findViewById(R.id.sv_inicio);
-        mswipe=(SwipeRefreshLayout) findViewById(R.id.swiperefresh);
-        imgCard1=(ImageView) findViewById(R.id.imgCardD1);
-        imgCard2=(ImageView) findViewById(R.id.imgCardD2);
-        imgCard3=(ImageView) findViewById(R.id.imgCardD3);
-        imgCard4=(ImageView) findViewById(R.id.imgCardD4);
-        imgCard5=(ImageView) findViewById(R.id.imgCardD5);
-        imgCard6=(ImageView) findViewById(R.id.imgCardD6);
-        imgCard7=(ImageView) findViewById(R.id.imgCardD7);
-        imgCard8=(ImageView) findViewById(R.id.imgCardD8);
-        imgCard9=(ImageView) findViewById(R.id.imgCardD9);
-        imgCard10=(ImageView) findViewById(R.id.imgCardD10);
-        imgCard11=(ImageView) findViewById(R.id.imgCardD11);
-        imgCard12=(ImageView) findViewById(R.id.imgCardD12);
-        imgCard13=(ImageView) findViewById(R.id.imgCardD13);
-        imgCard14=(ImageView) findViewById(R.id.imgCardD14);
-        imgCard15=(ImageView) findViewById(R.id.imgCardD15);
-        imgCard16=(ImageView) findViewById(R.id.imgCardD16);
-        imgCard17=(ImageView) findViewById(R.id.imgCardD17);
-        imgCard18=(ImageView) findViewById(R.id.imgCardD18);
-        imgCard19=(ImageView) findViewById(R.id.imgCardD19);
-        imgCard20=(ImageView) findViewById(R.id.imgCardD20);
 
-        txtTitulo1=(TextView) findViewById(R.id.tv_cardD_titulo1);
-        txtTitulo2=(TextView) findViewById(R.id.tv_cardD_titulo2);
-        txtTitulo3=(TextView) findViewById(R.id.tv_cardD_titulo3);
-        txtTitulo4=(TextView) findViewById(R.id.tv_cardD_titulo4);
-        txtTitulo5=(TextView) findViewById(R.id.tv_cardD_titulo5);
-        txtTitulo6=(TextView) findViewById(R.id.tv_cardD_titulo6);
-        txtTitulo7=(TextView) findViewById(R.id.tv_cardD_titulo7);
-        txtTitulo8=(TextView) findViewById(R.id.tv_cardD_titulo8);
-        txtTitulo9=(TextView) findViewById(R.id.tv_cardD_titulo9);
-        txtTitulo10=(TextView) findViewById(R.id.tv_cardD_titulo10);
-        txtTitulo11=(TextView) findViewById(R.id.tv_cardD_titulo11);
-        txtTitulo12=(TextView) findViewById(R.id.tv_cardD_titulo12);
-        txtTitulo13=(TextView) findViewById(R.id.tv_cardD_titulo13);
-        txtTitulo14=(TextView) findViewById(R.id.tv_cardD_titulo14);
-        txtTitulo15=(TextView) findViewById(R.id.tv_cardD_titulo15);
-        txtTitulo16=(TextView) findViewById(R.id.tv_cardD_titulo16);
-        txtTitulo17=(TextView) findViewById(R.id.tv_cardD_titulo17);
-        txtTitulo18=(TextView) findViewById(R.id.tv_cardD_titulo18);
-        txtTitulo19=(TextView) findViewById(R.id.tv_cardD_titulo19);
-        txtTitulo20=(TextView) findViewById(R.id.tv_cardD_titulo20);
+    public void setLoad() {
+        scrollView = (ScrollView) findViewById(R.id.sv_inicio);
+        mswipe = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+        imgCard1 = (ImageView) findViewById(R.id.imgCardD1);
+        imgCard2 = (ImageView) findViewById(R.id.imgCardD2);
+        imgCard3 = (ImageView) findViewById(R.id.imgCardD3);
+        imgCard4 = (ImageView) findViewById(R.id.imgCardD4);
+        imgCard5 = (ImageView) findViewById(R.id.imgCardD5);
+        imgCard6 = (ImageView) findViewById(R.id.imgCardD6);
+        imgCard7 = (ImageView) findViewById(R.id.imgCardD7);
+        imgCard8 = (ImageView) findViewById(R.id.imgCardD8);
+        imgCard9 = (ImageView) findViewById(R.id.imgCardD9);
+        imgCard10 = (ImageView) findViewById(R.id.imgCardD10);
+        imgCard11 = (ImageView) findViewById(R.id.imgCardD11);
+        imgCard12 = (ImageView) findViewById(R.id.imgCardD12);
+        imgCard13 = (ImageView) findViewById(R.id.imgCardD13);
+        imgCard14 = (ImageView) findViewById(R.id.imgCardD14);
+        imgCard15 = (ImageView) findViewById(R.id.imgCardD15);
+        imgCard16 = (ImageView) findViewById(R.id.imgCardD16);
+        imgCard17 = (ImageView) findViewById(R.id.imgCardD17);
+        imgCard18 = (ImageView) findViewById(R.id.imgCardD18);
+        imgCard19 = (ImageView) findViewById(R.id.imgCardD19);
+        imgCard20 = (ImageView) findViewById(R.id.imgCardD20);
 
-        txtCapitulo1=(TextView) findViewById(R.id.tv_cardD_capitulo1);
-        txtCapitulo2=(TextView) findViewById(R.id.tv_cardD_capitulo2);
-        txtCapitulo3=(TextView) findViewById(R.id.tv_cardD_capitulo3);
-        txtCapitulo4=(TextView) findViewById(R.id.tv_cardD_capitulo4);
-        txtCapitulo5=(TextView) findViewById(R.id.tv_cardD_capitulo5);
-        txtCapitulo6=(TextView) findViewById(R.id.tv_cardD_capitulo6);
-        txtCapitulo7=(TextView) findViewById(R.id.tv_cardD_capitulo7);
-        txtCapitulo8=(TextView) findViewById(R.id.tv_cardD_capitulo8);
-        txtCapitulo9=(TextView) findViewById(R.id.tv_cardD_capitulo9);
-        txtCapitulo10=(TextView) findViewById(R.id.tv_cardD_capitulo10);
-        txtCapitulo11=(TextView) findViewById(R.id.tv_cardD_capitulo11);
-        txtCapitulo12=(TextView) findViewById(R.id.tv_cardD_capitulo12);
-        txtCapitulo13=(TextView) findViewById(R.id.tv_cardD_capitulo13);
-        txtCapitulo14=(TextView) findViewById(R.id.tv_cardD_capitulo14);
-        txtCapitulo15=(TextView) findViewById(R.id.tv_cardD_capitulo15);
-        txtCapitulo16=(TextView) findViewById(R.id.tv_cardD_capitulo16);
-        txtCapitulo17=(TextView) findViewById(R.id.tv_cardD_capitulo17);
-        txtCapitulo18=(TextView) findViewById(R.id.tv_cardD_capitulo18);
-        txtCapitulo19=(TextView) findViewById(R.id.tv_cardD_capitulo19);
-        txtCapitulo20=(TextView) findViewById(R.id.tv_cardD_capitulo20);
+        txtTitulo1 = (TextView) findViewById(R.id.tv_cardD_titulo1);
+        txtTitulo2 = (TextView) findViewById(R.id.tv_cardD_titulo2);
+        txtTitulo3 = (TextView) findViewById(R.id.tv_cardD_titulo3);
+        txtTitulo4 = (TextView) findViewById(R.id.tv_cardD_titulo4);
+        txtTitulo5 = (TextView) findViewById(R.id.tv_cardD_titulo5);
+        txtTitulo6 = (TextView) findViewById(R.id.tv_cardD_titulo6);
+        txtTitulo7 = (TextView) findViewById(R.id.tv_cardD_titulo7);
+        txtTitulo8 = (TextView) findViewById(R.id.tv_cardD_titulo8);
+        txtTitulo9 = (TextView) findViewById(R.id.tv_cardD_titulo9);
+        txtTitulo10 = (TextView) findViewById(R.id.tv_cardD_titulo10);
+        txtTitulo11 = (TextView) findViewById(R.id.tv_cardD_titulo11);
+        txtTitulo12 = (TextView) findViewById(R.id.tv_cardD_titulo12);
+        txtTitulo13 = (TextView) findViewById(R.id.tv_cardD_titulo13);
+        txtTitulo14 = (TextView) findViewById(R.id.tv_cardD_titulo14);
+        txtTitulo15 = (TextView) findViewById(R.id.tv_cardD_titulo15);
+        txtTitulo16 = (TextView) findViewById(R.id.tv_cardD_titulo16);
+        txtTitulo17 = (TextView) findViewById(R.id.tv_cardD_titulo17);
+        txtTitulo18 = (TextView) findViewById(R.id.tv_cardD_titulo18);
+        txtTitulo19 = (TextView) findViewById(R.id.tv_cardD_titulo19);
+        txtTitulo20 = (TextView) findViewById(R.id.tv_cardD_titulo20);
 
-        ibDes1=(GifImageButton) findViewById(R.id.ib_descargar_cardD1);
-        ibDes2=(GifImageButton) findViewById(R.id.ib_descargar_cardD2);
-        ibDes3=(GifImageButton) findViewById(R.id.ib_descargar_cardD3);
-        ibDes4=(GifImageButton) findViewById(R.id.ib_descargar_cardD4);
-        ibDes5=(GifImageButton) findViewById(R.id.ib_descargar_cardD5);
-        ibDes6=(GifImageButton) findViewById(R.id.ib_descargar_cardD6);
-        ibDes7=(GifImageButton) findViewById(R.id.ib_descargar_cardD7);
-        ibDes8=(GifImageButton) findViewById(R.id.ib_descargar_cardD8);
-        ibDes9=(GifImageButton) findViewById(R.id.ib_descargar_cardD9);
-        ibDes10=(GifImageButton) findViewById(R.id.ib_descargar_cardD10);
-        ibDes11=(GifImageButton) findViewById(R.id.ib_descargar_cardD11);
-        ibDes12=(GifImageButton) findViewById(R.id.ib_descargar_cardD12);
-        ibDes13=(GifImageButton) findViewById(R.id.ib_descargar_cardD13);
-        ibDes14=(GifImageButton) findViewById(R.id.ib_descargar_cardD14);
-        ibDes15=(GifImageButton) findViewById(R.id.ib_descargar_cardD15);
-        ibDes16=(GifImageButton) findViewById(R.id.ib_descargar_cardD16);
-        ibDes17=(GifImageButton) findViewById(R.id.ib_descargar_cardD17);
-        ibDes18=(GifImageButton) findViewById(R.id.ib_descargar_cardD18);
-        ibDes19=(GifImageButton) findViewById(R.id.ib_descargar_cardD19);
-        ibDes20=(GifImageButton) findViewById(R.id.ib_descargar_cardD20);
+        txtCapitulo1 = (TextView) findViewById(R.id.tv_cardD_capitulo1);
+        txtCapitulo2 = (TextView) findViewById(R.id.tv_cardD_capitulo2);
+        txtCapitulo3 = (TextView) findViewById(R.id.tv_cardD_capitulo3);
+        txtCapitulo4 = (TextView) findViewById(R.id.tv_cardD_capitulo4);
+        txtCapitulo5 = (TextView) findViewById(R.id.tv_cardD_capitulo5);
+        txtCapitulo6 = (TextView) findViewById(R.id.tv_cardD_capitulo6);
+        txtCapitulo7 = (TextView) findViewById(R.id.tv_cardD_capitulo7);
+        txtCapitulo8 = (TextView) findViewById(R.id.tv_cardD_capitulo8);
+        txtCapitulo9 = (TextView) findViewById(R.id.tv_cardD_capitulo9);
+        txtCapitulo10 = (TextView) findViewById(R.id.tv_cardD_capitulo10);
+        txtCapitulo11 = (TextView) findViewById(R.id.tv_cardD_capitulo11);
+        txtCapitulo12 = (TextView) findViewById(R.id.tv_cardD_capitulo12);
+        txtCapitulo13 = (TextView) findViewById(R.id.tv_cardD_capitulo13);
+        txtCapitulo14 = (TextView) findViewById(R.id.tv_cardD_capitulo14);
+        txtCapitulo15 = (TextView) findViewById(R.id.tv_cardD_capitulo15);
+        txtCapitulo16 = (TextView) findViewById(R.id.tv_cardD_capitulo16);
+        txtCapitulo17 = (TextView) findViewById(R.id.tv_cardD_capitulo17);
+        txtCapitulo18 = (TextView) findViewById(R.id.tv_cardD_capitulo18);
+        txtCapitulo19 = (TextView) findViewById(R.id.tv_cardD_capitulo19);
+        txtCapitulo20 = (TextView) findViewById(R.id.tv_cardD_capitulo20);
 
-        ibVer1=(ImageButton) findViewById(R.id.ib_ver_cardD1);
-        ibVer2=(ImageButton) findViewById(R.id.ib_ver_cardD2);
-        ibVer3=(ImageButton) findViewById(R.id.ib_ver_cardD3);
-        ibVer4=(ImageButton) findViewById(R.id.ib_ver_cardD4);
-        ibVer5=(ImageButton) findViewById(R.id.ib_ver_cardD5);
-        ibVer6=(ImageButton) findViewById(R.id.ib_ver_cardD6);
-        ibVer7=(ImageButton) findViewById(R.id.ib_ver_cardD7);
-        ibVer8=(ImageButton) findViewById(R.id.ib_ver_cardD8);
-        ibVer9=(ImageButton) findViewById(R.id.ib_ver_cardD9);
-        ibVer10=(ImageButton) findViewById(R.id.ib_ver_cardD10);
-        ibVer11=(ImageButton) findViewById(R.id.ib_ver_cardD11);
-        ibVer12=(ImageButton) findViewById(R.id.ib_ver_cardD12);
-        ibVer13=(ImageButton) findViewById(R.id.ib_ver_cardD13);
-        ibVer14=(ImageButton) findViewById(R.id.ib_ver_cardD14);
-        ibVer15=(ImageButton) findViewById(R.id.ib_ver_cardD15);
-        ibVer16=(ImageButton) findViewById(R.id.ib_ver_cardD16);
-        ibVer17=(ImageButton) findViewById(R.id.ib_ver_cardD17);
-        ibVer18=(ImageButton) findViewById(R.id.ib_ver_cardD18);
-        ibVer19=(ImageButton) findViewById(R.id.ib_ver_cardD19);
-        ibVer20=(ImageButton) findViewById(R.id.ib_ver_cardD20);
-        textoff=(TextView) findViewById(R.id.textOffline);
+        ibDes1 = (GifImageButton) findViewById(R.id.ib_descargar_cardD1);
+        ibDes2 = (GifImageButton) findViewById(R.id.ib_descargar_cardD2);
+        ibDes3 = (GifImageButton) findViewById(R.id.ib_descargar_cardD3);
+        ibDes4 = (GifImageButton) findViewById(R.id.ib_descargar_cardD4);
+        ibDes5 = (GifImageButton) findViewById(R.id.ib_descargar_cardD5);
+        ibDes6 = (GifImageButton) findViewById(R.id.ib_descargar_cardD6);
+        ibDes7 = (GifImageButton) findViewById(R.id.ib_descargar_cardD7);
+        ibDes8 = (GifImageButton) findViewById(R.id.ib_descargar_cardD8);
+        ibDes9 = (GifImageButton) findViewById(R.id.ib_descargar_cardD9);
+        ibDes10 = (GifImageButton) findViewById(R.id.ib_descargar_cardD10);
+        ibDes11 = (GifImageButton) findViewById(R.id.ib_descargar_cardD11);
+        ibDes12 = (GifImageButton) findViewById(R.id.ib_descargar_cardD12);
+        ibDes13 = (GifImageButton) findViewById(R.id.ib_descargar_cardD13);
+        ibDes14 = (GifImageButton) findViewById(R.id.ib_descargar_cardD14);
+        ibDes15 = (GifImageButton) findViewById(R.id.ib_descargar_cardD15);
+        ibDes16 = (GifImageButton) findViewById(R.id.ib_descargar_cardD16);
+        ibDes17 = (GifImageButton) findViewById(R.id.ib_descargar_cardD17);
+        ibDes18 = (GifImageButton) findViewById(R.id.ib_descargar_cardD18);
+        ibDes19 = (GifImageButton) findViewById(R.id.ib_descargar_cardD19);
+        ibDes20 = (GifImageButton) findViewById(R.id.ib_descargar_cardD20);
+
+        ibVer1 = (ImageButton) findViewById(R.id.ib_ver_cardD1);
+        ibVer2 = (ImageButton) findViewById(R.id.ib_ver_cardD2);
+        ibVer3 = (ImageButton) findViewById(R.id.ib_ver_cardD3);
+        ibVer4 = (ImageButton) findViewById(R.id.ib_ver_cardD4);
+        ibVer5 = (ImageButton) findViewById(R.id.ib_ver_cardD5);
+        ibVer6 = (ImageButton) findViewById(R.id.ib_ver_cardD6);
+        ibVer7 = (ImageButton) findViewById(R.id.ib_ver_cardD7);
+        ibVer8 = (ImageButton) findViewById(R.id.ib_ver_cardD8);
+        ibVer9 = (ImageButton) findViewById(R.id.ib_ver_cardD9);
+        ibVer10 = (ImageButton) findViewById(R.id.ib_ver_cardD10);
+        ibVer11 = (ImageButton) findViewById(R.id.ib_ver_cardD11);
+        ibVer12 = (ImageButton) findViewById(R.id.ib_ver_cardD12);
+        ibVer13 = (ImageButton) findViewById(R.id.ib_ver_cardD13);
+        ibVer14 = (ImageButton) findViewById(R.id.ib_ver_cardD14);
+        ibVer15 = (ImageButton) findViewById(R.id.ib_ver_cardD15);
+        ibVer16 = (ImageButton) findViewById(R.id.ib_ver_cardD16);
+        ibVer17 = (ImageButton) findViewById(R.id.ib_ver_cardD17);
+        ibVer18 = (ImageButton) findViewById(R.id.ib_ver_cardD18);
+        ibVer19 = (ImageButton) findViewById(R.id.ib_ver_cardD19);
+        ibVer20 = (ImageButton) findViewById(R.id.ib_ver_cardD20);
+        textoff = (TextView) findViewById(R.id.textOffline);
         textoff.setVisibility(View.GONE);
-        IBsDesList.add(ibDes1);IBsVerList.add(ibVer1);
-        IBsDesList.add(ibDes2);IBsVerList.add(ibVer2);
-        IBsDesList.add(ibDes3);IBsVerList.add(ibVer3);
-        IBsDesList.add(ibDes4);IBsVerList.add(ibVer4);
-        IBsDesList.add(ibDes5);IBsVerList.add(ibVer5);
-        IBsDesList.add(ibDes6);IBsVerList.add(ibVer6);
-        IBsDesList.add(ibDes7);IBsVerList.add(ibVer7);
-        IBsDesList.add(ibDes8);IBsVerList.add(ibVer8);
-        IBsDesList.add(ibDes9);IBsVerList.add(ibVer9);
-        IBsDesList.add(ibDes10);IBsVerList.add(ibVer10);
-        IBsDesList.add(ibDes11);IBsVerList.add(ibVer11);
-        IBsDesList.add(ibDes12);IBsVerList.add(ibVer12);
-        IBsDesList.add(ibDes13);IBsVerList.add(ibVer13);
-        IBsDesList.add(ibDes14);IBsVerList.add(ibVer14);
-        IBsDesList.add(ibDes15);IBsVerList.add(ibVer15);
-        IBsDesList.add(ibDes16);IBsVerList.add(ibVer16);
-        IBsDesList.add(ibDes17);IBsVerList.add(ibVer17);
-        IBsDesList.add(ibDes18);IBsVerList.add(ibVer18);
-        IBsDesList.add(ibDes19);IBsVerList.add(ibVer19);
-        IBsDesList.add(ibDes20);IBsVerList.add(ibVer20);
-        card1=(CardView) findViewById(R.id.card1);
-        card2=(CardView) findViewById(R.id.card2);
-        card3=(CardView) findViewById(R.id.card3);
-        card4=(CardView) findViewById(R.id.card4);
-        card5=(CardView) findViewById(R.id.card5);
-        card6=(CardView) findViewById(R.id.card6);
-        card7=(CardView) findViewById(R.id.card7);
-        card8=(CardView) findViewById(R.id.card8);
-        card9=(CardView) findViewById(R.id.card9);
-        card10=(CardView) findViewById(R.id.card10);
-        card11=(CardView) findViewById(R.id.card11);
-        card12=(CardView) findViewById(R.id.card12);
-        card13=(CardView) findViewById(R.id.card13);
-        card14=(CardView) findViewById(R.id.card14);
-        card15=(CardView) findViewById(R.id.card15);
-        card16=(CardView) findViewById(R.id.card16);
-        card17=(CardView) findViewById(R.id.card17);
-        card18=(CardView) findViewById(R.id.card18);
-        card19=(CardView) findViewById(R.id.card19);
-        card20=(CardView) findViewById(R.id.card20);
-        Cards.add(card1);Cards.add(card2);
-        Cards.add(card3);Cards.add(card4);
-        Cards.add(card5);Cards.add(card6);
-        Cards.add(card7);Cards.add(card8);
-        Cards.add(card9);Cards.add(card10);
-        Cards.add(card11);Cards.add(card12);
-        Cards.add(card13);Cards.add(card14);
-        Cards.add(card15);Cards.add(card16);
-        Cards.add(card17);Cards.add(card18);
-        Cards.add(card19);Cards.add(card20);
-        web=(WebView) findViewById(R.id.wv_inicio);
+        IBsDesList.add(ibDes1);
+        IBsVerList.add(ibVer1);
+        IBsDesList.add(ibDes2);
+        IBsVerList.add(ibVer2);
+        IBsDesList.add(ibDes3);
+        IBsVerList.add(ibVer3);
+        IBsDesList.add(ibDes4);
+        IBsVerList.add(ibVer4);
+        IBsDesList.add(ibDes5);
+        IBsVerList.add(ibVer5);
+        IBsDesList.add(ibDes6);
+        IBsVerList.add(ibVer6);
+        IBsDesList.add(ibDes7);
+        IBsVerList.add(ibVer7);
+        IBsDesList.add(ibDes8);
+        IBsVerList.add(ibVer8);
+        IBsDesList.add(ibDes9);
+        IBsVerList.add(ibVer9);
+        IBsDesList.add(ibDes10);
+        IBsVerList.add(ibVer10);
+        IBsDesList.add(ibDes11);
+        IBsVerList.add(ibVer11);
+        IBsDesList.add(ibDes12);
+        IBsVerList.add(ibVer12);
+        IBsDesList.add(ibDes13);
+        IBsVerList.add(ibVer13);
+        IBsDesList.add(ibDes14);
+        IBsVerList.add(ibVer14);
+        IBsDesList.add(ibDes15);
+        IBsVerList.add(ibVer15);
+        IBsDesList.add(ibDes16);
+        IBsVerList.add(ibVer16);
+        IBsDesList.add(ibDes17);
+        IBsVerList.add(ibVer17);
+        IBsDesList.add(ibDes18);
+        IBsVerList.add(ibVer18);
+        IBsDesList.add(ibDes19);
+        IBsVerList.add(ibVer19);
+        IBsDesList.add(ibDes20);
+        IBsVerList.add(ibVer20);
+        card1 = (CardView) findViewById(R.id.card1);
+        card2 = (CardView) findViewById(R.id.card2);
+        card3 = (CardView) findViewById(R.id.card3);
+        card4 = (CardView) findViewById(R.id.card4);
+        card5 = (CardView) findViewById(R.id.card5);
+        card6 = (CardView) findViewById(R.id.card6);
+        card7 = (CardView) findViewById(R.id.card7);
+        card8 = (CardView) findViewById(R.id.card8);
+        card9 = (CardView) findViewById(R.id.card9);
+        card10 = (CardView) findViewById(R.id.card10);
+        card11 = (CardView) findViewById(R.id.card11);
+        card12 = (CardView) findViewById(R.id.card12);
+        card13 = (CardView) findViewById(R.id.card13);
+        card14 = (CardView) findViewById(R.id.card14);
+        card15 = (CardView) findViewById(R.id.card15);
+        card16 = (CardView) findViewById(R.id.card16);
+        card17 = (CardView) findViewById(R.id.card17);
+        card18 = (CardView) findViewById(R.id.card18);
+        card19 = (CardView) findViewById(R.id.card19);
+        card20 = (CardView) findViewById(R.id.card20);
+        Cards.add(card1);
+        Cards.add(card2);
+        Cards.add(card3);
+        Cards.add(card4);
+        Cards.add(card5);
+        Cards.add(card6);
+        Cards.add(card7);
+        Cards.add(card8);
+        Cards.add(card9);
+        Cards.add(card10);
+        Cards.add(card11);
+        Cards.add(card12);
+        Cards.add(card13);
+        Cards.add(card14);
+        Cards.add(card15);
+        Cards.add(card16);
+        Cards.add(card17);
+        Cards.add(card18);
+        Cards.add(card19);
+        Cards.add(card20);
+        web = (WebView) findViewById(R.id.wv_inicio);
         web.getSettings().setJavaScriptEnabled(true);
         web.addJavascriptInterface(new JavaScriptInterface(context), "HtmlViewer");
         web.setWebViewClient(new WebViewClient() {
@@ -1696,22 +1785,22 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                         long l = manager.enqueue(request);
                         getSharedPreferences("data", MODE_PRIVATE).edit().putString(eidT, Long.toString(l)).apply();
-                        String descargados=getSharedPreferences("data",MODE_PRIVATE).getString("eids_descarga","");
-                        String epID=getSharedPreferences("data",MODE_PRIVATE).getString("epIDS_descarga","");
-                        if (descargados.contains(eidT)){
-                            getSharedPreferences("data",MODE_PRIVATE).edit().putString("eids_descarga",descargados.replace(eidT+":::","")).apply();
-                            getSharedPreferences("data",MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(aids[posT] + "_" + numeros[posT] + ":::", "")).apply();
+                        String descargados = getSharedPreferences("data", MODE_PRIVATE).getString("eids_descarga", "");
+                        String epID = getSharedPreferences("data", MODE_PRIVATE).getString("epIDS_descarga", "");
+                        if (descargados.contains(eidT)) {
+                            getSharedPreferences("data", MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eidT + ":::", "")).apply();
+                            getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(aids[posT] + "_" + numeros[posT] + ":::", "")).apply();
                         }
-                        descargados=getSharedPreferences("data",MODE_PRIVATE).getString("eids_descarga","");
-                        getSharedPreferences("data",MODE_PRIVATE).edit().putString("eids_descarga",descargados+eidT+":::").apply();
-                        String tits=getSharedPreferences("data",MODE_PRIVATE).getString("titulos_descarga","");
-                        epID=getSharedPreferences("data",MODE_PRIVATE).getString("epIDS_descarga","");
-                        getSharedPreferences("data",MODE_PRIVATE).edit().putString("titulos_descarga",tits+aids[posT]+":::").apply();
-                        getSharedPreferences("data",MODE_PRIVATE).edit().putString("epIDS_descarga",epID+aids[posT]+"_"+numeros[posT]+":::").apply();
-                        String vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                        if (!vistos.contains(eids[posT].trim())){
-                            vistos=vistos+eids[posT].trim()+":::";
-                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos",vistos).apply();
+                        descargados = getSharedPreferences("data", MODE_PRIVATE).getString("eids_descarga", "");
+                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("eids_descarga", descargados + eidT + ":::").apply();
+                        String tits = getSharedPreferences("data", MODE_PRIVATE).getString("titulos_descarga", "");
+                        epID = getSharedPreferences("data", MODE_PRIVATE).getString("epIDS_descarga", "");
+                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("titulos_descarga", tits + aids[posT] + ":::").apply();
+                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID + aids[posT] + "_" + numeros[posT] + ":::").apply();
+                        String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                        if (!vistos.contains(eids[posT].trim())) {
+                            vistos = vistos + eids[posT].trim() + ":::";
+                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
                         }
                         descargando = false;
                         web.loadUrl("about:blank");
@@ -1761,10 +1850,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             String[] headers = {"cookie", cookie, "User-Agent", web.getSettings().getUserAgentString(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", urlD};
                             intent.putExtra("headers", headers);
                             startActivity(intent);
-                            String vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                            if (!vistos.contains(eids[posT].trim())){
-                                vistos=vistos+eids[posT].trim()+":::";
-                                context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos",vistos).apply();
+                            String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                            if (!vistos.contains(eids[posT].trim())) {
+                                vistos = vistos + eids[posT].trim() + ":::";
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
                             }
                             break;
                         case "com.mxtech.videoplayer.ad":
@@ -1776,10 +1865,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             String[] headersad = {"cookie", cookie, "User-Agent", web.getSettings().getUserAgentString(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", urlD};
                             intentad.putExtra("headers", headersad);
                             startActivity(intentad);
-                            String vistosad=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                            if (!vistosad.contains(eids[posT].trim())){
-                                vistosad=vistosad+eids[posT].trim()+":::";
-                                context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos",vistosad).apply();
+                            String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                            if (!vistosad.contains(eids[posT].trim())) {
+                                vistosad = vistosad + eids[posT].trim() + ":::";
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
                             }
                             break;
                         default:
@@ -1790,7 +1879,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         });
 
-        web_Links=(WebView) findViewById(R.id.wv_inicio2);
+        web_Links = (WebView) findViewById(R.id.wv_inicio2);
         web_Links.getSettings().setJavaScriptEnabled(true);
         web_Links.getSettings().setLoadsImagesAutomatically(false);
         web_Links.getSettings().setBlockNetworkLoads(true);
@@ -1806,9 +1895,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         });
     }
 
-    public void loadImg(String[] list){
-        final Context context=getApplicationContext();
-        final String[] url=list;
+    public void loadImg(String[] list) {
+        final Context context = getApplicationContext();
+        final String[] url = list;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -1835,6 +1924,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         });
     }
+
     public void loadTitulos(String[] list) {
         final String[] titulo = list;
         runOnUiThread(new Runnable() {
@@ -1863,6 +1953,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         });
     }
+
     public void loadCapitulos(String[] list) {
         final String[] capitulo = list;
         runOnUiThread(new Runnable() {
@@ -1891,7 +1982,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         });
     }
-    public void getJson(){
+
+    public void getJson() {
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {
                 mediaStorage.mkdirs();
@@ -1902,8 +1994,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (isNetworkAvailable()) {
             textoff.setVisibility(View.GONE);
             new Requests(this, TaskType.GET_INICIO).execute(inicio);
-        }else {
-            verOk=false;
+        } else {
+            verOk = false;
             if (file.exists()) {
                 textoff.setVisibility(View.VISIBLE);
                 String infile = getStringFromFile(file_loc);
@@ -1913,118 +2005,139 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         }
     }
+
     public void getlinks(String json) {
         loadImg(parser.parseLinks(json));
     }
-    public void gettitulos(String json){
+
+    public void gettitulos(String json) {
         loadTitulos(parser.parseTitulos(json));
     }
-    public void getCapitulos(String json){
+
+    public void getCapitulos(String json) {
         loadCapitulos(parser.parseCapitulos(json));
     }
-    public void isFirst(){
+
+    public void isFirst() {
         mswipe.post(new Runnable() {
             @Override
             public void run() {
                 mswipe.setRefreshing(false);
             }
         });
-        if (first==1){
+        if (first == 1) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     scrollView.setVisibility(View.VISIBLE);
-                }});
-            if (mswipe.isRefreshing()){mswipe.setRefreshing(false);}
-            first=0;
+                }
+            });
+            if (mswipe.isRefreshing()) {
+                mswipe.setRefreshing(false);
+            }
+            first = 0;
             NotificationManager notificationManager = (NotificationManager) this
                     .getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.cancel(6991);
         }
     }
-    public void checkForNew(String[] capitulos,String[] aids){
-        List<String> caps=Arrays.asList(capitulos);
-        List<String> aid=Arrays.asList(aids);
-        Cards.get(0).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(1).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(2).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(3).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(4).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(5).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(6).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(7).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(8).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(9).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(10).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(11).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(12).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(13).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(14).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(15).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(16).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(17).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(18).setCardBackgroundColor(getResources().getColor(R.color.blanco));Cards.get(19).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        checkCards(caps.get(0),aid.get(0),Cards.get(0));
-        checkCards(caps.get(1),aid.get(1),Cards.get(1));
-        checkCards(caps.get(2),aid.get(2),Cards.get(2));
-        checkCards(caps.get(3),aid.get(3),Cards.get(3));
-        checkCards(caps.get(4),aid.get(4),Cards.get(4));
-        checkCards(caps.get(5),aid.get(5),Cards.get(5));
-        checkCards(caps.get(6),aid.get(6),Cards.get(6));
-        checkCards(caps.get(7),aid.get(7),Cards.get(7));
-        checkCards(caps.get(8),aid.get(8),Cards.get(8));
-        checkCards(caps.get(9),aid.get(9),Cards.get(9));
-        checkCards(caps.get(10),aid.get(10),Cards.get(10));
-        checkCards(caps.get(11),aid.get(11),Cards.get(11));
-        checkCards(caps.get(12),aid.get(12),Cards.get(12));
-        checkCards(caps.get(13),aid.get(13),Cards.get(13));
-        checkCards(caps.get(14),aid.get(14),Cards.get(14));
-        checkCards(caps.get(15),aid.get(15),Cards.get(15));
-        checkCards(caps.get(16),aid.get(16),Cards.get(16));
-        checkCards(caps.get(17),aid.get(17),Cards.get(17));
-        checkCards(caps.get(18),aid.get(18),Cards.get(18));
-        checkCards(caps.get(19),aid.get(19),Cards.get(19));
+
+    public void checkForNew(String[] capitulos, String[] aids) {
+        List<String> caps = Arrays.asList(capitulos);
+        List<String> aid = Arrays.asList(aids);
+        Cards.get(0).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(1).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(2).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(3).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(4).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(5).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(6).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(7).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(8).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(9).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(10).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(11).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(12).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(13).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(14).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(15).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(16).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(17).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(18).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        Cards.get(19).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+        checkCards(caps.get(0), aid.get(0), Cards.get(0));
+        checkCards(caps.get(1), aid.get(1), Cards.get(1));
+        checkCards(caps.get(2), aid.get(2), Cards.get(2));
+        checkCards(caps.get(3), aid.get(3), Cards.get(3));
+        checkCards(caps.get(4), aid.get(4), Cards.get(4));
+        checkCards(caps.get(5), aid.get(5), Cards.get(5));
+        checkCards(caps.get(6), aid.get(6), Cards.get(6));
+        checkCards(caps.get(7), aid.get(7), Cards.get(7));
+        checkCards(caps.get(8), aid.get(8), Cards.get(8));
+        checkCards(caps.get(9), aid.get(9), Cards.get(9));
+        checkCards(caps.get(10), aid.get(10), Cards.get(10));
+        checkCards(caps.get(11), aid.get(11), Cards.get(11));
+        checkCards(caps.get(12), aid.get(12), Cards.get(12));
+        checkCards(caps.get(13), aid.get(13), Cards.get(13));
+        checkCards(caps.get(14), aid.get(14), Cards.get(14));
+        checkCards(caps.get(15), aid.get(15), Cards.get(15));
+        checkCards(caps.get(16), aid.get(16), Cards.get(16));
+        checkCards(caps.get(17), aid.get(17), Cards.get(17));
+        checkCards(caps.get(18), aid.get(18), Cards.get(18));
+        checkCards(caps.get(19), aid.get(19), Cards.get(19));
     }
-    public void checkCards(String capitulo, String aid, CardView card){
-        Boolean resaltar=PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar",true);
-        if (capitulo.trim().equals("Capitulo 1") || capitulo.trim().contains("OVA") || capitulo.trim().contains("Pelicula")){
+
+    public void checkCards(String capitulo, String aid, CardView card) {
+        Boolean resaltar = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar", true);
+        if (capitulo.trim().equals("Capitulo 1") || capitulo.trim().contains("OVA") || capitulo.trim().contains("Pelicula")) {
             if (resaltar)
                 card.setCardBackgroundColor(Color.argb(100, 253, 250, 93));
         }
-        String favoritos=getSharedPreferences("data",MODE_PRIVATE).getString("favoritos","");
-        if (favoritos.contains(aid)){
+        String favoritos = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
+        if (favoritos.contains(aid)) {
             if (resaltar)
                 card.setCardBackgroundColor(Color.argb(100, 26, 206, 246));
         }
 
     }
-    public void getData(String json){
+
+    public void getData(String json) {
         getlinks(json);
         gettitulos(json);
         getCapitulos(json);
-        checkForNew(parser.parseCapitulos(json),parser.parseAID(json));
+        checkForNew(parser.parseCapitulos(json), parser.parseAID(json));
         ActualizarFavoritos();
-        titulos=parser.parseTitulos(json);
-        eids=parser.parseEID(json);
-        aids=parser.parseAID(json);
-        numeros=parser.parsenumeros(json);
+        titulos = parser.parseTitulos(json);
+        eids = parser.parseEID(json);
+        aids = parser.parseAID(json);
+        numeros = parser.parsenumeros(json);
         mswipe.setRefreshing(false);
         checkButtons(aids, numeros, eids);
-        String teids="";
-        for (String s:eids){
-            teids+=":::"+s;
+        String teids = "";
+        for (String s : eids) {
+            teids += ":::" + s;
         }
-        getSharedPreferences("data",MODE_PRIVATE).edit().putString("teids",teids).apply();
+        getSharedPreferences("data", MODE_PRIVATE).edit().putString("teids", teids).apply();
         isFirst();
     }
-    public void checkButtons(String[] aids,String[] numeros,String[] eids){
-        List<String> a= Arrays.asList(aids);
-        List<String> n=Arrays.asList(numeros);
-        List<String> e=Arrays.asList(eids);
-        isDesc=new ArrayList<Boolean>();
-        for (String s:e){
+
+    public void checkButtons(String[] aids, String[] numeros, String[] eids) {
+        List<String> a = Arrays.asList(aids);
+        List<String> n = Arrays.asList(numeros);
+        List<String> e = Arrays.asList(eids);
+        isDesc = new ArrayList<Boolean>();
+        for (String s : e) {
             Log.i("dir", Environment.getExternalStorageDirectory() + "/Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
-            int index=e.indexOf(s);
-            File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+a.get(e.indexOf(s))+"/"+a.get(e.indexOf(s))+"_"+n.get(e.indexOf(s))+".mp4");
-            File fileSD=new File(getSD1() + "/Animeflv/download/"+a.get(e.indexOf(s))+"/"+a.get(e.indexOf(s))+"_"+n.get(e.indexOf(s))+".mp4");
-            Log.i("Existe",String.valueOf(file.exists()));
-            if (file.exists()||fileSD.exists()){
+            int index = e.indexOf(s);
+            File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
+            File fileSD = new File(getSD1() + "/Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
+            Log.i("Existe", String.valueOf(file.exists()));
+            if (file.exists() || fileSD.exists()) {
                 IBsDesList.get(index).setImageResource(R.drawable.ic_borrar_r);
                 IBsVerList.get(index).setEnabled(true);
                 IBsVerList.get(index).setImageResource(R.drawable.ic_rep_r);
                 isDesc.add(true);
-            }else {
+            } else {
                 IBsDesList.get(index).setImageResource(R.drawable.ic_get_r);
                 IBsVerList.get(index).setEnabled(false);
                 IBsVerList.get(index).setImageResource(R.drawable.ic_ver_no);
@@ -2032,133 +2145,150 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         }
     }
-    public String getUrl(String titulo,String capitulo){
-        String ftitulo="";
-        String atitulo=titulo.toLowerCase();
-        atitulo=atitulo.replace("*","-");
-        atitulo=atitulo.replace(":","");
-        atitulo=atitulo.replace(",","");
-        atitulo=atitulo.replace(" \u2606 ","-");
-        atitulo=atitulo.replace("\u2606","-");
-        atitulo=atitulo.replace("  ","-");
-        atitulo=atitulo.replace("@","a");
-        atitulo=atitulo.replace("/","-");
-        atitulo=atitulo.replace(".","");
-        atitulo=atitulo.replace("\"","");
-        atitulo=atitulo.replace("♥","-");
-        for (int x=0; x < atitulo.length(); x++) {
+
+    public String getUrl(String titulo, String capitulo) {
+        String ftitulo = "";
+        String atitulo = titulo.toLowerCase();
+        atitulo = atitulo.replace("*", "-");
+        atitulo = atitulo.replace(":", "");
+        atitulo = atitulo.replace(",", "");
+        atitulo = atitulo.replace(" \u2606 ", "-");
+        atitulo = atitulo.replace("\u2606", "-");
+        atitulo = atitulo.replace("  ", "-");
+        atitulo = atitulo.replace("@", "a");
+        atitulo = atitulo.replace("/", "-");
+        atitulo = atitulo.replace(".", "");
+        atitulo = atitulo.replace("\"", "");
+        atitulo = atitulo.replace("♥", "-");
+        for (int x = 0; x < atitulo.length(); x++) {
             if (atitulo.charAt(x) != ' ') {
                 ftitulo += atitulo.charAt(x);
-            }else {
+            } else {
                 if (atitulo.charAt(x) == ' ') {
                     ftitulo += "-";
                 }
             }
         }
-        ftitulo=ftitulo.replace("!!!","-3");
-        ftitulo=ftitulo.replace("!", "");
-        ftitulo=ftitulo.replace("°", "");
-        ftitulo=ftitulo.replace("&deg;", "");
-        ftitulo=ftitulo.replace("(","");
-        ftitulo=ftitulo.replace(")","");
-        ftitulo=ftitulo.replace("2nd-season","2");
-        ftitulo=ftitulo.replace("'","");
-        if (ftitulo.trim().equals("gintama")){ftitulo=ftitulo+"-2015";}
-        if (ftitulo.trim().equals("miss-monochrome-the-animation-2")){ftitulo="miss-monochrome-the-animation-2nd-season";}
-        if (ftitulo.trim().equals("ore-ga-ojousama-gakkou-ni-shomin-sample-toshite-gets-sareta-ken")){ftitulo="ore-ga-ojousama-gakkou-ni-shomin-sample-toshite-gets-sareta-";}
-        if (ftitulo.trim().equals("diabolik-lovers-moreblood")){ftitulo="diabolik-lovers-more-blood";}
-        String link="http://animeflv.com/ver/"+ftitulo+"-"+capitulo+".html";
+        ftitulo = ftitulo.replace("!!!", "-3");
+        ftitulo = ftitulo.replace("!", "");
+        ftitulo = ftitulo.replace("°", "");
+        ftitulo = ftitulo.replace("&deg;", "");
+        ftitulo = ftitulo.replace("(", "");
+        ftitulo = ftitulo.replace(")", "");
+        ftitulo = ftitulo.replace("2nd-season", "2");
+        ftitulo = ftitulo.replace("'", "");
+        if (ftitulo.trim().equals("gintama")) {
+            ftitulo = ftitulo + "-2015";
+        }
+        if (ftitulo.trim().equals("miss-monochrome-the-animation-2")) {
+            ftitulo = "miss-monochrome-the-animation-2nd-season";
+        }
+        if (ftitulo.trim().equals("ore-ga-ojousama-gakkou-ni-shomin-sample-toshite-gets-sareta-ken")) {
+            ftitulo = "ore-ga-ojousama-gakkou-ni-shomin-sample-toshite-gets-sareta-";
+        }
+        if (ftitulo.trim().equals("diabolik-lovers-moreblood")) {
+            ftitulo = "diabolik-lovers-more-blood";
+        }
+        String link = "http://animeflv.com/ver/" + ftitulo + "-" + capitulo + ".html";
         return link;
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (isXLargeScreen(getApplicationContext())){
+        if (isXLargeScreen(getApplicationContext())) {
             getMenuInflater().inflate(R.menu.menu_main_dark, menu);
-        }else {
+        } else {
             getMenuInflater().inflate(R.menu.menu_main, menu);
         }
         return true;
     }
+
     @Override
     public void onRefresh() {
         if (isNetworkAvailable()) {
-            getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
+            getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
             textoff.setVisibility(View.GONE);
             new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
             new Requests(this, TaskType.GET_INICIO).execute(inicio);
-        }else {
+        } else {
             textoff.setVisibility(View.VISIBLE);
-            if (mswipe.isRefreshing()){mswipe.setRefreshing(false);}
+            if (mswipe.isRefreshing()) {
+                mswipe.setRefreshing(false);
+            }
         }
         NotificationManager notificationManager = (NotificationManager) this
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(6991);
     }
+
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
                 >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
+
     @Override
-    public void onConfigurationChanged (Configuration newConfig) {
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        if (!isXLargeScreen(getApplicationContext()) ) {
+        if (!isXLargeScreen(getApplicationContext())) {
             return;
         }
     }
-    public void cambiarColor(){
-            final MaterialDialog dialog = new MaterialDialog.Builder(context)
-                    .title("Selecciona un color:")
-                    .customView(R.layout.dialog_colores, false)
-                    .build();
-            ImageButton naranja = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_naranja);
-            ImageButton amarillo = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_amarillo);
-            ImageButton rojo = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_rojo);
-            ImageButton rosa = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_rosa);
-            ImageButton alnek = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_AlNek);
-            naranja.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 0).apply();
-                    getHDraw(true);
-                    dialog.dismiss();
-                }
-            });
-            amarillo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 1).apply();
-                    getHDraw(true);
-                    dialog.dismiss();
-                }
-            });
-            rojo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 2).apply();
-                    getHDraw(true);
-                    dialog.dismiss();
-                }
-            });
-            rosa.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 3).apply();
-                    getHDraw(true);
-                    dialog.dismiss();
-                }
-            });
-            alnek.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 4).apply();
-                    getHDraw(true);
-                    dialog.dismiss();
-                }
-            });
-            dialog.show();
+
+    public void cambiarColor() {
+        final MaterialDialog dialog = new MaterialDialog.Builder(context)
+                .title("Selecciona un color:")
+                .customView(R.layout.dialog_colores, false)
+                .build();
+        ImageButton naranja = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_naranja);
+        ImageButton amarillo = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_amarillo);
+        ImageButton rojo = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_rojo);
+        ImageButton rosa = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_rosa);
+        ImageButton alnek = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_AlNek);
+        naranja.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 0).apply();
+                getHDraw(true);
+                dialog.dismiss();
+            }
+        });
+        amarillo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 1).apply();
+                getHDraw(true);
+                dialog.dismiss();
+            }
+        });
+        rojo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 2).apply();
+                getHDraw(true);
+                dialog.dismiss();
+            }
+        });
+        rosa.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 3).apply();
+                getHDraw(true);
+                dialog.dismiss();
+            }
+        });
+        alnek.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 4).apply();
+                getHDraw(true);
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
+
     public static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
@@ -2169,17 +2299,21 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         reader.close();
         return sb.toString();
     }
-    public static String getStringFromFile (String filePath) {
-        String ret="";
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
         try {
             File fl = new File(filePath);
             FileInputStream fin = new FileInputStream(fl);
             ret = convertStreamToString(fin);
             fin.close();
-        }catch (IOException e){}catch (Exception e){}
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
         return ret;
     }
-    public  void writeToFile(String body,File file){
+
+    public void writeToFile(String body, File file) {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(file);
@@ -2189,15 +2323,16 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             e.printStackTrace();
         }
     }
-    public static boolean isNumeric( String str ) {
+
+    public static boolean isNumeric(String str) {
         DecimalFormatSymbols currentLocaleSymbols = DecimalFormatSymbols.getInstance();
         char localeMinusSign = currentLocaleSymbols.getMinusSign();
-        if ( !Character.isDigit( str.charAt( 0 ) ) && str.charAt( 0 ) != localeMinusSign ) return false;
+        if (!Character.isDigit(str.charAt(0)) && str.charAt(0) != localeMinusSign) return false;
         boolean isDecimalSeparatorFound = false;
         char localeDecimalSeparator = currentLocaleSymbols.getDecimalSeparator();
-        for ( char c : str.substring( 1 ).toCharArray() ) {
-            if ( !Character.isDigit( c ) ) {
-                if ( c == localeDecimalSeparator && !isDecimalSeparatorFound ) {
+        for (char c : str.substring(1).toCharArray()) {
+            if (!Character.isDigit(c)) {
+                if (c == localeDecimalSeparator && !isDecimalSeparatorFound) {
                     isDecimalSeparatorFound = true;
                     continue;
                 }
@@ -2206,31 +2341,33 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         return true;
     }
+
     private boolean isNetworkAvailable() {
-        Boolean net=false;
-        int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
+        Boolean net = false;
+        int Tcon = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        switch (Tcon){
+        switch (Tcon) {
             case 0:
                 NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                net=Wifi.isConnected();
+                net = Wifi.isConnected();
                 break;
             case 1:
                 NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                net=mobile.isConnected();
+                net = mobile.isConnected();
                 break;
             case 2:
                 NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                net=WifiA.isConnected()||mobileA.isConnected();
+                net = WifiA.isConnected() || mobileA.isConnected();
                 break;
         }
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && net;
     }
+
     @Override
-    public void sendtext1(String data,TaskType taskType){
-        if (taskType==TaskType.DIRECTORIO){
+    public void sendtext1(String data, TaskType taskType) {
+        if (taskType == TaskType.DIRECTORIO) {
             if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                 if (!mediaStorage.exists()) {
                     mediaStorage.mkdirs();
@@ -2238,7 +2375,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-            if (isNetworkAvailable()&&!data.trim().equals("error")) {
+            if (isNetworkAvailable() && !data.trim().equals("error")) {
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {
@@ -2250,7 +2387,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         writeToFile(data, file);
                         Intent intent = new Intent(context, Directorio.class);
                         startActivity(intent);
-                    }else {
+                    } else {
                         toast("Error en Servidor");
                     }
                 } else {
@@ -2262,7 +2399,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             writeToFile(data, file);
                             Intent intent = new Intent(context, Directorio.class);
                             startActivity(intent);
-                        }else {
+                        } else {
                             file.delete();
                             setDir(tbool);
                             toast("Error en cache, recargando");
@@ -2272,14 +2409,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             Log.d("Cargar", "Json existente");
                             Intent intent = new Intent(context, Directorio.class);
                             startActivity(intent);
-                        }else {
+                        } else {
                             file.delete();
                             setDir(tbool);
                             toast("Error en cache, recargando");
                         }
                     }
                 }
-            }else{
+            } else {
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!mediaStorage.exists()) {
                         mediaStorage.mkdirs();
@@ -2287,7 +2424,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 }
                 File fileoff = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
                 String file_loc_off = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-                if (fileoff.exists()&&isJSONValid(getStringFromFile(file_loc_off))) {
+                if (fileoff.exists() && isJSONValid(getStringFromFile(file_loc_off))) {
                     Intent intent = new Intent(context, Directorio.class);
                     startActivity(intent);
                 } else {
@@ -2295,7 +2432,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 }
             }
         }
-        if (taskType==TaskType.DIRECTORIO1){
+        if (taskType == TaskType.DIRECTORIO1) {
             if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                 if (!mediaStorage.exists()) {
                     mediaStorage.mkdirs();
@@ -2303,7 +2440,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-            if (isNetworkAvailable()&&!data.trim().equals("error")) {
+            if (isNetworkAvailable() && !data.trim().equals("error")) {
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {
@@ -2312,8 +2449,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         Log.d("Archivo:", "Error al crear archivo");
                     }
                     writeToFile(data, file);
-                    Intent intent=new Intent(context,Directorio.class);
-                    Bundle bundle=new Bundle();
+                    Intent intent = new Intent(context, Directorio.class);
+                    Bundle bundle = new Bundle();
                     bundle.putString("tipo", "Busqueda");
                     intent.putExtras(bundle);
                     startActivity(intent);
@@ -2323,37 +2460,37 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     if (!infile.trim().equals(data.trim())) {
                         Log.d("Cargar", "Json nuevo");
                         writeToFile(data, file);
-                        Intent intent=new Intent(context,Directorio.class);
-                        Bundle bundle=new Bundle();
+                        Intent intent = new Intent(context, Directorio.class);
+                        Bundle bundle = new Bundle();
                         bundle.putString("tipo", "Busqueda");
                         intent.putExtras(bundle);
                         startActivity(intent);
                     } else {
                         Log.d("Cargar", "Json existente");
-                        Intent intent=new Intent(context,Directorio.class);
-                        Bundle bundle=new Bundle();
-                        bundle.putString("tipo","Busqueda");
+                        Intent intent = new Intent(context, Directorio.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("tipo", "Busqueda");
                         intent.putExtras(bundle);
                         startActivity(intent);
                     }
                 }
             }
         }
-        if (taskType==TaskType.VERSION){
-            String vers="";
-            if (!isNetworkAvailable()||data.trim().equals("error")){
-                vers=Integer.toString(versionCode);
-            }else {
+        if (taskType == TaskType.VERSION) {
+            String vers = "";
+            if (!isNetworkAvailable() || data.trim().equals("error")) {
+                vers = Integer.toString(versionCode);
+            } else {
                 if (isNumeric(data.trim())) {
                     vers = data;
-                }else {
+                } else {
                     vers = "0";
-                    mensaje=data.split(":::");
+                    mensaje = data.split(":::");
                 }
             }
-            Log.d("Version", Integer.toString(versionCode)+ " >> "+vers.trim());
-            if (versionCode>=Integer.parseInt(vers.trim())){
-                if (Integer.parseInt(vers.trim())==0){
+            Log.d("Version", Integer.toString(versionCode) + " >> " + vers.trim());
+            if (versionCode >= Integer.parseInt(vers.trim())) {
+                if (Integer.parseInt(vers.trim()) == 0) {
                     if (!disM) {
                         MaterialDialog dialog = new MaterialDialog.Builder(this)
                                 .title(mensaje[0])
@@ -2376,20 +2513,20 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                             dialog.dismiss();
                                         }
                                         if (!mensaje[4].trim().toLowerCase().equals("salir") || !mensaje[4].trim().toLowerCase().equals("cerrar")) {
-                                            if (mensaje[5].trim().equals("toast")){
+                                            if (mensaje[5].trim().equals("toast")) {
                                                 toast(mensaje[6].trim());
                                             }
-                                            if (mensaje[5].trim().equals("toast&notshow")){
+                                            if (mensaje[5].trim().equals("toast&notshow")) {
                                                 toast(mensaje[6].trim());
-                                                disM=true;
+                                                disM = true;
                                             }
-                                            if (mensaje[5].trim().equals("finish")){
+                                            if (mensaje[5].trim().equals("finish")) {
                                                 finish();
                                             }
-                                            if (mensaje[5].trim().equals("dismiss")){
+                                            if (mensaje[5].trim().equals("dismiss")) {
                                                 dialog.dismiss();
                                             }
-                                            if (mensaje[5].trim().equals("dismiss&notshow")){
+                                            if (mensaje[5].trim().equals("dismiss&notshow")) {
                                                 disM = true;
                                                 dialog.dismiss();
                                             }
@@ -2403,14 +2540,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 }).build();
                         dialog.show();
                     }
-                }else {
+                } else {
                     Log.d("Version", "OK");
                     verOk = true;
                     getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("notVer", false);
                 }
-            }else {
+            } else {
                 if (showact) {
-                    showact=false;
+                    showact = false;
                     Log.d("Version", "Actualizar");
                     verOk = false;
                     MaterialDialog dialog = new MaterialDialog.Builder(this)
@@ -2478,7 +2615,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 }
             }
         }
-        if(taskType == TaskType.GET_INICIO) {
+        if (taskType == TaskType.GET_INICIO) {
             if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                 if (!mediaStorage.exists()) {
                     mediaStorage.mkdirs();
@@ -2486,10 +2623,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
-            if (isNetworkAvailable()&&!data.trim().equals("error")) {
+            if (isNetworkAvailable() && !data.trim().equals("error")) {
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
-                    Log.d("Json",data);
+                    Log.d("Json", data);
                     try {
                         file.createNewFile();
                     } catch (IOException e) {
@@ -2500,7 +2637,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 } else {
                     Log.d("Archivo", "Existe");
                     String infile = getStringFromFile(file_loc);
-                    if (isJSONValid(infile)&&isJSONValid(data)) {
+                    if (isJSONValid(infile) && isJSONValid(data)) {
                         if (!parser.parseEID(infile)[0].trim().equals(parser.parseEID(data)[0].trim())) {
                             Log.d("Cargar", "Json nuevo");
                             writeToFile(data, file);
@@ -2509,109 +2646,148 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             Log.d("Cargar", "Json existente");
                             getData(infile);
                         }
-                    }else {
+                    } else {
                         file.delete();
                         toast("Error en cache, volviendo a cargar");
-                        new Requests(context,TaskType.GET_INICIO).execute(inicio);
+                        new Requests(context, TaskType.GET_INICIO).execute(inicio);
                     }
                 }
-            }else {
+            } else {
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     if (data.trim().equals("error")) {
                         toast("Error en servidor, sin cache para mostrar");
                         if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
                     }
-                    if (!isNetworkAvailable()){
+                    if (!isNetworkAvailable()) {
                         toast("Sin cache para mostrar");
                         if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
                     }
                 } else {
                     Log.d("Archivo", "Existe");
                     String infile = getStringFromFile(file_loc);
-                    if (data.trim().equals("error"))toast("Error en servidor, cargando desde cache");
-                    if (!isNetworkAvailable())toast("Cargando desde cache");
+                    if (data.trim().equals("error"))
+                        toast("Error en servidor, cargando desde cache");
+                    if (!isNetworkAvailable()) toast("Cargando desde cache");
                     Log.d("Cargar", "Json existente");
                     getData(infile);
                 }
             }
         }
-        if(taskType == TaskType.GET_HTML1) {
+        if (taskType == TaskType.GET_HTML1) {
             web_Links.loadUrl("about:blank");
             web_Links.loadData(data, "text/html", "UTF-8");
         }
-        if (taskType==TaskType.GET_INFO){
+        if (taskType == TaskType.GET_INFO) {
             actCacheInfo(data);
         }
-        if (taskType==TaskType.GET_HTML2){
-            int a=Integer.parseInt(data.substring(data.indexOf("document.getElementById('lang-one').a = ")+40,data.indexOf("document.getElementById('lang-one').a = ") + 46).trim());
-            int b=1234567;
-            String code=Integer.toString((((a + 3) * 3) % b) + 3);
-            Log.d("Int a",Integer.toString(a));
-            Log.d("Int b",Integer.toString(b));
+        if (taskType == TaskType.GET_HTML2) {
+            int a = Integer.parseInt(data.substring(data.indexOf("document.getElementById('lang-one').a = ") + 40, data.indexOf("document.getElementById('lang-one').a = ") + 46).trim());
+            int b = 1234567;
+            String code = Integer.toString((((a + 3) * 3) % b) + 3);
+            Log.d("Int a", Integer.toString(a));
+            Log.d("Int b", Integer.toString(b));
             Log.d("code", code);
-            String durl=data.substring(data.indexOf("document.getElementById('dlbutton').href = ") + 45, data.indexOf(";", data.indexOf("document.getElementById('dlbutton').href = ") + 45) - 1);
-            durl=durl.replace("\"+e()+\"",code);
-            String url=getSharedPreferences("data",MODE_PRIVATE).getString("urlD",null);
-            String furl="http://"+url.substring(url.indexOf("www"),url.indexOf(".",url.indexOf("www")))+".zippyshare.com/"+durl;
-            Log.d("Final D Link",furl);
+            String durl = data.substring(data.indexOf("document.getElementById('dlbutton').href = ") + 45, data.indexOf(";", data.indexOf("document.getElementById('dlbutton').href = ") + 45) - 1);
+            durl = durl.replace("\"+e()+\"", code);
+            String url = getSharedPreferences("data", MODE_PRIVATE).getString("urlD", null);
+            String furl = "http://" + url.substring(url.indexOf("www"), url.indexOf(".", url.indexOf("www"))) + ".zippyshare.com/" + durl;
+            Log.d("Final D Link", furl);
         }
-        if (taskType==TaskType.GET_FAV){
-            if (data.contains(":::")){
+        if (taskType == TaskType.GET_FAV) {
+            if (data.contains(":::")) {
                 if (!data.contains(":;:")) {
                     getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", data.trim()).commit();
-                }else{
-                    String[] datas=data.trim().split(":;:");
+                } else {
+                    String[] datas = data.trim().split(":;:");
                     getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", datas[0]).commit();
-                    getSharedPreferences("data",MODE_PRIVATE).edit().putString("vistos",datas[1]).commit();
-                    String[] v=datas[1].split(";;;");
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("vistos", datas[1]).commit();
+                    String[] v = datas[1].split(";;;");
                     for (String s : v) {
-                        getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean(s,true).apply();
+                        getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, true).apply();
                     }
                 }
             }
         }
-    }
-        public boolean isJSONValid(String test) {
-            try {
-                new JSONObject(test);
-            } catch (JSONException ex) {
-                // edited, to include @Arthur's comment
-                // e.g. in case JSONArray is valid as well...
-                try {
-                    new JSONArray(test);
-                } catch (JSONException ex1) {
-                    return false;
+        if (taskType == TaskType.APP_BAN) {
+            if (data.contains(":::")) {
+                String[] values = data.split(":::");
+                if (values[0].trim().equals("ban")) {
+                    toast("Has sido baneado de la app :(");
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("appBanned", true).apply();
+                    String l = getSharedPreferences("data", MODE_PRIVATE).getString(eidT, "0");
+                    DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                    downloadManager.remove(Long.parseLong(l));
+                    new File(mediaStorage, "inicio.txt").delete();
+                    finish();
+                } else if (values[0].trim().equals("ok")) {
+                    if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("appBanned", false))
+                        toast("Tu Ban ah sido retirado :D");
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("appBanned", false).apply();
                 }
             }
-            return true;
         }
+        if (taskType == TaskType.CHAT_BAN) {
+            if (data.contains(":::")) {
+                String[] values = data.split(":::");
+                if (values[1].trim().equals("ban")) {
+                    toast("Has sido baneado del chat :(");
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("chatBanned", true).apply();
+                } else if (values[1].trim().equals("ok")) {
+                    if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("chatBanned", false))
+                        toast("Tu Ban ah sido retirado :D");
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("chatBanned", false).apply();
+                    startActivity(new Intent(context, Chat.class));
+                }
+            }
+        }
+    }
+
+    public boolean isJSONValid(String test) {
+        try {
+            new JSONObject(test);
+        } catch (JSONException ex) {
+            // edited, to include @Arthur's comment
+            // e.g. in case JSONArray is valid as well...
+            try {
+                new JSONArray(test);
+            } catch (JSONException ex1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        pause=false;
-        getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
-        if(shouldExecuteOnResume){
+        pause = false;
+        getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
+        if (shouldExecuteOnResume) {
             if (isNetworkAvailable()) {
                 //getSharedPreferences("data",MODE_PRIVATE).edit().putInt("nCaps",0).apply();
                 textoff.setVisibility(View.GONE);
+                checkBan(APP);
                 new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
                 new Requests(this, TaskType.GET_INICIO).execute(inicio);
-            }else {
+            } else {
                 textoff.setVisibility(View.VISIBLE);
-                if (mswipe.isRefreshing()){mswipe.setRefreshing(false);}
+                if (mswipe.isRefreshing()) {
+                    mswipe.setRefreshing(false);
+                }
             }
             NotificationManager notificationManager = (NotificationManager) this
                     .getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.cancel(6991);
-        } else{
+        } else {
             shouldExecuteOnResume = true;
         }
     }
+
     @Override
     protected void onPause() {
         super.onPause();
-        pause=true;
+        pause = true;
     }
 
     @Override
@@ -2629,30 +2805,30 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     doubleBackToExitPressedOnce = false;
                 }
             }, 2000);
-        }else {
+        } else {
             result.closeDrawer();
         }
     }
 
     @Override
     public void sendtext1(String data, TaskType taskType, int position) {
-        if (taskType==TaskType.CHECK_DOWN){
-            if (data.trim().equals("ok")){
+        if (taskType == TaskType.CHECK_DOWN) {
+            if (data.trim().equals("ok")) {
                 DescargarInbyID(position);
-            }else {
+            } else {
                 toast("Error en descarga, intentando modo alternativo");
-                posT=position;
+                posT = position;
                 String urlDes = getUrl(titulos[position], numeros[position]);
                 new Requests(this, TaskType.GET_HTML1).execute(urlDes);
             }
         }
-        if (taskType==TaskType.CHECK_STREAM){
-            if (data.trim().equals("ok")){
+        if (taskType == TaskType.CHECK_STREAM) {
+            if (data.trim().equals("ok")) {
                 StreamInbyID(position);
-            }else {
+            } else {
                 toast("Error, intentando modo alternativo");
-                posT=position;
-                Streaming=true;
+                posT = position;
+                Streaming = true;
                 String urlStream = getUrl(titulos[position], numeros[position]);
                 new Requests(this, TaskType.GET_HTML1).execute(urlStream);
             }
@@ -2661,28 +2837,32 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
 
     class JavaScriptInterface {
         private Context ctx;
+
         JavaScriptInterface(Context ctx) {
-            this.ctx = ctx;}
+            this.ctx = ctx;
+        }
+
         @JavascriptInterface
         public void showHTML(String html) {
-            String s_html_i=html.substring(21);
-            String s_html_f="{"+s_html_i.substring(0,s_html_i.length()-7);
+            String s_html_i = html.substring(21);
+            String s_html_f = "{" + s_html_i.substring(0, s_html_i.length() - 7);
             json = s_html_f;
             getData(s_html_f);
         }
+
         @JavascriptInterface
         public void showHTMLD1(String html) {
-            String replace=html.replace("\\/", "/");
+            String replace = html.replace("\\/", "/");
             String cortado;
-            if (!replace.trim().contains("Error 404")&&replace.contains("zippyshare")) {
+            if (!replace.trim().contains("Error 404") && replace.contains("zippyshare")) {
                 cortado = replace.substring(replace.indexOf("&proxy.link=") + 12);
                 cortado = cortado.substring(0, cortado.indexOf("file.html") + 9).trim();
                 getSharedPreferences("data", MODE_PRIVATE).edit().putString("urlD", cortado).apply();
                 getSharedPreferences("data", MODE_PRIVATE).edit().putInt("sov", 1).apply();
-            }else {
+            } else {
                 cortado = "http://error-al-descargar.com";
             }
-            final String finalstring=cortado;
+            final String finalstring = cortado;
             web.post(new Runnable() {
                 @Override
                 public void run() {
@@ -2691,11 +2871,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             });
             //new Requests(context,TaskType.GET_HTML2).execute(cortado);
             //Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(cortado));
-           //startActivity(intent);
+            //startActivity(intent);
         }
+
         @JavascriptInterface
         public void showHTMLD2(String html) {
             Log.d("Zippy", html);
-        }}
+        }
+    }
 
 }

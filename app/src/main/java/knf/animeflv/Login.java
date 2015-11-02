@@ -27,9 +27,13 @@ import se.simbio.encryption.Encryption;
  * Created by Jordy on 04/09/2015.
  */
 public class Login extends DialogFragment{
+    public interface OnResponseCallback {
+        void ResponseCallback(String response);
+    }
 
-    public static Login create() {
+    public Login create() {
         Login dialog = new Login();
+        this.listener = null;
         return dialog;
     }
     EditText email;
@@ -59,6 +63,7 @@ public class Login extends DialogFragment{
     LinearLayout cPassPage;
     int dialogo;
     MaterialDialog dialog;
+    private OnResponseCallback listener;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -132,6 +137,7 @@ public class Login extends DialogFragment{
                             izquierda.setText("ATRAS");
                             derecha.setText("INICIAR SESION");
                             derecha.setVisibility(View.VISIBLE);
+                            derecha.setEnabled(true);
                         }
                     });
                     nuevo.setOnClickListener(new View.OnClickListener() {
@@ -143,6 +149,7 @@ public class Login extends DialogFragment{
                             derecha.setText("CREAR");
                             derecha.setVisibility(View.VISIBLE);
                             izquierda.setText("ATRAS");
+                            derecha.setEnabled(true);
                             dialogo=1;
                         }
                     });
@@ -551,5 +558,9 @@ public class Login extends DialogFragment{
                 Toast.makeText(getActivity(),"Contraseña Cambiada!!",Toast.LENGTH_SHORT).show();
                 break;
         }
+    }
+
+    public void setCustomObjectListener(OnResponseCallback listener) {
+        this.listener = listener;
     }
 }

@@ -8,8 +8,9 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 84
-        versionName "1.9.7"
+        versionCode 85
+        versionName "1.9.8"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -49,8 +50,11 @@ dependencies {
     compile 'com.github.recruit-lifestyle:WaveSwipeRefreshLayout:1.2'
     compile 'se.simbio.encryption:library:1.2.0'
     compile 'com.github.paolorotolo:appintro:3.2.0'
+    compile 'com.parse.bolts:bolts-android:1.+'
+    compile 'com.parse:parse-android:1.+'
     compile('com.mikepenz:materialdrawer:4.0.0@aar') {
         transitive = true
     }
     compile files('src/trace.jar')
+
 }

@@ -116,11 +116,8 @@
                             android:scaleType="fitEnd"
                             android:clickable="true"
                             android:onClick="onDesClicked" />
-
                     </LinearLayout>
-
                 </LinearLayout>
-
             </android.support.v7.widget.CardView>
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"

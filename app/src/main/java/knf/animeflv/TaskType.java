@@ -23,10 +23,12 @@ public enum TaskType {
     CONTAR(17),
     CHECK_DOWN(18),
     CHECK_STREAM(19),
-    UPDATE(20);
+    UPDATE(20),
+    APP_BAN(21),
+    CHAT_BAN(22);
     int value;
 
-    private TaskType(int value) {
+    TaskType(int value) {
         this.value = value;
     }
 }

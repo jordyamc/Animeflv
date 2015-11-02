@@ -30,7 +30,7 @@ import knf.animeflv.Recyclers.RecyclerAdapter;
 /**
  * Created by Jordy on 23/08/2015.
  */
-public class Favoritos extends AppCompatActivity implements RequestFav.callback{
+public class Favoritos extends AppCompatActivity implements RequestFav.callback, LoginServer.callback {
     RecyclerView recyclerView;
     Toolbar toolbar;
     Toolbar ltoolbar;
@@ -179,6 +179,11 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback{
         if (!isXLargeScreen(getApplicationContext()) ) {
             return;
         }
+    }
+
+    @Override
+    public void response(String data, TaskType taskType) {
+
     }
 
     @Override

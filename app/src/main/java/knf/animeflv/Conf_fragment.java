@@ -56,7 +56,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     MediaPlayer dango;
     private FragmentActivity myContext;
     MaterialDialog dialog;
-    Login login;
+    Login login = new Login();
     //Ringtone r;
     @Override
     public void onCreate(final Bundle savedInstanceState){
@@ -133,7 +133,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 //Login.create().show(myContext.getSupportFragmentManager(),"Login");
                 //Login.create().show(myContext.getSupportFragmentManager(), "login");
                 if (isNetworkAvailable()) {
-                    login = Login.create();
+                    //login = Login.create();
                     login.show(myContext.getSupportFragmentManager(), "login");
                 }else {
                     Toast.makeText(getActivity(),"Necesitas Internet!!!",Toast.LENGTH_SHORT).show();

@@ -28,13 +28,19 @@ public class LoginServer extends AsyncTask<String,String,String> {
     String email_coded;
     String pass_coded;
     MaterialDialog materialDialog;
+    callback call;
     public LoginServer(Context c,TaskType taskType,@Nullable String mail,@Nullable String email_c,@Nullable String pass_c,@Nullable MaterialDialog dialog){
         this.context=c;
         this.taskType=taskType;
+        call = (callback) c;
         if (mail!=null)this.email=mail;
         if (email_c!=null)this.email_coded=email_c;
         if (pass_c!=null)this.pass_coded=pass_c;
         if (dialog!=null)this.materialDialog=dialog;
+    }
+
+    public interface callback {
+        void response(String data, TaskType taskType);
     }
     @Override
     protected String doInBackground(String... params) {
@@ -82,6 +88,7 @@ public class LoginServer extends AsyncTask<String,String,String> {
             }
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             sharedPreferences.edit().putString("nCuenta_Status", state).apply();
+            call.response("OK", taskType);
         }
         if (taskType==TaskType.GET_FAV){
             Log.d("GET State",state);
@@ -93,11 +100,11 @@ public class LoginServer extends AsyncTask<String,String,String> {
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", email_coded).apply();
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", pass_coded).apply();
                 if (!s.toLowerCase().trim().contains(":;:")) {
-                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", context.MODE_PRIVATE);
+                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
                     sharedPreferences.edit().putString("favoritos", s.trim()).apply();
                     defsharedPreferences.edit().putString("GET_Status", "exito").apply();
                 }else {
-                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", context.MODE_PRIVATE);
+                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
                     String[] separar=s.trim().split(":;:");
                     sharedPreferences.edit().putString("favoritos", separar[0]).apply();
                     sharedPreferences.edit().putString("vistos", separar[1]).apply();
@@ -105,6 +112,7 @@ public class LoginServer extends AsyncTask<String,String,String> {
                 }
                 materialDialog.dismiss();
                 Toast.makeText(context, "Sesion Iniciada!!", Toast.LENGTH_SHORT).show();
+                call.response("OK", taskType);
             }
         }
         if (taskType==TaskType.GET_FAV_SL){
@@ -114,11 +122,11 @@ public class LoginServer extends AsyncTask<String,String,String> {
             defsharedPreferences.edit().putString("GETSL_Status", state).apply();
             if (s.toLowerCase().trim().contains(":::")||s.toLowerCase().trim().equals("")) {
                 if (!s.toLowerCase().trim().contains(":;:")) {
-                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", context.MODE_PRIVATE);
+                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
                     sharedPreferences.edit().putString("favoritos", s.trim()).apply();
                     defsharedPreferences.edit().putString("GETSL_Status", "exito").apply();
                 }else {
-                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", context.MODE_PRIVATE);
+                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
                     String[] separar=s.trim().split(":;:");
                     sharedPreferences.edit().putString("favoritos", separar[0]).apply();
                     sharedPreferences.edit().putString("vistos", separar[1]).apply();
