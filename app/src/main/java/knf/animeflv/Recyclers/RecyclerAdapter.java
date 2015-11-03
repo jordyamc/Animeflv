@@ -114,13 +114,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         request.setDestinationInExternalPublicDir("Animeflv/download/" + id, id + "_" + item + ".mp4");
                         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                         long l = manager.enqueue(request);
-                        context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString(eids.get(position), Long.toString(l)).apply();
-                        String descargados=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("eids_descarga","");
-                        context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("eids_descarga",descargados+eids.get(position)+":::").apply();
-                        String tits=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("titulos_descarga","");
-                        String epID=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("epIDS_descarga", "");
-                        context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("titulos_descarga",tits+id+":::").apply();
-                        context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID + id + "_" + item + ":::").apply();
+                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eids.get(position), Long.toString(l)).apply();
+                        String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
+                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados + eids.get(position) + ":::").apply();
+                        String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
+                        String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
+                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("titulos_descarga", tits + id + ":::").apply();
+                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID + id + "_" + item + ":::").apply();
                         holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
                         holder.ib_ver.setImageResource(R.drawable.ic_rep_r);
                         holder.ib_ver.setEnabled(true);
@@ -130,9 +130,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                             String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
                             Svistos=Svistos+";;;"+"visto" + id + "_" + item;
                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                            String favoritos=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("favoritos", "");
+                            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
                             if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
                             }
                             holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                         }
@@ -168,13 +168,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                         request.setDestinationInExternalPublicDir("Animeflv/download/" + id, id + "_" + item + ".mp4");
                                         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                                         long l = manager.enqueue(request);
-                                        context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString(eids.get(position), Long.toString(l)).apply();
-                                        String descargados=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("eids_descarga","");
-                                        context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("eids_descarga",descargados+eids.get(position)+":::").apply();
-                                        String tits=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("titulos_descarga","");
-                                        String epID=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("epIDS_descarga", "");
-                                        context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("titulos_descarga",tits+id+":::").apply();
-                                        context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("epIDS_descarga",epID+id+"_"+item+":::").apply();
+                                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eids.get(position), Long.toString(l)).apply();
+                                        String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
+                                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados + eids.get(position) + ":::").apply();
+                                        String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
+                                        String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
+                                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("titulos_descarga", tits + id + ":::").apply();
+                                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID + id + "_" + item + ":::").apply();
                                         holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
                                         holder.ib_ver.setImageResource(R.drawable.ic_rep_r);
                                         holder.ib_ver.setEnabled(true);
@@ -184,9 +184,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                             String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
                                             Svistos=Svistos+";;;"+"visto" + id + "_" + item;
                                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                                            String favoritos=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("favoritos", "");
+                                            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
                                             if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                                                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                                                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
                                             }
                                             holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                                         }
@@ -226,9 +226,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                                     String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
                                                     Svistos=Svistos+";;;"+"visto" + id + "_" + item;
                                                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                                                    String favoritos=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("favoritos", "");
+                                                    String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
                                                     if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                                                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                                                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
                                                     }
                                                     holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                                                 }
@@ -247,9 +247,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                                     String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
                                                     Svistos=Svistos+";;;"+"visto" + id + "_" + item;
                                                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                                                    String favoritos=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("favoritos", "");
+                                                    String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
                                                     if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                                                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                                                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
                                                     }
                                                     holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                                                 }
@@ -285,32 +285,32 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                     if (file.delete()) {
                                         holder.ib_des.setImageResource(R.drawable.ic_get_r);
                                         holder.ib_ver.setImageResource(R.drawable.ic_ver_no);
-                                        long l = Long.parseLong(context.getSharedPreferences("data", context.MODE_PRIVATE).getString(eids.get(position), "0"));
+                                        long l = Long.parseLong(context.getSharedPreferences("data", Context.MODE_PRIVATE).getString(eids.get(position), "0"));
                                         if (l != 0) {
                                             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                                             manager.remove(l);
-                                            String descargados=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("eids_descarga","");
-                                            context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eids.get(position)+":::","")).apply();
-                                            String tits=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("titulos_descarga","");
-                                            String epID=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("epIDS_descarga","");
-                                            context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("titulos_descarga",tits.replace(id+":::","")).apply();
-                                            context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("epIDS_descarga",epID.replace(id+"_"+item+":::","")).apply();
+                                            String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
+                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eids.get(position) + ":::", "")).apply();
+                                            String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
+                                            String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
+                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("titulos_descarga", tits.replace(id + ":::", "")).apply();
+                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(id + "_" + item + ":::", "")).apply();
                                         }
                                         Toast.makeText(context, "Archivo Eliminado", Toast.LENGTH_SHORT).show();
                                     }
                                     if (sd.delete()) {
                                         holder.ib_des.setImageResource(R.drawable.ic_get_r);
                                         holder.ib_ver.setImageResource(R.drawable.ic_ver_no);
-                                        long l = Long.parseLong(context.getSharedPreferences("data", context.MODE_PRIVATE).getString(eids.get(position), "0"));
+                                        long l = Long.parseLong(context.getSharedPreferences("data", Context.MODE_PRIVATE).getString(eids.get(position), "0"));
                                         if (l != 0) {
                                             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                                             manager.remove(l);
-                                            String descargados=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("eids_descarga","");
-                                            context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eids.get(position)+":::","")).apply();
-                                            String tits=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("titulos_descarga","");
-                                            String epID=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("epIDS_descarga","");
-                                            context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("titulos_descarga",tits.replace(id+":::","")).apply();
-                                            context.getSharedPreferences("data", context.MODE_PRIVATE).edit().putString("epIDS_descarga",epID.replace(id+"_"+item+":::","")).apply();
+                                            String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
+                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eids.get(position) + ":::", "")).apply();
+                                            String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
+                                            String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
+                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("titulos_descarga", tits.replace(id + ":::", "")).apply();
+                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(id + "_" + item + ":::", "")).apply();
                                         }
                                         Toast.makeText(context, "Archivo Eliminado", Toast.LENGTH_SHORT).show();
                                     }
@@ -365,9 +365,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
                     Svistos=Svistos+";;;"+"visto" + id + "_" + item;
                     context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                    String favoritos=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("favoritos", "");
+                    String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
                     if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                        //new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                        //new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
                     }
                     holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                 }else {
@@ -375,9 +375,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
                     Svistos=Svistos.replace(";;;"+"visto" + id + "_" + item,"");
                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                    String favoritos=context.getSharedPreferences("data", context.MODE_PRIVATE).getString("favoritos", "");
+                    String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
                     if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                        //new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                        //new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
                     }
                     holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
                 }

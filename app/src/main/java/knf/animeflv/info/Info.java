@@ -134,7 +134,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
         String Svistos=getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
         String favoritos=getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
         if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-            //new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+            //new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
         }
     }
     public void toast(String texto){
@@ -212,7 +212,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
                 getSharedPreferences("data",MODE_PRIVATE).edit().putString("favoritos",builder.toString()).commit();
                 String vistos=getSharedPreferences("data",MODE_PRIVATE).getString("vistos","");
                 if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString()+":;:"+vistos);
+                    new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString() + ":;:" + vistos);
                 }
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_no,Amenu);
@@ -233,7 +233,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
                 getSharedPreferences("data",MODE_PRIVATE).edit().putString("favoritos",builderNo.toString()).commit();
                 String vistos1=getSharedPreferences("data",MODE_PRIVATE).getString("vistos","");
                 if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString()+":;:"+vistos1);
+                    new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString() + ":;:" + vistos1);
                 }
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_si, Amenu);
@@ -377,7 +377,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
         String Svistos=getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
         String favoritos=getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
         if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-            new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+            new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
         }
     }
 

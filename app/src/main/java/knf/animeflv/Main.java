@@ -33,6 +33,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -51,6 +52,7 @@ import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.utils.Utils;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -226,7 +228,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     String[] numeros;
     String[] titulos;
     String url;
-    String inicio = "http://animeflv.com/api.php?accion=inicio";
+    String inicio = "http://animeflv.net/api.php?accion=inicio";
     String json = "{}";
     Alarm alarm = new Alarm();
     String ext_storage_state = Environment.getExternalStorageState();
@@ -274,11 +276,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     Boolean tbool;
     int APP = 1;
     int CHAT = 2;
+    private Handler handler = new Handler();
+    String urlInfoT = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
-        ExceptionHandler.register(this, "http://necrotic-neganebulus.hol.es/errors/server.php");
+        ExceptionHandler.register(this, "http://animeflv-app.ultimatefreehost.in/errors/server.php");
         context = this;
         shouldExecuteOnResume = false;
         if (!getSharedPreferences("data", MODE_PRIVATE).getBoolean("intro", false)) {
@@ -332,8 +337,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         if (isNetworkAvailable()) {
             Log.d("Registrar", androidID);
-            //web.loadUrl("http://necrotic-neganebulus.hol.es/contador.php?id=" + androidID.trim());
-            new Requests(context, TaskType.CONTAR).execute("http://necrotic-neganebulus.hol.es/contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode));
+            //web.loadUrl("http://animeflv-app.ultimatefreehost.in/contador.php?id=" + androidID.trim());
+            new Requests(context, TaskType.CONTAR).execute("http://animeflv-app.ultimatefreehost.in/contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode));
         }
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -445,12 +450,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                         if (!feedback.trim().equals("")) {
                                                             if (isNetworkAvailable()) {
                                                                 if (tipo == 0) {
-                                                                    webViewFeed.loadUrl("http://necrotic-neganebulus.hol.es/feedback.php?tipo=" + type + "&cuenta=" + email + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
+                                                                    webViewFeed.loadUrl("http://animeflv-app.ultimatefreehost.in/feedback.php?tipo=" + type + "&cuenta=" + email + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
                                                                 } else {
                                                                     if (type.equals("twitter") && !Scuenta.startsWith("@")) {
                                                                         Scuenta = "@" + Scuenta;
                                                                     }
-                                                                    webViewFeed.loadUrl("http://necrotic-neganebulus.hol.es/feedback.php?tipo=" + type + "&cuenta=" + Scuenta.replace(" ", "_") + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
+                                                                    webViewFeed.loadUrl("http://animeflv-app.ultimatefreehost.in/feedback.php?tipo=" + type + "&cuenta=" + Scuenta.replace(" ", "_") + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
                                                                 }
                                                                 new Handler().postDelayed(new Runnable() {
                                                                     @Override
@@ -540,7 +545,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 webViewFeed.setWebViewClient(new WebViewClient() {
                                     @Override
                                     public void onPageFinished(WebView view, String url) {
-                                        if (url.trim().equals("http://necrotic-neganebulus.hol.es/feedback.php?ok=ok") && !cancelPost) {
+                                        if (url.trim().equals("http://animeflv-app.ultimatefreehost.in/feedback.php?ok=ok") && !cancelPost) {
                                             view.loadUrl("about:blank");
                                             cancelPost = true;
                                             toast("Sugerencia enviada");
@@ -667,6 +672,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             descarga.delete();
         }
         ActualizarFavoritos();
+        handler.postDelayed(runnable, 60000);
     }
 
     public void ActualizarFavoritos() {
@@ -674,7 +680,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
             String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
             if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                new Requests(this, TaskType.GET_FAV).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
+                new Requests(this, TaskType.GET_FAV).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
             }
         }
     }
@@ -991,88 +997,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             IBVT.setEnabled(false);
                             descargando = false;
                         }
-                        /*switch (view.getId()) {
-                            case R.id.ib_descargar_cardD1:
-                                url = getUrl(titulos[0], numeros[0]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD2:
-                                url = getUrl(titulos[1], numeros[1]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD3:
-                                url = getUrl(titulos[2], numeros[2]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD4:
-                                url = getUrl(titulos[3], numeros[3]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD5:
-                                url = getUrl(titulos[4], numeros[4]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD6:
-                                url = getUrl(titulos[5], numeros[5]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD7:
-                                url = getUrl(titulos[6], numeros[6]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD8:
-                                url = getUrl(titulos[7], numeros[7]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD9:
-                                url = getUrl(titulos[8], numeros[8]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD10:
-                                url = getUrl(titulos[9], numeros[9]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD11:
-                                url = getUrl(titulos[10], numeros[10]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD12:
-                                url = getUrl(titulos[11], numeros[11]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD13:
-                                url = getUrl(titulos[12], numeros[12]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD14:
-                                url = getUrl(titulos[13], numeros[13]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD15:
-                                url = getUrl(titulos[14], numeros[14]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD16:
-                                url = getUrl(titulos[15], numeros[15]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD17:
-                                url = getUrl(titulos[16], numeros[16]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD18:
-                                url = getUrl(titulos[17], numeros[17]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD19:
-                                url = getUrl(titulos[18], numeros[18]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD20:
-                                url = getUrl(titulos[19], numeros[19]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                        }*/
                     } else {
                         ndialog = new MaterialDialog.Builder(context)
                                 .title(titulos[index])
@@ -1111,88 +1035,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                             IBVT.setEnabled(false);
                                             descargando = false;
                                         }
-                        /*switch (view.getId()) {
-                            case R.id.ib_descargar_cardD1:
-                                url = getUrl(titulos[0], numeros[0]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD2:
-                                url = getUrl(titulos[1], numeros[1]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD3:
-                                url = getUrl(titulos[2], numeros[2]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD4:
-                                url = getUrl(titulos[3], numeros[3]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD5:
-                                url = getUrl(titulos[4], numeros[4]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD6:
-                                url = getUrl(titulos[5], numeros[5]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD7:
-                                url = getUrl(titulos[6], numeros[6]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD8:
-                                url = getUrl(titulos[7], numeros[7]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD9:
-                                url = getUrl(titulos[8], numeros[8]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD10:
-                                url = getUrl(titulos[9], numeros[9]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD11:
-                                url = getUrl(titulos[10], numeros[10]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD12:
-                                url = getUrl(titulos[11], numeros[11]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD13:
-                                url = getUrl(titulos[12], numeros[12]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD14:
-                                url = getUrl(titulos[13], numeros[13]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD15:
-                                url = getUrl(titulos[14], numeros[14]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD16:
-                                url = getUrl(titulos[15], numeros[15]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD17:
-                                url = getUrl(titulos[16], numeros[16]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD18:
-                                url = getUrl(titulos[17], numeros[17]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD19:
-                                url = getUrl(titulos[18], numeros[18]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD20:
-                                url = getUrl(titulos[19], numeros[19]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                        }*/
                                         ndialog.dismiss();
                                     }
 
@@ -1224,88 +1066,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                             IBVT.setEnabled(false);
                                             descargando = false;
                                         }
-                        /*switch (view.getId()) {
-                            case R.id.ib_descargar_cardD1:
-                                url = getUrl(titulos[0], numeros[0]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD2:
-                                url = getUrl(titulos[1], numeros[1]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD3:
-                                url = getUrl(titulos[2], numeros[2]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD4:
-                                url = getUrl(titulos[3], numeros[3]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD5:
-                                url = getUrl(titulos[4], numeros[4]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD6:
-                                url = getUrl(titulos[5], numeros[5]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD7:
-                                url = getUrl(titulos[6], numeros[6]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD8:
-                                url = getUrl(titulos[7], numeros[7]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD9:
-                                url = getUrl(titulos[8], numeros[8]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD10:
-                                url = getUrl(titulos[9], numeros[9]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD11:
-                                url = getUrl(titulos[10], numeros[10]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD12:
-                                url = getUrl(titulos[11], numeros[11]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD13:
-                                url = getUrl(titulos[12], numeros[12]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD14:
-                                url = getUrl(titulos[13], numeros[13]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD15:
-                                url = getUrl(titulos[14], numeros[14]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD16:
-                                url = getUrl(titulos[15], numeros[15]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD17:
-                                url = getUrl(titulos[16], numeros[16]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD18:
-                                url = getUrl(titulos[17], numeros[17]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD19:
-                                url = getUrl(titulos[18], numeros[18]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                            case R.id.ib_descargar_cardD20:
-                                url = getUrl(titulos[19], numeros[19]);
-                                new Requests(this, TaskType.GET_HTML1).execute(url);
-                                break;
-                        }*/
                                         ndialog.dismiss();
                                     }
 
@@ -1401,14 +1161,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         switch (Type) {
             case 1:
                 if (isNetworkAvailable()) {
-                    new Requests(context, TaskType.APP_BAN).execute("http://necrotic-neganebulus.hol.es/ban-hammer.php?type=get&id=" + androidID);
+                    new Requests(context, TaskType.APP_BAN).execute("http://animeflv-app.ultimatefreehost.in/ban-hammer.php?type=get&id=" + androidID);
                 } else if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("appBanned", false)) {
                     toast("Has sido baneado de la app :(");
                     finish();
                 }
                 break;
             case 2:
-                new Requests(context, TaskType.CHAT_BAN).execute("http://necrotic-neganebulus.hol.es/ban-hammer.php?type=get&id=" + androidID);
+                new Requests(context, TaskType.CHAT_BAN).execute("http://animeflv-app.ultimatefreehost.in/ban-hammer.php?type=get&id=" + androidID);
                 break;
         }
     }
@@ -1473,6 +1233,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("aid", aidInfo);
         editor.commit();
+        urlInfoT = "http://animeflv.com/api.php?accion=anime&aid=" + aid;
         new Requests(this, TaskType.GET_INFO).execute("http://animeflv.com/api.php?accion=anime&aid=" + aid);
     }
 
@@ -1722,22 +1483,34 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             @Override
             public void onPageFinished(WebView view, String url) {
                 //web.loadUrl("javascript:"+"var num=e();"+"window.HtmlViewer.showHTMLD2(e());");
-                if (!url.startsWith("http://necrotic-neganebulus.hol.es/contador.php?id=")) {
-                    if (url.contains("zippyshare.com") || url.contains("blank")) {
-                        web.loadUrl("javascript:("
-                                + "function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);}"
-                                + ")()");
+                if (!url.contains("api.php")) {
+                    if (!url.contains("animeflv")) {
+                        if (url.contains("zippyshare.com") || url.contains("blank")) {
+                            web.loadUrl("javascript:("
+                                    + "function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);}"
+                                    + ")()");
+                        } else {
+                            isDesc.add(Tindex, false);
+                            GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+                            GIBT.setImageResource(R.drawable.ic_get_r);
+                            IBsVerList.get(Tindex).setImageResource(R.drawable.ic_ver_no);
+                            IBsVerList.get(Tindex).setEnabled(false);
+                            descargando = false;
+                            toast("Error al descargar");
+                        }
                     } else {
-                        isDesc.add(Tindex, false);
-                        GIBT.setScaleType(ImageView.ScaleType.FIT_END);
-                        GIBT.setImageResource(R.drawable.ic_get_r);
-                        IBsVerList.get(Tindex).setImageResource(R.drawable.ic_ver_no);
-                        IBsVerList.get(Tindex).setEnabled(false);
-                        descargando = false;
-                        toast("Error al descargar");
+                        web.loadUrl(inicio);
                     }
                 } else {
-                    getSharedPreferences("data", MODE_PRIVATE).edit().putInt("reg" + Integer.toString(versionCode), 1);
+                    if (view.getUrl().contains("api.php?accion=anime")) {
+                        web.loadUrl("javascript:window.HtmlViewer.HTMLInfo(document.getElementsByTagName('body')[0].innerHTML);");
+                        //web.loadUrl("about:blank");
+                    } else {
+                        if (view.getUrl().contains("api.php?accion=inicio")) {
+                            web.loadUrl("javascript:window.HtmlViewer.showHTMLD2(document.getElementsByTagName('body')[0].innerHTML);");
+                            //web.loadUrl("about:blank");
+                        }
+                    }
                 }
             }
 
@@ -2324,6 +2097,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
     }
 
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            ActualizarFavoritos();
+            handler.postDelayed(this, 60000);
+        }
+    };
+
     public static boolean isNumeric(String str) {
         DecimalFormatSymbols currentLocaleSymbols = DecimalFormatSymbols.getInstance();
         char localeMinusSign = currentLocaleSymbols.getMinusSign();
@@ -2658,6 +2439,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     if (data.trim().equals("error")) {
                         toast("Error en servidor, sin cache para mostrar");
                         if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
+                        web.loadUrl(inicio);
                     }
                     if (!isNetworkAvailable()) {
                         toast("Sin cache para mostrar");
@@ -2668,6 +2450,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     String infile = getStringFromFile(file_loc);
                     if (data.trim().equals("error"))
                         toast("Error en servidor, cargando desde cache");
+                    web.loadUrl(inicio);
                     if (!isNetworkAvailable()) toast("Cargando desde cache");
                     Log.d("Cargar", "Json existente");
                     getData(infile);
@@ -2679,7 +2462,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             web_Links.loadData(data, "text/html", "UTF-8");
         }
         if (taskType == TaskType.GET_INFO) {
-            actCacheInfo(data);
+            if (isJSONValid(data.trim())) {
+                actCacheInfo(data);
+            } else {
+                if (data.trim().equals("error")) {
+                    web.loadUrl(urlInfoT);
+                }
+            }
         }
         if (taskType == TaskType.GET_HTML2) {
             int a = Integer.parseInt(data.substring(data.indexOf("document.getElementById('lang-one').a = ") + 40, data.indexOf("document.getElementById('lang-one').a = ") + 46).trim());
@@ -2697,14 +2486,25 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (taskType == TaskType.GET_FAV) {
             if (data.contains(":::")) {
                 if (!data.contains(":;:")) {
-                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", data.trim()).commit();
+                    String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
+                    if (!favs.equals(data.trim())) {
+                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", data.trim()).commit();
+                        new Requests(context, TaskType.GET_INICIO).execute(inicio);
+                    }
                 } else {
                     String[] datas = data.trim().split(":;:");
-                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", datas[0]).commit();
-                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("vistos", datas[1]).commit();
-                    String[] v = datas[1].split(";;;");
-                    for (String s : v) {
-                        getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, true).apply();
+                    String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
+                    if (!favs.equals(datas[0])) {
+                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", datas[0]).commit();
+                        new Requests(context, TaskType.GET_INICIO).execute(inicio);
+                    }
+                    String vistos = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
+                    if (!vistos.equals(datas[1])) {
+                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("vistos", datas[1]).commit();
+                        String[] v = datas[1].split(";;;");
+                        for (String s : v) {
+                            getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, true).apply();
+                        }
                     }
                 }
             }
@@ -2873,8 +2673,33 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
 
         @JavascriptInterface
-        public void showHTMLD2(String html) {
-            Log.d("Zippy", html);
+        public void showHTMLD2(final String htmlInicio) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (isJSONValid(htmlInicio)) {
+                        getData(htmlInicio.trim());
+                        toast("Cargando modo alternativo");
+                    } else {
+                        web.loadUrl(inicio);
+                    }
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void HTMLInfo(final String htmlInfo) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (isJSONValid(htmlInfo)) {
+                        actCacheInfo(htmlInfo.trim());
+                        toast("Cargando Info en modo alternativo");
+                    } else {
+                        web.loadUrl(urlInfoT);
+                    }
+                }
+            });
         }
     }
 

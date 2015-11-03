@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -172,6 +173,29 @@ public class Chat extends AppCompatActivity implements LoginServer.callback {
     private void setupMessagePosting() {
         etMessage = (EditText) findViewById(R.id.etMessage);
         etMessage.setTextColor(getResources().getColor(R.color.black));
+        etMessage.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.KEYCODE_ENTER) {
+                    String body = etMessage.getText().toString();
+                    String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+                    if (body.length() > 0) {
+                        Message message = new Message();
+                        message.setUserId(sUserId);
+                        message.setBody(body);
+                        message.setAndroidID(androidID);
+                        message.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                receiveMessage();
+                            }
+                        });
+                        etMessage.setText("");
+                    }
+                }
+                return false;
+            }
+        });
         btSend = (Button) findViewById(R.id.btSend);
         lvChat = (ListView) findViewById(R.id.lvChat);
         mMessages = new ArrayList<Message>();

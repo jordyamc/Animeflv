@@ -16,7 +16,7 @@
         android:id="@+id/tvBody"
         android:padding="20dp"
         android:maxLines="8"
-        android:inputType="textMultiLine"
+        android:inputType="textMultiLine|textNoSuggestions"
         android:layout_marginRight="64dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

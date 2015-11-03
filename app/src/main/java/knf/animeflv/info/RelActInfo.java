@@ -14,6 +14,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,7 +56,7 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
         aidInfo=aid;
         SharedPreferences sharedPreferences=getSharedPreferences("data",MODE_PRIVATE);
         SharedPreferences.Editor editor=sharedPreferences.edit();
-        editor.putString("aid",aidInfo);
+        editor.putString("aid", aidInfo);
         editor.commit();
         new Requests(this, TaskType.GET_INFO).execute("http://animeflv.com/api.php?accion=anime&aid=" + aid);
     }
@@ -158,13 +162,31 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
             }
         }
     }
+
+    public boolean isJSONValid(String test) {
+        try {
+            new JSONObject(test);
+        } catch (JSONException ex) {
+            try {
+                new JSONArray(test);
+            } catch (JSONException ex1) {
+                return false;
+            }
+        }
+        return true;
+    }
     public void toast(String texto){
         Toast.makeText(this, texto, Toast.LENGTH_LONG).show();
     }
     @Override
     public void sendtext1(String data,TaskType taskType){
         if (taskType==TaskType.GET_INFO){
-            actCacheInfo(data);
+            if (isJSONValid(data)) {
+                actCacheInfo(data);
+            } else {
+                toast("Error en servidor");
+                finish();
+            }
         }
     }
 }

@@ -29,7 +29,7 @@ public class Requests extends AsyncTask<String,String,String> {
     TaskType taskType;
 
     public interface callback{
-        public void sendtext1(String data,TaskType taskType);
+        void sendtext1(String data, TaskType taskType);
     }
     public Requests(Context con, TaskType taskType){
         call=(callback) con;
@@ -41,12 +41,13 @@ public class Requests extends AsyncTask<String,String,String> {
         StringBuilder builder = new StringBuilder();
         HttpURLConnection c = null;
         try {
-            Log.d("URL",params[0]);
             URL u = new URL(params[0]);
             c = (HttpURLConnection) u.openConnection();
             c.setRequestProperty("Content-length", "0");
             c.setRequestProperty( "User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4" );
             c.setUseCaches(true);
+            c.setInstanceFollowRedirects(true);
+            HttpURLConnection.setFollowRedirects(true);
             c.setConnectTimeout(15000);
             c.setAllowUserInteraction(false);
             c.connect();
@@ -58,13 +59,16 @@ public class Requests extends AsyncTask<String,String,String> {
                 sb.append(line + "\n");
             }
             br.close();
-            Log.d("Requests URL Normal", u.toString());
+            if (!c.getURL().toString().contains("fav-server"))
+                Log.d("Requests URL Normal", u.toString());
             if (c.getURL()!=u){
                 if (!c.getURL().toString().trim().startsWith("http://animeflv")) {
-                    Log.d("Requests URL ERROR", c.getURL().toString());
+                    if (!c.getURL().toString().contains("fav-server"))
+                        Log.d("Requests URL ERROR", c.getURL().toString());
                     _response = "error";
                 }else {
-                    Log.d("Requests URL OK",c.getURL().toString());
+                    if (!c.getURL().toString().contains("fav-server"))
+                        Log.d("Requests URL OK", c.getURL().toString());
                     if (c.getResponseCode()==HttpURLConnection.HTTP_OK) {
                         _response = sb.toString();
                     }else{
@@ -72,7 +76,8 @@ public class Requests extends AsyncTask<String,String,String> {
                     }
                 }
             }else {
-                Log.d("Requests URL OK",c.getURL().toString());
+                if (!c.getURL().toString().contains("fav-server"))
+                    Log.d("Requests URL OK", c.getURL().toString());
                 if (c.getResponseCode()==HttpURLConnection.HTTP_OK) {
                     _response = sb.toString();
                 }else{

@@ -30,7 +30,7 @@ import knf.animeflv.Recyclers.RecyclerAdapter;
 /**
  * Created by Jordy on 23/08/2015.
  */
-public class Favoritos extends AppCompatActivity implements RequestFav.callback, LoginServer.callback {
+public class Favoritos extends AppCompatActivity implements RequestFav.callback, LoginServer.callback, Requests.callback {
     RecyclerView recyclerView;
     Toolbar toolbar;
     Toolbar ltoolbar;
@@ -40,6 +40,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     String[] favoritos={};
     Context context;
     boolean shouldExecuteOnResume;
+    Handler handler = new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +77,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         final String email_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
         final String pass_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
         if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-            new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute("http://necrotic-neganebulus.hol.es/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
+            new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
         }
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -84,6 +85,25 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                 init();
             }
         },500);
+        handler.postDelayed(runnable, 1000);
+    }
+
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            ActualizarFavoritos();
+            handler.postDelayed(this, 1000);
+        }
+    };
+
+    public void ActualizarFavoritos() {
+        if (isNetworkAvailable()) {
+            String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
+            String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
+            if (!email_coded.equals("null") && !email_coded.equals("null")) {
+                new Requests(this, TaskType.GET_FAV).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
+            }
+        }
     }
     public void init(){
         SharedPreferences sharedPreferences=getSharedPreferences("data", MODE_PRIVATE);
@@ -141,14 +161,14 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             }
             List<String> links = new ArrayList<String>();
             for (String aid : aids) {
-                if (isNetworkAvailable()) {
+                /*if (isNetworkAvailable()) {
                     links.add("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg");
-                }else {
+                }else {*/
                     File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aid+".txt");
                     if (file.exists()){
                         links.add("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg");
                     }
-                }
+                //}
             }
             for (String tit : links) {
                 Log.d("URL IMG", tit);
@@ -184,6 +204,36 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     @Override
     public void response(String data, TaskType taskType) {
 
+    }
+
+    @Override
+    public void sendtext1(String data, TaskType taskType) {
+        if (taskType == TaskType.GET_FAV) {
+            if (data.contains(":::")) {
+                if (!data.contains(":;:")) {
+                    String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
+                    if (!favs.equals(data.trim())) {
+                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", data.trim()).commit();
+                        init();
+                    }
+                } else {
+                    String[] datas = data.trim().split(":;:");
+                    String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
+                    if (!favs.equals(datas[0])) {
+                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", datas[0]).commit();
+                        init();
+                    }
+                    String vistos = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
+                    if (!vistos.equals(datas[1])) {
+                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("vistos", datas[1]).commit();
+                        String[] v = datas[1].split(";;;");
+                        for (String s : v) {
+                            getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, true).apply();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override

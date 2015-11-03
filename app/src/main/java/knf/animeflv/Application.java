@@ -13,5 +13,9 @@ public class Application extends android.app.Application {
         Parse.enableLocalDatastore(this);
         ParseObject.registerSubclass(Message.class);
         Parse.initialize(this, "SSAa2CfCYAzpY3uqFf7ZMy19RU6jCgnVr2IbM6zC", "kownbaCYyGG07ZtlQDM5TEVZBezLzR32dzJIdzcF");
+        android.webkit.CookieSyncManager.createInstance(this);
+        android.webkit.CookieManager.getInstance().setAcceptCookie(true);
+        WebkitCookieManagerProxy coreCookieManager = new WebkitCookieManagerProxy(null, java.net.CookiePolicy.ACCEPT_ALL);
+        java.net.CookieHandler.setDefault(coreCookieManager);
     }
 }
