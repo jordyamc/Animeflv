@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -27,11 +26,13 @@ public class Requests extends AsyncTask<String,String,String> {
     String _response;
     callback call;
     TaskType taskType;
+    Context context;
 
     public interface callback{
         void sendtext1(String data, TaskType taskType);
     }
     public Requests(Context con, TaskType taskType){
+        context = con;
         call=(callback) con;
         this.taskType=taskType;
 
@@ -41,13 +42,14 @@ public class Requests extends AsyncTask<String,String,String> {
         StringBuilder builder = new StringBuilder();
         HttpURLConnection c = null;
         try {
+            String cookies = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("cookies", "");
             URL u = new URL(params[0]);
             c = (HttpURLConnection) u.openConnection();
             c.setRequestProperty("Content-length", "0");
-            c.setRequestProperty( "User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4" );
-            c.setUseCaches(true);
-            c.setInstanceFollowRedirects(true);
-            HttpURLConnection.setFollowRedirects(true);
+            c.setRequestProperty("User-Agent", "Mozilla/5.0 ( compatible ) ");
+            c.setRequestProperty("Accept", "*/*");
+            c.setRequestProperty("Cookie", cookies.trim().substring(0, cookies.indexOf(";") + 1));
+            c.setUseCaches(false);
             c.setConnectTimeout(15000);
             c.setAllowUserInteraction(false);
             c.connect();
@@ -86,7 +88,7 @@ public class Requests extends AsyncTask<String,String,String> {
             }
             //String fullPage = page.asXml();
         } catch (Exception e) {
-            Log.e("log_tag", "Error in http connection " + e.toString());
+            Log.e("Requests", "Error in http connection " + e.toString());
             _response="error";
         }
         return _response;

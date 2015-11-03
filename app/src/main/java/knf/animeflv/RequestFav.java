@@ -30,7 +30,7 @@ public class RequestFav extends AsyncTask<String,String,String> {
     HttpURLConnection c = null;
     URL u;
     public interface callback{
-        public void favCall(String data,TaskType taskType);
+        void favCall(String data, TaskType taskType);
     }
     public RequestFav(Context con, TaskType taskType){
         call=(callback) con;
@@ -45,7 +45,7 @@ public class RequestFav extends AsyncTask<String,String,String> {
             if (!file.exists()) {
                 try {
                     Log.d("aid", i);
-                    u = new URL("http://animeflv.com/api.php?accion=anime&aid=" + i);
+                    u = new URL("http://animeflv.moe/api.php?accion=anime&aid=" + i);
                     c = (HttpURLConnection) u.openConnection();
                     c.setRequestProperty("Content-length", "0");
                     c.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");

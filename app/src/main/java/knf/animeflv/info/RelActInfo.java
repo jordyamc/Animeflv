@@ -58,7 +58,7 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putString("aid", aidInfo);
         editor.commit();
-        new Requests(this, TaskType.GET_INFO).execute("http://animeflv.com/api.php?accion=anime&aid=" + aid);
+        new Requests(this, TaskType.GET_INFO).execute("http://animeflv.moe/api.php?accion=anime&aid=" + aid);
     }
     public static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));

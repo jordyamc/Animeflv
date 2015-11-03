@@ -228,7 +228,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     String[] numeros;
     String[] titulos;
     String url;
-    String inicio = "http://animeflv.net/api.php?accion=inicio";
+    String inicio = "http://animeflv.moe/api.php?accion=inicio";
     String json = "{}";
     Alarm alarm = new Alarm();
     String ext_storage_state = Environment.getExternalStorageState();
@@ -1177,7 +1177,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         tbool = busqueda;
         if (!busqueda) {
             if (isNetworkAvailable()) {
-                new Requests(context, TaskType.DIRECTORIO).execute("http://animeflv.com/api.php?accion=directorio");
+                new Requests(context, TaskType.DIRECTORIO).execute("http://animeflv.moe/api.php?accion=directorio");
             } else {
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!mediaStorage.exists()) {
@@ -1200,7 +1200,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         } else {
             if (isNetworkAvailable()) {
-                new Requests(context, TaskType.DIRECTORIO1).execute("http://animeflv.com/api.php?accion=directorio");
+                new Requests(context, TaskType.DIRECTORIO1).execute("http://animeflv.moe/api.php?accion=directorio");
             } else {
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!mediaStorage.exists()) {
@@ -1233,8 +1233,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("aid", aidInfo);
         editor.commit();
-        urlInfoT = "http://animeflv.com/api.php?accion=anime&aid=" + aid;
-        new Requests(this, TaskType.GET_INFO).execute("http://animeflv.com/api.php?accion=anime&aid=" + aid);
+        urlInfoT = "http://animeflv.moe/api.php?accion=anime&aid=" + aid;
+        new Requests(this, TaskType.GET_INFO).execute("http://animeflv.moe/api.php?accion=anime&aid=" + aid);
     }
 
     public void actCacheInfo(String json) {
@@ -1504,10 +1504,16 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 } else {
                     if (view.getUrl().contains("api.php?accion=anime")) {
                         web.loadUrl("javascript:window.HtmlViewer.HTMLInfo(document.getElementsByTagName('body')[0].innerHTML);");
+                        CookieManager cookieManager = CookieManager.getInstance();
+                        String cookies = cookieManager.getCookie(url);
+                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("cookies", cookies).apply();
                         //web.loadUrl("about:blank");
                     } else {
                         if (view.getUrl().contains("api.php?accion=inicio")) {
                             web.loadUrl("javascript:window.HtmlViewer.showHTMLD2(document.getElementsByTagName('body')[0].innerHTML);");
+                            CookieManager cookieManager = CookieManager.getInstance();
+                            String cookies = cookieManager.getCookie(url);
+                            getSharedPreferences("data", MODE_PRIVATE).edit().putString("cookies", cookies).apply();
                             //web.loadUrl("about:blank");
                         }
                     }
@@ -1962,7 +1968,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (ftitulo.trim().equals("diabolik-lovers-moreblood")) {
             ftitulo = "diabolik-lovers-more-blood";
         }
-        String link = "http://animeflv.com/ver/" + ftitulo + "-" + capitulo + ".html";
+        String link = "http://animeflv.moe/ver/" + ftitulo + "-" + capitulo + ".html";
         return link;
     }
 
