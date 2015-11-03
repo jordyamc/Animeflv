@@ -283,7 +283,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
-        ExceptionHandler.register(this, "http://animeflv-app.ultimatefreehost.in/errors/server.php");
+        ExceptionHandler.register(this, "http://animeflvapp.x10.mx/errors/server.php");
         context = this;
         shouldExecuteOnResume = false;
         if (!getSharedPreferences("data", MODE_PRIVATE).getBoolean("intro", false)) {
@@ -337,8 +337,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         if (isNetworkAvailable()) {
             Log.d("Registrar", androidID);
-            //web.loadUrl("http://animeflv-app.ultimatefreehost.in/contador.php?id=" + androidID.trim());
-            new Requests(context, TaskType.CONTAR).execute("http://animeflv-app.ultimatefreehost.in/contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode));
+            //web.loadUrl("http://animeflvapp.x10.mx/contador.php?id=" + androidID.trim());
+            new Requests(context, TaskType.CONTAR).execute("http://animeflvapp.x10.mx/contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode));
         }
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -450,12 +450,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                         if (!feedback.trim().equals("")) {
                                                             if (isNetworkAvailable()) {
                                                                 if (tipo == 0) {
-                                                                    webViewFeed.loadUrl("http://animeflv-app.ultimatefreehost.in/feedback.php?tipo=" + type + "&cuenta=" + email + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
+                                                                    webViewFeed.loadUrl("http://animeflvapp.x10.mx/feedback.php?tipo=" + type + "&cuenta=" + email + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
                                                                 } else {
                                                                     if (type.equals("twitter") && !Scuenta.startsWith("@")) {
                                                                         Scuenta = "@" + Scuenta;
                                                                     }
-                                                                    webViewFeed.loadUrl("http://animeflv-app.ultimatefreehost.in/feedback.php?tipo=" + type + "&cuenta=" + Scuenta.replace(" ", "_") + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
+                                                                    webViewFeed.loadUrl("http://animeflvapp.x10.mx/feedback.php?tipo=" + type + "&cuenta=" + Scuenta.replace(" ", "_") + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
                                                                 }
                                                                 new Handler().postDelayed(new Runnable() {
                                                                     @Override
@@ -545,7 +545,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 webViewFeed.setWebViewClient(new WebViewClient() {
                                     @Override
                                     public void onPageFinished(WebView view, String url) {
-                                        if (url.trim().equals("http://animeflv-app.ultimatefreehost.in/feedback.php?ok=ok") && !cancelPost) {
+                                        if (url.trim().equals("http://animeflvapp.x10.mx/feedback.php?ok=ok") && !cancelPost) {
                                             view.loadUrl("about:blank");
                                             cancelPost = true;
                                             toast("Sugerencia enviada");
@@ -680,7 +680,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
             String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
             if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                new Requests(this, TaskType.GET_FAV).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
+                new Requests(this, TaskType.GET_FAV).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
             }
         }
     }
@@ -1161,14 +1161,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         switch (Type) {
             case 1:
                 if (isNetworkAvailable()) {
-                    new Requests(context, TaskType.APP_BAN).execute("http://animeflv-app.ultimatefreehost.in/ban-hammer.php?type=get&id=" + androidID);
+                    new Requests(context, TaskType.APP_BAN).execute("http://animeflvapp.x10.mx/ban-hammer.php?type=get&id=" + androidID);
                 } else if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("appBanned", false)) {
                     toast("Has sido baneado de la app :(");
                     finish();
                 }
                 break;
             case 2:
-                new Requests(context, TaskType.CHAT_BAN).execute("http://animeflv-app.ultimatefreehost.in/ban-hammer.php?type=get&id=" + androidID);
+                new Requests(context, TaskType.CHAT_BAN).execute("http://animeflvapp.x10.mx/ban-hammer.php?type=get&id=" + androidID + "&ckattempt=1");
                 break;
         }
     }
@@ -2539,6 +2539,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("chatBanned", false).apply();
                     startActivity(new Intent(context, Chat.class));
                 }
+            } else {
+                Log.d("error", data);
             }
         }
     }

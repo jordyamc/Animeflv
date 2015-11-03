@@ -131,7 +131,7 @@ public class Login extends DialogFragment{
                         @Override
                         public void onClick(View v) {
                             dialogo=2;
-                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=list");
+                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=list");
                             main.setVisibility(View.GONE);
                             loginPage.setVisibility(View.VISIBLE);
                             izquierda.setText("ATRAS");
@@ -143,7 +143,7 @@ public class Login extends DialogFragment{
                     nuevo.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=list");
+                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=list");
                             main.setVisibility(View.GONE);
                             nCuenta.setVisibility(View.VISIBLE);
                             derecha.setText("CREAR");
@@ -156,7 +156,7 @@ public class Login extends DialogFragment{
                     cCorreo.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=list");
+                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=list");
                             main.setVisibility(View.GONE);
                             cCorreoPage.setVisibility(View.VISIBLE);
                             derecha.setText("CAMBIAR");
@@ -171,7 +171,7 @@ public class Login extends DialogFragment{
                     cPass.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=list");
+                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=list");
                             main.setVisibility(View.GONE);
                             cPassPage.setVisibility(View.VISIBLE);
                             derecha.setText("CAMBIAR");
@@ -291,11 +291,11 @@ public class Login extends DialogFragment{
                             Log.d("mail", encriytedmailfinal);
                             Log.d("pass", encriytedpassfinal);
                             Log.d("favs", fav);
-                            new LoginServer(getActivity(), TaskType.NEW_USER, email.getText().toString(), encriytedmailfinal, encriytedpassfinal, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=nCuenta&email_coded=" + encriytedmailfinal + "&pass_coded=" + encriytedpassfinal + "&fav_code=" + fav);
+                            new LoginServer(getActivity(), TaskType.NEW_USER, email.getText().toString(), encriytedmailfinal, encriytedpassfinal, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=nCuenta&email_coded=" + encriytedmailfinal + "&pass_coded=" + encriytedpassfinal + "&fav_code=" + fav);
                         }else {
                             Toast.makeText(getActivity(),"El correo ya esta registrado",Toast.LENGTH_SHORT).show();
                             dialogo=2;
-                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=list");
+                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=list");
                             nCuenta.setVisibility(View.GONE);
                             loginPage.setVisibility(View.VISIBLE);
                             izquierda.setText("ATRAS");
@@ -353,7 +353,7 @@ public class Login extends DialogFragment{
                         String encriytedpassfinal = encriytedpass.replace("=", "IGUAL").replace("&", "AMPERSAND").replace("\"", "COMILLA").replace("?", "PREGUNTA").replace("+", "MAS").replace("/", "SLIDE_DERECHO").replace(",", "COMA").trim();
                         Log.d("mail", encriytedmailfinal);
                         Log.d("pass", encriytedpassfinal);
-                        new LoginServer(getActivity(), TaskType.GET_FAV, login_email.getText().toString(), encriytedmailfinal, encriytedpassfinal, dialog).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=get&email_coded=" + encriytedmailfinal + "&pass_coded=" + encriytedpassfinal);
+                        new LoginServer(getActivity(), TaskType.GET_FAV, login_email.getText().toString(), encriytedmailfinal, encriytedpassfinal, dialog).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=get&email_coded=" + encriytedmailfinal + "&pass_coded=" + encriytedpassfinal);
                     }else {
                         login_email.setError("Correo no registrado");
                         login_email.requestFocus();
@@ -415,7 +415,7 @@ public class Login extends DialogFragment{
 
                                     Log.d("mail", encriytedmailfinal);
                                     Log.d("pass", encriytedpassfinal);
-                                    new LoginServer(getActivity(), TaskType.cPass, null, null, encriytednpassfinal, dialog).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=cPass&email_coded=" + encriytedmailfinal + "&pass_coded=" + encriytedpassfinal + "&new_pass_coded=" + encriytednpassfinal);
+                                    new LoginServer(getActivity(), TaskType.cPass, null, null, encriytednpassfinal, dialog).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=cPass&email_coded=" + encriytedmailfinal + "&pass_coded=" + encriytedpassfinal + "&new_pass_coded=" + encriytednpassfinal);
                                 }else {
                                     cPass_rncontrasena.setError("La Contraseña no Coincide");
                                     cPass_rncontrasena.requestFocus();
@@ -474,7 +474,7 @@ public class Login extends DialogFragment{
                             String encriytedpassfinal = encriytedpass.replace("=", "IGUAL").replace("&", "AMPERSAND").replace("\"", "COMILLA").replace("?", "PREGUNTA").replace("+", "MAS").replace("/", "SLIDE_DERECHO").replace(",", "COMA").trim();
                             Log.d("mail", encriytedmailfinal);
                             Log.d("pass", encriytedpassfinal);
-                            new LoginServer(getActivity(), TaskType.cCorreo, cCorreo_nemail.getText().toString(), encriytedmailfinal, null, dialog).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=cCuenta&past_email_coded=" + encriytedmailfinal + "&new_email_coded=" + encriytednmailfinal + "&pass_coded=" + encriytedpassfinal);
+                            new LoginServer(getActivity(), TaskType.cCorreo, cCorreo_nemail.getText().toString(), encriytedmailfinal, null, dialog).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=cCuenta&past_email_coded=" + encriytedmailfinal + "&new_email_coded=" + encriytednmailfinal + "&pass_coded=" + encriytedpassfinal);
                         } else {
                             cCorreo_email.setError("Correo no registrado");
                             cCorreo_email.requestFocus();

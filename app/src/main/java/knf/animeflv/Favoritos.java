@@ -77,7 +77,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         final String email_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
         final String pass_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
         if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-            new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
+            new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
         }
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -101,7 +101,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
             String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
             if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                new Requests(this, TaskType.GET_FAV).execute("http://animeflv-app.ultimatefreehost.in/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
+                new Requests(this, TaskType.GET_FAV).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
             }
         }
     }

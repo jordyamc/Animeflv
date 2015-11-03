@@ -46,7 +46,7 @@ public class Descargas extends AppCompatActivity implements RequestDownload.call
         super.onCreate(savedInstanceState);
         setContentView(R.layout.descargas);
         context=this;
-        ExceptionHandler.register(this, "http://animeflv-app.ultimatefreehost.in/errors/server.php");
+        ExceptionHandler.register(this, "http://animeflvapp.x10.mx/errors/server.php");
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
