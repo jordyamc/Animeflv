@@ -25,7 +25,8 @@ public enum TaskType {
     CHECK_STREAM(19),
     UPDATE(20),
     APP_BAN(21),
-    CHAT_BAN(22);
+    CHAT_BAN(22),
+    FEEDBACK(23);
     int value;
 
     TaskType(int value) {

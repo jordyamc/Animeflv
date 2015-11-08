@@ -21,7 +21,7 @@ public class CheckVideo extends AsyncTask<String,String,String> {
     int position;
 
     public interface callback{
-        public void sendtext1(String data, TaskType taskType, int position);
+        void sendtext1(String data, TaskType taskType, int position);
     }
     public CheckVideo(Context con, TaskType taskType, int pos){
         call=(callback) con;
@@ -40,7 +40,7 @@ public class CheckVideo extends AsyncTask<String,String,String> {
             c.setRequestProperty("Content-length", "0");
             c.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");
             c.setUseCaches(true);
-            c.setConnectTimeout(15000);
+            c.setConnectTimeout(30000);
             c.setAllowUserInteraction(false);
             c.connect();
             //c.disconnect();

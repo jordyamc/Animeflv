@@ -410,7 +410,12 @@ public class Directorio extends AppCompatActivity {
         });
         if (bundle!=null){
             if (!isXLargeScreen(context)) {
-                try {linearLayout.setVisibility(View.GONE);}catch (NullPointerException e) {Toast.makeText(context,"Esta vista se hizo para tablets, por favor desactiva el modo landscape",Toast.LENGTH_SHORT).show();}
+                try {
+                    linearLayout.setVisibility(View.GONE);
+                } catch (NullPointerException e) {
+                    Toast.makeText(context, "Esta vista se hizo para tablets, por favor desactiva el modo landscape", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
                 recyclerView.setVisibility(View.VISIBLE);
             }else {
                 viewPager.setVisibility(View.GONE);
@@ -429,15 +434,17 @@ public class Directorio extends AppCompatActivity {
         for (String s:titOrd){
             String indexn=index.get(titulos.indexOf(s));
             indexOrd.add(indexn);
+            String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + indexn + ".jpg";
+            links.add(link);
         }
         for (String so:titOrd){
             String tipon=tipos.get(titulos.indexOf(so));
             tiposOrd.add(tipon);
         }
-        for (String st:indexOrd){
+        /*for (String st:indexOrd){
             String link="http://cdn.animeflv.net/img/portada/thumb_80/"+st+".jpg";
             links.add(link);
-        }
+        }*/
         AdapterBusqueda adapterBusqueda=new AdapterBusqueda(this,titOrd,tiposOrd,links,indexOrd);
         recyclerView.setAdapter(adapterBusqueda);
     }

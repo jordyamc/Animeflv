@@ -28,6 +28,14 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+    <string-array name="servidores">
+        <item>NET</item>
+        <item>MOE</item>
+    </string-array>
+    <string-array name="servidores_val">
+        <item>http://animeflv.net/api.php?accion=</item>
+        <item>http://animeflv.moe/api.php?accion=</item>
+    </string-array>
     <string-array name="sonidos">
         <item>Por Defecto</item>
         <item>Especial</item>

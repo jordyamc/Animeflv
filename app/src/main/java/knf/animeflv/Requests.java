@@ -50,7 +50,7 @@ public class Requests extends AsyncTask<String,String,String> {
             c.setRequestProperty("Accept", "*/*");
             c.setRequestProperty("Cookie", cookies.trim().substring(0, cookies.indexOf(";") + 1));
             c.setUseCaches(false);
-            c.setConnectTimeout(15000);
+            c.setConnectTimeout(30000);
             c.setAllowUserInteraction(false);
             c.connect();
             BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
@@ -65,8 +65,7 @@ public class Requests extends AsyncTask<String,String,String> {
                 Log.d("Requests URL Normal", u.toString());
             if (c.getURL()!=u){
                 if (!c.getURL().toString().trim().startsWith("http://animeflv")) {
-                    if (!c.getURL().toString().contains("fav-server"))
-                        Log.d("Requests URL ERROR", c.getURL().toString());
+                    Log.d("Requests URL ERROR", c.getURL().toString());
                     _response = "error";
                 }else {
                     if (!c.getURL().toString().contains("fav-server"))

@@ -53,11 +53,13 @@ public class Ovas extends Fragment {
         for (String s:titOrdOvas){
             String index=indexes.get(titulosOvas.indexOf(s));
             indexOrd.add(index);
-        }
-        for (String i:indexOrd){
-            String link="http://cdn.animeflv.net/img/portada/thumb_80/"+i+".jpg";
+            String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + index + ".jpg";
             links.add(link);
         }
+        /*for (String i:indexOrd){
+            String link="http://cdn.animeflv.net/img/portada/thumb_80/"+i+".jpg";
+            links.add(link);
+        }*/
         AdapterDirAnime adapter = new AdapterDirAnime(getActivity().getApplicationContext(), titOrdOvas,indexOrd,links);
         rvAnimes.setAdapter(adapter);
         return view;

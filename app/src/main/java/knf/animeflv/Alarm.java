@@ -23,7 +23,8 @@ public class Alarm extends BroadcastReceiver {
         Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones",true);
         if (not) {
             Log.d("Service", "Servicio Iniciado");
-            new RequestsBackground(context, TaskType.NOT).execute("http://animeflv.moe/api.php?accion=inicio");
+            String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
+            new RequestsBackground(context, TaskType.NOT).execute(servidor + "inicio");
             new RequestsBackground(context,TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
         }else {Log.d("Service", "Servicio Desactivado");}
         wl.release();

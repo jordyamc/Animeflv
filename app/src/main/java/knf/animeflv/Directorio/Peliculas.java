@@ -53,11 +53,13 @@ public class Peliculas extends Fragment {
         for (String s:titOrdPeliculas){
             String index=indexes.get(titulosPeliculas.indexOf(s));
             indexOrd.add(index);
-        }
-        for (String i:indexOrd){
-            String link="http://cdn.animeflv.net/img/portada/thumb_80/"+i+".jpg";
+            String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + index + ".jpg";
             links.add(link);
         }
+        /*for (String i:indexOrd){
+            String link="http://cdn.animeflv.net/img/portada/thumb_80/"+i+".jpg";
+            links.add(link);
+        }*/
         AdapterDirAnime adapter = new AdapterDirAnime(getActivity().getApplicationContext(), titOrdPeliculas,indexOrd,links);
         rvAnimes.setAdapter(adapter);
         return view;
