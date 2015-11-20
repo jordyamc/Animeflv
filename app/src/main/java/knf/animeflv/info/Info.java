@@ -115,7 +115,8 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
             titulo=parser.getTit(infile);
             id=parser.getAID(infile);
         }else {
-            new Requests(this, TaskType.GET_INFO).execute("http://animeflv.moe/api.php?accion=anime&aid=" + aid);
+            String servidor = PreferenceManager.getDefaultSharedPreferences(this).getString("servidor", "http://animeflv.net/api.php?accion=");
+            new Requests(this, TaskType.GET_INFO).execute(servidor + "anime&aid=" + aid);
         }
         Bundle bundle=new Bundle();
         bundle.putString("aid", getIntent().getExtras().getString("aid", "1"));

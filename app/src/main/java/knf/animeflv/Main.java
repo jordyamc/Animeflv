@@ -800,10 +800,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             IBVT.setEnabled(true);
             descargando = false;
             String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-            if (!vistos.contains(eids[position].trim())) {
+            /*if (!vistos.contains(eids[position].trim())) {
                 vistos = vistos + eids[position].trim() + ":::";
                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-            }
+            }*/
         } else {
             toast("No hay conexion a internet");
             GIBT.setScaleType(ImageView.ScaleType.FIT_END);
@@ -850,10 +850,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                    if (!vistos.contains(eids[position].trim())) {
+                    /*if (!vistos.contains(eids[position].trim())) {
                         vistos = vistos + eids[position].trim() + ":::";
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-                    }
+                    }*/
                     break;
                 case "com.mxtech.videoplayer.ad":
                     Intent intentad = new Intent(Intent.ACTION_VIEW);
@@ -864,10 +864,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intentad);
                     String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                    if (!vistosad.contains(eids[position].trim())) {
+                    /*if (!vistosad.contains(eids[position].trim())) {
                         vistosad = vistosad + eids[position].trim() + ":::";
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
-                    }
+                    }*/
                     break;
                 default:
                     toast("MX player no instalado");
@@ -924,7 +924,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     imageButton.setImageResource(R.drawable.ic_get_r);
                                     IBsVerList.get(index).setImageResource(R.drawable.ic_ver_no);
                                     IBsVerList.get(index).setEnabled(false);
-                                    long l = Long.parseLong(getSharedPreferences("data", MODE_PRIVATE).getString(eids[index], "0"));
+                                    /*long l = Long.parseLong(getSharedPreferences("data", MODE_PRIVATE).getString(eids[index], "0"));
                                     if (l != 0) {
                                         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                                         manager.remove(l);
@@ -934,7 +934,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         String epID = getSharedPreferences("data", MODE_PRIVATE).getString("epIDS_descarga", "");
                                         getSharedPreferences("data", MODE_PRIVATE).edit().putString("titulos_descarga", tits.replace(titulos[index] + ":::", "")).apply();
                                         getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(aids[index] + "_" + numeros[index] + ":::", "")).apply();
-                                    }
+                                    }*/
                                     toast("Archivo Eliminado");
                                 }
                             }
@@ -969,7 +969,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         isDesc.add(index, true);
                         descargando = true;
                         indexT = index;
-                        eidT = eids[index];
+                        //eidT = eids[index];
                         //DescargarInbyID(index);
                         if (isNetworkAvailable()) {
                             new CheckVideo(context, TaskType.CHECK_DOWN, index).execute("http://subidas.com/files/" + aids[index] + "/" + numeros[index] + ".mp4");
@@ -1006,7 +1006,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         isDesc.add(index, true);
                                         descargando = true;
                                         indexT = index;
-                                        eidT = eids[index];
+                                        //eidT = eids[index];
                                         //DescargarInbyID(index);
                                         if (isNetworkAvailable()) {
                                             new CheckVideo(context, TaskType.CHECK_DOWN, index).execute("http://subidas.com/files/" + aids[index] + "/" + numeros[index] + ".mp4");
@@ -1036,7 +1036,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         isDesc.add(index, true);
                                         descargando = true;
                                         indexT = index;
-                                        eidT = eids[index];
+                                        //eidT = eids[index];
                                         Streaming = true;
                                         //StreamInbyID(index);
                                         if (isNetworkAvailable()) {
@@ -1218,8 +1218,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("aid", aidInfo);
         editor.commit();
+        String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
         urlInfoT = "http://animeflv.moe/api.php?accion=anime&aid=" + aid;
-        new Requests(this, TaskType.GET_INFO).execute("http://animeflv.moe/api.php?accion=anime&aid=" + aid);
+        new Requests(this, TaskType.GET_INFO).execute(servidor + "anime&aid=" + aid);
     }
 
     public void actCacheInfo(String json) {
@@ -1468,7 +1469,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             @Override
             public void onPageFinished(WebView view, String url) {
                 //web.loadUrl("javascript:"+"var num=e();"+"window.HtmlViewer.showHTMLD2(e());");
-                if (!url.contains("api.php")) {
+                if (!url.contains("api.php") && !url.contains("getHtml.php")) {
                     if (!url.contains("animeflv")) {
                         if (url.contains("zippyshare.com") || url.contains("blank")) {
                             web.loadUrl("javascript:("
@@ -1484,7 +1485,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             toast("Error al descargar");
                         }
                     } else {
-                        web.loadUrl(getInicio());
+                        //web.loadUrl(getInicio());
+                        web.loadUrl("http://animeflvapp.x10.mx/getHtml.php?url=http://animeflv.net/");
                     }
                 } else {
                     if (view.getUrl().contains("api.php?accion=anime")) {
@@ -1500,6 +1502,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             String cookies = cookieManager.getCookie(url);
                             getSharedPreferences("data", MODE_PRIVATE).edit().putString("cookies", cookies).apply();
                             //web.loadUrl("about:blank");
+                        } else {
+                            web.loadUrl("javascript:window.HtmlViewer.showHTMLD2(document.getElementsByTagName('body')[0].innerHTML);");
                         }
                     }
                 }
@@ -1562,10 +1566,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         getSharedPreferences("data", MODE_PRIVATE).edit().putString("titulos_descarga", tits + aids[posT] + ":::").apply();
                         getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID + aids[posT] + "_" + numeros[posT] + ":::").apply();
                         String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                        if (!vistos.contains(eids[posT].trim())) {
+                        /*if (!vistos.contains(eids[posT].trim())) {
                             vistos = vistos + eids[posT].trim() + ":::";
                             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-                        }
+                        }*/
                         descargando = false;
                         web.loadUrl("about:blank");
                     } else {
@@ -1615,10 +1619,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             intent.putExtra("headers", headers);
                             startActivity(intent);
                             String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                            if (!vistos.contains(eids[posT].trim())) {
+                            /*if (!vistos.contains(eids[posT].trim())) {
                                 vistos = vistos + eids[posT].trim() + ":::";
                                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-                            }
+                            }*/
                             break;
                         case "com.mxtech.videoplayer.ad":
                             Intent intentad = new Intent(Intent.ACTION_VIEW);
@@ -1630,10 +1634,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             intentad.putExtra("headers", headersad);
                             startActivity(intentad);
                             String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                            if (!vistosad.contains(eids[posT].trim())) {
+                            /*if (!vistosad.contains(eids[posT].trim())) {
                                 vistosad = vistosad + eids[posT].trim() + ":::";
                                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
-                            }
+                            }*/
                             break;
                         default:
                             toast("MX player no instalado");
@@ -1758,7 +1762,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
         if (isNetworkAvailable()) {
             textoff.setVisibility(View.GONE);
-            new Requests(this, TaskType.GET_INICIO).execute(getInicio());
+            //new Requests(this, TaskType.GET_INICIO).execute(getInicio());
+            web.loadUrl("http://animeflvapp.x10.mx/getHtml.php?url=http://animeflv.net/");
         } else {
             verOk = false;
             if (file.exists()) {
@@ -2012,32 +2017,65 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt");
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
         if (isNetworkAvailable() && !data.trim().equals("error")) {
-            if (!file.exists()) {
-                Log.d("Archivo:", "No existe");
-                Log.d("Json", data);
-                try {
-                    file.createNewFile();
-                } catch (IOException e) {
-                    Log.d("Archivo:", "Error al crear archivo");
-                }
-                writeToFile(data, file);
-                getData(data);
-            } else {
-                Log.d("Archivo", "Existe");
-                String infile = getStringFromFile(file_loc);
-                if (isJSONValid(infile) && isJSONValid(data)) {
-                    if (!parser.parseEID(infile)[0].trim().equals(parser.parseEID(data)[0].trim())) {
-                        Log.d("Cargar", "Json nuevo");
-                        writeToFile(data, file);
-                        getData(data);
+            if (isJSONValid(data)) {
+                if (!file.exists()) {
+                    Log.d("Archivo:", "No existe");
+                    Log.d("Json", data);
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        Log.d("Archivo:", "Error al crear archivo");
+                    }
+                    writeToFile(data, file);
+                    getData(data);
+                } else {
+                    Log.d("Archivo", "Existe");
+                    String infile = getStringFromFile(file_loc);
+                    if (isJSONValid(infile) && isJSONValid(data)) {
+                        if (!parser.parseEID(infile)[0].trim().equals(parser.parseEID(data)[0].trim())) {
+                            Log.d("Cargar", "Json nuevo");
+                            writeToFile(data, file);
+                            getData(data);
+                        } else {
+                            Log.d("Cargar", "Json existente");
+                            getData(infile);
+                        }
                     } else {
-                        Log.d("Cargar", "Json existente");
-                        getData(infile);
+                        file.delete();
+                        toast("Error en cache, volviendo a cargar");
+                        //new Requests(context, TaskType.GET_INICIO).execute(getInicio());
+                        web.loadUrl("http://animeflvapp.x10.mx/getHtml.php?url=http://animeflv.net/");
+                    }
+                }
+            } else {
+                if (!file.exists()) {
+                    Log.d("Archivo:", "No existe");
+                    if (data.trim().equals("error")) {
+                        toast("Error en servidor, sin cache para mostrar");
+                        if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
+                        //web.loadUrl(getInicio());
+                        web.loadUrl("http://animeflvapp.x10.mx/getHtml.php?url=http://animeflv.net/");
+                    }
+                    if (!isNetworkAvailable()) {
+                        toast("Sin cache para mostrar");
+                        if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
                     }
                 } else {
-                    file.delete();
-                    toast("Error en cache, volviendo a cargar");
-                    new Requests(context, TaskType.GET_INICIO).execute(getInicio());
+                    Log.d("Archivo", "Existe");
+                    String infile = getStringFromFile(file_loc);
+                    if (data.trim().equals("error"))
+                        toast("Error en servidor");
+                    //web.loadUrl(getInicio());
+                    web.loadUrl("http://animeflvapp.x10.mx/getHtml.php?url=http://animeflv.net/");
+                    if (!isNetworkAvailable()) toast("Cargando desde cache");
+                    Log.d("Cargar", "Json existente");
+                    if (isJSONValid(infile)) {
+                        getData(infile);
+                    } else {
+                        file.delete();
+                        toast("Error en cache, volviendo a cargar");
+                        new Requests(context, TaskType.GET_INICIO).execute(getInicio());
+                    }
                 }
             }
         } else {
@@ -2046,7 +2084,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 if (data.trim().equals("error")) {
                     toast("Error en servidor, sin cache para mostrar");
                     if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
-                    web.loadUrl(getInicio());
+                    //web.loadUrl(getInicio());
+                    web.loadUrl("http://animeflvapp.x10.mx/getHtml.php?url=http://animeflv.net/");
                 }
                 if (!isNetworkAvailable()) {
                     toast("Sin cache para mostrar");
@@ -2057,7 +2096,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 String infile = getStringFromFile(file_loc);
                 if (data.trim().equals("error"))
                     toast("Error en servidor");
-                web.loadUrl(getInicio());
+                //web.loadUrl(getInicio());
+                web.loadUrl("http://animeflvapp.x10.mx/getHtml.php?url=http://animeflv.net/");
                 if (!isNetworkAvailable()) toast("Cargando desde cache");
                 Log.d("Cargar", "Json existente");
                 getData(infile);
@@ -2710,7 +2750,50 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         loadInicio(htmlInicio.trim());
                         toast("Cargando modo alternativo");
                     } else {
-                        web.loadUrl(getInicio());
+                        //web.loadUrl(getInicio());
+                        String[] splited = htmlInicio.split(";;;");
+                        String[] links = splited[0].substring(3).split(":::");
+                        List<String> aids1 = new ArrayList<String>();
+                        List<String> a = new ArrayList<String>();
+                        for (String parcial : links) {
+                            String aid = parcial.substring(parcial.lastIndexOf("/") + 1);
+                            aids1.add("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg");
+                            a.add(aid);
+                        }
+                        String[] images = new String[aids1.size()];
+                        aids1.toArray(images);
+                        List<String> titulos1 = new ArrayList<String>();
+                        List<String> numeros1 = new ArrayList<String>();
+                        List<String> numeros2 = new ArrayList<String>();
+                        String[] semi = splited[1].substring(3).split(":::");
+                        isDesc = new ArrayList<Boolean>();
+                        for (String doble : semi) {
+                            String tit = doble.substring(0, doble.trim().lastIndexOf(" "));
+                            String num = doble.substring(doble.trim().lastIndexOf(" ") + 1);
+
+                            titulos1.add(tit);
+                            numeros1.add("Capitulo " + num);
+                            numeros2.add(num);
+                            isDesc.add(false);
+                        }
+                        String[] tits = new String[titulos1.size()];
+                        titulos1.toArray(tits);
+                        String[] nums = new String[numeros1.size()];
+                        numeros1.toArray(nums);
+                        String[] num = new String[numeros2.size()];
+                        numeros2.toArray(num);
+                        String[] ad = new String[a.size()];
+                        for (String s : a) {
+                            Log.d("aid", s);
+                        }
+                        a.toArray(ad);
+                        titulos = tits;
+                        numeros = num;
+                        aids = ad;
+                        loadImg(images);
+                        loadTitulos(tits);
+                        loadCapitulos(nums);
+                        isFirst();
                     }
                 }
             });
