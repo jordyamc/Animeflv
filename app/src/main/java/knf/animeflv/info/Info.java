@@ -106,6 +106,8 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
         }
         File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aid+".txt");
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aid+".txt";
+        Bundle bundleR = getIntent().getExtras();
+        String link = bundleR.getString("link", "");
         if (file.exists()) {
             Log.d("Archivo", "Existe");
             String infile = getStringFromFile(file_loc);
@@ -116,7 +118,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
             id=parser.getAID(infile);
         }else {
             String servidor = PreferenceManager.getDefaultSharedPreferences(this).getString("servidor", "http://animeflv.net/api.php?accion=");
-            new Requests(this, TaskType.GET_INFO).execute(servidor + "anime&aid=" + aid);
+            new Requests(this, TaskType.GET_INFO).execute("http://animeflvapp.x10.mx/getHtml.php?url=" + link);
         }
         Bundle bundle=new Bundle();
         bundle.putString("aid", getIntent().getExtras().getString("aid", "1"));

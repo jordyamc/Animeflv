@@ -146,10 +146,10 @@ public class Directorio extends AppCompatActivity {
                             }else {
                                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                             }
-                            List<String> titulos = parser.DirTitulosBusqueda(json, null);
-                            List<String> tipos = parser.DirTiposBusqueda(json, null);
-                            List<String> index = parser.DirIndexBusqueda(json, null);
-                            List<String> titOrd = parser.DirTitulosBusqueda(json, null);
+                            List<String> titulos = parser.DirTitulosBusquedaA(json, null);
+                            List<String> tipos = parser.DirTiposBusquedaA(json, null);
+                            List<String> index = parser.DirIndexBusquedaA(json, null);
+                            List<String> titOrd = parser.DirTitulosBusquedaA(json, null);
                             Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
                             List<String> indexOrd = new ArrayList<String>();
                             List<String> tiposOrd = new ArrayList<String>();
@@ -228,10 +228,10 @@ public class Directorio extends AppCompatActivity {
                                     getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                                 }
                             }
-                            List<String> titulos = parser.DirTitulosBusqueda(json, s.toString());
-                            List<String> tipos = parser.DirTiposBusqueda(json, s.toString());
-                            List<String> index = parser.DirIndexBusqueda(json, s.toString());
-                            List<String> titOrd = parser.DirTitulosBusqueda(json, s.toString());
+                            List<String> titulos = parser.DirTitulosBusquedaA(json, s.toString());
+                            List<String> tipos = parser.DirTiposBusquedaA(json, s.toString());
+                            List<String> index = parser.DirIndexBusquedaA(json, s.toString());
+                            List<String> titOrd = parser.DirTitulosBusquedaA(json, s.toString());
                             Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
                             List<String> indexOrd = new ArrayList<String>();
                             List<String> tiposOrd = new ArrayList<String>();
@@ -305,10 +305,10 @@ public class Directorio extends AppCompatActivity {
                                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                             }
                         }
-                        List<String> titulos = parser.DirTitulosBusqueda(json, s.toString());
-                        List<String> tipos = parser.DirTiposBusqueda(json, s.toString());
-                        List<String> index = parser.DirIndexBusqueda(json, s.toString());
-                        List<String> titOrd = parser.DirTitulosBusqueda(json, s.toString());
+                    List<String> titulos = parser.DirTitulosBusquedaA(json, s.toString());
+                    List<String> tipos = parser.DirTiposBusquedaA(json, s.toString());
+                    List<String> index = parser.DirIndexBusquedaA(json, s.toString());
+                    List<String> titOrd = parser.DirTitulosBusquedaA(json, s.toString());
                         Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
                         List<String> indexOrd = new ArrayList<String>();
                         List<String> tiposOrd = new ArrayList<String>();
@@ -423,10 +423,10 @@ public class Directorio extends AppCompatActivity {
                 recyclerView.setVisibility(View.VISIBLE);
             }
         }
-        List<String>titulos=parser.DirTitulosBusqueda(json, null);
-        List<String>tipos=parser.DirTiposBusqueda(json, null);
-        List<String>index=parser.DirIndexBusqueda(json, null);
-        List<String> titOrd= parser.DirTitulosBusqueda(json, null);
+        List<String> titulos = parser.DirTitulosBusquedaA(json, null);
+        List<String> tipos = parser.DirTiposBusquedaA(json, null);
+        List<String> index = parser.DirIndexBusquedaA(json, null);
+        List<String> titOrd = parser.DirTitulosBusquedaA(json, null);
         Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
         List<String> indexOrd=new ArrayList<String>();
         List<String> tiposOrd=new ArrayList<String>();
@@ -454,7 +454,8 @@ public class Directorio extends AppCompatActivity {
         Bundle bundle=getIntent().getExtras();
         if (bundle==null){
             editText.setVisibility(View.GONE);
-            generosS.setVisibility(View.VISIBLE);
+            //generosS.setVisibility(View.VISIBLE);
+            generosS.setVisibility(View.GONE);
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
             menuGlobal.clear();
@@ -538,7 +539,8 @@ public class Directorio extends AppCompatActivity {
     public void cancelar() {
             editText.setText("");
             editText.setVisibility(View.GONE);
-        generosS.setVisibility(View.VISIBLE);
+        //generosS.setVisibility(View.VISIBLE);
+        generosS.setVisibility(View.GONE);
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
             menuGlobal.clear();

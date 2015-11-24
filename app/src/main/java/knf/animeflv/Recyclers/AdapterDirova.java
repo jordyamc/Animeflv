@@ -22,7 +22,7 @@ import knf.animeflv.info.RelActInfo;
 /**
  * Created by Jordy on 22/08/2015.
  */
-public class AdapterDirAnime extends RecyclerView.Adapter<AdapterDirAnime.ViewHolder> {
+public class AdapterDirova extends RecyclerView.Adapter<AdapterDirova.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView iv_rel;
@@ -36,42 +36,43 @@ public class AdapterDirAnime extends RecyclerView.Adapter<AdapterDirAnime.ViewHo
             this.card = (CardView) itemView.findViewById(R.id.cardRel);
         }
     }
+
     private Context context;
     List<String> titulosCard;
     List<String> aids;
     List<String> links;
     String j;
 
-    public AdapterDirAnime(Context context, List<String> titulos, List<String> aid, List<String> aidlinks, String json) {
+    public AdapterDirova(Context context, List<String> titulos, List<String> aid, List<String> aidlinks, String json) {
         this.context = context;
         this.titulosCard = titulos;
-        this.aids=aid;
-        this.links=aidlinks;
+        this.aids = aid;
+        this.links = aidlinks;
         this.j = json;
     }
 
     @Override
-    public AdapterDirAnime.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public AdapterDirova.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(context).
                 inflate(R.layout.item_anime_fav, parent, false);
-        return new AdapterDirAnime.ViewHolder(itemView);
+        return new AdapterDirova.ViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(AdapterDirAnime.ViewHolder holder, final int position) {
+    public void onBindViewHolder(AdapterDirova.ViewHolder holder, final int position) {
         PicassoCache.getPicassoInstance(context).load(links.get(position)).error(R.drawable.ic_block_r).into(holder.iv_rel);
         holder.tv_tit.setText(titulosCard.get(position));
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundle=new Bundle();
+                Bundle bundle = new Bundle();
                 bundle.putString("aid", aids.get(position));
-                bundle.putString("link", new Parser().getUrlAnime(j, aids.get(position)));
-                Intent intent=new Intent(context,RelActInfo.class);
+                bundle.putString("link", new Parser().getUrlOva(j, aids.get(position)));
+                Intent intent = new Intent(context, RelActInfo.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtras(bundle);
-                SharedPreferences.Editor sharedPreferences=context.getSharedPreferences("data",Context.MODE_PRIVATE).edit();
-                sharedPreferences.putString("aid",aids.get(position)).commit();
+                SharedPreferences.Editor sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
+                sharedPreferences.putString("aid", aids.get(position)).commit();
                 context.startActivity(intent);
             }
         });

@@ -53,9 +53,9 @@ public class Animes extends Fragment{
         rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         String json=getJson();
         int genero=getActivity().getSharedPreferences("data",Context.MODE_PRIVATE).getInt("genero",0);
-        List<String> titulosAnime=parser.DirTitulosAnime(json,genero);
-        List<String> indexes=parser.DirIntsAnime(json,genero);
-        List<String> titOrdAnime= parser.DirTitulosAnime(json,genero);
+        List<String> titulosAnime = parser.DirTitulosAnimeA(json, genero);
+        List<String> indexes = parser.DirIntsAnimeA(json, genero);
+        List<String> titOrdAnime = parser.DirTitulosAnimeA(json, genero);
         List<String> indexOrd=new ArrayList<String>();
         List<String> links=new ArrayList<String>();
         Collections.sort(titOrdAnime, String.CASE_INSENSITIVE_ORDER);
@@ -69,7 +69,7 @@ public class Animes extends Fragment{
             String link="http://cdn.animeflv.net/img/portada/thumb_80/"+i+".jpg";
             links.add(link);
         }*/
-        AdapterDirAnime adapter = new AdapterDirAnime(getActivity().getApplicationContext(), titOrdAnime,indexOrd,links);
+        AdapterDirAnime adapter = new AdapterDirAnime(getActivity().getApplicationContext(), titOrdAnime, indexOrd, links, json);
         rvAnimes.setAdapter(adapter);
         return view;
     }

@@ -45,20 +45,20 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
 
     Parser parser=new Parser();
     Context context;
+    String link;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context=getApplicationContext();
         Bundle bundle=getIntent().getExtras();
-        setInfo(bundle.getString("aid",""));
-    }
-    public void setInfo(String aid){
-        aidInfo=aid;
+        aidInfo = bundle.getString("aid", "");
+        link = bundle.getString("link", "about:blank");
         SharedPreferences sharedPreferences=getSharedPreferences("data",MODE_PRIVATE);
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putString("aid", aidInfo);
         editor.commit();
-        new Requests(this, TaskType.GET_INFO).execute("http://animeflv.moe/api.php?accion=anime&aid=" + aid);
+        //new Requests(this, TaskType.GET_INFO).execute("http://animeflv.moe/api.php?accion=anime&aid=" + aidInfo);
+        new Requests(this, TaskType.GET_INFO).execute("http://animeflvapp.x10.mx/getHtml.php?url=" + link);
     }
     public static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -127,6 +127,7 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
                 try {file.createNewFile();} catch (IOException e) {Log.d("Archivo:", "Error al crear archivo");}
                 writeToFile(json, file);
                 bundleInfo.putString("aid",parser.getAID(json));
+                bundleInfo.putString("link", link);
                 Intent intent=new Intent(this,Info.class);
                 intent.putExtras(bundleInfo);
                 finish();
@@ -136,6 +137,7 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
                 String infile = getStringFromFile(file_loc);
                 if (json.trim().equals(infile.trim())) {
                     bundleInfo.putString("aid",parser.getAID(json));
+                    bundleInfo.putString("link", link);
                     Intent intent = new Intent(this, Info.class);
                     intent.putExtras(bundleInfo);
                     finish();
@@ -143,6 +145,7 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
                 }else {
                     writeToFile(json,file);
                     bundleInfo.putString("aid", parser.getAID(json));
+                    bundleInfo.putString("link", link);
                     Intent intent = new Intent(this, Info.class);
                     intent.putExtras(bundleInfo);
                     finish();
@@ -152,6 +155,7 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
         } else {
             if (file.exists()) {
                 bundleInfo.putString("aid",parser.getAID(json));
+                bundleInfo.putString("link", link);
                 Intent intent = new Intent(this, Info.class);
                 intent.putExtras(bundleInfo);
                 finish();

@@ -211,6 +211,33 @@ public class Parser {
         return capitulos;
     }
 
+    public String[] parseTipos(String json) {
+        List<String> capitulosArray = new ArrayList<String>();
+        String[] capitulos;
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("lista");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject childJSONObject = jsonArray.getJSONObject(i);
+                String tid = childJSONObject.getString("tid");
+                String numero = childJSONObject.getString("numero");
+                if ("Anime".equals(tid)) {
+                    capitulosArray.add("anime");
+                } else if ("OVA".equals(tid)) {
+                    capitulosArray.add("ova");
+                } else {
+                    capitulosArray.add("pelicula");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            capitulos = new String[capitulosArray.size()];
+            capitulosArray.toArray(capitulos);
+        }
+        return capitulos;
+    }
+
     public String[] parsenumeros(String json){
         List<String> numerosArray=new ArrayList<String>();
         String[] numeros;
@@ -505,6 +532,50 @@ public class Parser {
         }
         return linkArray;
     }
+
+    public List<String> DirTitulosAnimeA(String json, int genero) {
+        List<String> linkArray = new ArrayList<String>();
+        switch (genero) {
+            case 0:
+                try {
+                    JSONArray jsonArray = new JSONArray(json);
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject j = jsonArray.getJSONObject(i);
+                        String array = j.getString("b");
+                        array = array.replace("[\"", "");
+                        array = array.replace("\"]", "");
+                        array = array.replace("\",\"", ":::");
+                        array = array.replace("\\/", "/");
+                        array = array.replace("&#039;", "\'");
+                        array = array.replace("&iacute;", "í");
+                        array = array.replace("&deg;", "°");
+                        array = array.replace("&amp;", "&");
+                        array = array.replace("&acirc;", "\u00C2");
+                        array = array.replace("&egrave;", "\u00E8");
+                        array = array.replace("&middot;", "\u00B7");
+                        array = array.replace("&#333;", "\u014D");
+                        array = array.replace("&#9834;", "\u266A");
+                        array = array.replace("&aacute;", "á");
+                        array = array.replace("&oacute;", "ó");
+                        array = array.replace("&quot;", "\"");
+                        array = array.replace("&uuml;", "\u00FC");
+                        array = array.replace("&szlig;", "\u00DF");
+                        array = array.replace("&radic;", "\u221A");
+                        array = array.replace("&dagger;", "\u2020");
+                        array = array.replace("&hearts;", "\u2665");
+                        String[] sarray = array.split(":::");
+                        String tipo = j.getString("c");
+                        if (tipo.equals("Anime")) {
+                            linkArray.add(array);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+        return linkArray;
+    }
     public List<String> DirIntsAnime(String json,int genero){
         List<String> linkArray=new ArrayList<String>();
         switch (genero){
@@ -541,6 +612,26 @@ public class Parser {
                         }
                     }
                 }catch (Exception e){
+                    e.printStackTrace();
+                }
+                break;
+        }
+        return linkArray;
+    }
+
+    public List<String> DirIntsAnimeA(String json, int genero) {
+        List<String> linkArray = new ArrayList<String>();
+        switch (genero) {
+            case 0:
+                try {
+                    JSONArray jsonArray = new JSONArray(json);
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject j = jsonArray.getJSONObject(i);
+                        if (j.getString("c").trim().equals("Anime")) {
+                            linkArray.add(j.getString("a"));
+                        }
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
@@ -626,6 +717,50 @@ public class Parser {
 
         return linkArray;
     }
+
+    public List<String> DirTitulosOvasA(String json, int genero) {
+        List<String> linkArray = new ArrayList<String>();
+        switch (genero) {
+            case 0:
+                try {
+                    JSONArray jsonArray = new JSONArray(json);
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject j = jsonArray.getJSONObject(i);
+                        String array = j.getString("b");
+                        array = array.replace("[\"", "");
+                        array = array.replace("\"]", "");
+                        array = array.replace("\",\"", ":::");
+                        array = array.replace("\\/", "/");
+                        array = array.replace("&#039;", "\'");
+                        array = array.replace("&iacute;", "í");
+                        array = array.replace("&deg;", "°");
+                        array = array.replace("&amp;", "&");
+                        array = array.replace("&acirc;", "\u00C2");
+                        array = array.replace("&egrave;", "\u00E8");
+                        array = array.replace("&middot;", "\u00B7");
+                        array = array.replace("&#333;", "\u014D");
+                        array = array.replace("&#9834;", "\u266A");
+                        array = array.replace("&aacute;", "á");
+                        array = array.replace("&oacute;", "ó");
+                        array = array.replace("&quot;", "\"");
+                        array = array.replace("&uuml;", "\u00FC");
+                        array = array.replace("&szlig;", "\u00DF");
+                        array = array.replace("&radic;", "\u221A");
+                        array = array.replace("&dagger;", "\u2020");
+                        array = array.replace("&hearts;", "\u2665");
+                        String[] sarray = array.split(":::");
+                        String tipo = j.getString("c");
+                        if (tipo.equals("OVA")) {
+                            linkArray.add(array);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+        return linkArray;
+    }
     public List<String> DirIntsOvas(String json,int genero){
         List<String> linkArray=new ArrayList<String>();
         switch (genero){
@@ -662,6 +797,26 @@ public class Parser {
                         }
                     }
                 }catch (Exception e){
+                    e.printStackTrace();
+                }
+                break;
+        }
+        return linkArray;
+    }
+
+    public List<String> DirIntsOvasA(String json, int genero) {
+        List<String> linkArray = new ArrayList<String>();
+        switch (genero) {
+            case 0:
+                try {
+                    JSONArray jsonArray = new JSONArray(json);
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject j = jsonArray.getJSONObject(i);
+                        if (j.getString("c").trim().equals("OVA")) {
+                            linkArray.add(j.getString("a"));
+                        }
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
@@ -748,6 +903,50 @@ public class Parser {
         }
         return linkArray;
     }
+
+    public List<String> DirTitulosPeliculaA(String json, int genero) {
+        List<String> linkArray = new ArrayList<String>();
+        switch (genero) {
+            case 0:
+                try {
+                    JSONArray jsonArray = new JSONArray(json);
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject j = jsonArray.getJSONObject(i);
+                        String array = j.getString("b");
+                        array = array.replace("[\"", "");
+                        array = array.replace("\"]", "");
+                        array = array.replace("\",\"", ":::");
+                        array = array.replace("\\/", "/");
+                        array = array.replace("&#039;", "\'");
+                        array = array.replace("&iacute;", "í");
+                        array = array.replace("&deg;", "°");
+                        array = array.replace("&amp;", "&");
+                        array = array.replace("&acirc;", "\u00C2");
+                        array = array.replace("&egrave;", "\u00E8");
+                        array = array.replace("&middot;", "\u00B7");
+                        array = array.replace("&#333;", "\u014D");
+                        array = array.replace("&#9834;", "\u266A");
+                        array = array.replace("&aacute;", "á");
+                        array = array.replace("&oacute;", "ó");
+                        array = array.replace("&quot;", "\"");
+                        array = array.replace("&uuml;", "\u00FC");
+                        array = array.replace("&szlig;", "\u00DF");
+                        array = array.replace("&radic;", "\u221A");
+                        array = array.replace("&dagger;", "\u2020");
+                        array = array.replace("&hearts;", "\u2665");
+                        String[] sarray = array.split(":::");
+                        String tipo = j.getString("c");
+                        if (tipo.equals("Pelicula")) {
+                            linkArray.add(array);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+        return linkArray;
+    }
     public List<String> DirIntsPelicula(String json,int genero){
         List<String> linkArray=new ArrayList<String>();
         switch (genero){
@@ -784,6 +983,26 @@ public class Parser {
                         }
                     }
                 }catch (Exception e){
+                    e.printStackTrace();
+                }
+                break;
+        }
+        return linkArray;
+    }
+
+    public List<String> DirIntsPeliculaA(String json, int genero) {
+        List<String> linkArray = new ArrayList<String>();
+        switch (genero) {
+            case 0:
+                try {
+                    JSONArray jsonArray = new JSONArray(json);
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject j = jsonArray.getJSONObject(i);
+                        if (j.getString("c").trim().equals("Pelicula")) {
+                            linkArray.add(j.getString("a"));
+                        }
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
@@ -864,6 +1083,81 @@ public class Parser {
         }
         return linkArray;
     }
+
+    public List<String> DirTitulosBusquedaA(String json, @Nullable String busqueda) {
+        List<String> linkArray = new ArrayList<String>();
+        if (busqueda == null) {
+            try {
+                JSONArray jsonArray = new JSONArray(json);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject j = new JSONObject(jsonArray.getString(i));
+                    String array = j.getString("b");
+                    array = array.replace("[\"", "");
+                    array = array.replace("\"]", "");
+                    array = array.replace("\",\"", ":::");
+                    array = array.replace("\\/", "/");
+                    array = array.replace("&#039;", "\'");
+                    array = array.replace("&iacute;", "í");
+                    array = array.replace("&deg;", "°");
+                    array = array.replace("&amp;", "&");
+                    array = array.replace("&quot;", "\"");
+                    array = array.replace("&acirc;", "\u00C2");
+                    array = array.replace("&egrave;", "\u00E8");
+                    array = array.replace("&middot;", "\u00B7");
+                    array = array.replace("&#333;", "\u014D");
+                    array = array.replace("&#9834;", "\u266A");
+                    array = array.replace("&aacute;", "á");
+                    array = array.replace("&oacute;", "ó");
+                    array = array.replace("&uuml;", "\u00FC");
+                    array = array.replace("&szlig;", "\u00DF");
+                    array = array.replace("&radic;", "\u221A");
+                    array = array.replace("&dagger;", "\u2020");
+                    array = array.replace("&hearts;", "\u2665");
+                    String[] sarray = array.split(":::");
+                    linkArray.add(array);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                JSONArray jsonArray = new JSONArray(json);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject j = new JSONObject(jsonArray.getString(i));
+                    String array = j.getString("b");
+                    array = array.replace("[\"", "");
+                    array = array.replace("\"]", "");
+                    array = array.replace("\",\"", ":::");
+                    array = array.replace("\\/", "/");
+                    array = array.replace("&#039;", "\'");
+                    array = array.replace("&iacute;", "í");
+                    array = array.replace("&iacute;", "í");
+                    array = array.replace("&deg;", "°");
+                    array = array.replace("&amp;", "&");
+                    array = array.replace("&quot;", "\"");
+                    array = array.replace("&acirc;", "\u00C2");
+                    array = array.replace("&egrave;", "\u00E8");
+                    array = array.replace("&middot;", "\u00B7");
+                    array = array.replace("&#333;", "\u014D");
+                    array = array.replace("&#9834;", "\u266A");
+                    array = array.replace("&aacute;", "á");
+                    array = array.replace("&oacute;", "ó");
+                    array = array.replace("&uuml;", "\u00FC");
+                    array = array.replace("&szlig;", "\u00DF");
+                    array = array.replace("&radic;", "\u221A");
+                    array = array.replace("&dagger;", "\u2020");
+                    array = array.replace("&hearts;", "\u2665");
+                    String[] sarray = array.split(":::");
+                    if (array.toLowerCase().contains(busqueda.toLowerCase())) {
+                        linkArray.add(array);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return linkArray;
+    }
     public List<String> DirIndexBusqueda(String json,@Nullable String busqueda){
         List<String> linkArray=new ArrayList<String>();
         if (busqueda==null) {
@@ -895,6 +1189,47 @@ public class Parser {
                     String[] sarray = array.split(":::");
                     if (sarray[1].trim().toLowerCase().contains(busqueda.toLowerCase())){
                         linkArray.add(sarray[0]);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return linkArray;
+    }
+
+    public List<String> DirIndexBusquedaA(String json, @Nullable String busqueda) {
+        List<String> linkArray = new ArrayList<String>();
+        if (busqueda == null) {
+            try {
+                JSONArray jsonArray = new JSONArray(json);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String array = jsonArray.getString(i);
+                    array = array.replace("[\"", "");
+                    array = array.replace("\"]", "");
+                    array = array.replace("\",\"", ":::");
+                    array = array.replace("\\/", "/");
+                    JSONObject j = jsonArray.getJSONObject(i);
+                    String index = j.getString("a");
+                    String[] sarray = array.split(":::");
+                    linkArray.add(index);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                JSONArray jsonArray = new JSONArray(json);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String array = jsonArray.getString(i);
+                    array = array.replace("[\"", "");
+                    array = array.replace("\"]", "");
+                    array = array.replace("\",\"", ":::");
+                    array = array.replace("\\/", "/");
+                    String[] sarray = array.split(":::");
+                    JSONObject j = jsonArray.getJSONObject(i);
+                    if (j.getString("b").toLowerCase().contains(busqueda.toLowerCase())) {
+                        linkArray.add(j.getString("a"));
                     }
                 }
             } catch (Exception e) {
@@ -941,6 +1276,126 @@ public class Parser {
             }
         }
         return linkArray;
+    }
+
+    public List<String> DirTiposBusquedaA(String json, @Nullable String busqueda) {
+        List<String> linkArray = new ArrayList<String>();
+        if (busqueda == null) {
+            try {
+                JSONArray jsonArray = new JSONArray(json);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String array = jsonArray.getString(i);
+                    array = array.replace("[\"", "");
+                    array = array.replace("\"]", "");
+                    array = array.replace("\",\"", ":::");
+                    array = array.replace("\\/", "/");
+                    String[] sarray = array.split(":::");
+                    JSONObject j = jsonArray.getJSONObject(i);
+                    linkArray.add(j.getString("c"));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                JSONArray jsonArray = new JSONArray(json);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String array = jsonArray.getString(i);
+                    array = array.replace("[\"", "");
+                    array = array.replace("\"]", "");
+                    array = array.replace("\",\"", ":::");
+                    array = array.replace("\\/", "/");
+                    String[] sarray = array.split(":::");
+                    JSONObject j = jsonArray.getJSONObject(i);
+                    if (j.getString("b").trim().toLowerCase().contains(busqueda.toLowerCase())) {
+                        linkArray.add(j.getString("c"));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return linkArray;
+    }
+
+    public String getUrlAnime(String json, String nombre) {
+        String ret = "";
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject nombreJ = jsonArray.getJSONObject(i);
+                String n = nombreJ.getString("a");
+                if (n.trim().equals(nombre)) {
+                    return "http://animeflv.net/anime/" + nombreJ.getString("d") + ".html";
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
+
+    public String getUrlOva(String json, String nombre) {
+        String ret = "";
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject nombreJ = jsonArray.getJSONObject(i);
+                String n = nombreJ.getString("a");
+                if (n.trim().equals(nombre)) {
+                    return "http://animeflv.net/ova/" + nombreJ.getString("d") + ".html";
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
+
+    public String getUrlPelicula(String json, String nombre) {
+        String ret = "";
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject nombreJ = jsonArray.getJSONObject(i);
+                String n = nombreJ.getString("a");
+                if (n.trim().equals(nombre)) {
+                    return "http://animeflv.net/pelicula/" + nombreJ.getString("d") + ".html";
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
+
+    public String getTipoAnime(String json) {
+        String tipo = "";
+        try {
+            JSONObject j = new JSONObject(json);
+            tipo = j.getString("tid");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tipo;
+    }
+
+    public String getUrlFavs(String json, String aid) {
+        String ret = "";
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject nombreJ = jsonArray.getJSONObject(i);
+                String n = nombreJ.getString("a");
+                if (n.trim().equals(aid)) {
+                    String tipo = nombreJ.getString("c").toLowerCase();
+                    return "http://animeflv.net/" + tipo + "/" + nombreJ.getString("d") + ".html";
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ret;
     }
     public Boolean igual(String json, String paid){
         String aid="";

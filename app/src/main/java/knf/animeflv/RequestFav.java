@@ -39,13 +39,15 @@ public class RequestFav extends AsyncTask<String,String,String> {
     }
     @Override
     protected String doInBackground(String... params) {
+        String file_ = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        String dir = getStringFromFile(file_);
         List<String> list=new ArrayList<String>();
         for (String i:params) {
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
             if (!file.exists()) {
                 try {
                     Log.d("aid", i);
-                    u = new URL("http://animeflv.moe/api.php?accion=anime&aid=" + i);
+                    u = new URL("http://animeflvapp.x10.mx/getHtml.php?url=" + parser.getUrlFavs(dir, i));
                     c = (HttpURLConnection) u.openConnection();
                     c.setRequestProperty("Content-length", "0");
                     c.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");

@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -228,6 +229,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     String[] aids;
     String[] numeros;
     String[] titulos;
+    String[] tipos;
     String url;
     String inicio = "http://animeflv.moe/api.php?accion=inicio";
     String json = "{}";
@@ -332,8 +334,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             ChangelogDialog.create()
                     .show(getSupportFragmentManager(), "changelog");
             getSharedPreferences("data", MODE_PRIVATE).edit().putInt(Integer.toString(versionCode), 1).apply();
-            if (versionName.trim().equals("1.9.2.1")) {
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("streaming", false).apply();
+            if (versionCode <= 94) {
+                getSharedPreferences("data", MODE_PRIVATE).edit().putString("eids_descarga", "").apply();
+                getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", "").apply();
             }
         }
         if (isNetworkAvailable()) {
@@ -1077,68 +1080,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
 
     public void onCardClicked(View view) {
-        switch (view.getId()) {
-            case R.id.card1:
-                setInfo(aids[0]);
-                break;
-            case R.id.card2:
-                setInfo(aids[1]);
-                break;
-            case R.id.card3:
-                setInfo(aids[2]);
-                break;
-            case R.id.card4:
-                setInfo(aids[3]);
-                break;
-            case R.id.card5:
-                setInfo(aids[4]);
-                break;
-            case R.id.card6:
-                setInfo(aids[5]);
-                break;
-            case R.id.card7:
-                setInfo(aids[6]);
-                break;
-            case R.id.card8:
-                setInfo(aids[7]);
-                break;
-            case R.id.card9:
-                setInfo(aids[8]);
-                break;
-            case R.id.card10:
-                setInfo(aids[9]);
-                break;
-            case R.id.card11:
-                setInfo(aids[10]);
-                break;
-            case R.id.card12:
-                setInfo(aids[11]);
-                break;
-            case R.id.card13:
-                setInfo(aids[12]);
-                break;
-            case R.id.card14:
-                setInfo(aids[13]);
-                break;
-            case R.id.card15:
-                setInfo(aids[14]);
-                break;
-            case R.id.card16:
-                setInfo(aids[15]);
-                break;
-            case R.id.card17:
-                setInfo(aids[16]);
-                break;
-            case R.id.card18:
-                setInfo(aids[17]);
-                break;
-            case R.id.card19:
-                setInfo(aids[18]);
-                break;
-            case R.id.card20:
-                setInfo(aids[19]);
-                break;
-        }
+        String id = view.getResources().getResourceName(view.getId());
+        int index = Integer.parseInt(id.substring(id.lastIndexOf("d") + 1)) - 1;
+        setInfo(aids[index], titulos[index], tipos[index]);
     }
 
     public void checkBan(int Type) {
@@ -1212,15 +1156,16 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
     }
 
-    public void setInfo(String aid) {
+    public void setInfo(String aid, String titulo, String tipo) {
         aidInfo = aid;
         SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("aid", aidInfo);
         editor.commit();
         String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
-        urlInfoT = "http://animeflv.moe/api.php?accion=anime&aid=" + aid;
-        new Requests(this, TaskType.GET_INFO).execute(servidor + "anime&aid=" + aid);
+        //urlInfoT = "http://animeflv.moe/api.php?accion=anime&aid=" + aid;
+        urlInfoT = "http://animeflvapp.x10.mx/getHtml.php?url=" + getUrlInfo(titulo, tipo);
+        new Requests(this, TaskType.GET_INFO).execute(urlInfoT);
     }
 
     public void actCacheInfo(String json) {
@@ -1486,7 +1431,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         }
                     } else {
                         //web.loadUrl(getInicio());
-                        web.loadUrl("http://animeflvapp.x10.mx/getHtml.php?url=http://animeflv.net/");
+                        web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
                     }
                 } else {
                     if (view.getUrl().contains("api.php?accion=anime")) {
@@ -1762,8 +1707,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
         if (isNetworkAvailable()) {
             textoff.setVisibility(View.GONE);
-            //new Requests(this, TaskType.GET_INICIO).execute(getInicio());
-            web.loadUrl("http://animeflvapp.x10.mx/getHtml.php?url=http://animeflv.net/");
+            new Requests(this, TaskType.GET_INICIO).execute(getInicio());
+            //web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
         } else {
             verOk = false;
             if (file.exists()) {
@@ -1881,6 +1826,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         eids = parser.parseEID(json);
         aids = parser.parseAID(json);
         numeros = parser.parsenumeros(json);
+        tipos = parser.parseTipos(json);
         mswipe.setRefreshing(false);
         checkButtons(aids, numeros, eids);
         String teids = "";
@@ -1899,6 +1845,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         for (String s : e) {
             Log.i("dir", Environment.getExternalStorageDirectory() + "/Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
             int index = e.indexOf(s);
+            if (index == 20) break;
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
             File fileSD = new File(getSD1() + "/Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
             Log.i("Existe", String.valueOf(file.exists()));
@@ -1914,6 +1861,54 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 isDesc.add(false);
             }
         }
+    }
+
+    public String getUrlInfo(String titulo, String tipo) {
+        String ftitulo = "";
+        String atitulo = titulo.toLowerCase();
+        atitulo = atitulo.replace("*", "-");
+        atitulo = atitulo.replace(":", "");
+        atitulo = atitulo.replace(",", "");
+        atitulo = atitulo.replace(" \u2606 ", "-");
+        atitulo = atitulo.replace("\u2606", "-");
+        atitulo = atitulo.replace("  ", "-");
+        atitulo = atitulo.replace("@", "a");
+        atitulo = atitulo.replace("&", "-");
+        atitulo = atitulo.replace("/", "-");
+        atitulo = atitulo.replace(".", "");
+        atitulo = atitulo.replace("\"", "");
+        atitulo = atitulo.replace("♥", "-");
+        for (int x = 0; x < atitulo.length(); x++) {
+            if (atitulo.charAt(x) != ' ') {
+                ftitulo += atitulo.charAt(x);
+            } else {
+                if (atitulo.charAt(x) == ' ') {
+                    ftitulo += "-";
+                }
+            }
+        }
+        ftitulo = ftitulo.replace("!!!", "-3");
+        ftitulo = ftitulo.replace("!", "");
+        ftitulo = ftitulo.replace("°", "");
+        ftitulo = ftitulo.replace("&deg;", "");
+        ftitulo = ftitulo.replace("(", "");
+        ftitulo = ftitulo.replace(")", "");
+        ftitulo = ftitulo.replace("2nd-season", "2");
+        ftitulo = ftitulo.replace("'", "");
+        if (ftitulo.trim().equals("gintama")) {
+            ftitulo = ftitulo + "-2015";
+        }
+        if (ftitulo.trim().equals("miss-monochrome-the-animation-2")) {
+            ftitulo = "miss-monochrome-the-animation-2nd-season";
+        }
+        if (ftitulo.trim().equals("ore-ga-ojousama-gakkou-ni-shomin-sample-toshite-gets-sareta-ken")) {
+            ftitulo = "ore-ga-ojousama-gakkou-ni-shomin-sample-toshite-gets-sareta-";
+        }
+        if (ftitulo.trim().equals("diabolik-lovers-moreblood")) {
+            ftitulo = "diabolik-lovers-more-blood";
+        }
+        String link = "http://animeflv.net/" + tipo.toLowerCase() + "/" + ftitulo + ".html";
+        return link;
     }
 
     public String getUrl(String titulo, String capitulo) {
@@ -2000,12 +1995,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
 
     public String getInicio() {
         String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
-        return servidor + "inicio";
+        //return servidor + "inicio";
+        return "http://animeflvapp.x10.mx/getHtml.php";
     }
 
     public String getDirectorio() {
-        String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
-        return servidor + "directorio";
+        //String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
+        //return servidor + "directorio";
+        return "http://animeflv.net/ajax/animes/lista_completa";
     }
 
     public void loadInicio(String data) {
@@ -2043,8 +2040,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     } else {
                         file.delete();
                         toast("Error en cache, volviendo a cargar");
-                        //new Requests(context, TaskType.GET_INICIO).execute(getInicio());
-                        web.loadUrl("http://animeflvapp.x10.mx/getHtml.php?url=http://animeflv.net/");
+                        new Requests(context, TaskType.GET_INICIO).execute(getInicio());
+                        //web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
                     }
                 }
             } else {
@@ -2054,7 +2051,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         toast("Error en servidor, sin cache para mostrar");
                         if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
                         //web.loadUrl(getInicio());
-                        web.loadUrl("http://animeflvapp.x10.mx/getHtml.php?url=http://animeflv.net/");
+                        web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
                     }
                     if (!isNetworkAvailable()) {
                         toast("Sin cache para mostrar");
@@ -2066,7 +2063,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     if (data.trim().equals("error"))
                         toast("Error en servidor");
                     //web.loadUrl(getInicio());
-                    web.loadUrl("http://animeflvapp.x10.mx/getHtml.php?url=http://animeflv.net/");
+                    web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
                     if (!isNetworkAvailable()) toast("Cargando desde cache");
                     Log.d("Cargar", "Json existente");
                     if (isJSONValid(infile)) {
@@ -2085,7 +2082,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     toast("Error en servidor, sin cache para mostrar");
                     if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
                     //web.loadUrl(getInicio());
-                    web.loadUrl("http://animeflvapp.x10.mx/getHtml.php?url=http://animeflv.net/");
+                    web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
                 }
                 if (!isNetworkAvailable()) {
                     toast("Sin cache para mostrar");
@@ -2097,7 +2094,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 if (data.trim().equals("error"))
                     toast("Error en servidor");
                 //web.loadUrl(getInicio());
-                web.loadUrl("http://animeflvapp.x10.mx/getHtml.php?url=http://animeflv.net/");
+                web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
                 if (!isNetworkAvailable()) toast("Cargando desde cache");
                 Log.d("Cargar", "Json existente");
                 getData(infile);
@@ -2272,8 +2269,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             } catch (IOException e) {
                                 Log.d("Archivo:", "Error al crear archivo");
                             }
-                            if (isJSONValid(data)) {
-                                writeToFile(data, file);
+                            if (isJSONValid(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")))) {
+                                writeToFile(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")), file);
                                 Intent intent = new Intent(context, Directorio.class);
                                 startActivity(intent);
                             } else {
@@ -2282,10 +2279,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         } else {
                             Log.d("Archivo", "Existe");
                             String infile = getStringFromFile(file_loc);
-                            if (!infile.trim().equals(data.trim())) {
+                            if (!infile.trim().equals(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")))) {
                                 if (isJSONValid(infile)) {
                                     Log.d("Cargar", "Json nuevo");
-                                    writeToFile(data, file);
+                                    writeToFile(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")), file);
                                     Intent intent = new Intent(context, Directorio.class);
                                     startActivity(intent);
                                 } else {
