@@ -1,6 +1,7 @@
 package knf.animeflv;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -1396,6 +1397,17 @@ public class Parser {
             e.printStackTrace();
         }
         return ret;
+    }
+
+    public int checkStatus(String json) {
+        int status = 0;
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            status = Integer.parseInt(jsonObject.getString("cache"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return status;
     }
     public Boolean igual(String json, String paid){
         String aid="";

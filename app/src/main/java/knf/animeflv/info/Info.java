@@ -380,7 +380,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
         String Svistos=getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
         String favoritos=getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
         if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-            new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+            //new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
         }
     }
 

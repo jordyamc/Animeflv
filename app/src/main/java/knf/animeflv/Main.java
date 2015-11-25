@@ -661,7 +661,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             descarga.delete();
         }
         ActualizarFavoritos();
-        handler.postDelayed(runnable, 1000);
+        handler.postDelayed(runnable, 500);
     }
 
     public void ActualizarFavoritos() {
@@ -1163,8 +1163,15 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         editor.putString("aid", aidInfo);
         editor.commit();
         String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
-        //urlInfoT = "http://animeflv.moe/api.php?accion=anime&aid=" + aid;
-        urlInfoT = "http://animeflvapp.x10.mx/getHtml.php?url=" + getUrlInfo(titulo, tipo);
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+        if (file.exists()) {
+            String json = getStringFromFile(file.getPath());
+            urlInfoT = "http://animeflvapp.x10.mx/getHtml.php?url=" + parser.getUrlFavs(json, aid);
+            Log.d("Buscar", "Parser");
+        } else {
+            urlInfoT = "http://animeflvapp.x10.mx/getHtml.php?url=" + getUrlInfo(titulo, tipo);
+            Log.d("Buscar", "GET");
+        }
         new Requests(this, TaskType.GET_INFO).execute(urlInfoT);
     }
 
@@ -1713,6 +1720,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             verOk = false;
             if (file.exists()) {
                 textoff.setVisibility(View.VISIBLE);
+                textoff.setText("MODO OFFLINE");
                 String infile = getStringFromFile(file_loc);
                 getData(infile);
             } else {
@@ -1973,11 +1981,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     public void onRefresh() {
         if (isNetworkAvailable()) {
             getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
-            textoff.setVisibility(View.GONE);
+            //textoff.setVisibility(View.GONE);
             new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
             new Requests(this, TaskType.GET_INICIO).execute(getInicio());
         } else {
             textoff.setVisibility(View.VISIBLE);
+            textoff.setText("MODO OFFLINE");
             if (mswipe.isRefreshing()) {
                 mswipe.setRefreshing(false);
             }
@@ -2002,7 +2011,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     public String getDirectorio() {
         //String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
         //return servidor + "directorio";
-        return "http://animeflv.net/ajax/animes/lista_completa";
+        return "http://animeflvapp.x10.mx/directorio.php";
     }
 
     public void loadInicio(String data) {
@@ -2024,6 +2033,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         Log.d("Archivo:", "Error al crear archivo");
                     }
                     writeToFile(data, file);
+                    if (parser.checkStatus(data) == 1) {
+                        textoff.setText("SERVIDOR DESACTUALIZADO");
+                        textoff.setVisibility(View.VISIBLE);
+                    } else {
+                        textoff.setVisibility(View.GONE);
+                    }
                     getData(data);
                 } else {
                     Log.d("Archivo", "Existe");
@@ -2032,9 +2047,21 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         if (!parser.parseEID(infile)[0].trim().equals(parser.parseEID(data)[0].trim())) {
                             Log.d("Cargar", "Json nuevo");
                             writeToFile(data, file);
+                            if (parser.checkStatus(data) == 1) {
+                                textoff.setText("SERVIDOR DESACTUALIZADO");
+                                textoff.setVisibility(View.VISIBLE);
+                            } else {
+                                textoff.setVisibility(View.GONE);
+                            }
                             getData(data);
                         } else {
                             Log.d("Cargar", "Json existente");
+                            if (parser.checkStatus(data) == 1) {
+                                textoff.setText("SERVIDOR DESACTUALIZADO");
+                                textoff.setVisibility(View.VISIBLE);
+                            } else {
+                                textoff.setVisibility(View.GONE);
+                            }
                             getData(infile);
                         }
                     } else {
@@ -2067,6 +2094,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     if (!isNetworkAvailable()) toast("Cargando desde cache");
                     Log.d("Cargar", "Json existente");
                     if (isJSONValid(infile)) {
+                        if (parser.checkStatus(data) == 1) {
+                            textoff.setText("SERVIDOR DESACTUALIZADO");
+                            textoff.setVisibility(View.VISIBLE);
+                        } else {
+                            textoff.setVisibility(View.GONE);
+                        }
                         getData(infile);
                     } else {
                         file.delete();
@@ -2097,6 +2130,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
                 if (!isNetworkAvailable()) toast("Cargando desde cache");
                 Log.d("Cargar", "Json existente");
+                if (parser.checkStatus(data) == 1) {
+                    textoff.setText("SERVIDOR DESACTUALIZADO");
+                    textoff.setVisibility(View.VISIBLE);
+                } else {
+                    textoff.setVisibility(View.GONE);
+                }
                 getData(infile);
             }
         }
@@ -2203,7 +2242,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         @Override
         public void run() {
             ActualizarFavoritos();
-            handler.postDelayed(this, 1000);
+            handler.postDelayed(this, 500);
         }
     };
 
@@ -2632,6 +2671,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 new Requests(this, TaskType.GET_INICIO).execute(getInicio());
             } else {
                 textoff.setVisibility(View.VISIBLE);
+                textoff.setText("MODO OFFLINE");
                 if (mswipe.isRefreshing()) {
                     mswipe.setRefreshing(false);
                 }

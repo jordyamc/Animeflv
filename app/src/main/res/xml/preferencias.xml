@@ -34,14 +34,6 @@
             app:dialogTitle="Tipo de conexion"
             app:entries="@array/tipos"
             app:entryValues="@array/tipos_val" />
-        <com.lb.material_preferences_library.custom_preferences.ListPreference
-            android:defaultValue="c"
-            android:key="servidor"
-            android:title="Servidor"
-            android:summary="%s"
-            app:dialogTitle="Elige servidor"
-            app:entries="@array/servidores"
-            app:entryValues="@array/servidores_val" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Busqueda">
         <com.lb.material_preferences_library.custom_preferences.ListPreference
