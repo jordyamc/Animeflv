@@ -423,6 +423,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         if (mediaStorage.isDirectory()) {
             String[] children = mediaStorage.list();
             for (int i = 0; i < children.length; i++) {
+                if (!children[i].equals("directorio.txt"))
                 new File(mediaStorage, children[i]).delete();
             }
         }
