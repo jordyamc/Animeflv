@@ -214,6 +214,7 @@ public class Login extends DialogFragment{
                                     PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString("login_pass_coded", "null").apply();
                                     dialog.dismiss();
                                     Toast.makeText(getActivity(),"Sesion Cerrada",Toast.LENGTH_SHORT).show();
+                                    new Parser().saveBackup(getActivity());
                                     break;
                                 case 4:
                                     dialogo=3;

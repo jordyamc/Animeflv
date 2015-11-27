@@ -114,6 +114,11 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
+        com.lb.material_preferences_library.custom_preferences.SwitchPreference switchPreference = (com.lb.material_preferences_library.custom_preferences.SwitchPreference) findPreference("streaming");
+        if (!isMXInstaled()) {
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("streaming", false).apply();
+            switchPreference.setChecked(false);
+        }
         getPreferenceScreen().findPreference("b_log").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -209,6 +214,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         super.onPause();
         // Set up a listener whenever a key changes
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        new Parser().saveBackup(context);
     }
 
     @Override
@@ -423,7 +429,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         if (mediaStorage.isDirectory()) {
             String[] children = mediaStorage.list();
             for (int i = 0; i < children.length; i++) {
-                if (!children[i].equals("directorio.txt"))
+                if (!children[i].equals("directorio.txt") && !children[i].equals("data.save"))
                 new File(mediaStorage, children[i]).delete();
             }
         }

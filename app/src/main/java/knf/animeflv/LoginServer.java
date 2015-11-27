@@ -99,6 +99,7 @@ public class LoginServer extends AsyncTask<String,String,String> {
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email", email).apply();
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", email_coded).apply();
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", pass_coded).apply();
+                new Parser().saveBackup(context);
                 if (!s.toLowerCase().trim().contains(":;:")) {
                     SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
                     sharedPreferences.edit().putString("favoritos", s.trim()).apply();

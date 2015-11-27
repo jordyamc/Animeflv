@@ -1,5 +1,6 @@
 package knf.animeflv;
 
+import android.app.DownloadManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -35,9 +36,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -191,8 +195,12 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                 writeToFile(s, file);
             } else {
                 String txt = getStringFromFile(file_loc);
+                String[] jsonAIDS = new Parser().parseAID(s);
+                String[] jsonNums = new Parser().parsenumeros(s);
+                String[] jsonTits = new Parser().parseTitulos(s);
                 String[] jsonDesc = new Parser().parseEID(s);
                 String[] jsonArchivo = new Parser().parseEID(txt);
+                Boolean desc = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoDesc", false);
                 if (isJSONValid(txt) && isJSONValid(s)){
                     if (!jsonDesc[0].trim().equals(jsonArchivo[0].trim())) {
                         writeToFile(s, file);
@@ -213,6 +221,12 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             {
                                 for (String st : jsonDesc) {
                                     if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                        List<String> indexs = Arrays.asList(jsonDesc);
+                                        int index = indexs.indexOf(st);
+                                        String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
+                                        if (favoritos.contains(jsonAIDS[index]) && desc) {
+                                            Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
+                                        }
                                         num += 1;
                                     } else {
                                         break loop;
@@ -241,7 +255,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                             mBuilder.setContentIntent(resultPendingIntent);
                             int mNotificationId = 6991;
-                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                             mNotifyMgr.cancel(mNotificationId);
                             mNotifyMgr.notify(mNotificationId, mBuilder.build());
                         }
@@ -261,6 +275,12 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             {
                                 for (String st : jsonDesc) {
                                     if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                        List<String> indexs = Arrays.asList(jsonDesc);
+                                        int index = indexs.indexOf(st);
+                                        String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
+                                        if (favoritos.contains(jsonAIDS[index]) && desc) {
+                                            Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
+                                        }
                                         num += 1;
                                     } else {
                                         break loop;
@@ -289,7 +309,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                             mBuilder.setContentIntent(resultPendingIntent);
                             int mNotificationId = 6991;
-                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                             mNotifyMgr.cancel(mNotificationId);
                             mNotifyMgr.notify(mNotificationId, mBuilder.build());
                         }
@@ -309,6 +329,12 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             {
                                 for (String st : jsonDesc) {
                                     if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                        List<String> indexs = Arrays.asList(jsonDesc);
+                                        int index = indexs.indexOf(st);
+                                        String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
+                                        if (favoritos.contains(jsonAIDS[index]) && desc) {
+                                            Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
+                                        }
                                         num += 1;
                                     } else {
                                         break loop;
@@ -337,7 +363,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                             mBuilder.setContentIntent(resultPendingIntent);
                             int mNotificationId = 6991;
-                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                             mNotifyMgr.cancel(mNotificationId);
                             mNotifyMgr.notify(mNotificationId, mBuilder.build());
                         }
@@ -357,6 +383,12 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             {
                                 for (String st : jsonDesc) {
                                     if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                        List<String> indexs = Arrays.asList(jsonDesc);
+                                        int index = indexs.indexOf(st);
+                                        String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
+                                        if (favoritos.contains(jsonAIDS[index]) && desc) {
+                                            Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
+                                        }
                                         num += 1;
                                     } else {
                                         break loop;
@@ -385,7 +417,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                             mBuilder.setContentIntent(resultPendingIntent);
                             int mNotificationId = 6991;
-                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                             mNotifyMgr.cancel(mNotificationId);
                             mNotifyMgr.notify(mNotificationId, mBuilder.build());
                         }
@@ -405,6 +437,12 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             {
                                 for (String st : jsonDesc) {
                                     if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                        List<String> indexs = Arrays.asList(jsonDesc);
+                                        int index = indexs.indexOf(st);
+                                        String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
+                                        if (favoritos.contains(jsonAIDS[index]) && desc) {
+                                            Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
+                                        }
                                         num += 1;
                                     } else {
                                         break loop;
@@ -433,7 +471,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                             PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                             mBuilder.setContentIntent(resultPendingIntent);
                             int mNotificationId = 6991;
-                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                             mNotifyMgr.cancel(mNotificationId);
                             mNotifyMgr.notify(mNotificationId, mBuilder.build());
                         }
@@ -481,7 +519,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         mBuilder.setContentIntent(resultPendingIntent);
                         int mNotificationId = 1964;
-                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
                     }
                     if (not==1){
@@ -503,7 +541,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         mBuilder.setContentIntent(resultPendingIntent);
                         int mNotificationId = 1964;
-                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
                     }
                     if (not==2){
@@ -525,7 +563,7 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         mBuilder.setContentIntent(resultPendingIntent);
                         int mNotificationId = 1964;
-                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
                     }
                     if (not==3){
@@ -547,11 +585,77 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         mBuilder.setContentIntent(resultPendingIntent);
                         int mNotificationId = 1964;
-                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                    }
+                    if (not == 4) {
+                        Log.d("Notificacion:", "Crear Sonido Sam");
+                        NotificationCompat.Builder mBuilder =
+                                new NotificationCompat.Builder(context)
+                                        .setSmallIcon(R.drawable.ic_not_r)
+                                        .setContentTitle("AnimeFLV")
+                                        .setContentText("Nueva Version Disponible!!!");
+                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango"), AudioManager.STREAM_NOTIFICATION);
+                        mBuilder.setAutoCancel(true);
+                        mBuilder.setPriority(Notification.PRIORITY_MAX);
+                        mBuilder.setLights(Color.BLUE, 5000, 2000);
+                        Intent resultIntent = new Intent(context, Main.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("act", "1");
+                        resultIntent.putExtras(bundle);
+                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        mBuilder.setContentIntent(resultPendingIntent);
+                        int mNotificationId = 1964;
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                         mNotifyMgr.notify(mNotificationId, mBuilder.build());
                     }
                 }
             }
         }
+    }
+
+    public void Descargar(String aid, String num, String titulo, String eid) {
+        int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
+        Uri ring = Uri.parse("");
+        switch (not) {
+            case 0:
+                ring = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                break;
+            case 1:
+                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound");
+                break;
+            case 2:
+                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/onii");
+                break;
+            case 3:
+                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sam");
+                break;
+            case 4:
+                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango");
+                break;
+        }
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.ic_not_r)
+                        .setContentTitle(titulo)
+                        .setContentText("Descargar capitulo " + num);
+        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+        mBuilder.setSound(ring, AudioManager.STREAM_NOTIFICATION);
+        mBuilder.setAutoCancel(true);
+        mBuilder.setPriority(Notification.PRIORITY_MAX);
+        mBuilder.setLights(Color.BLUE, 5000, 2000);
+        Intent resultIntent = new Intent(context, BackDownload.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("aid", aid);
+        bundle.putString("num", num);
+        bundle.putString("titulo", titulo);
+        bundle.putString("eid", eid);
+        resultIntent.putExtras(bundle);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setContentIntent(resultPendingIntent);
+        int mNotificationId = (int) Math.round(Math.random());
+        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
     }
 }

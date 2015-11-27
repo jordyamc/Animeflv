@@ -1,10 +1,12 @@
 package knf.animeflv;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -19,9 +21,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -34,7 +36,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -52,9 +53,16 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
-import com.mikepenz.iconics.utils.Utils;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -344,6 +352,15 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             //web.loadUrl("http://animeflvapp.x10.mx/contador.php?id=" + androidID.trim());
             new Requests(context, TaskType.CONTAR).execute("http://animeflvapp.x10.mx/contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode));
         }
+        checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        /*if (ContextCompat.checkSelfPermission(this,Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.GET_ACCOUNTS)) {
+                toast("La app usa este permiso para obtener el correo en las sugerencias");
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.GET_ACCOUNTS},2);
+            } else {
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.GET_ACCOUNTS},2);
+            }
+        }*/
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(getHDraw(false))
@@ -803,10 +820,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             IBVT.setEnabled(true);
             descargando = false;
             String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-            /*if (!vistos.contains(eids[position].trim())) {
+            if (!vistos.contains(eids[position].trim())) {
                 vistos = vistos + eids[position].trim() + ":::";
                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-            }*/
+            }
         } else {
             toast("No hay conexion a internet");
             GIBT.setScaleType(ImageView.ScaleType.FIT_END);
@@ -853,10 +870,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                    /*if (!vistos.contains(eids[position].trim())) {
+                    if (!vistos.contains(eids[position].trim())) {
                         vistos = vistos + eids[position].trim() + ":::";
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-                    }*/
+                    }
                     break;
                 case "com.mxtech.videoplayer.ad":
                     Intent intentad = new Intent(Intent.ACTION_VIEW);
@@ -867,10 +884,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intentad);
                     String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                    /*if (!vistosad.contains(eids[position].trim())) {
+                    if (!vistosad.contains(eids[position].trim())) {
                         vistosad = vistosad + eids[position].trim() + ":::";
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
-                    }*/
+                    }
                     break;
                 default:
                     toast("MX player no instalado");
@@ -927,7 +944,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     imageButton.setImageResource(R.drawable.ic_get_r);
                                     IBsVerList.get(index).setImageResource(R.drawable.ic_ver_no);
                                     IBsVerList.get(index).setEnabled(false);
-                                    /*long l = Long.parseLong(getSharedPreferences("data", MODE_PRIVATE).getString(eids[index], "0"));
+                                    long l = Long.parseLong(getSharedPreferences("data", MODE_PRIVATE).getString(eids[index], "0"));
                                     if (l != 0) {
                                         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                                         manager.remove(l);
@@ -937,7 +954,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         String epID = getSharedPreferences("data", MODE_PRIVATE).getString("epIDS_descarga", "");
                                         getSharedPreferences("data", MODE_PRIVATE).edit().putString("titulos_descarga", tits.replace(titulos[index] + ":::", "")).apply();
                                         getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(aids[index] + "_" + numeros[index] + ":::", "")).apply();
-                                    }*/
+                                    }
                                     toast("Archivo Eliminado");
                                 }
                             }
@@ -972,7 +989,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         isDesc.add(index, true);
                         descargando = true;
                         indexT = index;
-                        //eidT = eids[index];
+                        eidT = eids[index];
                         //DescargarInbyID(index);
                         if (isNetworkAvailable()) {
                             new CheckVideo(context, TaskType.CHECK_DOWN, index).execute("http://subidas.com/files/" + aids[index] + "/" + numeros[index] + ".mp4");
@@ -1009,7 +1026,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         isDesc.add(index, true);
                                         descargando = true;
                                         indexT = index;
-                                        //eidT = eids[index];
+                                        eidT = eids[index];
                                         //DescargarInbyID(index);
                                         if (isNetworkAvailable()) {
                                             new CheckVideo(context, TaskType.CHECK_DOWN, index).execute("http://subidas.com/files/" + aids[index] + "/" + numeros[index] + ".mp4");
@@ -1039,7 +1056,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         isDesc.add(index, true);
                                         descargando = true;
                                         indexT = index;
-                                        //eidT = eids[index];
+                                        eidT = eids[index];
                                         Streaming = true;
                                         //StreamInbyID(index);
                                         if (isNetworkAvailable()) {
@@ -1518,10 +1535,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         getSharedPreferences("data", MODE_PRIVATE).edit().putString("titulos_descarga", tits + aids[posT] + ":::").apply();
                         getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID + aids[posT] + "_" + numeros[posT] + ":::").apply();
                         String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                        /*if (!vistos.contains(eids[posT].trim())) {
+                        if (!vistos.contains(eids[posT].trim())) {
                             vistos = vistos + eids[posT].trim() + ":::";
                             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-                        }*/
+                        }
                         descargando = false;
                         web.loadUrl("about:blank");
                     } else {
@@ -1571,10 +1588,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             intent.putExtra("headers", headers);
                             startActivity(intent);
                             String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                            /*if (!vistos.contains(eids[posT].trim())) {
+                            if (!vistos.contains(eids[posT].trim())) {
                                 vistos = vistos + eids[posT].trim() + ":::";
                                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-                            }*/
+                            }
                             break;
                         case "com.mxtech.videoplayer.ad":
                             Intent intentad = new Intent(Intent.ACTION_VIEW);
@@ -1586,10 +1603,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             intentad.putExtra("headers", headersad);
                             startActivity(intentad);
                             String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                            /*if (!vistosad.contains(eids[posT].trim())) {
+                            if (!vistosad.contains(eids[posT].trim())) {
                                 vistosad = vistosad + eids[posT].trim() + ":::";
                                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
-                            }*/
+                            }
                             break;
                         default:
                             toast("MX player no instalado");
@@ -1843,6 +1860,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         getSharedPreferences("data", MODE_PRIVATE).edit().putString("teids", teids).apply();
         isFirst();
+        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isF", false).apply();
     }
 
     public void checkButtons(String[] aids, String[] numeros, String[] eids) {
@@ -2015,37 +2033,26 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
 
     public void loadInicio(String data) {
-        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-            if (!mediaStorage.exists()) {
-                mediaStorage.mkdirs();
-            }
-        }
-        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
-        if (isNetworkAvailable() && !data.trim().equals("error")) {
-            if (isJSONValid(data)) {
-                if (!file.exists()) {
-                    Log.d("Archivo:", "No existe");
-                    Log.d("Json", data);
-                    try {
-                        file.createNewFile();
-                    } catch (IOException e) {
-                        Log.d("Archivo:", "Error al crear archivo");
+        Boolean isF = getSharedPreferences("data", MODE_PRIVATE).getBoolean("isF", true);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED || isF) {
+            if (!isF) {
+                if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                    if (!mediaStorage.exists()) {
+                        mediaStorage.mkdirs();
                     }
-                    writeToFile(data, file);
-                    if (parser.checkStatus(data) == 1) {
-                        textoff.setText("SERVIDOR DESACTUALIZADO");
-                        textoff.setVisibility(View.VISIBLE);
-                    } else {
-                        textoff.setVisibility(View.GONE);
-                    }
-                    getData(data);
-                } else {
-                    Log.d("Archivo", "Existe");
-                    String infile = getStringFromFile(file_loc);
-                    if (isJSONValid(infile) && isJSONValid(data)) {
-                        if (!parser.parseEID(infile)[0].trim().equals(parser.parseEID(data)[0].trim())) {
-                            Log.d("Cargar", "Json nuevo");
+                }
+                File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt");
+                String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
+                if (isNetworkAvailable() && !data.trim().equals("error")) {
+                    if (isJSONValid(data)) {
+                        if (!file.exists()) {
+                            Log.d("Archivo:", "No existe");
+                            Log.d("Json", data);
+                            try {
+                                file.createNewFile();
+                            } catch (IOException e) {
+                                Log.d("Archivo:", "Error al crear archivo");
+                            }
                             writeToFile(data, file);
                             if (parser.checkStatus(data) == 1) {
                                 textoff.setText("SERVIDOR DESACTUALIZADO");
@@ -2055,45 +2062,95 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             }
                             getData(data);
                         } else {
-                            Log.d("Cargar", "Json existente");
-                            if (parser.checkStatus(data) == 1) {
-                                textoff.setText("SERVIDOR DESACTUALIZADO");
-                                textoff.setVisibility(View.VISIBLE);
+                            Log.d("Archivo", "Existe");
+                            String infile = getStringFromFile(file_loc);
+                            if (isJSONValid(infile) && isJSONValid(data)) {
+                                if (!parser.parseEID(infile)[0].trim().equals(parser.parseEID(data)[0].trim())) {
+                                    Log.d("Cargar", "Json nuevo");
+                                    writeToFile(data, file);
+                                    if (parser.checkStatus(data) == 1) {
+                                        textoff.setText("SERVIDOR DESACTUALIZADO");
+                                        textoff.setVisibility(View.VISIBLE);
+                                    } else {
+                                        textoff.setVisibility(View.GONE);
+                                    }
+                                    getData(data);
+                                } else {
+                                    Log.d("Cargar", "Json existente");
+                                    if (parser.checkStatus(data) == 1) {
+                                        textoff.setText("SERVIDOR DESACTUALIZADO");
+                                        textoff.setVisibility(View.VISIBLE);
+                                    } else {
+                                        textoff.setVisibility(View.GONE);
+                                    }
+                                    getData(infile);
+                                }
                             } else {
-                                textoff.setVisibility(View.GONE);
+                                file.delete();
+                                toast("Error en cache, volviendo a cargar");
+                                new Requests(context, TaskType.GET_INICIO).execute(getInicio());
+                                //web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
                             }
-                            getData(infile);
                         }
                     } else {
-                        file.delete();
-                        toast("Error en cache, volviendo a cargar");
-                        new Requests(context, TaskType.GET_INICIO).execute(getInicio());
-                        //web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
-                    }
-                }
-            } else {
-                if (!file.exists()) {
-                    Log.d("Archivo:", "No existe");
-                    if (data.trim().equals("error")) {
-                        toast("Error en servidor, sin cache para mostrar");
-                        if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
-                        //web.loadUrl(getInicio());
-                        web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
-                    }
-                    if (!isNetworkAvailable()) {
-                        toast("Sin cache para mostrar");
-                        if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
+                        if (!file.exists()) {
+                            Log.d("Archivo:", "No existe");
+                            if (data.trim().equals("error")) {
+                                toast("Error en servidor, sin cache para mostrar");
+                                if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
+                                //web.loadUrl(getInicio());
+                                web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
+                            }
+                            if (!isNetworkAvailable()) {
+                                toast("Sin cache para mostrar");
+                                if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
+                            }
+                        } else {
+                            Log.d("Archivo", "Existe");
+                            String infile = getStringFromFile(file_loc);
+                            if (data.trim().equals("error"))
+                                toast("Error en servidor");
+                            //web.loadUrl(getInicio());
+                            web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
+                            if (!isNetworkAvailable()) toast("Cargando desde cache");
+                            Log.d("Cargar", "Json existente");
+                            if (isJSONValid(infile)) {
+                                if (parser.checkStatus(data) == 1) {
+                                    textoff.setText("SERVIDOR DESACTUALIZADO");
+                                    textoff.setVisibility(View.VISIBLE);
+                                } else {
+                                    textoff.setVisibility(View.GONE);
+                                }
+                                getData(infile);
+                            } else {
+                                file.delete();
+                                toast("Error en cache, volviendo a cargar");
+                                new Requests(context, TaskType.GET_INICIO).execute(getInicio());
+                            }
+                        }
                     }
                 } else {
-                    Log.d("Archivo", "Existe");
-                    String infile = getStringFromFile(file_loc);
-                    if (data.trim().equals("error"))
-                        toast("Error en servidor");
-                    //web.loadUrl(getInicio());
-                    web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
-                    if (!isNetworkAvailable()) toast("Cargando desde cache");
-                    Log.d("Cargar", "Json existente");
-                    if (isJSONValid(infile)) {
+                    if (!file.exists()) {
+                        Log.d("Archivo:", "No existe");
+                        if (data.trim().equals("error")) {
+                            toast("Error en servidor, sin cache para mostrar");
+                            if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
+                            //web.loadUrl(getInicio());
+                            web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
+                        }
+                        if (!isNetworkAvailable()) {
+                            toast("Sin cache para mostrar");
+                            if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
+                        }
+                    } else {
+                        Log.d("Archivo", "Existe");
+                        String infile = getStringFromFile(file_loc);
+                        if (data.trim().equals("error"))
+                            toast("Error en servidor");
+                        //web.loadUrl(getInicio());
+                        web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
+                        if (!isNetworkAvailable()) toast("Cargando desde cache");
+                        Log.d("Cargar", "Json existente");
                         if (parser.checkStatus(data) == 1) {
                             textoff.setText("SERVIDOR DESACTUALIZADO");
                             textoff.setVisibility(View.VISIBLE);
@@ -2101,43 +2158,57 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             textoff.setVisibility(View.GONE);
                         }
                         getData(infile);
-                    } else {
-                        file.delete();
-                        toast("Error en cache, volviendo a cargar");
-                        new Requests(context, TaskType.GET_INICIO).execute(getInicio());
                     }
                 }
+            } else {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isF", false).apply();
+                    final File saveData = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/data.save");
+                    if (saveData.exists()) {
+                        new MaterialDialog.Builder(context)
+                                .title("Respaldo")
+                                .content("Se ah encontrado un respaldo de la configuracion, ¿Desea restaurarlo?")
+                                .positiveText("SI")
+                                .negativeText("NO")
+                                .autoDismiss(true)
+                                .cancelable(true)
+                                .callback(new MaterialDialog.ButtonCallback() {
+                                    @Override
+                                    public void onPositive(MaterialDialog dialog) {
+                                        super.onPositive(dialog);
+                                        String save = getStringFromFile(saveData.getPath());
+                                        if (parser.restoreBackup(save, context) != Parser.Response.OK) {
+                                            toast("Error al restaurar");
+                                            saveData.delete();
+                                        } else {
+                                            ActualizarFavoritos();
+                                            getHDraw(true);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onNegative(MaterialDialog dialog) {
+                                        super.onNegative(dialog);
+                                        saveData.delete();
+                                    }
+                                })
+                                .cancelListener(new DialogInterface.OnCancelListener() {
+                                    @Override
+                                    public void onCancel(DialogInterface dialog) {
+                                        saveData.delete();
+                                    }
+                                }).build().show();
+                    }
+                }
+                new Requests(context, TaskType.GET_INICIO).execute(getInicio());
             }
         } else {
-            if (!file.exists()) {
-                Log.d("Archivo:", "No existe");
-                if (data.trim().equals("error")) {
-                    toast("Error en servidor, sin cache para mostrar");
-                    if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
-                    //web.loadUrl(getInicio());
-                    web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
-                }
-                if (!isNetworkAvailable()) {
-                    toast("Sin cache para mostrar");
-                    if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
-                }
-            } else {
-                Log.d("Archivo", "Existe");
-                String infile = getStringFromFile(file_loc);
-                if (data.trim().equals("error"))
-                    toast("Error en servidor");
-                //web.loadUrl(getInicio());
-                web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
-                if (!isNetworkAvailable()) toast("Cargando desde cache");
-                Log.d("Cargar", "Json existente");
-                if (parser.checkStatus(data) == 1) {
-                    textoff.setText("SERVIDOR DESACTUALIZADO");
-                    textoff.setVisibility(View.VISIBLE);
-                } else {
-                    textoff.setVisibility(View.GONE);
-                }
-                getData(infile);
-            }
+            toast("El permiso de almacenamiento es necesario para continuar");
+            finish();
+            Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            i.addCategory(Intent.CATEGORY_DEFAULT);
+            i.setData(Uri.parse("package:" + getPackageName()));
+            startActivity(i);
         }
     }
 
@@ -2642,6 +2713,58 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 mat.dismiss();
             }
         }
+    }
+
+    public void checkPermission(final String permission) {
+        Dexter.checkPermission(new PermissionListener() {
+            @Override
+            public void onPermissionGranted(PermissionGrantedResponse response) {
+                if (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+                } else if (permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    checkPermission(Manifest.permission.GET_ACCOUNTS);
+                }
+            }
+
+            @Override
+            public void onPermissionDenied(PermissionDeniedResponse response) {
+                if (!response.isPermanentlyDenied()) {
+                    String titulo;
+                    String desc;
+                    if (response.getPermissionName().equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) || response.getPermissionName().equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        titulo = "Leer/Escribir archivos";
+                        desc = "Este permiso es necesario para descargar los animes, asi como para funcionar sin conexion";
+                    } else {
+                        titulo = "Obtener cuentas";
+                        desc = "Este permiso es necesario para obtener tu correo en las sugerencias y sincronixar favoritos";
+                    }
+                    new MaterialDialog.Builder(context)
+                            .title(titulo)
+                            .content(desc)
+                            .positiveText("ACEPTAR")
+                            .cancelable(false)
+                            .autoDismiss(true)
+                            .callback(new MaterialDialog.ButtonCallback() {
+                                @Override
+                                public void onPositive(MaterialDialog dialog) {
+                                    super.onPositive(dialog);
+                                    checkPermission(permission);
+                                }
+                            })
+                            .build().show();
+                } else {
+                    toast("El permiso es necesario, por favor activalo");
+                    finish();
+                    Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    i.addCategory(Intent.CATEGORY_DEFAULT);
+                    i.setData(Uri.parse("package:" + getPackageName()));
+                    startActivity(i);
+                }
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
+        }, permission);
     }
 
     public boolean isJSONValid(String test) {

@@ -59,6 +59,10 @@
             android:label="@string/app_name"
             android:theme="@style/Theme.Transparent">
         </activity>
+        <activity
+            android:name=".BackDownload"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Transparent"></activity>
         <activity android:name=".Configuracion"
             android:label="@string/app_name"
             android:theme="@style/AppTheme"/>
