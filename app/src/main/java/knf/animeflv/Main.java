@@ -42,11 +42,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -97,7 +99,7 @@ import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.info.Info;
 import pl.droidsonroids.gif.GifImageButton;
 
-public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, Requests.callback, CheckVideo.callback {
+public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, Requests.callback, CheckVideo.callback, LoginServer.callback {
     WebView web;
     WebView web_Links;
     WebView web_gets;
@@ -224,6 +226,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     CardView card18;
     CardView card19;
     CardView card20;
+    Switch nots;
+    Switch stream;
+    Spinner sonidos;
+    Spinner conexion;
     WebViewClient client;
     TextView textoff;
     ArrayList<GifImageButton> IBsDesList = new ArrayList<GifImageButton>();
@@ -289,7 +295,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     int CHAT = 2;
     private Handler handler = new Handler();
     String urlInfoT = "";
-
+    MaterialDialog RapConf;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -339,8 +345,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         final int change = getSharedPreferences("data", MODE_PRIVATE).getInt(Integer.toString(versionCode), 0);
         if (change == 0) {
-            ChangelogDialog.create()
-                    .show(getSupportFragmentManager(), "changelog");
+            Boolean isF = getSharedPreferences("data", MODE_PRIVATE).getBoolean("isF", true);
+            if (!isF) ChangelogDialog.create().show(getSupportFragmentManager(), "changelog");
             getSharedPreferences("data", MODE_PRIVATE).edit().putInt(Integer.toString(versionCode), 1).apply();
             if (versionCode <= 94) {
                 getSharedPreferences("data", MODE_PRIVATE).edit().putString("eids_descarga", "").apply();
@@ -679,6 +685,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         ActualizarFavoritos();
         handler.postDelayed(runnable, 500);
+        parser.saveBackup(context);
     }
 
     public void ActualizarFavoritos() {
@@ -819,6 +826,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             IBVT.setImageResource(R.drawable.ic_rep_r);
             IBVT.setEnabled(true);
             descargando = false;
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aids[position] + "_" + numeros[position], true).apply();
             String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
             if (!vistos.contains(eids[position].trim())) {
                 vistos = vistos + eids[position].trim() + ":::";
@@ -869,6 +877,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     intent.putExtra("title", titulos[position] + " " + numeros[position]);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aids[position] + "_" + numeros[position], true).apply();
                     String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
                     if (!vistos.contains(eids[position].trim())) {
                         vistos = vistos + eids[position].trim() + ":::";
@@ -883,6 +892,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     intentad.putExtra("title", titulos[position] + " " + numeros[position]);
                     intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intentad);
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aids[position] + "_" + numeros[position], true).apply();
                     String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
                     if (!vistosad.contains(eids[position].trim())) {
                         vistosad = vistosad + eids[position].trim() + ":::";
@@ -1534,6 +1544,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         epID = getSharedPreferences("data", MODE_PRIVATE).getString("epIDS_descarga", "");
                         getSharedPreferences("data", MODE_PRIVATE).edit().putString("titulos_descarga", tits + aids[posT] + ":::").apply();
                         getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID + aids[posT] + "_" + numeros[posT] + ":::").apply();
+                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aids[posT] + "_" + numeros[posT], true).apply();
                         String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
                         if (!vistos.contains(eids[posT].trim())) {
                             vistos = vistos + eids[posT].trim() + ":::";
@@ -1582,11 +1593,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             Intent intent = new Intent(Intent.ACTION_VIEW);
                             Uri videoUri = Uri.parse(url);
                             intent.setDataAndType(videoUri, "application/mp4");
+                            intent.putExtra("title", titulos[posT] + " " + numeros[posT]);
                             intent.setPackage("com.mxtech.videoplayer.pro");
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             String[] headers = {"cookie", cookie, "User-Agent", web.getSettings().getUserAgentString(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", urlD};
                             intent.putExtra("headers", headers);
                             startActivity(intent);
+                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aids[posT] + "_" + numeros[posT], true).apply();
                             String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
                             if (!vistos.contains(eids[posT].trim())) {
                                 vistos = vistos + eids[posT].trim() + ":::";
@@ -1598,10 +1611,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             Uri videoUriad = Uri.parse(url);
                             intentad.setDataAndType(videoUriad, "application/mp4");
                             intentad.setPackage("com.mxtech.videoplayer.ad");
+                            intentad.putExtra("title", titulos[posT] + " " + numeros[posT]);
                             intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             String[] headersad = {"cookie", cookie, "User-Agent", web.getSettings().getUserAgentString(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", urlD};
                             intentad.putExtra("headers", headersad);
                             startActivity(intentad);
+                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aids[posT] + "_" + numeros[posT], true).apply();
                             String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
                             if (!vistosad.contains(eids[posT].trim())) {
                                 vistosad = vistosad + eids[posT].trim() + ":::";
@@ -2190,14 +2205,88 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     public void onNegative(MaterialDialog dialog) {
                                         super.onNegative(dialog);
                                         saveData.delete();
+                                        parser.saveBackup(context);
                                     }
                                 })
                                 .cancelListener(new DialogInterface.OnCancelListener() {
                                     @Override
                                     public void onCancel(DialogInterface dialog) {
                                         saveData.delete();
+                                        parser.saveBackup(context);
                                     }
                                 }).build().show();
+                    } else {
+                        RapConf = new MaterialDialog.Builder(context)
+                                .title("Configuracion rapida")
+                                .titleGravity(GravityEnum.CENTER)
+                                .customView(R.layout.rap_conf, false)
+                                .positiveText("CONTINUAR")
+                                .autoDismiss(false)
+                                .cancelable(false)
+                                .callback(new MaterialDialog.ButtonCallback() {
+                                    @Override
+                                    public void onPositive(MaterialDialog dialog) {
+                                        super.onPositive(dialog);
+                                        toast("Se pueden volver a modificar desde configuracion");
+                                        RapConf.dismiss();
+                                        parser.saveBackup(context);
+                                        new Login().show(getSupportFragmentManager(), "Login");
+                                    }
+                                }).build();
+                        nots = (Switch) RapConf.getCustomView().findViewById(R.id.switch_not_conf);
+                        stream = (Switch) RapConf.getCustomView().findViewById(R.id.switch_stream_conf);
+                        sonidos = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_sonido_conf);
+                        conexion = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_conexion_conf);
+                        nots.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                if (isChecked) {
+                                    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", true).apply();
+                                } else {
+                                    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", false).apply();
+                                }
+                            }
+                        });
+                        stream.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                if (isChecked) {
+                                    if (isMXInstaled()) {
+                                        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("streaming", true).apply();
+                                    } else {
+                                        toast("Se necesita Reproductor MX instalado");
+                                        stream.setChecked(false);
+                                    }
+                                } else {
+                                    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("streaming", false).apply();
+                                }
+                            }
+                        });
+                        ArrayAdapter<String> adapterSonidos = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.sonidos));
+                        sonidos.setAdapter(adapterSonidos);
+                        sonidos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sonido", Integer.toString(position)).apply();
+                            }
+
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) {
+                            }
+                        });
+                        ArrayAdapter<String> adapterConx = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.tipos));
+                        conexion.setAdapter(adapterConx);
+                        conexion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_conexion", Integer.toString(position)).apply();
+                            }
+
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) {
+                            }
+                        });
+                        RapConf.show();
                     }
                 }
                 new Requests(context, TaskType.GET_INICIO).execute(getInicio());
@@ -2221,6 +2310,24 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
     }
 
+    public Boolean isMXInstaled() {
+        Boolean is = false;
+        List<ApplicationInfo> packages;
+        PackageManager pm;
+        pm = context.getPackageManager();
+        packages = pm.getInstalledApplications(0);
+        for (ApplicationInfo packageInfo : packages) {
+            if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
+                is = true;
+                break;
+            }
+            if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
+                is = true;
+                break;
+            }
+        }
+        return is;
+    }
     public void cambiarColor() {
         final MaterialDialog dialog = new MaterialDialog.Builder(context)
                 .title("Selecciona un color:")
@@ -2858,6 +2965,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
     }
 
+    @Override
+    public void response(String data, TaskType taskType) {
+    }
+
     class JavaScriptInterface {
         private Context ctx;
 
@@ -2900,6 +3011,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             //final String link=html.substring(html.indexOf(".link=")+6,html.lastIndexOf(".html")+5);
             //Log.d("link",link);
         }
+
 
         @JavascriptInterface
         public void showHTMLD2(final String htmlInicio) {
