@@ -2583,7 +2583,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     } catch (IOException e) {
                         Log.d("Archivo:", "Error al crear archivo");
                     }
-                    writeToFile(data, file);
+                    writeToFile(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")), file);
                     Intent intent = new Intent(context, Directorio.class);
                     Bundle bundle = new Bundle();
                     bundle.putString("tipo", "Busqueda");
@@ -2594,7 +2594,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     String infile = getStringFromFile(file_loc);
                     if (!infile.trim().equals(data.trim())) {
                         Log.d("Cargar", "Json nuevo");
-                        writeToFile(data, file);
+                        writeToFile(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")), file);
                         Intent intent = new Intent(context, Directorio.class);
                         Bundle bundle = new Bundle();
                         bundle.putString("tipo", "Busqueda");
