@@ -2240,8 +2240,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     @Override
                                     public void onPositive(MaterialDialog dialog) {
                                         super.onPositive(dialog);
-                                        toast("Se pueden volver a modificar desde configuracion");
                                         if (sonidos.getSelectedItemPosition() > 0 && conexion.getSelectedItemPosition() > 0) {
+                                            toast("Se pueden volver a modificar desde configuracion");
                                             RapConf.dismiss();
                                             parser.saveBackup(context);
                                             new Login().show(getSupportFragmentManager(), "Login");
