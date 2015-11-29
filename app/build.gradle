@@ -30,6 +30,7 @@ allprojects {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.shamanland:xdroid-toaster:0.0.10'
     compile 'com.karumi:dexter:2.0.0'
     compile 'com.android.support:appcompat-v7:23.+'
     compile 'com.android.support:recyclerview-v7:23.+'

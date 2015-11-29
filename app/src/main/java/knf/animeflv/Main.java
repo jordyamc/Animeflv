@@ -101,6 +101,7 @@ import java.util.List;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.info.Info;
 import pl.droidsonroids.gif.GifImageButton;
+import xdroid.toaster.Toaster;
 
 public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, Requests.callback, CheckVideo.callback, LoginServer.callback {
     WebView web;
@@ -2520,7 +2521,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 Intent intent = new Intent(context, Directorio.class);
                                 startActivity(intent);
                             } else {
-                                toast("Error en Servidor");
+                                Toaster.toast("Error en Servidor");
                             }
                         } else {
                             Log.d("Archivo", "Existe");
@@ -2534,7 +2535,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 } else {
                                     file.delete();
                                     setDir(tbool);
-                                    toast("Error en cache, recargando");
+                                    Toaster.toast("Error en cache, recargando");
                                 }
                             } else {
                                 if (isJSONValid(infile)) {
@@ -2544,7 +2545,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 } else {
                                     file.delete();
                                     setDir(tbool);
-                                    toast("Error en cache, recargando");
+                                    Toaster.toast("Error en cache, recargando");
                                 }
                             }
                         }
@@ -2560,7 +2561,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             Intent intent = new Intent(context, Directorio.class);
                             startActivity(intent);
                         } else {
-                            toast("Servidor fallando y no hay datos en cache");
+                            Toaster.toast("Servidor fallando y no hay datos en cache");
                         }
                     }
                 }

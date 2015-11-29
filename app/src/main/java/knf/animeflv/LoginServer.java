@@ -91,7 +91,6 @@ public class LoginServer extends AsyncTask<String,String,String> {
             call.response("OK", taskType);
         }
         if (taskType==TaskType.GET_FAV){
-            Log.d("GET State",state);
             SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
             defsharedPreferences.edit().putString("GET_Status", state).apply();
@@ -117,7 +116,6 @@ public class LoginServer extends AsyncTask<String,String,String> {
             }
         }
         if (taskType==TaskType.GET_FAV_SL){
-            Log.d("GET State",state);
             SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
             defsharedPreferences.edit().putString("GETSL_Status", state).apply();
@@ -141,7 +139,6 @@ public class LoginServer extends AsyncTask<String,String,String> {
             defsharedPreferences.edit().putString("lista", format).apply();
         }
         if (taskType==TaskType.cCorreo){
-            Log.d("cCorreo State",state);
             SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
             defsharedPreferences.edit().putString("cCorreo_Status", state).apply();
@@ -153,7 +150,6 @@ public class LoginServer extends AsyncTask<String,String,String> {
             }
         }
         if (taskType==TaskType.cPass){
-            Log.d("cPass State",state);
             SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
             defsharedPreferences.edit().putString("cPass_Status", state).apply();
