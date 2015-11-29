@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -93,6 +94,8 @@ import java.io.InputStreamReader;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import knf.animeflv.Directorio.Directorio;
@@ -300,13 +303,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
-        ExceptionHandler.register(this, "http://animeflvapp.x10.mx/errors/server.php");
+        String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        ExceptionHandler.register(this, "http://animeflvapp.x10.mx/errors/server.php?id=" + androidID);
         context = this;
         shouldExecuteOnResume = false;
         if (!getSharedPreferences("data", MODE_PRIVATE).getBoolean("intro", false)) {
             startActivity(new Intent(this, Intro.class));
         }
-        String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         checkBan(APP);
         getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
         getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("notVer", false).apply();
@@ -681,7 +684,16 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
         }
         if (descarga.exists()) {
-            descarga.delete();
+            PackageInfo info = getPackageManager().getPackageArchiveInfo(descarga.getPath(), 0);
+            if (info.versionCode <= versionCode) {
+                descarga.delete();
+            } else {
+                Intent promptInstall = new Intent(Intent.ACTION_VIEW)
+                        .setDataAndType(Uri.fromFile(descarga),
+                                "application/vnd.android.package-archive");
+                finish();
+                startActivity(promptInstall);
+            }
         }
         ActualizarFavoritos();
         handler.postDelayed(runnable, 500);
@@ -2228,9 +2240,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     public void onPositive(MaterialDialog dialog) {
                                         super.onPositive(dialog);
                                         toast("Se pueden volver a modificar desde configuracion");
-                                        RapConf.dismiss();
-                                        parser.saveBackup(context);
-                                        new Login().show(getSupportFragmentManager(), "Login");
+                                        if (sonidos.getSelectedItemPosition() > 0 && conexion.getSelectedItemPosition() > 0) {
+                                            RapConf.dismiss();
+                                            parser.saveBackup(context);
+                                            new Login().show(getSupportFragmentManager(), "Login");
+                                        } else {
+                                            toast("Falta cambiar configuraciones!!!");
+                                        }
                                     }
                                 }).build();
                         nots = (Switch) RapConf.getCustomView().findViewById(R.id.switch_not_conf);
@@ -2262,24 +2278,36 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 }
                             }
                         });
-                        ArrayAdapter<String> adapterSonidos = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.sonidos));
+                        List<String> sonido = new ArrayList<>();
+                        sonido.add("Selecciona...");
+                        for (String son : getResources().getStringArray(R.array.sonidos)) {
+                            sonido.add(son);
+                        }
+                        ArrayAdapter<String> adapterSonidos = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, sonido);
                         sonidos.setAdapter(adapterSonidos);
                         sonidos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                             @Override
                             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sonido", Integer.toString(position)).apply();
+                                if (position > 0)
+                                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sonido", Integer.toString(position - 1)).apply();
                             }
 
                             @Override
                             public void onNothingSelected(AdapterView<?> parent) {
                             }
                         });
-                        ArrayAdapter<String> adapterConx = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.tipos));
+                        List<String> tipos = new ArrayList<>();
+                        tipos.add("Selecciona...");
+                        for (String dat : getResources().getStringArray(R.array.tipos)) {
+                            tipos.add(dat);
+                        }
+                        ArrayAdapter<String> adapterConx = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, tipos);
                         conexion.setAdapter(adapterConx);
                         conexion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                             @Override
                             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_conexion", Integer.toString(position)).apply();
+                                if (position > 0)
+                                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_conexion", Integer.toString(position - 1)).apply();
                             }
 
                             @Override
@@ -2986,7 +3014,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
 
         @JavascriptInterface
         public void showHTMLD1(String html) {
-
             String replace = html.replace("\\/", "/");
             String cortado;
             if (!replace.trim().contains("Error 404") && replace.contains("zippyshare")) {

@@ -19,8 +19,8 @@
         <item>3600000</item>
     </string-array>
     <string-array name="tipos">
-        <item>WiFi</item>
-        <item>Datos Moviles</item>
+        <item>Solo WiFi</item>
+        <item>Solo Datos Moviles</item>
         <item>WiFi + Datos Moviles</item>
     </string-array>
     <string-array name="tipos_val">

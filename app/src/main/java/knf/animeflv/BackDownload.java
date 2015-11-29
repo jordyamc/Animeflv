@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -46,6 +47,10 @@ public class BackDownload extends AppCompatActivity implements CheckVideo.callba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         context = getApplicationContext();
         Bundle bundle = getIntent().getExtras();
         aid = bundle.getString("aid", "");
@@ -114,6 +119,13 @@ public class BackDownload extends AppCompatActivity implements CheckVideo.callba
             epID = context.getSharedPreferences("data", MODE_PRIVATE).getString("epIDS_descarga", "");
             context.getSharedPreferences("data", MODE_PRIVATE).edit().putString("titulos_descarga", tits + aid + ":::").apply();
             context.getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID + aid + "_" + num + ":::").apply();
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + eid + "_" + num, true).apply();
+            String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+            if (!vistos.contains(eid.trim())) {
+                vistos = vistos + eid.trim() + ":::";
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
+            }
+            finish();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -124,6 +136,7 @@ public class BackDownload extends AppCompatActivity implements CheckVideo.callba
         if (data.trim().equals("ok")) {
             Descargar(aid, num, titulo, eid);
         } else {
+            toast("Error al descargar...");
             finish();
         }
     }
