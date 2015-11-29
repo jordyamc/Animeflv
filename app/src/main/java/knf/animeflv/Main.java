@@ -3,6 +3,7 @@ package knf.animeflv;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -685,8 +686,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
         }
         if (descarga.exists()) {
-            PackageInfo info = getPackageManager().getPackageArchiveInfo(descarga.getPath(), 0);
             try {
+                PackageInfo info = getPackageManager().getPackageArchiveInfo(descarga.getAbsolutePath(), 0);
                 if (info.versionCode <= versionCode) {
                     descarga.delete();
                 } else {
@@ -1868,7 +1869,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 card.setCardBackgroundColor(Color.argb(100, 253, 250, 93));
         }
         String favoritos = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
-        if (favoritos.contains(aid)) {
+        Boolean comp = favoritos.startsWith(aid + ":::") || favoritos.contains(":::" + aid + ":::");
+        if (comp) {
             if (resaltar)
                 card.setCardBackgroundColor(Color.argb(100, 26, 206, 246));
         }
@@ -2855,56 +2857,59 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
     }
 
+    @TargetApi(23)
     public void checkPermission(final String permission) {
-        Dexter.checkPermission(new PermissionListener() {
-            @Override
-            public void onPermissionGranted(PermissionGrantedResponse response) {
-                if (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
-                } else if (permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    checkPermission(Manifest.permission.GET_ACCOUNTS);
-                }
-            }
-
-            @Override
-            public void onPermissionDenied(PermissionDeniedResponse response) {
-                if (!response.isPermanentlyDenied()) {
-                    String titulo;
-                    String desc;
-                    if (response.getPermissionName().equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) || response.getPermissionName().equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                        titulo = "Leer/Escribir archivos";
-                        desc = "Este permiso es necesario para descargar los animes, asi como para funcionar sin conexion";
-                    } else {
-                        titulo = "Obtener cuentas";
-                        desc = "Este permiso es necesario para obtener tu correo en las sugerencias y sincronixar favoritos";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Dexter.checkPermission(new PermissionListener() {
+                @Override
+                public void onPermissionGranted(PermissionGrantedResponse response) {
+                    if (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+                    } else if (permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        checkPermission(Manifest.permission.GET_ACCOUNTS);
                     }
-                    new MaterialDialog.Builder(context)
-                            .title(titulo)
-                            .content(desc)
-                            .positiveText("ACEPTAR")
-                            .cancelable(false)
-                            .autoDismiss(true)
-                            .callback(new MaterialDialog.ButtonCallback() {
-                                @Override
-                                public void onPositive(MaterialDialog dialog) {
-                                    super.onPositive(dialog);
-                                    checkPermission(permission);
-                                }
-                            })
-                            .build().show();
-                } else {
-                    toast("El permiso es necesario, por favor activalo");
-                    finish();
-                    Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                    i.addCategory(Intent.CATEGORY_DEFAULT);
-                    i.setData(Uri.parse("package:" + getPackageName()));
-                    startActivity(i);
                 }
-            }
 
-            @Override
-            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
-        }, permission);
+                @Override
+                public void onPermissionDenied(PermissionDeniedResponse response) {
+                    if (!response.isPermanentlyDenied()) {
+                        String titulo;
+                        String desc;
+                        if (response.getPermissionName().equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) || response.getPermissionName().equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                            titulo = "Leer/Escribir archivos";
+                            desc = "Este permiso es necesario para descargar los animes, asi como para funcionar sin conexion";
+                        } else {
+                            titulo = "Obtener cuentas";
+                            desc = "Este permiso es necesario para obtener tu correo en las sugerencias y sincronixar favoritos";
+                        }
+                        new MaterialDialog.Builder(context)
+                                .title(titulo)
+                                .content(desc)
+                                .positiveText("ACEPTAR")
+                                .cancelable(false)
+                                .autoDismiss(true)
+                                .callback(new MaterialDialog.ButtonCallback() {
+                                    @Override
+                                    public void onPositive(MaterialDialog dialog) {
+                                        super.onPositive(dialog);
+                                        checkPermission(permission);
+                                    }
+                                })
+                                .build().show();
+                    } else {
+                        toast("El permiso es necesario, por favor activalo");
+                        finish();
+                        Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        i.addCategory(Intent.CATEGORY_DEFAULT);
+                        i.setData(Uri.parse("package:" + getPackageName()));
+                        startActivity(i);
+                    }
+                }
+
+                @Override
+                public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
+            }, permission);
+        }
     }
 
     public boolean isJSONValid(String test) {

@@ -289,10 +289,11 @@ public class Login extends DialogFragment{
                             String encriytedpassfinal = encriytedpass.replace("=", "IGUAL").replace("&", "AMPERSAND").replace("\"", "COMILLA").replace("?", "PREGUNTA").replace("+", "MAS").replace("/", "SLIDE_DERECHO").replace(",", "COMA").trim();
                             SharedPreferences sharedPreferences = getActivity().getSharedPreferences("data", getActivity().MODE_PRIVATE);
                             String fav = sharedPreferences.getString("favoritos", "");
+                            String vistos = sharedPreferences.getString("vistos", "");
                             Log.d("mail", encriytedmailfinal);
                             Log.d("pass", encriytedpassfinal);
                             Log.d("favs", fav);
-                            new LoginServer(getActivity(), TaskType.NEW_USER, email.getText().toString(), encriytedmailfinal, encriytedpassfinal, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=nCuenta&email_coded=" + encriytedmailfinal + "&pass_coded=" + encriytedpassfinal + "&fav_code=" + fav);
+                            new LoginServer(getActivity(), TaskType.NEW_USER, email.getText().toString(), encriytedmailfinal, encriytedpassfinal, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=nCuenta&email_coded=" + encriytedmailfinal + "&pass_coded=" + encriytedpassfinal + "&fav_code=" + fav + ":;:" + vistos);
                         }else {
                             Toast.makeText(getActivity(),"El correo ya esta registrado",Toast.LENGTH_SHORT).show();
                             dialogo=2;

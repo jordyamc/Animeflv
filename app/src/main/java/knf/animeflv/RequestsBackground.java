@@ -224,7 +224,8 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                                         List<String> indexs = Arrays.asList(jsonDesc);
                                         int index = indexs.indexOf(st);
                                         String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                        if (favoritos.contains(jsonAIDS[index]) && desc) {
+                                        Boolean comp = favoritos.startsWith(jsonAIDS[index] + ":::") || favoritos.contains(":::" + jsonAIDS[index] + ":::");
+                                        if (comp && desc) {
                                             Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
                                         }
                                         num += 1;
@@ -278,7 +279,8 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                                         List<String> indexs = Arrays.asList(jsonDesc);
                                         int index = indexs.indexOf(st);
                                         String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                        if (favoritos.contains(jsonAIDS[index]) && desc) {
+                                        Boolean comp = favoritos.startsWith(jsonAIDS[index] + ":::") || favoritos.contains(":::" + jsonAIDS[index] + ":::");
+                                        if (comp && desc) {
                                             Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
                                         }
                                         num += 1;
@@ -332,7 +334,8 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                                         List<String> indexs = Arrays.asList(jsonDesc);
                                         int index = indexs.indexOf(st);
                                         String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                        if (favoritos.contains(jsonAIDS[index]) && desc) {
+                                        Boolean comp = favoritos.startsWith(jsonAIDS[index] + ":::") || favoritos.contains(":::" + jsonAIDS[index] + ":::");
+                                        if (comp && desc) {
                                             Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
                                         }
                                         num += 1;
@@ -386,7 +389,8 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                                         List<String> indexs = Arrays.asList(jsonDesc);
                                         int index = indexs.indexOf(st);
                                         String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                        if (favoritos.contains(jsonAIDS[index]) && desc) {
+                                        Boolean comp = favoritos.startsWith(jsonAIDS[index] + ":::") || favoritos.contains(":::" + jsonAIDS[index] + ":::");
+                                        if (comp && desc) {
                                             Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
                                         }
                                         num += 1;
@@ -440,7 +444,8 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                                         List<String> indexs = Arrays.asList(jsonDesc);
                                         int index = indexs.indexOf(st);
                                         String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                        if (favoritos.contains(jsonAIDS[index]) && desc) {
+                                        Boolean comp = favoritos.startsWith(jsonAIDS[index] + ":::") || favoritos.contains(":::" + jsonAIDS[index] + ":::");
+                                        if (comp && desc) {
                                             Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
                                         }
                                         num += 1;
