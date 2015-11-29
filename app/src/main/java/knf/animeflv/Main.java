@@ -686,15 +686,20 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         if (descarga.exists()) {
             PackageInfo info = getPackageManager().getPackageArchiveInfo(descarga.getPath(), 0);
-            if (info.versionCode <= versionCode) {
+            try {
+                if (info.versionCode <= versionCode) {
+                    descarga.delete();
+                } else {
+                    Intent promptInstall = new Intent(Intent.ACTION_VIEW)
+                            .setDataAndType(Uri.fromFile(descarga),
+                                    "application/vnd.android.package-archive");
+                    finish();
+                    startActivity(promptInstall);
+                }
+            } catch (Exception e) {
                 descarga.delete();
-            } else {
-                Intent promptInstall = new Intent(Intent.ACTION_VIEW)
-                        .setDataAndType(Uri.fromFile(descarga),
-                                "application/vnd.android.package-archive");
-                finish();
-                startActivity(promptInstall);
             }
+
         }
         ActualizarFavoritos();
         handler.postDelayed(runnable, 500);
@@ -1898,12 +1903,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         List<String> e = Arrays.asList(eids);
         isDesc = new ArrayList<Boolean>();
         for (String s : e) {
-            Log.i("dir", Environment.getExternalStorageDirectory() + "/Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
             int index = e.indexOf(s);
             if (index == 20) break;
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
             File fileSD = new File(getSD1() + "/Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
-            Log.i("Existe", String.valueOf(file.exists()));
             if (file.exists() || fileSD.exists()) {
                 IBsDesList.get(index).setImageResource(R.drawable.ic_borrar_r);
                 IBsVerList.get(index).setEnabled(true);
