@@ -697,7 +697,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         ActualizarFavoritos();
         handler.postDelayed(runnable, 500);
-        parser.saveBackup(context);
+        Boolean isF = getSharedPreferences("data", MODE_PRIVATE).getBoolean("isF", true);
+        if (!isF) parser.saveBackup(context);
     }
 
     public void ActualizarFavoritos() {
