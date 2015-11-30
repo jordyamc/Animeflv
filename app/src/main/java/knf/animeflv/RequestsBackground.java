@@ -98,6 +98,9 @@ public class RequestsBackground extends AsyncTask<String,String,String> {
                 } catch (Exception e) {
                     Log.e("log_tag", "Error in http connection " + e.toString());
                     _response="";
+                    if (!params[0].equals("http://animeflvapp.hol.es/getHtml.php")) {
+                        doInBackground("http://animeflvapp.hol.es/getHtml.php");
+                    }
                 }
             }else {Log.d("Conexion","No hay internet");}
         return _response;

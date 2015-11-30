@@ -3,6 +3,7 @@ package knf.animeflv;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.NetworkErrorException;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
@@ -17,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
@@ -301,6 +303,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     private Handler handler = new Handler();
     String urlInfoT = "";
     MaterialDialog RapConf;
+    MaterialDialog dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -712,7 +715,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (isNetworkAvailable()) {
             String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
             String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
-            if (!email_coded.equals("null") && !email_coded.equals("null")) {
+            if (!email_coded.equals("null") && !pass_coded.equals("null")) {
                 new Requests(this, TaskType.GET_FAV).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
             }
         }
@@ -1484,8 +1487,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             toast("Error al descargar");
                         }
                     } else {
-                        //web.loadUrl(getInicio());
-                        web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
+                        web.loadUrl(getInicioSec());
                     }
                 } else {
                     if (view.getUrl().contains("api.php?accion=anime")) {
@@ -2060,10 +2062,22 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         return "http://animeflvapp.x10.mx/getHtml.php";
     }
 
+    public String getInicioSec() {
+        String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
+        //return servidor + "inicio";
+        return "http://animeflvapp.hol.es/getHtml.php";
+    }
+
     public String getDirectorio() {
         //String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
         //return servidor + "directorio";
         return "http://animeflvapp.x10.mx/directorio.php";
+    }
+
+    public String getDirectorioSec() {
+        //String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
+        //return servidor + "directorio";
+        return "http://animeflvapp.hol.es/directorio.php";
     }
 
     public void loadInicio(String data) {
@@ -2130,10 +2144,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         if (!file.exists()) {
                             Log.d("Archivo:", "No existe");
                             if (data.trim().equals("error")) {
-                                toast("Error en servidor, sin cache para mostrar");
+                                //toast("Error en servidor, sin cache para mostrar");
                                 if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
-                                //web.loadUrl(getInicio());
-                                web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
+                                new Requests(context, TaskType.GET_INICIO).execute(getInicioSec());
                             }
                             if (!isNetworkAvailable()) {
                                 toast("Sin cache para mostrar");
@@ -2143,23 +2156,25 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             Log.d("Archivo", "Existe");
                             String infile = getStringFromFile(file_loc);
                             if (data.trim().equals("error"))
-                                toast("Error en servidor");
-                            //web.loadUrl(getInicio());
-                            web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
-                            if (!isNetworkAvailable()) toast("Cargando desde cache");
-                            Log.d("Cargar", "Json existente");
-                            if (isJSONValid(infile)) {
-                                if (parser.checkStatus(data) == 1) {
-                                    textoff.setText("SERVIDOR DESACTUALIZADO");
-                                    textoff.setVisibility(View.VISIBLE);
+                                //toast("Error en servidor");
+                                if (!isNetworkAvailable()) {
+                                    toast("Cargando desde cache");
+                                    Log.d("Cargar", "Json existente");
+                                    if (isJSONValid(infile)) {
+                                        if (parser.checkStatus(data) == 1) {
+                                            textoff.setText("SERVIDOR DESACTUALIZADO");
+                                            textoff.setVisibility(View.VISIBLE);
+                                        } else {
+                                            textoff.setVisibility(View.GONE);
+                                        }
+                                        getData(infile);
                                 } else {
-                                    textoff.setVisibility(View.GONE);
+                                        file.delete();
+                                        toast("Error en cache, sin conexion");
+                                        //new Requests(context, TaskType.GET_INICIO).execute(getInicio());
                                 }
-                                getData(infile);
-                            } else {
-                                file.delete();
-                                toast("Error en cache, volviendo a cargar");
-                                new Requests(context, TaskType.GET_INICIO).execute(getInicio());
+                                } else {
+                                    new Requests(context, TaskType.GET_INICIO).execute(getInicioSec());
                             }
                         }
                     }
@@ -2169,8 +2184,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         if (data.trim().equals("error")) {
                             toast("Error en servidor, sin cache para mostrar");
                             if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
-                            //web.loadUrl(getInicio());
-                            web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
+                            new Requests(context, TaskType.GET_INICIO).execute(getInicioSec());
                         }
                         if (!isNetworkAvailable()) {
                             toast("Sin cache para mostrar");
@@ -2179,10 +2193,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     } else {
                         Log.d("Archivo", "Existe");
                         String infile = getStringFromFile(file_loc);
-                        if (data.trim().equals("error"))
-                            toast("Error en servidor");
-                        //web.loadUrl(getInicio());
-                        web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
+                        new Requests(context, TaskType.GET_INICIO).execute(getInicioSec());
                         if (!isNetworkAvailable()) toast("Cargando desde cache");
                         Log.d("Cargar", "Json existente");
                         if (parser.checkStatus(data) == 1) {
@@ -2566,7 +2577,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             Intent intent = new Intent(context, Directorio.class);
                             startActivity(intent);
                         } else {
-                            Toaster.toast("Servidor fallando y no hay datos en cache");
+                            //Toaster.toast("Servidor fallando y no hay datos en cache");
+                            new Requests(context, TaskType.DIRECTORIO).execute(getDirectorioSec());
                         }
                     }
                 }
@@ -2614,6 +2626,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         startActivity(intent);
                     }
                 }
+            } else {
+                new Requests(context, TaskType.DIRECTORIO1).execute(getDirectorioSec());
             }
         }
         if (taskType == TaskType.VERSION) {
@@ -2690,7 +2704,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     showact = false;
                     Log.d("Version", "Actualizar");
                     verOk = false;
-                    MaterialDialog dialog = new MaterialDialog.Builder(this)
+                    dialog = new MaterialDialog.Builder(this)
                             .title("Nueva Version " + vers.trim())
                             .customView(R.layout.text_d_act, false)
                             .titleColorRes(R.color.prim)
@@ -2800,12 +2814,16 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         new Requests(context, TaskType.GET_INICIO).execute(getInicio());
                     }
                     String vistos = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
-                    if (!vistos.equals(datas[1])) {
-                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("vistos", datas[1]).commit();
-                        String[] v = datas[1].split(";;;");
-                        for (String s : v) {
-                            getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, true).apply();
+                    try {
+                        if (!vistos.equals(datas[1])) {
+                            getSharedPreferences("data", MODE_PRIVATE).edit().putString("vistos", datas[1]).commit();
+                            String[] v = datas[1].split(";;;");
+                            for (String s : v) {
+                                getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, true).apply();
+                            }
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -3057,10 +3075,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 public void run() {
                     if (isJSONValid(htmlInicio)) {
                         loadInicio(htmlInicio.trim());
-                        toast("Cargando modo alternativo");
                     } else {
-                        //web.loadUrl(getInicio());
-                        String[] splited = htmlInicio.split(";;;");
+                        web.loadUrl(getInicioSec());
+                        /*String[] splited = htmlInicio.split(";;;");
                         String[] links = splited[0].substring(3).split(":::");
                         List<String> aids1 = new ArrayList<String>();
                         List<String> a = new ArrayList<String>();
@@ -3102,7 +3119,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         loadImg(images);
                         loadTitulos(tits);
                         loadCapitulos(nums);
-                        isFirst();
+                        isFirst();*/
                     }
                 }
             });
