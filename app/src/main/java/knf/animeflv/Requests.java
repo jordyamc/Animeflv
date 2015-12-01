@@ -50,7 +50,7 @@ public class Requests extends AsyncTask<String,String,String> {
             c.setRequestProperty("Accept", "*/*");
             c.setRequestProperty("Cookie", cookies.trim().substring(0, cookies.indexOf(";") + 1));
             c.setUseCaches(false);
-            c.setConnectTimeout(30000);
+            c.setConnectTimeout(20000);
             c.setAllowUserInteraction(false);
             c.connect();
             BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));

@@ -66,11 +66,13 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
     String id="";
     MaterialDialog dialog;
     Spinner spinner;
+    Context context;
     WebView webView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.info);
+        context = this;
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
@@ -118,7 +120,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
             id=parser.getAID(infile);
         }else {
             String servidor = PreferenceManager.getDefaultSharedPreferences(this).getString("servidor", "http://animeflv.net/api.php?accion=");
-            new Requests(this, TaskType.GET_INFO).execute("http://animeflvapp.x10.mx/getHtml.php?url=" + link);
+            new Requests(this, TaskType.GET_INFO).execute(new Parser().getInicioUrl(TaskType.NORMAL, this) + "?url=" + link);
         }
         Bundle bundle=new Bundle();
         bundle.putString("aid", getIntent().getExtras().getString("aid", "1"));
@@ -215,7 +217,8 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
                 getSharedPreferences("data",MODE_PRIVATE).edit().putString("favoritos",builder.toString()).commit();
                 String vistos=getSharedPreferences("data",MODE_PRIVATE).getString("vistos","");
                 if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString() + ":;:" + vistos);
+                    new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString() + ":;:" + vistos);
+                    new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute(parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString() + ":;:" + vistos);
                 }
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_no,Amenu);
@@ -236,7 +239,8 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
                 getSharedPreferences("data",MODE_PRIVATE).edit().putString("favoritos",builderNo.toString()).commit();
                 String vistos1=getSharedPreferences("data",MODE_PRIVATE).getString("vistos","");
                 if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString() + ":;:" + vistos1);
+                    new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString() + ":;:" + vistos1);
+                    new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute(parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString() + ":;:" + vistos1);
                 }
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_si, Amenu);

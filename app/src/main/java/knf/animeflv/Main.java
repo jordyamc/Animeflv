@@ -304,13 +304,16 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     String urlInfoT = "";
     MaterialDialog RapConf;
     MaterialDialog dialog;
+    TaskType normal = TaskType.NORMAL;
+    TaskType secundario = TaskType.SECUNDARIA;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
-        String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        ExceptionHandler.register(this, "http://animeflvapp.x10.mx/errors/server.php?id=" + androidID);
         context = this;
+        parser.refreshUrls(this);
+        String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        ExceptionHandler.register(this, parser.getBaseUrl(normal, this) + "errors/server.php?id=" + androidID);
         shouldExecuteOnResume = false;
         if (!getSharedPreferences("data", MODE_PRIVATE).getBoolean("intro", false)) {
             startActivity(new Intent(this, Intro.class));
@@ -356,15 +359,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             Boolean isF = getSharedPreferences("data", MODE_PRIVATE).getBoolean("isF", true);
             if (!isF) ChangelogDialog.create().show(getSupportFragmentManager(), "changelog");
             getSharedPreferences("data", MODE_PRIVATE).edit().putInt(Integer.toString(versionCode), 1).apply();
-            if (versionCode <= 94) {
-                getSharedPreferences("data", MODE_PRIVATE).edit().putString("eids_descarga", "").apply();
-                getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", "").apply();
-            }
+            extraRules();
         }
         if (isNetworkAvailable()) {
             Log.d("Registrar", androidID);
             //web.loadUrl("http://animeflvapp.x10.mx/contador.php?id=" + androidID.trim());
-            new Requests(context, TaskType.CONTAR).execute("http://animeflvapp.x10.mx/contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode));
+            new Requests(context, TaskType.CONTAR).execute(parser.getBaseUrl(normal, context) + "contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode));
+            new Requests(context, TaskType.CONTAR).execute(parser.getBaseUrl(secundario, context) + "contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode));
         }
         checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         /*if (ContextCompat.checkSelfPermission(this,Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
@@ -487,13 +488,15 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                             if (isNetworkAvailable()) {
                                                                 if (tipo == 0) {
                                                                     //webViewFeed.loadUrl("http://animeflvapp.x10.mx/feedback.php?tipo=" + type + "&cuenta=" + email + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
-                                                                    new Requests(context, TaskType.FEEDBACK).execute("http://animeflvapp.x10.mx/feedback.php?tipo=" + type + "&cuenta=" + email + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
+                                                                    new Requests(context, TaskType.FEEDBACK).execute(parser.getBaseUrl(normal, context) + "feedback.php?tipo=" + type + "&cuenta=" + email + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
+                                                                    new Requests(context, TaskType.FEEDBACK).execute(parser.getBaseUrl(secundario, context) + "feedback.php?tipo=" + type + "&cuenta=" + email + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
                                                                 } else {
                                                                     if (type.equals("twitter") && !Scuenta.startsWith("@")) {
                                                                         Scuenta = "@" + Scuenta;
                                                                     }
                                                                     //webViewFeed.loadUrl("http://animeflvapp.x10.mx/feedback.php?tipo=" + type + "&cuenta=" + Scuenta.replace(" ", "_") + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
-                                                                    new Requests(context, TaskType.FEEDBACK).execute("http://animeflvapp.x10.mx/feedback.php?tipo=" + type + "&cuenta=" + email + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
+                                                                    new Requests(context, TaskType.FEEDBACK).execute(parser.getBaseUrl(normal, context) + "feedback.php?tipo=" + type + "&cuenta=" + Scuenta.replace(" ", "_") + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
+                                                                    new Requests(context, TaskType.FEEDBACK).execute(parser.getBaseUrl(secundario, context) + "feedback.php?tipo=" + type + "&cuenta=" + Scuenta.replace(" ", "_") + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
                                                                 }
                                                             } else {
                                                                 toast("No hay conexion");
@@ -565,7 +568,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 webViewFeed.setWebViewClient(new WebViewClient() {
                                     @Override
                                     public void onPageFinished(WebView view, String url) {
-                                        if (url.trim().equals("http://animeflvapp.x10.mx/feedback.php?ok=ok") && !cancelPost) {
+                                        if (url.trim().equals(new Parser().getBaseUrl(TaskType.NORMAL, context) + "feedback.php?ok=ok") && !cancelPost) {
                                             view.loadUrl("about:blank");
                                             cancelPost = true;
                                             toast("Sugerencia enviada");
@@ -716,7 +719,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
             String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
             if (!email_coded.equals("null") && !pass_coded.equals("null")) {
-                new Requests(this, TaskType.GET_FAV).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
+                new Requests(this, TaskType.GET_FAV).execute(parser.getBaseUrl(normal, context) + "fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
             }
         }
     }
@@ -747,7 +750,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 break;
         }
         if (set) {
-            ArrayList<IProfile> profile = new ArrayList<IProfile>();
+            ArrayList<IProfile> profile = new ArrayList<>();
             profile.add(new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withIcon(getResources().getDrawable(R.mipmap.ic_launcher)).withIdentifier(9));
             headerResult.setBackgroundRes(drawable);
             headerResult.setProfiles(profile);
@@ -935,6 +938,20 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             IBVT.setImageResource(R.drawable.ic_ver_no);
             IBVT.setEnabled(false);
             descargando = false;
+        }
+    }
+
+    public void extraRules() {
+        if (versionCode <= 103) {
+            String email = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email", "null");
+            String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
+            String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
+            String fav = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
+            String vistos = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
+            if (!email_coded.equals("null") && !pass_coded.equals("null")) {
+                new LoginServer(context, TaskType.NEW_USER, email, email_coded, pass_coded, null).execute(parser.getBaseUrl(normal, context) + "fav-server.php?tipo=nCuenta&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&fav_code=" + fav + ":;:" + vistos);
+                new LoginServer(context, TaskType.NEW_USER, email, email_coded, pass_coded, null).execute(parser.getBaseUrl(secundario, context) + "fav-server.php?tipo=nCuenta&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&fav_code=" + fav + ":;:" + vistos);
+            }
         }
     }
 
@@ -1140,14 +1157,14 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         switch (Type) {
             case 1:
                 if (isNetworkAvailable()) {
-                    new Requests(context, TaskType.APP_BAN).execute("http://animeflvapp.x10.mx/ban-hammer.php?type=get&id=" + androidID);
+                    new Requests(context, TaskType.APP_BAN).execute(parser.getBaseUrl(normal, context) + "ban-hammer.php?type=get&id=" + androidID);
                 } else if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("appBanned", false)) {
                     toast("Has sido baneado de la app :(");
                     finish();
                 }
                 break;
             case 2:
-                new Requests(context, TaskType.CHAT_BAN).execute("http://animeflvapp.x10.mx/ban-hammer.php?type=get&id=" + androidID + "&ckattempt=1");
+                new Requests(context, TaskType.CHAT_BAN).execute(parser.getBaseUrl(normal, context) + "ban-hammer.php?type=get&id=" + androidID + "&ckattempt=1");
                 break;
         }
     }
@@ -1211,15 +1228,15 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("aid", aidInfo);
-        editor.commit();
-        String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
+        editor.apply();
+        //String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
         File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
         if (file.exists()) {
             String json = getStringFromFile(file.getPath());
-            urlInfoT = "http://animeflvapp.x10.mx/getHtml.php?url=" + parser.getUrlFavs(json, aid);
+            urlInfoT = parser.getInicioUrl(normal, context) + "?url=" + parser.getUrlFavs(json, aid);
             Log.d("Buscar", "Parser");
         } else {
-            urlInfoT = "http://animeflvapp.x10.mx/getHtml.php?url=" + getUrlInfo(titulo, tipo);
+            urlInfoT = parser.getInicioUrl(normal, context) + "?url=" + getUrlInfo(titulo, tipo);
             Log.d("Buscar", "GET");
         }
         new Requests(this, TaskType.GET_INFO).execute(urlInfoT);
@@ -2036,6 +2053,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (isNetworkAvailable()) {
             getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
             //textoff.setVisibility(View.GONE);
+            parser.refreshUrls(context);
             new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
             new Requests(this, TaskType.GET_INICIO).execute(getInicio());
         } else {
@@ -2057,30 +2075,33 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
 
     public String getInicio() {
-        String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
+        //String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
         //return servidor + "inicio";
-        return "http://animeflvapp.x10.mx/getHtml.php";
+        return parser.getInicioUrl(normal, context);
     }
 
     public String getInicioSec() {
-        String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
+        //String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
         //return servidor + "inicio";
-        return "http://animeflvapp.hol.es/getHtml.php";
+        return parser.getInicioUrl(secundario, context);
     }
 
     public String getDirectorio() {
         //String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
         //return servidor + "directorio";
-        return "http://animeflvapp.x10.mx/directorio.php";
+        return parser.getDirectorioUrl(normal, context);
     }
 
     public String getDirectorioSec() {
         //String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
         //return servidor + "directorio";
-        return "http://animeflvapp.hol.es/directorio.php";
+        return parser.getDirectorioUrl(secundario, context);
     }
 
-    public void loadInicio(String data) {
+    public void loadInicio(String da) {
+        String data = da.replace("<!-- Hosting24 Analytics Code -->\n" +
+                "                                                         <script type=\"text/javascript\" src=\"http://stats.hosting24.com/count.php\"></script>\n" +
+                "                                                         <!-- End Of Analytics Code -->", "").trim();
         Boolean isF = getSharedPreferences("data", MODE_PRIVATE).getBoolean("isF", true);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED || isF) {
             if (!isF) {
@@ -2094,12 +2115,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 if (isNetworkAvailable() && !data.trim().equals("error")) {
                     if (isJSONValid(data)) {
                         if (!file.exists()) {
-                            Log.d("Archivo:", "No existe");
+                            Log.d("Archivo 1:", "No existe");
                             Log.d("Json", data);
                             try {
                                 file.createNewFile();
                             } catch (IOException e) {
-                                Log.d("Archivo:", "Error al crear archivo");
+                                Log.d("Archivo 1:", "Error al crear archivo");
                             }
                             writeToFile(data, file);
                             if (parser.checkStatus(data) == 1) {
@@ -2110,11 +2131,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             }
                             getData(data);
                         } else {
-                            Log.d("Archivo", "Existe");
+                            Log.d("Archivo 1", "Existe");
                             String infile = getStringFromFile(file_loc);
                             if (isJSONValid(infile) && isJSONValid(data)) {
                                 if (!parser.parseEID(infile)[0].trim().equals(parser.parseEID(data)[0].trim())) {
-                                    Log.d("Cargar", "Json nuevo");
+                                    Log.d("Cargar 1", "Json nuevo");
                                     writeToFile(data, file);
                                     if (parser.checkStatus(data) == 1) {
                                         textoff.setText("SERVIDOR DESACTUALIZADO");
@@ -2124,7 +2145,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     }
                                     getData(data);
                                 } else {
-                                    Log.d("Cargar", "Json existente");
+                                    Log.d("Cargar 1", "Json existente");
                                     if (parser.checkStatus(data) == 1) {
                                         textoff.setText("SERVIDOR DESACTUALIZADO");
                                         textoff.setVisibility(View.VISIBLE);
@@ -2142,7 +2163,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         }
                     } else {
                         if (!file.exists()) {
-                            Log.d("Archivo:", "No existe");
+                            Log.d("Archivo 2:", "No existe");
                             if (data.trim().equals("error")) {
                                 //toast("Error en servidor, sin cache para mostrar");
                                 if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
@@ -2153,13 +2174,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
                             }
                         } else {
-                            Log.d("Archivo", "Existe");
+                            Log.d("Archivo 2", "Existe");
                             String infile = getStringFromFile(file_loc);
                             if (data.trim().equals("error"))
-                                //toast("Error en servidor");
+                                toast("Error en servidor");
                                 if (!isNetworkAvailable()) {
                                     toast("Cargando desde cache");
-                                    Log.d("Cargar", "Json existente");
+                                    Log.d("Cargar 2", "Json existente");
                                     if (isJSONValid(infile)) {
                                         if (parser.checkStatus(data) == 1) {
                                             textoff.setText("SERVIDOR DESACTUALIZADO");
@@ -2180,9 +2201,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     }
                 } else {
                     if (!file.exists()) {
-                        Log.d("Archivo:", "No existe");
+                        Log.d("Archivo 3:", "No existe");
                         if (data.trim().equals("error")) {
-                            toast("Error en servidor, sin cache para mostrar");
+                            //toast("Error en servidor, sin cache para mostrar");
                             if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
                             new Requests(context, TaskType.GET_INICIO).execute(getInicioSec());
                         }
@@ -2191,11 +2212,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
                         }
                     } else {
-                        Log.d("Archivo", "Existe");
+                        Log.d("Archivo 3", "Existe");
                         String infile = getStringFromFile(file_loc);
                         new Requests(context, TaskType.GET_INICIO).execute(getInicioSec());
                         if (!isNetworkAvailable()) toast("Cargando desde cache");
-                        Log.d("Cargar", "Json existente");
+                        Log.d("Cargar 3", "Json existente");
                         if (parser.checkStatus(data) == 1) {
                             textoff.setText("SERVIDOR DESACTUALIZADO");
                             textoff.setVisibility(View.VISIBLE);
@@ -2228,6 +2249,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         } else {
                                             ActualizarFavoritos();
                                             getHDraw(true);
+                                            extraRules();
                                         }
                                     }
 

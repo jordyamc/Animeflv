@@ -26,7 +26,10 @@ public enum TaskType {
     UPDATE(20),
     APP_BAN(21),
     CHAT_BAN(22),
-    FEEDBACK(23);
+    FEEDBACK(23),
+    ACT_LIKNS(24),
+    NORMAL(25),
+    SECUNDARIA(26);
     int value;
 
     TaskType(int value) {

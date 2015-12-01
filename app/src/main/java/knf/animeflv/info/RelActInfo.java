@@ -56,9 +56,9 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
         SharedPreferences sharedPreferences=getSharedPreferences("data",MODE_PRIVATE);
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putString("aid", aidInfo);
-        editor.commit();
+        editor.apply();
         //new Requests(this, TaskType.GET_INFO).execute("http://animeflv.moe/api.php?accion=anime&aid=" + aidInfo);
-        new Requests(this, TaskType.GET_INFO).execute("http://animeflvapp.x10.mx/getHtml.php?url=" + link);
+        new Requests(this, TaskType.GET_INFO).execute(parser.getInicioUrl(TaskType.NORMAL, context) + "?url=" + link);
     }
     public static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));

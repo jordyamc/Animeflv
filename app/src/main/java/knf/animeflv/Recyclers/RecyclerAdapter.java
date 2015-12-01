@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import knf.animeflv.LoginServer;
+import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
 import knf.animeflv.WebDescarga;
@@ -57,6 +58,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     String id;
     List<String> eids;
     String ext_storage_state = Environment.getExternalStorageState();
+    Parser parser = new Parser();
 
     public RecyclerAdapter(Context context, List<String> capitulos,String aid,List<String> eid) {
         this.capitulo = capitulos;
@@ -132,7 +134,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
                             String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
                             if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+                                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
                             }
                             holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                         }
@@ -186,7 +188,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                             context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
                                             String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
                                             if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                                                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+                                                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
                                             }
                                             holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                                         }
@@ -228,7 +230,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
                                                     String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
                                                     if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                                                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+                                                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
                                                     }
                                                     holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                                                 }
@@ -249,7 +251,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
                                                     String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
                                                     if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                                                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+                                                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
                                                     }
                                                     holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                                                 }

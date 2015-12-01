@@ -29,11 +29,13 @@ public class RequestFav extends AsyncTask<String,String,String> {
     StringBuilder builder = new StringBuilder();
     HttpURLConnection c = null;
     URL u;
+    Context context;
     public interface callback{
         void favCall(String data, TaskType taskType);
     }
     public RequestFav(Context con, TaskType taskType){
         call=(callback) con;
+        this.context = con;
         this.taskType=taskType;
 
     }
@@ -47,7 +49,7 @@ public class RequestFav extends AsyncTask<String,String,String> {
             if (!file.exists()) {
                 try {
                     Log.d("aid", i);
-                    u = new URL("http://animeflvapp.x10.mx/getHtml.php?url=" + parser.getUrlFavs(dir, i));
+                    u = new URL(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlFavs(dir, i));
                     c = (HttpURLConnection) u.openConnection();
                     c.setRequestProperty("Content-length", "0");
                     c.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");
