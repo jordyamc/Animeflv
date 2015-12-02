@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -283,7 +284,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
     @Override
     public void sendtext1(String data,TaskType taskType) {
         SharedPreferences.Editor editor=getSharedPreferences("data", MODE_PRIVATE).edit();
-        editor.putString("titInfo",parser.getTit(data)).commit();
+        editor.putString("titInfo", parser.getTit(data)).apply();
         getSupportActionBar().setTitle(parser.getTit(data));
         titulo=parser.getTit(data);
         id=parser.getAID(data);
@@ -319,7 +320,10 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
             FileInputStream fin = new FileInputStream(fl);
             ret = convertStreamToString(fin);
             fin.close();
-        }catch (IOException e){}catch (Exception e){}
+        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return ret;
     }
     public String getUrl(String titulo,String capitulo) {

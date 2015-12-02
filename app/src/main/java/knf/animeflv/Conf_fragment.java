@@ -600,6 +600,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             dango.release();
         }
     }
+
     @Override
     public void onAttach(Activity activity) {
         myContext=(FragmentActivity) activity;

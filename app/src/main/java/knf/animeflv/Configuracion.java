@@ -61,7 +61,7 @@ public class Configuracion extends AppCompatActivity implements LoginServer.call
                 finish();
             }
         });
-        getFragmentManager().beginTransaction().replace(R.id.container_conf, new Conf_fragment()).commit();
+        getFragmentManager().beginTransaction().replace(R.id.container_conf, new Conf_fragment()).commitAllowingStateLoss();
     }
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout

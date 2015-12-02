@@ -3,7 +3,6 @@ package knf.animeflv;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.NetworkErrorException;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
@@ -16,9 +15,9 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
@@ -60,12 +59,10 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.PermissionListener;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -97,8 +94,6 @@ import java.io.InputStreamReader;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import knf.animeflv.Directorio.Directorio;
@@ -109,7 +104,6 @@ import xdroid.toaster.Toaster;
 public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, Requests.callback, CheckVideo.callback, LoginServer.callback {
     WebView web;
     WebView web_Links;
-    WebView web_gets;
     Toolbar toolbar;
     Context context;
     ScrollView scrollView;
@@ -276,8 +270,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     int indexT;
     String eidT = "0";
     boolean shouldExecuteOnResume;
-    int esperando = 0;
-    boolean login = false;
     boolean version = false;
     boolean verOk = false;
     String[] mensaje;
@@ -326,7 +318,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             alarm.SetAlarm(this);
         }
         first = 1;
-        if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
+        if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -1839,61 +1831,21 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     public void checkForNew(String[] capitulos, String[] aids) {
         List<String> caps = Arrays.asList(capitulos);
         List<String> aid = Arrays.asList(aids);
-        Cards.get(0).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(1).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(2).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(3).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(4).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(5).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(6).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(7).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(8).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(9).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(10).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(11).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(12).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(13).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(14).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(15).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(16).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(17).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(18).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        Cards.get(19).setCardBackgroundColor(getResources().getColor(R.color.blanco));
-        checkCards(caps.get(0), aid.get(0), Cards.get(0));
-        checkCards(caps.get(1), aid.get(1), Cards.get(1));
-        checkCards(caps.get(2), aid.get(2), Cards.get(2));
-        checkCards(caps.get(3), aid.get(3), Cards.get(3));
-        checkCards(caps.get(4), aid.get(4), Cards.get(4));
-        checkCards(caps.get(5), aid.get(5), Cards.get(5));
-        checkCards(caps.get(6), aid.get(6), Cards.get(6));
-        checkCards(caps.get(7), aid.get(7), Cards.get(7));
-        checkCards(caps.get(8), aid.get(8), Cards.get(8));
-        checkCards(caps.get(9), aid.get(9), Cards.get(9));
-        checkCards(caps.get(10), aid.get(10), Cards.get(10));
-        checkCards(caps.get(11), aid.get(11), Cards.get(11));
-        checkCards(caps.get(12), aid.get(12), Cards.get(12));
-        checkCards(caps.get(13), aid.get(13), Cards.get(13));
-        checkCards(caps.get(14), aid.get(14), Cards.get(14));
-        checkCards(caps.get(15), aid.get(15), Cards.get(15));
-        checkCards(caps.get(16), aid.get(16), Cards.get(16));
-        checkCards(caps.get(17), aid.get(17), Cards.get(17));
-        checkCards(caps.get(18), aid.get(18), Cards.get(18));
-        checkCards(caps.get(19), aid.get(19), Cards.get(19));
-    }
-
-    public void checkCards(String capitulo, String aid, CardView card) {
-        Boolean resaltar = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar", true);
-        if (capitulo.trim().equals("Capitulo 1") || capitulo.trim().contains("OVA") || capitulo.trim().contains("Pelicula")) {
-            if (resaltar)
-                card.setCardBackgroundColor(Color.argb(100, 253, 250, 93));
+        for (int a = 0; a < 20; a++) {
+            Cards.get(a).setCardBackgroundColor(getResources().getColor(R.color.blanco));
+            String capitulo = caps.get(a);
+            Boolean resaltar = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar", true);
+            if (capitulo.trim().equals("Capitulo 1") || capitulo.trim().contains("OVA") || capitulo.trim().contains("Pelicula")) {
+                if (resaltar)
+                    Cards.get(a).setCardBackgroundColor(Color.argb(100, 253, 250, 93));
+            }
+            String favoritos = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
+            Boolean comp = favoritos.startsWith(aid.get(a) + ":::") || favoritos.contains(":::" + aid.get(a) + ":::") || favoritos.endsWith(":::" + aid.get(a));
+            if (comp) {
+                if (resaltar)
+                    Cards.get(a).setCardBackgroundColor(Color.argb(100, 26, 206, 246));
+            }
         }
-        String favoritos = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
-        Boolean comp = favoritos.startsWith(aid + ":::") || favoritos.contains(":::" + aid + ":::");
-        if (comp) {
-            if (resaltar)
-                card.setCardBackgroundColor(Color.argb(100, 26, 206, 246));
-        }
-
     }
 
     public void getData(String json) {
@@ -2075,26 +2027,18 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
 
     public String getInicio() {
-        //String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
-        //return servidor + "inicio";
         return parser.getInicioUrl(normal, context);
     }
 
     public String getInicioSec() {
-        //String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
-        //return servidor + "inicio";
         return parser.getInicioUrl(secundario, context);
     }
 
     public String getDirectorio() {
-        //String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
-        //return servidor + "directorio";
         return parser.getDirectorioUrl(normal, context);
     }
 
     public String getDirectorioSec() {
-        //String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
-        //return servidor + "directorio";
         return parser.getDirectorioUrl(secundario, context);
     }
 
