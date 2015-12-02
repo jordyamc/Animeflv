@@ -1453,6 +1453,9 @@ public class Parser {
             JSONObject autodes = new JSONObject();
             autodes.put("name", "autoDesc");
             autodes.put("value", PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoDesc", false));
+            JSONObject autoUp = new JSONObject();
+            autoUp.put("name", "autoUpdate");
+            autoUp.put("value", PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoUpdate", false));
             jsonArray.put(not);
             jsonArray.put(tmp);
             jsonArray.put(sonido);
@@ -1461,6 +1464,7 @@ public class Parser {
             jsonArray.put(stream);
             jsonArray.put(resaltar);
             jsonArray.put(autodes);
+            jsonArray.put(autoUp);
             jsonObject.put("preferencias", jsonArray);
             File saveData = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/data.save");
             if (saveData.exists()) {

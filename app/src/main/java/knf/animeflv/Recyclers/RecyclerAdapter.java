@@ -362,6 +362,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             public void onClick(View v) {
                 String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
                 Boolean vistos=context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("cambio", true).apply();
                 if (!vistos){
                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
                     String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");

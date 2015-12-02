@@ -74,6 +74,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
         super.onCreate(savedInstanceState);
         setContentView(R.layout.info);
         context = this;
+        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio", false).apply();
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
@@ -385,8 +386,10 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
         final String pass_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
         String Svistos=getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
         String favoritos=getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
-        if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-            //new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+        Boolean cambio = getSharedPreferences("data", MODE_PRIVATE).getBoolean("cambio", false);
+        if (!email_coded.equals("null") && !email_coded.equals("null") && cambio) {
+            new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+            new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute(parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
         }
     }
 

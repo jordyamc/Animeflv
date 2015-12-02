@@ -68,6 +68,11 @@
             android:key="autoDesc"
             android:title="Notificar capitulos nuevos"
             android:summary="Generar una notificacion para descargar capitulos nuevos de animes en favoritos" />
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="autoUpdate"
+            android:title="Autodescargar Actualizaciones"
+            android:summary="Descarga la actualizacion en segundo plano, y crea una notificacion para instalarla" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Almacenamiento">
         <com.lb.material_preferences_library.custom_preferences.Preference
