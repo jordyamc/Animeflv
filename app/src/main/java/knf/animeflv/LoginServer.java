@@ -10,6 +10,10 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -94,22 +98,17 @@ public class LoginServer extends AsyncTask<String,String,String> {
             SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
             defsharedPreferences.edit().putString("GET_Status", state).apply();
-            if (s.toLowerCase().trim().contains(":::")||s.toLowerCase().trim().equals("")) {
+            if (isJSONValid(s.trim())) {
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email", email).apply();
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", email_coded).apply();
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", pass_coded).apply();
                 new Parser().saveBackup(context);
-                if (!s.toLowerCase().trim().contains(":;:")) {
-                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                    sharedPreferences.edit().putString("favoritos", s.trim()).apply();
-                    defsharedPreferences.edit().putString("GET_Status", "exito").apply();
-                }else {
-                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                    String[] separar=s.trim().split(":;:");
-                    sharedPreferences.edit().putString("favoritos", separar[0]).apply();
-                    sharedPreferences.edit().putString("vistos", separar[1]).apply();
-                    defsharedPreferences.edit().putString("GET_Status", "exito").apply();
-                }
+                String favs = new Parser().getUserFavs(s.trim());
+                String vistos = new Parser().getUserVistos(s.trim());
+                SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+                sharedPreferences.edit().putString("favoritos", favs).apply();
+                sharedPreferences.edit().putString("vistos", vistos).apply();
+                defsharedPreferences.edit().putString("GET_Status", "exito").apply();
                 materialDialog.dismiss();
                 Toast.makeText(context, "Sesion Iniciada!!", Toast.LENGTH_SHORT).show();
                 call.response("OK", taskType);
@@ -119,18 +118,13 @@ public class LoginServer extends AsyncTask<String,String,String> {
             SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
             defsharedPreferences.edit().putString("GETSL_Status", state).apply();
-            if (s.toLowerCase().trim().contains(":::")||s.toLowerCase().trim().equals("")) {
-                if (!s.toLowerCase().trim().contains(":;:")) {
-                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                    sharedPreferences.edit().putString("favoritos", s.trim()).apply();
-                    defsharedPreferences.edit().putString("GETSL_Status", "exito").apply();
-                }else {
-                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                    String[] separar=s.trim().split(":;:");
-                    sharedPreferences.edit().putString("favoritos", separar[0]).apply();
-                    sharedPreferences.edit().putString("vistos", separar[1]).apply();
-                    defsharedPreferences.edit().putString("GETSL_Status", "exito").apply();
-                }
+            if (isJSONValid(s.trim())) {
+                String favs = new Parser().getUserFavs(s.trim());
+                String vistos = new Parser().getUserVistos(s.trim());
+                SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+                sharedPreferences.edit().putString("favoritos", favs).apply();
+                sharedPreferences.edit().putString("vistos", vistos).apply();
+                defsharedPreferences.edit().putString("GETSL_Status", "exito").apply();
             }
         }
         if (taskType==TaskType.LIST_USERS){
@@ -145,6 +139,7 @@ public class LoginServer extends AsyncTask<String,String,String> {
             if (s.toLowerCase().trim().equals("exito")) {
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email", email).apply();
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", email_coded).apply();
+                new Parser().saveBackup(context);
                 materialDialog.dismiss();
                 Toast.makeText(context, "Email Cambiado!!", Toast.LENGTH_SHORT).show();
             }
@@ -155,9 +150,23 @@ public class LoginServer extends AsyncTask<String,String,String> {
             defsharedPreferences.edit().putString("cPass_Status", state).apply();
             if (s.toLowerCase().trim().equals("exito")) {
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", pass_coded).apply();
+                new Parser().saveBackup(context);
                 materialDialog.dismiss();
                 Toast.makeText(context, "Contraseña Cambiada!!", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public boolean isJSONValid(String test) {
+        try {
+            new JSONObject(test);
+        } catch (JSONException ex) {
+            try {
+                new JSONArray(test);
+            } catch (JSONException ex1) {
+                return false;
+            }
+        }
+        return true;
     }
 }

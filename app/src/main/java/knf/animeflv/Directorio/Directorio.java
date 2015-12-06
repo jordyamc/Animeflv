@@ -1,7 +1,7 @@
 package knf.animeflv.Directorio;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -23,7 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -50,11 +49,6 @@ import java.util.List;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterBusqueda;
-import knf.animeflv.Requests;
-import knf.animeflv.TaskType;
-import knf.animeflv.info.AnimeInfo;
-import knf.animeflv.info.Info;
-import knf.animeflv.info.InfoCap;
 
 /**
  * Created by Jordy on 29/08/2015.
@@ -67,22 +61,23 @@ public class Directorio extends AppCompatActivity {
     LinearLayout linearLayout;
     String ext_storage_state = Environment.getExternalStorageState();
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
-    Parser parser=new Parser();
-    String json="";
+    Parser parser = new Parser();
+    String json = "";
     Context context;
     EditText.OnEditorActionListener listener;
     int t_busqueda;
     ViewPager viewPager;
     SmartTabLayout viewPagerTab;
     Spinner generosS;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.directorio);
-        json=getJson();
-        context=this;
-        generosS=(Spinner) findViewById(R.id.spinner_generos);
-        final Bundle bundle=getIntent().getExtras();
+        json = getJson();
+        context = this;
+        generosS = (Spinner) findViewById(R.id.spinner_generos);
+        final Bundle bundle = getIntent().getExtras();
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
@@ -95,8 +90,8 @@ public class Directorio extends AppCompatActivity {
             window.setStatusBarColor(getResources().getColor(R.color.dark));
             getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
         }
-        t_busqueda= Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_busqueda","0").trim());
-        toolbarS=(Toolbar) findViewById(R.id.toolbar_search);
+        t_busqueda = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_busqueda", "0").trim());
+        toolbarS = (Toolbar) findViewById(R.id.toolbar_search);
         setSupportActionBar(toolbarS);
         if (!isXLargeScreen(context)) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -115,8 +110,8 @@ public class Directorio extends AppCompatActivity {
                     }
                 }
             });
-        }else {
-            Toolbar ltoolbar=(Toolbar)findViewById(R.id.toolbar_l);
+        } else {
+            Toolbar ltoolbar = (Toolbar) findViewById(R.id.toolbar_l);
             ltoolbar.setNavigationIcon(R.drawable.ic_back_r);
             ltoolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
@@ -143,7 +138,7 @@ public class Directorio extends AppCompatActivity {
                             menuGlobal.clear();
                             if (!isXLargeScreen(context)) {
                                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                            }else {
+                            } else {
                                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                             }
                             List<String> titulos = parser.DirTitulosBusquedaA(json, null);
@@ -151,19 +146,16 @@ public class Directorio extends AppCompatActivity {
                             List<String> index = parser.DirIndexBusquedaA(json, null);
                             List<String> titOrd = parser.DirTitulosBusquedaA(json, null);
                             Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
-                            List<String> indexOrd = new ArrayList<String>();
-                            List<String> tiposOrd = new ArrayList<String>();
-                            List<String> links = new ArrayList<String>();
+                            List<String> indexOrd = new ArrayList<String>(titOrd.size());
+                            List<String> tiposOrd = new ArrayList<String>(titOrd.size());
+                            List<String> links = new ArrayList<String>(titOrd.size());
                             for (String si : titOrd) {
-                                String indexn = index.get(titulos.indexOf(si));
+                                int i = titulos.indexOf(si);
+                                String indexn = index.get(i);
                                 indexOrd.add(indexn);
-                            }
-                            for (String so : titOrd) {
-                                String tipon = tipos.get(titulos.indexOf(so));
+                                String tipon = tipos.get(i);
                                 tiposOrd.add(tipon);
-                            }
-                            for (String st : indexOrd) {
-                                String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + st + ".jpg";
+                                String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + indexn + ".jpg";
                                 links.add(link);
                             }
                             AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);
@@ -171,9 +163,9 @@ public class Directorio extends AppCompatActivity {
                         }
                         break;
                     case R.id.buscar_cancelar:
-                        if (bundle==null) {
+                        if (bundle == null) {
                             cancelar();
-                        }else {
+                        } else {
                             finish();
                         }
                         break;
@@ -188,13 +180,13 @@ public class Directorio extends AppCompatActivity {
                         menuGlobal.clear();
                         if (!isXLargeScreen(context)) {
                             getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                        }else {
+                        } else {
                             getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                         }
                         if (!isXLargeScreen(context)) {
                             linearLayout.setVisibility(View.GONE);
                             recyclerView.setVisibility(View.VISIBLE);
-                        }else {
+                        } else {
                             viewPager.setVisibility(View.GONE);
                             viewPagerTab.setVisibility(View.GONE);
                             recyclerView.setVisibility(View.VISIBLE);
@@ -204,28 +196,30 @@ public class Directorio extends AppCompatActivity {
                 return true;
             }
         });
-        editText=(EditText) findViewById(R.id.et_busqueda);
+        editText = (EditText) findViewById(R.id.et_busqueda);
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(final Editable s) {
-                Handler handler=new Handler();
+                Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if (t_busqueda==0) {
+                        if (t_busqueda == 0) {
                             if (s.length() > 0) {
                                 menuGlobal.clear();
                                 if (!isXLargeScreen(context)) {
                                     getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
-                                }else {
+                                } else {
                                     getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
                                 }
                             } else {
-                                menuGlobal.clear();
-                                if (!isXLargeScreen(context)) {
-                                    getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                                }else {
-                                    getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                                if (editText.getVisibility() == View.VISIBLE) {
+                                    menuGlobal.clear();
+                                    if (!isXLargeScreen(context)) {
+                                        getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
+                                    } else {
+                                        getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                                    }
                                 }
                             }
                             List<String> titulos = parser.DirTitulosBusquedaA(json, s.toString());
@@ -233,42 +227,39 @@ public class Directorio extends AppCompatActivity {
                             List<String> index = parser.DirIndexBusquedaA(json, s.toString());
                             List<String> titOrd = parser.DirTitulosBusquedaA(json, s.toString());
                             Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
-                            List<String> indexOrd = new ArrayList<String>();
-                            List<String> tiposOrd = new ArrayList<String>();
-                            List<String> links = new ArrayList<String>();
+                            List<String> indexOrd = new ArrayList<String>(titOrd.size());
+                            List<String> tiposOrd = new ArrayList<String>(titOrd.size());
+                            List<String> links = new ArrayList<String>(titOrd.size());
                             for (String si : titOrd) {
-                                String indexn = index.get(titulos.indexOf(si));
+                                int i = titulos.indexOf(si);
+                                String indexn = index.get(i);
                                 indexOrd.add(indexn);
-                            }
-                            for (String so : titOrd) {
-                                String tipon = tipos.get(titulos.indexOf(so));
+                                String tipon = tipos.get(i);
                                 tiposOrd.add(tipon);
-                            }
-                            for (String st : indexOrd) {
-                                String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + st + ".jpg";
+                                String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + indexn + ".jpg";
                                 links.add(link);
                             }
                             AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);
                             recyclerView.setAdapter(adapterBusqueda);
-                        }else {
+                        } else {
                             if (s.length() > 0) {
                                 menuGlobal.clear();
                                 if (!isXLargeScreen(context)) {
                                     getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
-                                }else {
+                                } else {
                                     getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
                                 }
                             } else {
                                 menuGlobal.clear();
                                 if (!isXLargeScreen(context)) {
                                     getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                                }else {
+                                } else {
                                     getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                                 }
                             }
                         }
                     }
-                },1000);
+                }, 1000);
             }
 
             @Override
@@ -285,59 +276,56 @@ public class Directorio extends AppCompatActivity {
                 editText.requestFocus();
             }
         });
-        listener=new TextView.OnEditorActionListener() {
+        listener = new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
-                if (t_busqueda==1) {
-                        Editable s=editText.getEditableText();
-                        if (s.length() > 0) {
-                            menuGlobal.clear();
-                            if (!isXLargeScreen(context)) {
-                                getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
-                            }else {
-                                getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
-                            }
+                if (t_busqueda == 1) {
+                    Editable s = editText.getEditableText();
+                    if (s.length() > 0) {
+                        menuGlobal.clear();
+                        if (!isXLargeScreen(context)) {
+                            getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
                         } else {
-                            menuGlobal.clear();
-                            if (!isXLargeScreen(context)) {
-                                getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                            }else {
-                                getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
-                            }
+                            getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
                         }
+                    } else {
+                        menuGlobal.clear();
+                        if (!isXLargeScreen(context)) {
+                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
+                        } else {
+                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                        }
+                    }
                     List<String> titulos = parser.DirTitulosBusquedaA(json, s.toString());
                     List<String> tipos = parser.DirTiposBusquedaA(json, s.toString());
                     List<String> index = parser.DirIndexBusquedaA(json, s.toString());
                     List<String> titOrd = parser.DirTitulosBusquedaA(json, s.toString());
-                        Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
-                        List<String> indexOrd = new ArrayList<String>();
-                        List<String> tiposOrd = new ArrayList<String>();
-                        List<String> links = new ArrayList<String>();
-                        for (String si : titOrd) {
-                            String indexn = index.get(titulos.indexOf(si));
-                            indexOrd.add(indexn);
-                        }
-                        for (String so : titOrd) {
-                            String tipon = tipos.get(titulos.indexOf(so));
-                            tiposOrd.add(tipon);
-                        }
-                        for (String st : indexOrd) {
-                            String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + st + ".jpg";
-                            links.add(link);
-                        }
-                        AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);
-                        recyclerView.setAdapter(adapterBusqueda);
+                    Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
+                    List<String> indexOrd = new ArrayList<String>(titOrd.size());
+                    List<String> tiposOrd = new ArrayList<String>(titOrd.size());
+                    List<String> links = new ArrayList<String>(titOrd.size());
+                    for (String si : titOrd) {
+                        int i = titulos.indexOf(si);
+                        String indexn = index.get(i);
+                        indexOrd.add(indexn);
+                        String tipon = tipos.get(i);
+                        tiposOrd.add(tipon);
+                        String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + indexn + ".jpg";
+                        links.add(link);
+                    }
+                    AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);
+                    recyclerView.setAdapter(adapterBusqueda);
                 }
                 return true;
             }
         };
         editText.setOnEditorActionListener(listener);
-        if (t_busqueda==1){
+        if (t_busqueda == 1) {
             editText.setHint("Presiona Enter...");
         }
-        getSharedPreferences("data",MODE_PRIVATE).edit().putInt("genero",0).apply();
-        linearLayout=(LinearLayout) findViewById(R.id.LY_dir);
-        recyclerView=(RecyclerView)findViewById(R.id.rv_busqueda);
+        getSharedPreferences("data", MODE_PRIVATE).edit().putInt("genero", 0).apply();
+        linearLayout = (LinearLayout) findViewById(R.id.LY_dir);
+        recyclerView = (RecyclerView) findViewById(R.id.rv_busqueda);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
@@ -351,7 +339,7 @@ public class Directorio extends AppCompatActivity {
         viewPager.setAdapter(adapter);
         viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab2);
         viewPagerTab.setViewPager(viewPager);
-        String[] generos={
+        String[] generos = {
                 "Todos",
                 "Acción",
                 "Aventuras",
@@ -385,11 +373,11 @@ public class Directorio extends AppCompatActivity {
                 "Yaoi",
                 "Yuri",
                 "Sobrenatural"};
-        if (isXLargeScreen(context)){
-            ArrayAdapter<String> spinerA=new ArrayAdapter<String>(context,R.layout.spinner_generos_blanco,generos);
+        if (isXLargeScreen(context)) {
+            ArrayAdapter<String> spinerA = new ArrayAdapter<String>(context, R.layout.spinner_generos_blanco, generos);
             generosS.setAdapter(spinerA);
-        }else {
-            ArrayAdapter<String> spinerA=new ArrayAdapter<String>(context,R.layout.spinner_generos_normal,generos);
+        } else {
+            ArrayAdapter<String> spinerA = new ArrayAdapter<String>(context, R.layout.spinner_generos_normal, generos);
             generosS.setAdapter(spinerA);
         }
         generosS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -408,7 +396,7 @@ public class Directorio extends AppCompatActivity {
 
             }
         });
-        if (bundle!=null){
+        if (bundle != null) {
             if (!isXLargeScreen(context)) {
                 try {
                     linearLayout.setVisibility(View.GONE);
@@ -417,7 +405,7 @@ public class Directorio extends AppCompatActivity {
                     finish();
                 }
                 recyclerView.setVisibility(View.VISIBLE);
-            }else {
+            } else {
                 viewPager.setVisibility(View.GONE);
                 viewPagerTab.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
@@ -428,31 +416,31 @@ public class Directorio extends AppCompatActivity {
         List<String> index = parser.DirIndexBusquedaA(json, null);
         List<String> titOrd = parser.DirTitulosBusquedaA(json, null);
         Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
-        List<String> indexOrd=new ArrayList<String>();
-        List<String> tiposOrd=new ArrayList<String>();
-        List<String>links=new ArrayList<String>();
-        for (String s:titOrd){
-            String indexn=index.get(titulos.indexOf(s));
+        List<String> indexOrd = new ArrayList<String>(titOrd.size());
+        List<String> tiposOrd = new ArrayList<String>(titOrd.size());
+        List<String> links = new ArrayList<String>(titOrd.size());
+        for (String s : titOrd) {
+            int i = titulos.indexOf(s);
+            String indexn = index.get(i);
             indexOrd.add(indexn);
             String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + indexn + ".jpg";
             links.add(link);
-        }
-        for (String so:titOrd){
-            String tipon=tipos.get(titulos.indexOf(so));
+            String tipon = tipos.get(i);
             tiposOrd.add(tipon);
         }
         /*for (String st:indexOrd){
             String link="http://cdn.animeflv.net/img/portada/thumb_80/"+st+".jpg";
             links.add(link);
         }*/
-        AdapterBusqueda adapterBusqueda=new AdapterBusqueda(this,titOrd,tiposOrd,links,indexOrd);
+        AdapterBusqueda adapterBusqueda = new AdapterBusqueda(this, titOrd, tiposOrd, links, indexOrd);
         recyclerView.setAdapter(adapterBusqueda);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menuGlobal=menu;
-        Bundle bundle=getIntent().getExtras();
-        if (bundle==null){
+        menuGlobal = menu;
+        Bundle bundle = getIntent().getExtras();
+        if (bundle == null) {
             editText.setVisibility(View.GONE);
             //generosS.setVisibility(View.VISIBLE);
             generosS.setVisibility(View.GONE);
@@ -461,14 +449,14 @@ public class Directorio extends AppCompatActivity {
             menuGlobal.clear();
             if (!isXLargeScreen(context)) {
                 getMenuInflater().inflate(R.menu.menu_main, menuGlobal);
-            }else {
+            } else {
                 getMenuInflater().inflate(R.menu.menu_main_dark, menuGlobal);
             }
             getSupportActionBar().setTitle("Directorio");
-        }else {
+        } else {
             if (!isXLargeScreen(context)) {
                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menu);
-            }else {
+            } else {
                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menu);
             }
         }
@@ -478,16 +466,18 @@ public class Directorio extends AppCompatActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus){
+        if (hasFocus) {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.showSoftInput(editText, 0);
         }
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         finish();
     }
+
     public String getJson() {
         String json = "";
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
@@ -503,6 +493,7 @@ public class Directorio extends AppCompatActivity {
         }
         return json;
     }
+
     public static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
@@ -513,72 +504,58 @@ public class Directorio extends AppCompatActivity {
         reader.close();
         return sb.toString();
     }
-    public static String getStringFromFile (String filePath) {
-        String ret="";
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
         try {
             File fl = new File(filePath);
             FileInputStream fin = new FileInputStream(fl);
             ret = convertStreamToString(fin);
             fin.close();
-        }catch (IOException e){}catch (Exception e){}
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
         return ret;
     }
+
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
                 >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
+
     @Override
-    public void onConfigurationChanged (Configuration newConfig) {
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        if (!isXLargeScreen(getApplicationContext()) ) {
+        if (!isXLargeScreen(getApplicationContext())) {
             return;
         }
     }
+
     public void cancelar() {
-            editText.setText("");
-            editText.setVisibility(View.GONE);
+        editText.setText("");
+        editText.setVisibility(View.GONE);
         //generosS.setVisibility(View.VISIBLE);
         generosS.setVisibility(View.GONE);
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-            menuGlobal.clear();
-            if (!isXLargeScreen(context)) {
-                getMenuInflater().inflate(R.menu.menu_main, menuGlobal);
-            }else {
-                getMenuInflater().inflate(R.menu.menu_main_dark, menuGlobal);
-            }
-            getSupportActionBar().setTitle("Directorio");
-            if (!isXLargeScreen(context)) {
-                recyclerView.setVisibility(View.GONE);
-                linearLayout.setVisibility(View.VISIBLE);
-            }else {
-                recyclerView.setVisibility(View.GONE);
-                viewPager.setVisibility(View.VISIBLE);
-                viewPagerTab.setVisibility(View.VISIBLE);
-            }
-            /*List<String> titulos = parser.DirTitulosBusqueda(json, null);
-            List<String> tipos = parser.DirTiposBusqueda(json, null);
-            List<String> index = parser.DirIndexBusqueda(json, null);
-            List<String> titOrd = parser.DirTitulosBusqueda(json, null);
-            Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
-            List<String> indexOrd = new ArrayList<String>();
-            List<String> tiposOrd = new ArrayList<String>();
-            List<String> links = new ArrayList<String>();
-            for (String si : titOrd) {
-                String indexn = index.get(titulos.indexOf(si));
-                indexOrd.add(indexn);
-            }
-            for (String so : titOrd) {
-                String tipon = tipos.get(titulos.indexOf(so));
-                tiposOrd.add(tipon);
-            }
-            for (String st : indexOrd) {
-                String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + st + ".jpg";
-                links.add(link);
-            }
-            AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);
-            recyclerView.setAdapter(adapterBusqueda);*/
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+        menuGlobal.clear();
+        if (!isXLargeScreen(context)) {
+            getMenuInflater().inflate(R.menu.menu_main, menuGlobal);
+            invalidateOptionsMenu();
+        } else {
+            getMenuInflater().inflate(R.menu.menu_main_dark, menuGlobal);
+            invalidateOptionsMenu();
+        }
+        getSupportActionBar().setTitle("Directorio");
+        if (!isXLargeScreen(context)) {
+            recyclerView.setVisibility(View.GONE);
+            linearLayout.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.GONE);
+            viewPager.setVisibility(View.VISIBLE);
+            viewPagerTab.setVisibility(View.VISIBLE);
+        }
     }
 }

@@ -1421,6 +1421,39 @@ public class Parser {
         return status;
     }
 
+    public String getUserCont(String json) {
+        String response = "";
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            response = jsonObject.getString("cont");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    public String getUserFavs(String json) {
+        String response = "";
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            response = jsonObject.getString("favs");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    public String getUserVistos(String json) {
+        String response = "";
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            response = jsonObject.getString("vistos");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
     public void saveBackup(Context context) {
         try {
             JSONObject jsonObject = new JSONObject();
