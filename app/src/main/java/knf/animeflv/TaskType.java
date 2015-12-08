@@ -29,7 +29,8 @@ public enum TaskType {
     FEEDBACK(23),
     ACT_LIKNS(24),
     NORMAL(25),
-    SECUNDARIA(26);
+    SECUNDARIA(26),
+    EVALUAR(27);
     int value;
 
     TaskType(int value) {

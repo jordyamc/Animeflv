@@ -330,7 +330,7 @@ public class Login extends DialogFragment{
     public void checklogin(){
         derecha.setEnabled(false);
         String mail=login_email.getText().toString();
-        boolean termina=mail.endsWith("com")||mail.endsWith("net");
+        boolean termina = mail.endsWith("com") || mail.endsWith("net") || mail.endsWith("mx");
         if (mail.indexOf("@")!=0&&mail.contains("@")&&mail.contains(".")&&termina){
             if (login_contrasena.getText().toString().length()<4){
                 login_contrasena.setError("Contraseña muy corta");
@@ -380,7 +380,7 @@ public class Login extends DialogFragment{
         derecha.setEnabled(false);
         String mail=cPass_email.getText().toString();
         String npass=cPass_ncontrasena.getText().toString();
-        boolean termina=mail.endsWith("com")||mail.endsWith("net");
+        boolean termina = mail.endsWith("com") || mail.endsWith("net") || mail.endsWith("mx");
         if (mail.indexOf("@")!=0&&mail.contains("@")&&mail.contains(".")&&termina){
             if (cPass_contrasena.getText().toString().length()<4){
                 cPass_contrasena.setError("Contraseña muy corta");
@@ -447,8 +447,8 @@ public class Login extends DialogFragment{
         derecha.setEnabled(false);
         String mail=cCorreo_email.getText().toString();
         String nmail=cCorreo_nemail.getText().toString();
-        boolean termina=mail.endsWith("com")||mail.endsWith("net");
-        boolean ntermina=nmail.endsWith("com")||nmail.endsWith("net");
+        boolean termina = mail.endsWith("com") || mail.endsWith("net") || mail.endsWith("mx");
+        boolean ntermina = nmail.endsWith("com") || nmail.endsWith("net") || mail.endsWith("mx");
         if (!mail.equals("admin")) {
             if (mail.indexOf("@") != 0 && mail.contains("@") && mail.contains(".") && nmail.indexOf("@") != 0 && nmail.contains("@") && nmail.contains(".") && ntermina && termina) {
                 if (cCorreo_contrasena.getText().toString().length() < 4) {

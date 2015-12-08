@@ -3008,7 +3008,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 return;
             }
             this.doubleBackToExitPressedOnce = true;
-            Toast.makeText(this, "Precione ATRAS para salir", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Presione ATRAS para salir", Toast.LENGTH_SHORT).show();
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {

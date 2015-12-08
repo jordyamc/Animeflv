@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +19,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,6 +46,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     Context context;
     boolean shouldExecuteOnResume;
     Handler handler = new Handler();
+    Parser parser = new Parser();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +93,6 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         },500);
         handler.postDelayed(runnable, 1000);
     }
-
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -206,30 +211,48 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
 
     }
 
+    public boolean isJSONValid(String test) {
+        try {
+            new JSONObject(test);
+        } catch (JSONException ex) {
+            try {
+                new JSONArray(test);
+            } catch (JSONException ex1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public void sendtext1(String data, TaskType taskType) {
         if (taskType == TaskType.GET_FAV) {
-            if (data.contains(":::")) {
-                if (!data.contains(":;:")) {
+            if (isJSONValid(data)) {
+                String favoritos = parser.getUserFavs(data.trim());
+                String visto = parser.getUserVistos(data.trim());
+                if (visto.equals("")) {
                     String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
-                    if (!favs.equals(data.trim())) {
-                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", data.trim()).commit();
+                    if (!favs.equals(favoritos)) {
+                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).commit();
                         init();
                     }
                 } else {
-                    String[] datas = data.trim().split(":;:");
                     String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
-                    if (!favs.equals(datas[0])) {
-                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", datas[0]).commit();
+                    if (!favs.equals(favoritos)) {
+                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).commit();
                         init();
                     }
                     String vistos = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
-                    if (!vistos.equals(datas[1])) {
-                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("vistos", datas[1]).commit();
-                        String[] v = datas[1].split(";;;");
-                        for (String s : v) {
-                            getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, true).apply();
+                    try {
+                        if (!vistos.equals(visto)) {
+                            getSharedPreferences("data", MODE_PRIVATE).edit().putString("vistos", visto).commit();
+                            String[] v = visto.split(";;;");
+                            for (String s : v) {
+                                getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, true).apply();
+                            }
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }
