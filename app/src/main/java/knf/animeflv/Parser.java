@@ -1461,6 +1461,8 @@ public class Parser {
             jsonObject.put("email_coded", PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null"));
             jsonObject.put("pass_coded", PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null"));
             jsonObject.put("color", context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("color", 0));
+            jsonObject.put("favoritos", context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", ""));
+            jsonObject.put("vistos", context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", ""));
             JSONArray jsonArray = new JSONArray();
             JSONObject not = new JSONObject();
             not.put("name", "notificaciones");
@@ -1521,6 +1523,8 @@ public class Parser {
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", j.getString("email_coded")).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", j.getString("pass_coded")).apply();
             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", j.getInt("color")).apply();
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("favoritos", j.getString("favoritos")).apply();
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", j.getString("vistos")).apply();
             JSONArray jsonArray = j.getJSONArray("preferencias");
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonA = jsonArray.getJSONObject(i);

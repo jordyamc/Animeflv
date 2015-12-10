@@ -50,8 +50,13 @@ public class CheckVideo extends AsyncTask<String,String,String> {
                     Log.d("URL ERROR", c.getURL().toString());
                     _response="error";
                 }else {
-                    Log.d("URL OK",c.getURL().toString());
-                    _response = "ok";
+                    if (c.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                        Log.d("URL OK", c.getURL().toString());
+                        _response = "ok";
+                    } else {
+                        Log.d("URL ERROR", c.getURL().toString());
+                        _response = "error";
+                    }
                 }
             }else {
                 _response = "error";
