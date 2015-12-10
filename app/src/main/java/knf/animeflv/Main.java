@@ -406,7 +406,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         new PrimaryDrawerItem().withName("Sugerencias").withIcon(GoogleMaterial.Icon.gmd_assignment).withIdentifier(4),
                         new PrimaryDrawerItem().withName("Pagina Oficial").withIcon(FontAwesome.Icon.faw_facebook_f).withIdentifier(5),
                         new PrimaryDrawerItem().withName("Chat").withIcon(GoogleMaterial.Icon.gmd_message).withIdentifier(6),
-                        new PrimaryDrawerItem().withName("Web Oficial").withIcon(GoogleMaterial.Icon.gmd_web).withIdentifier(7)
+                        new PrimaryDrawerItem().withName("Web Oficial").withIcon(GoogleMaterial.Icon.gmd_web).withIdentifier(7),
+                        new PrimaryDrawerItem().withName("Publicidad").withIcon(GoogleMaterial.Icon.gmd_cloud).withIdentifier(8)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -623,6 +624,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 result.setSelection(0);
                                 result.closeDrawer();
                                 break;
+                            case 9:
+                                startActivity(new Intent(context, ADS.class));
+                                result.setSelection(0);
+                                result.closeDrawer();
+                                break;
                         }
                         return false;
                     }
@@ -718,7 +724,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (isNetworkAvailable()) {
             String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
             String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
-            if (!email_coded.equals("null") && !pass_coded.equals("null")) {
+            if (!email_coded.equals("null") && !pass_coded.equals("null") && isOnline()) {
                 new Requests(this, TaskType.GET_FAV).execute(parser.getBaseUrl(normal, context) + "fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
             }
         }
@@ -1720,6 +1726,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         });
     }
 
+    public boolean isOnline() {
+        return getSharedPreferences("data", MODE_PRIVATE).getBoolean("online", false);
+    }
+
     public void loadTitulos(String[] list) {
         final String[] titulo = list;
         runOnUiThread(new Runnable() {
@@ -2085,6 +2095,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 textoff.setVisibility(View.GONE);
                             }
                             getData(data);
+                            getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true);
                             intentos = 0;
                         } else {
                             Log.d("Archivo 1", "Existe");
@@ -2099,6 +2110,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     } else {
                                         textoff.setVisibility(View.GONE);
                                     }
+                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true);
                                     getData(data);
                                     intentos = 0;
                                 } else {
@@ -2109,6 +2121,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     } else {
                                         textoff.setVisibility(View.GONE);
                                     }
+                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true);
                                     getData(infile);
                                     intentos = 0;
                                 }
@@ -2129,6 +2142,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     new Requests(context, TaskType.GET_INICIO).execute(getInicioSec());
                                     intentos++;
                                 } else {
+                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", false);
                                     toast("Error en servidor, sin cache para mostrar");
                                     intentos = 0;
                                 }
@@ -2156,6 +2170,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 } else {
                                         file.delete();
                                         toast("Error en cache, sin conexion");
+                                        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", false);
                                         //new Requests(context, TaskType.GET_INICIO).execute(getInicio());
                                 }
                                 } else {
@@ -2173,6 +2188,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 new Requests(context, TaskType.GET_INICIO).execute(getInicioSec());
                                 intentos++;
                             } else {
+                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", false);
                                 toast("Error en servidor, sin cache para mostrar");
                                 intentos = 0;
                             }
@@ -2218,6 +2234,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 textoff.setVisibility(View.GONE);
                             }
                             if (isJSONValid(infile)) {
+                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true);
                                 getData(infile);
                             } else {
                                 file.delete();

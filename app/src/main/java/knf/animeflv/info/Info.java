@@ -224,6 +224,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
                 }
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_no,Amenu);
+                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", true).apply();
                 break;
             case R.id.favorito_no:
                 String[] favoritosNo={getSharedPreferences("data",MODE_PRIVATE).getString("favoritos","")};
@@ -246,6 +247,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
                 }
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_si, Amenu);
+                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", true).apply();
                 break;
             case R.id.comentarios:
                 dialog=new MaterialDialog.Builder(this)

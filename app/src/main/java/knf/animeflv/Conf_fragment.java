@@ -99,18 +99,31 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("b_video").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                deleteDownload(file);
-                DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-                String[] eids = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("teids", "").split(":::");
-                for (String s : eids) {
-                    if (!s.trim().equals("")) {
-                        long l = Long.parseLong(context.getSharedPreferences("data", Context.MODE_PRIVATE).getString(s, "0"));
-                        manager.remove(l);
-                    }
-                }
-                String si = formatSize(getFileSize(file));
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_video", si).commit();
-                getPreferenceScreen().findPreference("b_video").setSummary("Espacio usado: " + si);
+                new MaterialDialog.Builder(myContext)
+                        .title("ELIMINAR")
+                        .titleGravity(GravityEnum.CENTER)
+                        .content("Desea eliminar TODOS los animes descargados?")
+                        .positiveText("SI")
+                        .negativeText("CANCELAR")
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                deleteDownload(file);
+                                DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                                String[] eids = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("teids", "").split(":::");
+                                for (String s : eids) {
+                                    if (!s.trim().equals("")) {
+                                        long l = Long.parseLong(context.getSharedPreferences("data", Context.MODE_PRIVATE).getString(s, "0"));
+                                        manager.remove(l);
+                                    }
+                                }
+                                String si = formatSize(getFileSize(file));
+                                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_video", si).commit();
+                                getPreferenceScreen().findPreference("b_video").setSummary("Espacio usado: " + si);
+                            }
+                        }).build().show();
+
                 return false;
             }
         });

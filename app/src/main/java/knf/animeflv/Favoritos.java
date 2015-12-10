@@ -85,6 +85,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         if (!email_coded.equals("null")&&!email_coded.equals("null")) {
             new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
         }
+        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", false).apply();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -263,7 +264,11 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     protected void onResume() {
         super.onResume();
         if(shouldExecuteOnResume){
-            init();
+            Boolean cambiado = getSharedPreferences("data", MODE_PRIVATE).getBoolean("cambio_fav", false);
+            if (cambiado) {
+                init();
+                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", false).apply();
+            }
         } else{
             shouldExecuteOnResume = true;
         }

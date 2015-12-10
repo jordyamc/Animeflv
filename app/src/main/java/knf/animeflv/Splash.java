@@ -171,7 +171,7 @@ public class Splash extends AwesomeSplash {
                                     break;
                             }
                         } else {
-                            if (isJSONValid(sb.toString())) {
+                            if (isJSONValid(sb.toString()) && c.getResponseCode() == HttpURLConnection.HTTP_OK) {
                                 switch (i) {
                                     case 0:
                                         link1 = "ok";

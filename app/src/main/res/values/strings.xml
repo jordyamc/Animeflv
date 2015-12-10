@@ -50,4 +50,34 @@
         <item>0</item>
         <item>1</item>
     </string-array>
+    <string name="title_activity_ads">ADS</string>
+
+    <string name="next_level">Mostrar Publicidad</string>
+    <!-- -
+        This is an ad unit ID for an interstitial test ad. Replace with your own interstitial ad unit id.
+        For more information, see https://support.google.com/admob/answer/3052638
+    <!- -->
+    <string name="interstitial_ad_unit_id1">ca-app-pub-5390653757953587/5574735954</string>
+    <string name="interstitial_ad_unit_id2">ca-app-pub-5390653757953587/6632666754</string>
+    <string name="interstitial_ad_unit_id3">ca-app-pub-5390653757953587/8109399951</string>
+
+    <string name="banner_ad_unit_id1">ca-app-pub-5390653757953587/3679200353</string>
+    <string name="banner_ad_unit_id2">ca-app-pub-5390653757953587/8469326751</string>
+    <string name="banner_ad_unit_id3">ca-app-pub-5390653757953587/5155933554</string>
+    <string name="banner_ad_unit_id4">ca-app-pub-5390653757953587/5515860353</string>
+
+    <string-array name="bannersizes_largesizes">
+        <item>Banner</item>
+        <item>Large Banner</item>
+        <item>Smart Banner</item>
+        <item>Full Banner</item>
+        <item>Medium Rectangle</item>
+        <item>Leaderboard</item>
+    </string-array>
+
+    <string-array name="bannersizes_smallsizes">
+        <item>Banner</item>
+        <item>Large Banner</item>
+        <item>Smart Banner</item>
+    </string-array>
 </resources>

@@ -73,7 +73,12 @@ public class AdapterFavs extends RecyclerView.Adapter<AdapterFavs.ViewHolder> {
                 String json = getStringFromFile(file);
                 Bundle bundle=new Bundle();
                 bundle.putString("aid", aids.get(position));
-                bundle.putString("link", getUrlInfo(titulosCard.get(position), new Parser().getTipoAnime(json)));
+                File directorio = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+                if (directorio.exists()) {
+                    bundle.putString("link", new Parser().getUrlFavs(getStringFromFile(directorio.getPath()), aids.get(position)));
+                } else {
+                    bundle.putString("link", getUrlInfo(titulosCard.get(position), new Parser().getTipoAnime(json)));
+                }
                 Intent intent=new Intent(context,RelActInfo.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtras(bundle);

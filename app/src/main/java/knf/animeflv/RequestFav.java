@@ -5,6 +5,10 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,7 +50,7 @@ public class RequestFav extends AsyncTask<String,String,String> {
         List<String> list=new ArrayList<String>();
         for (String i:params) {
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
-            if (!file.exists()) {
+            if (!file.exists() || !isJSONValid(getStringFromFile(file.getPath()))) {
                 try {
                     Log.d("aid", i);
                     u = new URL(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlFavs(dir, i));
@@ -108,6 +112,19 @@ public class RequestFav extends AsyncTask<String,String,String> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isJSONValid(String test) {
+        try {
+            new JSONObject(test);
+        } catch (JSONException ex) {
+            try {
+                new JSONArray(test);
+            } catch (JSONException ex1) {
+                return false;
+            }
+        }
+        return true;
     }
     public static String getStringFromFile (String filePath) {
         String ret="";
