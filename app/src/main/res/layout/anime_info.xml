@@ -126,6 +126,33 @@
                 android:paddingLeft="3dp"
                 android:textColor="@android:color/darker_gray" />
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/lay_debug"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AID:"
+                android:padding="3dp"
+                android:maxLines="1" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="..."
+                android:id="@+id/debug_info"
+                android:maxLines="2"
+                android:paddingBottom="3dp"
+                android:paddingRight="3dp"
+                android:paddingTop="3dp"
+                android:paddingLeft="3dp"
+                android:textColor="@android:color/darker_gray" />
+        </LinearLayout>
     </LinearLayout>
     <View
         android:layout_width="match_parent"

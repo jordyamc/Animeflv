@@ -2,8 +2,13 @@ package knf.animeflv;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -35,32 +40,42 @@ public class Splash extends AwesomeSplash {
 
             /* you don't have to override every property */
         context = this;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(getResources().getColor(R.color.dark));
-            getWindow().setNavigationBarColor(getResources().getColor(R.color.nmain));
-            getWindow().setStatusBarColor(getResources().getColor(R.color.nmain));
+        if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
-        //Customize Circular Reveal
-        configSplash.setBackgroundColor(R.color.nmain); //any color you want form colors.xml
-        configSplash.setAnimCircularRevealDuration(500); //int ms
-        configSplash.setRevealFlagX(Flags.REVEAL_RIGHT);  //or Flags.REVEAL_LEFT
-        configSplash.setRevealFlagY(Flags.REVEAL_BOTTOM); //or Flags.REVEAL_TOP
+        if (isNetworkAvailable()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(getResources().getColor(R.color.dark));
+                getWindow().setNavigationBarColor(getResources().getColor(R.color.nmain));
+                getWindow().setStatusBarColor(getResources().getColor(R.color.nmain));
+            }
+            //Customize Circular Reveal
+            configSplash.setBackgroundColor(R.color.nmain); //any color you want form colors.xml
+            configSplash.setAnimCircularRevealDuration(500); //int ms
+            configSplash.setRevealFlagX(Flags.REVEAL_RIGHT);  //or Flags.REVEAL_LEFT
+            configSplash.setRevealFlagY(Flags.REVEAL_BOTTOM); //or Flags.REVEAL_TOP
 
-        //Customize Logo
-        configSplash.setLogoSplash(R.drawable.splash); //or any other drawable
-        configSplash.setAnimLogoSplashDuration(500); //int ms
-        configSplash.setAnimLogoSplashTechnique(Techniques.Bounce); //choose one form Techniques (ref: https://github.com/daimajia/AndroidViewAnimations)
+            //Customize Logo
+            configSplash.setLogoSplash(R.drawable.splash); //or any other drawable
+            configSplash.setAnimLogoSplashDuration(500); //int ms
+            configSplash.setAnimLogoSplashTechnique(Techniques.Bounce); //choose one form Techniques (ref: https://github.com/daimajia/AndroidViewAnimations)
 
 
-        //Customize Title
-        configSplash.setTitleSplash("AnimeFLV App");
-        configSplash.setTitleTextColor(R.color.blanco);
-        configSplash.setTitleTextSize(30f); //float value
-        configSplash.setAnimTitleDuration(750);
-        configSplash.setAnimTitleTechnique(Techniques.FlipInX);
+            //Customize Title
+            configSplash.setTitleSplash("AnimeFLV App");
+            configSplash.setTitleTextColor(R.color.blanco);
+            configSplash.setTitleTextSize(30f); //float value
+            configSplash.setAnimTitleDuration(750);
+            configSplash.setAnimTitleTechnique(Techniques.FlipInX);
+        } else {
+            finish();
+            startActivity(new Intent(context, Main.class));
+        }
     }
 
     public boolean isJSONValid(String test) {
@@ -81,6 +96,43 @@ public class Splash extends AwesomeSplash {
         new back(context, TaskType.ACT_LIKNS).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/links.html");
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (!isXLargeScreen(getApplicationContext())) {
+            return;
+        }
+    }
+
+    public static boolean isXLargeScreen(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+
+    private boolean isNetworkAvailable() {
+        Boolean net = false;
+        int Tcon = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        switch (Tcon) {
+            case 0:
+                NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                net = Wifi.isConnected();
+                break;
+            case 1:
+                NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net = mobile.isConnected();
+                break;
+            case 2:
+                NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net = WifiA.isConnected() || mobileA.isConnected();
+                break;
+        }
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && net;
+    }
     public class back extends AsyncTask<String, String, String> {
         Context context;
         TaskType taskType;
@@ -206,6 +258,7 @@ public class Splash extends AwesomeSplash {
             super.onPostExecute(s);
             if (taskType == TaskType.ACT_LIKNS) {
                 if (!s.equals("error")) {
+                    Boolean isDebuging = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("debug", false);
                     try {
                         JSONObject jsonObject = new JSONObject(s.trim());
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_base", jsonObject.getString("base")).apply();
@@ -214,7 +267,12 @@ public class Splash extends AwesomeSplash {
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_inicio_back", jsonObject.getString("inicio_back")).apply();
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_directorio", jsonObject.getString("directorio")).apply();
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_directorio_back", jsonObject.getString("directorio_back")).apply();
-                        new back(context, TaskType.EVALUAR).execute(jsonObject.getString("inicio"), jsonObject.getString("inicio_back"));
+                        if (isDebuging) {
+                            new back(context, TaskType.EVALUAR).execute(jsonObject.getString("inicio"), jsonObject.getString("inicio_back"));
+                        } else {
+                            finish();
+                            startActivity(new Intent(context, Main.class));
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                         finish();

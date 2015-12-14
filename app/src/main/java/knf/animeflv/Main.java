@@ -718,6 +718,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         handler.postDelayed(runnable, 500);
         Boolean isF = getSharedPreferences("data", MODE_PRIVATE).getBoolean("isF", true);
         if (!isF) parser.saveBackup(context);
+        web_Links.loadUrl(parser.getBaseUrl(TaskType.NORMAL, context));
     }
 
     public void ActualizarFavoritos() {
@@ -1691,7 +1692,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 web_Links.loadUrl("javascript:" +
                         "var json=JSON.stringify(videos);" +
                         //"var json=JSON.stringify(document.getElementsByName('FlashVars')[0].value);"+
-                        "window.HtmlViewer.showHTMLD1(json);");
+                        "window.HtmlViewer.showHTMLD2(json);");
             }
         });
     }
@@ -2024,6 +2025,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     @Override
     public void onRefresh() {
         if (isNetworkAvailable()) {
+            web_Links.loadUrl(parser.getBaseUrl(TaskType.NORMAL, context));
             getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
             //textoff.setVisibility(View.GONE);
             parser.refreshUrls(context);
@@ -2068,6 +2070,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 "                                                         <script type=\"text/javascript\" src=\"http://stats.hosting24.com/count.php\"></script>\n" +
                 "                                                         <!-- End Of Analytics Code -->", "").trim();
         Boolean isF = getSharedPreferences("data", MODE_PRIVATE).getBoolean("isF", true);
+        web_Links.loadUrl(parser.getBaseUrl(TaskType.NORMAL, context));
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED || isF) {
             if (!isF) {
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
@@ -3117,7 +3120,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     if (isJSONValid(htmlInicio)) {
                         loadInicio(htmlInicio.trim());
                     } else {
-                        web.loadUrl(getInicioSec());
+                        //web.loadUrl(getInicioSec());
                         /*String[] splited = htmlInicio.split(";;;");
                         String[] links = splited[0].substring(3).split(":::");
                         List<String> aids1 = new ArrayList<String>();

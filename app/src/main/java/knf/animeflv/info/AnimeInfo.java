@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -52,7 +53,9 @@ public class AnimeInfo extends Fragment{
     TextView txt_tipo;
     TextView txt_estado;
     TextView txt_generos;
+    TextView txt_debug;
     LinearLayout layout;
+    LinearLayout layout_debug;
     RecyclerView rv_rel;
     View view;
 
@@ -140,11 +143,16 @@ public class AnimeInfo extends Fragment{
         txt_tipo=(TextView) view.findViewById(R.id.tipo);
         txt_estado=(TextView) view.findViewById(R.id.estado);
         txt_generos=(TextView) view.findViewById(R.id.generos);
+        txt_debug = (TextView) view.findViewById(R.id.debug_info);
         layout=(LinearLayout) view.findViewById(R.id.lay_info);
+        layout_debug = (LinearLayout) view.findViewById(R.id.lay_debug);
     }
     public void setInfo(String json){
         final Context context=getActivity().getApplicationContext();
         final String jinfo=json;
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("data", Context.MODE_PRIVATE);
+        final String aid = sharedPreferences.getString("aid", "");
+        final Boolean isDebuging = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("debug", false);
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -154,6 +162,10 @@ public class AnimeInfo extends Fragment{
                 txt_tipo.setText(parser.getInfoTipo(jinfo));
                 txt_estado.setText(parser.getInfoEstado(jinfo));
                 txt_generos.setText(parser.getInfoGeneros(jinfo));
+                if (isDebuging) {
+                    txt_debug.setText(aid);
+                    layout_debug.setVisibility(View.VISIBLE);
+                }
                 layout.setVisibility(View.VISIBLE);
             }
         });
