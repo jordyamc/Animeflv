@@ -1692,7 +1692,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 web_Links.loadUrl("javascript:" +
                         "var json=JSON.stringify(videos);" +
                         //"var json=JSON.stringify(document.getElementsByName('FlashVars')[0].value);"+
-                        "window.HtmlViewer.showHTMLD2(json);");
+                        "window.HtmlViewer.showHTMLD1(json);");
             }
         });
     }
