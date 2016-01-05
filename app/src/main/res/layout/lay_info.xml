@@ -11,4 +11,13 @@
         android:gravity="center"
         android:textSize="20sp"
         android:clickable="true" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/help_certification"
+        android:gravity="center"
+        android:textSize="15sp"
+        android:clickable="false"
+        android:visibility="gone" />
 </LinearLayout>

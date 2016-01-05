@@ -40,7 +40,7 @@ public class CheckVideo extends AsyncTask<String,String,String> {
             c.setRequestProperty("Content-length", "0");
             c.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");
             c.setUseCaches(true);
-            c.setConnectTimeout(30000);
+            c.setConnectTimeout(5000);
             c.setAllowUserInteraction(false);
             c.connect();
             //c.disconnect();

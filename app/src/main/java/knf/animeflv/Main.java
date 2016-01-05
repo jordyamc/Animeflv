@@ -14,12 +14,14 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -51,6 +53,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -85,12 +88,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -231,6 +243,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     Switch stream;
     Spinner sonidos;
     Spinner conexion;
+    Spinner sp;
     WebViewClient client;
     TextView textoff;
     ArrayList<GifImageButton> IBsDesList = new ArrayList<GifImageButton>();
@@ -257,7 +270,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     int versionCode;
     String versionName;
     Boolean Streaming = false;
-
+    MaterialDialog d;
     Drawer result;
     boolean doubleBackToExitPressedOnce = false;
     Toolbar ltoolbar;
@@ -299,6 +312,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     TaskType normal = TaskType.NORMAL;
     TaskType secundario = TaskType.SECUNDARIA;
     int intentos = 0;
+    String firma;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -306,6 +320,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         context = this;
         parser.refreshUrls(this);
         extraRules();
+        firma = getCertificateSHA1Fingerprint();
+        Log.d("Firma->", firma);
         String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         ExceptionHandler.register(this, parser.getBaseUrl(normal, this) + "errors/server.php?id=" + androidID);
         shouldExecuteOnResume = false;
@@ -359,7 +375,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             Log.d("Registrar", androidID);
             //web.loadUrl("http://animeflvapp.x10.mx/contador.php?id=" + androidID.trim());
             new Requests(context, TaskType.CONTAR).execute(parser.getBaseUrl(normal, context) + "contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode));
-            new Requests(context, TaskType.CONTAR).execute(parser.getBaseUrl(secundario, context) + "contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode));
+            //new Requests(context, TaskType.CONTAR).execute(parser.getBaseUrl(secundario, context) + "contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode));
         }
         checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         /*if (ContextCompat.checkSelfPermission(this,Manifest.permission.GET_ACCOUNTS) != PackageManager.PERMISSION_GRANTED) {
@@ -726,7 +742,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
             String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
             if (!email_coded.equals("null") && !pass_coded.equals("null") && isOnline()) {
-                new Requests(this, TaskType.GET_FAV).execute(parser.getBaseUrl(normal, context) + "fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
+                new Requests(this, TaskType.GET_FAV).execute(parser.getBaseUrl(normal, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
             }
         }
     }
@@ -876,6 +892,65 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
     }
 
+    public void DescargarInbyURL(int position, String downUrl) {
+        if (isNetworkAvailable()) {
+            File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aids[position]);
+            if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                if (!Dstorage.exists()) {
+                    if (!Dstorage.mkdirs()) toast("Error al crear carpeta");
+                }
+            }
+            try {
+                checkBan(APP);
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downUrl));
+                Log.d("DURL", downUrl);
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                //request.setTitle(fileName.substring(0, fileName.indexOf(".")));
+                request.setTitle(titulos[position]);
+                request.setDescription("Capitulo " + numeros[position]);
+                request.setMimeType("video/mp4");
+                request.setDestinationInExternalPublicDir("Animeflv/download/" + aids[position], aids[position] + "_" + numeros[position] + ".mp4");
+                DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                long l = manager.enqueue(request);
+                getSharedPreferences("data", MODE_PRIVATE).edit().putString(eidT, Long.toString(l)).apply();
+                String descargados = getSharedPreferences("data", MODE_PRIVATE).getString("eids_descarga", "");
+                String epID = getSharedPreferences("data", MODE_PRIVATE).getString("epIDS_descarga", "");
+                if (descargados.contains(eidT)) {
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eidT + ":::", "")).apply();
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(aids[position] + "_" + numeros[position] + ":::", "")).apply();
+                }
+                descargados = getSharedPreferences("data", MODE_PRIVATE).getString("eids_descarga", "");
+                getSharedPreferences("data", MODE_PRIVATE).edit().putString("eids_descarga", descargados + eidT + ":::").apply();
+                String tits = getSharedPreferences("data", MODE_PRIVATE).getString("titulos_descarga", "");
+                epID = getSharedPreferences("data", MODE_PRIVATE).getString("epIDS_descarga", "");
+                getSharedPreferences("data", MODE_PRIVATE).edit().putString("titulos_descarga", tits + aids[position] + ":::").apply();
+                getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID + aids[position] + "_" + numeros[position] + ":::").apply();
+            } catch (Exception e) {
+                toast("Error " + e.getMessage());
+            }
+            GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+            GIBT.setImageResource(R.drawable.ic_borrar_r);
+            GIBT.setEnabled(true);
+            IBVT.setImageResource(R.drawable.ic_rep_r);
+            IBVT.setEnabled(true);
+            descargando = false;
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aids[position] + "_" + numeros[position], true).apply();
+            String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+            if (!vistos.contains(eids[position].trim())) {
+                vistos = vistos + eids[position].trim() + ":::";
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
+            }
+        } else {
+            toast("No hay conexion a internet");
+            GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+            GIBT.setImageResource(R.drawable.ic_get_r);
+            GIBT.setEnabled(true);
+            IBVT.setImageResource(R.drawable.ic_ver_no);
+            IBVT.setEnabled(false);
+            descargando = false;
+        }
+    }
+
     public void StreamInbyID(int position) {
         if (isNetworkAvailable()) {
             checkBan(APP);
@@ -955,8 +1030,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         String fav = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
         String vistos = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
         if (!email_coded.equals("null") && !pass_coded.equals("null")) {
-            new LoginServer(context, TaskType.NEW_USER, email, email_coded, pass_coded, null).execute(parser.getBaseUrl(normal, context) + "fav-server.php?tipo=nCuenta&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&fav_code=" + fav + ":;:" + vistos);
-            new LoginServer(context, TaskType.NEW_USER, email, email_coded, pass_coded, null).execute(parser.getBaseUrl(secundario, context) + "fav-server.php?tipo=nCuenta&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&fav_code=" + fav + ":;:" + vistos);
+            new LoginServer(context, TaskType.NEW_USER, email, email_coded, pass_coded, null).execute(parser.getBaseUrl(normal, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=nCuenta&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&fav_code=" + fav + ":;:" + vistos);
+            //new LoginServer(context, TaskType.NEW_USER, email, email_coded, pass_coded, null).execute(parser.getBaseUrl(secundario, context) + "fav-server.php?tipo=nCuenta&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&fav_code=" + fav + ":;:" + vistos);
         }
     }
 
@@ -1240,7 +1315,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (file.exists() && isJSONValid(json)) {
             urlInfoT = parser.getInicioUrl(normal, context) + "?url=" + parser.getUrlFavs(json, aid);
             if (urlInfoT.trim().equals("")) {
-                urlInfoT = parser.getInicioUrl(normal, context) + "?url=" + getUrlInfo(titulo, tipo);
+                String url = getUrlInfo(titulo, tipo);
+                if (url.trim().equals(""))
+                    toast("Porfavor abra el directorio para actualizar la lista de animes");
+                urlInfoT = parser.getInicioUrl(normal, context) + "?url=" + url;
                 Log.d("Buscar", "Parser Error ---> GET");
             } else {
                 Log.d("Buscar", "Parser");
@@ -1252,6 +1330,56 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         new Requests(this, TaskType.GET_INFO).execute(urlInfoT);
     }
 
+    private String getCertificateSHA1Fingerprint() {
+        PackageManager pm = context.getPackageManager();
+        String packageName = context.getPackageName();
+        int flags = PackageManager.GET_SIGNATURES;
+        PackageInfo packageInfo = null;
+        try {
+            packageInfo = pm.getPackageInfo(packageName, flags);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        Signature[] signatures = packageInfo.signatures;
+        byte[] cert = signatures[0].toByteArray();
+        InputStream input = new ByteArrayInputStream(cert);
+        CertificateFactory cf = null;
+        try {
+            cf = CertificateFactory.getInstance("X509");
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        }
+        X509Certificate c = null;
+        try {
+            c = (X509Certificate) cf.generateCertificate(input);
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        }
+        String hexString = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA1");
+            byte[] publicKey = md.digest(c.getEncoded());
+            hexString = byte2HexFormatted(publicKey);
+        } catch (NoSuchAlgorithmException e1) {
+            e1.printStackTrace();
+        } catch (CertificateEncodingException e) {
+            e.printStackTrace();
+        }
+        return hexString;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
     public void actCacheInfo(String json) {
         Bundle bundleInfo = new Bundle();
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
@@ -1505,13 +1633,15 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     + "function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);}"
                                     + ")()");
                         } else {
-                            isDesc.add(Tindex, false);
-                            GIBT.setScaleType(ImageView.ScaleType.FIT_END);
-                            GIBT.setImageResource(R.drawable.ic_get_r);
-                            IBsVerList.get(Tindex).setImageResource(R.drawable.ic_ver_no);
-                            IBsVerList.get(Tindex).setEnabled(false);
-                            descargando = false;
-                            toast("Error al descargar");
+                            if (!url.contains("izanagi.php")) {
+                                if (url.contains("amazona")) {
+                                    Log.d("Download", "Amazona");
+                                    DescargarInbyURL(posT, url);
+                                } else {
+                                    CancelPreDown();
+                                    toast("Error al descargar");
+                                }
+                            }
                         }
                     } else {
                         web.loadUrl(getInicioSec());
@@ -1531,7 +1661,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             getSharedPreferences("data", MODE_PRIVATE).edit().putString("cookies", cookies).apply();
                             //web.loadUrl("about:blank");
                         } else {
-                            web.loadUrl("javascript:window.HtmlViewer.showHTMLD2(document.getElementsByTagName('body')[0].innerHTML);");
+                            if (!view.getUrl().contains("izanagi.php")) {
+                                web.loadUrl("javascript:window.HtmlViewer.showHTMLD2(document.getElementsByTagName('body')[0].innerHTML);");
+                            }
                         }
                     }
                 }
@@ -1703,26 +1835,26 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                PicassoCache.getPicassoInstance(context).load(url[0]).error(R.drawable.ic_block_r).into(imgCard1);
-                PicassoCache.getPicassoInstance(context).load(url[1]).error(R.drawable.ic_block_r).into(imgCard2);
-                PicassoCache.getPicassoInstance(context).load(url[2]).error(R.drawable.ic_block_r).into(imgCard3);
-                PicassoCache.getPicassoInstance(context).load(url[3]).error(R.drawable.ic_block_r).into(imgCard4);
-                PicassoCache.getPicassoInstance(context).load(url[4]).error(R.drawable.ic_block_r).into(imgCard5);
-                PicassoCache.getPicassoInstance(context).load(url[5]).error(R.drawable.ic_block_r).into(imgCard6);
-                PicassoCache.getPicassoInstance(context).load(url[6]).error(R.drawable.ic_block_r).into(imgCard7);
-                PicassoCache.getPicassoInstance(context).load(url[7]).error(R.drawable.ic_block_r).into(imgCard8);
-                PicassoCache.getPicassoInstance(context).load(url[8]).error(R.drawable.ic_block_r).into(imgCard9);
-                PicassoCache.getPicassoInstance(context).load(url[9]).error(R.drawable.ic_block_r).into(imgCard10);
-                PicassoCache.getPicassoInstance(context).load(url[10]).error(R.drawable.ic_block_r).into(imgCard11);
-                PicassoCache.getPicassoInstance(context).load(url[11]).error(R.drawable.ic_block_r).into(imgCard12);
-                PicassoCache.getPicassoInstance(context).load(url[12]).error(R.drawable.ic_block_r).into(imgCard13);
-                PicassoCache.getPicassoInstance(context).load(url[13]).error(R.drawable.ic_block_r).into(imgCard14);
-                PicassoCache.getPicassoInstance(context).load(url[14]).error(R.drawable.ic_block_r).into(imgCard15);
-                PicassoCache.getPicassoInstance(context).load(url[15]).error(R.drawable.ic_block_r).into(imgCard16);
-                PicassoCache.getPicassoInstance(context).load(url[16]).error(R.drawable.ic_block_r).into(imgCard17);
-                PicassoCache.getPicassoInstance(context).load(url[17]).error(R.drawable.ic_block_r).into(imgCard18);
-                PicassoCache.getPicassoInstance(context).load(url[18]).error(R.drawable.ic_block_r).into(imgCard19);
-                PicassoCache.getPicassoInstance(context).load(url[19]).error(R.drawable.ic_block_r).into(imgCard20);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[0]).error(R.drawable.ic_block_r).into(imgCard1);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[1]).error(R.drawable.ic_block_r).into(imgCard2);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[2]).error(R.drawable.ic_block_r).into(imgCard3);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[3]).error(R.drawable.ic_block_r).into(imgCard4);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[4]).error(R.drawable.ic_block_r).into(imgCard5);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[5]).error(R.drawable.ic_block_r).into(imgCard6);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[6]).error(R.drawable.ic_block_r).into(imgCard7);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[7]).error(R.drawable.ic_block_r).into(imgCard8);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[8]).error(R.drawable.ic_block_r).into(imgCard9);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[9]).error(R.drawable.ic_block_r).into(imgCard10);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[10]).error(R.drawable.ic_block_r).into(imgCard11);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[11]).error(R.drawable.ic_block_r).into(imgCard12);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[12]).error(R.drawable.ic_block_r).into(imgCard13);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[13]).error(R.drawable.ic_block_r).into(imgCard14);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[14]).error(R.drawable.ic_block_r).into(imgCard15);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[15]).error(R.drawable.ic_block_r).into(imgCard16);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[16]).error(R.drawable.ic_block_r).into(imgCard17);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[17]).error(R.drawable.ic_block_r).into(imgCard18);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[18]).error(R.drawable.ic_block_r).into(imgCard19);
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(normal, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[19]).error(R.drawable.ic_block_r).into(imgCard20);
             }
         });
     }
@@ -1731,6 +1863,15 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         return getSharedPreferences("data", MODE_PRIVATE).getBoolean("online", false);
     }
 
+    public void CancelPreDown() {
+        isDesc.add(indexT, false);
+        GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+        GIBT.setImageResource(R.drawable.ic_get_r);
+        IBsVerList.get(indexT).setImageResource(R.drawable.ic_ver_no);
+        IBsVerList.get(indexT).setEnabled(false);
+        descargando = false;
+        recreate();
+    }
     public void loadTitulos(String[] list) {
         final String[] titulo = list;
         runOnUiThread(new Runnable() {
@@ -1996,6 +2137,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         ftitulo = ftitulo.replace(")", "");
         ftitulo = ftitulo.replace("2nd-season", "2");
         ftitulo = ftitulo.replace("'", "");
+        ftitulo = ftitulo.replace("í", "i");
         if (ftitulo.trim().equals("gintama")) {
             ftitulo = ftitulo + "-2015";
         }
@@ -2812,6 +2954,91 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 }
             }
         }
+        if (taskType == TaskType.D_OPTIONS) {
+            if (isJSONValid(data.trim())) {
+                try {
+                    JSONObject jsonObject = new JSONObject(data.trim());
+                    final String aflv = jsonObject.getString("aflv");
+                    final String izanagi = jsonObject.getString("izanagi");
+                    final String zippy = jsonObject.getString("zippy");
+                    final String sync = jsonObject.getString("sync");
+                    final String mega = jsonObject.getString("mega");
+                    final List<String> descargas = new ArrayList<>();
+                    //if (!aflv.equals("null"))descargas.add("Aflv");
+                    if (!izanagi.equals("null")) descargas.add("Izanagi");
+                    if (!zippy.equals("null")) descargas.add("Zyppyshare");
+                    if (!sync.equals("null")) descargas.add("4Sync");
+                    if (!mega.equals("null")) descargas.add("Mega");
+                    d = new MaterialDialog.Builder(context)
+                            .title("Opciones")
+                            .titleGravity(GravityEnum.CENTER)
+                            .customView(R.layout.dialog_down, false)
+                            .cancelable(true)
+                            .autoDismiss(false)
+                            .positiveText("Descargar")
+                            .negativeText("Cancelar")
+                            .callback(new MaterialDialog.ButtonCallback() {
+                                @Override
+                                public void onPositive(MaterialDialog dialog) {
+                                    super.onPositive(dialog);
+                                    String des = descargas.get(sp.getSelectedItemPosition());
+                                    switch (des.toLowerCase()) {
+                                        case "izanagi":
+                                            Log.d("Descargar", "Izanagi -> " + izanagi);
+                                            //web.loadUrl(izanagi);
+                                            new Izanagi().execute(izanagi);
+                                            d.dismiss();
+                                            break;
+                                        case "zyppyshare":
+                                            Log.d("Descargar", "Zyppyshre -> " + zippy);
+                                            web.post(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    web.loadUrl(zippy);
+                                                }
+                                            });
+                                            d.dismiss();
+                                            break;
+                                        case "4sync":
+                                            Log.d("Descargar", "4Sync -> " + sync);
+                                            DescargarInbyURL(posT, sync);
+                                            d.dismiss();
+                                            break;
+                                        case "mega":
+                                            Log.d("Descargar", "Mega -> " + mega);
+                                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mega)));
+                                            d.dismiss();
+                                            CancelPreDown();
+                                            break;
+                                    }
+                                }
+
+                                @Override
+                                public void onNegative(MaterialDialog dialog) {
+                                    super.onNegative(dialog);
+                                    d.dismiss();
+                                    CancelPreDown();
+                                }
+                            })
+                            .cancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    d.dismiss();
+                                    CancelPreDown();
+                                }
+                            })
+                            .build();
+                    sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
+                    sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, descargas));
+                    d.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.d("Data", data);
+                }
+            } else {
+                Log.d("Data", data);
+            }
+        }
         if (taskType == TaskType.GET_INICIO) {
             loadInicio(data);
         }
@@ -3046,10 +3273,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             if (data.trim().equals("ok")) {
                 DescargarInbyID(position);
             } else {
-                toast("Error en descarga, intentando modo alternativo");
+                toast("Error en descarga, seleccione modo alternativo");
                 posT = position;
                 String urlDes = getUrl(titulos[position], numeros[position]);
-                new Requests(this, TaskType.GET_HTML1).execute(urlDes);
+                new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
             }
         }
         if (taskType == TaskType.CHECK_STREAM) {
@@ -3185,4 +3412,45 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
     }
 
+    public class Izanagi extends AsyncTask<String, String, String> {
+        String _response;
+
+        @Override
+        protected String doInBackground(String... params) {
+            HttpURLConnection c = null;
+            try {
+                URL u = new URL(params[0]);
+                c = (HttpURLConnection) u.openConnection();
+                c.setRequestProperty("Content-length", "0");
+                c.setRequestProperty("User-Agent", "Mozilla/5.0 ( compatible ) ");
+                c.setRequestProperty("Accept", "*/*");
+                c.setInstanceFollowRedirects(true);
+                c.setUseCaches(false);
+                c.setConnectTimeout(10000);
+                c.setAllowUserInteraction(false);
+                c.connect();
+                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                //c.disconnect();
+                StringBuilder sb = new StringBuilder();
+                String line = "";
+                while ((line = br.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+                br.close();
+                _response = sb.toString();
+                //String fullPage = page.asXml();
+            } catch (Exception e) {
+                Log.e("Requests", "Error in http connection " + e.toString());
+                _response = "error";
+            }
+            return _response;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            String furl = s.substring(s.indexOf("URL=") + 4, s.lastIndexOf("\">"));
+            DescargarInbyURL(posT, furl);
+        }
+    }
 }

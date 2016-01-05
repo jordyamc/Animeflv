@@ -80,4 +80,5 @@
         <item>Large Banner</item>
         <item>Smart Banner</item>
     </string-array>
+    <string name="title_activity_maps">Map</string>
 </resources>

@@ -79,6 +79,7 @@ public class Parser {
             url=url.replace("&iquest;","\u00BF");
             url=url.replace("&hellip;","\u2026");
             url=url.replace("&#333;","\u014D");
+            url = url.replace("&uuml;", "\u00FC");
             url=url.replace("&iexcl;","¡");
             url=url.replace("&quot;","\"");
             if (url.trim().equals("")){
@@ -112,6 +113,7 @@ public class Parser {
             url=url.replace("&radic;","\u221A");
             url=url.replace("&dagger;", "\u2020");
             url=url.replace("&hearts;","\u2665");
+            url = url.replace("&Delta;", "\u0394");
             url=url.replace("\u00c3\u0097","\u00D7");
             url=url.replace("\u00c2\u00bd","\u00BD");
             url=url.replace("\u00c3\u00b1","\u00F1");
@@ -180,6 +182,7 @@ public class Parser {
                 titulo=titulo.replace("&aacute;","á");
                 titulo=titulo.replace("&oacute;","ó");
                 titulo=titulo.replace("&quot;","\"");
+                titulo = titulo.replace("&Delta;", "\u0394");
                 titulo=titulo.replace("&uuml;","\u00FC");
                 titulo=titulo.replace("&szlig;","\u00DF");
                 titulo=titulo.replace("&radic;","\u221A");
@@ -342,6 +345,7 @@ public class Parser {
                 tituloRel=tituloRel.replace("&aacute;","á");
                 tituloRel=tituloRel.replace("&oacute;","ó");
                 tituloRel=tituloRel.replace("&quot;","\"");
+                tituloRel = tituloRel.replace("&Delta;", "\u0394");
                 tituloRel=tituloRel.replace("&uuml;","\u00FC");
                 tituloRel=tituloRel.replace("&szlig;","\u00DF");
                 tituloRel=tituloRel.replace("&radic;","\u221A");
@@ -433,6 +437,7 @@ public class Parser {
             aid=aid.replace("&middot;","\u00B7");
             aid=aid.replace("&#333;", "\u014D");
             aid=aid.replace("&#9834;", "\u266A");
+            aid = aid.replace("&Delta;", "\u0394");
             aid=aid.replace("&aacute;","á");
             aid=aid.replace("&oacute;","ó");
             aid=aid.replace("&quot;","\"");
@@ -570,6 +575,7 @@ public class Parser {
                         array = array.replace("&aacute;", "á");
                         array = array.replace("&oacute;", "ó");
                         array = array.replace("&quot;", "\"");
+                        array = array.replace("&Delta;", "\u0394");
                         array = array.replace("&uuml;", "\u00FC");
                         array = array.replace("&szlig;", "\u00DF");
                         array = array.replace("&radic;", "\u221A");
@@ -755,6 +761,7 @@ public class Parser {
                         array = array.replace("&aacute;", "á");
                         array = array.replace("&oacute;", "ó");
                         array = array.replace("&quot;", "\"");
+                        array = array.replace("&Delta;", "\u0394");
                         array = array.replace("&uuml;", "\u00FC");
                         array = array.replace("&szlig;", "\u00DF");
                         array = array.replace("&radic;", "\u221A");
@@ -941,6 +948,7 @@ public class Parser {
                         array = array.replace("&aacute;", "á");
                         array = array.replace("&oacute;", "ó");
                         array = array.replace("&quot;", "\"");
+                        array = array.replace("&Delta;", "\u0394");
                         array = array.replace("&uuml;", "\u00FC");
                         array = array.replace("&szlig;", "\u00DF");
                         array = array.replace("&radic;", "\u221A");
@@ -1118,6 +1126,7 @@ public class Parser {
                     array = array.replace("&middot;", "\u00B7");
                     array = array.replace("&#333;", "\u014D");
                     array = array.replace("&#9834;", "\u266A");
+                    array = array.replace("&Delta;", "\u0394");
                     array = array.replace("&aacute;", "á");
                     array = array.replace("&oacute;", "ó");
                     array = array.replace("&uuml;", "\u00FC");
