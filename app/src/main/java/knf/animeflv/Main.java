@@ -3006,9 +3006,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                             break;
                                         case "mega":
                                             Log.d("Descargar", "Mega -> " + mega);
-                                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mega)));
                                             d.dismiss();
                                             CancelPreDown();
+                                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mega)));
                                             break;
                                     }
                                 }
