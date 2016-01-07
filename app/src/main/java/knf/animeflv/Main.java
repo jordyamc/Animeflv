@@ -320,8 +320,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         context = this;
         parser.refreshUrls(this);
         extraRules();
-        firma = getCertificateSHA1Fingerprint();
-        Log.d("Firma->", firma);
+        toast(findViewById(R.id.layout_principal).getTag().toString());
         String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         ExceptionHandler.register(this, parser.getBaseUrl(normal, this) + "errors/server.php?id=" + androidID);
         shouldExecuteOnResume = false;
@@ -3275,7 +3274,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             } else {
                 toast("Error en descarga, seleccione modo alternativo");
                 posT = position;
-                String urlDes = getUrl(titulos[position], numeros[position]);
+                String urlDes = parser.getUrlCached(aids[position], numeros[position]);
                 new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
             }
         }

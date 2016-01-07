@@ -12,8 +12,10 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -1415,6 +1417,48 @@ public class Parser {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        return ret;
+    }
+
+    public String getUrlCached(String aid, String numero) {
+        String ret = "";
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        try {
+            JSONArray jsonArray = new JSONArray(getStringFromFile(file_loc));
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject nombreJ = jsonArray.getJSONObject(i);
+                String n = nombreJ.getString("a");
+                if (n.trim().equals(aid)) {
+                    return "http://animeflv.net/ver/" + nombreJ.getString("d") + "-" + numero + ".html";
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
+
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
         }
         return ret;
     }
