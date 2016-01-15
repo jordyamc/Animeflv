@@ -2,12 +2,15 @@ package knf.animeflv.Recyclers;
 
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.net.Uri;
-import android.os.Bundle;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
@@ -16,14 +19,37 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
+import android.webkit.DownloadListener;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,7 +57,6 @@ import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
-import knf.animeflv.WebDescarga;
 
 /**
  * Created by Jordy on 08/08/2015.
@@ -44,6 +69,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         public ImageButton ib_des;
         public CardView card;
         public RecyclerView recyclerView;
+        public WebView web;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -51,6 +77,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             this.ib_ver = (ImageButton) itemView.findViewById(R.id.ib_ver_rv);
             this.ib_des = (ImageButton) itemView.findViewById(R.id.ib_descargar_rv);
             this.card = (CardView) itemView.findViewById(R.id.card_descargas_info);
+            this.web = (WebView) itemView.findViewById(R.id.wv_anime_zippy);
         }
     }
     private Context context;
@@ -59,6 +86,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     List<String> eids;
     String ext_storage_state = Environment.getExternalStorageState();
     Parser parser = new Parser();
+    MaterialDialog dialog;
+    MaterialDialog d;
 
     public RecyclerAdapter(Context context, List<String> capitulos,String aid,List<String> eid) {
         this.capitulo = capitulos;
@@ -76,7 +105,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final RecyclerAdapter.ViewHolder holder, final int position) {
-        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
+        SetUpWeb(holder.web, holder);
+        final String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
         final File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+id+"/"+id+"_"+item+".mp4");
         final File sd=new File(getSD1() + "/Animeflv/download/"+id+"/"+id+"_"+item+".mp4");
         final String email_coded=PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
@@ -98,48 +128,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             public void onClick(View v) {
                 if (!file.exists()&&!sd.exists()) {
                     if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("streaming", false)) {
-                        File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + id);
-                        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-                            if (!Dstorage.exists()) {
-                                Dstorage.mkdirs();
-                            }
-                        }
-                        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
-                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse("http://subidas.com/files/" + id + "/" + item + ".mp4"));
-                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                        //request.setTitle(fileName.substring(0, fileName.indexOf(".")));
-                        SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                        String titulo = sharedPreferences.getString("titInfo", "Error");
-                        request.setTitle(titulo);
-                        request.setDescription("Capitulo " + item);
-                        request.setMimeType("video/mp4");
-                        request.setDestinationInExternalPublicDir("Animeflv/download/" + id, id + "_" + item + ".mp4");
-                        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-                        long l = manager.enqueue(request);
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eids.get(position), Long.toString(l)).apply();
-                        String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados + eids.get(position) + ":::").apply();
-                        String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
-                        String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("titulos_descarga", tits + id + ":::").apply();
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID + id + "_" + item + ":::").apply();
-                        holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
-                        holder.ib_ver.setImageResource(R.drawable.ic_rep_r);
-                        holder.ib_ver.setEnabled(true);
-                        Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
-                        if (!vistos){
-                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
-                            String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                            Svistos=Svistos+";;;"+"visto" + id + "_" + item;
-                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                            if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
-                            }
-                            holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
-                        }
+                        new Check(holder.web, holder.ib_des, holder.ib_ver, holder.tv_capitulo, position).execute(new Parser().getUrlCached(id, item));
                     } else {
-                        MaterialDialog dialog = new MaterialDialog.Builder(context)
+                        dialog = new MaterialDialog.Builder(context)
                                 .title("Descargar?")
                                 .titleGravity(GravityEnum.CENTER)
                                 .content("Desea descargar el capitulo?")
@@ -152,47 +143,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                     @Override
                                     public void onPositive(MaterialDialog dialog) {
                                         super.onPositive(dialog);
-                                        File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + id);
-                                        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-                                            if (!Dstorage.exists()) {
-                                                Dstorage.mkdirs();
-                                            }
-                                        }
-                                        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
-                                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse("http://subidas.com/files/" + id + "/" + item + ".mp4"));
-                                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                                        //request.setTitle(fileName.substring(0, fileName.indexOf(".")));
-                                        SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                                        String titulo = sharedPreferences.getString("titInfo", "Error");
-                                        request.setTitle(titulo);
-                                        request.setDescription("Capitulo " + item);
-                                        request.setMimeType("video/mp4");
-                                        request.setDestinationInExternalPublicDir("Animeflv/download/" + id, id + "_" + item + ".mp4");
-                                        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-                                        long l = manager.enqueue(request);
-                                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eids.get(position), Long.toString(l)).apply();
-                                        String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
-                                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados + eids.get(position) + ":::").apply();
-                                        String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
-                                        String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
-                                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("titulos_descarga", tits + id + ":::").apply();
-                                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID + id + "_" + item + ":::").apply();
-                                        holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
-                                        holder.ib_ver.setImageResource(R.drawable.ic_rep_r);
-                                        holder.ib_ver.setEnabled(true);
-                                        Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
-                                        if (!vistos){
-                                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
-                                            String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                                            Svistos=Svistos+";;;"+"visto" + id + "_" + item;
-                                            context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                                            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                            if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                                                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
-                                            }
-                                            holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
-                                        }
                                         dialog.dismiss();
+                                        new Check(holder.web, holder.ib_des, holder.ib_ver, holder.tv_capitulo, position).execute(new Parser().getUrlCached(id, item));
                                     }
 
                                     @Override
@@ -456,4 +408,379 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         return capitulo.size();
     }
 
+    public void DownloadByUrl(String url, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position) {
+        final String email_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
+        final String pass_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
+        File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + id);
+        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+            if (!Dstorage.exists()) {
+                Dstorage.mkdirs();
+            }
+        }
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
+        SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+        String titulo = sharedPreferences.getString("titInfo", "Error");
+        request.setTitle(titulo);
+        request.setDescription("Capitulo " + item);
+        request.setMimeType("video/mp4");
+        request.setDestinationInExternalPublicDir("Animeflv/download/" + id, id + "_" + item + ".mp4");
+        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        long l = manager.enqueue(request);
+        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eids.get(position), Long.toString(l)).apply();
+        String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
+        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados + eids.get(position) + ":::").apply();
+        String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
+        String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
+        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("titulos_descarga", tits + id + ":::").apply();
+        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID + id + "_" + item + ":::").apply();
+        ib_des.setImageResource(R.drawable.ic_borrar_r);
+        ib_ver.setImageResource(R.drawable.ic_rep_r);
+        ib_ver.setEnabled(true);
+        Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+        if (!vistos) {
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
+            String Svistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+            Svistos = Svistos + ";;;" + "visto" + id + "_" + item;
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
+            if (!email_coded.equals("null") && !email_coded.equals("null")) {
+                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+            }
+            tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+        }
+    }
+
+    public class Check extends AsyncTask<String, String, String> {
+        public Check(WebView w, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position) {
+            this.des = ib_des;
+            this.ver = ib_ver;
+            this.cap = tv_capitulo;
+            this.pos = position;
+            this.web = w;
+        }
+
+        ImageButton des;
+        ImageButton ver;
+        WebView web;
+        TextView cap;
+        int pos;
+        String _response;
+        Spinner sp;
+
+        @Override
+        protected String doInBackground(String... params) {
+            HttpURLConnection c = null;
+            try {
+                Log.d("URL", params[0]);
+                URL u = new URL("http://animeflvapp.xyz/getHtml.php?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + params[0]);
+                c = (HttpURLConnection) u.openConnection();
+                c.setRequestProperty("Content-length", "0");
+                c.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");
+                c.setUseCaches(true);
+                c.setConnectTimeout(5000);
+                c.setAllowUserInteraction(false);
+                c.connect();
+                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line = "";
+                while ((line = br.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+                br.close();
+                String json = sb.toString().trim();
+                if (new Parser().isJSONValid(json)) {
+                    _response = json;
+                } else {
+                    _response = "error";
+                }
+            } catch (Exception e) {
+                Log.e("log_tag", "Error in http connection " + e.toString());
+                _response = "error";
+            }
+            return _response;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (s.equals("error")) {
+                dialog.dismiss();
+                Toast.makeText(context, "Error en servidor", Toast.LENGTH_SHORT).show();
+            } else {
+                try {
+                    JSONObject jsonObject = new JSONObject(s);
+                    final String aflv = jsonObject.getString("aflv");
+                    final String izanagi = jsonObject.getString("izanagi");
+                    final String zippy = jsonObject.getString("zippy");
+                    final String sync = jsonObject.getString("sync");
+                    final String mega = jsonObject.getString("mega");
+                    final List<String> descargas = new ArrayList<>();
+                    if (!aflv.equals("null")) descargas.add("Aflv");
+                    if (!izanagi.equals("null")) descargas.add("Izanagi");
+                    if (!zippy.equals("null")) descargas.add("Zyppyshare");
+                    if (!sync.equals("null")) descargas.add("4Sync");
+                    if (!mega.equals("null")) descargas.add("Mega");
+                    d = new MaterialDialog.Builder(context)
+                            .title("Opciones")
+                            .titleGravity(GravityEnum.CENTER)
+                            .customView(R.layout.dialog_down, false)
+                            .cancelable(true)
+                            .autoDismiss(false)
+                            .positiveText("Descargar")
+                            .negativeText("Cancelar")
+                            .callback(new MaterialDialog.ButtonCallback() {
+                                @Override
+                                public void onPositive(MaterialDialog dialog) {
+                                    super.onPositive(dialog);
+                                    String desc = descargas.get(sp.getSelectedItemPosition());
+                                    switch (desc.toLowerCase()) {
+                                        case "aflv":
+                                            Log.d("Descargar", "Izanagi -> " + aflv);
+                                            DownloadByUrl(aflv, des, ver, cap, pos);
+                                            d.dismiss();
+                                            break;
+                                        case "izanagi":
+                                            Log.d("Descargar", "Izanagi -> " + izanagi);
+                                            //web.loadUrl(izanagi);
+                                            new Izanagi(des, ver, cap, pos).execute(izanagi);
+                                            d.dismiss();
+                                            break;
+                                        case "zyppyshare":
+                                            Log.d("Descargar", "Zyppyshre -> " + zippy);
+                                            web.post(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    web.loadUrl(zippy);
+                                                }
+                                            });
+                                            d.dismiss();
+                                            break;
+                                        case "4sync":
+                                            Log.d("Descargar", "4Sync -> " + sync);
+                                            DownloadByUrl(sync, des, ver, cap, pos);
+                                            d.dismiss();
+                                            break;
+                                        case "mega":
+                                            Log.d("Descargar", "Mega -> " + mega);
+                                            d.dismiss();
+                                            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mega)));
+                                            break;
+                                    }
+                                }
+
+                                @Override
+                                public void onNegative(MaterialDialog dialog) {
+                                    super.onNegative(dialog);
+                                    d.dismiss();
+                                }
+                            })
+                            .cancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    d.dismiss();
+                                }
+                            })
+                            .build();
+                    sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
+                    sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, descargas));
+                    d.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public class Izanagi extends AsyncTask<String, String, String> {
+        public Izanagi(ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position) {
+            this.des = ib_des;
+            this.ver = ib_ver;
+            this.cap = tv_capitulo;
+            this.pos = position;
+        }
+
+        ImageButton des;
+        ImageButton ver;
+        TextView cap;
+        int pos;
+        String _response;
+
+        @Override
+        protected String doInBackground(String... params) {
+            HttpURLConnection c = null;
+            try {
+                URL u = new URL(params[0]);
+                c = (HttpURLConnection) u.openConnection();
+                c.setRequestProperty("Content-length", "0");
+                c.setRequestProperty("User-Agent", "Mozilla/5.0 ( compatible ) ");
+                c.setRequestProperty("Accept", "*/*");
+                c.setInstanceFollowRedirects(true);
+                c.setUseCaches(false);
+                c.setConnectTimeout(10000);
+                c.setAllowUserInteraction(false);
+                c.connect();
+                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                //c.disconnect();
+                StringBuilder sb = new StringBuilder();
+                String line = "";
+                while ((line = br.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+                br.close();
+                _response = sb.toString();
+                //String fullPage = page.asXml();
+            } catch (Exception e) {
+                Log.e("Requests", "Error in http connection " + e.toString());
+                _response = "error";
+            }
+            return _response;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            String furl = s.substring(s.indexOf("URL=") + 4, s.lastIndexOf("\">"));
+            DownloadByUrl(furl, des, ver, cap, pos);
+        }
+    }
+
+    public void SetUpWeb(final WebView web, final RecyclerAdapter.ViewHolder holder) {
+        web.getSettings().setJavaScriptEnabled(true);
+        CookieSyncManager.createInstance(context);
+        CookieSyncManager.getInstance().startSync();
+        web.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                if (url.contains("zippyshare.com") || url.contains("blank")) {
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("urlD", url).apply();
+                    web.loadUrl("javascript:("
+                            + "function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);}"
+                            + ")()");
+                }
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
+        });
+        web.setDownloadListener(new DownloadListener() {
+            public void onDownloadStart(String url, String userAgent,
+                                        String contentDisposition, String mimetype,
+                                        long contentLength) {
+                String fileName = url.substring(url.lastIndexOf("/") + 1);
+                web.loadUrl("about:blank");
+                File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")));
+                if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                    if (!Dstorage.exists()) {
+                        Dstorage.mkdirs();
+                    }
+                }
+                File archivo = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")) + "/" + fileName);
+                if (!archivo.exists()) {
+                    final String email_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
+                    final String pass_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
+                    String item = capitulo.get(holder.getAdapterPosition()).substring(capitulo.get(holder.getAdapterPosition()).lastIndexOf(" ") + 1).trim();
+                    String urlD = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("urlD", null);
+                    CookieManager cookieManager = CookieManager.getInstance();
+                    String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+                    String titulo = sharedPreferences.getString("titInfo", "Error");
+                    request.setTitle(titulo);
+                    request.setDescription("Capitulo " + item);
+                    request.addRequestHeader("cookie", cookie);
+                    request.addRequestHeader("User-Agent", web.getSettings().getUserAgentString());
+                    request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
+                    request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
+                    request.addRequestHeader("Referer", urlD);
+                    request.setMimeType("video/mp4");
+                    request.setDestinationInExternalPublicDir("Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")), fileName);
+                    DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                    long l = manager.enqueue(request);
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eids.get(holder.getAdapterPosition()), Long.toString(l)).apply();
+                    String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados + eids.get(holder.getAdapterPosition()) + ":::").apply();
+                    String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
+                    String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("titulos_descarga", tits + id + ":::").apply();
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID + id + "_" + item + ":::").apply();
+                    holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
+                    holder.ib_ver.setImageResource(R.drawable.ic_rep_r);
+                    holder.ib_ver.setEnabled(true);
+                    Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+                    if (!vistos) {
+                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
+                        String Svistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                        Svistos = Svistos + ";;;" + "visto" + id + "_" + item;
+                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                        String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
+                        if (!email_coded.equals("null") && !email_coded.equals("null")) {
+                            new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+                        }
+                        holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+                    }
+                } else {
+                    Toast.makeText(context, "El archivo ya existe", Toast.LENGTH_SHORT).show();
+                }
+                d.dismiss();
+
+            }
+        });
+    }
+
+    private String getCertificateSHA1Fingerprint() {
+        PackageManager pm = context.getPackageManager();
+        String packageName = context.getPackageName();
+        int flags = PackageManager.GET_SIGNATURES;
+        PackageInfo packageInfo = null;
+        try {
+            packageInfo = pm.getPackageInfo(packageName, flags);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        Signature[] signatures = packageInfo.signatures;
+        byte[] cert = signatures[0].toByteArray();
+        InputStream input = new ByteArrayInputStream(cert);
+        CertificateFactory cf = null;
+        try {
+            cf = CertificateFactory.getInstance("X509");
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        }
+        X509Certificate c = null;
+        try {
+            c = (X509Certificate) cf.generateCertificate(input);
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        }
+        String hexString = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA1");
+            byte[] publicKey = md.digest(c.getEncoded());
+            hexString = byte2HexFormatted(publicKey);
+        } catch (NoSuchAlgorithmException e1) {
+            e1.printStackTrace();
+        } catch (CertificateEncodingException e) {
+            e.printStackTrace();
+        }
+        return hexString;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
 }

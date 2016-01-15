@@ -41,6 +41,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -97,6 +98,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
@@ -320,7 +322,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         context = this;
         parser.refreshUrls(this);
         extraRules();
-        toast(findViewById(R.id.layout_principal).getTag().toString());
         String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         ExceptionHandler.register(this, parser.getBaseUrl(normal, this) + "errors/server.php?id=" + androidID);
         shouldExecuteOnResume = false;
@@ -1621,6 +1622,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         web = (WebView) findViewById(R.id.wv_inicio);
         web.getSettings().setJavaScriptEnabled(true);
         web.addJavascriptInterface(new JavaScriptInterface(context), "HtmlViewer");
+        CookieSyncManager.createInstance(this);
+        CookieSyncManager.getInstance().startSync();
         web.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
@@ -1643,7 +1646,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             }
                         }
                     } else {
-                        web.loadUrl(getInicioSec());
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                //web.loadUrl("javascript:window.HtmlViewer.showHTMLD2(document.getElementsByTagName('body')[0].innerHTML);");
+                            }
+                        }, 10000);
                     }
                 } else {
                     if (view.getUrl().contains("api.php?accion=anime")) {
@@ -2233,6 +2241,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             }
                             writeToFile(data, file);
                             if (parser.checkStatus(data) == 1) {
+                                web.loadUrl("http://animeflv.net");
                                 textoff.setText("SERVIDOR DESACTUALIZADO");
                                 textoff.setVisibility(View.VISIBLE);
                             } else {
@@ -2249,6 +2258,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     Log.d("Cargar 1", "Json nuevo");
                                     writeToFile(data, file);
                                     if (parser.checkStatus(data) == 1) {
+                                        web.loadUrl("http://animeflv.net");
                                         textoff.setText("SERVIDOR DESACTUALIZADO");
                                         textoff.setVisibility(View.VISIBLE);
                                     } else {
@@ -2260,6 +2270,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 } else {
                                     Log.d("Cargar 1", "Json existente");
                                     if (parser.checkStatus(data) == 1) {
+                                        web.loadUrl("http://animeflv.net");
                                         textoff.setText("SERVIDOR DESACTUALIZADO");
                                         textoff.setVisibility(View.VISIBLE);
                                     } else {
@@ -2305,6 +2316,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     Log.d("Cargar 2", "Json existente");
                                     if (isJSONValid(infile)) {
                                         if (parser.checkStatus(data) == 1) {
+                                            web.loadUrl("http://animeflv.net");
                                             textoff.setText("SERVIDOR DESACTUALIZADO");
                                             textoff.setVisibility(View.VISIBLE);
                                         } else {
@@ -3216,6 +3228,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     @Override
     protected void onResume() {
         super.onResume();
+        CookieSyncManager.getInstance().stopSync();
         pause = false;
         getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
         if (shouldExecuteOnResume) {
@@ -3243,6 +3256,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     @Override
     protected void onPause() {
         super.onPause();
+        CookieSyncManager.getInstance().sync();
         pause = true;
     }
 
@@ -3390,6 +3404,15 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         loadTitulos(tits);
                         loadCapitulos(nums);
                         isFirst();*/
+                        if (htmlInicio.contains("<title>Anime Online - AnimeFLV</title>")) {
+                            try {
+                                new Requests(context, TaskType.GET_INICIO).execute(parser.getInicioUrl(normal, context) + "?certificate=" + getCertificateSHA1Fingerprint() + "&data=" + URLEncoder.encode(htmlInicio, "UTF-8"));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            web.loadUrl("http://animeflv.net");
+                        }
                     }
                 }
             });

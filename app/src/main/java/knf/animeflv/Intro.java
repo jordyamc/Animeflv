@@ -63,6 +63,15 @@ public class Intro extends AppIntro2 {
     }
 
     @Override
+    public void onSlideChanged() {
+
+    }
+
+    @Override
+    public void onNextPressed() {
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
     }
