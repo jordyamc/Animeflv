@@ -1405,7 +1405,7 @@ public class Parser {
     }
 
     public String getUrlFavs(String json, String aid) {
-        String ret = "";
+        String ret = "null";
         try {
             JSONArray jsonArray = new JSONArray(json);
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -1423,19 +1423,43 @@ public class Parser {
     }
 
     public String getUrlCached(String aid, String numero) {
-        String ret = "";
+        String ret = "null";
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-        try {
-            JSONArray jsonArray = new JSONArray(getStringFromFile(file_loc));
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject nombreJ = jsonArray.getJSONObject(i);
-                String n = nombreJ.getString("a");
-                if (n.trim().equals(aid)) {
-                    return "http://animeflv.net/ver/" + nombreJ.getString("d") + "-" + numero + ".html";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONArray jsonArray = new JSONArray(getStringFromFile(file_loc));
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject nombreJ = jsonArray.getJSONObject(i);
+                    String n = nombreJ.getString("a");
+                    if (n.trim().equals(aid)) {
+                        return "http://animeflv.net/ver/" + nombreJ.getString("d") + "-" + numero + ".html";
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+        return ret;
+    }
+
+    public String getUrlAnimeCached(String aid) {
+        String ret = "null";
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONArray jsonArray = new JSONArray(getStringFromFile(file_loc));
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject nombreJ = jsonArray.getJSONObject(i);
+                    String n = nombreJ.getString("a");
+                    if (n.trim().equals(aid)) {
+                        return "http://animeflv.net/" + nombreJ.getString("c").toLowerCase() + "/" + nombreJ.getString("d") + ".html";
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return ret;
     }

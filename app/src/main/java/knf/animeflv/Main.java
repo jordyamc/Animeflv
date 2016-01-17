@@ -16,7 +16,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -54,7 +53,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -315,6 +313,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     TaskType secundario = TaskType.SECUNDARIA;
     int intentos = 0;
     String firma;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -750,22 +749,21 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     public int getHDraw(final Boolean set) {
         int color = getSharedPreferences("data", Context.MODE_PRIVATE).getInt("color", 0);
         int drawable = R.drawable.cargando;
+        headerTit = "Animeflv";
+        String e = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email", "null");
+        if (!e.equals("null")) headerTit = e;
         switch (color) {
             case 0:
                 drawable = R.drawable.naranja;
-                headerTit = "Animeflv";
                 break;
             case 1:
                 drawable = R.drawable.amarillo;
-                headerTit = "Animeflv";
                 break;
             case 2:
                 drawable = R.drawable.rojo;
-                headerTit = "Animeflv";
                 break;
             case 3:
                 drawable = R.drawable.rosa;
-                headerTit = "Animeflv";
                 break;
             case 4:
                 drawable = R.drawable.alnek;
@@ -1305,27 +1303,17 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
 
     public void setInfo(String aid, String titulo, String tipo) {
         aidInfo = aid;
-        SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("aid", aidInfo);
-        editor.apply();
-        //String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
-        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
-        String json = getStringFromFile(file.getPath());
-        if (file.exists() && isJSONValid(json)) {
-            urlInfoT = parser.getInicioUrl(normal, context) + "?url=" + parser.getUrlFavs(json, aid);
-            if (urlInfoT.trim().equals("")) {
-                String url = getUrlInfo(titulo, tipo);
-                if (url.trim().equals(""))
-                    toast("Porfavor abra el directorio para actualizar la lista de animes");
-                urlInfoT = parser.getInicioUrl(normal, context) + "?url=" + url;
-                Log.d("Buscar", "Parser Error ---> GET");
-            } else {
-                Log.d("Buscar", "Parser");
-            }
+        getSharedPreferences("data", MODE_PRIVATE).edit().putString("aid", aidInfo).apply();
+        urlInfoT = parser.getInicioUrl(normal, context) + "?url=" + parser.getUrlAnimeCached(aid);
+        if (urlInfoT.trim().contains("url=null")) {
+            String url = getUrlInfo(titulo, tipo);
+            if (url.trim().equals("null"))
+                toast("Error, abra el directorio para actualizar la lista de animes");
+            urlInfoT = parser.getInicioUrl(normal, context) + "?url=" + url;
+            Log.d("Buscar", "Parser Error ---> GET");
         } else {
-            urlInfoT = parser.getInicioUrl(normal, context) + "?url=" + getUrlInfo(titulo, tipo);
-            Log.d("Buscar", "GET");
+            Log.d("Buscar", "Parser");
+            Log.d("URL", urlInfoT);
         }
         new Requests(this, TaskType.GET_INFO).execute(urlInfoT);
     }
@@ -1380,6 +1368,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         return str.toString();
     }
+
     public void actCacheInfo(String json) {
         Bundle bundleInfo = new Bundle();
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
@@ -1879,6 +1868,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         descargando = false;
         recreate();
     }
+
     public void loadTitulos(String[] list) {
         final String[] titulo = list;
         runOnUiThread(new Runnable() {
@@ -2311,26 +2301,26 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             String infile = getStringFromFile(file_loc);
                             if (data.trim().equals("error"))
                                 toast("Error en servidor");
-                                if (!isNetworkAvailable()) {
-                                    toast("Cargando desde cache");
-                                    Log.d("Cargar 2", "Json existente");
-                                    if (isJSONValid(infile)) {
-                                        if (parser.checkStatus(data) == 1) {
-                                            web.loadUrl("http://animeflv.net");
-                                            textoff.setText("SERVIDOR DESACTUALIZADO");
-                                            textoff.setVisibility(View.VISIBLE);
-                                        } else {
-                                            textoff.setVisibility(View.GONE);
-                                        }
-                                        getData(infile);
+                            if (!isNetworkAvailable()) {
+                                toast("Cargando desde cache");
+                                Log.d("Cargar 2", "Json existente");
+                                if (isJSONValid(infile)) {
+                                    if (parser.checkStatus(data) == 1) {
+                                        web.loadUrl("http://animeflv.net");
+                                        textoff.setText("SERVIDOR DESACTUALIZADO");
+                                        textoff.setVisibility(View.VISIBLE);
+                                    } else {
+                                        textoff.setVisibility(View.GONE);
+                                    }
+                                    getData(infile);
                                 } else {
-                                        file.delete();
-                                        toast("Error en cache, sin conexion");
-                                        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", false);
-                                        //new Requests(context, TaskType.GET_INICIO).execute(getInicio());
+                                    file.delete();
+                                    toast("Error en cache, sin conexion");
+                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", false);
+                                    //new Requests(context, TaskType.GET_INICIO).execute(getInicio());
                                 }
-                                } else {
-                                    new Requests(context, TaskType.GET_INICIO).execute(getInicioSec());
+                            } else {
+                                new Requests(context, TaskType.GET_INICIO).execute(getInicioSec());
                             }
                         }
                     }
@@ -2570,6 +2560,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
         return is;
     }
+
     public void cambiarColor() {
         final MaterialDialog dialog = new MaterialDialog.Builder(context)
                 .title("Selecciona un color:")
@@ -2779,6 +2770,68 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     }
                 }
             }).start();
+        }
+        if (taskType == TaskType.ACT_DIR) {
+            if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                if (!mediaStorage.exists()) {
+                    mediaStorage.mkdirs();
+                }
+            }
+            File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+            String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+            if (isNetworkAvailable() && !data.trim().equals("error")) {
+                if (!file.exists()) {
+                    Log.d("Archivo:", "No existe");
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        Log.d("Archivo:", "Error al crear archivo");
+                    }
+                    if (isJSONValid(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")))) {
+                        writeToFile(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")), file);
+                        String urlDes = parser.getUrlCached(aids[posT], numeros[posT]);
+                        if (!urlDes.equals("null")) {
+                            new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
+                        } else {
+                            Toaster.toast("Error en servidor");
+                            recreate();
+                        }
+                    } else {
+                        Toaster.toast("Error al actualizar directorio");
+                        recreate();
+                    }
+                } else {
+                    String infile = getStringFromFile(file_loc);
+                    if (!infile.trim().equals(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")))) {
+                        if (isJSONValid(infile)) {
+                            writeToFile(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")), file);
+                            String urlDes = parser.getUrlCached(aids[posT], numeros[posT]);
+                            if (!urlDes.equals("null")) {
+                                new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
+                            } else {
+                                Toaster.toast("Error en servidor");
+                                recreate();
+                            }
+                        } else {
+                            Toaster.toast("Error al actualizar directorio");
+                            recreate();
+                        }
+                    } else {
+                        if (isJSONValid(infile)) {
+                            String urlDes = parser.getUrlCached(aids[posT], numeros[posT]);
+                            if (!urlDes.equals("null")) {
+                                new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
+                            } else {
+                                Toaster.toast("Error en servidor");
+                                recreate();
+                            }
+                        } else {
+                            Toaster.toast("Error al actualizar directorio");
+                            recreate();
+                        }
+                    }
+                }
+            }
         }
         if (taskType == TaskType.DIRECTORIO1) {
             if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
@@ -3289,7 +3342,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 toast("Error en descarga, seleccione modo alternativo");
                 posT = position;
                 String urlDes = parser.getUrlCached(aids[position], numeros[position]);
-                new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
+                if (!urlDes.trim().equals("null")) {
+                    new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
+                } else {
+                    toast("Anime no encontrado, actualizando el directorio...");
+                    new Requests(this, TaskType.ACT_DIR).execute(parser.getDirectorioUrl(normal, context));
+                }
             }
         }
         if (taskType == TaskType.CHECK_STREAM) {
