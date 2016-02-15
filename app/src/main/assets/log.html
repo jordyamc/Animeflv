@@ -1,37 +1,79 @@
 <!DOCTYPE html>
 <html lang="">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Log</title>
+    <style>
+        #new:before {
+        color: black;
+        font-weight: bold;
+        font-size: large;
+        color: gold;
+        content: "Nuevo: ";
+        }
+
+        #corregido:before {
+        color: black;
+        font-weight: bold;
+        font-size: large;
+        color: red;
+        content: "Corregido: ";
+        }
+
+        #importante:before {
+        color: black;
+        font-weight: bold;
+        font-size: large;
+        color: purple;
+        content: "Importante: ";
+        }
+
+        #cambio:before {
+        color: black;
+        font-weight: bold;
+        font-size: large;
+        color: green;
+        content: "Cambio: ";
+        }
+    </style>
 </head>
+
 <body>
+<h2>2.8.1</h2>
+<ul type="circle">
+    <li><span id="corregido"></span>Errores al reproducir archivos descargados</li>
+    <li><span id="cambio"></span>Mejora en changelog</li>
+    <li><span id="importante"></span>Mejora en carga de directorio y busqueda</li>
+    <li><span id="cambio"></span>Estructura de servidor para directorio</li>
+</ul>
 <h2>2.8</h2>
 <ul type="circle">
-    <li>Errores corregidos</li>
-    <li>Reproductor Interno</li>
-    <li>Modificaciones para el servidor</li>
-    <li>Lista de Descargas/Streaming mejorados</li>
-    <li>Lista de streaming en directorio</li>
+    <li><span id="corregido"></span>Errores generales</li>
+    <li><span id="new"></span>Reproductor Interno</li>
+    <li><span id="cambio"></span>Modificaciones para el servidor</li>
+    <li><span id="cambio"></span>Lista de Descargas/Streaming mejorados</li>
+    <li><span id="new"></span>Lista de streaming en directorio</li>
 </ul>
 <h2>2.7.7</h2>
 <ul type="circle">
-    <li>Errores corregidos</li>
-    <li>Actualizar directorio automaticamente</li>
+    <li><span id="corregido"></span>Errores generales</li>
+    <li><span id="cambio">Actualizar directorio automaticamente</li>
 </ul>
 <h2>2.7.6</h2>
 <ul type="circle">
-    <li>Errores corregidos</li>
+    <li><span id="corregido"></span>Errores generales</li>
     <li>Opciones de descarga en todos los animes del directorio</li>
 </ul>
 <h2>2.7.5</h2>
 <ul type="circle">
-    <li>Errores corregidos</li>
+    <li><span id="corregido"></span>Errores generales</li>
     <li>Mejoras en interfaz (soporte para mas resoluciones)</li>
 </ul>
 <h2>2.7</h2>
 <ul type="circle">
-    <li>Errores corregidos</li>
+    <li><span id="corregido"></span>Errores generales</li>
     <li>Mayor seguridad en servidor</li>
     <li>Sitema de cache de imagenes (siempre estaran disponibles las imagenes aun con la pagina
         caida)
@@ -42,19 +84,19 @@
 </ul>
 <h2>2.6.2</h2>
 <ul type="circle">
-    <li>Errores corregidos</li>
+    <li><span id="corregido"></span>Errores generales</li>
 </ul>
 <blockquote></blockquote>
 <h2>2.6.1</h2>
 <ul type="circle">
-    <li>Errores corregidos</li>
+    <li><span id="corregido"></span>Errores generales</li>
     <li>Servidor de descargas de Animeflv en mantenimiento (No hay descargas para animes antiguos)
     </li>
 </ul>
 <blockquote></blockquote>
 <h2>2.6</h2>
 <ul type="circle">
-    <li>Multiples errores corregidos</li>
+    <li><span id="corregido"></span>Errores generales</li>
     <li>Dialogo de confirmacion al borrar todos los videos</li>
     <li>Seccion de publicidad (Apoyen!! :D)</li>
 </ul>
@@ -79,18 +121,18 @@
 <ul type="circle">
     <li>Auto descargar actualizacion agregado(Configuracion)</li>
     <li>Mejora de registro de favoritos</li>
-    <li>Errores corregidos</li>
+    <li><span id="corregido"></span>Errores generales</li>
 </ul>
 <blockquote></blockquote>
 <h2>2.4.1</h2>
 <ul type="circle">
-    <li>Errores corregidos</li>
+    <li><span id="corregido"></span>Errores generales</li>
 </ul>
 <blockquote></blockquote>
 <h2>2.4</h2>
 <ul type="circle">
     <li>Cambio de servidores (otra vez XD)</li>
-    <li>Otros errores corregidos</li>
+    <li><span id="corregido"></span>Errores generales</li>
 </ul>
 <blockquote></blockquote>
 <h2>2.3.2.3</h2>
@@ -107,13 +149,13 @@
 <blockquote></blockquote>
 <h2>2.3.2.1</h2>
 <ul type="circle">
-    <li>Errores corregidos</li>
+    <li><span id="corregido"></span>Errores generales</li>
 </ul>
 <blockquote></blockquote>
 <h2>2.3.2</h2>
 <ul type="circle">
     <li>Codigo de referencia en configuracion para errores individuales</li>
-    <li>Algunos errores corregidos</li>
+    <li><span id="corregido"></span>Errores generales</li>
 </ul>
 <blockquote></blockquote>
 <h2>2.3.1</h2>
@@ -128,15 +170,14 @@
     <li>Respaldo y recuperacion de configuraciones</li>
     <li>Notificar capitulos nuevos de animes en favoritos (Configuracion)</li>
     <li>Soporte para los nuevos permisos de Android 6</li>
-    <li>Algunos errores corregidos</li>
+    <li><span id="corregido"></span>Errores generales</li>
 </ul>
 <blockquote></blockquote>
 <h2>2.2.1</h2>
 <ul type="circle">
     <li>Error al abrir informacion en Animes relacionados</li>
     <li>Error al abrir informacion al buscar</li>
-    <li>Al borrar cache, directorio.txt se quedara (ahora es necesario para hacer funcionar la
-        app)
+    <li>Al borrar cache, directorio.txt se quedara (ahora es necesario para hacer funcionar la app)
     </li>
 </ul>
 <blockquote></blockquote>
@@ -166,7 +207,7 @@
 <h2>1.9.8.5</h2>
 <ul type="circle">
     <li>Mejora en Directorio</li>
-    <li>Correcciones menores</li>
+    <li><span id="corregido"></span>Errores menores</li>
 </ul>
 <blockquote></blockquote>
 <h2>1.9.8.4</h2>
@@ -176,7 +217,7 @@
 <blockquote></blockquote>
 <h2>1.9.8.3.1</h2>
 <ul type="circle">
-    <li>Error en servidores internos</li>
+    <li><span id="corregido"></span>Servidores internos</li>
 </ul>
 <blockquote></blockquote>
 <h2>1.9.8.3</h2>
@@ -188,7 +229,7 @@
 <blockquote></blockquote>
 <h2>1.9.8.2</h2>
 <ul type="circle">
-    <li>Correccion en Chat</li>
+    <li><span id="corregido"></span>Chat</li>
 </ul>
 <blockquote></blockquote>
 <h2>1.9.8.1</h2>
@@ -216,7 +257,9 @@
 <blockquote></blockquote>
 <h2>1.9.6</h2>
 <ul type="circle">
-    <li>Error donde los favoritos desaparecian cuando no habia conexion, corregido</li>
+    <li><span id="corregido"></span>Error donde los favoritos desaparecian cuando no habia conexion,
+        corregido
+    </li>
     <li>Mejoras generales</li>
 </ul>
 <blockquote></blockquote>
@@ -245,7 +288,7 @@
 <blockquote></blockquote>
 <h2>1.9.3.2</h2>
 <ul type="circle">
-    <li>Error con las notificaciones, corregido</li>
+    <li><span id="corregido"></span>Error con las notificaciones</li>
 </ul>
 <blockquote></blockquote>
 <h2>1.9.3.1</h2>
@@ -273,7 +316,7 @@
 <blockquote></blockquote>
 <h2>1.9.2.8.1</h2>
 <ul type="circle">
-    <li>Correccion en pagina de Introduccion</li>
+    <li><span id="corregido"></span>Pagina de Introduccion</li>
     <li>Actualizar favoritos automaticamente</li>
 </ul>
 <blockquote></blockquote>
@@ -361,7 +404,9 @@
     <li>Mostrar nombre de anime en descargas</li>
     <li>Correccion con descarga de algunos animes</li>
     <li>Boton para abrir pagina de facebook</li>
-    <li>Manejar error en el link en la pagina de recientes (reportar anime en sugerencias, o en la pagina, para poder coregirlo lo mas rapido posible)</li>
+    <li>Manejar error en el link en la pagina de recientes (reportar anime en sugerencias, o en la
+        pagina, para poder coregirlo lo mas rapido posible)
+    </li>
 </ul>
 <blockquote></blockquote>
 <h2>1.9.1.9.8</h2>
@@ -409,7 +454,7 @@
 <blockquote></blockquote>
 <h2>1.9.1.9.2</h2>
 <ul type="circle">
-    <li>Varios errores corregidos</li>
+    <li><span id="corregido"></span>Errores generales</li>
 </ul>
 <blockquote></blockquote>
 <h2>1.9.1.9.1</h2>
@@ -445,4 +490,5 @@
 </ul>
 <blockquote></blockquote>
 </body>
+
 </html>

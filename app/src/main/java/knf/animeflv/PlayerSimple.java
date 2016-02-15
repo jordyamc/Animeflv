@@ -42,7 +42,7 @@ public class PlayerSimple extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         context = this;
         load = (RelativeLayout) findViewById(R.id.loading);
-        load.bringToFront();
+        if (load != null) load.bringToFront();
         videoView = (VideoView) findViewById(R.id.video_simple);
         videoView.setMediaController(new MediaController(this));
         videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {

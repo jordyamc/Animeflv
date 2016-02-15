@@ -32,9 +32,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import knf.animeflv.AnimeCompare;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterDirAnime;
+import knf.animeflv.Recyclers.AdapterDirAnimeNew;
 import knf.animeflv.Recyclers.RecyclerAdapter;
 
 public class Animes extends Fragment{
@@ -53,7 +55,9 @@ public class Animes extends Fragment{
         rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         String json=getJson();
         int genero=getActivity().getSharedPreferences("data",Context.MODE_PRIVATE).getInt("genero",0);
-        List<String> titulosAnime = parser.DirTitulosAnimeA(json, genero);
+        List<AnimeClass> animes = parser.DirAnimes(json);
+        Collections.sort(animes, new AnimeCompare());
+        /*List<String> titulosAnime = parser.DirTitulosAnimeA(json, genero);
         List<String> indexes = parser.DirIntsAnimeA(json, genero);
         List<String> titOrdAnime = parser.DirTitulosAnimeA(json, genero);
         List<String> indexOrd=new ArrayList<String>();
@@ -69,7 +73,8 @@ public class Animes extends Fragment{
             String link="http://cdn.animeflv.net/img/portada/thumb_80/"+i+".jpg";
             links.add(link);
         }*/
-        AdapterDirAnime adapter = new AdapterDirAnime(getActivity().getApplicationContext(), titOrdAnime, indexOrd, links, json);
+        //AdapterDirAnime adapter = new AdapterDirAnime(getActivity().getApplicationContext(), titOrdAnime, indexOrd, links, json);
+        AdapterDirAnimeNew adapter = new AdapterDirAnimeNew(getActivity().getApplicationContext(), animes);
         rvAnimes.setAdapter(adapter);
         return view;
     }
@@ -86,6 +91,7 @@ public class Animes extends Fragment{
             Log.d("Archivo", "Existe");
             json = getStringFromFile(file_loc);
         }
+        //Log.d("json",json);
         return json;
     }
     public static String convertStreamToString(InputStream is) throws Exception {

@@ -21,9 +21,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import knf.animeflv.AnimeCompare;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterDirAnime;
+import knf.animeflv.Recyclers.AdapterDirAnimeNew;
 import knf.animeflv.Recyclers.AdapterDirova;
 
 /**
@@ -45,7 +47,9 @@ public class Ovas extends Fragment {
         rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         String json=getJson();
         int genero=getActivity().getSharedPreferences("data", Context.MODE_PRIVATE).getInt("genero", 0);
-        List<String> titulosOvas = parser.DirTitulosOvasA(json, genero);
+        List<AnimeClass> animes = parser.DirOvas(json);
+        Collections.sort(animes, new AnimeCompare());
+        /*List<String> titulosOvas = parser.DirTitulosOvasA(json, genero);
         List<String> indexes = parser.DirIntsOvasA(json, genero);
         List<String> titOrdOvas = parser.DirTitulosOvasA(json, genero);
         List<String> indexOrd=new ArrayList<String>();
@@ -61,7 +65,8 @@ public class Ovas extends Fragment {
             String link="http://cdn.animeflv.net/img/portada/thumb_80/"+i+".jpg";
             links.add(link);
         }*/
-        AdapterDirova adapter = new AdapterDirova(getActivity().getApplicationContext(), titOrdOvas, indexOrd, links, json);
+        //AdapterDirova adapter = new AdapterDirova(getActivity().getApplicationContext(), titOrdOvas, indexOrd, links, json);
+        AdapterDirAnimeNew adapter = new AdapterDirAnimeNew(getActivity().getApplicationContext(), animes);
         rvAnimes.setAdapter(adapter);
         return view;
     }

@@ -46,9 +46,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import knf.animeflv.AnimeCompare;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterBusqueda;
+import knf.animeflv.Recyclers.AdapterBusquedaNew;
 
 /**
  * Created by Jordy on 29/08/2015.
@@ -222,7 +224,9 @@ public class Directorio extends AppCompatActivity {
                                     }
                                 }
                             }
-                            List<String> titulos = parser.DirTitulosBusquedaA(json, s.toString());
+                            List<AnimeClass> animes = parser.DirAllAnimes(json, s.toString());
+                            Collections.sort(animes, new AnimeCompare());
+                            /*List<String> titulos = parser.DirTitulosBusquedaA(json, s.toString());
                             List<String> tipos = parser.DirTiposBusquedaA(json, s.toString());
                             List<String> index = parser.DirIndexBusquedaA(json, s.toString());
                             List<String> titOrd = parser.DirTitulosBusquedaA(json, s.toString());
@@ -239,7 +243,8 @@ public class Directorio extends AppCompatActivity {
                                 String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + indexn + ".jpg";
                                 links.add(link);
                             }
-                            AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);
+                            AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);*/
+                            AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                             recyclerView.setAdapter(adapterBusqueda);
                         } else {
                             if (s.length() > 0) {
@@ -259,7 +264,7 @@ public class Directorio extends AppCompatActivity {
                             }
                         }
                     }
-                }, 1000);
+                }, 500);
             }
 
             @Override
@@ -296,7 +301,9 @@ public class Directorio extends AppCompatActivity {
                             getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                         }
                     }
-                    List<String> titulos = parser.DirTitulosBusquedaA(json, s.toString());
+                    List<AnimeClass> animes = parser.DirAllAnimes(json, s.toString());
+                    Collections.sort(animes, new AnimeCompare());
+                    /*List<String> titulos = parser.DirTitulosBusquedaA(json, s.toString());
                     List<String> tipos = parser.DirTiposBusquedaA(json, s.toString());
                     List<String> index = parser.DirIndexBusquedaA(json, s.toString());
                     List<String> titOrd = parser.DirTitulosBusquedaA(json, s.toString());
@@ -312,8 +319,9 @@ public class Directorio extends AppCompatActivity {
                         tiposOrd.add(tipon);
                         String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + indexn + ".jpg";
                         links.add(link);
-                    }
-                    AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);
+                    }*/
+                    //AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);
+                    AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                     recyclerView.setAdapter(adapterBusqueda);
                 }
                 return true;
@@ -411,7 +419,9 @@ public class Directorio extends AppCompatActivity {
                 recyclerView.setVisibility(View.VISIBLE);
             }
         }
-        List<String> titulos = parser.DirTitulosBusquedaA(json, null);
+        List<AnimeClass> animes = parser.DirAllAnimes(json, null);
+        Collections.sort(animes, new AnimeCompare());
+        /*List<String> titulos = parser.DirTitulosBusquedaA(json, null);
         List<String> tipos = parser.DirTiposBusquedaA(json, null);
         List<String> index = parser.DirIndexBusquedaA(json, null);
         List<String> titOrd = parser.DirTitulosBusquedaA(json, null);
@@ -431,8 +441,9 @@ public class Directorio extends AppCompatActivity {
         /*for (String st:indexOrd){
             String link="http://cdn.animeflv.net/img/portada/thumb_80/"+st+".jpg";
             links.add(link);
-        }*/
-        AdapterBusqueda adapterBusqueda = new AdapterBusqueda(this, titOrd, tiposOrd, links, indexOrd);
+        }
+        AdapterBusqueda adapterBusqueda = new AdapterBusqueda(this, titOrd, tiposOrd, links, indexOrd);*/
+        AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
         recyclerView.setAdapter(adapterBusqueda);
     }
 

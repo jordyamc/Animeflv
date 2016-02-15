@@ -21,10 +21,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import knf.animeflv.AnimeCompare;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterDirAnime;
+import knf.animeflv.Recyclers.AdapterDirAnimeNew;
 import knf.animeflv.Recyclers.AdapterDirPelicula;
+import knf.animeflv.Recyclers.AdapterDirPeliculaNew;
 
 /**
  * Created by Jordy on 30/08/2015.
@@ -45,7 +48,9 @@ public class Peliculas extends Fragment {
         rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         String json=getJson();
         int genero=getActivity().getSharedPreferences("data", Context.MODE_PRIVATE).getInt("genero", 0);
-        List<String> titulosPeliculas = parser.DirTitulosPeliculaA(json, genero);
+        List<AnimeClass> animes = parser.DirPelis(json);
+        Collections.sort(animes, new AnimeCompare());
+        /*List<String> titulosPeliculas = parser.DirTitulosPeliculaA(json, genero);
         List<String> indexes = parser.DirIntsPeliculaA(json, genero);
         List<String> titOrdPeliculas = parser.DirTitulosPeliculaA(json, genero);
         List<String> indexOrd=new ArrayList<String>();
@@ -61,7 +66,8 @@ public class Peliculas extends Fragment {
             String link="http://cdn.animeflv.net/img/portada/thumb_80/"+i+".jpg";
             links.add(link);
         }*/
-        AdapterDirPelicula adapter = new AdapterDirPelicula(getActivity().getApplicationContext(), titOrdPeliculas, indexOrd, links, json);
+        //AdapterDirPelicula adapter = new AdapterDirPelicula(getActivity().getApplicationContext(), titOrdPeliculas, indexOrd, links, json);
+        AdapterDirPeliculaNew adapter = new AdapterDirPeliculaNew(getActivity().getApplicationContext(), animes);
         rvAnimes.setAdapter(adapter);
         return view;
     }

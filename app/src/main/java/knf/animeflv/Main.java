@@ -116,7 +116,7 @@ import knf.animeflv.info.Info;
 import pl.droidsonroids.gif.GifImageButton;
 import xdroid.toaster.Toaster;
 
-public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, Requests.callback, CheckVideo.callback, LoginServer.callback {
+public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, Requests.callback, CheckVideo.callback, LoginServer.callback, DirGetter.callback {
     public Boolean tbool;
     WebView web;
     WebView web_Links;
@@ -1311,7 +1311,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
                             } else {
                                 toast("Anime no encontrado, actualizando el directorio...");
-                                new Requests(this, TaskType.ACT_DIR).execute(parser.getDirectorioUrl(normal, context));
+                                new DirGetter(this, TaskType.ACT_DIR).execute(parser.getDirectorioUrl(normal, context));
                             }
                         } else {
                             toast("No hay conexion a internet");
@@ -1356,7 +1356,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                 new Requests(context, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
                                             } else {
                                                 toast("Anime no encontrado, actualizando el directorio...");
-                                                new Requests(context, TaskType.ACT_DIR).execute(parser.getDirectorioUrl(normal, context));
+                                                new DirGetter(context, TaskType.ACT_DIR).execute(parser.getDirectorioUrl(normal, context));
                                             }
                                         } else {
                                             toast("No hay conexion a internet");
@@ -1395,7 +1395,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                                 new Requests(context, TaskType.S_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlStream);
                                             } else {
                                                 toast("Anime no encontrado, actualizando el directorio...");
-                                                new Requests(context, TaskType.ACT_DIR_S).execute(parser.getDirectorioUrl(normal, context));
+                                                new DirGetter(context, TaskType.ACT_DIR_S).execute(parser.getDirectorioUrl(normal, context));
                                             }
                                         } else {
                                             toast("No hay conexion a internet");
@@ -1459,7 +1459,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         tbool = busqueda;
         if (!busqueda) {
             if (isNetworkAvailable()) {
-                new Requests(context, TaskType.DIRECTORIO).execute(getDirectorio());
+                new DirGetter(context, TaskType.DIRECTORIO).execute(getDirectorio());
             } else {
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!mediaStorage.exists()) {
@@ -1482,7 +1482,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             }
         } else {
             if (isNetworkAvailable()) {
-                new Requests(context, TaskType.DIRECTORIO1).execute(getDirectorio());
+                new DirGetter(context, TaskType.DIRECTORIO1).execute(getDirectorio());
             } else {
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!mediaStorage.exists()) {
@@ -2948,7 +2948,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
 
     @Override
-    public void sendtext1(final String data, TaskType taskType) {
+    public void ReqDirs(final String data, TaskType taskType) {
         if (taskType == TaskType.DIRECTORIO) {
             new Thread(new Runnable() {
                 @Override
@@ -2961,6 +2961,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
                     String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
                     if (isNetworkAvailable() && !data.trim().equals("error")) {
+                        String trimed = data.trim();
                         if (!file.exists()) {
                             Log.d("Archivo:", "No existe");
                             try {
@@ -2968,8 +2969,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             } catch (IOException e) {
                                 Log.d("Archivo:", "Error al crear archivo");
                             }
-                            if (isJSONValid(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")))) {
-                                writeToFile(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")), file);
+
+                            if (isJSONValid(trimed)) {
+                                writeToFile(trimed, file);
                                 Intent intent = new Intent(context, Directorio.class);
                                 startActivity(intent);
                             } else {
@@ -2978,12 +2980,16 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         } else {
                             Log.d("Archivo", "Existe");
                             String infile = getStringFromFile(file_loc);
-                            if (!infile.trim().equals(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")))) {
+                            if (!infile.trim().equals(trimed)) {
                                 if (isJSONValid(infile)) {
-                                    Log.d("Cargar", "Json nuevo");
-                                    writeToFile(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")), file);
-                                    Intent intent = new Intent(context, Directorio.class);
-                                    startActivity(intent);
+                                    if (isJSONValid(trimed)) {
+                                        Log.d("Cargar", "Json nuevo");
+                                        writeToFile(trimed, file);
+                                        Intent intent = new Intent(context, Directorio.class);
+                                        startActivity(intent);
+                                    } else {
+                                        setDir(tbool);
+                                    }
                                 } else {
                                     file.delete();
                                     setDir(tbool);
@@ -3014,7 +3020,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             startActivity(intent);
                         } else {
                             //Toaster.toast("Servidor fallando y no hay datos en cache");
-                            new Requests(context, TaskType.DIRECTORIO).execute(getDirectorioSec());
+                            new DirGetter(context, TaskType.DIRECTORIO).execute(getDirectorioSec());
                         }
                     }
                 }
@@ -3029,6 +3035,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
             if (isNetworkAvailable() && !data.trim().equals("error")) {
+                String trimed = data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";"));
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {
@@ -3036,8 +3043,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     } catch (IOException e) {
                         Log.d("Archivo:", "Error al crear archivo");
                     }
-                    if (isJSONValid(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")))) {
-                        writeToFile(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")), file);
+                    if (isJSONValid(trimed)) {
+                        writeToFile(trimed, file);
                         String urlDes = parser.getUrlCached(aids[posT], numeros[posT]);
                         if (!urlDes.equals("null")) {
                             new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
@@ -3051,9 +3058,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     }
                 } else {
                     String infile = getStringFromFile(file_loc);
-                    if (!infile.trim().equals(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")))) {
+                    if (!infile.trim().equals(trimed)) {
                         if (isJSONValid(infile)) {
-                            writeToFile(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")), file);
+                            writeToFile(trimed, file);
                             Streaming = true;
                             String urlStream = parser.getUrlCached(aids[posT], numeros[posT]);
                             if (!urlStream.trim().equals("null")) {
@@ -3093,6 +3100,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
             if (isNetworkAvailable() && !data.trim().equals("error")) {
+                String trimed = data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";"));
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {
@@ -3100,8 +3108,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     } catch (IOException e) {
                         Log.d("Archivo:", "Error al crear archivo");
                     }
-                    if (isJSONValid(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")))) {
-                        writeToFile(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")), file);
+                    if (isJSONValid(trimed)) {
+                        writeToFile(trimed, file);
                         String urlDes = parser.getUrlCached(aids[posT], numeros[posT]);
                         if (!urlDes.equals("null")) {
                             new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
@@ -3115,9 +3123,9 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     }
                 } else {
                     String infile = getStringFromFile(file_loc);
-                    if (!infile.trim().equals(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")))) {
+                    if (!infile.trim().equals(trimed)) {
                         if (isJSONValid(infile)) {
-                            writeToFile(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")), file);
+                            writeToFile(trimed, file);
                             String urlDes = parser.getUrlCached(aids[posT], numeros[posT]);
                             if (!urlDes.equals("null")) {
                                 new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
@@ -3155,6 +3163,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
             if (isNetworkAvailable() && !data.trim().equals("error")) {
+                String trimed = data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";"));
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {
@@ -3162,7 +3171,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     } catch (IOException e) {
                         Log.d("Archivo:", "Error al crear archivo");
                     }
-                    writeToFile(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")), file);
+                    writeToFile(trimed, file);
                     Intent intent = new Intent(context, Directorio.class);
                     Bundle bundle = new Bundle();
                     bundle.putString("tipo", "Busqueda");
@@ -3173,7 +3182,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     String infile = getStringFromFile(file_loc);
                     if (!infile.trim().equals(data.trim())) {
                         Log.d("Cargar", "Json nuevo");
-                        writeToFile(data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";")), file);
+                        writeToFile(trimed, file);
                         Intent intent = new Intent(context, Directorio.class);
                         Bundle bundle = new Bundle();
                         bundle.putString("tipo", "Busqueda");
@@ -3189,9 +3198,13 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     }
                 }
             } else {
-                new Requests(context, TaskType.DIRECTORIO1).execute(getDirectorioSec());
+                new DirGetter(context, TaskType.DIRECTORIO1).execute(getDirectorioSec());
             }
         }
+    }
+
+    @Override
+    public void sendtext1(final String data, TaskType taskType) {
         if (taskType == TaskType.VERSION) {
             String vers = "";
             if (!isNetworkAvailable() || data.trim().equals("error")) {
@@ -3755,7 +3768,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
                 } else {
                     toast("Anime no encontrado, actualizando el directorio...");
-                    new Requests(this, TaskType.ACT_DIR).execute(parser.getDirectorioUrl(normal, context));
+                    new DirGetter(this, TaskType.ACT_DIR).execute(parser.getDirectorioUrl(normal, context));
                 }
             }
         }
@@ -3771,7 +3784,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     new Requests(this, TaskType.S_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlStream);
                 } else {
                     toast("Anime no encontrado, actualizando el directorio...");
-                    new Requests(this, TaskType.ACT_DIR_S).execute(parser.getDirectorioUrl(normal, context));
+                    new DirGetter(this, TaskType.ACT_DIR_S).execute(parser.getDirectorioUrl(normal, context));
                 }
             }
         }
@@ -3782,7 +3795,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         if (taskType == TaskType.GET_FAV) {
             if (data.equals("OK")) {
                 Log.d("Login", "Actualizando favoritos");
-                ActualizarFavoritos();
+                new Requests(this, TaskType.GET_INICIO).execute(getInicio());
             }
         }
     }

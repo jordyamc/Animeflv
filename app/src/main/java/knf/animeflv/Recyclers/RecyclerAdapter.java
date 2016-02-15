@@ -249,15 +249,24 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         holder.ib_ver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_video", "0"));
                 if (file.exists()){
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(file));
-                    intent.setDataAndType(Uri.fromFile(file), "video/mp4");
-                    context.startActivity(intent);
+                    if (type == 0) {
+                        PlayIntbySrc(file, holder.getAdapterPosition());
+                    } else {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(file));
+                        intent.setDataAndType(Uri.fromFile(file), "video/mp4");
+                        context.startActivity(intent);
+                    }
                 }else {
                     if (sd.exists()){
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(sd));
-                        intent.setDataAndType(Uri.fromFile(sd), "video/mp4");
-                        context.startActivity(intent);
+                        if (type == 0) {
+                            PlayIntbySrc(file, holder.getAdapterPosition());
+                        } else {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(file));
+                            intent.setDataAndType(Uri.fromFile(file), "video/mp4");
+                            context.startActivity(intent);
+                        }
                     }else {
                         Toast.makeText(context, "El archivo no existe", Toast.LENGTH_SHORT).show();
                     }
