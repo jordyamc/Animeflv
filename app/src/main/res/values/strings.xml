@@ -35,6 +35,10 @@
         <item>Onii-chan (Sam)</item>
         <item>Dango</item>
     </string-array>
+    <string-array name="players">
+        <item>Interno</item>
+        <item>Externo</item>
+    </string-array>
     <string-array name="tipos_sonidos">
         <item>0</item>
         <item>1</item>
@@ -50,7 +54,18 @@
         <item>0</item>
         <item>1</item>
     </string-array>
+    <string-array name="players_type">
+        <item>Simple</item>
+        <!--<item>Avanzado</item>
+        <item>Exo</item>-->
+    </string-array>
+    <string-array name="players_ints">
+        <item>0</item>
+        <!--<item>1</item>
+        <item>2</item>-->
+    </string-array>
     <string name="title_activity_ads">ADS</string>
+    <string name="description">Player</string>
 
     <string name="next_level">Mostrar Publicidad</string>
     <!-- -

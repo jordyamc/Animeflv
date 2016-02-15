@@ -1,6 +1,7 @@
 package knf.animeflv;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -1544,6 +1545,26 @@ public class Parser {
         return response;
     }
 
+    public Intent getPrefIntPlayer(Context context) {
+        int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_player", "0"));
+        Intent intent;
+        switch (type) {
+            case 0:
+                intent = new Intent(context, PlayerSimple.class);
+                break;
+            case 1:
+                intent = new Intent(context, Player.class);
+                break;
+            case 2:
+                intent = new Intent(context, PlayerExo.class);
+                break;
+            default:
+                intent = new Intent(context, PlayerSimple.class);
+                break;
+        }
+        return intent;
+    }
+
     public void saveBackup(Context context) {
         try {
             JSONObject jsonObject = new JSONObject();
@@ -1569,9 +1590,6 @@ public class Parser {
             JSONObject tbus = new JSONObject();
             tbus.put("name", "t_busqueda");
             tbus.put("value", PreferenceManager.getDefaultSharedPreferences(context).getString("t_busqueda", "0"));
-            JSONObject stream = new JSONObject();
-            stream.put("name", "streaming");
-            stream.put("value", PreferenceManager.getDefaultSharedPreferences(context).getBoolean("streaming", false));
             JSONObject resaltar = new JSONObject();
             resaltar.put("name", "resaltar");
             resaltar.put("value", PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar", true));
@@ -1581,15 +1599,22 @@ public class Parser {
             JSONObject autoUp = new JSONObject();
             autoUp.put("name", "autoUpdate");
             autoUp.put("value", PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoUpdate", false));
+            JSONObject playVid = new JSONObject();
+            playVid.put("name", "t_video");
+            playVid.put("value", PreferenceManager.getDefaultSharedPreferences(context).getString("t_video", "0"));
+            JSONObject playStream = new JSONObject();
+            playStream.put("name", "t_streaming");
+            playStream.put("value", PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
             jsonArray.put(not);
             jsonArray.put(tmp);
             jsonArray.put(sonido);
             jsonArray.put(conx);
             jsonArray.put(tbus);
-            jsonArray.put(stream);
             jsonArray.put(resaltar);
             jsonArray.put(autodes);
             jsonArray.put(autoUp);
+            jsonArray.put(playVid);
+            jsonArray.put(playStream);
             jsonObject.put("preferencias", jsonArray);
             File saveData = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/data.save");
             if (saveData.exists()) {

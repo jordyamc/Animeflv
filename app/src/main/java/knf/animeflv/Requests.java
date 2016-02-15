@@ -55,7 +55,7 @@ public class Requests extends AsyncTask<String,String,String> {
         try {
             String cookies = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("cookies", "");
             URL u;
-            if (params[0].startsWith(new Parser().getBaseUrl(TaskType.NORMAL, context))) {
+            if (params[0].startsWith(new Parser().getBaseUrl(TaskType.NORMAL, context)) || params[0].contains("getHtml.php")) {
                 if (params[0].endsWith(".php")) {
                     u = new URL(params[0] + "?certificate=" + getCertificateSHA1Fingerprint());
                 } else {

@@ -8,11 +8,17 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.pm.Signature;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -31,9 +37,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -88,12 +96,22 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     Parser parser = new Parser();
     MaterialDialog dialog;
     MaterialDialog d;
+    Boolean streaming = false;
+    int posT;
 
     public RecyclerAdapter(Context context, List<String> capitulos,String aid,List<String> eid) {
         this.capitulo = capitulos;
         this.context = context;
         this.id=aid;
         this.eids=eid;
+    }
+
+    public String getTit() {
+        return context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titInfo", "");
+    }
+
+    public String getNum(int position) {
+        return capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
     }
 
     @Override
@@ -128,7 +146,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             public void onClick(View v) {
                 if (!file.exists()&&!sd.exists()) {
                     if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("streaming", false)) {
-                        new Check(holder.web, holder.ib_des, holder.ib_ver, holder.tv_capitulo, position).execute(new Parser().getUrlCached(id, item));
+                        new CheckDown(holder.web, holder.ib_des, holder.ib_ver, holder.tv_capitulo, position).execute(new Parser().getUrlCached(id, item));
                     } else {
                         dialog = new MaterialDialog.Builder(context)
                                 .title("Descargar?")
@@ -139,85 +157,23 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                 .positiveText("DESCARGAR")
                                 .negativeText("STREAMING")
                                 .neutralText("ATRAS")
-                                .callback(new MaterialDialog.ButtonCallback() {
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
                                     @Override
-                                    public void onPositive(MaterialDialog dialog) {
-                                        super.onPositive(dialog);
-                                        dialog.dismiss();
-                                        new Check(holder.web, holder.ib_des, holder.ib_ver, holder.tv_capitulo, position).execute(new Parser().getUrlCached(id, item));
+                                    public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                        materialDialog.dismiss();
+                                        new CheckDown(holder.web, holder.ib_des, holder.ib_ver, holder.tv_capitulo, position).execute(new Parser().getUrlCached(id, item));
                                     }
-
+                                })
+                                .onNegative(new MaterialDialog.SingleButtonCallback() {
                                     @Override
-                                    public void onNegative(MaterialDialog dialog) {
-                                        super.onNegative(dialog);
-                                        List<ApplicationInfo> packages;
-                                        PackageManager pm;
-                                        pm = context.getPackageManager();
-                                        packages = pm.getInstalledApplications(0);
-                                        String pack = "null";
-                                        for (ApplicationInfo packageInfo : packages) {
-                                            if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
-                                                pack = "com.mxtech.videoplayer.pro";
-                                                break;
-                                            }
-                                            if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
-                                                pack = "com.mxtech.videoplayer.ad";
-                                                break;
-                                            }
-                                        }
-                                        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
-                                        switch (pack) {
-                                            case "com.mxtech.videoplayer.pro":
-                                                Intent intent = new Intent(Intent.ACTION_VIEW);
-                                                Uri videoUri = Uri.parse("http://subidas.com/files/" + id + "/" + item + ".mp4");
-                                                intent.setDataAndType(videoUri, "application/mp4");
-                                                intent.setPackage("com.mxtech.videoplayer.pro");
-                                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                context.startActivity(intent);
-                                                Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
-                                                if (!vistos){
-                                                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
-                                                    String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                                                    Svistos=Svistos+";;;"+"visto" + id + "_" + item;
-                                                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                                                    String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                                    if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                                                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
-                                                    }
-                                                    holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
-                                                }
-                                                dialog.dismiss();
-                                                break;
-                                            case "com.mxtech.videoplayer.ad":
-                                                Intent intentad = new Intent(Intent.ACTION_VIEW);
-                                                Uri videoUriad = Uri.parse("http://subidas.com/files/" + id + "/" + item + ".mp4");
-                                                intentad.setDataAndType(videoUriad, "application/mp4");
-                                                intentad.setPackage("com.mxtech.videoplayer.ad");
-                                                intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                context.startActivity(intentad);
-                                                Boolean vistosad=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
-                                                if (!vistosad){
-                                                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
-                                                    String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                                                    Svistos=Svistos+";;;"+"visto" + id + "_" + item;
-                                                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                                                    String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                                    if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                                                        new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
-                                                    }
-                                                    holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
-                                                }
-                                                dialog.dismiss();
-                                                break;
-                                            default:
-                                                Toast.makeText(context, "MX player no instalado", Toast.LENGTH_SHORT).show();
-                                                break;
-                                        }
+                                    public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                        materialDialog.dismiss();
+                                        new CheckStream(holder.web, holder.tv_capitulo, position).execute(new Parser().getUrlCached(id, item));
                                     }
-
+                                })
+                                .onNeutral(new MaterialDialog.SingleButtonCallback() {
                                     @Override
-                                    public void onNeutral(MaterialDialog dialog) {
-                                        super.onNeutral(dialog);
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                         dialog.dismiss();
                                     }
                                 })
@@ -232,10 +188,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                             .content("Desea eliminar el capitulo " + item + "?")
                             .positiveText("Eliminar")
                             .negativeText("Cancelar")
-                            .callback(new MaterialDialog.ButtonCallback() {
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
-                                public void onPositive(MaterialDialog dialog) {
-                                    super.onPositive(dialog);
+                                public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
                                     if (file.delete()) {
                                         holder.ib_des.setImageResource(R.drawable.ic_get_r);
                                         holder.ib_ver.setImageResource(R.drawable.ic_ver_no);
@@ -269,11 +224,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                         Toast.makeText(context, "Archivo Eliminado", Toast.LENGTH_SHORT).show();
                                     }
                                 }
-
+                            })
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
                                 @Override
-                                public void onNegative(MaterialDialog dialog) {
-                                    super.onPositive(dialog);
-                                    dialog.dismiss();
+                                public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                    materialDialog.dismiss();
                                 }
                             })
                             .build();
@@ -452,8 +407,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
     }
 
-    public class Check extends AsyncTask<String, String, String> {
-        public Check(WebView w, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position) {
+    public class CheckDown extends AsyncTask<String, String, String> {
+        public CheckDown(WebView w, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position) {
             this.des = ib_des;
             this.ver = ib_ver;
             this.cap = tv_capitulo;
@@ -473,8 +428,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         protected String doInBackground(String... params) {
             HttpURLConnection c = null;
             try {
-                Log.d("URL", params[0]);
-                URL u = new URL("http://animeflvapp.xyz/getHtml.php?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + params[0]);
+                URL u = new URL(new Parser().getBaseUrl(TaskType.NORMAL, context) + "getHtml.php?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + params[0]);
+                Log.d("URL", u.toString());
                 c = (HttpURLConnection) u.openConnection();
                 c.setRequestProperty("Content-length", "0");
                 c.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");
@@ -510,18 +465,22 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 Toast.makeText(context, "Error en servidor", Toast.LENGTH_SHORT).show();
             } else {
                 try {
-                    JSONObject jsonObject = new JSONObject(s);
-                    final String aflv = jsonObject.getString("aflv");
-                    final String izanagi = jsonObject.getString("izanagi");
-                    final String zippy = jsonObject.getString("zippy");
-                    final String sync = jsonObject.getString("sync");
-                    final String mega = jsonObject.getString("mega");
-                    final List<String> descargas = new ArrayList<>();
-                    if (!aflv.equals("null")) descargas.add("Aflv");
-                    if (!izanagi.equals("null")) descargas.add("Izanagi");
-                    if (!zippy.equals("null")) descargas.add("Zyppyshare");
-                    if (!sync.equals("null")) descargas.add("4Sync");
-                    if (!mega.equals("null")) descargas.add("Mega");
+                    JSONObject jsonObject = new JSONObject(s.trim());
+                    JSONArray jsonArray = jsonObject.getJSONArray("downloads");
+                    final List<String> nombres = new ArrayList<>();
+                    final List<String> urls = new ArrayList<>();
+                    try {
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject object = jsonArray.getJSONObject(i);
+                            String u = object.getString("url");
+                            if (!u.trim().equals("null")) {
+                                nombres.add(object.getString("name"));
+                                urls.add(u);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     d = new MaterialDialog.Builder(context)
                             .title("Opciones")
                             .titleGravity(GravityEnum.CENTER)
@@ -530,50 +489,41 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                             .autoDismiss(false)
                             .positiveText("Descargar")
                             .negativeText("Cancelar")
-                            .callback(new MaterialDialog.ButtonCallback() {
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
-                                public void onPositive(MaterialDialog dialog) {
-                                    super.onPositive(dialog);
-                                    String desc = descargas.get(sp.getSelectedItemPosition());
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction dialogAction) {
+                                    String desc = nombres.get(sp.getSelectedItemPosition());
+                                    final String ur = urls.get(sp.getSelectedItemPosition());
+                                    Log.d("Descargar", "URL -> " + ur);
                                     switch (desc.toLowerCase()) {
-                                        case "aflv":
-                                            Log.d("Descargar", "Izanagi -> " + aflv);
-                                            DownloadByUrl(aflv, des, ver, cap, pos);
-                                            d.dismiss();
-                                            break;
                                         case "izanagi":
-                                            Log.d("Descargar", "Izanagi -> " + izanagi);
-                                            //web.loadUrl(izanagi);
-                                            new Izanagi(des, ver, cap, pos).execute(izanagi);
+                                            new Izanagi(des, ver, cap, pos).execute(ur);
                                             d.dismiss();
                                             break;
-                                        case "zyppyshare":
-                                            Log.d("Descargar", "Zyppyshre -> " + zippy);
+                                        case "zippyshare":
                                             web.post(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    web.loadUrl(zippy);
+                                                    web.loadUrl(ur);
                                                 }
                                             });
                                             d.dismiss();
                                             break;
-                                        case "4sync":
-                                            Log.d("Descargar", "4Sync -> " + sync);
-                                            DownloadByUrl(sync, des, ver, cap, pos);
-                                            d.dismiss();
-                                            break;
                                         case "mega":
-                                            Log.d("Descargar", "Mega -> " + mega);
                                             d.dismiss();
-                                            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mega)));
+                                            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
+                                            break;
+                                        default:
+                                            DownloadByUrl(ur, des, ver, cap, pos);
+                                            d.dismiss();
                                             break;
                                     }
                                 }
-
+                            })
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
                                 @Override
-                                public void onNegative(MaterialDialog dialog) {
-                                    super.onNegative(dialog);
-                                    d.dismiss();
+                                public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                    materialDialog.dismiss();
                                 }
                             })
                             .cancelListener(new DialogInterface.OnCancelListener() {
@@ -584,10 +534,146 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                             })
                             .build();
                     sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
-                    sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, descargas));
+                    sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
                     d.show();
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Toast.makeText(context, "Error en JSON", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    public class CheckStream extends AsyncTask<String, String, String> {
+        public CheckStream(WebView w, TextView tv_capitulo, int position) {
+            this.cap = tv_capitulo;
+            this.pos = position;
+            this.web = w;
+        }
+
+        WebView web;
+        TextView cap;
+        int pos;
+        String _response;
+        Spinner sp;
+
+        @Override
+        protected String doInBackground(String... params) {
+            HttpURLConnection c = null;
+            try {
+                URL u = new URL(new Parser().getBaseUrl(TaskType.NORMAL, context) + "getHtml.php?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + params[0]);
+                Log.d("URL", u.toString());
+                c = (HttpURLConnection) u.openConnection();
+                c.setRequestProperty("Content-length", "0");
+                c.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");
+                c.setUseCaches(true);
+                c.setConnectTimeout(5000);
+                c.setAllowUserInteraction(false);
+                c.connect();
+                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line = "";
+                while ((line = br.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+                br.close();
+                String json = sb.toString().trim();
+                if (new Parser().isJSONValid(json)) {
+                    _response = json;
+                } else {
+                    _response = "error";
+                }
+            } catch (Exception e) {
+                Log.e("log_tag", "Error in http connection " + e.toString());
+                _response = "error";
+            }
+            return _response;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            if (s.equals("error")) {
+                dialog.dismiss();
+                Toast.makeText(context, "Error en servidor", Toast.LENGTH_SHORT).show();
+            } else {
+                try {
+                    JSONObject jsonObject = new JSONObject(s.trim());
+                    JSONArray jsonArray = jsonObject.getJSONArray("downloads");
+                    final List<String> nombres = new ArrayList<>();
+                    final List<String> urls = new ArrayList<>();
+                    try {
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject object = jsonArray.getJSONObject(i);
+                            String u = object.getString("url");
+                            if (!u.trim().equals("null")) {
+                                nombres.add(object.getString("name"));
+                                urls.add(u);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    d = new MaterialDialog.Builder(context)
+                            .title("Opciones")
+                            .titleGravity(GravityEnum.CENTER)
+                            .customView(R.layout.dialog_down, false)
+                            .cancelable(true)
+                            .autoDismiss(false)
+                            .positiveText("Reproducir")
+                            .negativeText("Cancelar")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction dialogAction) {
+                                    String desc = nombres.get(sp.getSelectedItemPosition());
+                                    final String ur = urls.get(sp.getSelectedItemPosition());
+                                    Log.d("Streaming", "URL -> " + ur);
+                                    switch (desc.toLowerCase()) {
+                                        case "izanagi":
+                                            new IzanagiStream(cap, pos).execute(ur);
+                                            d.dismiss();
+                                            break;
+                                        case "zippyshare":
+                                            streaming = true;
+                                            posT = pos;
+                                            web.post(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    web.loadUrl(ur);
+                                                }
+                                            });
+                                            d.dismiss();
+                                            break;
+                                        case "mega":
+                                            d.dismiss();
+                                            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
+                                            break;
+                                        default:
+                                            StreamInbyURL(pos, ur);
+                                            d.dismiss();
+                                            break;
+                                    }
+                                }
+                            })
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                    materialDialog.dismiss();
+                                }
+                            })
+                            .cancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    d.dismiss();
+                                }
+                            })
+                            .build();
+                    sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
+                    sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
+                    d.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "Error en JSON", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -646,6 +732,57 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
     }
 
+    public class IzanagiStream extends AsyncTask<String, String, String> {
+        public IzanagiStream(TextView tv_capitulo, int position) {
+            this.cap = tv_capitulo;
+            this.pos = position;
+        }
+
+        ImageButton des;
+        ImageButton ver;
+        TextView cap;
+        int pos;
+        String _response;
+
+        @Override
+        protected String doInBackground(String... params) {
+            HttpURLConnection c = null;
+            try {
+                URL u = new URL(params[0]);
+                c = (HttpURLConnection) u.openConnection();
+                c.setRequestProperty("Content-length", "0");
+                c.setRequestProperty("User-Agent", "Mozilla/5.0 ( compatible ) ");
+                c.setRequestProperty("Accept", "*/*");
+                c.setInstanceFollowRedirects(true);
+                c.setUseCaches(false);
+                c.setConnectTimeout(10000);
+                c.setAllowUserInteraction(false);
+                c.connect();
+                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                //c.disconnect();
+                StringBuilder sb = new StringBuilder();
+                String line = "";
+                while ((line = br.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+                br.close();
+                _response = sb.toString();
+                //String fullPage = page.asXml();
+            } catch (Exception e) {
+                Log.e("Requests", "Error in http connection " + e.toString());
+                _response = "error";
+            }
+            return _response;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            String furl = s.substring(s.indexOf("URL=") + 4, s.lastIndexOf("\">"));
+            StreamInbyURL(pos, furl);
+        }
+    }
+
     public void SetUpWeb(final WebView web, final RecyclerAdapter.ViewHolder holder) {
         web.getSettings().setJavaScriptEnabled(true);
         CookieSyncManager.createInstance(context);
@@ -673,66 +810,219 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                         long contentLength) {
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
                 web.loadUrl("about:blank");
-                File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")));
-                if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-                    if (!Dstorage.exists()) {
-                        Dstorage.mkdirs();
+                if (!streaming) {
+                    File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")));
+                    if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                        if (!Dstorage.exists()) {
+                            Dstorage.mkdirs();
+                        }
                     }
-                }
-                File archivo = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")) + "/" + fileName);
-                if (!archivo.exists()) {
-                    final String email_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
-                    final String pass_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
-                    String item = capitulo.get(holder.getAdapterPosition()).substring(capitulo.get(holder.getAdapterPosition()).lastIndexOf(" ") + 1).trim();
+                    File archivo = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")) + "/" + fileName);
+                    if (!archivo.exists()) {
+                        final String email_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
+                        final String pass_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
+                        String item = capitulo.get(holder.getAdapterPosition()).substring(capitulo.get(holder.getAdapterPosition()).lastIndexOf(" ") + 1).trim();
+                        String urlD = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("urlD", null);
+                        CookieManager cookieManager = CookieManager.getInstance();
+                        String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
+                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                        SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+                        String titulo = sharedPreferences.getString("titInfo", "Error");
+                        request.setTitle(titulo);
+                        request.setDescription("Capitulo " + item);
+                        request.addRequestHeader("cookie", cookie);
+                        request.addRequestHeader("User-Agent", web.getSettings().getUserAgentString());
+                        request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
+                        request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
+                        request.addRequestHeader("Referer", urlD);
+                        request.setMimeType("video/mp4");
+                        request.setDestinationInExternalPublicDir("Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")), fileName);
+                        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                        long l = manager.enqueue(request);
+                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eids.get(holder.getAdapterPosition()), Long.toString(l)).apply();
+                        String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
+                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados + eids.get(holder.getAdapterPosition()) + ":::").apply();
+                        String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
+                        String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
+                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("titulos_descarga", tits + id + ":::").apply();
+                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID + id + "_" + item + ":::").apply();
+                        holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
+                        holder.ib_ver.setImageResource(R.drawable.ic_rep_r);
+                        holder.ib_ver.setEnabled(true);
+                        Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+                        if (!vistos) {
+                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
+                            String Svistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                            Svistos = Svistos + ";;;" + "visto" + id + "_" + item;
+                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
+                            if (!email_coded.equals("null") && !email_coded.equals("null")) {
+                                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+                            }
+                            holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+                        }
+                    } else {
+                        Toast.makeText(context, "El archivo ya existe", Toast.LENGTH_SHORT).show();
+                    }
+                    d.dismiss();
+
+                } else {
+                    int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
                     String urlD = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("urlD", null);
                     CookieManager cookieManager = CookieManager.getInstance();
                     String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
-                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                    String titulo = sharedPreferences.getString("titInfo", "Error");
-                    request.setTitle(titulo);
-                    request.setDescription("Capitulo " + item);
-                    request.addRequestHeader("cookie", cookie);
-                    request.addRequestHeader("User-Agent", web.getSettings().getUserAgentString());
-                    request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
-                    request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
-                    request.addRequestHeader("Referer", urlD);
-                    request.setMimeType("video/mp4");
-                    request.setDestinationInExternalPublicDir("Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")), fileName);
-                    DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-                    long l = manager.enqueue(request);
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eids.get(holder.getAdapterPosition()), Long.toString(l)).apply();
-                    String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados + eids.get(holder.getAdapterPosition()) + ":::").apply();
-                    String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
-                    String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("titulos_descarga", tits + id + ":::").apply();
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID + id + "_" + item + ":::").apply();
-                    holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
-                    holder.ib_ver.setImageResource(R.drawable.ic_rep_r);
-                    holder.ib_ver.setEnabled(true);
-                    Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
-                    if (!vistos) {
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
-                        String Svistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                        Svistos = Svistos + ";;;" + "visto" + id + "_" + item;
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                        String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                        if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                            new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+                    streaming = false;
+                    web.loadUrl("about:blank");
+                    if (type == 1) {
+                        List<ApplicationInfo> packages;
+                        PackageManager pm;
+                        pm = context.getPackageManager();
+                        packages = pm.getInstalledApplications(0);
+                        String pack = "null";
+                        for (ApplicationInfo packageInfo : packages) {
+                            if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
+                                pack = "com.mxtech.videoplayer.pro";
+                                break;
+                            }
+                            if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
+                                pack = "com.mxtech.videoplayer.ad";
+                                break;
+                            }
                         }
-                        holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+                        switch (pack) {
+                            case "com.mxtech.videoplayer.pro":
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                Uri videoUri = Uri.parse(url);
+                                intent.setDataAndType(videoUri, "application/mp4");
+                                intent.putExtra("title", getTit() + " " + getNum(posT));
+                                intent.setPackage("com.mxtech.videoplayer.pro");
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                String[] headers = {"cookie", cookie, "User-Agent", web.getSettings().getUserAgentString(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", urlD};
+                                intent.putExtra("headers", headers);
+                                context.startActivity(intent);
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + getNum(posT), true).apply();
+                                String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                                if (!vistos.contains(eids.get(posT))) {
+                                    vistos = vistos + eids.get(posT) + ":::";
+                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
+                                }
+                                break;
+                            case "com.mxtech.videoplayer.ad":
+                                Intent intentad = new Intent(Intent.ACTION_VIEW);
+                                Uri videoUriad = Uri.parse(url);
+                                intentad.setDataAndType(videoUriad, "application/mp4");
+                                intentad.setPackage("com.mxtech.videoplayer.ad");
+                                intentad.putExtra("title", getTit() + " " + getNum(posT));
+                                intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                String[] headersad = {"cookie", cookie, "User-Agent", web.getSettings().getUserAgentString(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", urlD};
+                                intentad.putExtra("headers", headersad);
+                                context.startActivity(intentad);
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + getNum(posT), true).apply();
+                                String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                                if (!vistosad.contains(eids.get(posT))) {
+                                    vistosad = vistosad + eids.get(posT) + ":::";
+                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
+                                }
+                                break;
+                            default:
+                                toast("MX player no instalado");
+                                break;
+                        }
+                    } else {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("url", url);
+                            bundle.putString("ops", "cookie:::" + cookie + ";;;" + "User-Agent:::" + web.getSettings().getUserAgentString() + ";;;" + "Accept:::text/html, application/xhtml+xml, */*;;;" + "Accept-Language:::en-US,en;q=0.7,he;q=0.3;;;" + "Referer:::" + urlD);
+                            Intent intent = parser.getPrefIntPlayer(context);
+                            intent.putExtras(bundle);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            context.startActivity(intent);
+                        } else {
+                            if (isMXinstalled()) {
+                                toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
+                                List<ApplicationInfo> packages;
+                                PackageManager pm;
+                                pm = context.getPackageManager();
+                                packages = pm.getInstalledApplications(0);
+                                String pack = "null";
+                                for (ApplicationInfo packageInfo : packages) {
+                                    if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
+                                        pack = "com.mxtech.videoplayer.pro";
+                                        break;
+                                    }
+                                    if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
+                                        pack = "com.mxtech.videoplayer.ad";
+                                        break;
+                                    }
+                                }
+                                switch (pack) {
+                                    case "com.mxtech.videoplayer.pro":
+                                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                                        Uri videoUri = Uri.parse(url);
+                                        intent.setDataAndType(videoUri, "application/mp4");
+                                        intent.putExtra("title", getTit() + " " + getNum(posT));
+                                        intent.setPackage("com.mxtech.videoplayer.pro");
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        String[] headers = {"cookie", cookie, "User-Agent", web.getSettings().getUserAgentString(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", urlD};
+                                        intent.putExtra("headers", headers);
+                                        context.startActivity(intent);
+                                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + getNum(posT), true).apply();
+                                        String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                                        if (!vistos.contains(eids.get(posT))) {
+                                            vistos = vistos + eids.get(posT) + ":::";
+                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
+                                        }
+                                        break;
+                                    case "com.mxtech.videoplayer.ad":
+                                        Intent intentad = new Intent(Intent.ACTION_VIEW);
+                                        Uri videoUriad = Uri.parse(url);
+                                        intentad.setDataAndType(videoUriad, "application/mp4");
+                                        intentad.setPackage("com.mxtech.videoplayer.ad");
+                                        intentad.putExtra("title", getTit() + " " + getNum(posT));
+                                        intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        String[] headersad = {"cookie", cookie, "User-Agent", web.getSettings().getUserAgentString(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", urlD};
+                                        intentad.putExtra("headers", headersad);
+                                        context.startActivity(intentad);
+                                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + getNum(posT), true).apply();
+                                        String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                                        if (!vistosad.contains(eids.get(posT))) {
+                                            vistosad = vistosad + eids.get(posT) + ":::";
+                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
+                                        }
+                                        break;
+                                    default:
+                                        toast("MX player no instalado");
+                                        break;
+                                }
+                            } else {
+                                toast("No hay reproductor adecuado disponible");
+                            }
+                        }
                     }
-                } else {
-                    Toast.makeText(context, "El archivo ya existe", Toast.LENGTH_SHORT).show();
                 }
-                d.dismiss();
-
             }
         });
     }
 
+    public boolean isMXinstalled() {
+        List<ApplicationInfo> packages;
+        PackageManager pm;
+        pm = context.getPackageManager();
+        packages = pm.getInstalledApplications(0);
+        String pack = "null";
+        for (ApplicationInfo packageInfo : packages) {
+            if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
+                pack = "com.mxtech.videoplayer.pro";
+                break;
+            }
+            if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
+                pack = "com.mxtech.videoplayer.ad";
+                break;
+            }
+        }
+        return !pack.equals("null");
+    }
     private String getCertificateSHA1Fingerprint() {
         PackageManager pm = context.getPackageManager();
         String packageName = context.getPackageName();
@@ -782,5 +1072,134 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             if (i < (arr.length - 1)) str.append(':');
         }
         return str.toString();
+    }
+
+    public void toast(String text) {
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+    }
+
+    public void StreamInbyURL(int position, String url) {
+        if (isNetworkAvailable()) {
+            int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
+            Log.d("Streaming", PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
+            switch (type) {
+                case 0:
+                    StreamingIntbyUrl(position, url);
+                    break;
+                case 1:
+                    StreamingExtbyURL(position, url);
+                    break;
+            }
+        } else {
+            toast("No hay conexion a internet");
+        }
+    }
+
+    public void StreamingExtbyURL(int position, String url) {
+        Intent i = (new Intent(Intent.ACTION_VIEW, Uri.parse(url)).setType("application/mp4"));
+        PackageManager pm = context.getPackageManager();
+        final ResolveInfo mInfo = pm.resolveActivity(i, 0);
+        if (mInfo != null) {
+            String id = mInfo.activityInfo.applicationInfo.processName;
+            if (id.startsWith("com.mxtech.videoplayer")) {
+                StreamMXbyURL(position, url);
+            } else {
+                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            }
+        } else {
+            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        }
+    }
+
+    public void StreamingIntbyUrl(int position, String url) {
+        Intent interno = parser.getPrefIntPlayer(context);
+        interno.putExtra("url", url);
+        interno.putExtra("title", getTit() + " " + getNum(position));
+        interno.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(interno);
+    }
+
+    public void PlayIntbySrc(File file, int position) {
+        Intent interno = parser.getPrefIntPlayer(context);
+        interno.putExtra("file", file.getAbsolutePath());
+        interno.putExtra("title", getTit() + " " + getNum(position));
+        interno.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(interno);
+    }
+
+    public void StreamMXbyURL(int position, String url) {
+        List<ApplicationInfo> packages;
+        PackageManager pm;
+        pm = context.getPackageManager();
+        packages = pm.getInstalledApplications(0);
+        String pack = "null";
+        for (ApplicationInfo packageInfo : packages) {
+            if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
+                pack = "com.mxtech.videoplayer.pro";
+                break;
+            }
+            if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
+                pack = "com.mxtech.videoplayer.ad";
+                break;
+            }
+        }
+        switch (pack) {
+            case "com.mxtech.videoplayer.pro":
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                Uri videoUri = Uri.parse(url);
+                intent.setDataAndType(videoUri, "application/mp4");
+                intent.setPackage("com.mxtech.videoplayer.pro");
+                intent.putExtra("title", getTit() + " " + getNum(position));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + getNum(position), true).apply();
+                String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                if (!vistos.contains(eids.get(position).trim())) {
+                    vistos = vistos + eids.get(position).trim() + ":::";
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
+                }
+                break;
+            case "com.mxtech.videoplayer.ad":
+                Intent intentad = new Intent(Intent.ACTION_VIEW);
+                Uri videoUriad = Uri.parse(url);
+                intentad.setDataAndType(videoUriad, "application/mp4");
+                intentad.setPackage("com.mxtech.videoplayer.ad");
+                intentad.putExtra("title", getTit() + " " + getNum(position));
+                intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intentad);
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + getNum(position), true).apply();
+                String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                if (!vistosad.contains(eids.get(position).trim())) {
+                    vistosad = vistosad + eids.get(position).trim() + ":::";
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
+                }
+                break;
+            default:
+                toast("MX player no instalado");
+                break;
+        }
+    }
+
+    private boolean isNetworkAvailable() {
+        Boolean net = false;
+        int Tcon = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        switch (Tcon) {
+            case 0:
+                NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                net = Wifi.isConnected();
+                break;
+            case 1:
+                NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net = mobile.isConnected();
+                break;
+            case 2:
+                NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net = WifiA.isConnected() || mobileA.isConnected();
+                break;
+        }
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && net;
     }
 }

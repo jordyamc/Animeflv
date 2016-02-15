@@ -147,7 +147,7 @@ public class LoginServer extends AsyncTask<String,String,String> {
             }
         }
         if (taskType==TaskType.LIST_USERS){
-            String format=s.replace("./user_favs/","").replace(".txt","");
+            String format = s.replace("../user_favs/", "").replace(".txt", "");
             SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             defsharedPreferences.edit().putString("lista", format).apply();
         }

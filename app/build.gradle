@@ -8,8 +8,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 115
-        versionName "2.7.7"
+        versionCode 116
+        versionName "2.8"
         multiDexEnabled true
     }
     buildTypes {
@@ -36,8 +36,14 @@ dependencies {
     compile('com.mikepenz:materialdrawer:4.0.0@aar') {
         transitive = true
     }
+    compile('com.github.afollestad.material-dialogs:core:0.8.5.4@aar') {
+        transitive = true
+    }
     compile files('src/trace.jar')
     compile files('src/SOMAAndroidSDK5.0.1.jar')
+    compile files('jsoup-1.8.3.jar')
+    compile 'com.google.android.exoplayer:exoplayer:r1.5.5'
+    compile 'com.github.ndczz:infinity-loading:0.4'
     compile 'com.google.android.gms:play-services-ads:8.4.0'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.daimajia.easing:library:1.0.1@aar'
@@ -52,7 +58,6 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
     compile 'com.squareup.okio:okio:1.5.0'
-    compile 'com.afollestad:material-dialogs:0.7.7.0'
     compile 'com.ogaclejapan.smarttablayout:library:1.2.2@aar'
     compile 'com.ogaclejapan.smarttablayout:utils-v4:1.2.2@aar'
     compile 'com.github.AndroidDeveloperLB:MaterialPreferenceLibrary:4'
@@ -68,3 +73,4 @@ dependencies {
     compile 'com.parse.bolts:bolts-android:1.+'
     compile 'com.parse:parse-android:1.+'
 }
+

@@ -1,12 +1,17 @@
 package knf.animeflv;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,14 +49,18 @@ public class RequestFav extends AsyncTask<String,String,String> {
     HttpURLConnection c = null;
     URL u;
     Context context;
+    MaterialDialog dialog;
+    Boolean running;
+    int prog = 0;
     public interface callback{
         void favCall(String data, TaskType taskType);
     }
-    public RequestFav(Context con, TaskType taskType){
+
+    public RequestFav(Context con, TaskType taskType, MaterialDialog d) {
         call=(callback) con;
         this.context = con;
         this.taskType=taskType;
-
+        this.dialog = d;
     }
 
     private String getCertificateSHA1Fingerprint() {
@@ -104,6 +113,23 @@ public class RequestFav extends AsyncTask<String,String,String> {
         }
         return str.toString();
     }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        running = true;
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                Toast.makeText(context, "Se ah cancelado la carga de los favoritos", Toast.LENGTH_SHORT).show();
+                running = false;
+                cancel(true);
+                ((Activity) context).finish();
+            }
+        });
+        dialog.show();
+    }
+
     @Override
     protected String doInBackground(String... params) {
         String file_ = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
@@ -154,6 +180,12 @@ public class RequestFav extends AsyncTask<String,String,String> {
                     list.add(parser.getTit(getStringFromFile(file_loc)));
                 }
             }
+            if (!running) {
+                cancel(true);
+                break;
+            }
+            prog++;
+            dialog.setProgress(prog);
         }
         String[] favoritos=new String[list.size()];
         list.toArray(favoritos);
@@ -210,6 +242,7 @@ public class RequestFav extends AsyncTask<String,String,String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
+        dialog.dismiss();
         call.favCall(s, taskType);
     }
 }

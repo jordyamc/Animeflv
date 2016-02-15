@@ -127,11 +127,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        com.lb.material_preferences_library.custom_preferences.SwitchPreference switchPreference = (com.lb.material_preferences_library.custom_preferences.SwitchPreference) findPreference("streaming");
-        if (!isMXInstaled()) {
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("streaming", false).apply();
-            switchPreference.setChecked(false);
-        }
         getPreferenceScreen().findPreference("b_log").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -373,13 +368,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                    getPreferenceScreen().findPreference("login").setSummary("Iniciar Sesion");
                }
                break;
-           case "streaming":
-               com.lb.material_preferences_library.custom_preferences.SwitchPreference switchPreference=(com.lb.material_preferences_library.custom_preferences.SwitchPreference)findPreference("streaming");
-               if (!isMXInstaled()&&sharedPreferences.getBoolean("streaming",false)){
-                   sharedPreferences.edit().putBoolean("streaming",false).apply();
-                   switchPreference.setChecked(false);
-                   Toast.makeText(context,"MX Player no esta instalado",Toast.LENGTH_SHORT).show();
-               }
        }
     }
     public Boolean isMXInstaled(){

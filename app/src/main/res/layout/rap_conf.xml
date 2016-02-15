@@ -85,49 +85,50 @@
             </LinearLayout>
 
             <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@android:color/darker_gray" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_margin="15dp">
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:layout_margin="8dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Activar Streaming"
-                        android:textSize="20sp"
-                        android:textIsSelectable="false" />
+                        android:text="Reproductor anime"
+                        android:textSize="20sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <Spinner
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="(MX Player necesario)"
-                        android:textSize="15sp"
-                        android:textIsSelectable="false" />
-
+                        android:id="@+id/spinner_rep_vid" />
                 </LinearLayout>
-
                 <View
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_weight="1" />
 
-                <Switch
+            <LinearLayout
+                android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="8dp">
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/switch_stream_conf"
-                    android:checked="false" />
+                    android:text="Reproductor streaming"
+                    android:textSize="20sp" />
+
+                <Spinner
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/spinner_rep_stream" />
             </LinearLayout>
-        </LinearLayout>
+            </LinearLayout>
 
     </ScrollView>
 </LinearLayout>

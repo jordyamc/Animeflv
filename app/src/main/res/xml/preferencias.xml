@@ -5,7 +5,7 @@
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="notificaciones"
-            android:title="Activar Notificaciones"/>
+            android:title="Activar Notificaciones" />
         <com.lb.material_preferences_library.custom_preferences.ListPreference
             android:defaultValue="60000"
             android:key="tiempo"
@@ -14,7 +14,7 @@
             app:dialogTitle="Revisar cada:"
             app:entries="@array/minutos"
             app:entryValues="@array/min_val"
-            android:enabled="true"/>
+            android:enabled="true" />
         <com.lb.material_preferences_library.custom_preferences.ListPreference
             android:defaultValue="0"
             android:key="sonido"
@@ -23,7 +23,7 @@
             app:dialogTitle="Sonido:"
             app:entries="@array/sonidos"
             app:entryValues="@array/tipos_sonidos"
-            android:enabled="true"/>
+            android:enabled="true" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Conexiones">
         <com.lb.material_preferences_library.custom_preferences.ListPreference
@@ -45,6 +45,32 @@
             app:entries="@array/busqueda"
             app:entryValues="@array/tipos_busqueda" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="Reproductores">
+        <com.lb.material_preferences_library.custom_preferences.ListPreference
+            android:defaultValue="0"
+            android:key="t_video"
+            android:title="Anime descargado"
+            android:summary="Reproductor: %s"
+            app:dialogTitle="Reproductor"
+            app:entries="@array/players"
+            app:entryValues="@array/tipos_busqueda" />
+        <com.lb.material_preferences_library.custom_preferences.ListPreference
+            android:defaultValue="0"
+            android:key="t_streaming"
+            android:title="Streaming"
+            android:summary="Reproductor: %s"
+            app:dialogTitle="Reproductor"
+            app:entries="@array/players"
+            app:entryValues="@array/tipos_busqueda" />
+        <com.lb.material_preferences_library.custom_preferences.ListPreference
+            android:defaultValue="0"
+            android:key="t_player"
+            android:title="Reproductor Interno"
+            android:summary="Tipo: %s"
+            app:dialogTitle="Selecciona"
+            app:entries="@array/players_type"
+            app:entryValues="@array/players_ints" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="Extras">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:key="b_log"
@@ -52,17 +78,12 @@
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:key="login"
             android:title="Sincronizar Favoritos"
-            android:summary="Iniciar Sesion"/>
-        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
-            android:defaultValue="false"
-            android:key="streaming"
-            android:title="Activar Streaming"
-            android:summary="Necesita tener MX Player instalado"/>
+            android:summary="Iniciar Sesion" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="resaltar"
             android:title="Resaltar"
-            android:summary="Animes, OVAS, Peliculas nuevas, y Animes en favoritos"/>
+            android:summary="Animes, OVAS, Peliculas nuevas, y Animes en favoritos" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="autoDesc"
