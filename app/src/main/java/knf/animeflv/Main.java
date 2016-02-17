@@ -2154,6 +2154,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         IBVT.setImageResource(R.drawable.ic_ver_no);
         IBVT.setEnabled(false);
         isDesc.set(Tindex, false);
+        checkButtons(aids, numeros, eids);
         descargando = false;
         /*isDesc.add(indexT, false);
         GIBT.setScaleType(ImageView.ScaleType.FIT_END);
