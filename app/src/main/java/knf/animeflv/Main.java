@@ -311,6 +311,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     TaskType normal = TaskType.NORMAL;
     TaskType secundario = TaskType.SECUNDARIA;
     int intentos = 0;
+    boolean frun;
     private Handler handler = new Handler();
     private Runnable runnable = new Runnable() {
         @Override
@@ -2147,13 +2148,20 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     }
 
     public void CancelPreDown() {
-        isDesc.add(indexT, false);
+        GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+        GIBT.setImageResource(R.drawable.ic_get_r);
+        GIBT.setEnabled(true);
+        IBVT.setImageResource(R.drawable.ic_ver_no);
+        IBVT.setEnabled(false);
+        isDesc.set(Tindex, false);
+        descargando = false;
+        /*isDesc.add(indexT, false);
         GIBT.setScaleType(ImageView.ScaleType.FIT_END);
         GIBT.setImageResource(R.drawable.ic_get_r);
         IBsVerList.get(indexT).setImageResource(R.drawable.ic_ver_no);
         IBsVerList.get(indexT).setEnabled(false);
         descargando = false;
-        recreate();
+        recreate();*/
     }
 
     public void loadTitulos(String[] list) {
@@ -2493,6 +2501,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         web_Links.loadUrl(parser.getBaseUrl(TaskType.NORMAL, context));
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED || isF) {
             if (!isF) {
+                frun = false;
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!mediaStorage.exists()) {
                         mediaStorage.mkdirs();
@@ -2673,6 +2682,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                 }
             } else {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    frun = true;
+                    new DirGetter(context, TaskType.ACT_DIR).execute(getDirectorio());
                     getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isF", false).apply();
                     final File saveData = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/data.save");
                     if (saveData.exists()) {
@@ -2692,9 +2703,8 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                             toast("Error al restaurar");
                                             saveData.delete();
                                         } else {
-                                            ActualizarFavoritos();
+                                            new Requests(context, TaskType.GET_INICIO).execute(getInicio());
                                             getHDraw(true);
-                                            extraRules();
                                         }
                                     }
 
@@ -3035,7 +3045,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
             if (isNetworkAvailable() && !data.trim().equals("error")) {
-                String trimed = data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";"));
+                String trimed = data.trim();
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {
@@ -3044,15 +3054,26 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         Log.d("Archivo:", "Error al crear archivo");
                     }
                     if (isJSONValid(trimed)) {
-                        writeToFile(trimed, file);
-                        String urlDes = parser.getUrlCached(aids[posT], numeros[posT]);
-                        if (!urlDes.equals("null")) {
-                            new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
-                        } else {
-                            Toaster.toast("Error en servidor");
-                            recreate();
+                        try {
+                            writeToFile(trimed, file);
+                            if (!frun) {
+                                String urlDes = parser.getUrlCached(aids[posT], numeros[posT]);
+                                if (!urlDes.equals("null")) {
+                                    new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
+                                } else {
+                                    Toaster.toast("Error en servidor");
+                                    recreate();
+                                }
+                            } else {
+                                Log.d("Directorio", "Actualizado");
+                                frun = false;
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
+
                     } else {
+                        file.delete();
                         Toaster.toast("Error al actualizar directorio");
                         recreate();
                     }
@@ -3060,28 +3081,60 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     String infile = getStringFromFile(file_loc);
                     if (!infile.trim().equals(trimed)) {
                         if (isJSONValid(infile)) {
-                            writeToFile(trimed, file);
-                            Streaming = true;
-                            String urlStream = parser.getUrlCached(aids[posT], numeros[posT]);
-                            if (!urlStream.trim().equals("null")) {
-                                new Requests(this, TaskType.S_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlStream);
-                            } else {
-                                Toaster.toast("Error en servidor");
-                                recreate();
+                            try {
+                                writeToFile(trimed, file);
+                                if (!frun) {
+                                    String urlStream = parser.getUrlCached(aids[posT], numeros[posT]);
+                                    if (!urlStream.trim().equals("null")) {
+                                        new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlStream);
+                                    } else {
+                                        Toaster.toast("Error en servidor");
+                                        recreate();
+                                    }
+                                } else {
+                                    Log.d("Directorio", "Actualizado");
+                                    frun = false;
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
                         } else {
-                            Toaster.toast("Error al actualizar directorio");
-                            recreate();
+                            if (isJSONValid(trimed)) {
+                                try {
+                                    writeToFile(trimed, file);
+                                    if (!frun) {
+                                        String urlStream = parser.getUrlCached(aids[posT], numeros[posT]);
+                                        if (!urlStream.trim().equals("null")) {
+                                            new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlStream);
+                                        } else {
+                                            Toaster.toast("Error en servidor");
+                                            recreate();
+                                        }
+                                    } else {
+                                        Log.d("Directorio", "Actualizado");
+                                        frun = false;
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                Toaster.toast("Error al actualizar directorio");
+                                recreate();
+                            }
                         }
                     } else {
                         if (isJSONValid(infile)) {
-                            Streaming = true;
-                            String urlStream = parser.getUrlCached(aids[posT], numeros[posT]);
-                            if (!urlStream.trim().equals("null")) {
-                                new Requests(this, TaskType.S_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlStream);
+                            if (!frun) {
+                                String urlStream = parser.getUrlCached(aids[posT], numeros[posT]);
+                                if (!urlStream.trim().equals("null")) {
+                                    new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlStream);
+                                } else {
+                                    Toaster.toast("Error en servidor");
+                                    recreate();
+                                }
                             } else {
-                                Toaster.toast("Error en servidor");
-                                recreate();
+                                Log.d("Directorio", "Actualizado");
+                                frun = false;
                             }
                         } else {
                             Toaster.toast("Error al actualizar directorio");
@@ -3100,7 +3153,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
             if (isNetworkAvailable() && !data.trim().equals("error")) {
-                String trimed = data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";"));
+                String trimed = data.trim();
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {
@@ -3112,7 +3165,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         writeToFile(trimed, file);
                         String urlDes = parser.getUrlCached(aids[posT], numeros[posT]);
                         if (!urlDes.equals("null")) {
-                            new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
+                            new Requests(this, TaskType.S_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
                         } else {
                             Toaster.toast("Error en servidor");
                             recreate();
@@ -3128,7 +3181,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             writeToFile(trimed, file);
                             String urlDes = parser.getUrlCached(aids[posT], numeros[posT]);
                             if (!urlDes.equals("null")) {
-                                new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
+                                new Requests(this, TaskType.S_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
                             } else {
                                 Toaster.toast("Error en servidor");
                                 recreate();
@@ -3141,7 +3194,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         if (isJSONValid(infile)) {
                             String urlDes = parser.getUrlCached(aids[posT], numeros[posT]);
                             if (!urlDes.equals("null")) {
-                                new Requests(this, TaskType.D_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
+                                new Requests(this, TaskType.S_OPTIONS).execute(parser.getInicioUrl(normal, context) + "?url=" + urlDes);
                             } else {
                                 Toaster.toast("Error en servidor");
                                 recreate();
@@ -3163,7 +3216,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
             String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
             if (isNetworkAvailable() && !data.trim().equals("error")) {
-                String trimed = data.trim().substring(data.indexOf("=") + 1, data.lastIndexOf(";"));
+                String trimed = data.trim();
                 if (!file.exists()) {
                     Log.d("Archivo:", "No existe");
                     try {
@@ -3694,6 +3747,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             try {
                 new JSONArray(test);
             } catch (JSONException ex1) {
+                ex1.printStackTrace();
                 return false;
             }
         }
