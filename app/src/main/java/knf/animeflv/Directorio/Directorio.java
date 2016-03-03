@@ -1,5 +1,6 @@
 package knf.animeflv.Directorio;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -16,6 +17,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.transition.Fade;
+import android.transition.Slide;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -75,6 +78,7 @@ public class Directorio extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setUpAnimations();
         setContentView(R.layout.directorio);
         json = getJson();
         context = this;
@@ -445,6 +449,21 @@ public class Directorio extends AppCompatActivity {
         AdapterBusqueda adapterBusqueda = new AdapterBusqueda(this, titOrd, tiposOrd, links, indexOrd);*/
         AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
         recyclerView.setAdapter(adapterBusqueda);
+    }
+
+    @TargetApi(21)
+    public void setUpAnimations() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+
+            Fade fade = new Fade();
+            fade.setDuration(1000);
+            getWindow().setEnterTransition(fade);
+
+            Slide slide = new Slide();
+            slide.setDuration(1000);
+            getWindow().setReturnTransition(slide);
+        }
     }
 
     @Override

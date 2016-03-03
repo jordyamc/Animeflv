@@ -35,7 +35,10 @@ public enum TaskType {
     ACT_DIR(29),
     ACT_DIR_INFO(30),
     S_OPTIONS(31),
-    ACT_DIR_S(32);
+    ACT_DIR_S(32),
+    SORT_NORMAL(33),
+    SORT_ALPH(34),
+    SORT_NUM(35);
     int value;
 
     TaskType(int value) {

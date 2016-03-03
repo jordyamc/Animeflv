@@ -26,6 +26,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import xdroid.toaster.Toaster;
 
@@ -50,24 +52,23 @@ public class Splash extends AwesomeSplash {
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(getResources().getColor(R.color.dark));
-                getWindow().setNavigationBarColor(getResources().getColor(R.color.nmain));
-                getWindow().setStatusBarColor(getResources().getColor(R.color.nmain));
+                getWindow().setNavigationBarColor(getResources().getColor(getSplashColor()));
+                getWindow().setStatusBarColor(getResources().getColor(getSplashColor()));
             }
             //Customize Circular Reveal
-            configSplash.setBackgroundColor(R.color.nmain); //any color you want form colors.xml
+            configSplash.setBackgroundColor(getSplashColor()); //any color you want form colors.xml
             configSplash.setAnimCircularRevealDuration(500); //int ms
             configSplash.setRevealFlagX(Flags.REVEAL_RIGHT);  //or Flags.REVEAL_LEFT
             configSplash.setRevealFlagY(Flags.REVEAL_BOTTOM); //or Flags.REVEAL_TOP
 
             //Customize Logo
-            configSplash.setLogoSplash(R.drawable.splash); //or any other drawable
+            configSplash.setLogoSplash(getSplashImage()); //or any other drawable
             configSplash.setAnimLogoSplashDuration(500); //int ms
             configSplash.setAnimLogoSplashTechnique(Techniques.Bounce); //choose one form Techniques (ref: https://github.com/daimajia/AndroidViewAnimations)
 
 
             //Customize Title
-            configSplash.setTitleSplash("AnimeFLV App");
+            configSplash.setTitleSplash(getSplashText());
             configSplash.setTitleTextColor(R.color.blanco);
             configSplash.setTitleTextSize(30f); //float value
             configSplash.setAnimTitleDuration(750);
@@ -76,6 +77,91 @@ public class Splash extends AwesomeSplash {
             finish();
             startActivity(new Intent(context, Main.class));
         }
+        //getSplashImage();
+    }
+
+    public int getSplashColor() {
+        int splash;
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        String fecha = dateFormat.format(calendar.getTime());
+        String trim = fecha.substring(0, fecha.lastIndexOf("-"));
+        switch (trim) {
+            case "24-12":
+                splash = R.color.navidad;
+                break;
+            case "31-12":
+                splash = R.color.anuevo;
+                break;
+            case "01-01":
+                splash = R.color.anuevo;
+                break;
+            case "14-02":
+                splash = R.color.amor;
+                break;
+            default:
+                splash = R.color.nmain;
+                break;
+        }
+        if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("isDown", false))
+            splash = R.color.negro;
+        return splash;
+    }
+
+    public int getSplashImage() {
+        int splash;
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        String fecha = dateFormat.format(calendar.getTime());
+        String trim = fecha.substring(0, fecha.lastIndexOf("-"));
+        switch (trim) {
+            case "24-12":
+                splash = R.drawable.splash_navidad;
+                break;
+            case "31-12":
+                splash = R.drawable.splash_new_year;
+                break;
+            case "01-01":
+                splash = R.drawable.splash_new_year;
+                break;
+            case "14-02":
+                splash = R.drawable.pepe_corazon;
+                break;
+            default:
+                splash = R.drawable.splash;
+                break;
+        }
+        if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("isDown", false))
+            splash = R.drawable.no_ahora_porfavor;
+        return splash;
+    }
+
+    public String getSplashText() {
+        String text;
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        String fecha = dateFormat.format(calendar.getTime());
+        String trim = fecha.substring(0, fecha.lastIndexOf("-"));
+        switch (trim) {
+            case "24-12":
+                text = "Feliz Navidad!!!";
+                break;
+            case "31-12":
+                text = "Feliz Año Nuevo!!!";
+                break;
+            case "01-01":
+                text = "Feliz Año Nuevo!!!";
+                break;
+            case "14-02":
+                text = "( ͡° ͜ʖ ͡°)";
+                break;
+            default:
+                text = "AnimeFLV App";
+                break;
+        }
+        if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("isDown", false))
+            text = "Server Fallando";
+        return text;
     }
 
     public boolean isJSONValid(String test) {

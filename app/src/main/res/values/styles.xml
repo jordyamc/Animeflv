@@ -12,6 +12,22 @@
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
+    <style name="AppThemeNoAn" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_material_light</item>
+        <item name="colorAccent">@color/dark</item>
+        <item name="android:colorBackground">@color/background_material_light</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@android:color/holo_orange_dark</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
     </style>
 
     <style name="toolbar" parent="AppTheme">
@@ -40,5 +56,20 @@
         <item name="colorControlNormal">@color/blanco</item>
         <item name="colorControlActivated">@color/dark</item>
         <item name="colorControlHighlight">@color/dark</item>
+    </style>
+
+    <style name="Animations" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/in_animation</item>
+        <item name="android:activityOpenExitAnimation">@anim/out_animation</item>
+        <item name="android:activityCloseEnterAnimation">@android:anim/slide_in_left</item>
+        <item name="android:activityCloseExitAnimation">@android:anim/slide_out_right</item>
+    </style>
+
+    <style name="AnimationsNo" parent="@android:style/Animation.Activity">
+        <!--<item name="android:activityOpenEnterAnimation">@anim/in_animation</item>
+        <item name="android:activityOpenExitAnimation">@anim/out_animation</item>-->
+        <item name="android:activityCloseExitAnimation">@android:anim/slide_out_right</item>
+        <item name="android:activityCloseEnterAnimation">@android:anim/slide_in_left</item>
+
     </style>
 </resources>

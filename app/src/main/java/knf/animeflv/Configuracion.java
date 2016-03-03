@@ -1,5 +1,6 @@
 package knf.animeflv;
 
+import android.annotation.TargetApi;
 import android.app.FragmentTransaction;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -18,6 +19,7 @@ import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
+import android.transition.Fade;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.view.Menu;
@@ -66,7 +68,7 @@ public class Configuracion extends AppCompatActivity implements LoginServer.call
         getSupportActionBar().setTitle("Configuracion");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        final Drawable upArrow = getResources().getDrawable(R.drawable.ic_back_r);
         upArrow.setColorFilter(getResources().getColor(R.color.blanco), PorterDuff.Mode.SRC_ATOP);
         getSupportActionBar().setHomeAsUpIndicator(upArrow);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {

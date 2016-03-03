@@ -121,5 +121,9 @@
             android:defaultValue="false"
             android:key="debug"
             android:title="Debug" />
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="sd_down"
+            android:title="Descargar Anime a SD" />
     </PreferenceCategory>
 </PreferenceScreen>

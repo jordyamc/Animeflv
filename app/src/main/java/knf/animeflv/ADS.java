@@ -13,6 +13,7 @@ import com.smaato.soma.interstitial.InterstitialAdListener;
 import com.smaato.soma.video.VASTAdListener;
 import com.smaato.soma.video.Video;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -22,6 +23,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
+import android.transition.Slide;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -68,6 +71,7 @@ public class ADS extends AppCompatActivity implements InterstitialAdListener, VA
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ads);
+        setUpAnimations();
         Toaster.toast("Si aprecias esta app, considera hacerle click a algunos anuncios y/o botones :D");
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -86,7 +90,7 @@ public class ADS extends AppCompatActivity implements InterstitialAdListener, VA
         getSupportActionBar().setTitle("Publicidad");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        final Drawable upArrow = getResources().getDrawable(R.drawable.ic_back_r);
         upArrow.setColorFilter(getResources().getColor(R.color.blanco), PorterDuff.Mode.SRC_ATOP);
         getSupportActionBar().setHomeAsUpIndicator(upArrow);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -176,6 +180,21 @@ public class ADS extends AppCompatActivity implements InterstitialAdListener, VA
         ad2.asyncLoadNewBanner();
         ad3.asyncLoadNewBanner();
         ad4.asyncLoadNewBanner();
+    }
+
+    @TargetApi(21)
+    public void setUpAnimations() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+
+            Fade fade = new Fade();
+            fade.setDuration(1000);
+            getWindow().setEnterTransition(fade);
+
+            Slide slide = new Slide();
+            slide.setDuration(1000);
+            getWindow().setReturnTransition(slide);
+        }
     }
 
 

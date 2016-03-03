@@ -1,5 +1,6 @@
 package knf.animeflv.info;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,6 +20,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
+import android.transition.Fade;
+import android.transition.Slide;
 import android.transition.Transition;
 import android.util.Log;
 import android.view.Menu;
@@ -27,6 +30,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -45,6 +49,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
@@ -82,6 +87,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setUpAnimations();
         setContentView(R.layout.info);
         context = this;
         getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio", false).apply();
@@ -101,7 +107,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        final Drawable upArrow = getResources().getDrawable(R.drawable.ic_back_r);
         upArrow.setColorFilter(getResources().getColor(R.color.blanco), PorterDuff.Mode.SRC_ATOP);
         getSupportActionBar().setHomeAsUpIndicator(upArrow);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -156,6 +162,20 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
     }
     public void toast(String texto){
         Toast.makeText(this, texto, Toast.LENGTH_SHORT).show();
+    }
+
+    public void setUpAnimations() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+
+            Fade fade = new Fade();
+            fade.setDuration(1000);
+            getWindow().setEnterTransition(new Fade());
+
+            Slide slide = new Slide();
+            slide.setDuration(1000);
+            getWindow().setReturnTransition(new Slide());
+        }
     }
     public String getJson() {
         String json="";
@@ -276,11 +296,32 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
                 webView.getSettings().setJavaScriptEnabled(true);
                 String newUA= "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
                 webView.getSettings().setUserAgentString(newUA);
-                webView.loadUrl("https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=http%3A%2F%2Fanimeflv.net%2Fver%2F" + getUrl(titulo, caps.get(0).substring(caps.get(0).lastIndexOf(" ") + 1)) + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000");
+                webView.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                        view.loadUrl(url);
+                        return true;
+                    }
+                });
+                String url = "";
+                try {
+                    url = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, caps.get(0).substring(caps.get(0).lastIndexOf(" ") + 1)), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Log.d("Comentarios", url);
+                webView.loadUrl(url);
                 spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        webView.loadUrl("https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=http%3A%2F%2Fanimeflv.net%2Fver%2F" + getUrl(titulo, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1)) + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000");
+                        String urlch = "";
+                        try {
+                            urlch = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1)), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        Log.d("Comentarios", urlch);
+                        webView.loadUrl(urlch);
                     }
 
                     @Override

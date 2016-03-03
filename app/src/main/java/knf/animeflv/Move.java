@@ -39,7 +39,7 @@ public class Move extends Activity {
     public String getSD1(){
         String sSDpath = null;
         File fileCur = null;
-        for( String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard")) {
+        for (String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard", "8E84-7E70")) {
             fileCur = new File( "/mnt/", sPathCur);
             if( fileCur.isDirectory() && fileCur.canWrite()) {
                 sSDpath = fileCur.getAbsolutePath();

@@ -5,5 +5,10 @@
     <color name="blanco">#fff</color>
     <color name="rojo">#F20000</color>
     <color name="newCap">#FDFA5D</color>
+
     <color name="nmain">#FAC720</color>
+    <color name="navidad">#F20000</color>
+    <color name="anuevo">#00E5FF</color>
+    <color name="amor">#E100FF</color>
+    <color name="negro">#000</color>
 </resources>

@@ -40,6 +40,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.thin.downloadmanager.ThinDownloadManager;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -61,6 +62,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import knf.animeflv.DManager;
+import knf.animeflv.Downloader;
 import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
@@ -168,7 +171,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                     @Override
                                     public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
                                         materialDialog.dismiss();
-                                        new CheckStream(holder.web, holder.tv_capitulo, position).execute(new Parser().getUrlCached(id, item));
+                                        new CheckStream(holder.web, holder.tv_capitulo, position, holder).execute(new Parser().getUrlCached(id, item));
                                     }
                                 })
                                 .onNeutral(new MaterialDialog.SingleButtonCallback() {
@@ -214,6 +217,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                         if (l != 0) {
                                             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                                             manager.remove(l);
+                                            ThinDownloadManager downloadManager = DManager.getManager();
+                                            downloadManager.cancel((int) l);
                                             String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
                                             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eids.get(position) + ":::", "")).apply();
                                             String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
@@ -252,7 +257,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_video", "0"));
                 if (file.exists()){
                     if (type == 0) {
-                        PlayIntbySrc(file, holder.getAdapterPosition());
+                        PlayIntbySrc(file, holder.getAdapterPosition(), holder);
                     } else {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(file));
                         intent.setDataAndType(Uri.fromFile(file), "video/mp4");
@@ -261,7 +266,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 }else {
                     if (sd.exists()){
                         if (type == 0) {
-                            PlayIntbySrc(file, holder.getAdapterPosition());
+                            PlayIntbySrc(file, holder.getAdapterPosition(), holder);
                         } else {
                             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(file));
                             intent.setDataAndType(Uri.fromFile(file), "video/mp4");
@@ -370,6 +375,30 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     @Override
     public int getItemCount() {
         return capitulo.size();
+    }
+
+    public void DescargarSD(String url, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position) {
+        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
+        File f = new File(getSD1() + "/Animeflv/download/" + id, id + "_" + item + ".mp4");
+        SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+        new Downloader(context, eids.get(position), id, sharedPreferences.getString("titInfo", "Error"), item, f).execute(url);
+        ib_des.setImageResource(R.drawable.ic_borrar_r);
+        ib_ver.setImageResource(R.drawable.ic_rep_r);
+        ib_ver.setEnabled(true);
+        final String email_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
+        final String pass_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
+        Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+        if (!vistos) {
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
+            String Svistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+            Svistos = Svistos + ";;;" + "visto" + id + "_" + item;
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
+            if (!email_coded.equals("null") && !email_coded.equals("null")) {
+                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+            }
+            tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+        }
     }
 
     public void DownloadByUrl(String url, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position) {
@@ -523,7 +552,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
                                             break;
                                         default:
-                                            DownloadByUrl(ur, des, ver, cap, pos);
+                                            chooseDownDir(ur, des, ver, cap, pos);
                                             d.dismiss();
                                             break;
                                     }
@@ -554,10 +583,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     }
 
     public class CheckStream extends AsyncTask<String, String, String> {
-        public CheckStream(WebView w, TextView tv_capitulo, int position) {
+        public CheckStream(WebView w, TextView tv_capitulo, int position, RecyclerAdapter.ViewHolder holder) {
             this.cap = tv_capitulo;
             this.pos = position;
             this.web = w;
+            this.holder = holder;
         }
 
         WebView web;
@@ -565,6 +595,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         int pos;
         String _response;
         Spinner sp;
+        RecyclerAdapter.ViewHolder holder;
 
         @Override
         protected String doInBackground(String... params) {
@@ -639,7 +670,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                     Log.d("Streaming", "URL -> " + ur);
                                     switch (desc.toLowerCase()) {
                                         case "izanagi":
-                                            new IzanagiStream(cap, pos).execute(ur);
+                                            new IzanagiStream(cap, pos, holder).execute(ur);
                                             d.dismiss();
                                             break;
                                         case "zippyshare":
@@ -658,7 +689,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
                                             break;
                                         default:
-                                            StreamInbyURL(pos, ur);
+                                            StreamInbyURL(pos, ur, holder);
                                             d.dismiss();
                                             break;
                                     }
@@ -685,6 +716,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     Toast.makeText(context, "Error en JSON", Toast.LENGTH_SHORT).show();
                 }
             }
+        }
+    }
+
+    public void chooseDownDir(String url, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position) {
+        Boolean inSD = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("sd_down", false);
+        if (inSD) {
+            DescargarSD(url, ib_des, ib_ver, tv_capitulo, position);
+        } else {
+            DownloadByUrl(url, ib_des, ib_ver, tv_capitulo, position);
         }
     }
 
@@ -737,14 +777,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             String furl = s.substring(s.indexOf("URL=") + 4, s.lastIndexOf("\">"));
-            DownloadByUrl(furl, des, ver, cap, pos);
+            chooseDownDir(furl, des, ver, cap, pos);
         }
     }
 
     public class IzanagiStream extends AsyncTask<String, String, String> {
-        public IzanagiStream(TextView tv_capitulo, int position) {
+        public IzanagiStream(TextView tv_capitulo, int position, RecyclerAdapter.ViewHolder holder) {
             this.cap = tv_capitulo;
             this.pos = position;
+            this.holder = holder;
         }
 
         ImageButton des;
@@ -752,6 +793,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         TextView cap;
         int pos;
         String _response;
+        RecyclerAdapter.ViewHolder holder;
 
         @Override
         protected String doInBackground(String... params) {
@@ -788,7 +830,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             String furl = s.substring(s.indexOf("URL=") + 4, s.lastIndexOf("\">"));
-            StreamInbyURL(pos, furl);
+            StreamInbyURL(pos, furl, holder);
         }
     }
 
@@ -947,6 +989,21 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                             intent.putExtras(bundle);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             context.startActivity(intent);
+                            final String email_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
+                            final String pass_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
+                            String item = capitulo.get(holder.getAdapterPosition()).substring(capitulo.get(holder.getAdapterPosition()).lastIndexOf(" ") + 1).trim();
+                            Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+                            if (!vistos) {
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
+                                String Svistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                                Svistos = Svistos + ";;;" + "visto" + id + "_" + item;
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+                                String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
+                                if (!email_coded.equals("null") && !email_coded.equals("null")) {
+                                    new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+                                }
+                                holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+                            }
                         } else {
                             if (isMXinstalled()) {
                                 toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
@@ -1087,13 +1144,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
 
-    public void StreamInbyURL(int position, String url) {
+    public void StreamInbyURL(int position, String url, RecyclerAdapter.ViewHolder holder) {
         if (isNetworkAvailable()) {
             int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
             Log.d("Streaming", PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
             switch (type) {
                 case 0:
-                    StreamingIntbyUrl(position, url);
+                    StreamingIntbyUrl(position, url, holder);
                     break;
                 case 1:
                     StreamingExtbyURL(position, url);
@@ -1120,20 +1177,50 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
     }
 
-    public void StreamingIntbyUrl(int position, String url) {
+    public void StreamingIntbyUrl(int position, String url, RecyclerAdapter.ViewHolder holder) {
         Intent interno = parser.getPrefIntPlayer(context);
         interno.putExtra("url", url);
         interno.putExtra("title", getTit() + " " + getNum(position));
         interno.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(interno);
+        final String email_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
+        final String pass_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
+        String item = capitulo.get(holder.getAdapterPosition()).substring(capitulo.get(holder.getAdapterPosition()).lastIndexOf(" ") + 1).trim();
+        Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+        if (!vistos) {
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
+            String Svistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+            Svistos = Svistos + ";;;" + "visto" + id + "_" + item;
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
+            if (!email_coded.equals("null") && !email_coded.equals("null")) {
+                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+            }
+            holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+        }
     }
 
-    public void PlayIntbySrc(File file, int position) {
+    public void PlayIntbySrc(File file, int position, RecyclerAdapter.ViewHolder holder) {
         Intent interno = parser.getPrefIntPlayer(context);
         interno.putExtra("file", file.getAbsolutePath());
         interno.putExtra("title", getTit() + " " + getNum(position));
         interno.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(interno);
+        final String email_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
+        final String pass_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
+        String item = capitulo.get(holder.getAdapterPosition()).substring(capitulo.get(holder.getAdapterPosition()).lastIndexOf(" ") + 1).trim();
+        Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+        if (!vistos) {
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
+            String Svistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+            Svistos = Svistos + ";;;" + "visto" + id + "_" + item;
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
+            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
+            if (!email_coded.equals("null") && !email_coded.equals("null")) {
+                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
+            }
+            holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+        }
     }
 
     public void StreamMXbyURL(int position, String url) {

@@ -1,5 +1,6 @@
 package knf.animeflv;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -10,6 +11,8 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Fade;
+import android.transition.Slide;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -59,6 +62,7 @@ public class Chat extends AppCompatActivity implements LoginServer.callback {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setUpAnimations();
         setContentView(R.layout.chat);
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -84,6 +88,19 @@ public class Chat extends AppCompatActivity implements LoginServer.callback {
             } else {
                 signUp(true);
             }
+        }
+    }
+
+    @TargetApi(21)
+    public void setUpAnimations() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Fade fade = new Fade();
+            fade.setDuration(1000);
+            getWindow().setEnterTransition(fade);
+
+            Slide slide = new Slide();
+            slide.setDuration(1000);
+            getWindow().setReturnTransition(slide);
         }
     }
 

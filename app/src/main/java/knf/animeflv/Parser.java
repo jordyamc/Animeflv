@@ -458,6 +458,19 @@ public class Parser {
         return aid;
     }
 
+    public AnimeClass parseAnime(String json) {
+        String titulo = "";
+        String aid = "";
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            titulo = corregirTit(jsonObj.getString("titulo"));
+            aid = jsonObj.getString("aid");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new AnimeClass(titulo, aid, null, null, 0);
+    }
+
     public String[] parseAID(String json){
         List<String> aidsArray=new ArrayList<String>();
         String[] aids;

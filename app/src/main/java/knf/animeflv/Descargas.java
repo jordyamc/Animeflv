@@ -1,5 +1,6 @@
 package knf.animeflv;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -12,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
+import android.transition.Slide;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -27,6 +30,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import knf.animeflv.Recyclers.DownloadAdapter;
+import knf.animeflv.Recyclers.DownloadAdapterNew;
 
 
 /**
@@ -44,8 +48,9 @@ public class Descargas extends AppCompatActivity implements RequestDownload.call
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setUpAnimations();
         setContentView(R.layout.descargas);
-        context=this;
+        context = Descargas.this;
         ExceptionHandler.register(this, new Parser().getBaseUrl(TaskType.NORMAL, context) + "/errors/server.php");
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -73,7 +78,7 @@ public class Descargas extends AppCompatActivity implements RequestDownload.call
                 finish();
             }
         });
-        new Timer().scheduleAtFixedRate(new TimerTask() {
+        /*new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 String eids=getSharedPreferences("data", MODE_PRIVATE).getString("eids_descarga","");
@@ -105,12 +110,55 @@ public class Descargas extends AppCompatActivity implements RequestDownload.call
                 aids.toArray(getTit);
                 new RequestDownload(context,TaskType.CONTAR).execute(getTit);
             }
-        }, 0, 1500);
+        }, 0, 1500);*/
+        String eids = getSharedPreferences("data", MODE_PRIVATE).getString("eids_descarga", "");
+        String epID = getSharedPreferences("data", MODE_PRIVATE).getString("epIDS_descarga", "");
+        Leids = Arrays.asList(eids.split(":::"));
+        LepIDS = Arrays.asList(epID.split(":::"));
+        List<String> aids = new ArrayList<>();
+        numeros = new ArrayList<>();
+        Dids = new ArrayList<>();
+        if (LepIDS.size() != 0 && !epID.trim().equals("")) {
+            for (String ep : LepIDS) {
+                String[] array = ep.split("_");
+                aids.add(array[0]);
+                numeros.add(array[1]);
+            }
+        } else {
+            numeros.add("");
+        }
+        for (String lon : Leids) {
+            try {
+                String id = getSharedPreferences("data", MODE_PRIVATE).getString(lon, "");
+                if (!id.equals(""))
+                    Dids.add(Long.parseLong(id));
+            } catch (ClassCastException e) {
+                e.printStackTrace();
+            }
+        }
+        String[] getTit = new String[aids.size()];
+        aids.toArray(getTit);
+        new RequestDownload(context, TaskType.CONTAR).execute(getTit);
     }
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
                 >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+
+    @TargetApi(21)
+    public void setUpAnimations() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+
+            Fade fade = new Fade();
+            fade.setDuration(1000);
+            getWindow().setEnterTransition(fade);
+
+            Slide slide = new Slide();
+            slide.setDuration(1000);
+            getWindow().setReturnTransition(slide);
+        }
     }
     @Override
     public void onConfigurationChanged (Configuration newConfig)
@@ -135,7 +183,7 @@ public class Descargas extends AppCompatActivity implements RequestDownload.call
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    DownloadAdapter adapter = new DownloadAdapter(context, titulos, numeros, Dids, LepIDS, Leids);
+                    DownloadAdapterNew adapter = new DownloadAdapterNew(context, titulos, numeros, Dids, LepIDS, Leids);
                     adapter.notifyDataSetChanged();
                     recyclerView.setAdapter(adapter);
                 }
@@ -146,7 +194,7 @@ public class Descargas extends AppCompatActivity implements RequestDownload.call
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    DownloadAdapter adapter = new DownloadAdapter(context, titulosOff, numeros, Dids, LepIDS, Leids);
+                    DownloadAdapterNew adapter = new DownloadAdapterNew(context, titulosOff, numeros, Dids, LepIDS, Leids);
                     adapter.notifyDataSetChanged();
                     recyclerView.setAdapter(adapter);
                 }

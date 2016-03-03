@@ -326,7 +326,7 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                 mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
                                 mBuilder.setAutoCancel(true);
                                 mBuilder.setPriority(Notification.PRIORITY_MAX);
-                                mBuilder.setLights(Color.BLUE, 5000, 2000);
+                                mBuilder.setLights(Color.argb(0, 255, 128, 0), 5000, 2000);
                                 Intent resultIntent = new Intent(context, Main.class);
                                 PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                                 mBuilder.setContentIntent(resultPendingIntent);

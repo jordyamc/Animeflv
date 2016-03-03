@@ -1,5 +1,6 @@
 package knf.animeflv;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -10,6 +11,7 @@ import android.content.pm.Signature;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -20,8 +22,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
+import android.transition.Slide;
+import android.transition.TransitionInflater;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -33,6 +41,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
@@ -43,13 +52,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.Recyclers.AdapterFavs;
 import knf.animeflv.Recyclers.RecyclerAdapter;
 
 /**
  * Created by Jordy on 23/08/2015.
  */
-public class Favoritos extends AppCompatActivity implements RequestFav.callback, LoginServer.callback, Requests.callback {
+public class Favoritos extends AppCompatActivity implements RequestFav.callback, LoginServer.callback, Requests.callback, RequestFavSort.callback {
     RecyclerView recyclerView;
     Toolbar toolbar;
     Toolbar ltoolbar;
@@ -63,6 +73,8 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     Parser parser = new Parser();
     MaterialDialog dialog;
     RequestFav favo;
+    Boolean sorted = false;
+    Boolean paused = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,23 +156,32 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         if (aids.size()==0){
             Toast.makeText(context,"No hay favoritos",Toast.LENGTH_LONG).show();
         }else {
-            recyclerView.setHasFixedSize(true);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            dialog = new MaterialDialog.Builder(context)
-                    .content("Actualizando Favoritos")
-                    .progress(false, favoritos.length, true)
-                    .cancelable(true)
-                    .cancelListener(new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            //Toast.makeText(context,"Se ah cancelado la carga de los favoritos",Toast.LENGTH_SHORT).show();
-                            finish();
-                            favo.cancel(true);
-                        }
-                    })
-                    .build();
-            favo = new RequestFav(this, TaskType.GET_INFO, dialog);
-            favo.execute(favoritos);
+            if (!paused) {
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setLayoutManager(new LinearLayoutManager(this));
+                dialog = new MaterialDialog.Builder(context)
+                        .content("Actualizando Favoritos")
+                        .progress(false, favoritos.length, true)
+                        .cancelable(true)
+                        .cancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                //Toast.makeText(context,"Se ah cancelado la carga de los favoritos",Toast.LENGTH_SHORT).show();
+                                finish();
+                                favo.cancel(true);
+                            }
+                        })
+                        .build();
+                favo = new RequestFav(this, TaskType.SORT_NORMAL, dialog);
+                favo.execute(favoritos);
+            } else {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        init();
+                    }
+                }, 1000);
+            }
         }
     }
     private boolean isNetworkAvailable() {
@@ -239,7 +260,9 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
 
     @Override
     public void response(String data, TaskType taskType) {
-
+        if (taskType == TaskType.UPDATE) {
+            sorted = false;
+        }
     }
 
     public boolean isJSONValid(String test) {
@@ -263,13 +286,13 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                 String visto = parser.getUserVistos(data.trim());
                 if (visto.equals("")) {
                     String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
-                    if (!favs.equals(favoritos)) {
+                    if (!favs.equals(favoritos) && sorted) {
                         getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).commit();
                         init();
                     }
                 } else {
                     String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
-                    if (!favs.equals(favoritos)) {
+                    if (!favs.equals(favoritos) && !sorted) {
                         getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).commit();
                         init();
                     }
@@ -294,6 +317,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     protected void onResume() {
         super.onResume();
         if(shouldExecuteOnResume){
+            paused = false;
             Boolean cambiado = getSharedPreferences("data", MODE_PRIVATE).getBoolean("cambio_fav", false);
             if (cambiado) {
                 init();
@@ -301,6 +325,14 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             }
         } else{
             shouldExecuteOnResume = true;
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (shouldExecuteOnResume) {
+            paused = true;
         }
     }
 
@@ -353,5 +385,87 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             if (i < (arr.length - 1)) str.append(':');
         }
         return str.toString();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_sort_fav, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+        fav = sharedPreferences.getString("favoritos", "");
+        String[] sem = fav.split(":::");
+        Log.d("favoritos", fav);
+        aids = new ArrayList<>();
+        for (String i : sem) {
+            if (!i.equals("")) {
+                aids.add(i);
+            }
+        }
+        favoritos = new String[aids.size()];
+        aids.toArray(favoritos);
+        switch (item.getItemId()) {
+            case R.id.sort_alph:
+                new RequestFavSort(context, TaskType.SORT_ALPH).execute(favoritos);
+                break;
+            case R.id.sort_num:
+                new RequestFavSort(context, TaskType.SORT_NUM).execute(favoritos);
+                break;
+        }
+        return true;
+    }
+
+    public void savefavs(List<String> favs) {
+        sorted = true;
+        String fin = "";
+        for (String aid : favs) {
+            fin = fin + ":::" + aid;
+        }
+        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", fin).apply();
+        final String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
+        final String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
+        String Svistos = getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+        if (!email_coded.equals("null") && !email_coded.equals("null")) {
+            new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + fin + ":;:" + Svistos);
+            new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute(parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + fin + ":;:" + Svistos);
+        }
+    }
+
+    @Override
+    public void favCallSort(List<AnimeClass> list, TaskType taskType) {
+        if (taskType == TaskType.SORT_ALPH) {
+            List<AnimeClass> alph = list;
+            Collections.sort(alph, new AnimeCompare());
+            List<String> links = new ArrayList<>();
+            List<String> aids = new ArrayList<>();
+            List<String> titulos = new ArrayList<>();
+            for (AnimeClass an : alph) {
+                titulos.add(an.getNombre());
+                aids.add(an.getAid());
+                links.add("http://cdn.animeflv.net/img/portada/thumb_80/" + an.getAid() + ".jpg");
+            }
+            AdapterFavs adapter = new AdapterFavs(context, titulos, aids, links);
+            recyclerView.setAdapter(adapter);
+            savefavs(aids);
+        }
+
+        if (taskType == TaskType.SORT_NUM) {
+            List<AnimeClass> num = list;
+            Collections.sort(num, new AnimeAidCompare());
+            List<String> links = new ArrayList<>();
+            List<String> aids = new ArrayList<>();
+            List<String> titulos = new ArrayList<>();
+            for (AnimeClass an : num) {
+                titulos.add(an.getNombre());
+                aids.add(an.getAid());
+                links.add("http://cdn.animeflv.net/img/portada/thumb_80/" + an.getAid() + ".jpg");
+            }
+            AdapterFavs adapter = new AdapterFavs(context, titulos, aids, links);
+            recyclerView.setAdapter(adapter);
+            savefavs(aids);
+        }
     }
 }

@@ -169,7 +169,11 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         });
         if (getSD1()==null){
             getPreferenceScreen().findPreference("b_move").setEnabled(false);
+            getPreferenceScreen().findPreference("sd_down").setEnabled(false);
             getPreferenceScreen().findPreference("b_move").setSummary("Tarjeta SD no encontrada");
+        } else {
+            getPreferenceScreen().findPreference("sd_down").setEnabled(true);
+            getPreferenceScreen().findPreference("b_move").setEnabled(true);
         }
         getPreferenceScreen().findPreference("b_move").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -368,6 +372,14 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                    getPreferenceScreen().findPreference("login").setSummary("Iniciar Sesion");
                }
                break;
+           case "sd_down":
+               if (sharedPreferences.getBoolean(key, false)) {
+                   if (getSD1() == null) {
+                       getPreferenceScreen().findPreference(key).setEnabled(false);
+                       sharedPreferences.edit().putBoolean(key, false);
+                   }
+               }
+               break;
        }
     }
     public Boolean isMXInstaled(){
@@ -510,7 +522,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     public String getSD1(){
         String sSDpath = null;
         File   fileCur = null;
-        for( String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard")) {
+        for (String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard", "8E84-7E70")) {
             fileCur = new File( "/mnt/", sPathCur);
             if( fileCur.isDirectory() && fileCur.canWrite()) {
                 sSDpath = fileCur.getAbsolutePath();

@@ -36,6 +36,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
+import android.transition.Slide;
+import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -110,13 +113,17 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.info.Info;
 import pl.droidsonroids.gif.GifImageButton;
 import xdroid.toaster.Toaster;
 
-public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, Requests.callback, CheckVideo.callback, LoginServer.callback, DirGetter.callback {
+public class Main extends AppCompatActivity implements
+        SwipeRefreshLayout.OnRefreshListener,
+        Requests.callback,
+        CheckVideo.callback,
+        LoginServer.callback,
+        DirGetter.callback {
     public Boolean tbool;
     WebView web;
     WebView web_Links;
@@ -388,7 +395,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         setContentView(R.layout.anime_inicio);
         context = this;
         parser.refreshUrls(this);
-        //new JSONCreatorAsync(JSONType.INICIO).execute("");
         extraRules();
         String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         ExceptionHandler.register(this, parser.getBaseUrl(normal, this) + "errors/server.php?id=" + androidID);
@@ -404,7 +410,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             alarm.SetAlarm(this);
         }
         first = 1;
-        if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait
+        if (!isXLargeScreen(getApplicationContext())) { //Portrait
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -477,10 +483,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                         new PrimaryDrawerItem().withName("Recientes").withIcon(FontAwesome.Icon.faw_home).withIdentifier(0),
                         new PrimaryDrawerItem().withName("Favoritos").withIcon(GoogleMaterial.Icon.gmd_star).withIdentifier(1),
                         new PrimaryDrawerItem().withName("Directorio").withIcon(GoogleMaterial.Icon.gmd_library_books).withIdentifier(2),
-                        new PrimaryDrawerItem().withName("Descargas").withIcon(GoogleMaterial.Icon.gmd_file_download).withIdentifier(3),
+                        //new PrimaryDrawerItem().withName("Descargas").withIcon(GoogleMaterial.Icon.gmd_file_download).withIdentifier(3),
                         new PrimaryDrawerItem().withName("Sugerencias").withIcon(GoogleMaterial.Icon.gmd_assignment).withIdentifier(4),
                         new PrimaryDrawerItem().withName("Pagina Oficial").withIcon(FontAwesome.Icon.faw_facebook_f).withIdentifier(5),
-                        new PrimaryDrawerItem().withName("Chat").withIcon(GoogleMaterial.Icon.gmd_message).withIdentifier(6),
+                        //new PrimaryDrawerItem().withName("Chat").withIcon(GoogleMaterial.Icon.gmd_message).withIdentifier(6),
                         new PrimaryDrawerItem().withName("Web Oficial").withIcon(GoogleMaterial.Icon.gmd_web).withIdentifier(7),
                         new PrimaryDrawerItem().withName("Publicidad").withIcon(GoogleMaterial.Icon.gmd_cloud).withIdentifier(8)
                 )
@@ -846,7 +852,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
     public String getSD1() {
         String sSDpath = null;
         File fileCur = null;
-        for (String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard")) {
+        for (String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard", "8E84-7E70")) {
             fileCur = new File("/mnt/", sPathCur);
             if (fileCur.isDirectory() && fileCur.canWrite()) {
                 sSDpath = fileCur.getAbsolutePath();
@@ -965,6 +971,29 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         }
     }
 
+    public void DescargarSD(int position, String downUrl) {
+        if (isNetworkAvailable()) {
+            Log.d("DURL", downUrl);
+            checkBan(APP);
+            File f = new File(/*Environment.getExternalStorageDirectory()*/ getSD1() + "/Animeflv/download/" + aids[position], aids[position] + "_" + numeros[position] + ".mp4");
+            new Downloader(context, eidT, aids[position], titulos[position], numeros[position], f).execute(downUrl);
+            GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+            GIBT.setImageResource(R.drawable.ic_borrar_r);
+            GIBT.setEnabled(true);
+            IBVT.setImageResource(R.drawable.ic_rep_r);
+            IBVT.setEnabled(true);
+            descargando = false;
+        } else {
+            toast("No hay conexion a internet");
+            GIBT.setScaleType(ImageView.ScaleType.FIT_END);
+            GIBT.setImageResource(R.drawable.ic_get_r);
+            GIBT.setEnabled(true);
+            IBVT.setImageResource(R.drawable.ic_ver_no);
+            IBVT.setEnabled(false);
+            descargando = false;
+        }
+    }
+
     public void DescargarInbyURL(int position, String downUrl) {
         if (isNetworkAvailable()) {
             File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aids[position]);
@@ -973,6 +1002,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                     if (!Dstorage.mkdirs()) toast("Error al crear carpeta");
                 }
             }
+
             try {
                 checkBan(APP);
                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downUrl));
@@ -1149,6 +1179,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         interno.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(interno);
         CancelPreDown();
+        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aids[position] + "_" + numeros[position], true).apply();
+        String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+        if (!vistosad.contains(eids[position].trim())) {
+            vistosad = vistosad + eids[position].trim() + ":::";
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
+        }
     }
 
     public void PlayIntbySrc(File file, int position) {
@@ -1157,6 +1193,12 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         interno.putExtra("title", titulos[position] + " " + numeros[position]);
         interno.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(interno);
+        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aids[position] + "_" + numeros[position], true).apply();
+        String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+        if (!vistosad.contains(eids[position].trim())) {
+            vistosad = vistosad + eids[position].trim() + ":::";
+            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
+        }
     }
 
     public void StreamMXbyURL(int position, String url) {
@@ -1265,14 +1307,20 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                     IBsVerList.get(index).setEnabled(false);
                                     long l = Long.parseLong(getSharedPreferences("data", MODE_PRIVATE).getString(eids[index], "0"));
                                     if (l != 0) {
-                                        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                                        manager.remove(l);
-                                        String descargados = getSharedPreferences("data", MODE_PRIVATE).getString("eids_descarga", "");
-                                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eids[index] + ":::", "")).apply();
-                                        String tits = getSharedPreferences("data", MODE_PRIVATE).getString("titulos_descarga", "");
-                                        String epID = getSharedPreferences("data", MODE_PRIVATE).getString("epIDS_descarga", "");
-                                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("titulos_descarga", tits.replace(titulos[index] + ":::", "")).apply();
-                                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(aids[index] + "_" + numeros[index] + ":::", "")).apply();
+                                        try {
+                                            DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                                            manager.remove(l);
+                                            ThinDownloadManager downloadManager = DManager.getManager();
+                                            downloadManager.cancel((int) l);
+                                            String descargados = getSharedPreferences("data", MODE_PRIVATE).getString("eids_descarga", "");
+                                            getSharedPreferences("data", MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eids[index] + ":::", "")).apply();
+                                            String tits = getSharedPreferences("data", MODE_PRIVATE).getString("titulos_descarga", "");
+                                            String epID = getSharedPreferences("data", MODE_PRIVATE).getString("epIDS_descarga", "");
+                                            getSharedPreferences("data", MODE_PRIVATE).edit().putString("titulos_descarga", tits.replace(titulos[index] + ":::", "")).apply();
+                                            getSharedPreferences("data", MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(aids[index] + "_" + numeros[index] + ":::", "")).apply();
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                     toast("Archivo Eliminado");
                                 }
@@ -2156,13 +2204,6 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         isDesc.set(Tindex, false);
         checkButtons(aids, numeros, eids);
         descargando = false;
-        /*isDesc.add(indexT, false);
-        GIBT.setScaleType(ImageView.ScaleType.FIT_END);
-        GIBT.setImageResource(R.drawable.ic_get_r);
-        IBsVerList.get(indexT).setImageResource(R.drawable.ic_ver_no);
-        IBsVerList.get(indexT).setEnabled(false);
-        descargando = false;
-        recreate();*/
     }
 
     public void loadTitulos(String[] list) {
@@ -2524,9 +2565,11 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             if (parser.checkStatus(data) == 1) {
                                 web.loadUrl("http://animeflv.net");
                                 textoff.setText("SERVIDOR DESACTUALIZADO");
+                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", true).apply();
                                 textoff.setVisibility(View.VISIBLE);
                             } else {
                                 textoff.setVisibility(View.GONE);
+                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
                             }
                             getData(data);
                             getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true);
@@ -2542,8 +2585,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         web.loadUrl("http://animeflv.net");
                                         textoff.setText("SERVIDOR DESACTUALIZADO");
                                         textoff.setVisibility(View.VISIBLE);
+                                        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", true).apply();
                                     } else {
                                         textoff.setVisibility(View.GONE);
+                                        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
                                     }
                                     getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true);
                                     getData(data);
@@ -2554,8 +2599,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         web.loadUrl("http://animeflv.net");
                                         textoff.setText("SERVIDOR DESACTUALIZADO");
                                         textoff.setVisibility(View.VISIBLE);
+                                        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", true).apply();
                                     } else {
                                         textoff.setVisibility(View.GONE);
+                                        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
                                     }
                                     getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true);
                                     getData(infile);
@@ -2600,8 +2647,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                         web.loadUrl("http://animeflv.net");
                                         textoff.setText("SERVIDOR DESACTUALIZADO");
                                         textoff.setVisibility(View.VISIBLE);
+                                        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", true).apply();
                                     } else {
                                         textoff.setVisibility(View.GONE);
+                                        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
                                     }
                                     getData(infile);
                                 } else {
@@ -2648,8 +2697,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                 if (parser.checkStatus(data) == 1) {
                                     textoff.setText("SERVIDOR DESACTUALIZADO");
                                     textoff.setVisibility(View.VISIBLE);
+                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", true).apply();
                                 } else {
                                     textoff.setVisibility(View.GONE);
+                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
                                 }
                                 if (isJSONValid(infile)) {
                                     getData(infile);
@@ -2667,8 +2718,10 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                             if (parser.checkStatus(data) == 1) {
                                 textoff.setText("SERVIDOR DESACTUALIZADO");
                                 textoff.setVisibility(View.VISIBLE);
+                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", true).apply();
                             } else {
                                 textoff.setVisibility(View.GONE);
+                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
                             }
                             if (isJSONValid(infile)) {
                                 getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true);
@@ -2934,6 +2987,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
             e.printStackTrace();
         }
     }
+
 
     private boolean isNetworkAvailable() {
         Boolean net = false;
@@ -3452,7 +3506,7 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
                                             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
                                             break;
                                         default:
-                                            DescargarInbyURL(posT, ur);
+                                            chooseDownDir(posT, ur);
                                             d.dismiss();
                                             break;
                                     }
@@ -4018,7 +4072,16 @@ public class Main extends AppCompatActivity implements SwipeRefreshLayout.OnRefr
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             String furl = s.substring(s.indexOf("URL=") + 4, s.lastIndexOf("\">"));
-            DescargarInbyURL(posT, furl);
+            chooseDownDir(posT, furl);
+        }
+    }
+
+    public void chooseDownDir(int position, String url) {
+        Boolean inSD = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
+        if (inSD) {
+            DescargarSD(position, url);
+        } else {
+            DescargarInbyURL(position, url);
         }
     }
 
