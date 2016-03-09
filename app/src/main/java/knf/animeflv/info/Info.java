@@ -1,7 +1,5 @@
 package knf.animeflv.info;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -15,14 +13,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Explode;
-import android.transition.Fade;
-import android.transition.Slide;
-import android.transition.Transition;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -61,7 +54,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import knf.animeflv.LoginServer;
-import knf.animeflv.Main;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Requests;
@@ -87,7 +79,6 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setUpAnimations();
         setContentView(R.layout.info);
         context = this;
         getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio", false).apply();
@@ -132,13 +123,10 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
             Log.d("Archivo", "Existe");
             String infile = getStringFromFile(file_loc);
             SharedPreferences.Editor editor=getSharedPreferences("data",MODE_PRIVATE).edit();
-            editor.putString("titInfo",parser.getTit(infile)).commit();
+            editor.putString("titInfo", parser.getTit(infile)).apply();
             getSupportActionBar().setTitle(parser.getTit(infile));
             titulo=parser.getTit(infile);
             id=parser.getAID(infile);
-        }else {
-            String servidor = PreferenceManager.getDefaultSharedPreferences(this).getString("servidor", "http://animeflv.net/api.php?accion=");
-            new Requests(this, TaskType.GET_INFO).execute(new Parser().getInicioUrl(TaskType.NORMAL, this) + "?url=" + link);
         }
         Bundle bundle=new Bundle();
         bundle.putString("aid", getIntent().getExtras().getString("aid", "1"));
@@ -152,30 +140,9 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
         viewPager.setAdapter(adapter);
         SmartTabLayout viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab1);
         viewPagerTab.setViewPager(viewPager);
-        final String email_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
-        final String pass_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
-        String Svistos=getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-        String favoritos=getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
-        if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-            //new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
-        }
     }
     public void toast(String texto){
         Toast.makeText(this, texto, Toast.LENGTH_SHORT).show();
-    }
-
-    public void setUpAnimations() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
-
-            Fade fade = new Fade();
-            fade.setDuration(1000);
-            getWindow().setEnterTransition(new Fade());
-
-            Slide slide = new Slide();
-            slide.setDuration(1000);
-            getWindow().setReturnTransition(new Slide());
-        }
     }
     public String getJson() {
         String json="";
@@ -199,7 +166,6 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
         String fav=sharedPreferences.getString("favoritos", "");
         String[] favoritos={};
         favoritos=fav.split(":::");
-        String tit=getSharedPreferences("data", MODE_PRIVATE).getString("titInfo","");
         Boolean isfav=false;
         for (String favo:favoritos){
             if (!favo.equals("")) {

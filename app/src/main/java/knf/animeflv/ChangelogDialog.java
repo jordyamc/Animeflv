@@ -1,6 +1,7 @@
 package knf.animeflv;
 
 import android.app.Dialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.InflateException;
@@ -9,7 +10,6 @@ import android.view.View;
 import android.webkit.WebView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.Theme;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -50,6 +50,7 @@ public class ChangelogDialog extends DialogFragment {
                 buf.append(str);
             in.close();
             //webView.loadData(buf.toString(), "text/html", "UTF-8");
+            webView.setBackgroundColor(Color.TRANSPARENT);
             webView.loadUrl("file:///android_asset/log.html");
         } catch (Throwable e) {
             webView.loadData("<h1>Unable to load</h1><p>" + e.getLocalizedMessage() + "</p>", "text/html", "UTF-8");

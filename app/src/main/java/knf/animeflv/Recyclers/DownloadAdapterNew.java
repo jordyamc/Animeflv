@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import knf.animeflv.Descargas;
 import knf.animeflv.R;
 
 /**

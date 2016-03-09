@@ -46,6 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Titulo:"
+            android:id="@+id/info_titles1"
             android:padding="3dp"
             android:maxLines="1" />
             <TextView
@@ -68,6 +69,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tipo:"
+                android:id="@+id/info_titles2"
                 android:padding="3dp"
                 android:maxLines="1" />
             <TextView
@@ -90,6 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Estado:"
+                android:id="@+id/info_titles3"
                 android:padding="3dp"
                 android:maxLines="1" />
             <TextView
@@ -112,6 +115,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Generos:"
+                android:id="@+id/info_titles4"
                 android:padding="3dp"
                 android:maxLines="1" />
             <TextView
@@ -138,6 +142,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="AID:"
+                android:id="@+id/info_titles5"
                 android:padding="3dp"
                 android:maxLines="1" />
 

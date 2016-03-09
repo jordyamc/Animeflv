@@ -6,8 +6,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -35,7 +37,7 @@ import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
-import knf.animeflv.info.RelActInfo;
+import knf.animeflv.info.InfoNew;
 
 /**
  * Created by Jordy on 22/08/2015.
@@ -75,6 +77,10 @@ public class AdapterFavs extends RecyclerView.Adapter<AdapterFavs.ViewHolder> {
 
     @Override
     public void onBindViewHolder(AdapterFavs.ViewHolder holder, final int position) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
+            holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
+            holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
+        }
         PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + links.get(position)).error(R.drawable.ic_block_r).into(holder.iv_rel);
         holder.tv_tit.setText(titulosCard.get(position));
         holder.card.setOnClickListener(new View.OnClickListener() {
@@ -90,7 +96,7 @@ public class AdapterFavs extends RecyclerView.Adapter<AdapterFavs.ViewHolder> {
                 } else {
                     bundle.putString("link", getUrlInfo(titulosCard.get(position), new Parser().getTipoAnime(json)));
                 }
-                Intent intent=new Intent(context,RelActInfo.class);
+                Intent intent = new Intent(context, InfoNew.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtras(bundle);
                 SharedPreferences.Editor sharedPreferences=context.getSharedPreferences("data",Context.MODE_PRIVATE).edit();

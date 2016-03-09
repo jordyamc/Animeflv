@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="prim">#212121</color>
-    <color name="dark">#ff454545</color>
+    <color name="dark">#454545</color>
     <color name="blanco">#fff</color>
     <color name="rojo">#F20000</color>
     <color name="newCap">#FDFA5D</color>
+
+    <color name="rojo_sub">#910707</color>
 
     <color name="nmain">#FAC720</color>
     <color name="navidad">#F20000</color>

@@ -1,17 +1,14 @@
 package knf.animeflv;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.util.Log;
-import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,6 +33,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Directorio.AnimeClass;
 
 /**
@@ -119,46 +117,28 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
     protected List<AnimeClass> doInBackground(String... params) {
         String file_ = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
         String dir = getStringFromFile(file_);
-        List<AnimeClass> list = new ArrayList<AnimeClass>();
-        for (String i : params) {
-            File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
+        final List<AnimeClass> list = new ArrayList<AnimeClass>();
+        for (final String i : params) {
+            final File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
             if (!file.exists() || !isJSONValid(getStringFromFile(file.getPath()))) {
-                try {
-                    //Log.d("aid", i);
-                    u = new URL(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlFavs(dir, i) + "&certificate=" + getCertificateSHA1Fingerprint());
-                    c = (HttpURLConnection) u.openConnection();
-                    c.setRequestProperty("Content-length", "0");
-                    c.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");
-                    c.setUseCaches(false);
-                    c.setAllowUserInteraction(false);
-                    c.setConnectTimeout(15000);
-                    c.connect();
-                    BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-                    //c.disconnect();
-                    StringBuilder sb = new StringBuilder();
-                    String line = "";
-                    while ((line = br.readLine()) != null) {
-                        sb.append(line + "\n");
+                new AsyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(i) + "&certificate=" + getCertificateSHA1Fingerprint(), null, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        super.onSuccess(statusCode, headers, response);
+                        writeToFile(response.toString(), file);
+                        list.add(new AnimeClass(response.toString()));
                     }
-                    br.close();
-                    if (c.getURL() == u) {
-                        writeToFile(sb.toString(), file);
-                        list.add(new AnimeClass(sb.toString()));
-                    } else {
-                        if (c.getURL().toString().trim().startsWith("http://animeflv")) {
-                            writeToFile(sb.toString(), file);
-                            list.add(new AnimeClass(sb.toString()));
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                        File file1 = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
+                        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt";
+                        if (file1.exists()) {
+                            list.add(new AnimeClass(getStringFromFile(file_loc)));
                         }
                     }
-                } catch (Exception e) {
-                    Log.e("log_tag", "Error in http connection " + e.toString());
-                    File file1 = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
-                    String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt";
-                    if (file1.exists()) {
-                        list.add(new AnimeClass(getStringFromFile(file_loc)));
-                    }
-                    //list.add("");
-                }
+                });
             } else {
                 String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt";
                 if (file.exists()) {

@@ -1,6 +1,5 @@
 package knf.animeflv;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -11,11 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by Jordy on 02/02/2016.

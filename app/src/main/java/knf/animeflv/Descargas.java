@@ -1,12 +1,9 @@
 package knf.animeflv;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,21 +12,16 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
 import android.transition.Slide;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.nullwire.trace.ExceptionHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import knf.animeflv.Recyclers.DownloadAdapter;
 import knf.animeflv.Recyclers.DownloadAdapterNew;
 
 

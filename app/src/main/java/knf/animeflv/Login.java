@@ -2,17 +2,15 @@ package knf.animeflv;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.text.InputType;
 import android.util.Log;
-import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -20,7 +18,16 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.ResponseHandlerInterface;
+import com.loopj.android.http.SyncHttpClient;
 
+import java.io.IOException;
+import java.net.URI;
+
+import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpResponse;
 import se.simbio.encryption.Encryption;
 
 /**
@@ -111,6 +118,38 @@ public class Login extends DialogFragment{
                     izquierda = (Button) dialog.getCustomView().findViewById(R.id.boton_iz);
                     cCorreo = (Button)dialog.getCustomView().findViewById(R.id.cCorreo);
                     cPass = (Button)dialog.getCustomView().findViewById(R.id.cCont);
+
+        if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("is_amoled", false)) {
+            login_email.setTextColor(getResources().getColor(R.color.blanco));
+            login_contrasena.setTextColor(getResources().getColor(R.color.blanco));
+            rcontrasena.setTextColor(getResources().getColor(R.color.blanco));
+            email.setTextColor(getResources().getColor(R.color.blanco));
+            cPass_email.setTextColor(getResources().getColor(R.color.blanco));
+            cPass_contrasena.setTextColor(getResources().getColor(R.color.blanco));
+            cPass_ncontrasena.setTextColor(getResources().getColor(R.color.blanco));
+            cPass_rncontrasena.setTextColor(getResources().getColor(R.color.blanco));
+            cCorreo_email.setTextColor(getResources().getColor(R.color.blanco));
+            cCorreo_contrasena.setTextColor(getResources().getColor(R.color.blanco));
+            cCorreo_nemail.setTextColor(getResources().getColor(R.color.blanco));
+            contrasena.setTextColor(getResources().getColor(R.color.blanco));
+
+            login_email.setHintTextColor(getResources().getColor(R.color.rojo_sub));
+            login_contrasena.setHintTextColor(getResources().getColor(R.color.rojo_sub));
+            rcontrasena.setHintTextColor(getResources().getColor(R.color.rojo_sub));
+            email.setHintTextColor(getResources().getColor(R.color.rojo_sub));
+            cPass_email.setHintTextColor(getResources().getColor(R.color.rojo_sub));
+            cPass_contrasena.setHintTextColor(getResources().getColor(R.color.rojo_sub));
+            cPass_ncontrasena.setHintTextColor(getResources().getColor(R.color.rojo_sub));
+            cPass_rncontrasena.setHintTextColor(getResources().getColor(R.color.rojo_sub));
+            cCorreo_email.setHintTextColor(getResources().getColor(R.color.rojo_sub));
+            cCorreo_contrasena.setHintTextColor(getResources().getColor(R.color.rojo_sub));
+            cCorreo_nemail.setHintTextColor(getResources().getColor(R.color.rojo_sub));
+            contrasena.setHintTextColor(getResources().getColor(R.color.rojo_sub));
+
+            izquierda.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            derecha.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+        }
+
                     String actCuenta=PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("login_email","null");
                     dialogo=0;
                     if (actCuenta.equals("null")){
@@ -131,7 +170,8 @@ public class Login extends DialogFragment{
                         @Override
                         public void onClick(View v) {
                             dialogo=2;
-                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, getActivity()) + "fav-server.php?tipo=list");
+                            //new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, getActivity()) + "fav-server.php?tipo=list");
+                            new getList(getActivity()).execute();
                             main.setVisibility(View.GONE);
                             loginPage.setVisibility(View.VISIBLE);
                             izquierda.setText("ATRAS");
@@ -143,7 +183,8 @@ public class Login extends DialogFragment{
                     nuevo.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, getActivity()) + "fav-server.php?tipo=list");
+                            //new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, getActivity()) + "fav-server.php?tipo=list");
+                            new getList(getActivity()).execute();
                             main.setVisibility(View.GONE);
                             nCuenta.setVisibility(View.VISIBLE);
                             derecha.setText("CREAR");
@@ -156,7 +197,8 @@ public class Login extends DialogFragment{
                     cCorreo.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, getActivity()) + "fav-server.php?tipo=list");
+                            //new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, getActivity()) + "fav-server.php?tipo=list");
+                            new getList(getActivity()).execute();
                             main.setVisibility(View.GONE);
                             cCorreoPage.setVisibility(View.VISIBLE);
                             derecha.setText("CAMBIAR");
@@ -171,7 +213,8 @@ public class Login extends DialogFragment{
                     cPass.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, getActivity()) + "fav-server.php?tipo=list");
+                            //new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, getActivity()) + "fav-server.php?tipo=list");
+                            new getList(getActivity()).execute();
                             main.setVisibility(View.GONE);
                             cPassPage.setVisibility(View.VISIBLE);
                             derecha.setText("CAMBIAR");
@@ -297,7 +340,8 @@ public class Login extends DialogFragment{
                         }else {
                             Toast.makeText(getActivity(),"El correo ya esta registrado",Toast.LENGTH_SHORT).show();
                             dialogo=2;
-                            new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, getActivity()) + "fav-server.php?tipo=list");
+                            //new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, getActivity()) + "fav-server.php?tipo=list");
+                            new getList(getActivity()).execute();
                             nCuenta.setVisibility(View.GONE);
                             loginPage.setVisibility(View.VISIBLE);
                             izquierda.setText("ATRAS");
@@ -559,6 +603,37 @@ public class Login extends DialogFragment{
                 dialog.dismiss();
                 Toast.makeText(getActivity(),"Contraseña Cambiada!!",Toast.LENGTH_SHORT).show();
                 break;
+        }
+    }
+
+    public class getList extends AsyncTask<String, String, String> {
+        Context context;
+        Parser parser = new Parser();
+
+        public getList(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            new SyncHttpClient().get(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=list" + "&certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                    super.onSuccess(statusCode, headers, responseString);
+                    String format = responseString.replace("../user_favs/", "").replace(".txt", "");
+                    SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                    defsharedPreferences.edit().putString("lista", format).apply();
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    super.onFailure(statusCode, headers, responseString, throwable);
+                    String format = responseString.replace("../user_favs/", "").replace(".txt", "");
+                    SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                    defsharedPreferences.edit().putString("lista", format).apply();
+                }
+            });
+            return null;
         }
     }
 

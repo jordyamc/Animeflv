@@ -9,8 +9,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -19,16 +17,15 @@ import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.MediaController;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import knf.animeflv.playerSources.*;
-
 import java.util.HashMap;
+
+import knf.animeflv.playerSources.ResizeSurfaceView;
+import knf.animeflv.playerSources.VideoControllerView;
 
 
 public class Player extends AppCompatActivity implements VideoControllerView.MediaPlayerControlListener, SurfaceHolder.Callback, MediaPlayer.OnVideoSizeChangedListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {

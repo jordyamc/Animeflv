@@ -1,9 +1,8 @@
 package knf.animeflv.info;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,20 +37,20 @@ public class InfoCap extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.info_capitulos,container,false);
+        if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("is_amoled", false)) {
+            view.setBackgroundColor(getResources().getColor(android.R.color.black));
+        }
         rvAnimes = (RecyclerView) view.findViewById(R.id.rv_caps);
         rvAnimes.setHasFixedSize(true);
         rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
-        SharedPreferences sharedPreferences=getActivity().getSharedPreferences("data",Context.MODE_PRIVATE);
-        String aid=sharedPreferences.getString("aid", "");
+        String aid = getActivity().getIntent().getExtras().getString("aid");
         RecyclerAdapter adapter = new RecyclerAdapter(getActivity(), parser.parseNumerobyEID(getJson()),aid,parser.parseEidsbyEID(getJson()));
         rvAnimes.setAdapter(adapter);
 
         return view;
     }
     public String getJson(){
-        SharedPreferences sharedPreferences=getActivity().getSharedPreferences("data",Context.MODE_PRIVATE);
-        String aid=sharedPreferences.getString("aid", "");
-        Log.d("Cap Aid",aid);
+        String aid = getActivity().getIntent().getExtras().getString("aid");
         String json="";
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {

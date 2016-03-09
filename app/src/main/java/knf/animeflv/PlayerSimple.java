@@ -11,16 +11,13 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.VideoView;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 @TargetApi(21)

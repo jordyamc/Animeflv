@@ -3,17 +3,9 @@ package knf.animeflv.Directorio;
 /**
  * Created by Jordy on 30/08/2015.
  */
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,16 +20,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import knf.animeflv.AnimeCompare;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
-import knf.animeflv.Recyclers.AdapterDirAnime;
 import knf.animeflv.Recyclers.AdapterDirAnimeNew;
-import knf.animeflv.Recyclers.RecyclerAdapter;
 
 public class Animes extends Fragment{
     public Animes(){}
@@ -57,23 +46,6 @@ public class Animes extends Fragment{
         int genero=getActivity().getSharedPreferences("data",Context.MODE_PRIVATE).getInt("genero",0);
         List<AnimeClass> animes = parser.DirAnimes(json);
         Collections.sort(animes, new AnimeCompare());
-        /*List<String> titulosAnime = parser.DirTitulosAnimeA(json, genero);
-        List<String> indexes = parser.DirIntsAnimeA(json, genero);
-        List<String> titOrdAnime = parser.DirTitulosAnimeA(json, genero);
-        List<String> indexOrd=new ArrayList<String>();
-        List<String> links=new ArrayList<String>();
-        Collections.sort(titOrdAnime, String.CASE_INSENSITIVE_ORDER);
-        for (String s:titOrdAnime){
-            String index=indexes.get(titulosAnime.indexOf(s));
-            indexOrd.add(index);
-            String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + index + ".jpg";
-            links.add(link);
-        }
-        /*for (String i:indexOrd){
-            String link="http://cdn.animeflv.net/img/portada/thumb_80/"+i+".jpg";
-            links.add(link);
-        }*/
-        //AdapterDirAnime adapter = new AdapterDirAnime(getActivity().getApplicationContext(), titOrdAnime, indexOrd, links, json);
         AdapterDirAnimeNew adapter = new AdapterDirAnimeNew(getActivity().getApplicationContext(), animes);
         rvAnimes.setAdapter(adapter);
         return view;

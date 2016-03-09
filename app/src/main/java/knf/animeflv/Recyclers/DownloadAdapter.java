@@ -3,13 +3,9 @@ package knf.animeflv.Recyclers;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -28,11 +24,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Handler;
 
-import knf.animeflv.DManager;
-import knf.animeflv.Descargas;
 import knf.animeflv.R;
 
 /**

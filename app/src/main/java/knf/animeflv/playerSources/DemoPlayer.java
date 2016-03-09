@@ -1,5 +1,10 @@
 package knf.animeflv.playerSources;
 
+import android.media.MediaCodec.CryptoException;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.Surface;
+
 import com.google.android.exoplayer.CodecCounters;
 import com.google.android.exoplayer.DummyTrackRenderer;
 import com.google.android.exoplayer.ExoPlaybackException;
@@ -24,11 +29,6 @@ import com.google.android.exoplayer.upstream.BandwidthMeter;
 import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer.util.DebugTextViewHelper;
 import com.google.android.exoplayer.util.PlayerControl;
-
-import android.media.MediaCodec.CryptoException;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.Surface;
 
 import java.io.IOException;
 import java.util.Collections;

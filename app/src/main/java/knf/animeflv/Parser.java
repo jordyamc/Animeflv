@@ -2,6 +2,9 @@ package knf.animeflv;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -13,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -21,6 +25,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -489,6 +499,54 @@ public class Parser {
             aidsArray.toArray(aids);
         }
         return aids;
+    }
+
+    public List<String> parseEstado(String json) {
+        List<String> aidsArray = new ArrayList<String>();
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("lista");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject childJSONObject = jsonArray.getJSONObject(i);
+                String eid = childJSONObject.getString("estado");
+                aidsArray.add(eid);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return aidsArray;
+    }
+
+    public List<String> parseDayCode(String json) {
+        List<String> aidsArray = new ArrayList<String>();
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("lista");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject childJSONObject = jsonArray.getJSONObject(i);
+                String eid = childJSONObject.getString("daycode");
+                aidsArray.add(eid);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return aidsArray;
+    }
+
+    public List<String> parseHour(String json) {
+        List<String> aidsArray = new ArrayList<String>();
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("lista");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject childJSONObject = jsonArray.getJSONObject(i);
+                String eid = childJSONObject.getString("hour");
+                aidsArray.add(eid);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return aidsArray;
     }
     public List<String> DirTitulosAnime(String json,int genero){
         List<String> linkArray=new ArrayList<String>();
@@ -1633,6 +1691,78 @@ public class Parser {
         return ret;
     }
 
+    public String getCertificateSHA1Fingerprint(Context context) {
+        PackageManager pm = context.getPackageManager();
+        String packageName = context.getPackageName();
+        int flags = PackageManager.GET_SIGNATURES;
+        PackageInfo packageInfo = null;
+        try {
+            packageInfo = pm.getPackageInfo(packageName, flags);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        Signature[] signatures = packageInfo.signatures;
+        byte[] cert = signatures[0].toByteArray();
+        InputStream input = new ByteArrayInputStream(cert);
+        CertificateFactory cf = null;
+        try {
+            cf = CertificateFactory.getInstance("X509");
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        }
+        X509Certificate c = null;
+        try {
+            c = (X509Certificate) cf.generateCertificate(input);
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        }
+        String hexString = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA1");
+            byte[] publicKey = md.digest(c.getEncoded());
+            hexString = byte2HexFormatted(publicKey);
+        } catch (NoSuchAlgorithmException e1) {
+            e1.printStackTrace();
+        } catch (CertificateEncodingException e) {
+            e.printStackTrace();
+        }
+        return hexString;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
+
+    public String getTitCached(String aid) {
+        String ret = "null";
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONArray jsonArray = new JSONArray(getStringFromFile(file_loc));
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject nombreJ = jsonArray.getJSONObject(i);
+                    String n = nombreJ.getString("a");
+                    if (n.trim().equals(aid)) {
+                        return corregirTit(nombreJ.getString("b"));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return corregirTit(ret);
+    }
+
     public boolean isJSONValid(String test) {
         try {
             new JSONObject(test);
@@ -1731,6 +1861,34 @@ public class Parser {
                 break;
         }
         return intent;
+    }
+
+    public String getSD1() {
+        String sSDpath = null;
+        File fileCur = null;
+        for (String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard", "8E84-7E70")) {
+            fileCur = new File("/mnt/", sPathCur);
+            if (fileCur.isDirectory() && fileCur.canWrite()) {
+                sSDpath = fileCur.getAbsolutePath();
+                break;
+            }
+            if (sSDpath == null) {
+                fileCur = new File("/storage/", sPathCur);
+                if (fileCur.isDirectory() && fileCur.canWrite()) {
+                    sSDpath = fileCur.getAbsolutePath();
+                    break;
+                }
+            }
+            if (sSDpath == null) {
+                fileCur = new File("/storage/emulated", sPathCur);
+                if (fileCur.isDirectory() && fileCur.canWrite()) {
+                    sSDpath = fileCur.getAbsolutePath();
+                    Log.e("path", sSDpath);
+                    break;
+                }
+            }
+        }
+        return sSDpath;
     }
 
     public void saveBackup(Context context) {

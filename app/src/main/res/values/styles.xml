@@ -15,6 +15,45 @@
         <item name="android:windowAnimationStyle">@style/Animations</item>
     </style>
 
+    <style name="AppThemeDarkNo" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:colorForeground">@color/foreground_material_light</item>
+        <item name="colorAccent">@android:color/holo_red_dark</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@android:color/holo_red_dark</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    </style>
+
+    <style name="AppThemeDark" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_material_light</item>
+        <item name="colorAccent">@android:color/holo_red_dark</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@android:color/holo_red_dark</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
     <style name="AppThemeNoAn" parent="MaterialDrawerTheme.Light.DarkToolbar">
         <item name="colorPrimary">@color/prim</item>
         <item name="colorPrimaryDark">@color/dark</item>
@@ -48,6 +87,12 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
     <style name="CustomSearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <item name="queryBackground">@color/prim</item>
+        <item name="searchIcon">@drawable/ic_buscar</item>
+        <item name="closeIcon">@drawable/ic_exit_r</item>
+    </style>
+
+    <style name="CustomSearchViewStyleDark" parent="Widget.AppCompat.SearchView">
         <item name="queryBackground">@color/prim</item>
         <item name="searchIcon">@drawable/ic_buscar</item>
         <item name="closeIcon">@drawable/ic_exit_r</item>

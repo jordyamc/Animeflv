@@ -4,31 +4,22 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.media.MediaPlayer;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Environment;
-import android.os.Handler;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.SwitchPreference;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.GravityEnum;
@@ -41,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -183,16 +175,33 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                         .setFilterByStatus(DownloadManager.STATUS_PAUSED
                                 | DownloadManager.STATUS_RUNNING));
                     if (getSD1()!=null) {
-                        //try {MoveFiles();} catch (IOException e) {Toast.makeText(context, "Error " + e.getMessage(), Toast.LENGTH_LONG).show();}
-                        Toast.makeText(context, "No descargues ni reproduzcas anime hasta que la operacion se complete (No hay problema con Streaming))", Toast.LENGTH_LONG).show();
-                        new MoveFiles(context).execute();
-                        //context.startActivity(new Intent(context,Move.class));
+                        if (count() > 0) {
+                            new MoveFiles(context, myContext).execute();
+                        } else {
+                            Toast.makeText(context, "No hay archivos para mover", Toast.LENGTH_LONG).show();
+                        }
                     } else {
                         Toast.makeText(context, "No se detecta tarjeta SD", Toast.LENGTH_LONG).show();
                     }
                 return false;
             }
         });
+    }
+
+    private int count() {
+        int count = 0;
+        File f = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download");
+        File[] files = f.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    if (file.list() != null) {
+                        count += file.list().length;
+                    }
+                }
+            }
+        }
+        return count;
     }
     public long getcachesize(){
         long size = 0;
@@ -379,6 +388,9 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                        sharedPreferences.edit().putBoolean(key, false);
                    }
                }
+               break;
+           case "is_amoled":
+               getActivity().recreate();
                break;
        }
     }

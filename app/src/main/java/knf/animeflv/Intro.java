@@ -2,8 +2,6 @@ package knf.animeflv;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Toast;
 
 import com.github.paolorotolo.appintro.AppIntro2;
 import com.github.paolorotolo.appintro.AppIntroFragment;

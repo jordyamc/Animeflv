@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center">
+
+    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cardRel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        card_view:cardCornerRadius="5dp"
+        card_view:cardElevation="4dp"
+        card_view:cardBackgroundColor="@android:color/white"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:layout_marginTop="3dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="3dp"
+        android:layout_marginLeft="10dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/emision_normal"
+                android:visibility="visible">
+
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:id="@+id/imgCardEmision"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_block_r" />
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:weightSum="2"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Titulo"
+                        android:id="@+id/tv_emision_tit"
+                        android:background="@android:color/transparent"
+                        android:lines="1"
+                        android:scrollHorizontally="true"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:layout_weight="1"
+                        android:textColor="#4d4d4d" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="N Capitulo"
+                        android:id="@+id/tv_emision_time"
+                        android:background="@android:color/transparent"
+                        android:lines="1"
+                        android:maxLines="1"
+                        android:layout_weight="1"
+                        android:textColor="#7d7d7d" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/emision_null"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:weightSum="2"
+                    android:gravity="center_vertical"
+                    android:padding="10dp"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No hay Animes"
+                        android:id="@+id/emision_no"
+                        android:layout_gravity="center"
+                        android:background="@android:color/transparent"
+                        android:lines="1"
+                        android:scrollHorizontally="true"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:layout_weight="1"
+                        android:textColor="#4d4d4d"
+                        android:textSize="15sp"
+                        android:padding="10dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

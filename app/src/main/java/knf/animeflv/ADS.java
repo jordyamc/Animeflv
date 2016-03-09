@@ -1,18 +1,5 @@
 package knf.animeflv;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
-import com.smaato.soma.AdDimension;
-import com.smaato.soma.BannerView;
-import com.smaato.soma.debug.Debugger;
-import com.smaato.soma.interstitial.Interstitial;
-import com.smaato.soma.interstitial.InterstitialAdListener;
-import com.smaato.soma.video.VASTAdListener;
-import com.smaato.soma.video.Video;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -21,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
@@ -32,8 +20,14 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+
+import com.smaato.soma.AdDimension;
+import com.smaato.soma.BannerView;
+import com.smaato.soma.debug.Debugger;
+import com.smaato.soma.interstitial.Interstitial;
+import com.smaato.soma.interstitial.InterstitialAdListener;
+import com.smaato.soma.video.VASTAdListener;
+import com.smaato.soma.video.Video;
 
 import xdroid.toaster.Toaster;
 
@@ -69,9 +63,11 @@ public class ADS extends AppCompatActivity implements InterstitialAdListener, VA
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+            setTheme(R.style.AppThemeDark);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ads);
-        setUpAnimations();
         Toaster.toast("Si aprecias esta app, considera hacerle click a algunos anuncios y/o botones :D");
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -86,6 +82,17 @@ public class ADS extends AppCompatActivity implements InterstitialAdListener, VA
             getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
         }
         toolbar = (Toolbar) findViewById(R.id.toolbar_ads);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+            toolbar.setBackgroundColor(getResources().getColor(android.R.color.black));
+            toolbar.getRootView().setBackgroundColor(getResources().getColor(android.R.color.black));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(getResources().getColor(R.color.negro));
+                getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
+            }
+        }
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Publicidad");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -120,6 +127,11 @@ public class ADS extends AppCompatActivity implements InterstitialAdListener, VA
                 showInterstitial3();
             }
         });
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+            inter_ad1.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            inter_ad2.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            inter_ad3.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+        }
 
         ad1_id = 130070017;
         ad2_id = 130070020;

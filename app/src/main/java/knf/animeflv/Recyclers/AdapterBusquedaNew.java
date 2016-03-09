@@ -6,8 +6,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -36,7 +38,7 @@ import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
-import knf.animeflv.info.RelActInfo;
+import knf.animeflv.info.InfoNew;
 
 /**
  * Created by Jordy on 17/08/2015.
@@ -78,6 +80,11 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
     @Override
     public void onBindViewHolder(final AdapterBusquedaNew.ViewHolder holder, final int position) {
         restartViews(holder);
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
+            holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
+            holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
+            holder.tv_tipo.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
+        }
         PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + Animes.get(holder.getAdapterPosition()).getImagen()).error(R.drawable.ic_block_r).into(holder.iv_rel);
         holder.tv_tit.setText(Animes.get(holder.getAdapterPosition()).getNombre());
         holder.tv_tipo.setText(Animes.get(holder.getAdapterPosition()).getTipo());
@@ -90,7 +97,7 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
                     Bundle bundle = new Bundle();
                     bundle.putString("aid", Animes.get(holder.getAdapterPosition()).getAid());
                     bundle.putString("link", new Parser().getUrlFavs(json, Animes.get(holder.getAdapterPosition()).getAid()));
-                    Intent intent = new Intent(context, RelActInfo.class);
+                    Intent intent = new Intent(context, InfoNew.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtras(bundle);
                     SharedPreferences.Editor sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();

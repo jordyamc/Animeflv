@@ -1,8 +1,5 @@
 package knf.animeflv;
 
-/**
- * Created by Jordy on 11/08/2015.
- */
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -10,21 +7,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 public class Alarm extends BroadcastReceiver {
     @Override
-    public void onReceive(Context context, Intent intent)
-    {
+    public void onReceive(Context context, Intent intent) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
         wl.acquire();
+        String url = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("dir_inicio", "http://animeflvapps.x10.mx/getHtml.php");//new Parser().getInicioUrl(TaskType.NORMAL, context);
         Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones",true);
         if (not) {
             Log.d("Service", "Servicio Iniciado");
-            String servidor = PreferenceManager.getDefaultSharedPreferences(context).getString("servidor", "http://animeflv.net/api.php?accion=");
-            new RequestsBackground(context, TaskType.NOT).execute(new Parser().getInicioUrl(TaskType.NORMAL, context));
+            new RequestsBackground(context, TaskType.NOT).execute(url);
             new RequestsBackground(context,TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
         }else {Log.d("Service", "Servicio Desactivado");}
         wl.release();

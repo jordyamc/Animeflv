@@ -8,16 +8,14 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -38,10 +36,7 @@ import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
-import knf.animeflv.WebDescarga;
-import knf.animeflv.info.AnimeInfo;
-import knf.animeflv.info.Info;
-import knf.animeflv.info.RelActInfo;
+import knf.animeflv.info.InfoNew;
 
 /**
  * Created by Jordy on 17/08/2015.
@@ -85,6 +80,11 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
 
     @Override
     public void onBindViewHolder(AdapterRel.ViewHolder holder, final int position) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
+            holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
+            holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
+            holder.tv_tipo.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
+        }
         PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[position]).error(R.drawable.ic_block_r).into(holder.iv_rel);
         holder.tv_tit.setText(titulosCard.get(position));
         holder.tv_tipo.setText(tiposCard.get(position));
@@ -97,7 +97,7 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
                 Bundle bundle=new Bundle();
                 bundle.putString("aid", aids[position]);
                 bundle.putString("link", link);
-                Intent intent=new Intent(context,RelActInfo.class);
+                Intent intent = new Intent(context, InfoNew.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtras(bundle);
                 SharedPreferences.Editor sharedPreferences=context.getSharedPreferences("data",Context.MODE_PRIVATE).edit();

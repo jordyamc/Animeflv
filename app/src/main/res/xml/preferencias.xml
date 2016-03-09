@@ -35,6 +35,12 @@
             app:entries="@array/tipos"
             app:entryValues="@array/tipos_val" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="Colores">
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="is_amoled"
+            android:title="Modo AMOLED" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="Busqueda">
         <com.lb.material_preferences_library.custom_preferences.ListPreference
             android:defaultValue="0"
@@ -115,15 +121,15 @@
             android:defaultValue="0"
             android:key="b_move"
             android:title="Mover videos a SD" />
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="sd_down"
+            android:title="Descargar Anime a SD" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Experimental">
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="debug"
             android:title="Debug" />
-        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
-            android:defaultValue="false"
-            android:key="sd_down"
-            android:title="Descargar Anime a SD" />
     </PreferenceCategory>
 </PreferenceScreen>

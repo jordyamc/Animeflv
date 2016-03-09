@@ -1,15 +1,14 @@
 package knf.animeflv.Recyclers;
 
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.Signature;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -32,7 +31,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,7 +38,6 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.thin.downloadmanager.ThinDownloadManager;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -62,8 +59,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import knf.animeflv.DManager;
-import knf.animeflv.Downloader;
+import knf.animeflv.DownloadManager.CookieConstructor;
+import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
@@ -127,6 +124,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     @Override
     public void onBindViewHolder(final RecyclerAdapter.ViewHolder holder, final int position) {
         SetUpWeb(holder.web, holder);
+
         final String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
         final File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+id+"/"+id+"_"+item+".mp4");
         final File sd=new File(getSD1() + "/Animeflv/download/"+id+"/"+id+"_"+item+".mp4");
@@ -141,6 +139,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         holder.tv_capitulo.setText(capitulo.get(position));
         Boolean vistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getBoolean("visto"+id + "_" + item, false);
         holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
+            holder.card.setCardBackgroundColor(Color.parseColor("#212121"));
+            holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.blanco));
+            holder.ib_ver.setColorFilter(Color.argb(255, 255, 255, 255));
+            holder.ib_des.setColorFilter(Color.argb(255, 255, 255, 255));
+        }
         if (vistos){
             holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
         }
@@ -197,35 +201,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                     if (file.delete()) {
                                         holder.ib_des.setImageResource(R.drawable.ic_get_r);
                                         holder.ib_ver.setImageResource(R.drawable.ic_ver_no);
-                                        long l = Long.parseLong(context.getSharedPreferences("data", Context.MODE_PRIVATE).getString(eids.get(position), "0"));
-                                        if (l != 0) {
-                                            DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-                                            manager.remove(l);
-                                            String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
-                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eids.get(position) + ":::", "")).apply();
-                                            String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
-                                            String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
-                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("titulos_descarga", tits.replace(id + ":::", "")).apply();
-                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(id + "_" + item + ":::", "")).apply();
-                                        }
+                                        ManageDownload.cancel(context, eids.get(position));
                                         Toast.makeText(context, "Archivo Eliminado", Toast.LENGTH_SHORT).show();
                                     }
                                     if (sd.delete()) {
                                         holder.ib_des.setImageResource(R.drawable.ic_get_r);
                                         holder.ib_ver.setImageResource(R.drawable.ic_ver_no);
-                                        long l = Long.parseLong(context.getSharedPreferences("data", Context.MODE_PRIVATE).getString(eids.get(position), "0"));
-                                        if (l != 0) {
-                                            DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-                                            manager.remove(l);
-                                            ThinDownloadManager downloadManager = DManager.getManager();
-                                            downloadManager.cancel((int) l);
-                                            String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
-                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados.replace(eids.get(position) + ":::", "")).apply();
-                                            String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
-                                            String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
-                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("titulos_descarga", tits.replace(id + ":::", "")).apply();
-                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID.replace(id + "_" + item + ":::", "")).apply();
-                                        }
+                                        ManageDownload.cancel(context, eids.get(position));
                                         Toast.makeText(context, "Archivo Eliminado", Toast.LENGTH_SHORT).show();
                                     }
                                 }
@@ -239,16 +221,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                             .build();
                     borrar.show();
                 }
-                /*String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
-                SharedPreferences sharedPreferences=context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                String titulo=sharedPreferences.getString("titInfo","Error");
-                String url=getUrl(titulo, item);
-                Intent intent=new Intent(context,WebDescarga.class);
-                Bundle bundle=new Bundle();
-                bundle.putString("url",url);
-                intent.putExtras(bundle);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);*/
             }
         });
         holder.ib_ver.setOnClickListener(new View.OnClickListener() {
@@ -308,40 +280,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             }
         });
     }
-    public String getUrl(String titulo,String capitulo){
-        String ftitulo="";
-        String atitulo=titulo.toLowerCase();
-        atitulo=atitulo.replace("*","-");
-        atitulo=atitulo.replace(":","");
-        atitulo=atitulo.replace(",","");
-        atitulo=atitulo.replace(" \u2606 ","-");
-        atitulo=atitulo.replace("\u2606","-");
-        atitulo=atitulo.replace("  ","-");
-        atitulo=atitulo.replace("@","a");
-        atitulo=atitulo.replace("/","-");
-        atitulo=atitulo.replace(".","");
-        for (int x=0; x < atitulo.length(); x++) {
-            if (atitulo.charAt(x) != ' ') {
-                ftitulo += atitulo.charAt(x);
-            }else {
-                if (atitulo.charAt(x) == ' ') {
-                    ftitulo += "-";
-                }
-            }
-        }
-        ftitulo=ftitulo.replace("!!!","-3");
-        ftitulo=ftitulo.replace("!", "");
-        ftitulo=ftitulo.replace("°", "");
-        ftitulo=ftitulo.replace("&deg;", "");
-        ftitulo=ftitulo.replace("(","");
-        ftitulo=ftitulo.replace(")","");
-        ftitulo=ftitulo.replace("2nd-season","2");
-        ftitulo=ftitulo.replace("'","");
-        if (ftitulo.trim().equals("gintama")){ftitulo=ftitulo+"-2015";}
-        if (ftitulo.trim().equals("miss-monochrome-the-animation-2")){ftitulo="miss-monochrome-the-animation-2nd-season";}
-        String link="http://animeflv.com/ver/"+ftitulo+"-"+capitulo+".html";
-        return link;
-    }
     public String getSD1(){
         String sSDpath = null;
         File   fileCur = null;
@@ -378,69 +316,49 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     }
 
     public void DescargarSD(String url, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position) {
-        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
-        File f = new File(getSD1() + "/Animeflv/download/" + id, id + "_" + item + ".mp4");
-        SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-        new Downloader(context, eids.get(position), id, sharedPreferences.getString("titInfo", "Error"), item, f).execute(url);
+        ManageDownload.external(context).startDownload(eids.get(position), url);
         ib_des.setImageResource(R.drawable.ic_borrar_r);
         ib_ver.setImageResource(R.drawable.ic_rep_r);
         ib_ver.setEnabled(true);
-        final String email_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
-        final String pass_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
+        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
         Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
         if (!vistos) {
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
-            String Svistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-            Svistos = Svistos + ";;;" + "visto" + id + "_" + item;
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-            if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
-            }
+            tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+        }
+    }
+
+    public void DescargarSD(String url, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position, CookieConstructor constructor) {
+        ManageDownload.external(context).startDownload(eids.get(position), url, constructor);
+        ib_des.setImageResource(R.drawable.ic_borrar_r);
+        ib_ver.setImageResource(R.drawable.ic_rep_r);
+        ib_ver.setEnabled(true);
+        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
+        Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+        if (!vistos) {
             tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
         }
     }
 
     public void DownloadByUrl(String url, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position) {
-        final String email_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
-        final String pass_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
-        File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + id);
-        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-            if (!Dstorage.exists()) {
-                Dstorage.mkdirs();
-            }
-        }
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
-        SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-        String titulo = sharedPreferences.getString("titInfo", "Error");
-        request.setTitle(titulo);
-        request.setDescription("Capitulo " + item);
-        request.setMimeType("video/mp4");
-        request.setDestinationInExternalPublicDir("Animeflv/download/" + id, id + "_" + item + ".mp4");
-        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        long l = manager.enqueue(request);
-        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eids.get(position), Long.toString(l)).apply();
-        String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
-        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados + eids.get(position) + ":::").apply();
-        String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
-        String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
-        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("titulos_descarga", tits + id + ":::").apply();
-        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID + id + "_" + item + ":::").apply();
+        ManageDownload.internal(context).startDownload(eids.get(position), url);
         ib_des.setImageResource(R.drawable.ic_borrar_r);
         ib_ver.setImageResource(R.drawable.ic_rep_r);
         ib_ver.setEnabled(true);
+        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
         Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
         if (!vistos) {
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
-            String Svistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-            Svistos = Svistos + ";;;" + "visto" + id + "_" + item;
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-            if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
-            }
+            tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
+        }
+    }
+
+    public void DownloadByUrl(String url, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position, CookieConstructor constructor) {
+        ManageDownload.internal(context).startDownload(eids.get(position), url, constructor);
+        ib_des.setImageResource(R.drawable.ic_borrar_r);
+        ib_ver.setImageResource(R.drawable.ic_rep_r);
+        ib_ver.setEnabled(true);
+        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
+        Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+        if (!vistos) {
             tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
         }
     }
@@ -466,7 +384,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         protected String doInBackground(String... params) {
             HttpURLConnection c = null;
             try {
-                URL u = new URL(new Parser().getBaseUrl(TaskType.NORMAL, context) + "getHtml.php?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + params[0]);
+                URL u = new URL(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + params[0]);
                 Log.d("URL", u.toString());
                 c = (HttpURLConnection) u.openConnection();
                 c.setRequestProperty("Content-length", "0");
@@ -601,7 +519,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         protected String doInBackground(String... params) {
             HttpURLConnection c = null;
             try {
-                URL u = new URL(new Parser().getBaseUrl(TaskType.NORMAL, context) + "getHtml.php?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + params[0]);
+                URL u = new URL(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + params[0]);
                 Log.d("URL", u.toString());
                 c = (HttpURLConnection) u.openConnection();
                 c.setRequestProperty("Content-length", "0");
@@ -725,6 +643,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             DescargarSD(url, ib_des, ib_ver, tv_capitulo, position);
         } else {
             DownloadByUrl(url, ib_des, ib_ver, tv_capitulo, position);
+        }
+    }
+
+    public void chooseDownDir(String url, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position, CookieConstructor constructor) {
+        Boolean inSD = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("sd_down", false);
+        if (inSD) {
+            DescargarSD(url, ib_des, ib_ver, tv_capitulo, position, constructor);
+        } else {
+            DownloadByUrl(url, ib_des, ib_ver, tv_capitulo, position, constructor);
         }
     }
 
@@ -870,47 +797,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     }
                     File archivo = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")) + "/" + fileName);
                     if (!archivo.exists()) {
-                        final String email_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
-                        final String pass_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
                         String item = capitulo.get(holder.getAdapterPosition()).substring(capitulo.get(holder.getAdapterPosition()).lastIndexOf(" ") + 1).trim();
                         String urlD = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("urlD", null);
                         CookieManager cookieManager = CookieManager.getInstance();
                         String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
-                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                        SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                        String titulo = sharedPreferences.getString("titInfo", "Error");
-                        request.setTitle(titulo);
-                        request.setDescription("Capitulo " + item);
-                        request.addRequestHeader("cookie", cookie);
-                        request.addRequestHeader("User-Agent", web.getSettings().getUserAgentString());
-                        request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
-                        request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
-                        request.addRequestHeader("Referer", urlD);
-                        request.setMimeType("video/mp4");
-                        request.setDestinationInExternalPublicDir("Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")), fileName);
-                        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-                        long l = manager.enqueue(request);
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eids.get(holder.getAdapterPosition()), Long.toString(l)).apply();
-                        String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("eids_descarga", descargados + eids.get(holder.getAdapterPosition()) + ":::").apply();
-                        String tits = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titulos_descarga", "");
-                        String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("titulos_descarga", tits + id + ":::").apply();
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID + id + "_" + item + ":::").apply();
-                        holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
-                        holder.ib_ver.setImageResource(R.drawable.ic_rep_r);
-                        holder.ib_ver.setEnabled(true);
+                        CookieConstructor constructor = new CookieConstructor(cookie, web.getSettings().getUserAgentString(), urlD);
+                        chooseDownDir(url, holder.ib_des, holder.ib_ver, holder.tv_capitulo, holder.getAdapterPosition(), constructor);
                         Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
                         if (!vistos) {
-                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
-                            String Svistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                            Svistos = Svistos + ";;;" + "visto" + id + "_" + item;
-                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                            if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                                new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
-                            }
                             holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                         }
                     } else {

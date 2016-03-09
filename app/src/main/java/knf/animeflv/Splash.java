@@ -6,7 +6,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -14,6 +13,8 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.daimajia.androidanimations.library.Techniques;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.viksaa.sssplash.lib.activity.AwesomeSplash;
 import com.viksaa.sssplash.lib.cnst.Flags;
 import com.viksaa.sssplash.lib.model.ConfigSplash;
@@ -22,14 +23,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import xdroid.toaster.Toaster;
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Jordy on 05/12/2015.
@@ -179,7 +176,47 @@ public class Splash extends AwesomeSplash {
 
     @Override
     public void animationsFinished() {
-        new back(context, TaskType.ACT_LIKNS).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/links.html");
+        //new back(context, TaskType.ACT_LIKNS).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/links.html");
+        AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+        asyncHttpClient.setConnectTimeout(2000);
+        asyncHttpClient.get("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/links.html", null, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                actlinks(response.toString());
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                super.onSuccess(statusCode, headers, response);
+                actlinks(response.toString());
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                super.onSuccess(statusCode, headers, responseString);
+                actlinks(responseString);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                actlinks("error");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                actlinks("error");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                actlinks("error");
+            }
+        });
     }
 
     @Override
@@ -219,181 +256,27 @@ public class Splash extends AwesomeSplash {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && net;
     }
-    public class back extends AsyncTask<String, String, String> {
-        Context context;
-        TaskType taskType;
-        String _response = "";
 
-        public back(Context c, TaskType t) {
-            this.context = c;
-            this.taskType = t;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            StringBuilder builder = new StringBuilder();
-            HttpURLConnection c = null;
-            String link1 = "";
-            String link2 = "";
-            if (taskType == TaskType.ACT_LIKNS) {
-                try {
-                    String cookies = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("cookies", "");
-                    URL u = new URL(params[0]);
-                    c = (HttpURLConnection) u.openConnection();
-                    c.setRequestProperty("Content-length", "0");
-                    c.setRequestProperty("User-Agent", "Mozilla/5.0 ( compatible ) ");
-                    c.setRequestProperty("Accept", "*/*");
-                    c.setRequestProperty("Cookie", cookies.trim().substring(0, cookies.indexOf(";") + 1));
-                    c.setUseCaches(false);
-                    c.setConnectTimeout(3000);
-                    c.setAllowUserInteraction(false);
-                    c.connect();
-                    BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-                    StringBuilder sb = new StringBuilder();
-                    String line = "";
-                    while ((line = br.readLine()) != null) {
-                        sb.append(line + "\n");
-                    }
-                    br.close();
-                    if (!c.getURL().toString().contains("fav-server"))
-                        if (c.getURL() != u) {
-                            if (!c.getURL().toString().trim().startsWith("http://animeflv")) {
-                                _response = "error";
-                            } else {
-                                if (!c.getURL().toString().contains("fav-server"))
-                                    if (c.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                                        _response = sb.toString();
-                                    } else {
-                                        _response = "error";
-                                    }
-                            }
-                        } else {
-                            if (!c.getURL().toString().contains("fav-server"))
-                                if (c.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                                    _response = sb.toString();
-                                } else {
-                                    _response = "error";
-                                }
-                        }
-                } catch (Exception e) {
-                    _response = "error";
-                }
-            } else {
-                for (int i = 0; i < 2; i++) {
-                    try {
-                        String cookies = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("cookies", "");
-                        URL u = new URL(params[i]);
-                        c = (HttpURLConnection) u.openConnection();
-                        c.setRequestProperty("Content-length", "0");
-                        c.setRequestProperty("User-Agent", "Mozilla/5.0 ( compatible ) ");
-                        c.setRequestProperty("Accept", "*/*");
-                        c.setRequestProperty("Cookie", cookies.trim().substring(0, cookies.indexOf(";") + 1));
-                        c.setUseCaches(false);
-                        c.setConnectTimeout(3000);
-                        c.setAllowUserInteraction(false);
-                        c.connect();
-                        BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-                        StringBuilder sb = new StringBuilder();
-                        String line = "";
-                        while ((line = br.readLine()) != null) {
-                            sb.append(line + "\n");
-                        }
-                        br.close();
-                        if (c.getURL() != u) {
-                            switch (i) {
-                                case 0:
-                                    link1 = "error";
-                                    break;
-                                case 1:
-                                    link2 = "error";
-                                    break;
-                            }
-                        } else {
-                            if (isJSONValid(sb.toString()) && c.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                                switch (i) {
-                                    case 0:
-                                        link1 = "ok";
-                                        break;
-                                    case 1:
-                                        link2 = "ok";
-                                        break;
-                                }
-                            } else {
-                                switch (i) {
-                                    case 0:
-                                        link1 = "error";
-                                        break;
-                                    case 1:
-                                        link2 = "error";
-                                        break;
-                                }
-                            }
-                        }
-                    } catch (Exception e) {
-                        _response = "error";
-                    }
-                }
-                if (!_response.equals("error"))
-                    _response = link1 + "<-->" + link2;
+    public void actlinks(String s) {
+        if (!s.equals("error")) {
+            try {
+                JSONObject jsonObject = new JSONObject(s.trim());
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_base", jsonObject.getString("base")).apply();
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_base_back", jsonObject.getString("base_back")).apply();
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_inicio", jsonObject.getString("inicio")).apply();
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_inicio_back", jsonObject.getString("inicio_back")).apply();
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_directorio", jsonObject.getString("directorio")).apply();
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_directorio_back", jsonObject.getString("directorio_back")).apply();
+                finish();
+                startActivity(new Intent(context, Main.class));
+            } catch (Exception e) {
+                e.printStackTrace();
+                finish();
+                startActivity(new Intent(context, Main.class));
             }
-            return _response;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (taskType == TaskType.ACT_LIKNS) {
-                if (!s.equals("error")) {
-                    Boolean isDebuging = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("debug", false);
-                    try {
-                        JSONObject jsonObject = new JSONObject(s.trim());
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_base", jsonObject.getString("base")).apply();
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_base_back", jsonObject.getString("base_back")).apply();
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_inicio", jsonObject.getString("inicio")).apply();
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_inicio_back", jsonObject.getString("inicio_back")).apply();
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_directorio", jsonObject.getString("directorio")).apply();
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_directorio_back", jsonObject.getString("directorio_back")).apply();
-                        if (isDebuging) {
-                            new back(context, TaskType.EVALUAR).execute(jsonObject.getString("inicio"), jsonObject.getString("inicio_back"));
-                        } else {
-                            finish();
-                            startActivity(new Intent(context, Main.class));
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        finish();
-                        startActivity(new Intent(context, Main.class));
-                    }
-                } else {
-                    finish();
-                    startActivity(new Intent(context, Main.class));
-                }
-            }
-            if (taskType == TaskType.EVALUAR) {
-                if (s.contains("<-->")) {
-                    Log.d("EVALUAR", s);
-                    switch (s) {
-                        case "ok<-->ok":
-                            Toaster.toast("Todos los servidores funcionando");
-                            break;
-                        case "ok<-->error":
-                            Toaster.toast("Servidor principal funcionando");
-                            break;
-                        case "error<-->ok":
-                            Toaster.toast("Servidor de respaldo funcionando");
-                            break;
-                        case "error<-->error":
-                            Toaster.toast("Sin servidores disponibles");
-                            break;
-                    }
-                    finish();
-                    startActivity(new Intent(context, Main.class));
-                } else {
-                    Log.d("EVALUAR", "ERROR");
-                    finish();
-                    startActivity(new Intent(context, Main.class));
-                }
-            }
+        } else {
+            finish();
+            startActivity(new Intent(context, Main.class));
         }
     }
 }

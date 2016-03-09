@@ -24,7 +24,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.thin.downloadmanager.DownloadRequest;
-import com.thin.downloadmanager.DownloadStatusListener;
+import com.thin.downloadmanager.DownloadStatusListenerV1;
 import com.thin.downloadmanager.ThinDownloadManager;
 
 import org.json.JSONArray;
@@ -47,7 +47,9 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -245,6 +247,46 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
         return true;
     }
 
+    private String getHour() {
+        SimpleDateFormat sdf = new SimpleDateFormat("~hh:mmaa");
+        Date d = new Date();
+        return sdf.format(d);
+    }
+
+    private int getActualDayCode() {
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+        Date d = new Date();
+        String day = sdf.format(d).toLowerCase();
+        int code;
+        switch (day.substring(0, 1)) {
+            case "l":
+                code = 1;
+                break;
+            case "m":
+                if (day.substring(1, 2).equals("a")) {
+                    code = 2;
+                } else {
+                    code = 3;
+                }
+                break;
+            case "j":
+                code = 4;
+                break;
+            case "v":
+                code = 5;
+                break;
+            case "s":
+                code = 6;
+                break;
+            case "d":
+                code = 7;
+                break;
+            default:
+                code = 0;
+        }
+        return code;
+    }
+
     @Override
     protected void onPostExecute(final String s) {
         super.onPostExecute(s);
@@ -279,36 +321,35 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                     if (isJSONValid(txt) && isJSONValid(s)) {
                         if (!jsonDesc[0].trim().equals(jsonArchivo[0].trim())) {
                             writeToFile(s, file);
-                            int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
-                            if (not == 0) {
-                                Log.d("Notificacion:", "Crear Sonido Def");
-                                String act = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("reload", "0");
-                                Log.d("Registrer", act);
-                                if (act.trim().equals("0")) {
-                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "1").apply();
-                                    Log.d("Registrer to", "1");
-                                } else {
-                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "0").apply();
-                                    Log.d("Registrer to", "0");
-                                }
-                                int num = 0;
-                                loop:
-                                {
-                                    for (String st : jsonDesc) {
-                                        if (!st.trim().equals(jsonArchivo[0].trim())) {
-                                            List<String> indexs = Arrays.asList(jsonDesc);
-                                            int index = indexs.indexOf(st);
-                                            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                            Boolean comp = favoritos.startsWith(jsonAIDS[index] + ":::") || favoritos.contains(":::" + jsonAIDS[index] + ":::");
-                                            if (comp && desc) {
-                                                Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
-                                            }
-                                            num += 1;
-                                        } else {
-                                            break loop;
+                            String act = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("reload", "0");
+                            if (act.trim().equals("0")) {
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "1").apply();
+                            } else {
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "0").apply();
+                            }
+                            int num = 0;
+                            Boolean isnot = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
+                            loop:
+                            {
+                                for (String st : jsonDesc) {
+                                    if (!st.trim().equals(jsonArchivo[0].trim())) {
+                                        List<String> indexs = Arrays.asList(jsonDesc);
+                                        int index = indexs.indexOf(st);
+                                        String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
+                                        Boolean comp = favoritos.startsWith(jsonAIDS[index] + ":::") || favoritos.contains(":::" + jsonAIDS[index] + ":::");
+                                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt(jsonAIDS[index] + "onday", getActualDayCode()).apply();
+                                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(jsonAIDS[index] + "onhour", getHour()).apply();
+                                        Log.d("Registrer", "Aid: " + jsonAIDS[index] + "   ----   Hour: " + getHour() + "   ----   Day: " + getActualDayCode());
+                                        if (comp && desc && isnot) {
+                                            Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
                                         }
+                                        num += 1;
+                                    } else {
+                                        break loop;
                                     }
                                 }
+                            }
+                            if (isnot) {
                                 int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
                                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
                                 String mess = "";
@@ -323,230 +364,32 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                                 .setContentTitle("AnimeFLV")
                                                 .setContentText(mess);
                                 mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                                mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+                                int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
+                                switch (not) {
+                                    case 0:
+                                        Log.d("Notificacion:", "Crear Sonido Def");
+                                        mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+                                        break;
+                                    case 1:
+                                        Log.d("Notificacion:", "Crear Sonido Especial");
+                                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound"), AudioManager.STREAM_NOTIFICATION);
+                                        break;
+                                    case 2:
+                                        Log.d("Notificacion:", "Crear Sonido Onii-chan");
+                                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/onii"), AudioManager.STREAM_NOTIFICATION);
+                                        break;
+                                    case 3:
+                                        Log.d("Notificacion:", "Crear Sonido Sam");
+                                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sam"), AudioManager.STREAM_NOTIFICATION);
+                                        break;
+                                    case 4:
+                                        Log.d("Notificacion:", "Crear Sonido Dango");
+                                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango"), AudioManager.STREAM_NOTIFICATION);
+                                        break;
+                                }
                                 mBuilder.setAutoCancel(true);
                                 mBuilder.setPriority(Notification.PRIORITY_MAX);
                                 mBuilder.setLights(Color.argb(0, 255, 128, 0), 5000, 2000);
-                                Intent resultIntent = new Intent(context, Main.class);
-                                PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                                mBuilder.setContentIntent(resultPendingIntent);
-                                int mNotificationId = 6991;
-                                NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                                mNotifyMgr.cancel(mNotificationId);
-                                mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                            }
-                            if (not == 1) {
-                                Log.d("Notificacion:", "Crear Sonido Especial");
-                                String act = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("reload", "0");
-                                Log.d("Registrer", act);
-                                if (act.equals("0")) {
-                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "1").apply();
-                                    Log.d("Registrer to", "1");
-                                } else {
-                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "0").apply();
-                                    Log.d("Registrer to", "0");
-                                }
-                                int num = 0;
-                                loop:
-                                {
-                                    for (String st : jsonDesc) {
-                                        if (!st.trim().equals(jsonArchivo[0].trim())) {
-                                            List<String> indexs = Arrays.asList(jsonDesc);
-                                            int index = indexs.indexOf(st);
-                                            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                            Boolean comp = favoritos.startsWith(jsonAIDS[index] + ":::") || favoritos.contains(":::" + jsonAIDS[index] + ":::");
-                                            if (comp && desc) {
-                                                Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
-                                            }
-                                            num += 1;
-                                        } else {
-                                            break loop;
-                                        }
-                                    }
-                                }
-                                int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
-                                String mess = "";
-                                if (nCaps == 1) {
-                                    mess = "Hay " + Integer.toString(nCaps) + " nuevo capitulo disponible!!!";
-                                } else {
-                                    mess = "Hay " + Integer.toString(nCaps) + " nuevos capitulos disponibles!!!";
-                                }
-                                NotificationCompat.Builder mBuilder =
-                                        new NotificationCompat.Builder(context)
-                                                .setSmallIcon(R.drawable.ic_not_r)
-                                                .setContentTitle("AnimeFLV")
-                                                .setContentText(mess);
-                                mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound"), AudioManager.STREAM_NOTIFICATION);
-                                mBuilder.setAutoCancel(true);
-                                mBuilder.setPriority(Notification.PRIORITY_MAX);
-                                mBuilder.setLights(Color.BLUE, 5000, 2000);
-                                Intent resultIntent = new Intent(context, Main.class);
-                                PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                                mBuilder.setContentIntent(resultPendingIntent);
-                                int mNotificationId = 6991;
-                                NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                                mNotifyMgr.cancel(mNotificationId);
-                                mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                            }
-                            if (not == 2) {
-                                Log.d("Notificacion:", "Crear Sonido Onii-chan");
-                                String act = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("reload", "0");
-                                Log.d("Registrer", act);
-                                if (act.equals("0")) {
-                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "1").apply();
-                                    Log.d("Registrer to", "1");
-                                } else {
-                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "0").apply();
-                                    Log.d("Registrer to", "0");
-                                }
-                                int num = 0;
-                                loop:
-                                {
-                                    for (String st : jsonDesc) {
-                                        if (!st.trim().equals(jsonArchivo[0].trim())) {
-                                            List<String> indexs = Arrays.asList(jsonDesc);
-                                            int index = indexs.indexOf(st);
-                                            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                            Boolean comp = favoritos.startsWith(jsonAIDS[index] + ":::") || favoritos.contains(":::" + jsonAIDS[index] + ":::");
-                                            if (comp && desc) {
-                                                Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
-                                            }
-                                            num += 1;
-                                        } else {
-                                            break loop;
-                                        }
-                                    }
-                                }
-                                int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
-                                String mess = "";
-                                if (nCaps == 1) {
-                                    mess = "Hay " + Integer.toString(nCaps) + " nuevo capitulo disponible!!!";
-                                } else {
-                                    mess = "Hay " + Integer.toString(nCaps) + " nuevos capitulos disponibles!!!";
-                                }
-                                NotificationCompat.Builder mBuilder =
-                                        new NotificationCompat.Builder(context)
-                                                .setSmallIcon(R.drawable.ic_not_r)
-                                                .setContentTitle("AnimeFLV")
-                                                .setContentText(mess);
-                                mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/onii"), AudioManager.STREAM_NOTIFICATION);
-                                mBuilder.setAutoCancel(true);
-                                mBuilder.setPriority(Notification.PRIORITY_MAX);
-                                mBuilder.setLights(Color.BLUE, 5000, 2000);
-                                Intent resultIntent = new Intent(context, Main.class);
-                                PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                                mBuilder.setContentIntent(resultPendingIntent);
-                                int mNotificationId = 6991;
-                                NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                                mNotifyMgr.cancel(mNotificationId);
-                                mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                            }
-                            if (not == 3) {
-                                Log.d("Notificacion:", "Crear Sonido Sam");
-                                String act = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("reload", "0");
-                                Log.d("Registrer", act);
-                                if (act.equals("0")) {
-                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "1").apply();
-                                    Log.d("Registrer to", "1");
-                                } else {
-                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "0").apply();
-                                    Log.d("Registrer to", "0");
-                                }
-                                int num = 0;
-                                loop:
-                                {
-                                    for (String st : jsonDesc) {
-                                        if (!st.trim().equals(jsonArchivo[0].trim())) {
-                                            List<String> indexs = Arrays.asList(jsonDesc);
-                                            int index = indexs.indexOf(st);
-                                            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                            Boolean comp = favoritos.startsWith(jsonAIDS[index] + ":::") || favoritos.contains(":::" + jsonAIDS[index] + ":::");
-                                            if (comp && desc) {
-                                                Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
-                                            }
-                                            num += 1;
-                                        } else {
-                                            break loop;
-                                        }
-                                    }
-                                }
-                                int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
-                                String mess = "";
-                                if (nCaps == 1) {
-                                    mess = "Hay " + Integer.toString(nCaps) + " nuevo capitulo disponible!!!";
-                                } else {
-                                    mess = "Hay " + Integer.toString(nCaps) + " nuevos capitulos disponibles!!!";
-                                }
-                                NotificationCompat.Builder mBuilder =
-                                        new NotificationCompat.Builder(context)
-                                                .setSmallIcon(R.drawable.ic_not_r)
-                                                .setContentTitle("AnimeFLV")
-                                                .setContentText(mess);
-                                mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sam"), AudioManager.STREAM_NOTIFICATION);
-                                mBuilder.setAutoCancel(true);
-                                mBuilder.setPriority(Notification.PRIORITY_MAX);
-                                mBuilder.setLights(Color.BLUE, 5000, 2000);
-                                Intent resultIntent = new Intent(context, Main.class);
-                                PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                                mBuilder.setContentIntent(resultPendingIntent);
-                                int mNotificationId = 6991;
-                                NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                                mNotifyMgr.cancel(mNotificationId);
-                                mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                            }
-                            if (not == 4) {
-                                Log.d("Notificacion:", "Crear Sonido Dango");
-                                String act = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("reload", "0");
-                                Log.d("Registrer", act);
-                                if (act.equals("0")) {
-                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "1").apply();
-                                    Log.d("Registrer to", "1");
-                                } else {
-                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "0").apply();
-                                    Log.d("Registrer to", "0");
-                                }
-                                int num = 0;
-                                loop:
-                                {
-                                    for (String st : jsonDesc) {
-                                        if (!st.trim().equals(jsonArchivo[0].trim())) {
-                                            List<String> indexs = Arrays.asList(jsonDesc);
-                                            int index = indexs.indexOf(st);
-                                            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                            Boolean comp = favoritos.startsWith(jsonAIDS[index] + ":::") || favoritos.contains(":::" + jsonAIDS[index] + ":::");
-                                            if (comp && desc) {
-                                                Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
-                                            }
-                                            num += 1;
-                                        } else {
-                                            break loop;
-                                        }
-                                    }
-                                }
-                                int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
-                                String mess = "";
-                                if (nCaps == 1) {
-                                    mess = "Hay " + Integer.toString(nCaps) + " nuevo capitulo disponible!!!";
-                                } else {
-                                    mess = "Hay " + Integer.toString(nCaps) + " nuevos capitulos disponibles!!!";
-                                }
-                                NotificationCompat.Builder mBuilder =
-                                        new NotificationCompat.Builder(context)
-                                                .setSmallIcon(R.drawable.ic_not_r)
-                                                .setContentTitle("AnimeFLV")
-                                                .setContentText(mess);
-                                mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango"), AudioManager.STREAM_NOTIFICATION);
-                                mBuilder.setAutoCancel(true);
-                                mBuilder.setPriority(Notification.PRIORITY_MAX);
-                                mBuilder.setLights(Color.BLUE, 5000, 2000);
                                 Intent resultIntent = new Intent(context, Main.class);
                                 PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                                 mBuilder.setContentIntent(resultPendingIntent);
@@ -590,117 +433,47 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                         Log.d("Version", "Not ya existe");
                     } else {
                         sharedPreferences.edit().putBoolean("notVer", true).apply();
+                        NotificationCompat.Builder mBuilder =
+                                new NotificationCompat.Builder(context)
+                                        .setSmallIcon(R.drawable.ic_not_r)
+                                        .setContentTitle("AnimeFLV")
+                                        .setContentText("Nueva Version Disponible!!!");
+                        mBuilder.setVibrate(new long[]{100, 200, 100, 500});
                         int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
-                        if (not == 0) {
-                            Log.d("Notificacion:", "Crear Sonido 0");
-                            NotificationCompat.Builder mBuilder =
-                                    new NotificationCompat.Builder(context)
-                                            .setSmallIcon(R.drawable.ic_not_r)
-                                            .setContentTitle("AnimeFLV")
-                                            .setContentText("Nueva Version Disponible!!!");
-                            mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                            mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
-                            mBuilder.setAutoCancel(true);
-                            mBuilder.setPriority(Notification.PRIORITY_MAX);
-                            mBuilder.setLights(Color.BLUE, 5000, 2000);
-                            Intent resultIntent = new Intent(context, Main.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putString("act", "1");
-                            resultIntent.putExtras(bundle);
-                            PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                            mBuilder.setContentIntent(resultPendingIntent);
-                            int mNotificationId = 1964;
-                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                        switch (not) {
+                            case 0:
+                                Log.d("Notificacion:", "Crear Sonido Def");
+                                mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+                                break;
+                            case 1:
+                                Log.d("Notificacion:", "Crear Sonido Especial");
+                                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound"), AudioManager.STREAM_NOTIFICATION);
+                                break;
+                            case 2:
+                                Log.d("Notificacion:", "Crear Sonido Onii-chan");
+                                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/onii"), AudioManager.STREAM_NOTIFICATION);
+                                break;
+                            case 3:
+                                Log.d("Notificacion:", "Crear Sonido Sam");
+                                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sam"), AudioManager.STREAM_NOTIFICATION);
+                                break;
+                            case 4:
+                                Log.d("Notificacion:", "Crear Sonido Dango");
+                                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango"), AudioManager.STREAM_NOTIFICATION);
+                                break;
                         }
-                        if (not == 1) {
-                            Log.d("Notificacion:", "Crear Sonido Especial");
-                            NotificationCompat.Builder mBuilder =
-                                    new NotificationCompat.Builder(context)
-                                            .setSmallIcon(R.drawable.ic_not_r)
-                                            .setContentTitle("AnimeFLV")
-                                            .setContentText("Nueva Version Disponible!!!");
-                            mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                            mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound"), AudioManager.STREAM_NOTIFICATION);
-                            mBuilder.setAutoCancel(true);
-                            mBuilder.setPriority(Notification.PRIORITY_MAX);
-                            mBuilder.setLights(Color.BLUE, 5000, 2000);
-                            Intent resultIntent = new Intent(context, Main.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putString("act", "1");
-                            resultIntent.putExtras(bundle);
-                            PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                            mBuilder.setContentIntent(resultPendingIntent);
-                            int mNotificationId = 1964;
-                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                        }
-                        if (not == 2) {
-                            Log.d("Notificacion:", "Crear Sonido Onii-chan");
-                            NotificationCompat.Builder mBuilder =
-                                    new NotificationCompat.Builder(context)
-                                            .setSmallIcon(R.drawable.ic_not_r)
-                                            .setContentTitle("AnimeFLV")
-                                            .setContentText("Nueva Version Disponible!!!");
-                            mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                            mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/onii"), AudioManager.STREAM_NOTIFICATION);
-                            mBuilder.setAutoCancel(true);
-                            mBuilder.setPriority(Notification.PRIORITY_MAX);
-                            mBuilder.setLights(Color.BLUE, 5000, 2000);
-                            Intent resultIntent = new Intent(context, Main.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putString("act", "1");
-                            resultIntent.putExtras(bundle);
-                            PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                            mBuilder.setContentIntent(resultPendingIntent);
-                            int mNotificationId = 1964;
-                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                        }
-                        if (not == 3) {
-                            Log.d("Notificacion:", "Crear Sonido Sam");
-                            NotificationCompat.Builder mBuilder =
-                                    new NotificationCompat.Builder(context)
-                                            .setSmallIcon(R.drawable.ic_not_r)
-                                            .setContentTitle("AnimeFLV")
-                                            .setContentText("Nueva Version Disponible!!!");
-                            mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                            mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sam"), AudioManager.STREAM_NOTIFICATION);
-                            mBuilder.setAutoCancel(true);
-                            mBuilder.setPriority(Notification.PRIORITY_MAX);
-                            mBuilder.setLights(Color.BLUE, 5000, 2000);
-                            Intent resultIntent = new Intent(context, Main.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putString("act", "1");
-                            resultIntent.putExtras(bundle);
-                            PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                            mBuilder.setContentIntent(resultPendingIntent);
-                            int mNotificationId = 1964;
-                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                        }
-                        if (not == 4) {
-                            Log.d("Notificacion:", "Crear Sonido Sam");
-                            NotificationCompat.Builder mBuilder =
-                                    new NotificationCompat.Builder(context)
-                                            .setSmallIcon(R.drawable.ic_not_r)
-                                            .setContentTitle("AnimeFLV")
-                                            .setContentText("Nueva Version Disponible!!!");
-                            mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                            mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango"), AudioManager.STREAM_NOTIFICATION);
-                            mBuilder.setAutoCancel(true);
-                            mBuilder.setPriority(Notification.PRIORITY_MAX);
-                            mBuilder.setLights(Color.BLUE, 5000, 2000);
-                            Intent resultIntent = new Intent(context, Main.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putString("act", "1");
-                            resultIntent.putExtras(bundle);
-                            PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                            mBuilder.setContentIntent(resultPendingIntent);
-                            int mNotificationId = 1964;
-                            NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                            mNotifyMgr.notify(mNotificationId, mBuilder.build());
-                        }
+                        mBuilder.setAutoCancel(true);
+                        mBuilder.setPriority(Notification.PRIORITY_MAX);
+                        mBuilder.setLights(Color.BLUE, 5000, 2000);
+                        Intent resultIntent = new Intent(context, Main.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("act", "1");
+                        resultIntent.putExtras(bundle);
+                        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        mBuilder.setContentIntent(resultPendingIntent);
+                        int mNotificationId = 1964;
+                        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
                     }
                 } else {
                     Log.d("Auto", "true");
@@ -742,9 +515,9 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
         final ThinDownloadManager downloadManager = new ThinDownloadManager();
         final DownloadRequest downloadRequest = new DownloadRequest(download)
                 .setDestinationURI(Uri.fromFile(descarga))
-                .setDownloadListener(new DownloadStatusListener() {
+                .setStatusListener(new DownloadStatusListenerV1() {
                     @Override
-                    public void onDownloadComplete(int i) {
+                    public void onDownloadComplete(DownloadRequest downloadRequest) {
                         Log.d("Actualizacion", "OK");
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("isDescRun", false).apply();
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("isDescDown", Integer.parseInt(s.trim())).apply();
@@ -788,14 +561,14 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                     }
 
                     @Override
-                    public void onDownloadFailed(int i, int i1, String s) {
+                    public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("notVer", false).apply();
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("isDescRun", false).apply();
                         Log.d("Actualizacion", "Fallada");
                     }
 
                     @Override
-                    public void onProgress(int id, long totalBytes, int progress) {
+                    public void onProgress(DownloadRequest downloadRequest, long totalBytes, long downloadedBytes, int progress) {
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("ActProg", progress).apply();
                     }
                 });

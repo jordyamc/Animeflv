@@ -1,23 +1,18 @@
 package knf.animeflv;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
+import com.afollestad.materialdialogs.GravityEnum;
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
 
@@ -25,37 +20,105 @@ import java.util.Arrays;
  * Created by Jordy on 12/08/2015.
  */
 public class MoveFiles extends AsyncTask<String,String,String> {
-    ProgressDialog dialog;
+    MaterialDialog dialog;
     Context context;
-    public MoveFiles(Context c){
-        context=c;
+    Context d_context;
+
+    public MoveFiles(Context c, Context d_c) {
+        this.context = c;
+        this.d_context = d_c;
     }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        dialog = new MaterialDialog.Builder(d_context)
+                .title("Moviendo Animes...")
+                .titleGravity(GravityEnum.CENTER)
+                .progress(false, count(), true)
+                .cancelable(false)
+                .build();
+        dialog.show();
+    }
+
     @Override
     protected String doInBackground(String... params) {
         try {
-            MoveFiles();
-        } catch (IOException e) {
+            File sourceLocation = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download");
+            File targetLocation = new File(getSD1() + "/Animeflv/download");
+            if (sourceLocation.isDirectory()) {
+                if (!targetLocation.exists() && !targetLocation.mkdirs()) {
+                    throw new IOException("Cannot create dir " + targetLocation.getAbsolutePath());
+                }
+                String[] children = sourceLocation.list();
+                for (String i : children) {
+                    File scan = new File(sourceLocation, i);
+                    if (scan.isDirectory()) {
+                        String[] archivos = scan.list();
+                        for (String mp4 : archivos) {
+                            File inSD = new File(targetLocation.getPath(), i);
+                            if (!inSD.exists()) {
+                                inSD.mkdir();
+                            }
+                            if (!new File(inSD.getPath(), mp4).exists()) {
+                                //boolean success = new File(sourceLocation+"/"+i+"/"+mp4).renameTo(new File(getSD1()+"/Animeflv/download/"+i+"/"+mp4));
+                                FileChannel inChannel = new FileInputStream(new File(sourceLocation + "/" + i + "/" + mp4)).getChannel();
+                                FileChannel outChannel = new FileOutputStream(new File(getSD1() + "/Animeflv/download/" + i + "/" + mp4)).getChannel();
+                                try {
+                                    inChannel.transferTo(0, inChannel.size(), outChannel);
+                                } finally {
+                                    if (inChannel != null)
+                                        inChannel.close();
+                                    if (outChannel != null)
+                                        outChannel.close();
+                                }
+                                File file = new File(inSD.getPath(), mp4);
+                                if (file.exists()) {
+                                    if (!new File(scan.getPath(), mp4).exists()) {
+                                        Log.d("Move ok", mp4);
+                                        dialog.incrementProgress(1);
+                                    } else {
+                                        if (new File(scan.getPath(), mp4).delete()) {
+                                            Log.d("Move ok", mp4);
+                                            dialog.incrementProgress(1);
+                                        } else {
+                                            Log.d("Move error", mp4);
+                                            throw new IOException("error");
+                                        }
+                                    }
+                                } else {
+                                    Log.d("Move error", mp4);
+                                    throw new IOException("error");
+                                }
+                            } else {
+                                if (new File(scan.getPath(), mp4).delete()) {
+                                    Log.d("Move ok", mp4);
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             return "Error " + e.getMessage();
         }
         return "";
     }
-    public String getSD(){
-        String sd = Environment.getExternalStorageDirectory().getAbsolutePath();
-        if (android.os.Build.DEVICE.contains("samsung") || android.os.Build.MANUFACTURER.contains("samsung")) {
-            File f = new File(Environment.getExternalStorageDirectory().getParent() + "/extSdCard");
-            if (f.exists() && f.isDirectory()) {
-                sd = Environment.getExternalStorageDirectory().getParent() + "/extSdCard";
-            } else {
-                f = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/external_sd");
-                if (f.exists() && f.isDirectory()) {
-                    sd = Environment.getExternalStorageDirectory().getAbsolutePath() + "/external_sd";
-                } else {
-                    sd = "NoSD";
+
+    private int count() {
+        int count = 0;
+        File f = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download");
+        File[] files = f.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    count += file.list().length;
                 }
             }
         }
-        return sd;
+        return count;
     }
     public String getSD1(){
         String sSDpath = null;
@@ -86,7 +149,8 @@ public class MoveFiles extends AsyncTask<String,String,String> {
         }
         return sSDpath;
     }
-    public void MoveFiles() throws IOException {
+
+    public void MoveFiles() throws Exception {
         File sourceLocation=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download");
         File targetLocation=new File(getSD1() + "/Animeflv/download");
         if (sourceLocation.isDirectory()) {
@@ -94,11 +158,23 @@ public class MoveFiles extends AsyncTask<String,String,String> {
                 throw new IOException("Cannot create dir " + targetLocation.getAbsolutePath());
             }
             String[] children = sourceLocation.list();
+            int prog = 0;
+            dialog = new MaterialDialog.Builder(d_context)
+                    .title("Moviendo Animes...")
+                    .titleGravity(GravityEnum.CENTER)
+                    .progress(false, children.length, true)
+                    .cancelable(false)
+                    .build();
+            dialog.show();
             for (String i:children) {
+                prog++;
+                dialog.setProgress(prog);
+                String tit = new Parser().getTitCached(i);
                 File scan=new File(sourceLocation,i);
                 if (scan.isDirectory()) {
                     String[] archivos = scan.list();
                     for (String mp4:archivos){
+                        dialog.setContent(tit + " " + mp4.replace(i + "_", "").replace(".mp4", ""));
                         File inSD=new File(targetLocation.getPath(),i);
                         if (!inSD.exists()){
                             inSD.mkdir();
@@ -146,11 +222,19 @@ public class MoveFiles extends AsyncTask<String,String,String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        if (s.contains("Error")){
-            Toast.makeText(context,s , Toast.LENGTH_LONG).show();
-        }else {
-            Toast.makeText(context,"Movidos correctamente",Toast.LENGTH_SHORT).show();
+        try {
+            if (s.contains("Error")) {
+                Toast.makeText(context, s, Toast.LENGTH_LONG).show();
+                dialog.dismiss();
+            } else {
+                Toast.makeText(context, "Movidos correctamente", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
         }
+
 
     }
 }

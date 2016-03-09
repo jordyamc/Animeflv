@@ -1,6 +1,5 @@
 package knf.animeflv;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -16,20 +15,16 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.transition.Fade;
-import android.transition.Slide;
-import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -41,7 +36,6 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
@@ -54,7 +48,6 @@ import java.util.List;
 
 import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.Recyclers.AdapterFavs;
-import knf.animeflv.Recyclers.RecyclerAdapter;
 
 /**
  * Created by Jordy on 23/08/2015.
@@ -77,6 +70,9 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     Boolean paused = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+            setTheme(R.style.AppThemeDark);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_favs);
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
@@ -87,6 +83,13 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         }
         context=this;
         shouldExecuteOnResume = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(getResources().getColor(R.color.dark));
+            getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
+        }
         toolbar=(Toolbar) findViewById(R.id.favs_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Favoritos");
@@ -107,6 +110,17 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                     finish();
                 }
             });
+        }
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+            toolbar.setBackgroundColor(getResources().getColor(android.R.color.black));
+            toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(getResources().getColor(R.color.negro));
+                getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
+            }
         }
         final String email_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
         final String pass_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
@@ -161,7 +175,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                 recyclerView.setLayoutManager(new LinearLayoutManager(this));
                 dialog = new MaterialDialog.Builder(context)
                         .content("Actualizando Favoritos")
-                        .progress(false, favoritos.length, true)
+                        .progress(true, 0)
                         .cancelable(true)
                         .cancelListener(new DialogInterface.OnCancelListener() {
                             @Override
@@ -174,6 +188,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                         .build();
                 favo = new RequestFav(this, TaskType.SORT_NORMAL, dialog);
                 favo.execute(favoritos);
+                dialog.show();
             } else {
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -208,6 +223,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     }
     @Override
     public void favCall(String data,TaskType taskType){
+        dialog.dismiss();
         if (!data.trim().equals("")) {
             String[] crop = data.split(":::");
             List<String> titulos = new ArrayList<String>();

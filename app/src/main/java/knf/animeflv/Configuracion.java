@@ -1,7 +1,5 @@
 package knf.animeflv;
 
-import android.annotation.TargetApi;
-import android.app.FragmentTransaction;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -18,10 +16,6 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Explode;
-import android.transition.Fade;
-import android.transition.Slide;
-import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +26,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.lb.material_preferences_library.custom_preferences.Preference;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -49,6 +42,9 @@ import java.security.cert.X509Certificate;
 public class Configuracion extends AppCompatActivity implements LoginServer.callback {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+            setTheme(R.style.AppThemeDark);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.configuracion);
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
@@ -64,6 +60,17 @@ public class Configuracion extends AppCompatActivity implements LoginServer.call
             getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
         }
         Toolbar toolbar=(Toolbar) findViewById(R.id.conf_toolbar);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+            toolbar.setBackgroundColor(getResources().getColor(android.R.color.black));
+            toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(getResources().getColor(R.color.negro));
+                getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
+            }
+        }
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Configuracion");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

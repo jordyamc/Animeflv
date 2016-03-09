@@ -1,28 +1,26 @@
 package knf.animeflv.info;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -43,8 +41,6 @@ import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterRel;
-import knf.animeflv.Recyclers.RecyclerAdapter;
-import knf.animeflv.Requests;
 import knf.animeflv.TaskType;
 
 /**
@@ -90,10 +86,7 @@ public class AnimeInfo extends Fragment{
         return view;
     }
     public void getJsonfromFile(){
-        //SharedPreferences sharedPreferences=getActivity().getSharedPreferences("data",Context.MODE_PRIVATE);
-        //String aid=sharedPreferences.getString("aid","");
-        SharedPreferences sharedPreferences=getActivity().getSharedPreferences("data", Context.MODE_PRIVATE);
-        String aid=sharedPreferences.getString("aid","");
+        String aid = getActivity().getIntent().getExtras().getString("aid");
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {
                 mediaStorage.mkdirs();
@@ -109,9 +102,7 @@ public class AnimeInfo extends Fragment{
     }
     public String getJsonfromFile(Boolean bool){
         String json="{}";
-        SharedPreferences sharedPreferences=getActivity().getSharedPreferences("data", Context.MODE_PRIVATE);
-        String aid=sharedPreferences.getString("aid","");
-        Log.d("Info Aid",aid);
+        String aid = getActivity().getIntent().getExtras().getString("aid");
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {
                 mediaStorage.mkdirs();
@@ -156,12 +147,30 @@ public class AnimeInfo extends Fragment{
         txt_debug = (TextView) view.findViewById(R.id.debug_info);
         layout=(LinearLayout) view.findViewById(R.id.lay_info);
         layout_debug = (LinearLayout) view.findViewById(R.id.lay_debug);
+        if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("is_amoled", false)) {
+            view.setBackgroundColor(getResources().getColor(android.R.color.black));
+            txt_sinopsis.setTextColor(getResources().getColor(R.color.blanco));
+            txt_titulo.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            txt_tipo.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            txt_estado.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            txt_generos.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            txt_debug.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            TextView tit1 = (TextView) view.findViewById(R.id.info_titles1);
+            TextView tit2 = (TextView) view.findViewById(R.id.info_titles2);
+            TextView tit3 = (TextView) view.findViewById(R.id.info_titles3);
+            TextView tit4 = (TextView) view.findViewById(R.id.info_titles4);
+            TextView tit5 = (TextView) view.findViewById(R.id.info_titles5);
+            tit1.setTextColor(getResources().getColor(R.color.blanco));
+            tit2.setTextColor(getResources().getColor(R.color.blanco));
+            tit3.setTextColor(getResources().getColor(R.color.blanco));
+            tit4.setTextColor(getResources().getColor(R.color.blanco));
+            tit5.setTextColor(getResources().getColor(R.color.blanco));
+        }
     }
     public void setInfo(String json){
         final Context context=getActivity().getApplicationContext();
         final String jinfo=json;
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("data", Context.MODE_PRIVATE);
-        final String aid = sharedPreferences.getString("aid", "");
+        final String aid = getArguments().getString("aid", "null");
         final Boolean isDebuging = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("debug", false);
         getActivity().runOnUiThread(new Runnable() {
             @Override

@@ -7,26 +7,15 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.thin.downloadmanager.DownloadRequest;
-import com.thin.downloadmanager.DownloadStatusListener;
+import com.thin.downloadmanager.DownloadStatusListenerV1;
 import com.thin.downloadmanager.ThinDownloadManager;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
-
-import br.com.goncalves.pugnotification.notification.PugNotification;
 
 /**
  * Created by Jordy on 29/02/2016.
@@ -44,10 +33,10 @@ public class Downloader extends AsyncTask<String, String, String> {
     NotificationManager notificationManager;
     NotificationCompat.Builder builder;
 
-    int COMPLETADO = 0;
-    int DESCARGANDO = 1;
-    int ERROR = 3;
-    int CANCELADO = 4;
+    int DESCARGANDO = 0;
+    int COMPLETADO = 1;
+    int ERROR = 2;
+    int CANCELADO = 3;
 
     public Downloader(Context c, String eid, String aid, String titulo, String numero, File ext) {
         this.eid = eid;
@@ -61,7 +50,7 @@ public class Downloader extends AsyncTask<String, String, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        File Dstorage = new File(/*Environment.getExternalStorageDirectory()*/getSD1() + "/Animeflv/download/" + aid);
+        File Dstorage = new File(getSD1() + "/Animeflv/download/" + aid);
         if (!Dstorage.exists()) {
             Dstorage.mkdirs();
         }
@@ -100,9 +89,9 @@ public class Downloader extends AsyncTask<String, String, String> {
             Uri download = Uri.parse(params[0]);
             final DownloadRequest downloadRequest = new DownloadRequest(download)
                     .setDestinationURI(Uri.fromFile(ext_dir))
-                    .setDownloadListener(new DownloadStatusListener() {
+                    .setStatusListener(new DownloadStatusListenerV1() {
                         @Override
-                        public void onDownloadComplete(int id) {
+                        public void onDownloadComplete(DownloadRequest downloadRequest) {
                             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt(eid + "status", COMPLETADO).apply();
                             Intent resultIntent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(ext_dir))
                                     .setDataAndType(Uri.fromFile(ext_dir), "video/mp4");
@@ -118,9 +107,10 @@ public class Downloader extends AsyncTask<String, String, String> {
                         }
 
                         @Override
-                        public void onDownloadFailed(int id, int errorCode, String errorMessage) {
+                        public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
                             if (!errorMessage.toLowerCase().contains("cancelled")) {
                                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt(eid + "status", ERROR).apply();
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eid + "errmessage", errorMessage).apply();
                                 Bundle bundle = new Bundle();
                                 bundle.putString("aid", aid);
                                 bundle.putString("eid", eid);
@@ -146,13 +136,12 @@ public class Downloader extends AsyncTask<String, String, String> {
                         }
 
                         @Override
-                        public void onProgress(int id, long totalBytes, int progress) {
+                        public void onProgress(DownloadRequest downloadRequest, long totalBytes, long downloadedBytes, int progress) {
                             builder.setProgress(100, progress, false);
                             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eid + "prog", String.valueOf(progress)).apply();
                             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt(eid + "status", DESCARGANDO).apply();
                             notificationManager.notify(idDown, builder.build());
                         }
-
                     });
             idDown = downloadManager.add(downloadRequest);
             notificationManager.notify(idDown, builder.build());

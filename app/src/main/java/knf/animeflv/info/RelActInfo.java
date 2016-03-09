@@ -5,13 +5,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -25,11 +24,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import knf.animeflv.Parser;
 import knf.animeflv.Requests;
@@ -49,6 +43,10 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         context=getApplicationContext();
         Bundle bundle=getIntent().getExtras();
         aidInfo = bundle.getString("aid", "");
@@ -57,7 +55,6 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putString("aid", aidInfo);
         editor.apply();
-        //new Requests(this, TaskType.GET_INFO).execute("http://animeflv.moe/api.php?accion=anime&aid=" + aidInfo);
         new Requests(this, TaskType.GET_INFO).execute(parser.getInicioUrl(TaskType.NORMAL, context) + "?url=" + link);
     }
     public static String convertStreamToString(InputStream is) throws Exception {
@@ -182,6 +179,7 @@ public class RelActInfo extends AppCompatActivity implements Requests.callback {
     public void toast(String texto){
         Toast.makeText(this, texto, Toast.LENGTH_LONG).show();
     }
+
     @Override
     public void sendtext1(String data,TaskType taskType){
         if (taskType==TaskType.GET_INFO){

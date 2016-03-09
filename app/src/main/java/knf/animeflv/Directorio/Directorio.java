@@ -1,7 +1,6 @@
 package knf.animeflv.Directorio;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -45,14 +44,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import knf.animeflv.AnimeCompare;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
-import knf.animeflv.Recyclers.AdapterBusqueda;
 import knf.animeflv.Recyclers.AdapterBusquedaNew;
 
 /**
@@ -77,6 +74,9 @@ public class Directorio extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+            setTheme(R.style.AppThemeDark);
+        }
         super.onCreate(savedInstanceState);
         setUpAnimations();
         setContentView(R.layout.directorio);
@@ -147,24 +147,9 @@ public class Directorio extends AppCompatActivity {
                             } else {
                                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                             }
-                            List<String> titulos = parser.DirTitulosBusquedaA(json, null);
-                            List<String> tipos = parser.DirTiposBusquedaA(json, null);
-                            List<String> index = parser.DirIndexBusquedaA(json, null);
-                            List<String> titOrd = parser.DirTitulosBusquedaA(json, null);
-                            Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
-                            List<String> indexOrd = new ArrayList<String>(titOrd.size());
-                            List<String> tiposOrd = new ArrayList<String>(titOrd.size());
-                            List<String> links = new ArrayList<String>(titOrd.size());
-                            for (String si : titOrd) {
-                                int i = titulos.indexOf(si);
-                                String indexn = index.get(i);
-                                indexOrd.add(indexn);
-                                String tipon = tipos.get(i);
-                                tiposOrd.add(tipon);
-                                String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + indexn + ".jpg";
-                                links.add(link);
-                            }
-                            AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);
+                            List<AnimeClass> animes = parser.DirAllAnimes(json, null);
+                            Collections.sort(animes, new AnimeCompare());
+                            AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                             recyclerView.setAdapter(adapterBusqueda);
                         }
                         break;
@@ -203,6 +188,20 @@ public class Directorio extends AppCompatActivity {
             }
         });
         editText = (EditText) findViewById(R.id.et_busqueda);
+        viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab2);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+            toolbarS.setBackgroundColor(getResources().getColor(android.R.color.black));
+            toolbarS.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
+            viewPagerTab.setBackgroundColor(getResources().getColor(android.R.color.black));
+            viewPagerTab.setSelectedIndicatorColors(getResources().getColor(R.color.prim));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(getResources().getColor(R.color.negro));
+                getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
+            }
+        }
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(final Editable s) {
@@ -230,24 +229,6 @@ public class Directorio extends AppCompatActivity {
                             }
                             List<AnimeClass> animes = parser.DirAllAnimes(json, s.toString());
                             Collections.sort(animes, new AnimeCompare());
-                            /*List<String> titulos = parser.DirTitulosBusquedaA(json, s.toString());
-                            List<String> tipos = parser.DirTiposBusquedaA(json, s.toString());
-                            List<String> index = parser.DirIndexBusquedaA(json, s.toString());
-                            List<String> titOrd = parser.DirTitulosBusquedaA(json, s.toString());
-                            Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
-                            List<String> indexOrd = new ArrayList<String>(titOrd.size());
-                            List<String> tiposOrd = new ArrayList<String>(titOrd.size());
-                            List<String> links = new ArrayList<String>(titOrd.size());
-                            for (String si : titOrd) {
-                                int i = titulos.indexOf(si);
-                                String indexn = index.get(i);
-                                indexOrd.add(indexn);
-                                String tipon = tipos.get(i);
-                                tiposOrd.add(tipon);
-                                String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + indexn + ".jpg";
-                                links.add(link);
-                            }
-                            AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);*/
                             AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                             recyclerView.setAdapter(adapterBusqueda);
                         } else {
@@ -307,24 +288,6 @@ public class Directorio extends AppCompatActivity {
                     }
                     List<AnimeClass> animes = parser.DirAllAnimes(json, s.toString());
                     Collections.sort(animes, new AnimeCompare());
-                    /*List<String> titulos = parser.DirTitulosBusquedaA(json, s.toString());
-                    List<String> tipos = parser.DirTiposBusquedaA(json, s.toString());
-                    List<String> index = parser.DirIndexBusquedaA(json, s.toString());
-                    List<String> titOrd = parser.DirTitulosBusquedaA(json, s.toString());
-                    Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
-                    List<String> indexOrd = new ArrayList<String>(titOrd.size());
-                    List<String> tiposOrd = new ArrayList<String>(titOrd.size());
-                    List<String> links = new ArrayList<String>(titOrd.size());
-                    for (String si : titOrd) {
-                        int i = titulos.indexOf(si);
-                        String indexn = index.get(i);
-                        indexOrd.add(indexn);
-                        String tipon = tipos.get(i);
-                        tiposOrd.add(tipon);
-                        String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + indexn + ".jpg";
-                        links.add(link);
-                    }*/
-                    //AdapterBusqueda adapterBusqueda = new AdapterBusqueda(context, titOrd, tiposOrd, links, indexOrd);
                     AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                     recyclerView.setAdapter(adapterBusqueda);
                 }
@@ -349,7 +312,6 @@ public class Directorio extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewpager2);
         viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(adapter);
-        viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab2);
         viewPagerTab.setViewPager(viewPager);
         String[] generos = {
                 "Todos",
@@ -425,28 +387,6 @@ public class Directorio extends AppCompatActivity {
         }
         List<AnimeClass> animes = parser.DirAllAnimes(json, null);
         Collections.sort(animes, new AnimeCompare());
-        /*List<String> titulos = parser.DirTitulosBusquedaA(json, null);
-        List<String> tipos = parser.DirTiposBusquedaA(json, null);
-        List<String> index = parser.DirIndexBusquedaA(json, null);
-        List<String> titOrd = parser.DirTitulosBusquedaA(json, null);
-        Collections.sort(titOrd, String.CASE_INSENSITIVE_ORDER);
-        List<String> indexOrd = new ArrayList<String>(titOrd.size());
-        List<String> tiposOrd = new ArrayList<String>(titOrd.size());
-        List<String> links = new ArrayList<String>(titOrd.size());
-        for (String s : titOrd) {
-            int i = titulos.indexOf(s);
-            String indexn = index.get(i);
-            indexOrd.add(indexn);
-            String link = "http://cdn.animeflv.net/img/portada/thumb_80/" + indexn + ".jpg";
-            links.add(link);
-            String tipon = tipos.get(i);
-            tiposOrd.add(tipon);
-        }
-        /*for (String st:indexOrd){
-            String link="http://cdn.animeflv.net/img/portada/thumb_80/"+st+".jpg";
-            links.add(link);
-        }
-        AdapterBusqueda adapterBusqueda = new AdapterBusqueda(this, titOrd, tiposOrd, links, indexOrd);*/
         AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
         recyclerView.setAdapter(adapterBusqueda);
     }
