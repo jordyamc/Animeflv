@@ -15,15 +15,21 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.Bundler;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
+import knf.animeflv.Application;
 import knf.animeflv.R;
+import xdroid.toaster.Toaster;
 
 /**
  * Created by Jordy on 05/03/2016.
@@ -41,6 +47,10 @@ public class EmisionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.emision);
         initActivity();
+        Application application = (Application) getApplication();
+        Tracker mTracker = application.getDefaultTracker();
+        mTracker.setScreenName("Emision");
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
         toolbar = (Toolbar) findViewById(R.id.emision_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Emision");
@@ -77,35 +87,34 @@ public class EmisionActivity extends AppCompatActivity {
     }
 
     private int getActualDayCode() {
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
-        Date d = new Date();
-        String day = sdf.format(d).toLowerCase();
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_WEEK);
         int code;
-        switch (day.substring(0, 1)) {
-            case "l":
+        switch (day) {
+            case Calendar.MONDAY:
                 code = 1;
                 break;
-            case "m":
-                if (day.substring(1, 2).equals("a")) {
-                    code = 2;
-                } else {
-                    code = 3;
-                }
+            case Calendar.TUESDAY:
+                code = 2;
                 break;
-            case "j":
+            case Calendar.WEDNESDAY:
+                code = 3;
+                break;
+            case Calendar.THURSDAY:
                 code = 4;
                 break;
-            case "v":
+            case Calendar.FRIDAY:
                 code = 5;
                 break;
-            case "s":
+            case Calendar.SATURDAY:
                 code = 6;
                 break;
-            case "d":
+            case Calendar.SUNDAY:
                 code = 7;
                 break;
             default:
                 code = 0;
+                break;
         }
         return code;
     }

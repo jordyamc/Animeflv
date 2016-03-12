@@ -43,14 +43,14 @@ public class InfoCap extends Fragment{
         rvAnimes = (RecyclerView) view.findViewById(R.id.rv_caps);
         rvAnimes.setHasFixedSize(true);
         rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
-        String aid = getActivity().getIntent().getExtras().getString("aid");
+        String aid = getArguments().getString("aid");
         RecyclerAdapter adapter = new RecyclerAdapter(getActivity(), parser.parseNumerobyEID(getJson()),aid,parser.parseEidsbyEID(getJson()));
         rvAnimes.setAdapter(adapter);
 
         return view;
     }
     public String getJson(){
-        String aid = getActivity().getIntent().getExtras().getString("aid");
+        String aid = getArguments().getString("aid");
         String json="";
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {

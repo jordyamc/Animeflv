@@ -34,6 +34,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
@@ -48,6 +50,7 @@ import java.util.Collections;
 import java.util.List;
 
 import knf.animeflv.AnimeCompare;
+import knf.animeflv.Application;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterBusquedaNew;
@@ -411,6 +414,10 @@ public class Directorio extends AppCompatActivity {
         menuGlobal = menu;
         Bundle bundle = getIntent().getExtras();
         if (bundle == null) {
+            Application application = (Application) getApplication();
+            Tracker mTracker = application.getDefaultTracker();
+            mTracker.setScreenName("Directorio");
+            mTracker.send(new HitBuilders.ScreenViewBuilder().build());
             editText.setVisibility(View.GONE);
             //generosS.setVisibility(View.VISIBLE);
             generosS.setVisibility(View.GONE);
@@ -424,6 +431,10 @@ public class Directorio extends AppCompatActivity {
             }
             getSupportActionBar().setTitle("Directorio");
         } else {
+            Application application = (Application) getApplication();
+            Tracker mTracker = application.getDefaultTracker();
+            mTracker.setScreenName("Busqueda");
+            mTracker.send(new HitBuilders.ScreenViewBuilder().build());
             if (!isXLargeScreen(context)) {
                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menu);
             } else {

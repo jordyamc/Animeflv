@@ -63,6 +63,8 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.exoplayer.C;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -408,6 +410,10 @@ public class Main extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
         context = this;
+        Application application = (Application) getApplication();
+        Tracker mTracker = application.getDefaultTracker();
+        mTracker.setScreenName("Recientes");
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
         parser.refreshUrls(this);
         extraRules();
         String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -2691,9 +2697,12 @@ public class Main extends AppCompatActivity implements
                                             toast("Error al restaurar");
                                             saveData.delete();
                                         } else {
-                                            //new Requests(context, TaskType.GET_INICIO).execute(getInicio());
-                                            loadMainJson();
-                                            getHDraw(true);
+                                            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
+                                                recreate();
+                                            } else {
+                                                loadMainJson();
+                                                getHDraw(true);
+                                            }
                                         }
                                     }
 

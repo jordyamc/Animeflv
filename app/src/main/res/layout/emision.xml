@@ -23,7 +23,7 @@
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
             android:clipToPadding="false"
-            app:stl_distributeEvenly="true"
+            app:stl_distributeEvenly="false"
             app:stl_indicatorInterpolation="smart"
             app:stl_indicatorColor="@color/dark"
             app:stl_indicatorThickness="40dp"

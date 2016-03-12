@@ -38,6 +38,9 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.SyncHttpClient;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -59,11 +62,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import cz.msebera.android.httpclient.Header;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
+import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.TaskType;
 
 /**
@@ -125,11 +130,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public void onBindViewHolder(final RecyclerAdapter.ViewHolder holder, final int position) {
         SetUpWeb(holder.web, holder);
 
-        final String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
+        final String item = capitulo.get(position).replace("Capitulo ", "").trim();
         final File file=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/"+id+"/"+id+"_"+item+".mp4");
         final File sd=new File(getSD1() + "/Animeflv/download/"+id+"/"+id+"_"+item+".mp4");
-        final String email_coded=PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
-        final String pass_coded=PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
         if (file.exists()||sd.exists()){
             holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
         }else {
@@ -188,7 +191,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         dialog.show();
                     }
                 } else {
-                    final String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
+                    final String item = capitulo.get(position).replace("Capitulo ", "").trim();
                     MaterialDialog borrar = new MaterialDialog.Builder(context)
                             .title("Eliminar")
                             .titleGravity(GravityEnum.CENTER)
@@ -253,29 +256,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
+                String item = capitulo.get(position).replace("Capitulo ", "").trim();
                 Boolean vistos=context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("cambio", true).apply();
                 if (!vistos){
                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
-                    String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                    Svistos=Svistos+";;;"+"visto" + id + "_" + item;
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                    String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                    if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                        //new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
-                    }
                     holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
                 }else {
                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, false).apply();
-                    String Svistos=context.getSharedPreferences("data",Context.MODE_PRIVATE).getString("vistos","");
-                    Svistos=Svistos.replace(";;;"+"visto" + id + "_" + item,"");
-                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                    String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                    if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-                        //new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute("http://animeflvapp.x10.mx/fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos+":;:"+Svistos);
+                    if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
+                        holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.blanco));
+                    } else {
+                        holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
                     }
-                    holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
                 }
             }
         });
@@ -320,7 +313,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         ib_des.setImageResource(R.drawable.ic_borrar_r);
         ib_ver.setImageResource(R.drawable.ic_rep_r);
         ib_ver.setEnabled(true);
-        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
+        String item = capitulo.get(position).replace("Capitulo ", "").trim();
         Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
         if (!vistos) {
             tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
@@ -332,7 +325,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         ib_des.setImageResource(R.drawable.ic_borrar_r);
         ib_ver.setImageResource(R.drawable.ic_rep_r);
         ib_ver.setEnabled(true);
-        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
+        String item = capitulo.get(position).replace("Capitulo ", "").trim();
         Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
         if (!vistos) {
             tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
@@ -344,7 +337,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         ib_des.setImageResource(R.drawable.ic_borrar_r);
         ib_ver.setImageResource(R.drawable.ic_rep_r);
         ib_ver.setEnabled(true);
-        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
+        String item = capitulo.get(position).replace("Capitulo ", "").trim();
         Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
         if (!vistos) {
             tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
@@ -356,7 +349,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         ib_des.setImageResource(R.drawable.ic_borrar_r);
         ib_ver.setImageResource(R.drawable.ic_rep_r);
         ib_ver.setEnabled(true);
-        String item = capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1);
+        String item = capitulo.get(position).replace("Capitulo ", "").trim();
         Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
         if (!vistos) {
             tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
@@ -382,34 +375,37 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         @Override
         protected String doInBackground(String... params) {
-            HttpURLConnection c = null;
-            try {
-                URL u = new URL(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + params[0]);
-                Log.d("URL", u.toString());
-                c = (HttpURLConnection) u.openConnection();
-                c.setRequestProperty("Content-length", "0");
-                c.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");
-                c.setUseCaches(true);
-                c.setConnectTimeout(5000);
-                c.setAllowUserInteraction(false);
-                c.connect();
-                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-                StringBuilder sb = new StringBuilder();
-                String line = "";
-                while ((line = br.readLine()) != null) {
-                    sb.append(line + "\n");
+            new SyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + params[0], null, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    super.onSuccess(statusCode, headers, response);
+                    _response = response.toString();
                 }
-                br.close();
-                String json = sb.toString().trim();
-                if (new Parser().isJSONValid(json)) {
-                    _response = json;
-                } else {
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                    super.onSuccess(statusCode, headers, responseString);
+                    _response = responseString;
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    super.onFailure(statusCode, headers, responseString, throwable);
                     _response = "error";
                 }
-            } catch (Exception e) {
-                Log.e("log_tag", "Error in http connection " + e.toString());
-                _response = "error";
-            }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                    _response = "error";
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                    _response = "error";
+                }
+            });
             return _response;
         }
 
@@ -517,34 +513,37 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         @Override
         protected String doInBackground(String... params) {
-            HttpURLConnection c = null;
-            try {
-                URL u = new URL(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + params[0]);
-                Log.d("URL", u.toString());
-                c = (HttpURLConnection) u.openConnection();
-                c.setRequestProperty("Content-length", "0");
-                c.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4");
-                c.setUseCaches(true);
-                c.setConnectTimeout(5000);
-                c.setAllowUserInteraction(false);
-                c.connect();
-                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-                StringBuilder sb = new StringBuilder();
-                String line = "";
-                while ((line = br.readLine()) != null) {
-                    sb.append(line + "\n");
+            new SyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + params[0], null, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    super.onSuccess(statusCode, headers, response);
+                    _response = response.toString();
                 }
-                br.close();
-                String json = sb.toString().trim();
-                if (new Parser().isJSONValid(json)) {
-                    _response = json;
-                } else {
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                    super.onSuccess(statusCode, headers, responseString);
+                    _response = responseString;
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    super.onFailure(statusCode, headers, responseString, throwable);
                     _response = "error";
                 }
-            } catch (Exception e) {
-                Log.e("log_tag", "Error in http connection " + e.toString());
-                _response = "error";
-            }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                    _response = "error";
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                    _response = "error";
+                }
+            });
             return _response;
         }
 
@@ -797,7 +796,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     }
                     File archivo = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")) + "/" + fileName);
                     if (!archivo.exists()) {
-                        String item = capitulo.get(holder.getAdapterPosition()).substring(capitulo.get(holder.getAdapterPosition()).lastIndexOf(" ") + 1).trim();
+                        String item = capitulo.get(holder.getAdapterPosition()).replace("Capitulo ", "").trim();
                         String urlD = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("urlD", null);
                         CookieManager cookieManager = CookieManager.getInstance();
                         String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
@@ -819,142 +818,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
                     streaming = false;
                     web.loadUrl("about:blank");
+                    CookieConstructor constructor = new CookieConstructor(cookie, web.getSettings().getUserAgentString(), urlD);
                     if (type == 1) {
-                        List<ApplicationInfo> packages;
-                        PackageManager pm;
-                        pm = context.getPackageManager();
-                        packages = pm.getInstalledApplications(0);
-                        String pack = "null";
-                        for (ApplicationInfo packageInfo : packages) {
-                            if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
-                                pack = "com.mxtech.videoplayer.pro";
-                                break;
-                            }
-                            if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
-                                pack = "com.mxtech.videoplayer.ad";
-                                break;
-                            }
-                        }
-                        switch (pack) {
-                            case "com.mxtech.videoplayer.pro":
-                                Intent intent = new Intent(Intent.ACTION_VIEW);
-                                Uri videoUri = Uri.parse(url);
-                                intent.setDataAndType(videoUri, "application/mp4");
-                                intent.putExtra("title", getTit() + " " + getNum(posT));
-                                intent.setPackage("com.mxtech.videoplayer.pro");
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                String[] headers = {"cookie", cookie, "User-Agent", web.getSettings().getUserAgentString(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", urlD};
-                                intent.putExtra("headers", headers);
-                                context.startActivity(intent);
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + getNum(posT), true).apply();
-                                String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                                if (!vistos.contains(eids.get(posT))) {
-                                    vistos = vistos + eids.get(posT) + ":::";
-                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-                                }
-                                break;
-                            case "com.mxtech.videoplayer.ad":
-                                Intent intentad = new Intent(Intent.ACTION_VIEW);
-                                Uri videoUriad = Uri.parse(url);
-                                intentad.setDataAndType(videoUriad, "application/mp4");
-                                intentad.setPackage("com.mxtech.videoplayer.ad");
-                                intentad.putExtra("title", getTit() + " " + getNum(posT));
-                                intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                String[] headersad = {"cookie", cookie, "User-Agent", web.getSettings().getUserAgentString(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", urlD};
-                                intentad.putExtra("headers", headersad);
-                                context.startActivity(intentad);
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + getNum(posT), true).apply();
-                                String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                                if (!vistosad.contains(eids.get(posT))) {
-                                    vistosad = vistosad + eids.get(posT) + ":::";
-                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
-                                }
-                                break;
-                            default:
-                                toast("MX player no instalado");
-                                break;
-                        }
+                        StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
                     } else {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            Bundle bundle = new Bundle();
-                            bundle.putString("url", url);
-                            bundle.putString("ops", "cookie:::" + cookie + ";;;" + "User-Agent:::" + web.getSettings().getUserAgentString() + ";;;" + "Accept:::text/html, application/xhtml+xml, */*;;;" + "Accept-Language:::en-US,en;q=0.7,he;q=0.3;;;" + "Referer:::" + urlD);
-                            Intent intent = parser.getPrefIntPlayer(context);
-                            intent.putExtras(bundle);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            context.startActivity(intent);
-                            final String email_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
-                            final String pass_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
-                            String item = capitulo.get(holder.getAdapterPosition()).substring(capitulo.get(holder.getAdapterPosition()).lastIndexOf(" ") + 1).trim();
-                            Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
-                            if (!vistos) {
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
-                                String Svistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                                Svistos = Svistos + ";;;" + "visto" + id + "_" + item;
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", Svistos).apply();
-                                String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                                    new LoginServer(context, TaskType.GET_FAV_SL, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + favoritos + ":;:" + Svistos);
-                                }
-                                holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.rojo));
-                            }
+                            StreamManager.internal(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
                         } else {
                             if (isMXinstalled()) {
                                 toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
-                                List<ApplicationInfo> packages;
-                                PackageManager pm;
-                                pm = context.getPackageManager();
-                                packages = pm.getInstalledApplications(0);
-                                String pack = "null";
-                                for (ApplicationInfo packageInfo : packages) {
-                                    if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
-                                        pack = "com.mxtech.videoplayer.pro";
-                                        break;
-                                    }
-                                    if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
-                                        pack = "com.mxtech.videoplayer.ad";
-                                        break;
-                                    }
-                                }
-                                switch (pack) {
-                                    case "com.mxtech.videoplayer.pro":
-                                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                                        Uri videoUri = Uri.parse(url);
-                                        intent.setDataAndType(videoUri, "application/mp4");
-                                        intent.putExtra("title", getTit() + " " + getNum(posT));
-                                        intent.setPackage("com.mxtech.videoplayer.pro");
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        String[] headers = {"cookie", cookie, "User-Agent", web.getSettings().getUserAgentString(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", urlD};
-                                        intent.putExtra("headers", headers);
-                                        context.startActivity(intent);
-                                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + getNum(posT), true).apply();
-                                        String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                                        if (!vistos.contains(eids.get(posT))) {
-                                            vistos = vistos + eids.get(posT) + ":::";
-                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-                                        }
-                                        break;
-                                    case "com.mxtech.videoplayer.ad":
-                                        Intent intentad = new Intent(Intent.ACTION_VIEW);
-                                        Uri videoUriad = Uri.parse(url);
-                                        intentad.setDataAndType(videoUriad, "application/mp4");
-                                        intentad.setPackage("com.mxtech.videoplayer.ad");
-                                        intentad.putExtra("title", getTit() + " " + getNum(posT));
-                                        intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        String[] headersad = {"cookie", cookie, "User-Agent", web.getSettings().getUserAgentString(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", urlD};
-                                        intentad.putExtra("headers", headersad);
-                                        context.startActivity(intentad);
-                                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + getNum(posT), true).apply();
-                                        String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                                        if (!vistosad.contains(eids.get(posT))) {
-                                            vistosad = vistosad + eids.get(posT) + ":::";
-                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
-                                        }
-                                        break;
-                                    default:
-                                        toast("MX player no instalado");
-                                        break;
-                                }
+                                StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
                             } else {
                                 toast("No hay reproductor adecuado disponible");
                             }

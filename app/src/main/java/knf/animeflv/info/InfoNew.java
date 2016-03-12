@@ -30,6 +30,8 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
@@ -52,6 +54,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import knf.animeflv.Application;
 import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
@@ -158,6 +161,10 @@ public class InfoNew extends AppCompatActivity implements Requests.callback, Log
         });
         Bundle bundleR = getIntent().getExtras();
         aid = bundleR.getString("aid", "1");
+        Application application = (Application) getApplication();
+        Tracker mTracker = application.getDefaultTracker();
+        mTracker.setScreenName("Info " + aid);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {
                 mediaStorage.mkdirs();
@@ -185,7 +192,7 @@ public class InfoNew extends AppCompatActivity implements Requests.callback, Log
                 viewPager.setAdapter(adapter);
                 viewPagerTab.setViewPager(viewPager);
             } else {
-                toast("No hat cache para mostrar");
+                toast("No hay cache para mostrar");
                 finish();
             }
         } else {

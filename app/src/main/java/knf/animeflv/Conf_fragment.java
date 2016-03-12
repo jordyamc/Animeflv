@@ -20,10 +20,12 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.lb.material_preferences_library.custom_preferences.ListPreference;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,6 +37,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+
+import xdroid.toaster.Toaster;
 
 /**
  * Created by Jordy on 16/08/2015.
@@ -186,6 +190,146 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
+        getPreferenceScreen().findPreference("sonido").setSummary(getResources().getStringArray(R.array.sonidos)[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("sonido", "0"))]);
+        getPreferenceScreen().findPreference("sonido").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new MaterialDialog.Builder(myContext)
+                        .title("Sonido")
+                        .titleGravity(GravityEnum.CENTER)
+                        .items(getResources().getStringArray(R.array.sonidos))
+                        .itemsCallbackSingleChoice(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("sonido", "0")), new MaterialDialog.ListCallbackSingleChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("sonido", String.valueOf(which)).apply();
+                                getPreferenceScreen().findPreference("sonido").setSummary(text);
+                                return true;
+                            }
+                        })
+                        .show();
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("tiempo").setSummary("Revisar actualizaciones cada " + getResources().getStringArray(R.array.minutos)[Arrays.asList(getResources().getStringArray(R.array.min_val)).indexOf(PreferenceManager.getDefaultSharedPreferences(myContext).getString("tiempo", "60000"))]);
+        getPreferenceScreen().findPreference("tiempo").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new MaterialDialog.Builder(myContext)
+                        .title("Revisar cada")
+                        .titleGravity(GravityEnum.CENTER)
+                        .items(getResources().getStringArray(R.array.minutos))
+                        .itemsCallbackSingleChoice(Arrays.asList(getResources().getStringArray(R.array.min_val)).indexOf(PreferenceManager.getDefaultSharedPreferences(myContext).getString("tiempo", "60000")), new MaterialDialog.ListCallbackSingleChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("tiempo", getResources().getStringArray(R.array.min_val)[which]).apply();
+                                getPreferenceScreen().findPreference("tiempo").setSummary("Revisar actualizaciones cada " + text);
+                                return true;
+                            }
+                        })
+                        .show();
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("t_conexion").setSummary(getResources().getStringArray(R.array.tipos)[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_conexion", "0"))]);
+        getPreferenceScreen().findPreference("t_conexion").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new MaterialDialog.Builder(myContext)
+                        .title("Usar Conexion")
+                        .titleGravity(GravityEnum.CENTER)
+                        .items(getResources().getStringArray(R.array.tipos))
+                        .itemsCallbackSingleChoice(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_conexion", "0")), new MaterialDialog.ListCallbackSingleChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("t_conexion", String.valueOf(which)).apply();
+                                getPreferenceScreen().findPreference("t_conexion").setSummary(text);
+                                return true;
+                            }
+                        })
+                        .show();
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("t_busqueda").setSummary(getResources().getStringArray(R.array.busqueda)[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_busqueda", "0"))]);
+        getPreferenceScreen().findPreference("t_busqueda").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new MaterialDialog.Builder(myContext)
+                        .title("Tipo de busqueda")
+                        .titleGravity(GravityEnum.CENTER)
+                        .items(getResources().getStringArray(R.array.busqueda))
+                        .itemsCallbackSingleChoice(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_busqueda", "0")), new MaterialDialog.ListCallbackSingleChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("t_busqueda", String.valueOf(which)).apply();
+                                getPreferenceScreen().findPreference("t_busqueda").setSummary(text);
+                                return true;
+                            }
+                        })
+                        .show();
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("t_video").setSummary("Reproductor: " + getResources().getStringArray(R.array.players)[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_video", "0"))]);
+        getPreferenceScreen().findPreference("t_video").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new MaterialDialog.Builder(myContext)
+                        .title("Reproductor")
+                        .titleGravity(GravityEnum.CENTER)
+                        .items(getResources().getStringArray(R.array.players))
+                        .itemsCallbackSingleChoice(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_video", "0")), new MaterialDialog.ListCallbackSingleChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("t_video", String.valueOf(which)).apply();
+                                getPreferenceScreen().findPreference("t_video").setSummary("Reproductor: " + text);
+                                return true;
+                            }
+                        })
+                        .show();
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("t_streaming").setSummary("Reproductor: " + getResources().getStringArray(R.array.players)[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_streaming", "0"))]);
+        getPreferenceScreen().findPreference("t_streaming").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new MaterialDialog.Builder(myContext)
+                        .title("Reproductor")
+                        .titleGravity(GravityEnum.CENTER)
+                        .items(getResources().getStringArray(R.array.players))
+                        .itemsCallbackSingleChoice(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_streaming", "0")), new MaterialDialog.ListCallbackSingleChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("t_streaming", String.valueOf(which)).apply();
+                                getPreferenceScreen().findPreference("t_streaming").setSummary("Reproductor: " + text);
+                                return true;
+                            }
+                        })
+                        .show();
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("t_player").setSummary("Tipo: " + getResources().getStringArray(R.array.players_type)[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_player", "0"))]);
+        getPreferenceScreen().findPreference("t_player").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new MaterialDialog.Builder(myContext)
+                        .title("Selecciona")
+                        .titleGravity(GravityEnum.CENTER)
+                        .items(getResources().getStringArray(R.array.players_type))
+                        .itemsCallbackSingleChoice(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_player", "0")), new MaterialDialog.ListCallbackSingleChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("t_player", String.valueOf(which)).apply();
+                                getPreferenceScreen().findPreference("t_player").setSummary("Tipo: " + text);
+                                return true;
+                            }
+                        })
+                        .show();
+                return false;
+            }
+        });
     }
 
     private int count() {
@@ -210,8 +354,10 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         for (File f:files) {
             size = size+f.length();
         }
-        for (File f1:mediaStorage){
-            size = size+f1.length();
+        if (mediaStorage != null) {
+            for (File f1 : mediaStorage) {
+                size = size + f1.length();
+            }
         }
         return size;
     }

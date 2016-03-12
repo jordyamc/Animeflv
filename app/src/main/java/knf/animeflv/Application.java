@@ -1,5 +1,7 @@
 package knf.animeflv;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
 import com.karumi.dexter.Dexter;
 import com.parse.Parse;
 import com.parse.ParseObject;
@@ -19,5 +21,16 @@ public class Application extends android.app.Application {
         android.webkit.CookieManager.getInstance().setAcceptCookie(true);
         WebkitCookieManagerProxy coreCookieManager = new WebkitCookieManagerProxy(null, java.net.CookiePolicy.ACCEPT_ALL);
         java.net.CookieHandler.setDefault(coreCookieManager);
+    }
+
+    private Tracker mTracker;
+
+    synchronized public Tracker getDefaultTracker() {
+        if (mTracker == null) {
+            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+            // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
+            mTracker = analytics.newTracker(R.xml.global_tracker);
+        }
+        return mTracker;
     }
 }

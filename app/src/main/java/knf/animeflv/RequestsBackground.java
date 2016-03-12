@@ -390,6 +390,7 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                 mBuilder.setAutoCancel(true);
                                 mBuilder.setPriority(Notification.PRIORITY_MAX);
                                 mBuilder.setLights(Color.argb(0, 255, 128, 0), 5000, 2000);
+                                mBuilder.setGroup("animeflv_group");
                                 Intent resultIntent = new Intent(context, Main.class);
                                 PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                                 mBuilder.setContentIntent(resultPendingIntent);
@@ -465,6 +466,7 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                         mBuilder.setAutoCancel(true);
                         mBuilder.setPriority(Notification.PRIORITY_MAX);
                         mBuilder.setLights(Color.BLUE, 5000, 2000);
+                        mBuilder.setGroup("animeflv_group");
                         Intent resultIntent = new Intent(context, Main.class);
                         Bundle bundle = new Bundle();
                         bundle.putString("act", "1");
@@ -550,6 +552,7 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                         mBuilder.setAutoCancel(true);
                         mBuilder.setPriority(Notification.PRIORITY_MAX);
                         mBuilder.setLights(Color.BLUE, 5000, 2000);
+                        mBuilder.setGroup("animeflv_group");
                         Intent resultIntent = new Intent(Intent.ACTION_VIEW)
                                 .setDataAndType(Uri.fromFile(descarga),
                                         "application/vnd.android.package-archive");
@@ -605,6 +608,7 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
         mBuilder.setAutoCancel(true);
         mBuilder.setPriority(Notification.PRIORITY_MAX);
         mBuilder.setLights(Color.BLUE, 5000, 2000);
+        mBuilder.setGroup("animeflv_group");
         Intent resultIntent = new Intent(context, BackDownload.class);
         Bundle bundle = new Bundle();
         bundle.putString("aid", aid);

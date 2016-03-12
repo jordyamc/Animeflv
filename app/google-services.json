@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_id": "animeflvapp",
+    "project_number": "545685263928",
+    "name": "AnimeFlvApp"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545685263928:android:a8774144a5b04ee0",
+        "client_id": "android:knf.animeflv",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "knf.animeflv",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-40289745-2"
+          }
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}

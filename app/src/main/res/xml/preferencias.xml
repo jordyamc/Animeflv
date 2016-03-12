@@ -6,34 +6,25 @@
             android:defaultValue="true"
             android:key="notificaciones"
             android:title="Activar Notificaciones" />
-        <com.lb.material_preferences_library.custom_preferences.ListPreference
+        <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="60000"
             android:key="tiempo"
             android:title="Actualizaciones"
             android:summary="Revisar actualizaciones cada %s"
-            app:dialogTitle="Revisar cada:"
-            app:entries="@array/minutos"
-            app:entryValues="@array/min_val"
             android:enabled="true" />
-        <com.lb.material_preferences_library.custom_preferences.ListPreference
+        <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="sonido"
             android:title="Sonido de Notificacion"
             android:summary="%s"
-            app:dialogTitle="Sonido:"
-            app:entries="@array/sonidos"
-            app:entryValues="@array/tipos_sonidos"
             android:enabled="true" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Conexiones">
-        <com.lb.material_preferences_library.custom_preferences.ListPreference
+        <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_conexion"
             android:title="Usar Conexion"
-            android:summary="%s"
-            app:dialogTitle="Tipo de conexion"
-            app:entries="@array/tipos"
-            app:entryValues="@array/tipos_val" />
+            android:summary="%s" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Colores">
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
@@ -42,40 +33,28 @@
             android:title="Modo AMOLED" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Busqueda">
-        <com.lb.material_preferences_library.custom_preferences.ListPreference
+        <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_busqueda"
             android:title="Tipo de busqueda"
-            android:summary="%s"
-            app:dialogTitle="Tipo de busqueda"
-            app:entries="@array/busqueda"
-            app:entryValues="@array/tipos_busqueda" />
+            android:summary="%s" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Reproductores">
-        <com.lb.material_preferences_library.custom_preferences.ListPreference
+        <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_video"
             android:title="Anime descargado"
-            android:summary="Reproductor: %s"
-            app:dialogTitle="Reproductor"
-            app:entries="@array/players"
-            app:entryValues="@array/tipos_busqueda" />
-        <com.lb.material_preferences_library.custom_preferences.ListPreference
+            android:summary="Reproductor: %s" />
+        <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_streaming"
             android:title="Streaming"
-            android:summary="Reproductor: %s"
-            app:dialogTitle="Reproductor"
-            app:entries="@array/players"
-            app:entryValues="@array/tipos_busqueda" />
-        <com.lb.material_preferences_library.custom_preferences.ListPreference
+            android:summary="Reproductor: %s" />
+        <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_player"
             android:title="Reproductor Interno"
-            android:summary="Tipo: %s"
-            app:dialogTitle="Selecciona"
-            app:entries="@array/players_type"
-            app:entryValues="@array/players_ints" />
+            android:summary="Tipo: %s" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Extras">
         <com.lb.material_preferences_library.custom_preferences.Preference

@@ -1763,6 +1763,49 @@ public class Parser {
         return corregirTit(ret);
     }
 
+    public String getAidCached(String tipe, String url) {
+        String ret = "0";
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONArray jsonArray = new JSONArray(getStringFromFile(file_loc));
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject nombreJ = jsonArray.getJSONObject(i);
+                    String tipo = nombreJ.getString("c").toLowerCase();
+                    String corto = nombreJ.getString("d");
+                    if (tipe.trim().equals(tipo.trim()) && corto.trim().equals(url.trim())) {
+                        return corregirTit(nombreJ.getString("a"));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public String getAidCached(String url) {
+        String ret = "0";
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONArray jsonArray = new JSONArray(getStringFromFile(file_loc));
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject nombreJ = jsonArray.getJSONObject(i);
+                    String corto = nombreJ.getString("d");
+                    if (corto.trim().equals(url.trim())) {
+                        return corregirTit(nombreJ.getString("a"));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
     public boolean isJSONValid(String test) {
         try {
             new JSONObject(test);
@@ -1931,6 +1974,9 @@ public class Parser {
             JSONObject playStream = new JSONObject();
             playStream.put("name", "t_streaming");
             playStream.put("value", PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
+            JSONObject isAmoled = new JSONObject();
+            isAmoled.put("name", "is_amoled");
+            isAmoled.put("value", PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false));
             jsonArray.put(not);
             jsonArray.put(tmp);
             jsonArray.put(sonido);
@@ -1941,6 +1987,7 @@ public class Parser {
             jsonArray.put(autoUp);
             jsonArray.put(playVid);
             jsonArray.put(playStream);
+            jsonArray.put(isAmoled);
             jsonObject.put("preferencias", jsonArray);
             File saveData = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/data.save");
             if (saveData.exists()) {

@@ -25,6 +25,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -97,7 +98,11 @@ public class Splash extends AwesomeSplash {
                 splash = R.color.amor;
                 break;
             default:
-                splash = R.color.nmain;
+                if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+                    splash = R.color.prim;
+                } else {
+                    splash = R.color.nmain;
+                }
                 break;
         }
         if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("isDown", false))
@@ -125,7 +130,11 @@ public class Splash extends AwesomeSplash {
                 splash = R.drawable.pepe_corazon;
                 break;
             default:
-                splash = R.drawable.splash;
+                if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+                    splash = R.drawable.dark_umaru;
+                } else {
+                    splash = R.drawable.splash;
+                }
                 break;
         }
         if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("isDown", false))
@@ -136,7 +145,7 @@ public class Splash extends AwesomeSplash {
     public String getSplashText() {
         String text;
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
         String fecha = dateFormat.format(calendar.getTime());
         String trim = fecha.substring(0, fecha.lastIndexOf("-"));
         switch (trim) {

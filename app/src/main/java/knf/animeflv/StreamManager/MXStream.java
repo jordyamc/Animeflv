@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.List;
 
 import knf.animeflv.DownloadManager.CookieConstructor;
@@ -123,6 +124,61 @@ public class MXStream {
                 intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 String[] headers1 = {"cookie", constructor.getCookie(), "User-Agent", constructor.getUseAgent(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", constructor.getReferer()};
                 intentad.putExtra("headers", headers1);
+                context.startActivity(intentad);
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
+                String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                if (!vistosad.contains(eid)) {
+                    vistosad = vistosad + eid + ":::";
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
+                }
+                break;
+            default:
+                Toast.makeText(context, "MX player no instalado", Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
+
+    public void Play(String eid, File file) {
+        String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
+        String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
+        List<ApplicationInfo> packages;
+        PackageManager pm;
+        pm = context.getPackageManager();
+        packages = pm.getInstalledApplications(0);
+        String pack = "null";
+        for (ApplicationInfo packageInfo : packages) {
+            if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
+                pack = "com.mxtech.videoplayer.pro";
+                break;
+            }
+            if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
+                pack = "com.mxtech.videoplayer.ad";
+                break;
+            }
+        }
+        switch (pack) {
+            case "com.mxtech.videoplayer.pro":
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                Uri videoUri = Uri.fromFile(file);
+                intent.setDataAndType(videoUri, "application/mp4");
+                intent.setPackage("com.mxtech.videoplayer.pro");
+                intent.putExtra("title", parser.getTitCached(aid) + " " + numero);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
+                String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                if (!vistos.contains(eid)) {
+                    vistos = vistos + eid + ":::";
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
+                }
+                break;
+            case "com.mxtech.videoplayer.ad":
+                Intent intentad = new Intent(Intent.ACTION_VIEW);
+                Uri videoUriad = Uri.fromFile(file);
+                intentad.setDataAndType(videoUriad, "application/mp4");
+                intentad.setPackage("com.mxtech.videoplayer.ad");
+                intentad.putExtra("title", parser.getTitCached(aid) + " " + numero);
+                intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intentad);
                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
                 String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");

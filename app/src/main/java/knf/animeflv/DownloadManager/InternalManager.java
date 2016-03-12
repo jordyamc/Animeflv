@@ -14,6 +14,7 @@ import java.io.File;
 
 import knf.animeflv.DManager;
 import knf.animeflv.Parser;
+import xdroid.toaster.Toaster;
 
 /**
  * Created by Jordy on 04/03/2016.

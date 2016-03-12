@@ -17,12 +17,12 @@
     <application
         android:name=".Application"
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        tools:replace="icon,label"
         android:largeHeap="true"
-        android:hardwareAccelerated="true">
+        android:theme="@style/AppTheme"
+        tools:replace="icon,label">
         <activity
             android:name=".Main"
             android:label="@string/app_name"
@@ -35,6 +35,16 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data
+                    android:scheme="http"
+                    android:host="animeflv.net"/>
+            </intent-filter>
+            -->
         </activity>
         <activity
             android:name=".WebDescarga"
@@ -69,10 +79,6 @@
             android:label="@string/app_name"
             android:theme="@style/Theme.Transparent" />
         <activity
-            android:name=".info.RelActInfo"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Transparent" />
-        <activity
             android:name=".BackDownload"
             android:label="@string/app_name"
             android:theme="@style/Theme.Transparent" />
@@ -93,7 +99,6 @@
         <activity
             android:name=".Emision.Section.EmisionActivity"
             android:label="@string/app_name" />
-
         <activity
             android:name=".Player"
             android:label="@string/app_name"
@@ -106,6 +111,60 @@
             android:name=".PlayerExo"
             android:label="@string/app_name"
             android:theme="@style/player" />
+        <activity
+            android:name=".info.InfoNewDeep"
+            android:label="@string/app_name">
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="animeflv.net"
+                    android:pathPrefix="/anime/"
+                    android:scheme="http" />
+            </intent-filter>
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="animeflv.net"
+                    android:pathPrefix="/ova/"
+                    android:scheme="http" />
+            </intent-filter>
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="animeflv.net"
+                    android:pathPrefix="/pelicula/"
+                    android:scheme="http" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".BackDownloadDeep"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Transparent">
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="animeflv.net"
+                    android:pathPrefix="/ver/"
+                    android:scheme="http" />
+            </intent-filter>
+        </activity>
+
         <receiver
             android:name=".Alarm"
             android:exported="true">
@@ -125,12 +184,12 @@
 
         <activity
             android:name=".ADS"
-            android:label="@string/title_activity_ads" /> <!-- Include the AdActivity configChanges and theme. -->
+            android:label="@string/title_activity_ads" />
+        <!-- Include the AdActivity configChanges and theme. -->
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:theme="@android:style/Theme.Translucent" />
-
     </application>
 
 </manifest>

@@ -86,7 +86,7 @@ public class AnimeInfo extends Fragment{
         return view;
     }
     public void getJsonfromFile(){
-        String aid = getActivity().getIntent().getExtras().getString("aid");
+        String aid = getArguments().getString("aid");
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {
                 mediaStorage.mkdirs();
@@ -102,7 +102,7 @@ public class AnimeInfo extends Fragment{
     }
     public String getJsonfromFile(Boolean bool){
         String json="{}";
-        String aid = getActivity().getIntent().getExtras().getString("aid");
+        String aid = getArguments().getString("aid");
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
             if (!mediaStorage.exists()) {
                 mediaStorage.mkdirs();
