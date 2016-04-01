@@ -10,11 +10,11 @@ import knf.animeflv.TaskType;
  * Created by Jordy on 05/03/2016.
  */
 public class TimeCompareModel {
-    String aid;
-    Context context;
-    Parser parser = new Parser();
-    SharedPreferences preferences;
-    boolean nodata = false;
+    private String aid;
+    private Context context;
+    private Parser parser = new Parser();
+    private SharedPreferences preferences;
+    private boolean nodata = false;
 
     public TimeCompareModel(String aid, Context context) {
         this.aid = aid;

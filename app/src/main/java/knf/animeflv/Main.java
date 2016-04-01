@@ -17,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.Signature;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -28,6 +29,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -62,7 +64,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.google.android.exoplayer.C;
+import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.karumi.dexter.Dexter;
@@ -111,12 +113,9 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Directorio.Directorio;
@@ -126,6 +125,7 @@ import knf.animeflv.Emision.AnimeListConstructor;
 import knf.animeflv.Emision.EmisionChecker;
 import knf.animeflv.Emision.Section.EmisionActivity;
 import knf.animeflv.StreamManager.StreamManager;
+import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.info.Info;
 import knf.animeflv.info.InfoNew;
 import pl.droidsonroids.gif.GifImageButton;
@@ -135,7 +135,8 @@ public class Main extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener,
         Requests.callback,
         LoginServer.callback,
-        DirGetter.callback {
+        DirGetter.callback,
+        ColorChooserDialog.ColorCallback {
     public Boolean tbool;
     WebView web;
     WebView web_Links;
@@ -331,6 +332,7 @@ public class Main extends AppCompatActivity implements
     TaskType secundario = TaskType.SECUNDARIA;
     int intentos = 0;
     boolean frun;
+    Boolean isAmoled = false;
     private Handler handler = new Handler();
     private Runnable runnable = new Runnable() {
         @Override
@@ -339,8 +341,6 @@ public class Main extends AppCompatActivity implements
             handler.postDelayed(this, 500);
         }
     };
-
-    Boolean isAmoled = false;
 
     public static String byte2HexFormatted(byte[] arr) {
         StringBuilder str = new StringBuilder(arr.length * 2);
@@ -384,6 +384,7 @@ public class Main extends AppCompatActivity implements
         }
         return ret;
     }
+
     public static boolean isNumeric(String str) {
         DecimalFormatSymbols currentLocaleSymbols = DecimalFormatSymbols.getInstance();
         char localeMinusSign = currentLocaleSymbols.getMinusSign();
@@ -404,8 +405,46 @@ public class Main extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
-            setTheme(R.style.AppThemeDarkNo);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(this));
+        if (preferences.getBoolean("is_amoled", false)) {
+            if (accent == ColorsRes.Rojo(this)) {
+                setTheme(R.style.AppThemeDarkNoRojo);
+            }
+            if (accent == ColorsRes.Naranja(this)) {
+                setTheme(R.style.AppThemeDarkNoNaranja);
+            }
+            if (accent == ColorsRes.Gris(this)) {
+                setTheme(R.style.AppThemeDarkNoGris);
+            }
+            if (accent == ColorsRes.Verde(this)) {
+                setTheme(R.style.AppThemeDarkNoVerde);
+            }
+            if (accent == ColorsRes.Rosa(this)) {
+                setTheme(R.style.AppThemeDarkNoRosa);
+            }
+            if (accent == ColorsRes.Morado(this)) {
+                setTheme(R.style.AppThemeDarkNoMorado);
+            }
+        } else {
+            if (accent == ColorsRes.Rojo(this)) {
+                setTheme(R.style.AppThemeNoRojo);
+            }
+            if (accent == ColorsRes.Naranja(this)) {
+                setTheme(R.style.AppThemeNoNaranja);
+            }
+            if (accent == ColorsRes.Gris(this)) {
+                setTheme(R.style.AppThemeNoGris);
+            }
+            if (accent == ColorsRes.Verde(this)) {
+                setTheme(R.style.AppThemeNoVerde);
+            }
+            if (accent == ColorsRes.Rosa(this)) {
+                setTheme(R.style.AppThemeNoRosa);
+            }
+            if (accent == ColorsRes.Morado(this)) {
+                setTheme(R.style.AppThemeNoMorado);
+            }
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_inicio);
@@ -417,7 +456,8 @@ public class Main extends AppCompatActivity implements
         parser.refreshUrls(this);
         extraRules();
         String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        ExceptionHandler.register(this, parser.getBaseUrl(normal, this) + "errors/server.php?id=" + androidID);
+        mTracker.send(new HitBuilders.EventBuilder("Inicio", "Start as " + androidID).build());
+        ExceptionHandler.register(this, parser.getBaseUrl(normal, this) + "/errors/server.php?id=" + androidID);
         shouldExecuteOnResume = false;
         if (!getSharedPreferences("data", MODE_PRIVATE).getBoolean("intro", false)) {
             startActivity(new Intent(this, Intro.class));
@@ -436,16 +476,10 @@ public class Main extends AppCompatActivity implements
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             ltoolbar = (Toolbar) findViewById(R.id.ltoolbar);
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(getResources().getColor(R.color.dark));
-            getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
-        }
         toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
             toolbar.setBackgroundColor(getResources().getColor(R.color.negro));
+            toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -454,6 +488,14 @@ public class Main extends AppCompatActivity implements
                 getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
             }
             isAmoled = true;
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(getResources().getColor(R.color.dark));
+                getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
+            }
         }
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Recientes");
@@ -850,29 +892,31 @@ public class Main extends AppCompatActivity implements
     }
 
     public int getHDraw(final Boolean set) {
-        int color = getSharedPreferences("data", Context.MODE_PRIVATE).getInt("color", 0);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         int drawable = R.drawable.cargando;
         headerTit = "Animeflv";
         String e = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email", "null");
+        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(this));
         if (!e.equals("null")) headerTit = e;
-        switch (color) {
-            case 0:
-                drawable = R.drawable.naranja;
-                break;
-            case 1:
-                drawable = R.drawable.amarillo;
-                break;
-            case 2:
-                drawable = R.drawable.rojo;
-                break;
-            case 3:
-                drawable = R.drawable.rosa;
-                break;
-            case 4:
-                drawable = R.drawable.alnek;
-                headerTit = "";
-                break;
+        if (accent == ColorsRes.Rojo(this)) {
+            drawable = R.drawable.rojo;
         }
+        if (accent == ColorsRes.Naranja(this)) {
+            drawable = R.drawable.naranja;
+        }
+        if (accent == ColorsRes.Gris(this)) {
+            drawable = R.drawable.gris;
+        }
+        if (accent == ColorsRes.Verde(this)) {
+            drawable = R.drawable.verde;
+        }
+        if (accent == ColorsRes.Rosa(this)) {
+            drawable = R.drawable.rosa;
+        }
+        if (accent == ColorsRes.Morado(this)) {
+            drawable = R.drawable.morado;
+        }
+
         if (set) {
             ArrayList<IProfile> profile = new ArrayList<>();
             profile.add(new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withIcon(getResources().getDrawable(R.mipmap.ic_launcher)).withIdentifier(9));
@@ -920,7 +964,7 @@ public class Main extends AppCompatActivity implements
         List<String> a = Arrays.asList(aids);
         List<String> n = Arrays.asList(numeros);
         File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + a.get(index) + "/" + a.get(index) + "_" + n.get(a.indexOf(a.get(index))) + ".mp4");
-        File sd = new File(getSD1() + "/Animeflv/download/" + a.get(index) + "/" + a.get(index) + "_" + n.get(a.indexOf(a.get(index))) + ".mp4");
+        File sd = new File(FileUtil.getSDPath() + "/Animeflv/download/" + a.get(index) + "/" + a.get(index) + "_" + n.get(a.indexOf(a.get(index))) + ".mp4");
         int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_video", "0"));
         Log.d("Play type", String.valueOf(type));
         switch (type) {
@@ -1062,7 +1106,7 @@ public class Main extends AppCompatActivity implements
             List<String> a = Arrays.asList(aids);
             List<String> n = Arrays.asList(numeros);
             final File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + a.get(index) + "/" + a.get(index) + "_" + n.get(a.indexOf(a.get(index))) + ".mp4");
-            final File sd = new File(getSD1() + "/Animeflv/download/" + a.get(index) + "/" + a.get(index) + "_" + n.get(a.indexOf(a.get(index))) + ".mp4");
+            final File sd = new File(FileUtil.getSDPath() + "/Animeflv/download/" + a.get(index) + "/" + a.get(index) + "_" + n.get(a.indexOf(a.get(index))) + ".mp4");
             File del = new File("");
             if (file.exists()) {
                 del = file;
@@ -1505,28 +1549,51 @@ public class Main extends AppCompatActivity implements
         txtCapitulo18 = (TextView) findViewById(R.id.tv_cardD_capitulo18);
         txtCapitulo19 = (TextView) findViewById(R.id.tv_cardD_capitulo19);
         txtCapitulo20 = (TextView) findViewById(R.id.tv_cardD_capitulo20);
+        int color = ColorsRes.Naranja(this);
+        try {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            int accent = preferences.getInt("accentColor", ColorsRes.Naranja(this));
+            if (accent == ColorsRes.Rojo(this)) {
+                color = ColorsRes.Rojo(this);
+            }
+            if (accent == ColorsRes.Naranja(this)) {
+                color = ColorsRes.Naranja(this);
+            }
+            if (accent == ColorsRes.Gris(this)) {
+                color = ColorsRes.Gris(this);
+            }
+            if (accent == ColorsRes.Verde(this)) {
+                color = ColorsRes.Verde(this);
+            }
+            if (accent == ColorsRes.Rosa(this)) {
+                color = ColorsRes.Rosa(this);
+            }
+            if (accent == ColorsRes.Morado(this)) {
+                color = ColorsRes.Morado(this);
+            }
 
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
-            txtCapitulo1.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo2.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo3.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo4.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo5.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo6.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo7.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo8.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo9.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo10.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo11.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo12.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo13.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo14.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo15.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo16.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo17.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo18.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo19.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txtCapitulo20.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            txtCapitulo1.setTextColor(color);
+            txtCapitulo2.setTextColor(color);
+            txtCapitulo3.setTextColor(color);
+            txtCapitulo4.setTextColor(color);
+            txtCapitulo5.setTextColor(color);
+            txtCapitulo6.setTextColor(color);
+            txtCapitulo7.setTextColor(color);
+            txtCapitulo8.setTextColor(color);
+            txtCapitulo9.setTextColor(color);
+            txtCapitulo10.setTextColor(color);
+            txtCapitulo11.setTextColor(color);
+            txtCapitulo12.setTextColor(color);
+            txtCapitulo13.setTextColor(color);
+            txtCapitulo14.setTextColor(color);
+            txtCapitulo15.setTextColor(color);
+            txtCapitulo16.setTextColor(color);
+            txtCapitulo17.setTextColor(color);
+            txtCapitulo18.setTextColor(color);
+            txtCapitulo19.setTextColor(color);
+            txtCapitulo20.setTextColor(color);
+        } catch (Exception e) {
+            toast(e.getMessage());
         }
 
         ibDes1 = (GifImageButton) findViewById(R.id.ib_descargar_cardD1);
@@ -1691,8 +1758,8 @@ public class Main extends AppCompatActivity implements
             textoff.setTextColor(getResources().getColor(R.color.blanco));
             toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
             mswipe.setBackgroundColor(getResources().getColor(R.color.prim));
-            mswipe.setColorSchemeColors(getResources().getColor(android.R.color.holo_red_dark));
         }
+        mswipe.setColorSchemeColors(color);
         web = (WebView) findViewById(R.id.wv_inicio);
         web.getSettings().setJavaScriptEnabled(true);
         web.addJavascriptInterface(new JavaScriptInterface(context), "HtmlViewer");
@@ -2359,7 +2426,7 @@ public class Main extends AppCompatActivity implements
             int index = e.indexOf(s);
             if (index == 20) break;
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
-            File fileSD = new File(getSD1() + "/Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
+            File fileSD = new File(FileUtil.getSDPath() + "/Animeflv/download/" + a.get(e.indexOf(s)) + "/" + a.get(e.indexOf(s)) + "_" + n.get(e.indexOf(s)) + ".mp4");
             if (file.exists() || fileSD.exists()) {
                 IBsDesList.get(index).setImageResource(R.drawable.ic_borrar_r);
                 IBsVerList.get(index).setEnabled(true);
@@ -2870,56 +2937,20 @@ public class Main extends AppCompatActivity implements
     }
 
     public void cambiarColor() {
-        final MaterialDialog dialog = new MaterialDialog.Builder(context)
-                .title("Selecciona un color:")
-                .customView(R.layout.dialog_colores, false)
+        Resources getRes = getResources();
+        int[] colorl = new int[]{getRes.getColor(R.color.theme_naranja), getRes.getColor(R.color.theme_rojo), getRes.getColor(R.color.theme_gris), getRes.getColor(R.color.theme_verde), getRes.getColor(R.color.theme_rosa), getRes.getColor(R.color.theme_morado)};
+
+        ColorChooserDialog dialog = new ColorChooserDialog.Builder(this, R.string.color_chooser)
+                .customColors(colorl, null)
+                .dynamicButtonColor(true)
+                .allowUserColorInput(false)
+                .allowUserColorInputAlpha(false)
+                .doneButton(android.R.string.ok)
+                .cancelButton(android.R.string.cancel)
+                .preselect(PreferenceManager.getDefaultSharedPreferences(context).getInt("accentColor", ColorsRes.Naranja(context)))
+                .accentMode(true)
                 .build();
-        ImageButton naranja = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_naranja);
-        ImageButton amarillo = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_amarillo);
-        ImageButton rojo = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_rojo);
-        ImageButton rosa = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_rosa);
-        ImageButton alnek = (ImageButton) dialog.getCustomView().findViewById(R.id.ib_color_AlNek);
-        naranja.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 0).apply();
-                getHDraw(true);
-                dialog.dismiss();
-            }
-        });
-        amarillo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 1).apply();
-                getHDraw(true);
-                dialog.dismiss();
-            }
-        });
-        rojo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 2).apply();
-                getHDraw(true);
-                dialog.dismiss();
-            }
-        });
-        rosa.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 3).apply();
-                getHDraw(true);
-                dialog.dismiss();
-            }
-        });
-        alnek.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", 4).apply();
-                getHDraw(true);
-                dialog.dismiss();
-            }
-        });
-        dialog.show();
+        dialog.show(this);
     }
 
     public void writeToFile(String body, File file) {
@@ -2932,7 +2963,6 @@ public class Main extends AppCompatActivity implements
             e.printStackTrace();
         }
     }
-
 
     private boolean isNetworkAvailable() {
         Boolean net = false;
@@ -3418,8 +3448,6 @@ public class Main extends AppCompatActivity implements
                                         if (descarga.exists()) {
                                             descarga.delete();
                                         }
-                                        final TextView textView = (TextView) dialog.getCustomView().findViewById(R.id.tv_progress);
-                                        textView.setVisibility(View.VISIBLE);
                                         final ThinDownloadManager downloadManager = new ThinDownloadManager();
                                         Uri download = Uri.parse("https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true");
                                         final DownloadRequest downloadRequest = new DownloadRequest(download)
@@ -3444,7 +3472,7 @@ public class Main extends AppCompatActivity implements
 
                                                     @Override
                                                     public void onProgress(DownloadRequest downloadRequest, long totalBytes, long downloadedBytes, int progress) {
-                                                        textView.setText(Integer.toString(progress) + "%");
+                                                        //textView.setText(Integer.toString(progress) + "%");
                                                     }
                                                 });
                                         actdown = downloadManager.add(downloadRequest);
@@ -3893,6 +3921,30 @@ public class Main extends AppCompatActivity implements
         }
     }
 
+    public void chooseDownDir(int position, String url) {
+        Boolean inSD = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
+        if (inSD) {
+            DescargarSD(position, url);
+        } else {
+            DescargarInbyURL(position, url);
+        }
+    }
+
+    public void chooseDownDir(int position, String url, CookieConstructor constructor) {
+        Boolean inSD = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
+        if (inSD) {
+            DescargarSD(position, url, constructor);
+        } else {
+            DescargarInbyURL(position, url, constructor);
+        }
+    }
+
+    @Override
+    public void onColorSelection(@NonNull ColorChooserDialog dialog, @ColorInt int selectedColor) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("accentColor", selectedColor).apply();
+        recreate();
+    }
+
     class JavaScriptInterface {
         private Context ctx;
 
@@ -4014,24 +4066,6 @@ public class Main extends AppCompatActivity implements
             super.onPostExecute(s);
             String furl = s.substring(s.indexOf("URL=") + 4, s.lastIndexOf("\">"));
             chooseDownDir(posT, furl);
-        }
-    }
-
-    public void chooseDownDir(int position, String url) {
-        Boolean inSD = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
-        if (inSD) {
-            DescargarSD(position, url);
-        } else {
-            DescargarInbyURL(position, url);
-        }
-    }
-
-    public void chooseDownDir(int position, String url, CookieConstructor constructor) {
-        Boolean inSD = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
-        if (inSD) {
-            DescargarSD(position, url, constructor);
-        } else {
-            DescargarInbyURL(position, url, constructor);
         }
     }
 

@@ -10,15 +10,20 @@
         background-color: rgba(0,0,0,0);
         }
         .new:before {
-        color: black;
         font-weight: bold;
         font-size: large;
         color: gold;
         content: "Nuevo: ";
         }
 
+        .newImp:before {
+        font-weight: bold;
+        font-size: large;
+        color: gold;
+        content: "Nuevo ";
+        }
+
         .corregido:before {
-        color: black;
         font-weight: bold;
         font-size: large;
         color: red;
@@ -26,7 +31,6 @@
         }
 
         .importante:before {
-        color: black;
         font-weight: bold;
         font-size: large;
         color: purple;
@@ -34,16 +38,52 @@
         }
 
         .cambio:before {
-        color: black;
         font-weight: bold;
         font-size: large;
         color: green;
         content: "Cambio: ";
         }
+
+        .granAct:before {
+        color: black;
+        align: center;
+        font-weight: bold;
+        font-size: 20px;
+        content: "*GRAN ACTUALIZACION*";
+        }
     </style>
 </head>
 
 <body>
+<h2>2.8.8</h2>
+<span class="granAct"></span>
+<ul type="circle">
+    <li><span class="corregido"></span>Errores en general</li>
+    <li><span class="corregido"></span>Reproductor interno se trababa al terminar de reproducir</li>
+    <li><span class="newImp"></span><span class="importante"></span><br>Seccion de Recientes rehecha
+        desde cero
+    </li>
+    <li><span class="newImp"></span><span class="importante"></span><br>Icono de botones cambiados,
+        un boton para descargar, y otro para streaming
+    </li>
+    <li><span class="new"></span>Opcion para desactivar el gif en recientes, agregado</li>
+    <li><span class="new"></span>Sonido Nico Nico Ni!!! agregado</li>
+    <li><span class="new"></span>Busqueda por Nombre, Generos, e ID</li>
+    <li><span class="new"></span>Opcion de mostrar ID agregada</li>
+    <li><span class="new"></span>Seccion de Lista de espera, agregada</li>
+    <li><span class="new"></span>Color acentuado independiente (Boton de Umaru en menu)</li>
+    <li><span class="new"></span>Sonido Nico Nico Ni!!! agregado</li>
+    <li><span class="new"></span>Actualizar directorio si no se encuentra el anime, en informacion
+        de anime
+    </li>
+    <li><span class="new"></span>Autobusqueda de tarjeta SD al entrar en configuracion (tambien
+        busqueda manual)
+    </li>
+    <li><span class="importante"></span>Algunas partes Optimizadas</li>
+    <li><span class="importante"></span>Lista de Emision actualizada por servidor</li>
+    <li><span class="cambio"></span>Minimizar dialogo mientras se descarga actualizacion</li>
+    <li><span class="cambio"></span>Dialogo de configuracion de sonido mejorado</li>
+</ul>
 <h2>2.8.6</h2>
 <ul type="circle">
     <li><span class="corregido"></span>Errores en general</li>
@@ -54,7 +94,6 @@
     </li>
     <li><span class="new"></span>Dark Umaru :3</li>
     <li><span class="new"></span>Inicio de soporte para Android N</li>
-
 </ul>
 <h2>2.8.5</h2>
 <ul type="circle">

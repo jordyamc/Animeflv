@@ -42,6 +42,43 @@ import knf.animeflv.Directorio.AnimeClass;
  */
 public class Parser {
 
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
+
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
+        return ret;
+    }
+
     public String[] parseLinks(String json){
         List<String> linkArray=new ArrayList<String>();
         String[] urls;
@@ -73,6 +110,7 @@ public class Parser {
         }
         return url;
     }
+
     public String getInfoSinopsis(String json){
         String url="";
         try {
@@ -141,6 +179,7 @@ public class Parser {
         }
         return url;
     }
+
     public String getInfoTipo(String json){
         String url="";
         try {
@@ -151,6 +190,7 @@ public class Parser {
         }
         return url;
     }
+
     public String getInfoEstado(String json){
         String url="";
         try {
@@ -166,6 +206,7 @@ public class Parser {
         }
         return url;
     }
+
     public String getInfoGeneros(String json){
         String url="";
         try {
@@ -308,6 +349,55 @@ public class Parser {
         }
         return eids;
     }
+
+    public List<String> parseListEID(String json) {
+        List<String> eidsArray = new ArrayList<String>();
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("lista");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject childJSONObject = jsonArray.getJSONObject(i);
+                String eid = childJSONObject.getString("eid");
+                eidsArray.add(eid);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return eidsArray;
+    }
+
+    public List<String> parseListTipo(String json) {
+        List<String> eidsArray = new ArrayList<String>();
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("lista");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject childJSONObject = jsonArray.getJSONObject(i);
+                String eid = childJSONObject.getString("tid");
+                eidsArray.add(eid);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return eidsArray;
+    }
+
+    public List<String> parseListTits(String json) {
+        List<String> eidsArray = new ArrayList<String>();
+        try {
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("lista");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject childJSONObject = jsonArray.getJSONObject(i);
+                String eid = childJSONObject.getString("titulo");
+                eidsArray.add(eid);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return eidsArray;
+    }
+
     public List<String> parseNumerobyEID(String json){
         List<String> eidsArray=new ArrayList<String>();
         String[] eids;
@@ -324,6 +414,7 @@ public class Parser {
         }
         return eidsArray;
     }
+
     public List<String> parseEidsbyEID(String json){
         List<String> eidsArray=new ArrayList<String>();
         String[] eids;
@@ -340,6 +431,7 @@ public class Parser {
         }
         return eidsArray;
     }
+
     public List<String> parseTitRel(String json){
         List<String> eidsArray=new ArrayList<String>();
         String[] eids;
@@ -374,6 +466,7 @@ public class Parser {
         }
         return eidsArray;
     }
+
     public List<String> parseTiposRel(String json){
         List<String> eidsArray=new ArrayList<String>();
         String[] eids;
@@ -391,6 +484,7 @@ public class Parser {
         }
         return eidsArray;
     }
+
     public String[] urlsRel(String json){
         List<String> urlArray=new ArrayList<String>();
         String[] urls;
@@ -410,6 +504,7 @@ public class Parser {
         }
         return urls;
     }
+
     public String[] parseAidRel(String json){
         List<String> urlArray=new ArrayList<String>();
         String[] urls;
@@ -429,6 +524,7 @@ public class Parser {
         }
         return urls;
     }
+
     public String getAID (String json){
         String aid="";
         try {
@@ -439,6 +535,7 @@ public class Parser {
         }
         return aid;
     }
+
     public String getTit(String json){
         String aid="";
         try {
@@ -548,6 +645,7 @@ public class Parser {
         }
         return aidsArray;
     }
+
     public List<String> DirTitulosAnime(String json,int genero){
         List<String> linkArray=new ArrayList<String>();
         switch (genero){
@@ -630,8 +728,8 @@ public class Parser {
     public List<AnimeClass> DirAnimes(String json) {
         List<AnimeClass> linkArray = new ArrayList<AnimeClass>();
         try {
-            //JSONObject jsonObj = new JSONObject(json);
-            JSONArray jsonArray = new JSONArray(json);
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("lista");
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject object = jsonArray.getJSONObject(i);
                 String tipo = object.getString("c");
@@ -643,7 +741,7 @@ public class Parser {
                 }
             }
         } catch (Exception e) {
-            Log.e("DirAnimes", e.getMessage());
+            Log.e("DirAnimes", e.getMessage(), e.getCause());
         }
         return linkArray;
     }
@@ -651,8 +749,8 @@ public class Parser {
     public List<AnimeClass> DirOvas(String json) {
         List<AnimeClass> linkArray = new ArrayList<AnimeClass>();
         try {
-            //JSONObject jsonObj = new JSONObject(json);
-            JSONArray jsonArray = new JSONArray(json);
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("lista");
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject object = jsonArray.getJSONObject(i);
                 String tipo = object.getString("c");
@@ -664,7 +762,7 @@ public class Parser {
                 }
             }
         } catch (Exception e) {
-            Log.e("DirAnimes", e.getMessage());
+            Log.e("DirOvas", e.getMessage(), e.getCause());
         }
         return linkArray;
     }
@@ -672,8 +770,8 @@ public class Parser {
     public List<AnimeClass> DirPelis(String json) {
         List<AnimeClass> linkArray = new ArrayList<AnimeClass>();
         try {
-            //JSONObject jsonObj = new JSONObject(json);
-            JSONArray jsonArray = new JSONArray(json);
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray jsonArray = jsonObj.getJSONArray("lista");
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject object = jsonArray.getJSONObject(i);
                 String tipo = object.getString("c");
@@ -685,7 +783,7 @@ public class Parser {
                 }
             }
         } catch (Exception e) {
-            Log.e("DirAnimes", e.getMessage());
+            Log.e("DirPeliculas", e.getMessage(), e.getCause());
         }
         return linkArray;
     }
@@ -709,12 +807,34 @@ public class Parser {
                 JSONArray jsonArray = new JSONArray(json);
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject object = jsonArray.getJSONObject(i);
-                    String nombre = corregirTit(object.getString("b"));
-                    if (nombre.toLowerCase().contains(search.toLowerCase())) {
-                        String tipo = object.getString("c");
+                    if (!search.toLowerCase().startsWith("aid:")) {
+                        String nombre = corregirTit(object.getString("b"));
                         String aid = object.getString("a");
-                        String url = "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
-                        linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
+                        if (nombre.toLowerCase().contains(search.toLowerCase())) {
+                            String tipo = object.getString("c");
+                            String url = "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
+                            linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
+                        }
+                    } else {
+                        String[] data = search.trim().split(":");
+                        if (!search.trim().toLowerCase().equals("aid:")) {
+                            String numero = data[1].trim();
+                            if (isNumber(numero)) {
+                                String nombre = corregirTit(object.getString("b"));
+                                String aid = object.getString("a");
+                                if (aid.equals(numero)) {
+                                    String tipo = object.getString("c");
+                                    String url = "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
+                                    linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
+                                }
+                            } else {
+                                linkArray.add(new AnimeClass(search.replace("aid:", "").trim(), "_NoNum_", "_NoNum_", "_NoNum_", 0));
+                                break;
+                            }
+                        } else {
+                            linkArray.add(new AnimeClass("_aid_", "_aid_", "_aid_", "_aid_", 0));
+                            break;
+                        }
                     }
                 }
                 if (linkArray.isEmpty()) {
@@ -727,12 +847,22 @@ public class Parser {
         return linkArray;
     }
 
+    private boolean isNumber(String number) {
+        try {
+            Integer.parseInt(number);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     public String corregirTit(String tit) {
         String array = tit;
         array = array.replace("[\"", "");
         array = array.replace("\"]", "");
         array = array.replace("\",\"", ":::");
         array = array.replace("\\/", "/");
+        array = array.replace("â\u0098\u0086", "\u2606");
         array = array.replace("&#039;", "\'");
         array = array.replace("&iacute;", "í");
         array = array.replace("&deg;", "°");
@@ -797,6 +927,7 @@ public class Parser {
         }
         return linkArray;
     }
+
     public List<String> DirIntsAnime(String json,int genero){
         List<String> linkArray=new ArrayList<String>();
         switch (genero){
@@ -859,6 +990,7 @@ public class Parser {
         }
         return linkArray;
     }
+
     public List<String> DirTitulosOvas(String json,int genero){
         List<String> linkArray=new ArrayList<String>();
         switch (genero){
@@ -983,6 +1115,7 @@ public class Parser {
         }
         return linkArray;
     }
+
     public List<String> DirIntsOvas(String json,int genero){
         List<String> linkArray=new ArrayList<String>();
         switch (genero){
@@ -1045,6 +1178,7 @@ public class Parser {
         }
         return linkArray;
     }
+
     public List<String> DirTitulosPelicula(String json,int genero){
         List<String> linkArray=new ArrayList<String>();
         switch (genero){
@@ -1170,6 +1304,7 @@ public class Parser {
         }
         return linkArray;
     }
+
     public List<String> DirIntsPelicula(String json,int genero){
         List<String> linkArray=new ArrayList<String>();
         switch (genero){
@@ -1232,6 +1367,7 @@ public class Parser {
         }
         return linkArray;
     }
+
     public List<String> DirTitulosBusqueda(String json,@Nullable String busqueda){
         List<String> linkArray=new ArrayList<String>();
         if (busqueda==null) {
@@ -1409,6 +1545,7 @@ public class Parser {
         array = array.replace("&hearts;", "\u2665");
         return array;
     }
+
     public List<String> DirIndexBusqueda(String json,@Nullable String busqueda){
         List<String> linkArray=new ArrayList<String>();
         if (busqueda==null) {
@@ -1489,6 +1626,7 @@ public class Parser {
         }
         return linkArray;
     }
+
     public List<String> DirTiposBusqueda(String json,@Nullable String busqueda){
         List<String> linkArray=new ArrayList<String>();
         if (busqueda==null) {
@@ -1655,7 +1793,33 @@ public class Parser {
         File file = new File(file_loc);
         if (file.exists()) {
             try {
-                JSONArray jsonArray = new JSONArray(getStringFromFile(file_loc));
+                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject nombreJ = jsonArray.getJSONObject(i);
+                    String n = nombreJ.getString("a");
+                    if (n.trim().equals(aid)) {
+                        return "http://animeflv.net/ver/" + nombreJ.getString("d") + "-" + numero + ".html";
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public String getUrlCached(String eid) {
+        String[] data = eid.replace("E", "").split("_");
+        String aid = data[0];
+        String numero = data[1];
+        String ret = "null";
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject nombreJ = jsonArray.getJSONObject(i);
                     String n = nombreJ.getString("a");
@@ -1676,7 +1840,8 @@ public class Parser {
         File file = new File(file_loc);
         if (file.exists()) {
             try {
-                JSONArray jsonArray = new JSONArray(getStringFromFile(file_loc));
+                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject nombreJ = jsonArray.getJSONObject(i);
                     String n = nombreJ.getString("a");
@@ -1729,26 +1894,14 @@ public class Parser {
         return hexString;
     }
 
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
-    }
-
     public String getTitCached(String aid) {
         String ret = "null";
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
         File file = new File(file_loc);
         if (file.exists()) {
             try {
-                JSONArray jsonArray = new JSONArray(getStringFromFile(file_loc));
+                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject nombreJ = jsonArray.getJSONObject(i);
                     String n = nombreJ.getString("a");
@@ -1791,12 +1944,35 @@ public class Parser {
         File file = new File(file_loc);
         if (file.exists()) {
             try {
-                JSONArray jsonArray = new JSONArray(getStringFromFile(file_loc));
+                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject nombreJ = jsonArray.getJSONObject(i);
                     String corto = nombreJ.getString("d");
                     if (corto.trim().equals(url.trim())) {
                         return corregirTit(nombreJ.getString("a"));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public boolean isInMain(String aid) {
+        boolean ret = false;
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONObject jsonObject = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObject.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject json = jsonArray.getJSONObject(i);
+                    if (json.getString("aid").equals(aid)) {
+                        ret = true;
+                        break;
                     }
                 }
             } catch (Exception e) {
@@ -1817,29 +1993,6 @@ public class Parser {
             }
         }
         return true;
-    }
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-
-    public static String getStringFromFile(String filePath) {
-        String ret = "";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        } catch (IOException e) {
-        } catch (Exception e) {
-        }
-        return ret;
     }
 
     public int checkStatus(String json) {

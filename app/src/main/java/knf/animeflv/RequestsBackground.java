@@ -50,7 +50,9 @@ import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Jordy on 11/08/2015.
@@ -92,6 +94,19 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
         return ret;
     }
 
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
+
     private String getCertificateSHA1Fingerprint() {
         PackageManager pm = context.getPackageManager();
         String packageName = context.getPackageName();
@@ -130,18 +145,6 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
         return hexString;
     }
 
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
-    }
     @Override
     protected String doInBackground(String... params) {
         StringBuilder builder = new StringBuilder();
@@ -329,6 +332,7 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                             }
                             int num = 0;
                             Boolean isnot = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
+                            Set<String> sts = context.getSharedPreferences("data", Context.MODE_PRIVATE).getStringSet("eidsNot", new HashSet<String>());
                             loop:
                             {
                                 for (String st : jsonDesc) {
@@ -344,6 +348,7 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                             Descargar(jsonAIDS[index], jsonNums[index], jsonTits[index], st);
                                         }
                                         num += 1;
+                                        sts.add(st);
                                     } else {
                                         break loop;
                                     }
@@ -352,18 +357,30 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                             if (isnot) {
                                 int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
                                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
+                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", sts).apply();
                                 String mess = "";
                                 if (nCaps == 1) {
                                     mess = "Hay " + Integer.toString(nCaps) + " nuevo capitulo disponible!!!";
                                 } else {
                                     mess = "Hay " + Integer.toString(nCaps) + " nuevos capitulos disponibles!!!";
                                 }
+                                String temp = "";
+                                for (String alone : sts) {
+                                    String[] data = alone.replace("E", "").split("_");
+                                    String tit = new Parser().getTitCached(data[0]);
+                                    temp += tit + " " + data[1] + "\n";
+                                }
+                                temp = temp.substring(0, temp.length() - 2);
+                                NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
+                                bigTextStyle.setBigContentTitle("Animes:");
+                                bigTextStyle.bigText(temp);
                                 NotificationCompat.Builder mBuilder =
                                         new NotificationCompat.Builder(context)
                                                 .setSmallIcon(R.drawable.ic_not_r)
                                                 .setContentTitle("AnimeFLV")
                                                 .setContentText(mess);
                                 mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                                mBuilder.setStyle(bigTextStyle);
                                 int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
                                 switch (not) {
                                     case 0:
@@ -386,12 +403,16 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                         Log.d("Notificacion:", "Crear Sonido Dango");
                                         mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango"), AudioManager.STREAM_NOTIFICATION);
                                         break;
+                                    case 5:
+                                        Log.d("Notificacion:", "Crear Sonido Nico");
+                                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/nico"), AudioManager.STREAM_NOTIFICATION);
+                                        break;
                                 }
                                 mBuilder.setAutoCancel(true);
                                 mBuilder.setPriority(Notification.PRIORITY_MAX);
                                 mBuilder.setLights(Color.argb(0, 255, 128, 0), 5000, 2000);
                                 mBuilder.setGroup("animeflv_group");
-                                Intent resultIntent = new Intent(context, Main.class);
+                                Intent resultIntent = new Intent(context, newMain.class);
                                 PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                                 mBuilder.setContentIntent(resultPendingIntent);
                                 int mNotificationId = 6991;
@@ -462,12 +483,16 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                 Log.d("Notificacion:", "Crear Sonido Dango");
                                 mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango"), AudioManager.STREAM_NOTIFICATION);
                                 break;
+                            case 5:
+                                Log.d("Notificacion:", "Crear Sonido Nico");
+                                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/nico"), AudioManager.STREAM_NOTIFICATION);
+                                break;
                         }
                         mBuilder.setAutoCancel(true);
                         mBuilder.setPriority(Notification.PRIORITY_MAX);
                         mBuilder.setLights(Color.BLUE, 5000, 2000);
                         mBuilder.setGroup("animeflv_group");
-                        Intent resultIntent = new Intent(context, Main.class);
+                        Intent resultIntent = new Intent(context, newMain.class);
                         Bundle bundle = new Bundle();
                         bundle.putString("act", "1");
                         resultIntent.putExtras(bundle);
@@ -541,6 +566,9 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                             case 4:
                                 ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango");
                                 break;
+                            case 5:
+                                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/nico");
+                                break;
                         }
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(context)
@@ -596,6 +624,9 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                 break;
             case 4:
                 ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango");
+                break;
+            case 5:
+                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/nico");
                 break;
         }
         NotificationCompat.Builder mBuilder =

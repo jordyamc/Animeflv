@@ -18,6 +18,7 @@ import java.io.File;
 import java.util.Arrays;
 
 import knf.animeflv.DownloadManager.CookieConstructor;
+import knf.animeflv.Utils.FileUtil;
 
 /**
  * Created by Jordy on 29/02/2016.
@@ -54,7 +55,7 @@ public class DownloaderCookie extends AsyncTask<String, String, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        File Dstorage = new File(getSD1() + "/Animeflv/download/" + aid);
+        File Dstorage = new File(FileUtil.getSDPath() + "/Animeflv/download/" + aid);
         if (!Dstorage.exists()) {
             Dstorage.mkdirs();
         }

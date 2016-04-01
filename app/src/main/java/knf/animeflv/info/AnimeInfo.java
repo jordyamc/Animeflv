@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -16,8 +15,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -37,6 +34,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import knf.animeflv.ColorsRes;
 import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
@@ -47,12 +45,9 @@ import knf.animeflv.TaskType;
  * Created by Jordy on 12/08/2015.
  */
 public class AnimeInfo extends Fragment{
-    public AnimeInfo(){}
     Parser parser=new Parser();
-
     String ext_storage_state = Environment.getExternalStorageState();
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
-
     ImageView imageView;
     TextView txt_sinopsis;
     TextView txt_titulo;
@@ -64,6 +59,46 @@ public class AnimeInfo extends Fragment{
     LinearLayout layout_debug;
     RecyclerView rv_rel;
     View view;
+
+    public AnimeInfo() {
+    }
+
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
+        return ret;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -85,6 +120,7 @@ public class AnimeInfo extends Fragment{
         getJsonfromFile();
         return view;
     }
+
     public void getJsonfromFile(){
         String aid = getArguments().getString("aid");
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
@@ -100,6 +136,7 @@ public class AnimeInfo extends Fragment{
                 setInfo(infile);
             }
     }
+
     public String getJsonfromFile(Boolean bool){
         String json="{}";
         String aid = getArguments().getString("aid");
@@ -116,26 +153,6 @@ public class AnimeInfo extends Fragment{
         }
         return json;
     }
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-    public static String getStringFromFile (String filePath) {
-        String ret="";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        }catch (IOException e){}catch (Exception e){}
-        return ret;
-    }
 
     public void setLoad(){
         imageView=(ImageView) view.findViewById(R.id.info_img);
@@ -150,11 +167,6 @@ public class AnimeInfo extends Fragment{
         if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("is_amoled", false)) {
             view.setBackgroundColor(getResources().getColor(android.R.color.black));
             txt_sinopsis.setTextColor(getResources().getColor(R.color.blanco));
-            txt_titulo.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txt_tipo.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txt_estado.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txt_generos.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            txt_debug.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
             TextView tit1 = (TextView) view.findViewById(R.id.info_titles1);
             TextView tit2 = (TextView) view.findViewById(R.id.info_titles2);
             TextView tit3 = (TextView) view.findViewById(R.id.info_titles3);
@@ -166,7 +178,34 @@ public class AnimeInfo extends Fragment{
             tit4.setTextColor(getResources().getColor(R.color.blanco));
             tit5.setTextColor(getResources().getColor(R.color.blanco));
         }
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(getActivity()));
+        int color = ColorsRes.Naranja(getActivity());
+        if (accent == ColorsRes.Rojo(getActivity())) {
+            color = ColorsRes.Rojo(getActivity());
+        }
+        if (accent == ColorsRes.Naranja(getActivity())) {
+            color = ColorsRes.Naranja(getActivity());
+        }
+        if (accent == ColorsRes.Gris(getActivity())) {
+            color = ColorsRes.Gris(getActivity());
+        }
+        if (accent == ColorsRes.Verde(getActivity())) {
+            color = ColorsRes.Verde(getActivity());
+        }
+        if (accent == ColorsRes.Rosa(getActivity())) {
+            color = ColorsRes.Rosa(getActivity());
+        }
+        if (accent == ColorsRes.Morado(getActivity())) {
+            color = ColorsRes.Morado(getActivity());
+        }
+        txt_titulo.setTextColor(color);
+        txt_tipo.setTextColor(color);
+        txt_estado.setTextColor(color);
+        txt_generos.setTextColor(color);
+        txt_debug.setTextColor(color);
     }
+
     public void setInfo(String json){
         final Context context=getActivity().getApplicationContext();
         final String jinfo=json;
@@ -226,18 +265,5 @@ public class AnimeInfo extends Fragment{
             e.printStackTrace();
         }
         return hexString;
-    }
-
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
     }
 }

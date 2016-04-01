@@ -34,6 +34,7 @@
         <item>Onii-chan</item>
         <item>Onii-chan (Sam)</item>
         <item>Dango</item>
+        <item>Nico Nico Ni!</item>
     </string-array>
     <string-array name="players">
         <item>Interno</item>
@@ -96,4 +97,14 @@
         <item>Smart Banner</item>
     </string-array>
     <string name="title_activity_maps">Map</string>
+    <string name="color_chooser">Selecciona un color:</string>
+    <array name="custom_colors">
+        <item>#EDEDED</item>
+        <item>#ffff8800</item>
+        <item>#9E9E9E</item>
+        <item>#4CAF50</item>
+        <item>#E91E63</item>
+        <item>#9C27B0</item>
+        <item>#ffcc0000</item>
+    </array>
 </resources>

@@ -8,13 +8,15 @@ import android.net.Uri;
 import android.os.Environment;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.thin.downloadmanager.ThinDownloadManager;
 
 import java.io.File;
 
+import knf.animeflv.Application;
 import knf.animeflv.DManager;
 import knf.animeflv.Parser;
-import xdroid.toaster.Toaster;
 
 /**
  * Created by Jordy on 04/03/2016.
@@ -31,6 +33,10 @@ public class InternalManager {
     }
 
     public void startDownload(String eid, String downUrl) {
+        Application application = (Application) context.getApplicationContext();
+        Tracker mTracker = application.getDefaultTracker();
+        mTracker.setScreenName("Download");
+        mTracker.send(new HitBuilders.EventBuilder("Download", "Download Int " + eid).build());
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         String titulo = parser.getTitCached(aid);
@@ -72,6 +78,10 @@ public class InternalManager {
     }
 
     public void startDownload(String eid, String downUrl, CookieConstructor constructor) {
+        Application application = (Application) context.getApplicationContext();
+        Tracker mTracker = application.getDefaultTracker();
+        mTracker.setScreenName("Download");
+        mTracker.send(new HitBuilders.EventBuilder("Download", "Download Int Zippy" + eid).build());
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         String titulo = parser.getTitCached(aid);
@@ -118,6 +128,10 @@ public class InternalManager {
     }
 
     public void cancelDownload(String eid) {
+        Application application = (Application) context.getApplicationContext();
+        Tracker mTracker = application.getDefaultTracker();
+        mTracker.setScreenName("Download");
+        mTracker.send(new HitBuilders.EventBuilder("Download", "Cancel Int " + eid).build());
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         String titulo = parser.getTitCached(aid);

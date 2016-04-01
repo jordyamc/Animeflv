@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -44,28 +43,52 @@ import knf.animeflv.info.InfoNew;
  */
 public class AdapterFavs extends RecyclerView.Adapter<AdapterFavs.ViewHolder> {
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView iv_rel;
-        public TextView tv_tit;
-        public CardView card;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            this.iv_rel = (ImageView) itemView.findViewById(R.id.imgCardInfoRel);
-            this.tv_tit = (TextView) itemView.findViewById(R.id.tv_info_rel_tit);
-            this.card = (CardView) itemView.findViewById(R.id.cardRel);
-        }
-    }
-    private Context context;
     List<String> titulosCard;
     List<String> aids;
     List<String> links;
-
+    private Context context;
     public AdapterFavs(Context context, List<String> titulos, List<String> aid, List<String> aidlinks) {
         this.context = context;
         this.titulosCard = titulos;
-        this.aids=aid;
-        this.links=aidlinks;
+        this.aids = aid;
+        this.links = aidlinks;
+    }
+
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
+        return ret;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
     }
 
     @Override
@@ -88,7 +111,7 @@ public class AdapterFavs extends RecyclerView.Adapter<AdapterFavs.ViewHolder> {
             public void onClick(View v) {
                 String file = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + aids.get(position) + ".txt";
                 String json = getStringFromFile(file);
-                Bundle bundle=new Bundle();
+                Bundle bundle = new Bundle();
                 bundle.putString("aid", aids.get(position));
                 File directorio = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
                 if (directorio.exists()) {
@@ -99,8 +122,8 @@ public class AdapterFavs extends RecyclerView.Adapter<AdapterFavs.ViewHolder> {
                 Intent intent = new Intent(context, InfoNew.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtras(bundle);
-                SharedPreferences.Editor sharedPreferences=context.getSharedPreferences("data",Context.MODE_PRIVATE).edit();
-                sharedPreferences.putString("aid",aids.get(position)).commit();
+                SharedPreferences.Editor sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
+                sharedPreferences.putString("aid", aids.get(position)).commit();
                 context.startActivity(intent);
             }
         });
@@ -154,30 +177,6 @@ public class AdapterFavs extends RecyclerView.Adapter<AdapterFavs.ViewHolder> {
         return link;
     }
 
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-
-    public static String getStringFromFile(String filePath) {
-        String ret = "";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        } catch (IOException e) {
-        } catch (Exception e) {
-        }
-        return ret;
-    }
-
     private String getCertificateSHA1Fingerprint() {
         PackageManager pm = context.getPackageManager();
         String packageName = context.getPackageName();
@@ -216,20 +215,21 @@ public class AdapterFavs extends RecyclerView.Adapter<AdapterFavs.ViewHolder> {
         return hexString;
     }
 
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
-    }
     @Override
     public int getItemCount() {
         return titulosCard.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public ImageView iv_rel;
+        public TextView tv_tit;
+        public CardView card;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            this.iv_rel = (ImageView) itemView.findViewById(R.id.imgCardInfoRel);
+            this.tv_tit = (TextView) itemView.findViewById(R.id.tv_info_rel_tit);
+            this.card = (CardView) itemView.findViewById(R.id.cardRel);
+        }
     }
 }

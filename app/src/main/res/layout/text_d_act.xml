@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
     <TextView
+        android:id="@+id/tv_dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_dialog"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp" />
-    <TextView
-        android:layout_width="match_parent"
+
+    <it.michelelacorte.elasticprogressbar.ElasticDownloadView
+        android:id="@+id/elastic_download_view"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_progress"
-        android:text="0%"
-        android:visibility="gone"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center"
-        android:textSize="80px"
-        android:layout_marginTop="30dp"
-        android:textColor="@color/prim" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
 
 </LinearLayout>

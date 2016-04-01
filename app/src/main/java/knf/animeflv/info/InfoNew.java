@@ -60,6 +60,7 @@ import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Requests;
 import knf.animeflv.TaskType;
+import knf.animeflv.Utils.FileUtil;
 
 /**
  * Created by Jordy on 07/03/2016.
@@ -196,36 +197,134 @@ public class InfoNew extends AppCompatActivity implements Requests.callback, Log
                 finish();
             }
         } else {
-            SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
-            editor.putString("titInfo", parser.getTitCached(aid)).apply();
-            getSupportActionBar().setTitle(parser.getTitCached(aid));
-            AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-            asyncHttpClient.setResponseTimeout(5000);
-            asyncHttpClient.get(parser.getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(aid) + "&certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    super.onSuccess(statusCode, headers, response);
-                    setJson(response);
+            if (parser.getTitCached(aid).equals("null")) {
+                getSupportActionBar().setTitle("Cargando...");
+                loadMainDir();
+            } else {
+                LoadData();
+            }
+        }
+    }
+
+    public void loadMainDir() {
+        AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+        asyncHttpClient.setResponseTimeout(10000);
+        asyncHttpClient.get(parser.getDirectorioUrl(TaskType.NORMAL, context) + "?certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                loadDir(response.toString());
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                super.onSuccess(statusCode, headers, response);
+                loadDir(response.toString());
+                toast("No hay cache para mostrar");
+                finish();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                toast("No hay cache para mostrar");
+                finish();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                toast("No hay cache para mostrar");
+                finish();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                toast("No hay cache para mostrar");
+                finish();
+            }
+        });
+    }
+
+    private void LoadData() {
+        getSupportActionBar().setTitle(parser.getTitCached(aid));
+        SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
+        editor.putString("titInfo", parser.getTitCached(aid)).apply();
+        getSupportActionBar().setTitle(parser.getTitCached(aid));
+        AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+        asyncHttpClient.setResponseTimeout(5000);
+        asyncHttpClient.get(parser.getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(aid) + "&certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                setJson(response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                onError(throwable);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                onError(throwable);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                onError(throwable);
+            }
+        });
+    }
+
+    public void loadDir(String data) {
+        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+            if (!mediaStorage.exists()) {
+                mediaStorage.mkdirs();
+            }
+        }
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        if (isNetworkAvailable() && !data.trim().equals("error")) {
+            String trimed = data.trim();
+            if (!file.exists()) {
+                Log.d("Archivo:", "No existe");
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    Log.d("Archivo:", "Error al crear archivo");
                 }
 
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                    onError(throwable);
+                if (FileUtil.isJSONValid(trimed)) {
+                    writeToFile(trimed, file);
+                    LoadData();
+                } else {
+                    toast("No hay cache para mostrar");
+                    finish();
                 }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                    onError(throwable);
+            } else {
+                Log.d("Archivo", "Existe");
+                String infile = getStringFromFile(file_loc);
+                if (!infile.trim().equals(trimed)) {
+                    if (FileUtil.isJSONValid(infile)) {
+                        if (FileUtil.isJSONValid(trimed)) {
+                            Log.d("Cargar", "Json nuevo");
+                            writeToFile(trimed, file);
+                            LoadData();
+                        }
+                    }
+                } else {
+                    toast("No hay cache para mostrar");
+                    finish();
                 }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    super.onFailure(statusCode, headers, responseString, throwable);
-                    onError(throwable);
-                }
-            });
+            }
+        } else {
+            toast("No hay cache para mostrar");
+            finish();
         }
     }
 
@@ -256,6 +355,60 @@ public class InfoNew extends AppCompatActivity implements Requests.callback, Log
             toast(throwable.getMessage());
             finish();
         }
+    }
+
+    private boolean isNetworkAvailable() {
+        Boolean net = false;
+        int Tcon = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        switch (Tcon) {
+            case 0:
+                NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                net = Wifi.isConnected();
+                break;
+            case 1:
+                NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net = mobile.isConnected();
+                break;
+            case 2:
+                NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net = WifiA.isConnected() || mobileA.isConnected();
+                break;
+        }
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && net;
+    }
+
+    public void writeToFile(String body, File file) {
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file);
+            fos.write(body.getBytes());
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void toast(String texto) {
+        Toast.makeText(this, texto, Toast.LENGTH_SHORT).show();
+    }
+
+    public String getJson() {
+        String json = "";
+        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+            if (!mediaStorage.exists()) {
+                mediaStorage.mkdirs();
+            }
+        }
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + aid + ".txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + aid + ".txt";
+        if (file.exists()) {
+            Log.d("Archivo", "Existe");
+            json = getStringFromFile(file_loc);
+        }
+        return json;
     }
 
     private void setJson(JSONObject json) {
@@ -315,60 +468,6 @@ public class InfoNew extends AppCompatActivity implements Requests.callback, Log
                 viewPagerTab.setViewPager(viewPager);
             }
         }
-    }
-
-    private boolean isNetworkAvailable() {
-        Boolean net = false;
-        int Tcon = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        switch (Tcon) {
-            case 0:
-                NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                net = Wifi.isConnected();
-                break;
-            case 1:
-                NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                net = mobile.isConnected();
-                break;
-            case 2:
-                NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                net = WifiA.isConnected() || mobileA.isConnected();
-                break;
-        }
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && net;
-    }
-
-    public void writeToFile(String body, File file) {
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
-            fos.write(body.getBytes());
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void toast(String texto) {
-        Toast.makeText(this, texto, Toast.LENGTH_SHORT).show();
-    }
-
-    public String getJson() {
-        String json = "";
-        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-            if (!mediaStorage.exists()) {
-                mediaStorage.mkdirs();
-            }
-        }
-        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + id + ".txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + id + ".txt";
-        if (file.exists()) {
-            Log.d("Archivo", "Existe");
-            json = getStringFromFile(file_loc);
-        }
-        return json;
     }
 
     @Override

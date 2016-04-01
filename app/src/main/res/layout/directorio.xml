@@ -1,58 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    xmlns:fab="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
     <android.support.v7.widget.Toolbar
-        android:layout_width="match_parent"
         android:id="@+id/toolbar_search"
+        android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:theme="@style/toolbar"
-        android:background="@color/prim">
+        android:background="@color/prim"
+        android:theme="@style/toolbar">
         <Spinner
-            android:layout_width="130dp"
-            android:gravity="right"
-            android:layout_height="match_parent"
             android:id="@+id/spinner_generos"
+            android:layout_width="130dp"
+            android:layout_height="match_parent"
             android:layout_gravity="right"
+            android:gravity="right"
             android:visibility="gone"/>
             <EditText
                 android:id="@+id/et_busqueda"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
-                android:maxLines="1"
+                android:hint="Buscar..."
+                android:imeOptions="actionSearch"
                 android:inputType="text"
                 android:lines="1"
-                android:imeOptions="actionSearch"
-                android:hint="Buscar..."/>
+                android:maxLines="1"
+                android:visibility="visible" />
+
     </android.support.v7.widget.Toolbar>
     <LinearLayout
+        android:id="@+id/LY_dir"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:id="@+id/LY_dir">
+        android:orientation="vertical">
     <com.ogaclejapan.smarttablayout.SmartTabLayout
         android:id="@+id/viewpagertab2"
         android:layout_width="match_parent"
         android:layout_height="48dp"
+        android:background="@color/prim"
+        android:clipToPadding="false"
         android:paddingBottom="8dp"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
-        android:clipToPadding="false"
-        app:stl_distributeEvenly="true"
-        app:stl_indicatorInterpolation="smart"
-        app:stl_indicatorColor="@color/dark"
-        app:stl_indicatorThickness="40dp"
-        app:stl_indicatorCornerRadius="20dp"
-        app:stl_underlineThickness="0dp"
-        app:stl_underlineColor="@android:color/transparent"
-        app:stl_dividerThickness="0dp"
-        app:stl_dividerColor="@android:color/transparent"
         app:stl_defaultTabTextColor="@android:color/white"
         app:stl_defaultTabTextHorizontalPadding="20dp"
-        android:background="@color/prim"/>
+        app:stl_distributeEvenly="true"
+        app:stl_dividerColor="@android:color/transparent"
+        app:stl_dividerThickness="0dp"
+        app:stl_indicatorColor="@color/dark"
+        app:stl_indicatorCornerRadius="20dp"
+        app:stl_indicatorInterpolation="smart"
+        app:stl_indicatorThickness="40dp"
+        app:stl_underlineColor="@android:color/transparent"
+        app:stl_underlineThickness="0dp" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager2"
@@ -60,9 +63,72 @@
         android:layout_height="match_parent"
         android:layout_below="@id/viewpagertab2"/>
     </LinearLayout>
-    <android.support.v7.widget.RecyclerView
+
+    <FrameLayout
+        android:id="@+id/frame_dir"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_busqueda"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
         android:visibility="gone"/>
+
+        <com.github.clans.fab.FloatingActionMenu
+            android:id="@+id/search_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            app:menu_labels_position="left"
+            app:menu_labels_style="@style/MenuLabelsStyle"
+            fab:menu_animationDelayPerItem="50"
+            fab:menu_backgroundColor="@android:color/transparent"
+            fab:menu_buttonSpacing="0dp"
+            fab:menu_colorPressed="@color/prim"
+            fab:menu_colorRipple="@color/dark"
+            fab:menu_fab_label="Menu"
+            fab:menu_fab_size="normal"
+            fab:menu_icon="@drawable/ic_search_text"
+            fab:menu_labels_hideAnimation="@anim/fab_slide_out_to_right"
+            fab:menu_labels_showAnimation="@anim/fab_slide_in_from_right"
+            fab:menu_openDirection="up"
+            fab:menu_shadowColor="#66000000"
+            fab:menu_shadowRadius="4dp"
+            fab:menu_shadowXOffset="1dp"
+            fab:menu_shadowYOffset="3dp"
+            fab:menu_showShadow="true">
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/search_menu_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_search_text"
+                fab:fab_label="Nombre"
+                fab:fab_size="mini" />
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/search_menu_generos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_search_generos"
+                fab:fab_label="Genero"
+                fab:fab_size="mini" />
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/search_menu_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_search_id"
+                fab:fab_label="ID"
+                fab:fab_size="mini" />
+
+        </com.github.clans.fab.FloatingActionMenu>
+    </FrameLayout>
 </LinearLayout>

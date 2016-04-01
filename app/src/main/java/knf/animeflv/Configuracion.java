@@ -3,6 +3,7 @@ package knf.animeflv;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -40,10 +41,67 @@ import java.security.cert.X509Certificate;
  * Created by Jordy on 16/08/2015.
  */
 public class Configuracion extends AppCompatActivity implements LoginServer.callback {
+    public static boolean isXLargeScreen(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
-            setTheme(R.style.AppThemeDark);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(this));
+        if (preferences.getBoolean("is_amoled", false)) {
+            if (accent == ColorsRes.Rojo(this)) {
+                setTheme(R.style.AppThemeDarkRojo);
+            }
+            if (accent == ColorsRes.Naranja(this)) {
+                setTheme(R.style.AppThemeDarkNaranja);
+            }
+            if (accent == ColorsRes.Gris(this)) {
+                setTheme(R.style.AppThemeDarkGris);
+            }
+            if (accent == ColorsRes.Verde(this)) {
+                setTheme(R.style.AppThemeDarkVerde);
+            }
+            if (accent == ColorsRes.Rosa(this)) {
+                setTheme(R.style.AppThemeDarkRosa);
+            }
+            if (accent == ColorsRes.Morado(this)) {
+                setTheme(R.style.AppThemeDarkMorado);
+            }
+        } else {
+            if (accent == ColorsRes.Rojo(this)) {
+                setTheme(R.style.AppThemeRojo);
+            }
+            if (accent == ColorsRes.Naranja(this)) {
+                setTheme(R.style.AppThemeNaranja);
+            }
+            if (accent == ColorsRes.Gris(this)) {
+                setTheme(R.style.AppThemeGris);
+            }
+            if (accent == ColorsRes.Verde(this)) {
+                setTheme(R.style.AppThemeVerde);
+            }
+            if (accent == ColorsRes.Rosa(this)) {
+                setTheme(R.style.AppThemeRosa);
+            }
+            if (accent == ColorsRes.Morado(this)) {
+                setTheme(R.style.AppThemeMorado);
+            }
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.configuracion);
@@ -85,11 +143,6 @@ public class Configuracion extends AppCompatActivity implements LoginServer.call
             }
         });
         getFragmentManager().beginTransaction().replace(R.id.container_conf, new Conf_fragment()).commitAllowingStateLoss();
-    }
-    public static boolean isXLargeScreen(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
     @Override
@@ -165,19 +218,6 @@ public class Configuracion extends AppCompatActivity implements LoginServer.call
             e.printStackTrace();
         }
         return hexString;
-    }
-
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
     }
 
     @Override

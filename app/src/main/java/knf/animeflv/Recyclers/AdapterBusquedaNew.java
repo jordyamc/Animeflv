@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -33,11 +32,13 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import knf.animeflv.ColorsRes;
 import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
+import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.InfoNew;
 
 /**
@@ -45,29 +46,49 @@ import knf.animeflv.info.InfoNew;
  */
 public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.ViewHolder> {
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView iv_rel;
-        public TextView tv_tit;
-        public TextView tv_tipo;
-        public TextView tv_noC;
-        public CardView card;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            this.iv_rel = (ImageView) itemView.findViewById(R.id.imgCardInfoRel);
-            this.tv_tit = (TextView) itemView.findViewById(R.id.tv_info_rel_tit);
-            this.tv_tipo = (TextView) itemView.findViewById(R.id.tv_info_rel_tipo);
-            this.tv_noC = (TextView) itemView.findViewById(R.id.tv_b_noC);
-            this.card = (CardView) itemView.findViewById(R.id.cardRel);
-        }
-    }
-
-    private Context context;
     List<AnimeClass> Animes;
+    private Context context;
 
     public AdapterBusquedaNew(Context context, List<AnimeClass> animes) {
         this.context = context;
         this.Animes = animes;
+    }
+
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
+        return ret;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
     }
 
     @Override
@@ -83,8 +104,9 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
             holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
             holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
-            holder.tv_tipo.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
+            holder.tv_noC.setTextColor(context.getResources().getColor(R.color.blanco));
         }
+        holder.tv_tipo.setTextColor(ThemeUtils.getAcentColor());
         PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + Animes.get(holder.getAdapterPosition()).getImagen()).error(R.drawable.ic_block_r).into(holder.iv_rel);
         holder.tv_tit.setText(Animes.get(holder.getAdapterPosition()).getNombre());
         holder.tv_tipo.setText(Animes.get(holder.getAdapterPosition()).getTipo());
@@ -110,6 +132,16 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
 
     public void restartViews(AdapterBusquedaNew.ViewHolder holder) {
         if (Animes.get(holder.getAdapterPosition()).getTipo().equals("none")) {
+            holder.tv_noC.setText("Sin Coincidencias");
+        }
+        if (Animes.get(holder.getAdapterPosition()).getTipo().equals("_aid_")) {
+            holder.tv_noC.setText("Escribe un ID");
+        }
+        if (Animes.get(holder.getAdapterPosition()).getTipo().equals("_NoNum_")) {
+            holder.tv_noC.setText(Animes.get(holder.getAdapterPosition()).getNombre() + " no es un ID");
+        }
+        String tipo = Animes.get(holder.getAdapterPosition()).getTipo();
+        if (tipo.equals("none") || tipo.equals("_aid_") || tipo.equals("_NoNum_")) {
             holder.iv_rel.setVisibility(View.GONE);
             holder.tv_tipo.setVisibility(View.GONE);
             holder.tv_tit.setVisibility(View.GONE);
@@ -122,28 +154,29 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
         }
     }
 
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
+    private int getColor() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(context));
+        int color = ColorsRes.Naranja(context);
+        if (accent == ColorsRes.Rojo(context)) {
+            color = ColorsRes.Rojo(context);
         }
-        reader.close();
-        return sb.toString();
-    }
-
-    public static String getStringFromFile(String filePath) {
-        String ret = "";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        } catch (IOException e) {
-        } catch (Exception e) {
+        if (accent == ColorsRes.Naranja(context)) {
+            color = ColorsRes.Naranja(context);
         }
-        return ret;
+        if (accent == ColorsRes.Gris(context)) {
+            color = ColorsRes.Gris(context);
+        }
+        if (accent == ColorsRes.Verde(context)) {
+            color = ColorsRes.Verde(context);
+        }
+        if (accent == ColorsRes.Rosa(context)) {
+            color = ColorsRes.Rosa(context);
+        }
+        if (accent == ColorsRes.Morado(context)) {
+            color = ColorsRes.Morado(context);
+        }
+        return color;
     }
 
     private String getCertificateSHA1Fingerprint() {
@@ -184,22 +217,26 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
         return hexString;
     }
 
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
-    }
-
     @Override
     public int getItemCount() {
         return Animes.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public ImageView iv_rel;
+        public TextView tv_tit;
+        public TextView tv_tipo;
+        public TextView tv_noC;
+        public CardView card;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            this.iv_rel = (ImageView) itemView.findViewById(R.id.imgCardInfoRel);
+            this.tv_tit = (TextView) itemView.findViewById(R.id.tv_info_rel_tit);
+            this.tv_tipo = (TextView) itemView.findViewById(R.id.tv_info_rel_tipo);
+            this.tv_noC = (TextView) itemView.findViewById(R.id.tv_b_noC);
+            this.card = (CardView) itemView.findViewById(R.id.cardRel);
+        }
     }
 
 }

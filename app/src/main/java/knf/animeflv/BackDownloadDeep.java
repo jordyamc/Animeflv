@@ -1,9 +1,9 @@
 package knf.animeflv;
 
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -30,7 +30,6 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.SaxAsyncHttpResponseHandler;
 import com.loopj.android.http.SyncHttpClient;
 import com.loopj.android.http.TextHttpResponseHandler;
 
@@ -45,8 +44,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
@@ -60,6 +57,7 @@ import cz.msebera.android.httpclient.Header;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.StreamManager.StreamManager;
+import knf.animeflv.Utils.FileUtil;
 import xdroid.toaster.Toaster;
 
 /**
@@ -84,12 +82,85 @@ public class BackDownloadDeep extends AppCompatActivity {
 
     MaterialDialog options;
 
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
+        return ret;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
-            setTheme(R.style.TranslucentDark);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(this));
+        if (preferences.getBoolean("is_amoled", false)) {
+            if (accent == ColorsRes.Rojo(this)) {
+                setTheme(R.style.TranslucentDarkRojo);
+            }
+            if (accent == ColorsRes.Naranja(this)) {
+                setTheme(R.style.TranslucentDarkNaranja);
+            }
+            if (accent == ColorsRes.Gris(this)) {
+                setTheme(R.style.TranslucentDarkGris);
+            }
+            if (accent == ColorsRes.Verde(this)) {
+                setTheme(R.style.TranslucentDarkVerde);
+            }
+            if (accent == ColorsRes.Rosa(this)) {
+                setTheme(R.style.TranslucentDarkRosa);
+            }
+            if (accent == ColorsRes.Morado(this)) {
+                setTheme(R.style.TranslucentDarkMorado);
+            }
         } else {
-            setTheme(R.style.Translucent);
+            if (accent == ColorsRes.Rojo(this)) {
+                setTheme(R.style.TranslucentRojo);
+            }
+            if (accent == ColorsRes.Naranja(this)) {
+                setTheme(R.style.TranslucentNaranja);
+            }
+            if (accent == ColorsRes.Gris(this)) {
+                setTheme(R.style.TranslucentGris);
+            }
+            if (accent == ColorsRes.Verde(this)) {
+                setTheme(R.style.TranslucentVerde);
+            }
+            if (accent == ColorsRes.Rosa(this)) {
+                setTheme(R.style.TranslucentRosa);
+            }
+            if (accent == ColorsRes.Morado(this)) {
+                setTheme(R.style.TranslucentMorado);
+            }
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.web);
@@ -131,7 +202,7 @@ public class BackDownloadDeep extends AppCompatActivity {
                             Toaster.toast("El anime ya existe, reproduciendo");
                             int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_video", "0"));
                             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid, eid.replace("E", "") + ".mp4");
-                            File sd = new File(new Parser().getSD1() + "/Animeflv/download/" + aid, eid.replace("E", "") + ".mp4");
+                            File sd = new File(FileUtil.getSDPath() + "/Animeflv/download/" + aid, eid.replace("E", "") + ".mp4");
                             switch (type) {
                                 case 0:
                                     if (file.exists()) {
@@ -168,7 +239,7 @@ public class BackDownloadDeep extends AppCompatActivity {
     }
 
     public boolean animeExist() {
-        return new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid, eid.replace("E", "") + ".mp4").exists() || new File(new Parser().getSD1() + "/Animeflv/download/" + aid, eid.replace("E", "") + ".mp4").exists();
+        return new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid, eid.replace("E", "") + ".mp4").exists() || new File(FileUtil.getSDPath() + "/Animeflv/download/" + aid, eid.replace("E", "") + ".mp4").exists();
     }
 
     public void setupWeb() {
@@ -342,30 +413,6 @@ public class BackDownloadDeep extends AppCompatActivity {
         });
     }
 
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-
-    public static String getStringFromFile(String filePath) {
-        String ret = "";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        } catch (IOException e) {
-        } catch (Exception e) {
-        }
-        return ret;
-    }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -495,19 +542,6 @@ public class BackDownloadDeep extends AppCompatActivity {
             e.printStackTrace();
         }
         return hexString;
-    }
-
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
     }
 
     public class Check extends AsyncTask<String, String, String> {

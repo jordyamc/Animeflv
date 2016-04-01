@@ -68,10 +68,75 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     RequestFav favo;
     Boolean sorted = false;
     Boolean paused = false;
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            ActualizarFavoritos();
+            handler.postDelayed(this, 1000);
+        }
+    };
+
+    public static boolean isXLargeScreen(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
-            setTheme(R.style.AppThemeDark);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(this));
+        if (preferences.getBoolean("is_amoled", false)) {
+            if (accent == ColorsRes.Rojo(this)) {
+                setTheme(R.style.AppThemeDarkRojo);
+            }
+            if (accent == ColorsRes.Naranja(this)) {
+                setTheme(R.style.AppThemeDarkNaranja);
+            }
+            if (accent == ColorsRes.Gris(this)) {
+                setTheme(R.style.AppThemeDarkGris);
+            }
+            if (accent == ColorsRes.Verde(this)) {
+                setTheme(R.style.AppThemeDarkVerde);
+            }
+            if (accent == ColorsRes.Rosa(this)) {
+                setTheme(R.style.AppThemeDarkRosa);
+            }
+            if (accent == ColorsRes.Morado(this)) {
+                setTheme(R.style.AppThemeDarkMorado);
+            }
+        } else {
+            if (accent == ColorsRes.Rojo(this)) {
+                setTheme(R.style.AppThemeRojo);
+            }
+            if (accent == ColorsRes.Naranja(this)) {
+                setTheme(R.style.AppThemeNaranja);
+            }
+            if (accent == ColorsRes.Gris(this)) {
+                setTheme(R.style.AppThemeGris);
+            }
+            if (accent == ColorsRes.Verde(this)) {
+                setTheme(R.style.AppThemeVerde);
+            }
+            if (accent == ColorsRes.Rosa(this)) {
+                setTheme(R.style.AppThemeRosa);
+            }
+            if (accent == ColorsRes.Morado(this)) {
+                setTheme(R.style.AppThemeMorado);
+            }
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_favs);
@@ -136,13 +201,6 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         },500);
         handler.postDelayed(runnable, 1000);
     }
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            ActualizarFavoritos();
-            handler.postDelayed(this, 1000);
-        }
-    };
 
     public void ActualizarFavoritos() {
         if (isNetworkAvailable()) {
@@ -153,6 +211,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             }
         }
     }
+
     public void init(){
         SharedPreferences sharedPreferences=getSharedPreferences("data", MODE_PRIVATE);
         fav=sharedPreferences.getString("favoritos", "");
@@ -180,7 +239,6 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                         .cancelListener(new DialogInterface.OnCancelListener() {
                             @Override
                             public void onCancel(DialogInterface dialog) {
-                                //Toast.makeText(context,"Se ah cancelado la carga de los favoritos",Toast.LENGTH_SHORT).show();
                                 finish();
                                 favo.cancel(true);
                             }
@@ -199,6 +257,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             }
         }
     }
+
     private boolean isNetworkAvailable() {
         Boolean net=false;
         int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
@@ -221,6 +280,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && net;
     }
+
     @Override
     public void favCall(String data,TaskType taskType){
         dialog.dismiss();
@@ -243,9 +303,6 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                     }
                 //}
             }
-            for (String tit : links) {
-                Log.d("URL IMG", tit);
-            }
             Log.d("Ntitulos", Integer.toString(titulos.size()));
             Log.d("Naids", Integer.toString(aids.size()));
             Log.d("Nlinks", Integer.toString(links.size()));
@@ -259,11 +316,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             Toast.makeText(context,"Error de red",Toast.LENGTH_SHORT).show();
         }
     }
-    public static boolean isXLargeScreen(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
+
     @Override
     public void onConfigurationChanged (Configuration newConfig)
     {
@@ -388,19 +441,6 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             e.printStackTrace();
         }
         return hexString;
-    }
-
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
     }
 
     @Override

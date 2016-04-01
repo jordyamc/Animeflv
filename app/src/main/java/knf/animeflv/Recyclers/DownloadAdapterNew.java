@@ -27,35 +27,17 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import knf.animeflv.R;
+import knf.animeflv.Utils.FileUtil;
 
 /**
  * Created by Jordy on 08/08/2015.
  */
 public class DownloadAdapterNew extends RecyclerView.Adapter<DownloadAdapterNew.ViewHolder> {
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView tv_titulo;
-        public TextView tv_capitulo;
-        public TextView tv_numero;
-        public ImageButton ib_ver;
-        public ImageButton ib_des;
-        public ProgressBar progress;
-        public CardView cardView;
-        public RecyclerView recyclerView;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            this.tv_titulo = (TextView) itemView.findViewById(R.id.tv_cardDownload_titulo);
-            this.tv_capitulo = (TextView) itemView.findViewById(R.id.tv_cardDownload_capitulo);
-            this.tv_numero = (TextView) itemView.findViewById(R.id.tv_numero);
-            this.ib_ver = (ImageButton) itemView.findViewById(R.id.ib_ver_download);
-            this.ib_des = (ImageButton) itemView.findViewById(R.id.ib_descargar_download);
-            this.progress = (ProgressBar) itemView.findViewById(R.id.progress_download);
-            this.cardView = (CardView) itemView.findViewById(R.id.card_descargas);
-        }
-    }
-
-    private Context context;
+    final int COMPLETADO = 0;
+    final int DESCARGANDO = 1;
+    final int ERROR = 3;
+    final int CANCELADO = 4;
     List<String> titulo;
     List<String> capitulo;
     List<Long> id;
@@ -64,12 +46,7 @@ public class DownloadAdapterNew extends RecyclerView.Adapter<DownloadAdapterNew.
     String ext_storage_state = Environment.getExternalStorageState();
     Timer t = new Timer();
     Boolean downloading = true;
-
-    final int COMPLETADO = 0;
-    final int DESCARGANDO = 1;
-    final int ERROR = 3;
-    final int CANCELADO = 4;
-
+    private Context context;
     public DownloadAdapterNew(Context context, List<String> titulos, List<String> capitulos, List<Long> dids, List<String> files, List<String> eids) {
         this.context = context;
         this.titulo = titulos;
@@ -256,7 +233,7 @@ public class DownloadAdapterNew extends RecyclerView.Adapter<DownloadAdapterNew.
                             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID2.replace(file.get(position) + ":::", "")).apply();
                             break;
                         case DESCARGANDO:
-                            File fileD = new File(getSD1() + "/Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")) + "/" + fileT + ".mp4");
+                            File fileD = new File(FileUtil.getSDPath() + "/Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")) + "/" + fileT + ".mp4");
                             if (fileD.exists()) {
                                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(fileD));
                                 intent.setDataAndType(Uri.fromFile(fileD), "video/mp4");
@@ -272,7 +249,7 @@ public class DownloadAdapterNew extends RecyclerView.Adapter<DownloadAdapterNew.
                             }
                             break;
                         case COMPLETADO:
-                            File file1 = new File(getSD1() + "/Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")) + "/" + fileT + ".mp4");
+                            File file1 = new File(FileUtil.getSDPath() + "/Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")) + "/" + fileT + ".mp4");
                             if (file1.exists()) {
                                 Intent intent1 = new Intent(Intent.ACTION_VIEW, Uri.fromFile(file1));
                                 intent1.setDataAndType(Uri.fromFile(file1), "video/mp4");
@@ -369,7 +346,7 @@ public class DownloadAdapterNew extends RecyclerView.Adapter<DownloadAdapterNew.
                     }
                     switch (context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt(eid + "status", CANCELADO)) {
                         case COMPLETADO:
-                            File file1 = new File(getSD1() + "/Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")) + "/" + fileT + ".mp4");
+                            File file1 = new File(FileUtil.getSDPath() + "/Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")) + "/" + fileT + ".mp4");
                             if (file1.exists()) {
                                 holder.progress.setVisibility(View.GONE);
                                 holder.ib_des.setImageResource(R.drawable.ic_borrar_r);
@@ -473,6 +450,28 @@ public class DownloadAdapterNew extends RecyclerView.Adapter<DownloadAdapterNew.
             }
         }
         return sSDpath;
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView tv_titulo;
+        public TextView tv_capitulo;
+        public TextView tv_numero;
+        public ImageButton ib_ver;
+        public ImageButton ib_des;
+        public ProgressBar progress;
+        public CardView cardView;
+        public RecyclerView recyclerView;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            this.tv_titulo = (TextView) itemView.findViewById(R.id.tv_cardDownload_titulo);
+            this.tv_capitulo = (TextView) itemView.findViewById(R.id.tv_cardDownload_capitulo);
+            this.tv_numero = (TextView) itemView.findViewById(R.id.tv_numero);
+            this.ib_ver = (ImageButton) itemView.findViewById(R.id.ib_ver_download);
+            this.ib_des = (ImageButton) itemView.findViewById(R.id.ib_descargar_download);
+            this.progress = (ProgressBar) itemView.findViewById(R.id.progress_download);
+            this.cardView = (CardView) itemView.findViewById(R.id.card_descargas);
+        }
     }
 
 }

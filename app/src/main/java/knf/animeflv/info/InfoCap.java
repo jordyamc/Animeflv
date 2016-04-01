@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.melnykov.fab.FloatingActionButton;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,20 +22,49 @@ import java.io.InputStreamReader;
 
 import knf.animeflv.Parser;
 import knf.animeflv.R;
-import knf.animeflv.Recyclers.RecyclerAdapter;
+import knf.animeflv.Recyclers.AdapterInfoCaps;
+import knf.animeflv.Utils.MainStates;
+import knf.animeflv.Utils.ThemeUtils;
 
 /**
  * Created by Jordy on 12/08/2015.
  */
 public class InfoCap extends Fragment{
-    public InfoCap(){}
     Parser parser=new Parser();
-
     String ext_storage_state = Environment.getExternalStorageState();
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
-
     View view;
     RecyclerView rvAnimes;
+    FloatingActionButton button;
+    AdapterInfoCaps adapter;
+
+    public InfoCap() {
+    }
+
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
+        return ret;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.info_capitulos,container,false);
@@ -44,11 +75,29 @@ public class InfoCap extends Fragment{
         rvAnimes.setHasFixedSize(true);
         rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         String aid = getArguments().getString("aid");
-        RecyclerAdapter adapter = new RecyclerAdapter(getActivity(), parser.parseNumerobyEID(getJson()),aid,parser.parseEidsbyEID(getJson()));
+        adapter = new AdapterInfoCaps(getActivity(), parser.parseNumerobyEID(getJson()), aid, parser.parseEidsbyEID(getJson()));
         rvAnimes.setAdapter(adapter);
-
+        button = (FloatingActionButton) view.findViewById(R.id.action_list);
+        button.attachToRecyclerView(rvAnimes);
+        button.setColorNormal(ThemeUtils.getAcentColor());
+        button.setColorPressed(ThemeUtils.getAcentColor());
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (MainStates.isListing()) {
+                    button.setImageResource(R.drawable.ic_add_list);
+                    MainStates.setListing(false);
+                    adapter.onStopList();
+                } else {
+                    button.setImageResource(R.drawable.ic_done);
+                    MainStates.setListing(true);
+                    adapter.onStartList();
+                }
+            }
+        });
         return view;
     }
+
     public String getJson(){
         String aid = getArguments().getString("aid");
         String json="";
@@ -64,25 +113,5 @@ public class InfoCap extends Fragment{
             json=getStringFromFile(file_loc);
         }
         return json;
-    }
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-    public static String getStringFromFile (String filePath) {
-        String ret="";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        }catch (IOException e){}catch (Exception e){}
-        return ret;
     }
 }

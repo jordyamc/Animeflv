@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="Notificaciones">
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
@@ -8,23 +7,23 @@
             android:title="Activar Notificaciones" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="60000"
+            android:enabled="true"
             android:key="tiempo"
-            android:title="Actualizaciones"
             android:summary="Revisar actualizaciones cada %s"
-            android:enabled="true" />
+            android:title="Actualizaciones" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
+            android:enabled="true"
             android:key="sonido"
-            android:title="Sonido de Notificacion"
             android:summary="%s"
-            android:enabled="true" />
+            android:title="Sonido de Notificacion" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Conexiones">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_conexion"
-            android:title="Usar Conexion"
-            android:summary="%s" />
+            android:summary="%s"
+            android:title="Usar Conexion" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Colores">
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
@@ -36,25 +35,25 @@
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_busqueda"
-            android:title="Tipo de busqueda"
-            android:summary="%s" />
+            android:summary="%s"
+            android:title="Tipo de busqueda" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Reproductores">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_video"
-            android:title="Anime descargado"
-            android:summary="Reproductor: %s" />
+            android:summary="Reproductor: %s"
+            android:title="Anime descargado" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_streaming"
-            android:title="Streaming"
-            android:summary="Reproductor: %s" />
+            android:summary="Reproductor: %s"
+            android:title="Streaming" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_player"
-            android:title="Reproductor Interno"
-            android:summary="Tipo: %s" />
+            android:summary="Tipo: %s"
+            android:title="Reproductor Interno" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Extras">
         <com.lb.material_preferences_library.custom_preferences.Preference
@@ -62,40 +61,61 @@
             android:title="ChangeLog" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:key="login"
-            android:title="Sincronizar Favoritos"
-            android:summary="Iniciar Sesion" />
+            android:summary="Iniciar Sesion"
+            android:title="Sincronizar Favoritos" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="resaltar"
-            android:title="Resaltar"
-            android:summary="Animes, OVAS, Peliculas nuevas, y Animes en favoritos" />
+            android:summary="Animes, OVAS, Peliculas nuevas, y Animes en favoritos"
+            android:title="Resaltar" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="autoDesc"
-            android:title="Notificar capitulos nuevos"
-            android:summary="Generar una notificacion para descargar capitulos nuevos de animes en favoritos" />
+            android:summary="Generar una notificacion para descargar capitulos nuevos de animes en favoritos"
+            android:title="Notificar capitulos nuevos" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="autoUpdate"
-            android:title="Autodescargar Actualizaciones"
-            android:summary="Descarga la actualizacion en segundo plano, y crea una notificacion para instalarla" />
+            android:summary="Descarga la actualizacion en segundo plano, y crea una notificacion para instalarla"
+            android:title="Autodescargar Actualizaciones" />
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="true"
+            android:key="noGif"
+            android:title="Desactivar Gifs" />
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="statusShown"
+            android:title="Ocultar informacion de Server" />
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="debug"
+            android:summary="(Informacion de Anime)"
+            android:title="Mostrar ID de Anime" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Almacenamiento">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="b_cache"
-            android:title="Borrar Cache"
-            android:summary="Tamaño de cache: %s MB" />
+            android:summary="Tamaño de cache: %s MB"
+            android:title="Borrar Cache" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="b_video"
-            android:title="Borrar todos los videos"
-            android:summary="Espacio usado: %s MB" />
+            android:summary="Espacio usado: %s MB"
+            android:title="Borrar todos los videos" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="b_vistos"
-            android:title="Capitulos vistos"
-            android:summary="Borrar historial de capitulos vistos" />
+            android:summary="Borrar historial de capitulos vistos"
+            android:title="Capitulos vistos" />
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="null"
+            android:key="SDpath"
+            android:title="SD Info" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="catSD"
+        android:title="Tarjeta SD">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="b_move"
@@ -104,11 +124,12 @@
             android:defaultValue="false"
             android:key="sd_down"
             android:title="Descargar Anime a SD" />
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="null"
+            android:key="Rpath"
+            android:title="Reiniciar Direccion SD" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Experimental">
-        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
-            android:defaultValue="false"
-            android:key="debug"
-            android:title="Debug" />
+
     </PreferenceCategory>
 </PreferenceScreen>

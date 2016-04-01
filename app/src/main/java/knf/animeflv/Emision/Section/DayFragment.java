@@ -12,17 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
-import java.util.TimeZone;
 
-import knf.animeflv.Emision.DateCompare;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterEmision;
 
@@ -32,6 +27,7 @@ import knf.animeflv.Recyclers.AdapterEmision;
 public class DayFragment extends Fragment {
     View rootview;
     int diaCode;
+    ArrayList<String> aids;
     SharedPreferences preferences;
     RecyclerView recyclerView;
     AdapterEmision emision;
@@ -51,53 +47,66 @@ public class DayFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             diaCode = bundle.getInt("code", 0);
+            aids = bundle.getStringArrayList("list");
         } else {
             diaCode = 0;
+            aids = new ArrayList<>();
         }
         Set<String> ongoing = preferences.getStringSet("ongoingSet", new HashSet<String>());
         List<TimeCompareModel> list = new ArrayList<>();
         if (!ongoing.isEmpty()) {
-            for (String aid : ongoing) {
-                TimeCompareModel compareModel = new TimeCompareModel(aid, getActivity());
-                boolean isthisday = preferences.getInt(aid + "onday", 0) == diaCode + 1 && compareModel.getTime().contains("AM") && UTCtoLocal(compareModel.getTime()).contains("PM");
-                boolean isotherday = compareModel.getTime().contains("AM") && UTCtoLocal(compareModel.getTime()).contains("PM");
-                if (preferences.getInt(aid + "onday", 0) == diaCode) {
-                    if (!isotherday) {
-                        list.add(compareModel);
-                    }
+            if (!aids.isEmpty()) {
+                for (String aid : aids) {
+                    list.add(new TimeCompareModel(aid, getActivity()));
                 }
-                if (isthisday) {
-                    list.add(compareModel);
-                }
-            }
-            if (list.isEmpty()) {
-                list.add(new TimeCompareModel());
             } else {
-                Collections.sort(list, new DateCompare());
+                list.add(new TimeCompareModel());
             }
         } else {
             list.add(new TimeCompareModel());
         }
-        emision = new AdapterEmision(getActivity(), list);
+        if (diaCode == getActualDayCode()) {
+            emision = new AdapterEmision(getActivity(), list, true);
+        } else {
+            emision = new AdapterEmision(getActivity(), list);
+        }
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         recyclerView.setAdapter(emision);
         return rootview;
     }
 
-    private String UTCtoLocal(String utc) {
-        String convert = "";
-        try {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("~hh:mmaa", Locale.ENGLISH);
-            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Date myDate = simpleDateFormat.parse(utc);
-            simpleDateFormat.setTimeZone(TimeZone.getDefault());
-            convert = simpleDateFormat.format(myDate);
-        } catch (Exception e) {
-            e.printStackTrace();
-            convert = utc + "-UTC--->" + e.getMessage();
+    private int getActualDayCode() {
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_WEEK);
+        int code;
+        switch (day) {
+            case Calendar.MONDAY:
+                code = 1;
+                break;
+            case Calendar.TUESDAY:
+                code = 2;
+                break;
+            case Calendar.WEDNESDAY:
+                code = 3;
+                break;
+            case Calendar.THURSDAY:
+                code = 4;
+                break;
+            case Calendar.FRIDAY:
+                code = 5;
+                break;
+            case Calendar.SATURDAY:
+                code = 6;
+                break;
+            case Calendar.SUNDAY:
+                code = 7;
+                break;
+            default:
+                code = 0;
+                break;
         }
-        return convert;
+        return code;
     }
 
     @Override
@@ -108,15 +117,12 @@ public class DayFragment extends Fragment {
             Set<String> ongoing = preferences.getStringSet("ongoingSet", new HashSet<String>());
             List<TimeCompareModel> list = new ArrayList<>();
             if (!ongoing.isEmpty()) {
-                for (String aid : ongoing) {
-                    if (preferences.getInt(aid + "onday", 0) == diaCode) {
+                if (!aids.isEmpty()) {
+                    for (String aid : aids) {
                         list.add(new TimeCompareModel(aid, getActivity()));
                     }
-                }
-                if (list.isEmpty()) {
-                    list.add(new TimeCompareModel());
                 } else {
-                    Collections.sort(list, new DateCompare());
+                    list.add(new TimeCompareModel());
                 }
             } else {
                 list.add(new TimeCompareModel());

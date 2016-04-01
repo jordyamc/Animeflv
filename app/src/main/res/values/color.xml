@@ -13,4 +13,17 @@
     <color name="anuevo">#00E5FF</color>
     <color name="amor">#E100FF</color>
     <color name="negro">#000</color>
+
+    <color name="foreground_light">#2f2f2f</color>
+
+    <color name="holo_light">#313131</color>
+    <color name="holo_dark">#D0D0D0</color>
+
+    <color name="theme_blanco">#EDEDED</color>
+    <color name="theme_naranja">@android:color/holo_orange_dark</color>
+    <color name="theme_gris">#9E9E9E</color>
+    <color name="theme_verde">#4CAF50</color>
+    <color name="theme_rosa">#E91E63</color>
+    <color name="theme_morado">#9C27B0</color>
+    <color name="theme_rojo">@android:color/holo_red_dark</color>
 </resources>

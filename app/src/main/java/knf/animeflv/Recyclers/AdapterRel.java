@@ -32,6 +32,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import knf.animeflv.ColorsRes;
 import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
@@ -43,68 +44,17 @@ import knf.animeflv.info.InfoNew;
  */
 public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView iv_rel;
-        public TextView tv_tit;
-        public TextView tv_tipo;
-        public CardView card;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            this.iv_rel = (ImageView) itemView.findViewById(R.id.imgCardInfoRel);
-            this.tv_tit = (TextView) itemView.findViewById(R.id.tv_info_rel_tit);
-            this.tv_tipo = (TextView) itemView.findViewById(R.id.tv_info_rel_tipo);
-            this.card = (CardView) itemView.findViewById(R.id.cardRel);
-        }
-    }
-    private Context context;
     List<String> titulosCard;
     List<String> tiposCard;
     String[] url;
     String[] aids;
-
+    private Context context;
     public AdapterRel(Context context, List<String> titulos, List<String> tipos, String[] urls, String[] aid) {
         this.context = context;
         this.titulosCard = titulos;
         this.tiposCard = tipos;
         this.url = urls;
         this.aids=aid;
-    }
-
-    @Override
-    public AdapterRel.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(context).
-                inflate(R.layout.item_anime_rel, parent, false);
-        return new AdapterRel.ViewHolder(itemView);
-    }
-
-    @Override
-    public void onBindViewHolder(AdapterRel.ViewHolder holder, final int position) {
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
-            holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
-            holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
-            holder.tv_tipo.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
-        }
-        PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[position]).error(R.drawable.ic_block_r).into(holder.iv_rel);
-        holder.tv_tit.setText(titulosCard.get(position));
-        holder.tv_tipo.setText(tiposCard.get(position));
-        holder.card.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String file = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-                String json = getStringFromFile(file);
-                String link = new Parser().getUrlFavs(json, aids[position]);
-                Bundle bundle=new Bundle();
-                bundle.putString("aid", aids[position]);
-                bundle.putString("link", link);
-                Intent intent = new Intent(context, InfoNew.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtras(bundle);
-                SharedPreferences.Editor sharedPreferences=context.getSharedPreferences("data",Context.MODE_PRIVATE).edit();
-                sharedPreferences.putString("aid",aids[position]).commit();
-                context.startActivity(intent);
-            }
-        });
     }
 
     public static String convertStreamToString(InputStream is) throws Exception {
@@ -129,6 +79,80 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
         } catch (Exception e) {
         }
         return ret;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
+
+    @Override
+    public AdapterRel.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(context).
+                inflate(R.layout.item_anime_rel, parent, false);
+        return new AdapterRel.ViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(AdapterRel.ViewHolder holder, final int position) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
+            holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
+            holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
+        }
+        holder.tv_tipo.setTextColor(getColor());
+        PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[position]).error(R.drawable.ic_block_r).into(holder.iv_rel);
+        holder.tv_tit.setText(titulosCard.get(position));
+        holder.tv_tipo.setText(tiposCard.get(position));
+        holder.card.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String file = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+                String json = getStringFromFile(file);
+                String link = new Parser().getUrlFavs(json, aids[position]);
+                Bundle bundle=new Bundle();
+                bundle.putString("aid", aids[position]);
+                bundle.putString("link", link);
+                Intent intent = new Intent(context, InfoNew.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtras(bundle);
+                SharedPreferences.Editor sharedPreferences=context.getSharedPreferences("data",Context.MODE_PRIVATE).edit();
+                sharedPreferences.putString("aid",aids[position]).commit();
+                context.startActivity(intent);
+            }
+        });
+    }
+
+    private int getColor() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(context));
+        int color = ColorsRes.Naranja(context);
+        if (accent == ColorsRes.Rojo(context)) {
+            color = ColorsRes.Rojo(context);
+        }
+        if (accent == ColorsRes.Naranja(context)) {
+            color = ColorsRes.Naranja(context);
+        }
+        if (accent == ColorsRes.Gris(context)) {
+            color = ColorsRes.Gris(context);
+        }
+        if (accent == ColorsRes.Verde(context)) {
+            color = ColorsRes.Verde(context);
+        }
+        if (accent == ColorsRes.Rosa(context)) {
+            color = ColorsRes.Rosa(context);
+        }
+        if (accent == ColorsRes.Morado(context)) {
+            color = ColorsRes.Morado(context);
+        }
+        return color;
     }
 
     private String getCertificateSHA1Fingerprint() {
@@ -169,21 +193,24 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
         return hexString;
     }
 
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
-    }
     @Override
     public int getItemCount() {
         return titulosCard.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public ImageView iv_rel;
+        public TextView tv_tit;
+        public TextView tv_tipo;
+        public CardView card;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            this.iv_rel = (ImageView) itemView.findViewById(R.id.imgCardInfoRel);
+            this.tv_tit = (TextView) itemView.findViewById(R.id.tv_info_rel_tit);
+            this.tv_tipo = (TextView) itemView.findViewById(R.id.tv_info_rel_tipo);
+            this.card = (CardView) itemView.findViewById(R.id.cardRel);
+        }
     }
 
 }

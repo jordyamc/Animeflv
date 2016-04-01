@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.Arrays;
 
+import knf.animeflv.Utils.FileUtil;
+
 /**
  * Created by Jordy on 15/10/2015.
  */
@@ -78,7 +80,7 @@ public class Move extends Activity {
     }
     public void MoveFiles() throws IOException {
         File sourceLocation = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download");
-        File targetLocation = new File(getSD1() + "/Animeflv/download");
+        File targetLocation = new File(FileUtil.getSDPath() + "/Animeflv/download");
         if (sourceLocation.isDirectory()) {
             if (!targetLocation.exists() && !targetLocation.mkdirs()) {
                 throw new IOException("Cannot create dir " + targetLocation.getAbsolutePath());
@@ -96,7 +98,7 @@ public class Move extends Activity {
                         if (!new File(inSD.getPath(), mp4).exists()) {
                             //boolean success = new File(sourceLocation+"/"+i+"/"+mp4).renameTo(new File(getSD1()+"/Animeflv/download/"+i+"/"+mp4));
                             FileChannel inChannel = new FileInputStream(new File(sourceLocation + "/" + i + "/" + mp4)).getChannel();
-                            FileChannel outChannel = new FileOutputStream(new File(getSD1() + "/Animeflv/download/" + i + "/" + mp4)).getChannel();
+                            FileChannel outChannel = new FileOutputStream(new File(FileUtil.getSDPath() + "/Animeflv/download/" + i + "/" + mp4)).getChannel();
                             try {
                                 Toast.makeText(this,"Moviendo video "+num,Toast.LENGTH_SHORT).show();
                                 inChannel.transferTo(0, inChannel.size(), outChannel);

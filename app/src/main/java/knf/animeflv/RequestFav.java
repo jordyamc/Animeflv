@@ -1,19 +1,14 @@
 package knf.animeflv;
 
-import android.app.Activity;
-import android.app.NotificationManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.support.v7.app.NotificationCompat;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.SyncHttpClient;
 
@@ -57,15 +52,48 @@ public class RequestFav extends AsyncTask<String,String,String> {
     MaterialDialog dialog;
     Boolean running;
     int prog = 0;
-    public interface callback{
-        void favCall(String data, TaskType taskType);
-    }
-
     public RequestFav(Context con, TaskType taskType, MaterialDialog d) {
         call=(callback) con;
         this.context = con;
         this.taskType=taskType;
         this.dialog = d;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
+        return ret;
+    }
+
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
     }
 
     private String getCertificateSHA1Fingerprint() {
@@ -106,20 +134,6 @@ public class RequestFav extends AsyncTask<String,String,String> {
         return hexString;
     }
 
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
-    }
-
-
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
@@ -135,6 +149,7 @@ public class RequestFav extends AsyncTask<String,String,String> {
         for (final String i : params) {
             final File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
             if (!file.exists() || !isJSONValid(getStringFromFile(file.getPath()))) {
+                Log.d("Link", new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(i) + "&certificate=" + getCertificateSHA1Fingerprint());
                 new SyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(i) + "&certificate=" + getCertificateSHA1Fingerprint(), null, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -142,7 +157,6 @@ public class RequestFav extends AsyncTask<String,String,String> {
                         writeToFile(response.toString(), file);
                         list.add(parser.getTit(response.toString()));
                     }
-
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
@@ -171,6 +185,7 @@ public class RequestFav extends AsyncTask<String,String,String> {
         _response=builder.toString();
         return _response;
     }
+
     public  void writeToFile(String body,File file){
         FileOutputStream fos = null;
         try {
@@ -194,29 +209,14 @@ public class RequestFav extends AsyncTask<String,String,String> {
         }
         return true;
     }
-    public static String getStringFromFile (String filePath) {
-        String ret="";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        }catch (IOException e){}catch (Exception e){}
-        return ret;
-    }
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
+
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
         call.favCall(s, taskType);
+    }
+
+    public interface callback {
+        void favCall(String data, TaskType taskType);
     }
 }

@@ -2,6 +2,7 @@ package knf.animeflv.Directorio;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -9,12 +10,14 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.transition.Fade;
 import android.transition.Slide;
@@ -29,11 +32,16 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
@@ -46,14 +54,20 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import knf.animeflv.AnimeCompare;
 import knf.animeflv.Application;
+import knf.animeflv.ColorsRes;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterBusquedaNew;
+import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.SearchUtils;
+import knf.animeflv.Utils.eNums.SearchType;
+import xdroid.toaster.Toaster;
 
 /**
  * Created by Jordy on 29/08/2015.
@@ -63,6 +77,7 @@ public class Directorio extends AppCompatActivity {
     Menu menuGlobal;
     EditText editText;
     RecyclerView recyclerView;
+    FrameLayout frameLayout;
     LinearLayout linearLayout;
     String ext_storage_state = Environment.getExternalStorageState();
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
@@ -74,11 +89,83 @@ public class Directorio extends AppCompatActivity {
     ViewPager viewPager;
     SmartTabLayout viewPagerTab;
     Spinner generosS;
+    FloatingActionButton nombre;
+    FloatingActionButton genero;
+    FloatingActionButton byid;
+    FloatingActionMenu actionMenu;
+
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
+        return ret;
+    }
+
+    public static boolean isXLargeScreen(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
-            setTheme(R.style.AppThemeDark);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(this));
+        if (preferences.getBoolean("is_amoled", false)) {
+            if (accent == ColorsRes.Rojo(this)) {
+                setTheme(R.style.AppThemeDarkRojo);
+            }
+            if (accent == ColorsRes.Naranja(this)) {
+                setTheme(R.style.AppThemeDarkNaranja);
+            }
+            if (accent == ColorsRes.Gris(this)) {
+                setTheme(R.style.AppThemeDarkGris);
+            }
+            if (accent == ColorsRes.Verde(this)) {
+                setTheme(R.style.AppThemeDarkVerde);
+            }
+            if (accent == ColorsRes.Rosa(this)) {
+                setTheme(R.style.AppThemeDarkRosa);
+            }
+            if (accent == ColorsRes.Morado(this)) {
+                setTheme(R.style.AppThemeDarkMorado);
+            }
+        } else {
+            if (accent == ColorsRes.Rojo(this)) {
+                setTheme(R.style.AppThemeRojo);
+            }
+            if (accent == ColorsRes.Naranja(this)) {
+                setTheme(R.style.AppThemeNaranja);
+            }
+            if (accent == ColorsRes.Gris(this)) {
+                setTheme(R.style.AppThemeGris);
+            }
+            if (accent == ColorsRes.Verde(this)) {
+                setTheme(R.style.AppThemeVerde);
+            }
+            if (accent == ColorsRes.Rosa(this)) {
+                setTheme(R.style.AppThemeRosa);
+            }
+            if (accent == ColorsRes.Morado(this)) {
+                setTheme(R.style.AppThemeMorado);
+            }
         }
         super.onCreate(savedInstanceState);
         setUpAnimations();
@@ -101,7 +188,134 @@ public class Directorio extends AppCompatActivity {
         }
         t_busqueda = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_busqueda", "0").trim());
         toolbarS = (Toolbar) findViewById(R.id.toolbar_search);
+        nombre = (FloatingActionButton) findViewById(R.id.search_menu_text);
+        genero = (FloatingActionButton) findViewById(R.id.search_menu_generos);
+        byid = (FloatingActionButton) findViewById(R.id.search_menu_id);
+        actionMenu = (FloatingActionMenu) findViewById(R.id.search_menu);
         setSupportActionBar(toolbarS);
+        actionMenu.getMenuIconView().setImageResource(R.drawable.ic_search_text);
+        actionMenu.setClosedOnTouchOutside(true);
+        actionMenu.setMenuButtonColorNormal(getColor());
+        actionMenu.setMenuButtonColorPressed(getColor());
+        nombre.setColorNormal(getColor());
+        nombre.setColorPressed(getColor());
+        genero.setColorNormal(getColor());
+        genero.setColorPressed(getColor());
+        byid.setColorNormal(getColor());
+        byid.setColorPressed(getColor());
+        SearchConstructor.SetSearch(SearchType.NOMBRE, null);
+        actionMenu.setOnMenuToggleListener(new FloatingActionMenu.OnMenuToggleListener() {
+            @Override
+            public void onMenuToggle(boolean opened) {
+                if (opened) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+                } else {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(editText, 0);
+                }
+            }
+        });
+        nombre.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toaster.toast("Buscar por Nombre");
+                return false;
+            }
+        });
+        genero.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toaster.toast("Buscar por Generos");
+                return false;
+            }
+        });
+        byid.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toaster.toast("Buscar por ID");
+                return false;
+            }
+        });
+        nombre.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (t_busqueda == 1) {
+                    editText.setHint("Presiona Enter...");
+                } else {
+                    editText.setHint("Buscar...");
+                }
+                actionMenu.close(true);
+                editText.setInputType(InputType.TYPE_CLASS_TEXT);
+                SearchConstructor.SetSearch(SearchType.NOMBRE, null);
+                actionMenu.getMenuIconView().setImageResource(R.drawable.ic_search_text);
+                editText.setText(editText.getEditableText().toString());
+            }
+        });
+        genero.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                actionMenu.close(false);
+                actionMenu.getMenuIconView().setImageResource(R.drawable.ic_search_generos);
+                editText.setInputType(InputType.TYPE_CLASS_TEXT);
+                SearchConstructor.SetSearch(SearchType.GENEROS, SearchConstructor.getGenerosInt());
+                editText.setText(editText.getEditableText().toString());
+                editText.setHint("Generos: TODOS");
+                new MaterialDialog.Builder(context)
+                        .items(getGeneros())
+                        .autoDismiss(false)
+                        .cancelable(false)
+                        .positiveText("OK")
+                        .alwaysCallMultiChoiceCallback()
+                        .itemsCallbackMultiChoice(SearchConstructor.getGenerosInt(), new MaterialDialog.ListCallbackMultiChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
+                                if (Arrays.asList(which).contains(0)) {
+                                    SearchConstructor.SetSearch(SearchType.GENEROS, which);
+                                    dialog.setSelectedIndices(new Integer[]{0});
+                                    editText.setHint("Generos: TODOS");
+                                } else {
+                                    SearchConstructor.SetSearch(SearchType.GENEROS, which);
+                                    editText.setHint("Generos: " + which.length);
+                                }
+                                List<AnimeClass> animes = SearchUtils.Search(json, editText.getEditableText().toString());
+                                Collections.sort(animes, new AnimeCompare());
+                                AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
+                                recyclerView.setAdapter(adapterBusqueda);
+                                return true;
+                            }
+                        })
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                editText.setText(editText.getEditableText().toString());
+                                dialog.dismiss();
+                                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                imm.showSoftInput(editText, 0);
+                                editText.requestFocus();
+                            }
+                        }).build().show();
+            }
+        });
+        byid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (t_busqueda == 1) {
+                    editText.setHint("Presiona Enter...");
+                } else {
+                    editText.setHint("Buscar...");
+                }
+                actionMenu.close(true);
+                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                SearchConstructor.SetSearch(SearchType.ID, null);
+                actionMenu.getMenuIconView().setImageResource(R.drawable.ic_search_id);
+                if (FileUtil.isNumber(editText.getEditableText().toString().trim())) {
+                    editText.setText(editText.getEditableText().toString());
+                } else {
+                    editText.setText("");
+                }
+            }
+        });
         if (!isXLargeScreen(context)) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
@@ -150,7 +364,7 @@ public class Directorio extends AppCompatActivity {
                             } else {
                                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                             }
-                            List<AnimeClass> animes = parser.DirAllAnimes(json, null);
+                            List<AnimeClass> animes = SearchUtils.Search(json, null);
                             Collections.sort(animes, new AnimeCompare());
                             AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                             recyclerView.setAdapter(adapterBusqueda);
@@ -180,10 +394,12 @@ public class Directorio extends AppCompatActivity {
                         if (!isXLargeScreen(context)) {
                             linearLayout.setVisibility(View.GONE);
                             recyclerView.setVisibility(View.VISIBLE);
+                            frameLayout.setVisibility(View.VISIBLE);
                         } else {
                             viewPager.setVisibility(View.GONE);
                             viewPagerTab.setVisibility(View.GONE);
                             recyclerView.setVisibility(View.VISIBLE);
+                            frameLayout.setVisibility(View.VISIBLE);
                         }
                         break;
                 }
@@ -192,6 +408,9 @@ public class Directorio extends AppCompatActivity {
         });
         editText = (EditText) findViewById(R.id.et_busqueda);
         viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab2);
+        editText.setEnabled(true);
+        editText.setClickable(true);
+        editText.setInputType(InputType.TYPE_CLASS_TEXT);
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
             toolbarS.setBackgroundColor(getResources().getColor(android.R.color.black));
             toolbarS.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
@@ -230,7 +449,7 @@ public class Directorio extends AppCompatActivity {
                                     }
                                 }
                             }
-                            List<AnimeClass> animes = parser.DirAllAnimes(json, s.toString());
+                            List<AnimeClass> animes = SearchUtils.Search(json, s.toString());
                             Collections.sort(animes, new AnimeCompare());
                             AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                             recyclerView.setAdapter(adapterBusqueda);
@@ -252,7 +471,7 @@ public class Directorio extends AppCompatActivity {
                             }
                         }
                     }
-                }, 500);
+                }, 150);
             }
 
             @Override
@@ -289,7 +508,7 @@ public class Directorio extends AppCompatActivity {
                             getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                         }
                     }
-                    List<AnimeClass> animes = parser.DirAllAnimes(json, s.toString());
+                    List<AnimeClass> animes = SearchUtils.Search(json, s.toString());
                     Collections.sort(animes, new AnimeCompare());
                     AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                     recyclerView.setAdapter(adapterBusqueda);
@@ -306,6 +525,7 @@ public class Directorio extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.rv_busqueda);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        frameLayout = (FrameLayout) findViewById(R.id.frame_dir);
         FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
                 getSupportFragmentManager(), FragmentPagerItems.with(this)
                 .add("ANIMES", Animes.class)
@@ -382,16 +602,57 @@ public class Directorio extends AppCompatActivity {
                     finish();
                 }
                 recyclerView.setVisibility(View.VISIBLE);
+                frameLayout.setVisibility(View.VISIBLE);
             } else {
                 viewPager.setVisibility(View.GONE);
                 viewPagerTab.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
+                frameLayout.setVisibility(View.VISIBLE);
             }
         }
-        List<AnimeClass> animes = parser.DirAllAnimes(json, null);
+        List<AnimeClass> animes = SearchUtils.Search(json, null);
         Collections.sort(animes, new AnimeCompare());
         AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
         recyclerView.setAdapter(adapterBusqueda);
+    }
+
+    private String[] getGeneros() {
+        String[] generos = {
+                "Todos",
+                "Accion",
+                "Aventuras",
+                "Carreras",
+                "Comedia",
+                "Cyberpunk",
+                "Deportes",
+                "Drama",
+                "Ecchi",
+                "Escolares",
+                "Fantasía",
+                "Ciencia Ficcion",
+                "Gore",
+                "Harem",
+                "Horror",
+                "Josei",
+                "Lucha",
+                "Magia",
+                "Mecha",
+                "Militar",
+                "Misterio",
+                "Música",
+                "Parodias",
+                "Psicologico",
+                "Recuentos de la vida",
+                "Romance",
+                "Seinen",
+                "Shojo",
+                "Shonen",
+                "Sin Genero",
+                "Sobrenatural",
+                "Vampiros",
+                "Yaoi",
+                "Yuri"};
+        return generos;
     }
 
     @TargetApi(21)
@@ -444,6 +705,31 @@ public class Directorio extends AppCompatActivity {
         return true;
     }
 
+    private int getColor() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(context));
+        int color = ColorsRes.Naranja(context);
+        if (accent == ColorsRes.Rojo(context)) {
+            color = ColorsRes.Rojo(context);
+        }
+        if (accent == ColorsRes.Naranja(context)) {
+            color = ColorsRes.Naranja(context);
+        }
+        if (accent == ColorsRes.Gris(context)) {
+            color = ColorsRes.Gris(context);
+        }
+        if (accent == ColorsRes.Verde(context)) {
+            color = ColorsRes.Verde(context);
+        }
+        if (accent == ColorsRes.Rosa(context)) {
+            color = ColorsRes.Rosa(context);
+        }
+        if (accent == ColorsRes.Morado(context)) {
+            color = ColorsRes.Morado(context);
+        }
+        return color;
+    }
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -475,36 +761,6 @@ public class Directorio extends AppCompatActivity {
         return json;
     }
 
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-
-    public static String getStringFromFile(String filePath) {
-        String ret = "";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        } catch (IOException e) {
-        } catch (Exception e) {
-        }
-        return ret;
-    }
-
-    public static boolean isXLargeScreen(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
-
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -532,9 +788,11 @@ public class Directorio extends AppCompatActivity {
         getSupportActionBar().setTitle("Directorio");
         if (!isXLargeScreen(context)) {
             recyclerView.setVisibility(View.GONE);
+            frameLayout.setVisibility(View.GONE);
             linearLayout.setVisibility(View.VISIBLE);
         } else {
             recyclerView.setVisibility(View.GONE);
+            frameLayout.setVisibility(View.GONE);
             viewPager.setVisibility(View.VISIBLE);
             viewPagerTab.setVisibility(View.VISIBLE);
         }

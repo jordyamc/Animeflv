@@ -31,6 +31,13 @@ public class PlayerSimple extends AppCompatActivity {
     Map<String, String> options;
     Handler handler = new Handler();
     Context context;
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            hideSystemUI();
+            handler.postDelayed(this, 3000);
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,8 +69,7 @@ public class PlayerSimple extends AppCompatActivity {
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                mp.reset();
-                mp.release();
+                finish();
             }
         });
         intent = getIntent();
@@ -96,18 +102,10 @@ public class PlayerSimple extends AppCompatActivity {
         }
     }
 
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            hideSystemUI();
-            handler.postDelayed(this, 3000);
-        }
-    };
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        //finish();
+        finish();
     }
 
     private void hideSystemUI() {

@@ -1,6 +1,10 @@
 package knf.animeflv.DownloadManager;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
+
+import knf.animeflv.Utils.NetworkUtils;
+import xdroid.toaster.Toaster;
 
 /**
  * Created by Jordy on 04/03/2016.
@@ -54,5 +58,55 @@ public class ManageDownload {
             prog = new ExternalManager(context).getProgress(eid);
         }
         return prog;
+    }
+
+    private static void DescargarSD(Context context, String eid, String downUrl) {
+        if (NetworkUtils.isNetworkAvailable()) {
+            ManageDownload.external(context).startDownload(eid, downUrl);
+        } else {
+            Toaster.toast("No hay conexion a internet");
+        }
+    }
+
+    private static void DescargarSD(Context context, String eid, String downUrl, CookieConstructor constructor) {
+        if (NetworkUtils.isNetworkAvailable()) {
+            ManageDownload.external(context).startDownload(eid, downUrl, constructor);
+        } else {
+            Toaster.toast("No hay conexion a internet");
+        }
+    }
+
+    private static void DescargarInbyURL(Context context, String eid, String downUrl) {
+        if (NetworkUtils.isNetworkAvailable()) {
+            ManageDownload.internal(context).startDownload(eid, downUrl);
+        } else {
+            Toaster.toast("No hay conexion a internet");
+        }
+    }
+
+    private static void DescargarInbyURL(Context context, String eid, String downUrl, CookieConstructor constructor) {
+        if (NetworkUtils.isNetworkAvailable()) {
+            ManageDownload.internal(context).startDownload(eid, downUrl, constructor);
+        } else {
+            Toaster.toast("No hay conexion a internet");
+        }
+    }
+
+    public static void chooseDownDir(Context context, String eid, String url) {
+        Boolean inSD = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
+        if (inSD) {
+            DescargarSD(context, eid, url);
+        } else {
+            DescargarInbyURL(context, eid, url);
+        }
+    }
+
+    public static void chooseDownDir(Context context, String eid, String url, CookieConstructor constructor) {
+        Boolean inSD = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
+        if (inSD) {
+            DescargarSD(context, eid, url, constructor);
+        } else {
+            DescargarInbyURL(context, eid, url, constructor);
+        }
     }
 }

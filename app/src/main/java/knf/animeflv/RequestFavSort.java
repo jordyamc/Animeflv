@@ -7,8 +7,8 @@ import android.content.pm.Signature;
 import android.os.AsyncTask;
 import android.os.Environment;
 
-import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.SyncHttpClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,14 +52,47 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
     Boolean running;
     int prog = 0;
 
-    public interface callback {
-        void favCallSort(List<AnimeClass> list, TaskType taskType);
-    }
-
     public RequestFavSort(Context con, TaskType taskType) {
         call = (callback) con;
         this.context = con;
         this.taskType = taskType;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
+        return ret;
+    }
+
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
     }
 
     private String getCertificateSHA1Fingerprint() {
@@ -100,19 +133,6 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
         return hexString;
     }
 
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
-    }
-
     @Override
     protected List<AnimeClass> doInBackground(String... params) {
         String file_ = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
@@ -121,7 +141,7 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
         for (final String i : params) {
             final File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
             if (!file.exists() || !isJSONValid(getStringFromFile(file.getPath()))) {
-                new AsyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(i) + "&certificate=" + getCertificateSHA1Fingerprint(), null, new JsonHttpResponseHandler() {
+                new SyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(i) + "&certificate=" + getCertificateSHA1Fingerprint(), null, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         super.onSuccess(statusCode, headers, response);
@@ -173,33 +193,13 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
         return true;
     }
 
-    public static String getStringFromFile(String filePath) {
-        String ret = "";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        } catch (IOException e) {
-        } catch (Exception e) {
-        }
-        return ret;
-    }
-
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-
     @Override
     protected void onPostExecute(List<AnimeClass> s) {
         super.onPostExecute(s);
         call.favCallSort(s, taskType);
+    }
+
+    public interface callback {
+        void favCallSort(List<AnimeClass> list, TaskType taskType);
     }
 }

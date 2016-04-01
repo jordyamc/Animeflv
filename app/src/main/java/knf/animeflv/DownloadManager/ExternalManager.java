@@ -3,12 +3,17 @@ package knf.animeflv.DownloadManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 import java.io.File;
 
+import knf.animeflv.Application;
 import knf.animeflv.DManager;
 import knf.animeflv.Downloader;
 import knf.animeflv.DownloaderCookie;
 import knf.animeflv.Parser;
+import knf.animeflv.Utils.FileUtil;
 
 /**
  * Created by Jordy on 04/03/2016.
@@ -25,24 +30,36 @@ public class ExternalManager {
     }
 
     public void startDownload(String eid, String url) {
+        Application application = (Application) context.getApplicationContext();
+        Tracker mTracker = application.getDefaultTracker();
+        mTracker.setScreenName("Download");
+        mTracker.send(new HitBuilders.EventBuilder("Download", "Download Ext " + eid).build());
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         String titulo = parser.getTitCached(aid);
-        File f = new File(parser.getSD1() + "/Animeflv/download/" + aid, aid + "_" + numero + ".mp4");
+        File f = new File(FileUtil.getSDPath() + "/Animeflv/download/" + aid, aid + "_" + numero + ".mp4");
         sharedPreferences.edit().putString(eid + "dtype", EXTERNA).apply();
         new Downloader(context, eid, aid, titulo, numero, f).execute(url);
     }
 
     public void startDownload(String eid, String url, CookieConstructor constructor) {
+        Application application = (Application) context.getApplicationContext();
+        Tracker mTracker = application.getDefaultTracker();
+        mTracker.setScreenName("Download");
+        mTracker.send(new HitBuilders.EventBuilder("Download", "Download Ext Zippy" + eid).build());
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         String titulo = parser.getTitCached(aid);
-        File f = new File(parser.getSD1() + "/Animeflv/download/" + aid, aid + "_" + numero + ".mp4");
+        File f = new File(FileUtil.getSDPath() + "/Animeflv/download/" + aid, aid + "_" + numero + ".mp4");
         sharedPreferences.edit().putString(eid + "dtype", EXTERNA).apply();
         new DownloaderCookie(context, eid, aid, titulo, numero, f, constructor).execute(url);
     }
 
     public void cancelDownload(String eid) {
+        Application application = (Application) context.getApplicationContext();
+        Tracker mTracker = application.getDefaultTracker();
+        mTracker.setScreenName("Download");
+        mTracker.send(new HitBuilders.EventBuilder("Download", "Cancel Ext " + eid).build());
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         String titulo = parser.getTitCached(aid);

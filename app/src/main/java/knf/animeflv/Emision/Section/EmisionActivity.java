@@ -1,8 +1,10 @@
 package knf.animeflv.Emision.Section;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -10,26 +12,34 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
-import com.ogaclejapan.smarttablayout.utils.v4.Bundler;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.TimeZone;
 
 import knf.animeflv.Application;
+import knf.animeflv.ColorsRes;
+import knf.animeflv.Emision.DateCompare;
 import knf.animeflv.R;
-import xdroid.toaster.Toaster;
 
 /**
  * Created by Jordy on 05/03/2016.
@@ -39,10 +49,54 @@ public class EmisionActivity extends AppCompatActivity {
     ViewPager viewPager;
     SmartTabLayout viewPagerTab;
 
+    public static boolean isXLargeScreen(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
-            setTheme(R.style.AppThemeDark);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(this));
+        if (preferences.getBoolean("is_amoled", false)) {
+            if (accent == ColorsRes.Rojo(this)) {
+                setTheme(R.style.AppThemeDarkRojo);
+            }
+            if (accent == ColorsRes.Naranja(this)) {
+                setTheme(R.style.AppThemeDarkNaranja);
+            }
+            if (accent == ColorsRes.Gris(this)) {
+                setTheme(R.style.AppThemeDarkGris);
+            }
+            if (accent == ColorsRes.Verde(this)) {
+                setTheme(R.style.AppThemeDarkVerde);
+            }
+            if (accent == ColorsRes.Rosa(this)) {
+                setTheme(R.style.AppThemeDarkRosa);
+            }
+            if (accent == ColorsRes.Morado(this)) {
+                setTheme(R.style.AppThemeDarkMorado);
+            }
+        } else {
+            if (accent == ColorsRes.Rojo(this)) {
+                setTheme(R.style.AppThemeRojo);
+            }
+            if (accent == ColorsRes.Naranja(this)) {
+                setTheme(R.style.AppThemeNaranja);
+            }
+            if (accent == ColorsRes.Gris(this)) {
+                setTheme(R.style.AppThemeGris);
+            }
+            if (accent == ColorsRes.Verde(this)) {
+                setTheme(R.style.AppThemeVerde);
+            }
+            if (accent == ColorsRes.Rosa(this)) {
+                setTheme(R.style.AppThemeRosa);
+            }
+            if (accent == ColorsRes.Morado(this)) {
+                setTheme(R.style.AppThemeMorado);
+            }
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.emision);
@@ -70,20 +124,7 @@ public class EmisionActivity extends AppCompatActivity {
                 getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
             }
         }
-        FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
-                getSupportFragmentManager(), FragmentPagerItems.with(this)
-                .add("LUNES", DayFragment.class, new Bundler().putInt("code", 1).get())
-                .add("MARTES", DayFragment.class, new Bundler().putInt("code", 2).get())
-                .add("MIERCOLES", DayFragment.class, new Bundler().putInt("code", 3).get())
-                .add("JUEVES", DayFragment.class, new Bundler().putInt("code", 4).get())
-                .add("VIERNES", DayFragment.class, new Bundler().putInt("code", 5).get())
-                .add("SABADO", DayFragment.class, new Bundler().putInt("code", 6).get())
-                .add("DOMINGO", DayFragment.class, new Bundler().putInt("code", 7).get())
-                .create());
-        viewPager.setOffscreenPageLimit(7);
-        viewPager.setAdapter(adapter);
-        viewPagerTab.setViewPager(viewPager);
-        viewPager.setCurrentItem(Math.abs(getActualDayCode() - 1), true);
+        new Loader(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private int getActualDayCode() {
@@ -119,6 +160,21 @@ public class EmisionActivity extends AppCompatActivity {
         return code;
     }
 
+    private String UTCtoLocal(String utc) {
+        String convert = "";
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("~hh:mmaa", Locale.ENGLISH);
+            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Date myDate = simpleDateFormat.parse(utc);
+            simpleDateFormat.setTimeZone(TimeZone.getDefault());
+            convert = simpleDateFormat.format(myDate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            convert = utc + "-UTC--->" + e.getMessage();
+        }
+        return convert;
+    }
+
     private void initActivity() {
         if (!isXLargeScreen(getApplicationContext())) { //Portrait
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -132,12 +188,6 @@ public class EmisionActivity extends AppCompatActivity {
             window.setStatusBarColor(getResources().getColor(R.color.dark));
             getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
         }
-    }
-
-    public static boolean isXLargeScreen(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
     @Override
@@ -163,5 +213,119 @@ public class EmisionActivity extends AppCompatActivity {
                 break;
         }
         return true;
+    }
+
+    private class Loader extends AsyncTask<String, String, String> {
+        Context context;
+        MaterialDialog dialog;
+
+        public Loader(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog = new MaterialDialog.Builder(context)
+                    .progress(true, 0)
+                    .content("Actualizando lista...")
+                    .build();
+            dialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            SharedPreferences preferences = getSharedPreferences("data", MODE_PRIVATE);
+            Set<String> ongoing = preferences.getStringSet("ongoingSet", new HashSet<String>());
+            ArrayList<String> c1 = new ArrayList<>();
+            ArrayList<String> c2 = new ArrayList<>();
+            ArrayList<String> c3 = new ArrayList<>();
+            ArrayList<String> c4 = new ArrayList<>();
+            ArrayList<String> c5 = new ArrayList<>();
+            ArrayList<String> c6 = new ArrayList<>();
+            ArrayList<String> c7 = new ArrayList<>();
+            List<ArrayList<String>> listas = new ArrayList<>();
+            listas.add(c1);
+            listas.add(c2);
+            listas.add(c3);
+            listas.add(c4);
+            listas.add(c5);
+            listas.add(c6);
+            listas.add(c7);
+            Log.d("Ongoing Size", "" + ongoing.size());
+            if (!ongoing.isEmpty()) {
+                List<TimeCompareModel> organizar = new ArrayList<>();
+                for (String aid : ongoing) {
+                    TimeCompareModel compareModel = new TimeCompareModel(aid, context);
+                    if (!compareModel.getTime().equals("null"))
+                        organizar.add(compareModel);
+                }
+                Collections.sort(organizar, new DateCompare());
+                for (TimeCompareModel compareModel : organizar) {
+                    int day = preferences.getInt(compareModel.getAid() + "onday", 0);
+                    if (day != 0) {
+                        boolean isotherday = compareModel.getTime().contains("AM") && UTCtoLocal(compareModel.getTime()).contains("PM");
+                        if (!isotherday) {
+                            listas.get(day - 1).add(compareModel.getAid());
+                        } else {
+                            int daybefore;
+                            if (day - 2 <= -1) {
+                                daybefore = 7;
+                            } else {
+                                daybefore = day - 2;
+                            }
+                            listas.get(daybefore).add(compareModel.getAid());
+                        }
+                    }
+                }
+            }
+            Bundle code1 = new Bundle();
+            code1.putInt("code", 1);
+            code1.putStringArrayList("list", c1);
+            Bundle code2 = new Bundle();
+            code2.putInt("code", 2);
+            code2.putStringArrayList("list", c2);
+            Bundle code3 = new Bundle();
+            code3.putInt("code", 3);
+            code3.putStringArrayList("list", c3);
+            Bundle code4 = new Bundle();
+            code4.putInt("code", 4);
+            code4.putStringArrayList("list", c4);
+            Bundle code5 = new Bundle();
+            code5.putInt("code", 5);
+            code5.putStringArrayList("list", c5);
+            Bundle code6 = new Bundle();
+            code6.putInt("code", 6);
+            code6.putStringArrayList("list", c6);
+            Bundle code7 = new Bundle();
+            code7.putInt("code", 7);
+            code7.putStringArrayList("list", c7);
+            final FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
+                    getSupportFragmentManager(), FragmentPagerItems.with(context)
+                    .add("LUNES", DayFragment.class, code1)
+                    .add("MARTES", DayFragment.class, code2)
+                    .add("MIERCOLES", DayFragment.class, code3)
+                    .add("JUEVES", DayFragment.class, code4)
+                    .add("VIERNES", DayFragment.class, code5)
+                    .add("SABADO", DayFragment.class, code6)
+                    .add("DOMINGO", DayFragment.class, code7)
+                    .create());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    viewPager.setOffscreenPageLimit(7);
+                    viewPager.setAdapter(adapter);
+                    viewPagerTab.setViewPager(viewPager);
+                    viewPager.setCurrentItem(Math.abs(getActualDayCode() - 1), true);
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            dialog.dismiss();
+        }
     }
 }

@@ -18,31 +18,16 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.ResponseHandlerInterface;
 import com.loopj.android.http.SyncHttpClient;
-
-import java.io.IOException;
-import java.net.URI;
+import com.loopj.android.http.TextHttpResponseHandler;
 
 import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.HttpResponse;
 import se.simbio.encryption.Encryption;
 
 /**
  * Created by Jordy on 04/09/2015.
  */
 public class Login extends DialogFragment{
-    public interface OnResponseCallback {
-        void ResponseCallback(String response);
-    }
-
-    public Login create() {
-        Login dialog = new Login();
-        this.listener = null;
-        return dialog;
-    }
     EditText email;
     EditText contrasena;
     EditText rcontrasena;
@@ -71,6 +56,12 @@ public class Login extends DialogFragment{
     int dialogo;
     MaterialDialog dialog;
     private OnResponseCallback listener;
+
+    public Login create() {
+        Login dialog = new Login();
+        this.listener = null;
+        return dialog;
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -301,9 +292,10 @@ public class Login extends DialogFragment{
                     });
                     return dialog;
                 }
+
     public void checknuser(){
         String mail=email.getText().toString();
-        boolean termina=mail.endsWith("com")||mail.endsWith("net");
+        boolean termina = mail.endsWith("com") || mail.endsWith("net") || mail.endsWith("mx") || mail.endsWith("xyz");
         if (mail.contains("@")&&mail.contains(".")&&termina){
             if (contrasena.getText().toString().length()<6){
                 contrasena.setError("Contraseña muy corta");
@@ -371,10 +363,11 @@ public class Login extends DialogFragment{
             }
         }
     }
+
     public void checklogin(){
         derecha.setEnabled(false);
         String mail=login_email.getText().toString();
-        boolean termina = mail.endsWith("com") || mail.endsWith("net") || mail.endsWith("mx");
+        boolean termina = mail.endsWith("com") || mail.endsWith("net") || mail.endsWith("mx") || mail.endsWith("xyz");
         if (mail.indexOf("@")!=0&&mail.contains("@")&&mail.contains(".")&&termina){
             if (login_contrasena.getText().toString().length()<4){
                 login_contrasena.setError("Contraseña muy corta");
@@ -420,11 +413,12 @@ public class Login extends DialogFragment{
             }
         }
     }
+
     public void checkcPass(){
         derecha.setEnabled(false);
         String mail=cPass_email.getText().toString();
         String npass=cPass_ncontrasena.getText().toString();
-        boolean termina = mail.endsWith("com") || mail.endsWith("net") || mail.endsWith("mx");
+        boolean termina = mail.endsWith("com") || mail.endsWith("net") || mail.endsWith("mx") || mail.endsWith("xyz");
         if (mail.indexOf("@")!=0&&mail.contains("@")&&mail.contains(".")&&termina){
             if (cPass_contrasena.getText().toString().length()<4){
                 cPass_contrasena.setError("Contraseña muy corta");
@@ -487,12 +481,13 @@ public class Login extends DialogFragment{
             }
         }
     }
+
     public void checkcCorreo(){
         derecha.setEnabled(false);
         String mail=cCorreo_email.getText().toString();
         String nmail=cCorreo_nemail.getText().toString();
-        boolean termina = mail.endsWith("com") || mail.endsWith("net") || mail.endsWith("mx");
-        boolean ntermina = nmail.endsWith("com") || nmail.endsWith("net") || mail.endsWith("mx");
+        boolean termina = mail.endsWith("com") || mail.endsWith("net") || mail.endsWith("mx") || mail.endsWith("xyz");
+        boolean ntermina = nmail.endsWith("com") || nmail.endsWith("net") || mail.endsWith("mx") || mail.endsWith("xyz");
         if (!mail.equals("admin")) {
             if (mail.indexOf("@") != 0 && mail.contains("@") && mail.contains(".") && nmail.indexOf("@") != 0 && nmail.contains("@") && nmail.contains(".") && ntermina && termina) {
                 if (cCorreo_contrasena.getText().toString().length() < 4) {
@@ -558,6 +553,7 @@ public class Login extends DialogFragment{
             derecha.setEnabled(true);
         }
     }
+
     public void LoginErrors(int cases){
         switch (cases){
             case 1:
@@ -577,6 +573,7 @@ public class Login extends DialogFragment{
                 break;
         }
     }
+
     public void cCorreoErrors(int cases){
         switch (cases){
             case 1:
@@ -591,6 +588,7 @@ public class Login extends DialogFragment{
                 break;
         }
     }
+
     public void cPassErrors(int cases){
         switch (cases){
             case 1:
@@ -606,6 +604,14 @@ public class Login extends DialogFragment{
         }
     }
 
+    public void setCustomObjectListener(OnResponseCallback listener) {
+        this.listener = listener;
+    }
+
+    public interface OnResponseCallback {
+        void ResponseCallback(String response);
+    }
+
     public class getList extends AsyncTask<String, String, String> {
         Context context;
         Parser parser = new Parser();
@@ -616,18 +622,16 @@ public class Login extends DialogFragment{
 
         @Override
         protected String doInBackground(String... params) {
-            new SyncHttpClient().get(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=list" + "&certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
+            new SyncHttpClient().get(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=list" + "&certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new TextHttpResponseHandler() {
                 @Override
-                public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                    super.onSuccess(statusCode, headers, responseString);
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                     String format = responseString.replace("../user_favs/", "").replace(".txt", "");
                     SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
                     defsharedPreferences.edit().putString("lista", format).apply();
                 }
 
                 @Override
-                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    super.onFailure(statusCode, headers, responseString, throwable);
+                public void onSuccess(int statusCode, Header[] headers, String responseString) {
                     String format = responseString.replace("../user_favs/", "").replace(".txt", "");
                     SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
                     defsharedPreferences.edit().putString("lista", format).apply();
@@ -635,9 +639,5 @@ public class Login extends DialogFragment{
             });
             return null;
         }
-    }
-
-    public void setCustomObjectListener(OnResponseCallback listener) {
-        this.listener = listener;
     }
 }

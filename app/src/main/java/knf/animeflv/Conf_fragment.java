@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -16,8 +17,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -25,7 +28,8 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.lb.material_preferences_library.custom_preferences.ListPreference;
+import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
+import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,25 +38,71 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Files.FileSearchResponse;
 import xdroid.toaster.Toaster;
 
 /**
  * Created by Jordy on 16/08/2015.
  */
-public class Conf_fragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class Conf_fragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, FolderChooserDialog.FolderCallback {
     Context context;
     MediaPlayer mp;
     MediaPlayer r;
     MediaPlayer oni;
     MediaPlayer sam;
     MediaPlayer dango;
-    private FragmentActivity myContext;
     MaterialDialog dialog;
     Login login = new Login();
+    int selectedSound;
+    private FragmentActivity myContext;
+
+    public static String formatSize(long v) {
+        if (v < 1024) return v + " B";
+        int z = (63 - Long.numberOfLeadingZeros(v)) / 10;
+        return String.format("%.1f %sB", (double) v / (1L << (z * 10)), " KMGTPE".charAt(z));
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        return dir.delete();
+    }
+
+    public static long getFileSize(final File file) {
+        if (file == null || !file.exists())
+            return 0;
+        if (!file.isDirectory())
+            return file.length();
+        final List<File> dirs = new LinkedList<File>();
+        dirs.add(file);
+        long result = 0;
+        while (!dirs.isEmpty()) {
+            final File dir = dirs.remove(0);
+            if (!dir.exists())
+                continue;
+            final File[] listFiles = dir.listFiles();
+            if (listFiles == null || listFiles.length == 0)
+                continue;
+            for (final File child : listFiles) {
+                result += child.length();
+                if (child.isDirectory())
+                    dirs.add(child);
+            }
+        }
+        return result;
+    }
+
     //Ringtone r;
     @Override
     public void onCreate(final Bundle savedInstanceState){
@@ -67,16 +117,12 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             getPreferenceScreen().findPreference("tiempo").setEnabled(true);
             getPreferenceScreen().findPreference("sonido").setEnabled(true);
         }
-        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        r = MediaPlayer.create(context, notification);
+        final Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         mp = MediaPlayer.create(context, R.raw.sound);
-        oni = MediaPlayer.create(context, R.raw.onii);
-        sam = MediaPlayer.create(context, R.raw.sam);
-        dango = MediaPlayer.create(context, R.raw.dango);
         final File file = new File(Environment.getExternalStorageDirectory()+"/Animeflv/download");
         long size = getcachesize();
         long dirsize=getFileSize(file);
-        String tamano=formatSize(size);
+        final String tamano = formatSize(size);
         String vidsize=formatSize(dirsize);
         PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_cache", tamano).commit();
         PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_video", vidsize).commit();
@@ -158,19 +204,11 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 for (String s:array){
                     context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean(s, false).apply();
                 }
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos","");
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", "").apply();
                 Toast.makeText(getActivity(), "Historial Borrado!!", Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
-        if (getSD1()==null){
-            getPreferenceScreen().findPreference("b_move").setEnabled(false);
-            getPreferenceScreen().findPreference("sd_down").setEnabled(false);
-            getPreferenceScreen().findPreference("b_move").setSummary("Tarjeta SD no encontrada");
-        } else {
-            getPreferenceScreen().findPreference("sd_down").setEnabled(true);
-            getPreferenceScreen().findPreference("b_move").setEnabled(true);
-        }
         getPreferenceScreen().findPreference("b_move").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -178,7 +216,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 Cursor c = downloadManager.query(new DownloadManager.Query()
                         .setFilterByStatus(DownloadManager.STATUS_PAUSED
                                 | DownloadManager.STATUS_RUNNING));
-                    if (getSD1()!=null) {
+                if (FileUtil.getSDPath() != null) {
                         if (count() > 0) {
                             new MoveFiles(context, myContext).execute();
                         } else {
@@ -194,15 +232,34 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("sonido").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
+                selectedSound = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("sonido", "0"));
+                setMediaPlayer(selectedSound);
                 new MaterialDialog.Builder(myContext)
                         .title("Sonido")
                         .titleGravity(GravityEnum.CENTER)
+                        .autoDismiss(false)
                         .items(getResources().getStringArray(R.array.sonidos))
+                        .alwaysCallSingleChoiceCallback()
                         .itemsCallbackSingleChoice(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("sonido", "0")), new MaterialDialog.ListCallbackSingleChoice() {
                             @Override
                             public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("sonido", String.valueOf(which)).apply();
-                                getPreferenceScreen().findPreference("sonido").setSummary(text);
+                                if (selectedSound != which) {
+                                    if (mp.isPlaying()) {
+                                        mp.stop();
+                                    }
+                                    setMediaPlayer(which);
+                                    selectedSound = which;
+                                    PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("sonido", String.valueOf(which)).apply();
+                                    getPreferenceScreen().findPreference("sonido").setSummary(text);
+                                    mp.start();
+                                } else {
+                                    if (mp.isPlaying()) {
+                                        mp.stop();
+                                    } else {
+                                        setMediaPlayer(which);
+                                        mp.start();
+                                    }
+                                }
                                 return true;
                             }
                         })
@@ -330,6 +387,131 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
+        getPreferenceScreen().findPreference("Rpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", "null").apply();
+                getActivity().recreate();
+                return false;
+            }
+        });
+        if (FileUtil.getSDPath() == null) {
+            getPreferenceScreen().findPreference("b_move").setEnabled(false);
+            getPreferenceScreen().findPreference("sd_down").setEnabled(false);
+            getPreferenceScreen().findPreference("b_move").setSummary("Tarjeta SD no encontrada");
+            final FileSearchResponse response = FileUtil.searchforSD();
+            if (response.existSD()) {
+                if (response.isOnlyOne()) {
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", response.getUniqueName()).apply();
+                    getPreferenceScreen().findPreference("SDpath").setTitle("SD Encontrada");
+                    getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.getSDPath());
+                    getPreferenceScreen().findPreference("SDpath").setEnabled(false);
+                    getActivity().recreate();
+                } else {
+                    getPreferenceScreen().findPreference("SDpath").setTitle("Multiples SD Encontrados");
+                    getPreferenceScreen().findPreference("SDpath").setSummary("Precione para seleccionar");
+                    getPreferenceScreen().findPreference("SDpath").setEnabled(true);
+                    getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            new MaterialDialog.Builder(myContext)
+                                    .title("Nombre de SD")
+                                    .titleGravity(GravityEnum.CENTER)
+                                    .items(response.list())
+                                    .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                                        @Override
+                                        public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", response.list().get(which)).apply();
+                                            if (FileUtil.getSDPath() != null) {
+                                                getPreferenceScreen().findPreference("SDpath").setTitle("SD Encontrada");
+                                                getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.getSDPath());
+                                                getPreferenceScreen().findPreference("SDpath").setEnabled(false);
+                                                getActivity().recreate();
+                                            }
+                                            return true;
+                                        }
+                                    })
+                                    .show();
+                            return false;
+                        }
+                    });
+                }
+            } else {
+                getPreferenceScreen().findPreference("SDpath").setTitle("SD No Encontrada");
+                getPreferenceScreen().findPreference("SDpath").setSummary("Seleccionar manualmente");
+                getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        new MaterialDialog.Builder(myContext)
+                                .title("Direccion")
+                                .titleGravity(GravityEnum.CENTER)
+                                .items(new String[]{"/mnt", "/storage"})
+                                .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                                    @Override
+                                    public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                                        Intent i = new Intent(context, FilePickerActivity.class);
+                                        i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
+                                        i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
+                                        i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
+                                        i.putExtra(FilePickerActivity.EXTRA_START_PATH, text);
+                                        startActivityForResult(i, 6991);
+                                        return false;
+                                    }
+                                }).build().show();
+                        return false;
+                    }
+                });
+                PreferenceCategory sd = (PreferenceCategory) getPreferenceScreen().findPreference("catSD");
+                getPreferenceScreen().removePreference(sd);
+            }
+        } else {
+            if (FileUtil.getSDPath().startsWith("_noWrite_")) {
+                getPreferenceScreen().findPreference("SDpath").setTitle("No se puede escribir en SD");
+                getPreferenceScreen().findPreference("SDpath").setSummary("Cambiar Direccion");
+                getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        new MaterialDialog.Builder(myContext)
+                                .title("Direccion")
+                                .titleGravity(GravityEnum.CENTER)
+                                .items(new String[]{"/mnt", "/storage"})
+                                .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                                    @Override
+                                    public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                                        Intent i = new Intent(context, FilePickerActivity.class);
+                                        i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
+                                        i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
+                                        i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
+                                        i.putExtra(FilePickerActivity.EXTRA_START_PATH, text);
+                                        startActivityForResult(i, 6991);
+                                        return false;
+                                    }
+                                }).build().show();
+                        return false;
+                    }
+                });
+                PreferenceCategory sd = (PreferenceCategory) getPreferenceScreen().findPreference("catSD");
+                getPreferenceScreen().removePreference(sd);
+            } else {
+                getPreferenceScreen().findPreference("sd_down").setEnabled(true);
+                getPreferenceScreen().findPreference("b_move").setEnabled(true);
+                getPreferenceScreen().findPreference("SDpath").setTitle("SD Encontrada");
+                getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.getSDPath());
+                getPreferenceScreen().findPreference("SDpath").setEnabled(false);
+            }
+        }
+    }
+
+    private boolean excludechar(String input) {
+        List<String> exclude = Arrays.asList("expand", "media_rw", "obb", "runtime", "secure", "shared",
+                "user", "self", "sdcard", "emulated", "acct", "cache", "config", "d", "data", "dev", "etc",
+                "firmware", "fsg", "oem", "persist", "proc", "root", "sbin", "sys", "system", "vendor");
+        for (String i : exclude) {
+            if (input.contains("/" + i)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private int count() {
@@ -347,6 +529,31 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         }
         return count;
     }
+
+    private void setMediaPlayer(int which) {
+        if (!mp.isPlaying()) {
+            if (which == 0) {
+                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                mp = MediaPlayer.create(context, notification);
+            }
+            if (which == 1) {
+                mp = MediaPlayer.create(context, R.raw.sound);
+            }
+            if (which == 2) {
+                mp = MediaPlayer.create(context, R.raw.onii);
+            }
+            if (which == 3) {
+                mp = MediaPlayer.create(context, R.raw.sam);
+            }
+            if (which == 4) {
+                mp = MediaPlayer.create(context, R.raw.dango);
+            }
+            if (which == 5) {
+                mp = MediaPlayer.create(context, R.raw.nico);
+            }
+        }
+    }
+
     public long getcachesize(){
         long size = 0;
         File[] files = context.getCacheDir().listFiles();
@@ -361,6 +568,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         }
         return size;
     }
+
     public void deleteDownload(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
@@ -369,6 +577,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             }
         }
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -404,60 +613,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                int tiempo=Integer.parseInt(sharedPreferences.getString(key, "60000"));
                new Alarm().CancelAlarm(context);
                new Alarm().SetAlarm(context,tiempo);
-               break;
-           case "sonido":
-               int not=Integer.parseInt(sharedPreferences.getString("sonido","0"));
-               if (not==0){
-                   if (mp.isPlaying()||oni.isPlaying()||sam.isPlaying()||dango.isPlaying()){
-                       if (mp.isPlaying())mp.stop();
-                       if (oni.isPlaying())oni.stop();
-                       if (sam.isPlaying())sam.stop();
-                       if (dango.isPlaying())dango.stop();
-                   }
-                   Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                   r = MediaPlayer.create(context, notification);
-                   r.start();
-               }
-               if (not==1){
-                   if (r.isPlaying()||oni.isPlaying()||sam.isPlaying()||dango.isPlaying()){
-                       if (r.isPlaying())r.stop();
-                       if (oni.isPlaying())oni.stop();
-                       if (sam.isPlaying())sam.stop();
-                       if (dango.isPlaying())dango.stop();
-                   }
-                   mp = MediaPlayer.create(context, R.raw.sound);
-                   mp.start();
-               }
-               if (not==2){
-                   if (r.isPlaying()||mp.isPlaying()||sam.isPlaying()||dango.isPlaying()){
-                       if (r.isPlaying())r.stop();
-                       if (mp.isPlaying())mp.stop();
-                       if (sam.isPlaying())sam.stop();
-                       if (dango.isPlaying())dango.stop();
-                   }
-                   oni = MediaPlayer.create(context, R.raw.onii);
-                   oni.start();
-               }
-               if (not==3){
-                   if (r.isPlaying()||mp.isPlaying()||oni.isPlaying()||dango.isPlaying()){
-                       if (r.isPlaying())r.stop();
-                       if (mp.isPlaying())mp.stop();
-                       if (oni.isPlaying())oni.stop();
-                       if (dango.isPlaying())dango.stop();
-                   }
-                   sam = MediaPlayer.create(context, R.raw.sam);
-                   sam.start();
-               }
-               if (not==4){
-                   if (r.isPlaying()||mp.isPlaying()||sam.isPlaying()||oni.isPlaying()){
-                       if (r.isPlaying())r.stop();
-                       if (mp.isPlaying())mp.stop();
-                       if (oni.isPlaying())oni.stop();
-                       if (sam.isPlaying())sam.stop();
-                   }
-                   dango = MediaPlayer.create(context, R.raw.dango);
-                   dango.start();
-               }
                break;
            case "b_cache":
                break;
@@ -529,7 +684,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                break;
            case "sd_down":
                if (sharedPreferences.getBoolean(key, false)) {
-                   if (getSD1() == null) {
+                   if (FileUtil.getSDPath() == null) {
                        getPreferenceScreen().findPreference(key).setEnabled(false);
                        sharedPreferences.edit().putBoolean(key, false);
                    }
@@ -540,6 +695,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                break;
        }
     }
+
     public Boolean isMXInstaled(){
         Boolean is=false;
         List<ApplicationInfo> packages;
@@ -558,6 +714,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         }
         return is;
     }
+
     private boolean isNetworkAvailable() {
         Boolean net=false;
         int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
@@ -580,11 +737,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && net;
     }
-    public static String formatSize(long v) {
-        if (v < 1024) return v + " B";
-        int z = (63 - Long.numberOfLeadingZeros(v)) / 10;
-        return String.format("%.1f %sB", (double)v / (1L << (z*10)), " KMGTPE".charAt(z));
-    }
+
     public void clearApplicationData() {
         File cache = context.getCacheDir();
         File appDir = new File(cache.getParent());
@@ -606,42 +759,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         }
     }
 
-    public static boolean deleteDir(File dir) {
-        if (dir != null && dir.isDirectory()) {
-            String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
-                    return false;
-                }
-            }
-        }
-        return dir.delete();
-    }
-    public static long getFileSize(final File file) {
-        if(file==null||!file.exists())
-            return 0;
-        if(!file.isDirectory())
-            return file.length();
-        final List<File> dirs=new LinkedList<File>();
-        dirs.add(file);
-        long result=0;
-        while(!dirs.isEmpty()) {
-            final File dir=dirs.remove(0);
-            if(!dir.exists())
-                continue;
-            final File[] listFiles=dir.listFiles();
-            if(listFiles==null||listFiles.length==0)
-                continue;
-            for(final File child : listFiles)
-            {
-                result+=child.length();
-                if(child.isDirectory())
-                    dirs.add(child);
-            }
-        }
-        return result;
-    }
     public String getSD(){
         String sd = Environment.getExternalStorageDirectory().getAbsolutePath();
         if (android.os.Build.DEVICE.contains("samsung") || android.os.Build.MANUFACTURER.contains("samsung")) {
@@ -748,27 +865,17 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     }
 
     @Override
+    public void onFolderSelection(@NonNull FolderChooserDialog dialog, @NonNull File folder) {
+        Toast.makeText(myContext, folder.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+        dialog.dismiss();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         if (mp.isPlaying()){
             mp.stop();
             mp.release();
-        }
-        if (r.isPlaying()){
-            r.stop();
-            r.release();
-        }
-        if (oni.isPlaying()){
-            oni.stop();
-            oni.release();
-        }
-        if (sam.isPlaying()){
-            sam.stop();
-            sam.release();
-        }
-        if (dango.isPlaying()){
-            dango.stop();
-            dango.release();
         }
     }
 
@@ -776,5 +883,28 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     public void onAttach(Activity activity) {
         myContext=(FragmentActivity) activity;
         super.onAttach(activity);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 6991 && resultCode == Activity.RESULT_OK) {
+            Uri uri = data.getData();
+            if (excludechar(uri.toString())) {
+                Toaster.toast("Directorio no valido");
+            } else {
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", uri.toString().substring(uri.toString().lastIndexOf("/") + 1).trim()).apply();
+                if (FileUtil.getSDPath() != null) {
+                    if (!FileUtil.getSDPath().startsWith("_noWrite_")) {
+                        getActivity().recreate();
+                    } else {
+                        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", "null").apply();
+                        Toaster.toast(uri.toString().substring(uri.toString().lastIndexOf("/") + 1) + " Directorio no puede escribir");
+                    }
+                } else {
+                    Toaster.toast(uri.toString().substring(uri.toString().lastIndexOf("/") + 1) + " Directorio no encontrado");
+                }
+            }
+        }
     }
 }

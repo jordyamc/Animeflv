@@ -4,9 +4,9 @@
         <item name="colorPrimary">@color/prim</item>
         <item name="colorPrimaryDark">@color/dark</item>
         <item name="android:textColorPrimary">@color/black</item>
-        <item name="android:colorForeground">@color/foreground_material_light</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/dark</item>
-        <item name="android:colorBackground">@color/background_material_light</item>
+        <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@android:color/holo_orange_dark</item>
         <item name="android:editTextColor">@color/blanco</item>
@@ -15,23 +15,31 @@
         <item name="android:windowAnimationStyle">@style/Animations</item>
     </style>
 
-    <style name="AppThemeDarkNo" parent="MaterialDrawerTheme.Light.DarkToolbar">
-        <item name="colorPrimary">@color/negro</item>
-        <item name="colorPrimaryDark">@color/negro</item>
-        <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:colorForeground">@color/foreground_material_light</item>
-        <item name="colorAccent">@android:color/holo_red_dark</item>
-        <item name="android:colorBackground">@color/negro</item>
-        <item name="material_drawer_background">@color/negro</item>
-        <item name="material_drawer_primary_text">@color/blanco</item>
-        <item name="material_drawer_primary_icon">@color/blanco</item>
-        <item name="material_drawer_secondary_text">@color/blanco</item>
-        <item name="material_drawer_selected">@color/negro</item>
-        <item name="material_drawer_selected_text">@android:color/holo_red_dark</item>
-        <item name="android:editTextColor">@color/blanco</item>
-        <item name="android:textColorHint">@color/dark</item>
-        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
-        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    <style name="MenuLabelsStyle">
+        <item name="android:background">@drawable/label</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="FilePickerTheme" parent="NNF_BaseTheme">
+        <!-- Set these to match your theme -->
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="colorAccent">@color/theme_naranja</item>
+
+        <!-- Need to set this also to style create folder dialog -->
+        <item name="alertDialogTheme">@style/FilePickerAlertDialogTheme</item>
+
+        <!-- If you want to set a specific toolbar theme, do it here -->
+        <!-- <item name="nnf_toolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item> -->
+    </style>
+
+    <style name="FilePickerAlertDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
     </style>
 
     <style name="AppThemeDark" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -39,7 +47,7 @@
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="android:textColorPrimary">@color/blanco</item>
         <item name="android:textColorSecondary">@color/dark</item>
-        <item name="android:colorForeground">@color/foreground_material_light</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@android:color/holo_red_dark</item>
         <item name="android:colorBackground">@color/negro</item>
         <item name="material_drawer_background">@color/negro</item>
@@ -58,9 +66,9 @@
         <item name="colorPrimary">@color/prim</item>
         <item name="colorPrimaryDark">@color/dark</item>
         <item name="android:textColorPrimary">@color/black</item>
-        <item name="android:colorForeground">@color/foreground_material_light</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/dark</item>
-        <item name="android:colorBackground">@color/background_material_light</item>
+        <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@android:color/holo_orange_dark</item>
         <item name="android:editTextColor">@color/blanco</item>
@@ -130,9 +138,9 @@
         <item name="android:windowIsFloating">true</item>
         <item name="android:backgroundDimEnabled">false</item>
         <item name="android:textColorPrimary">@color/black</item>
-        <item name="android:colorForeground">@color/foreground_material_light</item>
-        <item name="colorAccent">@color/dark</item>
-        <item name="android:colorBackground">@color/background_material_light</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_naranja</item>
+        <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@android:color/holo_orange_dark</item>
         <item name="android:editTextColor">@color/blanco</item>
@@ -150,7 +158,7 @@
         <item name="android:backgroundDimEnabled">false</item>
         <item name="android:textColorPrimary">@color/blanco</item>
         <item name="android:textColorSecondary">@color/dark</item>
-        <item name="android:colorForeground">@color/foreground_material_light</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@android:color/holo_red_dark</item>
         <item name="android:colorBackground">@color/negro</item>
         <item name="material_drawer_background">@color/negro</item>
@@ -159,6 +167,686 @@
         <item name="material_drawer_secondary_text">@color/blanco</item>
         <item name="material_drawer_selected">@color/negro</item>
         <item name="material_drawer_selected_text">@android:color/holo_red_dark</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+    </style>
+
+
+    <style name="AppThemeDarkNoRojo" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@android:color/holo_red_dark</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@android:color/holo_red_dark</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    </style>
+
+    <style name="AppThemeDarkNoNaranja" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_naranja</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_naranja</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    </style>
+
+    <style name="AppThemeDarkNoGris" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_gris</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_gris</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    </style>
+
+    <style name="AppThemeDarkNoVerde" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_verde</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_verde</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    </style>
+
+    <style name="AppThemeDarkNoRosa" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_rosa</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_rosa</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    </style>
+
+    <style name="AppThemeDarkNoMorado" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_morado</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_morado</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    </style>
+
+    <style name="AppThemeDarkRojo" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@android:color/holo_red_dark</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@android:color/holo_red_dark</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
+    <style name="AppThemeDarkNaranja" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_naranja</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_naranja</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
+    <style name="AppThemeDarkGris" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_gris</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_gris</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
+    <style name="AppThemeDarkVerde" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_verde</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_verde</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
+    <style name="AppThemeDarkRosa" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_rosa</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_rosa</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
+    <style name="AppThemeDarkMorado" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_morado</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_morado</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
+
+    <style name="AppThemeNoNaranja" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_naranja</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_naranja</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    </style>
+
+    <style name="AppThemeNoRojo" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_rojo</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_rojo</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    </style>
+
+    <style name="AppThemeNoGris" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/dark</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_gris</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    </style>
+
+    <style name="AppThemeNoVerde" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_verde</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_verde</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    </style>
+
+    <style name="AppThemeNoRosa" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_rosa</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_rosa</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    </style>
+
+    <style name="AppThemeNoMorado" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_morado</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_morado</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    </style>
+
+    <style name="AppThemeNaranja" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_naranja</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_naranja</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
+    <style name="AppThemeRojo" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_rojo</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_rojo</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
+    <style name="AppThemeGris" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/dark</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_gris</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
+    <style name="AppThemeVerde" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_verde</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_verde</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
+    <style name="AppThemeRosa" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_rosa</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_rosa</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
+    <style name="AppThemeMorado" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_morado</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_morado</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
+    <style name="TranslucentNaranja" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_naranja</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_naranja</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+    </style>
+
+    <style name="TranslucentRojo" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_rojo</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_rojo</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+    </style>
+
+    <style name="TranslucentGris" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_gris</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_gris</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+    </style>
+
+    <style name="TranslucentVerde" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_verde</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_verde</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+    </style>
+
+    <style name="TranslucentRosa" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_rosa</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_rosa</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+    </style>
+
+    <style name="TranslucentMorado" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_morado</item>
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="material_drawer_selected">#EDEDED</item>
+        <item name="material_drawer_selected_text">@color/theme_morado</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
+        <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+    </style>
+
+    <style name="TranslucentDarkRojo" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_rojo</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_rojo</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+    </style>
+
+    <style name="TranslucentDarkNaranja" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_naranja</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_naranja</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+    </style>
+
+    <style name="TranslucentDarkGris" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_gris</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_gris</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+    </style>
+
+    <style name="TranslucentDarkVerde" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_verde</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_verde</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+    </style>
+
+    <style name="TranslucentDarkRosa" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_rosa</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_rosa</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+    </style>
+
+    <style name="TranslucentDarkMorado" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="colorAccent">@color/theme_morado</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="material_drawer_selected_text">@color/theme_morado</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>

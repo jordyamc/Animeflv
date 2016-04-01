@@ -8,7 +8,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -35,10 +34,14 @@ import cz.msebera.android.httpclient.Header;
 public class Splash extends AwesomeSplash {
     Context context;
 
+    public static boolean isXLargeScreen(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+
     @Override
     public void initSplash(ConfigSplash configSplash) {
-
-            /* you don't have to override every property */
         context = this;
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -73,7 +76,7 @@ public class Splash extends AwesomeSplash {
             configSplash.setAnimTitleTechnique(Techniques.FlipInX);
         } else {
             finish();
-            startActivity(new Intent(context, Main.class));
+            startActivity(new Intent(context, newMain.class));
         }
         //getSplashImage();
     }
@@ -237,12 +240,6 @@ public class Splash extends AwesomeSplash {
         }
     }
 
-    public static boolean isXLargeScreen(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
-
     private boolean isNetworkAvailable() {
         Boolean net = false;
         int Tcon = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
@@ -277,15 +274,15 @@ public class Splash extends AwesomeSplash {
                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_directorio", jsonObject.getString("directorio")).apply();
                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_directorio_back", jsonObject.getString("directorio_back")).apply();
                 finish();
-                startActivity(new Intent(context, Main.class));
+                startActivity(new Intent(context, newMain.class));
             } catch (Exception e) {
                 e.printStackTrace();
                 finish();
-                startActivity(new Intent(context, Main.class));
+                startActivity(new Intent(context, newMain.class));
             }
         } else {
             finish();
-            startActivity(new Intent(context, Main.class));
+            startActivity(new Intent(context, newMain.class));
         }
     }
 }
