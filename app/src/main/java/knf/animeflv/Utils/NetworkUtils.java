@@ -7,7 +7,9 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -16,7 +18,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
-import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.SyncHttpClient;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
@@ -76,155 +78,188 @@ public class NetworkUtils {
 
     public static void checkVersion(final Context Tcontext, final FloatingActionButton button) {
         Log.d("CheckVersion", "Start");
-        new AsyncHttpClient().get(urlVersion, null, new TextHttpResponseHandler() {
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.e("Error", "CheckVersion", throwable);
-            }
+        if (UpdateUtil.getState() == UpdateState.NO_UPDATE) {
+            UpdateUtil.setState(UpdateState.START_UPDATE_CHECK);
+            new checkAct(Tcontext, button).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
+    }
 
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String data) {
-                String vers = "";
-                if (!isNetworkAvailable() || data.trim().equals("error")) {
-                    vers = Integer.toString(versionCode);
-                } else {
-                    if (FileUtil.isNumber(data.trim())) {
-                        vers = data;
-                    } else {
-                        vers = "0";
-                        mensaje = data.split(":::");
-                    }
+    private static class checkAct extends AsyncTask<String, String, String> {
+        Context Tcontext;
+        FloatingActionButton button;
+
+        public checkAct(Context tcontext, FloatingActionButton button) {
+            Tcontext = tcontext;
+            this.button = button;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            Looper.prepare();
+            new SyncHttpClient().get(urlVersion, null, new TextHttpResponseHandler() {
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    UpdateUtil.setState(UpdateState.NO_UPDATE);
+                    Log.e("Error", "CheckVersion", throwable);
                 }
-                Log.d("Version", Integer.toString(versionCode) + " >> " + vers.trim());
-                if (versionCode >= Integer.parseInt(vers.trim())) {
-                    if (Integer.parseInt(vers.trim()) == 0) {
-                        if (!disM) {
-                            MaterialDialog dialog = new MaterialDialog.Builder(Tcontext)
-                                    .title(mensaje[0])
-                                    .content(mensaje[1])
-                                    .titleColorRes(R.color.prim)
-                                    .autoDismiss(Boolean.valueOf(mensaje[2].trim()))
-                                    .cancelable(Boolean.valueOf(mensaje[3].trim()))
-                                    .backgroundColor(Color.WHITE)
-                                    .titleGravity(GravityEnum.CENTER)
-                                    .positiveText(mensaje[4])
-                                    .positiveColorRes(R.color.prim)
-                                    .callback(new MaterialDialog.ButtonCallback() {
-                                        @Override
-                                        public void onPositive(MaterialDialog dialog) {
-                                            if (mensaje[4].trim().toLowerCase().equals("salir")) {
-                                                System.exit(0);
-                                            }
-                                            if (mensaje[4].trim().toLowerCase().equals("cerrar")) {
-                                                disM = true;
-                                                dialog.dismiss();
-                                            }
-                                            if (!mensaje[4].trim().toLowerCase().equals("salir") || !mensaje[4].trim().toLowerCase().equals("cerrar")) {
-                                                if (mensaje[5].trim().equals("toast")) {
-                                                    Toaster.toast(mensaje[6].trim());
-                                                }
-                                                if (mensaje[5].trim().equals("toast&notshow")) {
-                                                    Toaster.toast(mensaje[6].trim());
-                                                    disM = true;
-                                                }
-                                                if (mensaje[5].trim().equals("finish")) {
-                                                    ((Activity) context).finish();
-                                                }
-                                                if (mensaje[5].trim().equals("dismiss")) {
-                                                    dialog.dismiss();
-                                                }
-                                                if (mensaje[5].trim().equals("dismiss&notshow")) {
-                                                    disM = true;
-                                                    dialog.dismiss();
-                                                }
-                                            }
-                                        }
 
-                                        @Override
-                                        public void onNegative(MaterialDialog dialog) {
-                                            System.exit(0);
-                                        }
-                                    }).build();
-                            dialog.show();
-                        }
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String data) {
+                    String vers = "";
+                    if (!isNetworkAvailable() || data.trim().equals("error")) {
+                        vers = Integer.toString(versionCode);
                     } else {
-                        UpdateUtil.setState(UpdateState.NO_UPDATE);
-                        Log.d("Version", "OK");
-                        Tcontext.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("notVer", false).apply();
+                        if (FileUtil.isNumber(data.trim())) {
+                            vers = data;
+                        } else {
+                            vers = "0";
+                            mensaje = data.split(":::");
+                        }
                     }
-                } else {
-                    Log.d("Version", "Actualizar");
-                    dialog = new MaterialDialog.Builder(Tcontext)
-                            .title("Nueva Version " + vers.trim())
-                            //.customView(R.layout.text_d_act, false)
-                            .content("Esta version (" + versionCode + ") es obsoleta, porfavor actualiza para continuar.")
-                            .autoDismiss(false)
-                            .cancelable(false)
-                            .titleGravity(GravityEnum.CENTER)
-                            .positiveText("Actualizar")
-                            .negativeText("Salir")
-                            .callback(new MaterialDialog.ButtonCallback() {
-                                @Override
-                                public void onPositive(final MaterialDialog dialog) {
-                                    dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
-                                    if (descarga.exists()) {
-                                        descarga.delete();
-                                    }
-                                    UpdateUtil.setState(UpdateState.DOWNLOADING);
-                                    button.setShowProgressBackground(true);
-                                    button.show(true);
-                                    final ThinDownloadManager downloadManager = new ThinDownloadManager();
-                                    Uri download = Uri.parse("https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true");
-                                    final DownloadRequest downloadRequest = new DownloadRequest(download)
-                                            .setDestinationURI(Uri.fromFile(descarga))
-                                            .setStatusListener(new DownloadStatusListenerV1() {
-                                                @Override
-                                                public void onDownloadComplete(DownloadRequest downloadRequest) {
-                                                    Toaster.toast("Presiona para instalar");
-                                                    UpdateUtil.setState(UpdateState.WAITING_TO_UPDATE);
-                                                    button.setImageResource(R.drawable.ic_done);
-                                                    button.setOnClickListener(new View.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(View v) {
-                                                            Intent promptInstall = new Intent(Intent.ACTION_VIEW)
-                                                                    .setDataAndType(Uri.fromFile(descarga),
-                                                                            "application/vnd.android.package-archive");
-                                                            dialog.dismiss();
-                                                            ((newMain) Tcontext).finish();
-                                                            Tcontext.startActivity(promptInstall);
-                                                        }
-                                                    });
-                                                }
-
-                                                @Override
-                                                public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
-                                                    Toaster.toast(errorMessage);
-                                                    dialog.dismiss();
+                    Log.d("Version", Integer.toString(versionCode) + " >> " + vers.trim());
+                    if (versionCode >= Integer.parseInt(vers.trim())) {
+                        if (Integer.parseInt(vers.trim()) == 0) {
+                            if (!disM) {
+                                MaterialDialog dialog = new MaterialDialog.Builder(Tcontext)
+                                        .title(mensaje[0])
+                                        .content(mensaje[1])
+                                        .titleColorRes(R.color.prim)
+                                        .autoDismiss(Boolean.valueOf(mensaje[2].trim()))
+                                        .cancelable(Boolean.valueOf(mensaje[3].trim()))
+                                        .backgroundColor(Color.WHITE)
+                                        .titleGravity(GravityEnum.CENTER)
+                                        .positiveText(mensaje[4])
+                                        .positiveColorRes(R.color.prim)
+                                        .callback(new MaterialDialog.ButtonCallback() {
+                                            @Override
+                                            public void onPositive(MaterialDialog dialog) {
+                                                if (mensaje[4].trim().toLowerCase().equals("salir")) {
                                                     System.exit(0);
                                                 }
-
-                                                @Override
-                                                public void onProgress(DownloadRequest downloadRequest, long totalBytes, long downloadedBytes, int progress) {
-
-                                                    button.setProgress(progress, true);
+                                                if (mensaje[4].trim().toLowerCase().equals("cerrar")) {
+                                                    disM = true;
+                                                    dialog.dismiss();
                                                 }
-                                            });
-                                    downloadManager.add(downloadRequest);
-                                    dialog.dismiss();
-                                }
+                                                if (!mensaje[4].trim().toLowerCase().equals("salir") || !mensaje[4].trim().toLowerCase().equals("cerrar")) {
+                                                    if (mensaje[5].trim().equals("toast")) {
+                                                        Toaster.toast(mensaje[6].trim());
+                                                    }
+                                                    if (mensaje[5].trim().equals("toast&notshow")) {
+                                                        Toaster.toast(mensaje[6].trim());
+                                                        disM = true;
+                                                    }
+                                                    if (mensaje[5].trim().equals("finish")) {
+                                                        ((Activity) Tcontext).finish();
+                                                    }
+                                                    if (mensaje[5].trim().equals("dismiss")) {
+                                                        dialog.dismiss();
+                                                    }
+                                                    if (mensaje[5].trim().equals("dismiss&notshow")) {
+                                                        disM = true;
+                                                        dialog.dismiss();
+                                                    }
+                                                }
+                                            }
 
-                                @Override
-                                public void onNegative(MaterialDialog dialog) {
-                                    dialog.dismiss();
-                                    System.exit(0);
-                                }
-                            }).build();
-                    //TextView textView = (TextView) dialog.getCustomView().findViewById(R.id.tv_dialog);
-                    //textView.setText("Esta version (" + versionCode + ") es obsoleta, porfavor actualiza para continuar.");
+                                            @Override
+                                            public void onNegative(MaterialDialog dialog) {
+                                                System.exit(0);
+                                            }
+                                        }).build();
+                                dialog.show();
+                            }
+                        } else {
+                            UpdateUtil.setState(UpdateState.NO_UPDATE);
+                            Log.d("Version", "OK");
+                            Tcontext.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("notVer", false).apply();
+                        }
+                    } else {
+                        Log.d("Version", "Actualizar");
+                        dialog = new MaterialDialog.Builder(Tcontext)
+                                .title("Nueva Version " + vers.trim())
+                                //.customView(R.layout.text_d_act, false)
+                                .content("Esta version (" + versionCode + ") es obsoleta, porfavor actualiza para continuar.")
+                                .autoDismiss(false)
+                                .cancelable(false)
+                                .titleGravity(GravityEnum.CENTER)
+                                .positiveText("Actualizar")
+                                .negativeText("Salir")
+                                .callback(new MaterialDialog.ButtonCallback() {
+                                    @Override
+                                    public void onPositive(final MaterialDialog dialog) {
+                                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
+                                        if (descarga.exists()) {
+                                            descarga.delete();
+                                        }
+                                        UpdateUtil.setState(UpdateState.DOWNLOADING);
+                                        ((newMain) Tcontext).runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                button.setShowProgressBackground(true);
+                                                button.show(true);
+                                            }
+                                        });
+                                        final ThinDownloadManager downloadManager = new ThinDownloadManager();
+                                        Uri download = Uri.parse("https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true");
+                                        final DownloadRequest downloadRequest = new DownloadRequest(download)
+                                                .setDestinationURI(Uri.fromFile(descarga))
+                                                .setStatusListener(new DownloadStatusListenerV1() {
+                                                    @Override
+                                                    public void onDownloadComplete(DownloadRequest downloadRequest) {
+                                                        Toaster.toast("Presiona para instalar");
+                                                        UpdateUtil.setState(UpdateState.WAITING_TO_UPDATE);
+                                                        ((newMain) Tcontext).runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                button.setImageResource(R.drawable.ic_done);
+                                                                button.setOnClickListener(new View.OnClickListener() {
+                                                                    @Override
+                                                                    public void onClick(View v) {
+                                                                        Intent promptInstall = new Intent(Intent.ACTION_VIEW)
+                                                                                .setDataAndType(Uri.fromFile(descarga),
+                                                                                        "application/vnd.android.package-archive");
+                                                                        dialog.dismiss();
+                                                                        ((newMain) Tcontext).finish();
+                                                                        Tcontext.startActivity(promptInstall);
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+                                                    }
 
-                    dialog.show();
+                                                    @Override
+                                                    public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
+                                                        Toaster.toast(errorMessage);
+                                                        dialog.dismiss();
+                                                        System.exit(0);
+                                                    }
+
+                                                    @Override
+                                                    public void onProgress(DownloadRequest downloadRequest, long totalBytes, long downloadedBytes, final int progress) {
+                                                        ((newMain) Tcontext).runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                button.setProgress(progress, true);
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                        downloadManager.add(downloadRequest);
+                                        dialog.dismiss();
+                                    }
+
+                                    @Override
+                                    public void onNegative(MaterialDialog dialog) {
+                                        dialog.dismiss();
+                                        System.exit(0);
+                                    }
+                                }).build();
+                        dialog.show();
+                    }
                 }
-            }
-        });
+            });
+            Looper.loop();
+            return null;
+        }
     }
 }

@@ -1154,6 +1154,7 @@ public class newMain extends AppCompatActivity implements
         eids = parser.parseEID(json);
         tipos = parser.parseTipos(json);
         EmisionChecker.Refresh();
+        NetworkUtils.checkVersion(this, updateButton);
         Status.reload(this);
         if (Status.getCacheStatusInt() == 1) {
             getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();

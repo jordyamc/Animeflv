@@ -6,7 +6,8 @@ package knf.animeflv.Utils.eNums;
 public enum UpdateState {
     NO_UPDATE(0),
     DOWNLOADING(1),
-    WAITING_TO_UPDATE(2);
+    WAITING_TO_UPDATE(2),
+    START_UPDATE_CHECK(3);
     int value;
 
     UpdateState(int value) {
