@@ -48,6 +48,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -365,10 +366,16 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                     mess = "Hay " + Integer.toString(nCaps) + " nuevos capitulos disponibles!!!";
                                 }
                                 String temp = "";
-                                for (String alone : sts) {
+                                List<String> tlist = new ArrayList<>();
+                                tlist.addAll(sts);
+                                for (String alone : tlist) {
                                     String[] data = alone.replace("E", "").split("_");
                                     String tit = new Parser().getTitCached(data[0]);
-                                    temp += tit + " " + data[1] + "\n";
+                                    if (tlist.get(tlist.size() - 1).equals(alone)) {
+                                        temp += tit + " " + data[1];
+                                    } else {
+                                        temp += tit + " " + data[1] + "\n";
+                                    }
                                 }
                                 temp = temp.substring(0, temp.length() - 2);
                                 NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();

@@ -10,13 +10,13 @@ import knf.animeflv.ColorsRes;
  * Created by Jordy on 30/03/2016.
  */
 public class ThemeUtils {
-    private static Context context;
+    private static Context contex;
 
     public static void init(Context con) {
-        context = con;
+        contex = con;
     }
 
-    public static int getAcentColor() {
+    public static int getAcentColor(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         int accent = preferences.getInt("accentColor", ColorsRes.Naranja(context));
         int color = ColorsRes.Naranja(context);

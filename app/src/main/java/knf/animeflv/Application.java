@@ -2,14 +2,13 @@ package knf.animeflv;
 
 import android.content.Context;
 import android.os.Environment;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.karumi.dexter.Dexter;
-import com.parse.Parse;
-import com.parse.ParseObject;
 
 import java.io.File;
 
@@ -31,9 +30,6 @@ public class Application extends android.app.Application {
         UtilsInit.init(this);
         EmisionChecker.Ginit(this);
         Dexter.initialize(getApplicationContext());
-        Parse.enableLocalDatastore(this);
-        ParseObject.registerSubclass(Message.class);
-        Parse.initialize(this, "SSAa2CfCYAzpY3uqFf7ZMy19RU6jCgnVr2IbM6zC", "kownbaCYyGG07ZtlQDM5TEVZBezLzR32dzJIdzcF");
         android.webkit.CookieSyncManager.createInstance(this);
         android.webkit.CookieManager.getInstance().setAcceptCookie(true);
         WebkitCookieManagerProxy coreCookieManager = new WebkitCookieManagerProxy(null, java.net.CookiePolicy.ACCEPT_ALL);
@@ -56,5 +52,11 @@ public class Application extends android.app.Application {
             mTracker = analytics.newTracker(R.xml.global_tracker);
         }
         return mTracker;
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 }

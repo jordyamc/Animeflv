@@ -12,7 +12,7 @@ public class UtilsInit {
         FileUtil.init(context);
         MainStates.init(context);
         NetworkUtils.init(context);
-        ThemeUtils.init(context);
+        //ThemeUtils.init(context);
         WaitManager.init(context);
         UrlUtils.init(context);
     }

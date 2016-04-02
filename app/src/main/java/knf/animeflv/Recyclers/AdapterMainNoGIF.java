@@ -78,9 +78,7 @@ import knf.animeflv.info.InfoNew;
 import knf.animeflv.newMain;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 17/08/2015.
- */
+
 public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.ViewHolder> {
 
     private Context context;

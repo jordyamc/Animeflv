@@ -79,8 +79,8 @@ public class InfoCap extends Fragment{
         rvAnimes.setAdapter(adapter);
         button = (FloatingActionButton) view.findViewById(R.id.action_list);
         button.attachToRecyclerView(rvAnimes);
-        button.setColorNormal(ThemeUtils.getAcentColor());
-        button.setColorPressed(ThemeUtils.getAcentColor());
+        button.setColorNormal(ThemeUtils.getAcentColor(getActivity()));
+        button.setColorPressed(ThemeUtils.getAcentColor(getActivity()));
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

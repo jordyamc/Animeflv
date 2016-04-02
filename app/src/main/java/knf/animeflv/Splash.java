@@ -43,6 +43,7 @@ public class Splash extends AwesomeSplash {
     @Override
     public void initSplash(ConfigSplash configSplash) {
         context = this;
+        new Alarm().SetAlarm(this);
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {

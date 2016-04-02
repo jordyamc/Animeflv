@@ -56,6 +56,8 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -233,6 +235,10 @@ public class newMain extends AppCompatActivity implements
         setUpDrawer();
         getJson();
         NetworkUtils.checkVersion(this, updateButton);
+        Application application = (Application) getApplication();
+        Tracker mTracker = application.getDefaultTracker();
+        mTracker.setScreenName("Recientes");
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     private void setUpDrawer() {

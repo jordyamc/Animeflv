@@ -106,7 +106,7 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
             holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
             holder.tv_noC.setTextColor(context.getResources().getColor(R.color.blanco));
         }
-        holder.tv_tipo.setTextColor(ThemeUtils.getAcentColor());
+        holder.tv_tipo.setTextColor(ThemeUtils.getAcentColor(context));
         PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + Animes.get(holder.getAdapterPosition()).getImagen()).error(R.drawable.ic_block_r).into(holder.iv_rel);
         holder.tv_tit.setText(Animes.get(holder.getAdapterPosition()).getNombre());
         holder.tv_tipo.setText(Animes.get(holder.getAdapterPosition()).getTipo());

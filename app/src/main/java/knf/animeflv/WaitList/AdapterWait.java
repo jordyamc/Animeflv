@@ -166,6 +166,16 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
     }
 
     @Override
+    public int getGroupItemViewType(int groupPosition) {
+        return 0;
+    }
+
+    @Override
+    public int getChildItemViewType(int groupPosition, int childPosition) {
+        return 0;
+    }
+
+    @Override
     public void onBindChildViewHolder(final ChildHolder holder, final int groupPosition, final int childPosition, int viewType) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
             holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
