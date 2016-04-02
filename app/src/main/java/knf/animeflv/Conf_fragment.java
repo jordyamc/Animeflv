@@ -2,17 +2,12 @@ package knf.animeflv;
 
 import android.app.Activity;
 import android.app.DownloadManager;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,17 +27,13 @@ import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Files.FileSearchResponse;
+import knf.animeflv.Utils.NetworkUtils;
 import xdroid.toaster.Toaster;
 
 /**
@@ -51,11 +42,6 @@ import xdroid.toaster.Toaster;
 public class Conf_fragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, FolderChooserDialog.FolderCallback {
     Context context;
     MediaPlayer mp;
-    MediaPlayer r;
-    MediaPlayer oni;
-    MediaPlayer sam;
-    MediaPlayer dango;
-    MaterialDialog dialog;
     Login login = new Login();
     int selectedSound;
     private FragmentActivity myContext;
@@ -105,25 +91,25 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
 
     //Ringtone r;
     @Override
-    public void onCreate(final Bundle savedInstanceState){
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferencias);
-        context=getActivity();
-        Boolean activado= PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("notificaciones", true);
-        if (!activado){
+        context = getActivity();
+        Boolean activado = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("notificaciones", true);
+        if (!activado) {
             getPreferenceScreen().findPreference("tiempo").setEnabled(false);
             getPreferenceScreen().findPreference("sonido").setEnabled(false);
-        }else {
+        } else {
             getPreferenceScreen().findPreference("tiempo").setEnabled(true);
             getPreferenceScreen().findPreference("sonido").setEnabled(true);
         }
         final Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         mp = MediaPlayer.create(context, R.raw.sound);
-        final File file = new File(Environment.getExternalStorageDirectory()+"/Animeflv/download");
+        final File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download");
         long size = getcachesize();
-        long dirsize=getFileSize(file);
+        long dirsize = getFileSize(file);
         final String tamano = formatSize(size);
-        String vidsize=formatSize(dirsize);
+        String vidsize = formatSize(dirsize);
         PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_cache", tamano).commit();
         PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_video", vidsize).commit();
         getPreferenceScreen().findPreference("b_cache").setSummary("Tamaño de cache: " + tamano);
@@ -178,20 +164,17 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        String login_email=PreferenceManager.getDefaultSharedPreferences(context).getString("login_email","null");
-        if (!login_email.equals("null")){
+        String login_email = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null");
+        if (!login_email.equals("null")) {
             getPreferenceScreen().findPreference("login").setSummary(login_email);
         }
         getPreferenceScreen().findPreference("login").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                //Login.create().show(myContext.getSupportFragmentManager(),"Login");
-                //Login.create().show(myContext.getSupportFragmentManager(), "login");
-                if (isNetworkAvailable()) {
-                    //login = Login.create();
+                if (NetworkUtils.isNetworkAvailable()) {
                     login.show(myContext.getSupportFragmentManager(), "login");
-                }else {
-                    Toast.makeText(getActivity(),"Necesitas Internet!!!",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Necesitas Internet!!!", Toast.LENGTH_SHORT).show();
                 }
                 return false;
             }
@@ -199,10 +182,10 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("b_vistos").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                String vistos=context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos","");
-                String[] array=vistos.split(":::");
-                for (String s:array){
-                    context.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putBoolean(s, false).apply();
+                String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                String[] array = vistos.split(":::");
+                for (String s : array) {
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, false).apply();
                 }
                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", "").apply();
                 Toast.makeText(getActivity(), "Historial Borrado!!", Toast.LENGTH_SHORT).show();
@@ -212,19 +195,19 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("b_move").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                DownloadManager downloadManager=(DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                 Cursor c = downloadManager.query(new DownloadManager.Query()
                         .setFilterByStatus(DownloadManager.STATUS_PAUSED
                                 | DownloadManager.STATUS_RUNNING));
                 if (FileUtil.getSDPath() != null) {
-                        if (count() > 0) {
-                            new MoveFiles(context, myContext).execute();
-                        } else {
-                            Toast.makeText(context, "No hay archivos para mover", Toast.LENGTH_LONG).show();
-                        }
+                    if (count() > 0) {
+                        new MoveFiles(context, myContext).execute();
                     } else {
-                        Toast.makeText(context, "No se detecta tarjeta SD", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "No hay archivos para mover", Toast.LENGTH_LONG).show();
                     }
+                } else {
+                    Toast.makeText(context, "No se detecta tarjeta SD", Toast.LENGTH_LONG).show();
+                }
                 return false;
             }
         });
@@ -554,12 +537,12 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         }
     }
 
-    public long getcachesize(){
+    public long getcachesize() {
         long size = 0;
         File[] files = context.getCacheDir().listFiles();
         File[] mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache").listFiles();
-        for (File f:files) {
-            size = size+f.length();
+        for (File f : files) {
+            size = size + f.length();
         }
         if (mediaStorage != null) {
             for (File f1 : mediaStorage) {
@@ -572,7 +555,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     public void deleteDownload(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
-            for (int i=0; i<children.length; i++) {
+            for (int i = 0; i < children.length; i++) {
                 deleteDir(new File(dir, children[i]));
             }
         }
@@ -596,146 +579,104 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.d("Preference", key);
-       switch (key){
-           case "notificaciones":
-               Boolean activado=sharedPreferences.getBoolean(key,true);
-               if (!activado){
-                   getPreferenceScreen().findPreference("tiempo").setEnabled(false);
-                   getPreferenceScreen().findPreference("sonido").setEnabled(false);
-                   new Alarm().CancelAlarm(context);
-               }else {
-                   getPreferenceScreen().findPreference("tiempo").setEnabled(true);
-                   getPreferenceScreen().findPreference("sonido").setEnabled(true);
-                   new Alarm().SetAlarm(context);
-               }
-               break;
-           case "tiempo":
-               int tiempo=Integer.parseInt(sharedPreferences.getString(key, "60000"));
-               new Alarm().CancelAlarm(context);
-               new Alarm().SetAlarm(context,tiempo);
-               break;
-           case "b_cache":
-               break;
-           case "nCuenta_Status":
-               String status=sharedPreferences.getString("nCuenta_Status","NULL");
-               switch (status){
-                   case "exito":
-                       sharedPreferences.edit().putString("nCuenta_Status","NEUTRAL").apply();
-                       login.dismiss();
-                       Toast.makeText(getActivity(), "Usuario Creado!!", Toast.LENGTH_SHORT).show();
-                       String login_email=PreferenceManager.getDefaultSharedPreferences(context).getString("login_email","null");
-                       getPreferenceScreen().findPreference("login").setSummary(login_email);
-                       break;
-                   case "error":
-                       sharedPreferences.edit().putString("nCuenta_Status","NEUTRAL").apply();
-                       login.dismiss();
-                       Toast.makeText(getActivity(),"Error!!",Toast.LENGTH_SHORT).show();
-                       break;
-                   case "existe":
-                       sharedPreferences.edit().putString("nCuenta_Status","NEUTRAL").apply();
-                       login.dismiss();
-                       Toast.makeText(getActivity(),"Usuario ya existe!!",Toast.LENGTH_SHORT).show();
-                       break;
-               }
-               break;
-           case "GET_Status":
-               String state=sharedPreferences.getString("GET_Status","NEUTRAL");
-               Log.d("GET_STATUS",state);
-               switch (state.trim()){
-                   case "contraseña":
-                       login.LoginErrors(1);
-                       break;
-                   case "noexiste":
-                       login.LoginErrors(2);
-                       break;
-               }
-               break;
-           case "cCorreo_Status":
-               String Cstate=sharedPreferences.getString("cCorreo_Status","NEUTRAL");
-               Log.d("cCorreo_STATUS",Cstate);
-               switch (Cstate.trim()){
-                   case "contraseña":
-                       login.cCorreoErrors(1);
-                       break;
-                   case "noexiste":
-                       login.cCorreoErrors(2);
-                       break;
-               }
-               break;
-           case "cPass_Status":
-               String CPstate=sharedPreferences.getString("cPass_Status","NEUTRAL");
-               Log.d("cPass_STATUS",CPstate);
-               switch (CPstate.trim()){
-                   case "contraseña":
-                       login.cPassErrors(1);
-                       break;
-                   case "noexiste":
-                       login.cPassErrors(2);
-                       break;
-               }
-               break;
-           case "login_email":
-               String login_email=PreferenceManager.getDefaultSharedPreferences(context).getString("login_email","null");
-               if (!login_email.equals("null")) {
-                   getPreferenceScreen().findPreference("login").setSummary(login_email);
-               }else {
-                   getPreferenceScreen().findPreference("login").setSummary("Iniciar Sesion");
-               }
-               break;
-           case "sd_down":
-               if (sharedPreferences.getBoolean(key, false)) {
-                   if (FileUtil.getSDPath() == null) {
-                       getPreferenceScreen().findPreference(key).setEnabled(false);
-                       sharedPreferences.edit().putBoolean(key, false);
-                   }
-               }
-               break;
-           case "is_amoled":
-               getActivity().recreate();
-               break;
-       }
-    }
-
-    public Boolean isMXInstaled(){
-        Boolean is=false;
-        List<ApplicationInfo> packages;
-        PackageManager pm;
-        pm = context.getPackageManager();
-        packages = pm.getInstalledApplications(0);
-        for (ApplicationInfo packageInfo : packages) {
-            if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
-                is=true;
+        switch (key) {
+            case "notificaciones":
+                Boolean activado = sharedPreferences.getBoolean(key, true);
+                if (!activado) {
+                    getPreferenceScreen().findPreference("tiempo").setEnabled(false);
+                    getPreferenceScreen().findPreference("sonido").setEnabled(false);
+                    new Alarm().CancelAlarm(context);
+                } else {
+                    getPreferenceScreen().findPreference("tiempo").setEnabled(true);
+                    getPreferenceScreen().findPreference("sonido").setEnabled(true);
+                    new Alarm().SetAlarm(context);
+                }
                 break;
-            }
-            if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
-                is=true;
+            case "tiempo":
+                int tiempo = Integer.parseInt(sharedPreferences.getString(key, "60000"));
+                new Alarm().CancelAlarm(context);
+                new Alarm().SetAlarm(context, tiempo);
                 break;
-            }
-        }
-        return is;
-    }
-
-    private boolean isNetworkAvailable() {
-        Boolean net=false;
-        int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        switch (Tcon){
-            case 0:
-                NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                net=Wifi.isConnected();
+            case "b_cache":
                 break;
-            case 1:
-                NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                net=mobile.isConnected();
+            case "nCuenta_Status":
+                String status = sharedPreferences.getString("nCuenta_Status", "NULL");
+                switch (status) {
+                    case "exito":
+                        sharedPreferences.edit().putString("nCuenta_Status", "NEUTRAL").apply();
+                        login.dismiss();
+                        Toast.makeText(getActivity(), "Usuario Creado!!", Toast.LENGTH_SHORT).show();
+                        String login_email = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null");
+                        getPreferenceScreen().findPreference("login").setSummary(login_email);
+                        break;
+                    case "error":
+                        sharedPreferences.edit().putString("nCuenta_Status", "NEUTRAL").apply();
+                        login.dismiss();
+                        Toast.makeText(getActivity(), "Error!!", Toast.LENGTH_SHORT).show();
+                        break;
+                    case "existe":
+                        sharedPreferences.edit().putString("nCuenta_Status", "NEUTRAL").apply();
+                        login.dismiss();
+                        Toast.makeText(getActivity(), "Usuario ya existe!!", Toast.LENGTH_SHORT).show();
+                        break;
+                }
                 break;
-            case 2:
-                NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                net=WifiA.isConnected()||mobileA.isConnected();
+            case "GET_Status":
+                String state = sharedPreferences.getString("GET_Status", "NEUTRAL");
+                Log.d("GET_STATUS", state);
+                switch (state.trim()) {
+                    case "contraseña":
+                        login.LoginErrors(1);
+                        break;
+                    case "noexiste":
+                        login.LoginErrors(2);
+                        break;
+                }
+                break;
+            case "cCorreo_Status":
+                String Cstate = sharedPreferences.getString("cCorreo_Status", "NEUTRAL");
+                Log.d("cCorreo_STATUS", Cstate);
+                switch (Cstate.trim()) {
+                    case "contraseña":
+                        login.cCorreoErrors(1);
+                        break;
+                    case "noexiste":
+                        login.cCorreoErrors(2);
+                        break;
+                }
+                break;
+            case "cPass_Status":
+                String CPstate = sharedPreferences.getString("cPass_Status", "NEUTRAL");
+                Log.d("cPass_STATUS", CPstate);
+                switch (CPstate.trim()) {
+                    case "contraseña":
+                        login.cPassErrors(1);
+                        break;
+                    case "noexiste":
+                        login.cPassErrors(2);
+                        break;
+                }
+                break;
+            case "login_email":
+                String login_email = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null");
+                if (!login_email.equals("null")) {
+                    getPreferenceScreen().findPreference("login").setSummary(login_email);
+                } else {
+                    getPreferenceScreen().findPreference("login").setSummary("Iniciar Sesion");
+                }
+                break;
+            case "sd_down":
+                if (sharedPreferences.getBoolean(key, false)) {
+                    if (FileUtil.getSDPath() == null) {
+                        getPreferenceScreen().findPreference(key).setEnabled(false);
+                        sharedPreferences.edit().putBoolean(key, false);
+                    }
+                }
+                break;
+            case "is_amoled":
+                getActivity().recreate();
                 break;
         }
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && net;
     }
 
     public void clearApplicationData() {
@@ -754,115 +695,11 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             String[] children = mediaStorage.list();
             for (int i = 0; i < children.length; i++) {
                 if (!children[i].equals("directorio.txt") && !children[i].equals("data.save"))
-                new File(mediaStorage, children[i]).delete();
+                    new File(mediaStorage, children[i]).delete();
             }
         }
     }
 
-    public String getSD(){
-        String sd = Environment.getExternalStorageDirectory().getAbsolutePath();
-        if (android.os.Build.DEVICE.contains("samsung") || android.os.Build.MANUFACTURER.contains("samsung")) {
-            File f = new File(Environment.getExternalStorageDirectory().getParent() + "/extSdCard");
-            if (f.exists() && f.isDirectory()) {
-                sd = Environment.getExternalStorageDirectory().getParent() + "/extSdCard";
-            } else {
-                f = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/external_sd");
-                if (f.exists() && f.isDirectory()) {
-                    sd = Environment.getExternalStorageDirectory().getAbsolutePath() + "/external_sd";
-                }else {
-                    f = new File(Environment.getExternalStorageDirectory().getParent() + "/sdcard1");
-                    if (f.exists() && f.isDirectory()) {
-                        sd = Environment.getExternalStorageDirectory().getParent() + "/sdcard1";
-                    }else {
-                        sd="NoSD";
-                    }
-                }
-            }
-        }else {
-            File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/external_sd");
-            if (f.exists() && f.isDirectory()) {
-                sd = Environment.getExternalStorageDirectory().getAbsolutePath() + "/external_sd";
-            }else {
-                f = new File(Environment.getExternalStorageDirectory().getParent() + "/sdcard1");
-                if (f.exists() && f.isDirectory()) {
-                    sd = Environment.getExternalStorageDirectory().getParent() + "/sdcard1";
-                }else {
-                    sd="NoSD";
-                }
-            }
-        }
-        Toast.makeText(context,sd,Toast.LENGTH_LONG).show();
-        return sd;
-    }
-    public String getSD1(){
-        String sSDpath = null;
-        File   fileCur = null;
-        for (String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard", "8E84-7E70")) {
-            fileCur = new File( "/mnt/", sPathCur);
-            if( fileCur.isDirectory() && fileCur.canWrite()) {
-                sSDpath = fileCur.getAbsolutePath();
-                break;
-            }
-            if( sSDpath == null)  {
-                fileCur = new File( "/storage/", sPathCur);
-                if( fileCur.isDirectory() && fileCur.canWrite())
-                {
-                    sSDpath = fileCur.getAbsolutePath();
-                    break;
-                }
-            }
-            if( sSDpath == null)  {
-                fileCur = new File( "/storage/emulated", sPathCur);
-                if( fileCur.isDirectory() && fileCur.canWrite())
-                {
-                    sSDpath = fileCur.getAbsolutePath();
-                    Log.e("path",sSDpath);
-                    break;
-                }
-            }
-        }
-        return sSDpath;
-    }
-    public void MoveFiles() throws IOException {
-        File sourceLocation=new File(Environment.getExternalStorageDirectory() + "/Animeflv/download");
-        File targetLocation=new File(getSD() + "/Animeflv/download");
-        ProgressDialog dialog=ProgressDialog.show(context,"","Por favor espere...",true,false);
-        if (sourceLocation.isDirectory()) {
-            if (!targetLocation.exists() && !targetLocation.mkdirs()) {
-                throw new IOException("Cannot create dir " + targetLocation.getAbsolutePath());
-            }
-            String[] children = sourceLocation.list();
-            for (String i:children) {
-                File scan=new File(sourceLocation,i);
-                if (scan.isDirectory()) {
-                    String[] archivos = scan.list();
-                    for (String mp4:archivos){
-                        File inSD=new File(targetLocation,i);
-                        if (!inSD.exists()){
-                            scan.mkdir();
-                        }
-                        InputStream in = new FileInputStream(new File(scan,mp4));
-                        OutputStream out = new FileOutputStream(new File(inSD,mp4));
-                        byte[] buf = new byte[1024];
-                        int len;
-                        while ((len = in.read(buf)) > 0) {
-                            out.write(buf, 0, len);
-                        }
-                        in.close();
-                        out.close();
-                        File file=new File(inSD,mp4);
-                        if (file.exists()){
-                            if (new File(scan,mp4).delete()){
-                                Log.d("Move ok",mp4);
-                            }
-                        }
-                    }
-
-                }
-            }
-            dialog.dismiss();
-        }
-    }
 
     @Override
     public void onFolderSelection(@NonNull FolderChooserDialog dialog, @NonNull File folder) {
@@ -873,7 +710,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mp.isPlaying()){
+        if (mp.isPlaying()) {
             mp.stop();
             mp.release();
         }
@@ -881,9 +718,11 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
 
     @Override
     public void onAttach(Activity activity) {
-        myContext=(FragmentActivity) activity;
+        myContext = (FragmentActivity) activity;
         super.onAttach(activity);
+
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

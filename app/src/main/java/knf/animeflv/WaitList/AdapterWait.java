@@ -58,9 +58,6 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
         this.context = context;
         animes = WaitManager.getAnimesList();
         animesCapList = WaitManager.getNumerosList();
-        if (animes.isEmpty()) {
-            animes.add("_no_");
-        }
         callback = (WaitDownloadCallback) context;
     }
 
