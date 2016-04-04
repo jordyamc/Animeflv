@@ -1,9 +1,7 @@
 package knf.animeflv.Utils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -120,24 +118,32 @@ public class NetworkUtils {
                     if (versionCode >= Integer.parseInt(vers.trim())) {
                         if (Integer.parseInt(vers.trim()) == 0) {
                             if (!disM) {
+                                /** Formato: dividido por ":::"
+                                 * String - Titulo
+                                 * String - Mensaje
+                                 * Boolean - autodismiss
+                                 * Boolean - Cancelable
+                                 * String - action: Salir/Cerrar
+                                 * String - ExtraAction: toast/toast&notshow/finish/dismiss/dismiss&notshow/none
+                                 * (Opcional) String - ToastMessage
+                                 */
                                 MaterialDialog dialog = new MaterialDialog.Builder(Tcontext)
                                         .title(mensaje[0])
                                         .content(mensaje[1])
-                                        .titleColorRes(R.color.prim)
                                         .autoDismiss(Boolean.valueOf(mensaje[2].trim()))
                                         .cancelable(Boolean.valueOf(mensaje[3].trim()))
-                                        .backgroundColor(Color.WHITE)
                                         .titleGravity(GravityEnum.CENTER)
                                         .positiveText(mensaje[4])
-                                        .positiveColorRes(R.color.prim)
                                         .callback(new MaterialDialog.ButtonCallback() {
                                             @Override
                                             public void onPositive(MaterialDialog dialog) {
                                                 if (mensaje[4].trim().toLowerCase().equals("salir")) {
                                                     System.exit(0);
-                                                }
+                                                } else
                                                 if (mensaje[4].trim().toLowerCase().equals("cerrar")) {
                                                     disM = true;
+                                                    dialog.dismiss();
+                                                } else {
                                                     dialog.dismiss();
                                                 }
                                                 if (!mensaje[4].trim().toLowerCase().equals("salir") || !mensaje[4].trim().toLowerCase().equals("cerrar")) {
@@ -149,7 +155,7 @@ public class NetworkUtils {
                                                         disM = true;
                                                     }
                                                     if (mensaje[5].trim().equals("finish")) {
-                                                        ((Activity) Tcontext).finish();
+                                                        System.exit(0);
                                                     }
                                                     if (mensaje[5].trim().equals("dismiss")) {
                                                         dialog.dismiss();

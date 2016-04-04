@@ -198,6 +198,8 @@ public class Parser {
             url = jsonObj.getString("fecha_fin");
             if (url.trim().equals("0000-00-00")){
                 url="En emision";
+            } else if (url.trim().equals("prox")) {
+                url = "Proximamente";
             }else {
                 url="Terminado";
             }

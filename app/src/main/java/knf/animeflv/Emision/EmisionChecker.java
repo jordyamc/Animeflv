@@ -118,6 +118,7 @@ public class EmisionChecker {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             MainStates.setLoadingEmision(false);
+            MainStates.setFload(false);
         }
 
         @Override
@@ -182,6 +183,7 @@ public class EmisionChecker {
                         Log.d("EmisionChecker", "Error " + e.getCause());
                     }
                     MainStates.setLoadingEmision(false);
+                    MainStates.setFload(false);
                 }
 
                 @Override
@@ -189,6 +191,7 @@ public class EmisionChecker {
                     super.onFailure(statusCode, headers, throwable, errorResponse);
                     throwable.printStackTrace();
                     MainStates.setLoadingEmision(false);
+                    MainStates.setFload(false);
                     Log.d("EmisionChecker", "Error " + throwable.getCause());
                 }
             });

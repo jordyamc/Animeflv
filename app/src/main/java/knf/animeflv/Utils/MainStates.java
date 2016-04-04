@@ -29,6 +29,15 @@ public class MainStates {
     private static ImageButton downState;
     private static String processingEid = "";
     private static boolean loadingEmision = true;
+    private static boolean fload = true;
+
+    public static boolean isFload() {
+        return fload;
+    }
+
+    public static void setFload(boolean fload) {
+        MainStates.fload = fload;
+    }
 
     public static void init(Context con) {
         if (states == null) {

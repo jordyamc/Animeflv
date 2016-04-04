@@ -12,23 +12,23 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.loopj.android.http.SyncHttpClient;
+import com.loopj.android.http.TextHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Jordy on 12/08/2015.
@@ -53,49 +53,45 @@ public class LoginServer extends AsyncTask<String,String,String> {
         if (dialog!=null)this.materialDialog=dialog;
     }
 
-    public interface callback {
-        void response(String data, TaskType taskType);
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
     }
+
     @Override
     protected String doInBackground(String... params) {
-        StringBuilder builder = new StringBuilder();
-        HttpURLConnection c = null;
-        try {
-            URL u;
-            if (params[0].startsWith(new Parser().getBaseUrl(TaskType.NORMAL, context))) {
-                if (params[0].endsWith(".php")) {
-                    u = new URL(params[0] + "?certificate=" + getCertificateSHA1Fingerprint());
-                } else {
-                    u = new URL(params[0] + "&certificate=" + getCertificateSHA1Fingerprint());
-                }
+        SyncHttpClient client = new SyncHttpClient();
+        client.setConnectTimeout(15000);
+        String u;
+        if (params[0].startsWith(new Parser().getBaseUrl(TaskType.NORMAL, context))) {
+            if (params[0].endsWith(".php")) {
+                u = params[0] + "?certificate=" + getCertificateSHA1Fingerprint();
             } else {
-                u = new URL(params[0]);
+                u = params[0] + "&certificate=" + getCertificateSHA1Fingerprint();
             }
-            c = (HttpURLConnection) u.openConnection();
-            c.setRequestProperty("Content-length", "0");
-            c.setRequestProperty( "User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4" );
-            c.setUseCaches(false);
-            c.setConnectTimeout(15000);
-            c.setAllowUserInteraction(false);
-            c.connect();
-            BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-            //c.disconnect();
-            StringBuilder sb = new StringBuilder();
-            String line="";
-            while ((line = br.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-            br.close();
-            Log.d("URL Normal", u.toString());
-            if (c.getURL()!=u){
-                _response="error";
-            }else {
-                _response = sb.toString();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            _response="error";
+        } else {
+            u = params[0];
         }
+        client.get(u, null, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.e("LoginServer", throwable.getMessage(), throwable);
+                _response="error";
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                _response = responseString;
+            }
+        });
         return _response;
     }
 
@@ -214,19 +210,6 @@ public class LoginServer extends AsyncTask<String,String,String> {
         return hexString;
     }
 
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
-    }
-
     public boolean isJSONValid(String test) {
         try {
             new JSONObject(test);
@@ -238,5 +221,9 @@ public class LoginServer extends AsyncTask<String,String,String> {
             }
         }
         return true;
+    }
+
+    public interface callback {
+        void response(String data, TaskType taskType);
     }
 }

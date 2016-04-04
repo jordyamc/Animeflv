@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -56,6 +57,11 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.ColorsRes;
@@ -82,6 +88,11 @@ import xdroid.toaster.Toaster;
 
 public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
 
+    int corePoolSize = 60;
+    int maximumPoolSize = 80;
+    int keepAliveTime = 10;
+    BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(maximumPoolSize);
+    Executor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
     private Context context;
     private List<MainAnimeModel> Animes = new ArrayList<>();
     private MainRecyclerCallbacks callbacks;
@@ -150,7 +161,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
             holder.ib_des.setColorFilter(ColorsRes.Holo_Light(context));
         }
         Boolean resaltar = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar", true);
-        if (getCap(holder.getAdapterPosition()).equals("Capitulo 1") || getCap(holder.getAdapterPosition()).contains("OVA") || getCap(holder.getAdapterPosition()).contains("Pelicula")) {
+        if (getCap(holder.getAdapterPosition()).equals("Capitulo 1") || getCap(holder.getAdapterPosition()).equals("Preestreno") || getCap(holder.getAdapterPosition()).contains("OVA") || getCap(holder.getAdapterPosition()).contains("Pelicula")) {
             if (resaltar)
                 holder.card.setCardBackgroundColor(Color.argb(100, 253, 250, 93));
         }
@@ -233,7 +244,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                 final int pos = holder.getAdapterPosition();
                                 new MaterialDialog.Builder(context)
                                         .content(
-                                                "El capitulo " + Animes.get(pos).getNumero() +
+                                                "El " + getCap(Animes.get(pos).getNumero()).toLowerCase() +
                                                         " de " + Animes.get(pos).getTitulo() +
                                                         " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
                                         .autoDismiss(true)
@@ -245,14 +256,14 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                                 MainStates.delFromWaitList(Animes.get(pos).getEid());
                                                 MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
                                                 showLoading(holder.ib_des);
-                                                new DownloadGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                                new DownloadGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
                                             }
                                         })
                                         .build().show();
                             } else {
                                 MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
                                 showLoading(holder.ib_des);
-                                new DownloadGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                new DownloadGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
                             }
                         } else {
                             Toaster.toast("Procesando");
@@ -261,7 +272,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                         MaterialDialog borrar = new MaterialDialog.Builder(context)
                                 .title("Eliminar")
                                 .titleGravity(GravityEnum.CENTER)
-                                .content("Desea eliminar el capitulo " + Animes.get(holder.getAdapterPosition()).getNumero() + " de " + Animes.get(holder.getAdapterPosition()).getTitulo() + "?")
+                                .content("Desea eliminar el " + getCap(Animes.get(holder.getAdapterPosition()).getNumero()).toLowerCase() + " de " + Animes.get(holder.getAdapterPosition()).getTitulo() + "?")
                                 .positiveText("Eliminar")
                                 .negativeText("Cancelar")
                                 .onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -302,7 +313,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                             if (!MainStates.isProcessing()) {
                                 MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
                                 showLoading(holder.ib_des);
-                                new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
                             }
                         }
                     }
@@ -367,7 +378,11 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         String res = "";
         switch (model.getTipo()) {
             case "Anime":
-                res = "Capitulo " + model.getNumero();
+                if (model.getNumero().equals("0")) {
+                    res = "Preestreno";
+                } else {
+                    res = "Capitulo " + model.getNumero();
+                }
                 break;
             case "OVA":
                 res = "OVA " + model.getNumero();
@@ -377,6 +392,14 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 break;
         }
         return res;
+    }
+
+    private String getCap(String numero) {
+        if (numero.equals("0")) {
+            return "Preestreno";
+        } else {
+            return "Capitulo " + numero;
+        }
     }
 
     private int getColor() {
@@ -571,9 +594,18 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Log.d("Prepare Search Download", eid);
+        }
+
+        @Override
         protected String doInBackground(String... params) {
+            Log.d("Start Search Download", eid);
             Looper.prepare();
-            new SyncHttpClient().get(parser.getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlCached(eid) + "&certificate=" + parser.getCertificateSHA1Fingerprint(context) + "&newMain", null, new JsonHttpResponseHandler() {
+            SyncHttpClient httpClient = new SyncHttpClient();
+            httpClient.setConnectTimeout(10000);
+            httpClient.get(parser.getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlCached(eid) + "&certificate=" + parser.getCertificateSHA1Fingerprint(context) + "&newMain", null, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject jsonObject) {
                     super.onSuccess(statusCode, headers, jsonObject);
@@ -659,7 +691,8 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     } catch (Exception e) {
                         MainStates.setProcessing(false, null);
                         showDownload(button);
-                        e.printStackTrace();
+                        Log.e("Error Descarga", e.getMessage(), e);
+                        FileUtil.writeToFile(e.getMessage() + "   " + parser.getUrlCached(eid) + "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
                         Toaster.toast("Error en JSON");
                     }
                 }

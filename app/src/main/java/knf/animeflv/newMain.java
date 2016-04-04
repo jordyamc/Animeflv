@@ -107,6 +107,8 @@ import knf.animeflv.Recyclers.AdapterMain;
 import knf.animeflv.Recyclers.AdapterMainNoGIF;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
+import knf.animeflv.Utils.UtilDialogPref;
+import knf.animeflv.Utils.UtilNotBlocker;
 import knf.animeflv.WaitList.WaitActivity;
 import xdroid.toaster.Toaster;
 
@@ -176,6 +178,8 @@ public class newMain extends AppCompatActivity implements
     private String[] eids;
     private String[] tipos;
 
+    private SharedPreferences.OnSharedPreferenceChangeListener listener;
+
     private Handler EmisionHandler = new Handler();
     Runnable EmisionWaiting = new Runnable() {
         @Override
@@ -239,6 +243,34 @@ public class newMain extends AppCompatActivity implements
         Tracker mTracker = application.getDefaultTracker();
         mTracker.setScreenName("Recientes");
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+        SharedPreferences prefs = this.getSharedPreferences("data", MODE_PRIVATE);
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                if (key.equals("reload") && !UtilNotBlocker.isPaused()) {
+                    mswipe.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!mswipe.isRefreshing()) {
+                                mswipe.setRefreshing(true);
+                            }
+                        }
+                    });
+                    if (isNetworkAvailable()) {
+                        Log.d("NewMain", "Block Nots");
+                        UtilNotBlocker.setBlocked(true);
+                        NetworkUtils.checkVersion(context, updateButton);
+                        loadMainJson();
+                    } else {
+                        if (mswipe.isRefreshing()) {
+                            mswipe.setRefreshing(false);
+                        }
+                    }
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", new HashSet<String>()).apply();
+                }
+            }
+        };
+        prefs.registerOnSharedPreferenceChangeListener(listener);
     }
 
     private void setUpDrawer() {
@@ -305,7 +337,7 @@ public class newMain extends AppCompatActivity implements
                                 setDir(false);
                                 break;
                             case 4:
-                                if (MainStates.isLoadingEmision()) {
+                                if (MainStates.isLoadingEmision() && MainStates.isFload()) {
                                     getWaitingSnackBar().show();
                                     EmisionWaiting.run();
                                 } else {
@@ -1737,13 +1769,13 @@ public class newMain extends AppCompatActivity implements
         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", new HashSet<String>()).apply();
         parser.refreshUrls(context);
         ActualizarFavoritos();
+        UtilNotBlocker.setPaused(false);
         if (shouldExecuteOnResume) {
             if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false) != isAmoled) {
                 recreate();
             }
             if (isNetworkAvailable()) {
                 //checkBan(APP);
-                //new Requests(context, TaskType.VERSION).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html");
                 loadMainJson();
             } else {
                 if (mswipe.isRefreshing()) {
@@ -1757,6 +1789,12 @@ public class newMain extends AppCompatActivity implements
             shouldExecuteOnResume = true;
         }
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        UtilNotBlocker.setPaused(true);
     }
 
     @Override
@@ -1790,6 +1828,14 @@ public class newMain extends AppCompatActivity implements
         super.onDestroy();
         MainStates.setProcessing(false, "destroyed");
         MainStates.setLoadingEmision(false);
+        MainStates.setFload(true);
+        if (UtilDialogPref.getPlayer() != null) {
+            if (UtilDialogPref.getPlayer().isPlaying()) {
+                UtilDialogPref.getPlayer().stop();
+                UtilDialogPref.getPlayer().release();
+                UtilDialogPref.setPlayer(null);
+            }
+        }
     }
 
     @Override

@@ -75,10 +75,10 @@ public class WaitActivity extends AppCompatActivity implements
                     String url = urls.get(eids.indexOf(s));
                     if (!url.equals("null")) {
                         ManageDownload.chooseDownDir(context, s, url);
+                        MainStates.delFromWaitList(s);
                     }
                 }
                 processing.dismiss();
-                MainStates.delFromGlobalWaitListbyEid(eids.get(0));
                 adapterWait.notifyResume();
             } else {
                 waitUrls.postDelayed(waitrun, 500);
@@ -162,12 +162,24 @@ public class WaitActivity extends AppCompatActivity implements
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(getResources().getColor(R.color.dark));
-            getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
+        toolbar = (Toolbar) findViewById(R.id.toolbar_wait);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+            toolbar.setBackgroundColor(getResources().getColor(android.R.color.black));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(getResources().getColor(R.color.negro));
+                getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
+            }
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                window.setStatusBarColor(getResources().getColor(R.color.dark));
+                getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
+            }
         }
         toolbar = (Toolbar) findViewById(R.id.toolbar_wait);
         recyclerView = (RecyclerView) findViewById(R.id.rv_wait_list);
@@ -369,7 +381,7 @@ public class WaitActivity extends AppCompatActivity implements
                     } catch (Exception e) {
                         Log.e("DownloadList", e.getMessage(), e.getCause());
                         processing.dismiss();
-                        Toaster.toast("Error al inicar descargas");
+                        Toaster.toast("Error al iniciar descargas");
                     }
                 }
 
@@ -378,7 +390,7 @@ public class WaitActivity extends AppCompatActivity implements
                     super.onFailure(statusCode, headers, throwable, errorResponse);
                     Log.e("AllCapsDownload", "Error", throwable);
                     processing.dismiss();
-                    Toaster.toast("Error al inicar descargas");
+                    Toaster.toast("Error al iniciar descargas");
                 }
 
                 @Override
@@ -387,7 +399,7 @@ public class WaitActivity extends AppCompatActivity implements
                     Log.e("AllCapsDownload", "Error", throwable);
                     Log.d("AllCapsDownload", responseString);
                     processing.dismiss();
-                    Toaster.toast("Error al inicar descargas");
+                    Toaster.toast("Error al iniciar descargas");
                 }
 
                 @Override
@@ -395,7 +407,7 @@ public class WaitActivity extends AppCompatActivity implements
                     super.onFailure(statusCode, headers, throwable, errorResponse);
                     Log.e("AllCapsDownload", "Error", throwable);
                     processing.dismiss();
-                    Toaster.toast("Error al inicar descargas");
+                    Toaster.toast("Error al iniciar descargas");
                 }
             });
             return null;

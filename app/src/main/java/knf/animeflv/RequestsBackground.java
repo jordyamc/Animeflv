@@ -55,6 +55,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import knf.animeflv.Utils.UtilNotBlocker;
+
 /**
  * Created by Jordy on 11/08/2015.
  */
@@ -355,7 +357,7 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                     }
                                 }
                             }
-                            if (isnot) {
+                            if (isnot && !UtilNotBlocker.isBlocked()) {
                                 int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
                                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
                                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", sts).apply();
@@ -377,7 +379,9 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                         temp += tit + " " + data[1] + "\n";
                                     }
                                 }
-                                temp = temp.substring(0, temp.length() - 2);
+                                if (temp.endsWith("\n")) {
+                                    temp = temp.substring(0, temp.length() - 2);
+                                }
                                 NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
                                 bigTextStyle.setBigContentTitle("Animes:");
                                 bigTextStyle.bigText(temp);
@@ -426,6 +430,11 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                 NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                                 mNotifyMgr.cancel(mNotificationId);
                                 mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                            } else {
+                                if (UtilNotBlocker.isBlocked()) {
+                                    Log.d("Not Service", "isBlocked");
+                                    UtilNotBlocker.setBlocked(false);
+                                }
                             }
                         } else {
                             Log.d("JSON", "Es igual");

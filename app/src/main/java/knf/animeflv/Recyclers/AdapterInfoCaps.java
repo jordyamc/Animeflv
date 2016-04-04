@@ -51,7 +51,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
@@ -104,14 +103,6 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
             if (i < (arr.length - 1)) str.append(':');
         }
         return str.toString();
-    }
-
-    public String getTit() {
-        return context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("titInfo", "");
-    }
-
-    public String getNum(int position) {
-        return capitulo.get(position).substring(capitulo.get(position).lastIndexOf(" ") + 1).trim();
     }
 
     @Override
@@ -273,34 +264,6 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
                 }
             }
         });
-    }
-
-    public String getSD1() {
-        String sSDpath = null;
-        File fileCur = null;
-        for (String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard")) {
-            fileCur = new File("/mnt/", sPathCur);
-            if (fileCur.isDirectory() && fileCur.canWrite()) {
-                sSDpath = fileCur.getAbsolutePath();
-                break;
-            }
-            if (sSDpath == null) {
-                fileCur = new File("/storage/", sPathCur);
-                if (fileCur.isDirectory() && fileCur.canWrite()) {
-                    sSDpath = fileCur.getAbsolutePath();
-                    break;
-                }
-            }
-            if (sSDpath == null) {
-                fileCur = new File("/storage/emulated", sPathCur);
-                if (fileCur.isDirectory() && fileCur.canWrite()) {
-                    sSDpath = fileCur.getAbsolutePath();
-                    Log.e("path", sSDpath);
-                    break;
-                }
-            }
-        }
-        return sSDpath;
     }
 
     @Override

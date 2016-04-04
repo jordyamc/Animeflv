@@ -1,5 +1,6 @@
 package knf.animeflv;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -17,6 +18,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.provider.DocumentFile;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -27,6 +29,7 @@ import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +37,7 @@ import java.util.List;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Files.FileSearchResponse;
 import knf.animeflv.Utils.NetworkUtils;
+import knf.animeflv.Utils.UtilDialogPref;
 import xdroid.toaster.Toaster;
 
 /**
@@ -104,7 +108,11 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             getPreferenceScreen().findPreference("sonido").setEnabled(true);
         }
         final Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        mp = MediaPlayer.create(context, R.raw.sound);
+        if (UtilDialogPref.getPlayer() != null) {
+            mp = UtilDialogPref.getPlayer();
+        } else {
+            mp = MediaPlayer.create(context, R.raw.sound);
+        }
         final File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download");
         long size = getcachesize();
         long dirsize = getFileSize(file);
@@ -215,38 +223,11 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("sonido").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                selectedSound = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("sonido", "0"));
-                setMediaPlayer(selectedSound);
-                new MaterialDialog.Builder(myContext)
-                        .title("Sonido")
-                        .titleGravity(GravityEnum.CENTER)
-                        .autoDismiss(false)
-                        .items(getResources().getStringArray(R.array.sonidos))
-                        .alwaysCallSingleChoiceCallback()
-                        .itemsCallbackSingleChoice(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("sonido", "0")), new MaterialDialog.ListCallbackSingleChoice() {
-                            @Override
-                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                if (selectedSound != which) {
-                                    if (mp.isPlaying()) {
-                                        mp.stop();
-                                    }
-                                    setMediaPlayer(which);
-                                    selectedSound = which;
-                                    PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("sonido", String.valueOf(which)).apply();
-                                    getPreferenceScreen().findPreference("sonido").setSummary(text);
-                                    mp.start();
-                                } else {
-                                    if (mp.isPlaying()) {
-                                        mp.stop();
-                                    } else {
-                                        setMediaPlayer(which);
-                                        mp.start();
-                                    }
-                                }
-                                return true;
-                            }
-                        })
-                        .show();
+                if (UtilDialogPref.getPlayer() != null) {
+                    mp = UtilDialogPref.getPlayer();
+                }
+                UtilDialogPref.init(getResources().getStringArray(R.array.sonidos), "sonido", "0", "Sonido", mp, getPreferenceScreen().findPreference("sonido"));
+                PrefDialog.create().show(myContext.getSupportFragmentManager(), "Pref");
                 return false;
             }
         });
@@ -254,19 +235,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("tiempo").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new MaterialDialog.Builder(myContext)
-                        .title("Revisar cada")
-                        .titleGravity(GravityEnum.CENTER)
-                        .items(getResources().getStringArray(R.array.minutos))
-                        .itemsCallbackSingleChoice(Arrays.asList(getResources().getStringArray(R.array.min_val)).indexOf(PreferenceManager.getDefaultSharedPreferences(myContext).getString("tiempo", "60000")), new MaterialDialog.ListCallbackSingleChoice() {
-                            @Override
-                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("tiempo", getResources().getStringArray(R.array.min_val)[which]).apply();
-                                getPreferenceScreen().findPreference("tiempo").setSummary("Revisar actualizaciones cada " + text);
-                                return true;
-                            }
-                        })
-                        .show();
+                UtilDialogPref.init(getResources().getStringArray(R.array.minutos), getResources().getStringArray(R.array.min_val), "Revisar actualizaciones cada %s", "tiempo", "60000", "Revisar cada", getPreferenceScreen().findPreference("tiempo"));
+                PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
                 return false;
             }
         });
@@ -274,19 +244,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("t_conexion").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new MaterialDialog.Builder(myContext)
-                        .title("Usar Conexion")
-                        .titleGravity(GravityEnum.CENTER)
-                        .items(getResources().getStringArray(R.array.tipos))
-                        .itemsCallbackSingleChoice(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_conexion", "0")), new MaterialDialog.ListCallbackSingleChoice() {
-                            @Override
-                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("t_conexion", String.valueOf(which)).apply();
-                                getPreferenceScreen().findPreference("t_conexion").setSummary(text);
-                                return true;
-                            }
-                        })
-                        .show();
+                UtilDialogPref.init(getResources().getStringArray(R.array.tipos), "t_conexion", "0", "Usar Conexion", getPreferenceScreen().findPreference("t_conexion"));
+                PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
                 return false;
             }
         });
@@ -294,19 +253,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("t_busqueda").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new MaterialDialog.Builder(myContext)
-                        .title("Tipo de busqueda")
-                        .titleGravity(GravityEnum.CENTER)
-                        .items(getResources().getStringArray(R.array.busqueda))
-                        .itemsCallbackSingleChoice(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_busqueda", "0")), new MaterialDialog.ListCallbackSingleChoice() {
-                            @Override
-                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("t_busqueda", String.valueOf(which)).apply();
-                                getPreferenceScreen().findPreference("t_busqueda").setSummary(text);
-                                return true;
-                            }
-                        })
-                        .show();
+                UtilDialogPref.init(getResources().getStringArray(R.array.busqueda), "t_busqueda", "0", "Tipo de busqueda", getPreferenceScreen().findPreference("t_busqueda"));
+                PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
                 return false;
             }
         });
@@ -314,19 +262,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("t_video").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new MaterialDialog.Builder(myContext)
-                        .title("Reproductor")
-                        .titleGravity(GravityEnum.CENTER)
-                        .items(getResources().getStringArray(R.array.players))
-                        .itemsCallbackSingleChoice(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_video", "0")), new MaterialDialog.ListCallbackSingleChoice() {
-                            @Override
-                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("t_video", String.valueOf(which)).apply();
-                                getPreferenceScreen().findPreference("t_video").setSummary("Reproductor: " + text);
-                                return true;
-                            }
-                        })
-                        .show();
+                UtilDialogPref.init(getResources().getStringArray(R.array.players), "Reproductor: %s", "t_video", "0", "Reproductor", getPreferenceScreen().findPreference("t_video"));
+                PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
                 return false;
             }
         });
@@ -334,19 +271,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("t_streaming").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new MaterialDialog.Builder(myContext)
-                        .title("Reproductor")
-                        .titleGravity(GravityEnum.CENTER)
-                        .items(getResources().getStringArray(R.array.players))
-                        .itemsCallbackSingleChoice(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_streaming", "0")), new MaterialDialog.ListCallbackSingleChoice() {
-                            @Override
-                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("t_streaming", String.valueOf(which)).apply();
-                                getPreferenceScreen().findPreference("t_streaming").setSummary("Reproductor: " + text);
-                                return true;
-                            }
-                        })
-                        .show();
+                UtilDialogPref.init(getResources().getStringArray(R.array.players), "Reproductor: %s", "t_streaming", "0", "Reproductor", getPreferenceScreen().findPreference("t_streaming"));
+                PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
                 return false;
             }
         });
@@ -354,19 +280,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("t_player").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new MaterialDialog.Builder(myContext)
-                        .title("Selecciona")
-                        .titleGravity(GravityEnum.CENTER)
-                        .items(getResources().getStringArray(R.array.players_type))
-                        .itemsCallbackSingleChoice(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_player", "0")), new MaterialDialog.ListCallbackSingleChoice() {
-                            @Override
-                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString("t_player", String.valueOf(which)).apply();
-                                getPreferenceScreen().findPreference("t_player").setSummary("Tipo: " + text);
-                                return true;
-                            }
-                        })
-                        .show();
+                UtilDialogPref.init(getResources().getStringArray(R.array.players_type), "Tipo: %s", "t_player", "0", "Selecciona", getPreferenceScreen().findPreference("t_player"));
+                PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
                 return false;
             }
         });
@@ -448,28 +363,15 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 getPreferenceScreen().removePreference(sd);
             }
         } else {
-            if (FileUtil.getSDPath().startsWith("_noWrite_")) {
+            if (FileUtil.getSDPath().contains("_noWrite_")) {
+                Toaster.toast("Se requiere autorizacion manual para escribir en tarjeta SD");
                 getPreferenceScreen().findPreference("SDpath").setTitle("No se puede escribir en SD");
-                getPreferenceScreen().findPreference("SDpath").setSummary("Cambiar Direccion");
+                getPreferenceScreen().findPreference("SDpath").setSummary("Solicitar Permiso");
                 getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
-                        new MaterialDialog.Builder(myContext)
-                                .title("Direccion")
-                                .titleGravity(GravityEnum.CENTER)
-                                .items(new String[]{"/mnt", "/storage"})
-                                .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
-                                    @Override
-                                    public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                                        Intent i = new Intent(context, FilePickerActivity.class);
-                                        i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
-                                        i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
-                                        i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
-                                        i.putExtra(FilePickerActivity.EXTRA_START_PATH, text);
-                                        startActivityForResult(i, 6991);
-                                        return false;
-                                    }
-                                }).build().show();
+                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                        startActivityForResult(intent, 15889);
                         return false;
                     }
                 });
@@ -511,30 +413,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             }
         }
         return count;
-    }
-
-    private void setMediaPlayer(int which) {
-        if (!mp.isPlaying()) {
-            if (which == 0) {
-                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                mp = MediaPlayer.create(context, notification);
-            }
-            if (which == 1) {
-                mp = MediaPlayer.create(context, R.raw.sound);
-            }
-            if (which == 2) {
-                mp = MediaPlayer.create(context, R.raw.onii);
-            }
-            if (which == 3) {
-                mp = MediaPlayer.create(context, R.raw.sam);
-            }
-            if (which == 4) {
-                mp = MediaPlayer.create(context, R.raw.dango);
-            }
-            if (which == 5) {
-                mp = MediaPlayer.create(context, R.raw.nico);
-            }
-        }
     }
 
     public long getcachesize() {
@@ -707,20 +585,31 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         dialog.dismiss();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (mp.isPlaying()) {
-            mp.stop();
-            mp.release();
-        }
-    }
 
     @Override
     public void onAttach(Activity activity) {
         myContext = (FragmentActivity) activity;
         super.onAttach(activity);
 
+    }
+
+    @TargetApi(19)
+    private void takePermission(Intent data) {
+        Uri treeUri = data.getData();
+        context.getContentResolver().takePersistableUriPermission(treeUri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        DocumentFile pickedDir = DocumentFile.fromTreeUri(context, treeUri);
+        DocumentFile newFile = pickedDir.createFile("text/plain", "Prueba");
+        try {
+            OutputStream out = context.getContentResolver().openOutputStream(newFile.getUri());
+            out.write("Prueba".getBytes());
+            out.close();
+            getActivity().recreate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toaster.toast("Error al obtener permiso");
+        }
     }
 
 
@@ -744,6 +633,9 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                     Toaster.toast(uri.toString().substring(uri.toString().lastIndexOf("/") + 1) + " Directorio no encontrado");
                 }
             }
+        }
+        if (requestCode == 15889) {
+            takePermission(data);
         }
     }
 }

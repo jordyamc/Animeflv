@@ -46,7 +46,7 @@
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:textColorSecondary">@color/blanco</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@android:color/holo_red_dark</item>
         <item name="android:colorBackground">@color/negro</item>
@@ -297,7 +297,7 @@
     <style name="AppThemeDarkRojo" parent="MaterialDrawerTheme.Light.DarkToolbar">
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
-        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:textColorSecondary">@color/blanco</item>
         <item name="android:textColorPrimary">@color/blanco</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@android:color/holo_red_dark</item>

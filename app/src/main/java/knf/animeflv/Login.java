@@ -55,11 +55,9 @@ public class Login extends DialogFragment{
     LinearLayout cPassPage;
     int dialogo;
     MaterialDialog dialog;
-    private OnResponseCallback listener;
 
     public Login create() {
         Login dialog = new Login();
-        this.listener = null;
         return dialog;
     }
 
@@ -161,7 +159,6 @@ public class Login extends DialogFragment{
                         @Override
                         public void onClick(View v) {
                             dialogo=2;
-                            //new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, getActivity()) + "fav-server.php?tipo=list");
                             new getList(getActivity()).execute();
                             main.setVisibility(View.GONE);
                             loginPage.setVisibility(View.VISIBLE);
@@ -174,7 +171,6 @@ public class Login extends DialogFragment{
                     nuevo.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            //new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, getActivity()) + "fav-server.php?tipo=list");
                             new getList(getActivity()).execute();
                             main.setVisibility(View.GONE);
                             nCuenta.setVisibility(View.VISIBLE);
@@ -188,7 +184,6 @@ public class Login extends DialogFragment{
                     cCorreo.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            //new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, getActivity()) + "fav-server.php?tipo=list");
                             new getList(getActivity()).execute();
                             main.setVisibility(View.GONE);
                             cCorreoPage.setVisibility(View.VISIBLE);
@@ -204,7 +199,6 @@ public class Login extends DialogFragment{
                     cPass.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            //new LoginServer(getActivity(), TaskType.LIST_USERS, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, getActivity()) + "fav-server.php?tipo=list");
                             new getList(getActivity()).execute();
                             main.setVisibility(View.GONE);
                             cPassPage.setVisibility(View.VISIBLE);
@@ -602,14 +596,6 @@ public class Login extends DialogFragment{
                 Toast.makeText(getActivity(),"Contraseña Cambiada!!",Toast.LENGTH_SHORT).show();
                 break;
         }
-    }
-
-    public void setCustomObjectListener(OnResponseCallback listener) {
-        this.listener = listener;
-    }
-
-    public interface OnResponseCallback {
-        void ResponseCallback(String response);
     }
 
     public class getList extends AsyncTask<String, String, String> {
