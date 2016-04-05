@@ -336,7 +336,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                         });
                     }
                     if (response.getUniqueName().contains("_noWrite_")) {
-                        Toaster.toast("Se requiere autorizacion manual para escribir en tarjeta SD");
+                        Toaster.toast("Se requiere autorizacion manual para escribir en " + response.getUniqueName().replace("_noWrite_", ""));
                         getPreferenceScreen().findPreference("SDpath").setTitle("No se puede escribir en SD");
                         getPreferenceScreen().findPreference("SDpath").setSummary("Solicitar Permiso");
                         getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -381,7 +381,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             }
         } else {
             if (FileUtil.getSDPath().contains("_noWrite_")) {
-                Toaster.toast("Se requiere autorizacion manual para escribir en tarjeta SD");
+                Toaster.toast("Se requiere autorizacion manual para escribir en " + FileUtil.getSDPath().replace("_noWrite_", ""));
                 getPreferenceScreen().findPreference("SDpath").setTitle("No se puede escribir en SD");
                 getPreferenceScreen().findPreference("SDpath").setSummary("Solicitar Permiso");
                 getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -407,7 +407,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     private boolean excludechar(String input) {
         List<String> exclude = Arrays.asList("expand", "media_rw", "obb", "runtime", "secure", "shared",
                 "user", "self", "sdcard", "emulated", "acct", "cache", "config", "d", "data", "dev", "etc",
-                "firmware", "fsg", "oem", "persist", "proc", "root", "sbin", "sys", "system", "vendor");
+                "firmware", "fsg", "oem", "persist", "proc", "root", "sbin", "sys", "system", "vendor", "asec");
         for (String i : exclude) {
             if (input.contains("/" + i)) {
                 return true;
@@ -640,14 +640,10 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             } else {
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", uri.toString().substring(uri.toString().lastIndexOf("/") + 1).trim()).apply();
                 if (FileUtil.getSDPath() != null) {
-                    if (!FileUtil.getSDPath().startsWith("_noWrite_")) {
-                        getActivity().recreate();
-                    } else {
-                        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", "null").apply();
-                        Toaster.toast(uri.toString().substring(uri.toString().lastIndexOf("/") + 1) + " Directorio no puede escribir");
-                    }
+                    getActivity().recreate();
                 } else {
-                    Toaster.toast(uri.toString().substring(uri.toString().lastIndexOf("/") + 1) + " Directorio no encontrado");
+                    Toaster.toast(uri.toString().substring(uri.toString().lastIndexOf("/") + 1) + " Directorio no encontrado o invalido");
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", "null").apply();
                 }
             }
         }

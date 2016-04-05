@@ -81,7 +81,9 @@ public class FileUtil {
 
     public static FileSearchResponse searchforSD() {
         List<String> sdNames = new ArrayList<>();
-        List<String> exclude = Arrays.asList("expand", "media_rw", "obb", "runtime", "secure", "shared", "user", "self", "sdcard", "emulated");
+        List<String> exclude = Arrays.asList("expand", "media_rw", "obb", "runtime", "secure", "shared",
+                "user", "self", "sdcard", "emulated", "acct", "cache", "config", "d", "data", "dev", "etc",
+                "firmware", "fsg", "oem", "persist", "proc", "root", "sbin", "sys", "system", "vendor", "asec");
         String intName = Environment.getExternalStorageDirectory().getName();
         File mnt = new File("/mnt");
         if (mnt.exists()) {
