@@ -13,7 +13,7 @@ import knf.animeflv.Utils.MainStates;
 public class WaitManager {
     private static Context context;
     private static List<String> animesList = new ArrayList<>();
-    private static List<List<Integer>> numerosList = new ArrayList<>();
+    private static List<List<Float>> numerosList = new ArrayList<>();
 
     public static void init(Context c) {
         context = c;
@@ -31,7 +31,7 @@ public class WaitManager {
         return animesList;
     }
 
-    public static List<List<Integer>> getNumerosList() {
+    public static List<List<Float>> getNumerosList() {
         return numerosList;
     }
 }

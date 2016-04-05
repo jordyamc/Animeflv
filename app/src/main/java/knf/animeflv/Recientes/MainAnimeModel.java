@@ -1,6 +1,6 @@
 package knf.animeflv.Recientes;
 
-import knf.animeflv.Parser;
+import knf.animeflv.Utils.FileUtil;
 
 /**
  * Created by Jordy on 17/03/2016.
@@ -11,12 +11,11 @@ public class MainAnimeModel {
     private String numero;
     private String tipo;
     private String titulo;
-    private Parser parser = new Parser();
 
     public MainAnimeModel(String eid, String tipo, String titulo) {
         this.eid = eid;
         this.tipo = tipo;
-        this.titulo = parser.corregirTit(titulo);
+        this.titulo = FileUtil.corregirTit(titulo);
         String[] cortado = eid.replace("E", "").split("_");
         this.aid = cortado[0];
         this.numero = cortado[1];

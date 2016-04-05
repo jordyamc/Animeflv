@@ -44,7 +44,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
         implements ExpandableDraggableItemAdapter<GroupHolder, ChildHolder>,
         ExpandableSwipeableItemAdapter<GroupHolder, ChildHolder> {
     List<String> animes;
-    List<List<Integer>> animesCapList;
+    List<List<Float>> animesCapList;
     RecyclerViewExpandableItemManager manager;
     RecyclerViewSwipeManager swipeManager;
     Context context;
@@ -80,7 +80,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
     @Override
     public long getChildId(int groupPosition, int childPosition) {
         // This method need to return unique value within the group.
-        return animesCapList.get(groupPosition).get(childPosition) * Integer.parseInt(animes.get(groupPosition));
+        return Math.round(animesCapList.get(groupPosition).get(childPosition) * Float.parseFloat(animes.get(groupPosition)));
     }
 
     @Override
@@ -180,7 +180,8 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
             holder.delete.setColorFilter(ColorsRes.Holo_Dark(context));
             holder.download.setColorFilter(ColorsRes.Holo_Dark(context));
         }
-        holder.cap.setText("Capitulo " + animesCapList.get(groupPosition).get(childPosition));
+        String text = "Capitulo " + animesCapList.get(groupPosition).get(childPosition);
+        holder.cap.setText(text.replace(".0", ""));
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

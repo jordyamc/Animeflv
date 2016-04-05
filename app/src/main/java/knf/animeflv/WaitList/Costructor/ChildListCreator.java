@@ -12,12 +12,16 @@ import java.util.Set;
  * Created by Jordy on 31/03/2016.
  */
 public class ChildListCreator {
-    public static List<Integer> getList(Context context, String aid) {
+    public static List<Float> getList(Context context, String aid) {
         String key = aid + "waiting";
         Set<String> set = context.getSharedPreferences("data", Context.MODE_PRIVATE).getStringSet(key, new HashSet<String>());
-        List<Integer> list = new ArrayList<>();
+        List<Float> list = new ArrayList<>();
         for (String i : set) {
-            list.add(Integer.parseInt(i));
+            try {
+                list.add(Float.parseFloat(i));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         Collections.sort(list);
         return list;

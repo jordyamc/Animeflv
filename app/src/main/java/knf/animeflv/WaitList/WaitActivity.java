@@ -78,8 +78,13 @@ public class WaitActivity extends AppCompatActivity implements
                         MainStates.delFromWaitList(s);
                     }
                 }
-                processing.dismiss();
-                adapterWait.notifyResume();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        processing.dismiss();
+                        adapterWait.notifyResume();
+                    }
+                });
             } else {
                 waitUrls.postDelayed(waitrun, 500);
             }
@@ -96,9 +101,14 @@ public class WaitActivity extends AppCompatActivity implements
                         ManageDownload.chooseDownDir(context, s, url);
                     }
                 }
-                processing.dismiss();
                 MainStates.delFromWaitList(eids.get(0));
-                adapterWait.notifyResume();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        processing.dismiss();
+                        adapterWait.notifyResume();
+                    }
+                });
             } else {
                 waitUrls.postDelayed(waitrunSingle, 500);
             }
@@ -251,7 +261,7 @@ public class WaitActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onAllCapsDownload(final String aid, final List<Integer> list) {
+    public void onAllCapsDownload(final String aid, final List<Float> list) {
         processing.show();
         processing.setContent(UrlUtils.getTitCached(aid));
         urls.clear();
@@ -261,13 +271,13 @@ public class WaitActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onSingleCapDownload(String aid, int cap) {
+    public void onSingleCapDownload(String aid, float cap) {
         processing.show();
         processing.setContent("Capitulo " + cap);
         urls.clear();
         eids.clear();
         Log.d("DownloadAll", "Start " + UrlUtils.getUrlAnimeCached(aid));
-        List<Integer> list = new ArrayList<>();
+        List<Float> list = new ArrayList<>();
         list.add(cap);
         new startSingleDownload(aid, list).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
@@ -342,9 +352,9 @@ public class WaitActivity extends AppCompatActivity implements
 
     private class startAllDownloads extends AsyncTask<String, String, String> {
         String aid;
-        List<Integer> list;
+        List<Float> list;
 
-        public startAllDownloads(String aid, List<Integer> list) {
+        public startAllDownloads(String aid, List<Float> list) {
             this.aid = aid;
             this.list = list;
         }
@@ -357,11 +367,18 @@ public class WaitActivity extends AppCompatActivity implements
                     super.onSuccess(statusCode, headers, response);
                     try {
                         JSONArray array = response.getJSONArray("episodios");
-                        for (int num : list) {
-                            String eid = aid + "_" + num + "E";
+                        for (float num : list) {
+                            String number = String.valueOf(num);
+                            String eid = aid + "_" + number.replace(".0", "") + "E";
                             eids.add(eid);
-                            JSONObject object = array.getJSONObject(num - 1);
-                            JSONArray downarray = object.optJSONArray("downloads");
+                            JSONArray downarray = null;
+                            for (int i = 0; i <= array.length(); i++) {
+                                JSONObject object = array.getJSONObject(i);
+                                if (object.getString("eid").equals(eid)) {
+                                    downarray = object.optJSONArray("downloads");
+                                    break;
+                                }
+                            }
                             if (downarray != null) {
                                 JSONObject sub = downarray.getJSONObject(0);
                                 String izanagiurl = sub.getString("url");
@@ -379,7 +396,7 @@ public class WaitActivity extends AppCompatActivity implements
                         }
                         waitrun.run();
                     } catch (Exception e) {
-                        Log.e("DownloadList", e.getMessage(), e.getCause());
+                        Log.e("DownloadList", e.getMessage(), e);
                         processing.dismiss();
                         Toaster.toast("Error al iniciar descargas");
                     }
@@ -416,9 +433,9 @@ public class WaitActivity extends AppCompatActivity implements
 
     private class startSingleDownload extends AsyncTask<String, String, String> {
         String aid;
-        List<Integer> list;
+        List<Float> list;
 
-        public startSingleDownload(String aid, List<Integer> list) {
+        public startSingleDownload(String aid, List<Float> list) {
             this.aid = aid;
             this.list = list;
         }
@@ -431,11 +448,18 @@ public class WaitActivity extends AppCompatActivity implements
                     super.onSuccess(statusCode, headers, response);
                     try {
                         JSONArray array = response.getJSONArray("episodios");
-                        for (int num : list) {
-                            String eid = aid + "_" + num + "E";
+                        for (float num : list) {
+                            String numer = String.valueOf(num);
+                            String eid = aid + "_" + numer.replace(".0", "") + "E";
                             eids.add(eid);
-                            JSONObject object = array.getJSONObject(num - 1);
-                            JSONArray downarray = object.optJSONArray("downloads");
+                            JSONArray downarray = null;
+                            for (int i = 0; i <= array.length(); i++) {
+                                JSONObject object = array.getJSONObject(eids.indexOf(eid));
+                                if (object.getString("eid").equals(eid)) {
+                                    downarray = object.optJSONArray("downloads");
+                                    break;
+                                }
+                            }
                             if (downarray != null) {
                                 JSONObject sub = downarray.getJSONObject(0);
                                 String izanagiurl = sub.getString("url");

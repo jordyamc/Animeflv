@@ -299,40 +299,57 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             getPreferenceScreen().findPreference("b_move").setSummary("Tarjeta SD no encontrada");
             final FileSearchResponse response = FileUtil.searchforSD();
             if (response.existSD()) {
-                if (response.isOnlyOne()) {
+                if (response.isOnlyOne() && !response.getUniqueName().contains("_noWrite_")) {
                     PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", response.getUniqueName()).apply();
                     getPreferenceScreen().findPreference("SDpath").setTitle("SD Encontrada");
                     getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.getSDPath());
                     getPreferenceScreen().findPreference("SDpath").setEnabled(false);
                     getActivity().recreate();
                 } else {
-                    getPreferenceScreen().findPreference("SDpath").setTitle("Multiples SD Encontrados");
-                    getPreferenceScreen().findPreference("SDpath").setSummary("Precione para seleccionar");
-                    getPreferenceScreen().findPreference("SDpath").setEnabled(true);
-                    getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                        @Override
-                        public boolean onPreferenceClick(Preference preference) {
-                            new MaterialDialog.Builder(myContext)
-                                    .title("Nombre de SD")
-                                    .titleGravity(GravityEnum.CENTER)
-                                    .items(response.list())
-                                    .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
-                                        @Override
-                                        public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", response.list().get(which)).apply();
-                                            if (FileUtil.getSDPath() != null) {
-                                                getPreferenceScreen().findPreference("SDpath").setTitle("SD Encontrada");
-                                                getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.getSDPath());
-                                                getPreferenceScreen().findPreference("SDpath").setEnabled(false);
-                                                getActivity().recreate();
+                    if (response.list().size() > 1) {
+                        getPreferenceScreen().findPreference("SDpath").setTitle("Multiples SD Encontrados");
+                        getPreferenceScreen().findPreference("SDpath").setSummary("Precione para seleccionar");
+                        getPreferenceScreen().findPreference("SDpath").setEnabled(true);
+                        getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                            @Override
+                            public boolean onPreferenceClick(Preference preference) {
+                                new MaterialDialog.Builder(myContext)
+                                        .title("Nombre de SD")
+                                        .titleGravity(GravityEnum.CENTER)
+                                        .items(response.list())
+                                        .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                                            @Override
+                                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", response.list().get(which)).apply();
+                                                if (FileUtil.getSDPath() != null) {
+                                                    getPreferenceScreen().findPreference("SDpath").setTitle("SD Encontrada");
+                                                    getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.getSDPath());
+                                                    getPreferenceScreen().findPreference("SDpath").setEnabled(false);
+                                                    getActivity().recreate();
+                                                }
+                                                return true;
                                             }
-                                            return true;
-                                        }
-                                    })
-                                    .show();
-                            return false;
-                        }
-                    });
+                                        })
+                                        .show();
+                                return false;
+                            }
+                        });
+                    }
+                    if (response.getUniqueName().contains("_noWrite_")) {
+                        Toaster.toast("Se requiere autorizacion manual para escribir en tarjeta SD");
+                        getPreferenceScreen().findPreference("SDpath").setTitle("No se puede escribir en SD");
+                        getPreferenceScreen().findPreference("SDpath").setSummary("Solicitar Permiso");
+                        getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                            @Override
+                            public boolean onPreferenceClick(Preference preference) {
+                                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                                startActivityForResult(intent, 15889);
+                                return false;
+                            }
+                        });
+                        PreferenceCategory sd = (PreferenceCategory) getPreferenceScreen().findPreference("catSD");
+                        getPreferenceScreen().removePreference(sd);
+                    }
                 }
             } else {
                 getPreferenceScreen().findPreference("SDpath").setTitle("SD No Encontrada");
@@ -635,7 +652,9 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             }
         }
         if (requestCode == 15889) {
-            takePermission(data);
+            if (resultCode == Activity.RESULT_OK) {
+                takePermission(data);
+            }
         }
     }
 }

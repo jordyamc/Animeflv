@@ -170,7 +170,7 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
                                                 public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
                                                     if (FileUtil.DeleteAnime(eids.get(holder.getAdapterPosition()))) {
                                                         showDownload(holder.ib_des);
-                                                        showPlay(holder.ib_ver);
+                                                        showCloudPlay(holder.ib_ver);
                                                         ManageDownload.cancel(context, eids.get(holder.getAdapterPosition()));
                                                         Toast.makeText(context, "Archivo Eliminado", Toast.LENGTH_SHORT).show();
                                                     }

@@ -179,8 +179,6 @@ public class InfoNew extends AppCompatActivity implements Requests.callback, Log
                 SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
                 editor.putString("titInfo", parser.getTit(infile)).apply();
                 getSupportActionBar().setTitle(parser.getTit(infile));
-                titulo = parser.getTitCached(aid);
-                getSupportActionBar().setTitle(titulo);
                 Bundle bundle = new Bundle();
                 bundle.putString("aid", aid);
                 FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
@@ -248,10 +246,9 @@ public class InfoNew extends AppCompatActivity implements Requests.callback, Log
     }
 
     private void LoadData() {
-        getSupportActionBar().setTitle(parser.getTitCached(aid));
         SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
-        editor.putString("titInfo", parser.getTitCached(aid)).apply();
-        getSupportActionBar().setTitle(parser.getTitCached(aid));
+        editor.putString("titInfo", FileUtil.corregirTit(parser.getTitCached(aid))).apply();
+        getSupportActionBar().setTitle(FileUtil.corregirTit(parser.getTitCached(aid)));
         AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
         asyncHttpClient.setResponseTimeout(5000);
         asyncHttpClient.get(parser.getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(aid) + "&certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
@@ -336,8 +333,7 @@ public class InfoNew extends AppCompatActivity implements Requests.callback, Log
             String infile = getStringFromFile(file_loc);
             SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
             editor.putString("titInfo", parser.getTit(infile)).apply();
-            getSupportActionBar().setTitle(parser.getTit(infile));
-            titulo = parser.getTitCached(aid);
+            titulo = FileUtil.corregirTit(aid);
             getSupportActionBar().setTitle(titulo);
             Bundle bundle = new Bundle();
             bundle.putString("aid", aid);

@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Utils.FileUtil;
 
 /**
  * Created by Jordy on 10/08/2015.
@@ -564,7 +565,7 @@ public class Parser {
         }catch (Exception e) {
             e.printStackTrace();
         }
-        return aid;
+        return FileUtil.corregirTit(aid);
     }
 
     public AnimeClass parseAnime(String json) {
@@ -1915,7 +1916,7 @@ public class Parser {
                 e.printStackTrace();
             }
         }
-        return corregirTit(ret);
+        return FileUtil.corregirTit(ret);
     }
 
     public String getAidCached(String tipe, String url) {

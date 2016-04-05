@@ -86,10 +86,18 @@ public class FileUtil {
         File mnt = new File("/mnt");
         if (mnt.exists()) {
             for (File dir : mnt.listFiles()) {
-                if (dir.isDirectory() && dir.canWrite()) {
-                    if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
-                        if (!sdNames.contains(dir.getName())) {
-                            sdNames.add(dir.getName());
+                if (dir.isDirectory()) {
+                    if (dir.canWrite()) {
+                        if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
+                            if (!sdNames.contains(dir.getName())) {
+                                sdNames.add(dir.getName());
+                            }
+                        }
+                    } else {
+                        if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
+                            if (!sdNames.contains(dir.getName())) {
+                                sdNames.add("_noWrite_" + dir.getName());
+                            }
                         }
                     }
                 }
@@ -98,10 +106,18 @@ public class FileUtil {
         File storage = new File("/storage");
         if (storage.exists()) {
             for (File dir : storage.listFiles()) {
-                if (dir.isDirectory() && dir.canWrite()) {
-                    if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
-                        if (!sdNames.contains(dir.getName())) {
-                            sdNames.add(dir.getName());
+                if (dir.isDirectory()) {
+                    if (dir.canWrite()) {
+                        if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
+                            if (!sdNames.contains(dir.getName())) {
+                                sdNames.add(dir.getName());
+                            }
+                        }
+                    } else {
+                        if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
+                            if (!sdNames.contains(dir.getName())) {
+                                sdNames.add("_noWrite_" + dir.getName());
+                            }
                         }
                     }
                 }
@@ -225,6 +241,7 @@ public class FileUtil {
         array = array.replace("&iacute;", "í");
         array = array.replace("&deg;", "°");
         array = array.replace("&amp;", "&");
+        array = array.replace("&Delta;", "\u0394");
         array = array.replace("&acirc;", "\u00C2");
         array = array.replace("&egrave;", "\u00E8");
         array = array.replace("&middot;", "\u00B7");
