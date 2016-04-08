@@ -7,8 +7,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 128
-        versionName "2.8.8.5"
+        versionCode 129
+        versionName "2.8.8.9"
         multiDexEnabled true
     }
     buildTypes {
@@ -21,6 +21,9 @@ android {
         javaMaxHeapSize "4g"
     }
     productFlavors {
+    }
+    defaultConfig {
+        multiDexEnabled true
     }
 }
 allprojects {
@@ -48,8 +51,6 @@ dependencies {
     compile('com.github.afollestad.material-dialogs:commons:0.8.5.7@aar') {
         transitive = true
     }
-    compile files('src/trace.jar')
-    compile files('src/SOMAAndroidSDK5.0.1.jar')
     compile files('jsoup-1.8.3.jar')
     compile 'com.github.halysongoncalves:pugnotification:1.8.1'
     compile 'com.google.android.exoplayer:exoplayer:r1.5.5'
@@ -62,9 +63,9 @@ dependencies {
     compile 'com.github.ViksaaSkool:AwesomeSplash:v1.0.0'
     compile 'com.shamanland:xdroid-toaster:0.0.10'
     compile 'com.karumi:dexter:2.2.1'
-    compile 'com.android.support:appcompat-v7:23.2.1'
-    compile 'com.android.support:recyclerview-v7:23.2.1'
-    compile 'com.android.support:cardview-v7:23.2.1'
+    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.android.support:recyclerview-v7:23.3.0'
+    compile 'com.android.support:cardview-v7:23.3.0'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
@@ -82,9 +83,12 @@ dependencies {
     compile 'com.github.recruit-lifestyle:WaveSwipeRefreshLayout:1.2'
     compile 'com.github.simbiose:Encryption:1.3.0'
     compile 'com.github.paolorotolo:appintro:3.4.0'
+    compile 'com.heinrichreimersoftware:material-intro:1.2.1'
     compile 'com.parse.bolts:bolts-android:1.+'
     compile 'com.parse:parse-android:1.+'
     compile 'com.melnykov:floatingactionbutton:1.3.0'
     //compile files('okio-1.6.0.jar')
+    compile files('src/SOMAAndroidSDK5.0.2.jar')
+    compile files('src/trace.jar')
 }
 apply plugin: 'com.google.gms.google-services'

@@ -158,6 +158,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
             holder.ib_des.setColorFilter(ColorsRes.Holo_Dark(context));
             holder.ib_ver.setColorFilter(ColorsRes.Holo_Dark(context));
         } else {
+            holder.card.setCardBackgroundColor(ColorsRes.Blanco(context));
             holder.ib_des.setColorFilter(ColorsRes.Holo_Light(context));
         }
         Boolean resaltar = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar", true);
@@ -244,7 +245,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                 final int pos = holder.getAdapterPosition();
                                 new MaterialDialog.Builder(context)
                                         .content(
-                                                "El " + getCap(Animes.get(pos).getNumero()).toLowerCase() +
+                                                "El "+ getCap(Animes.get(pos).getNumero()).toLowerCase() +
                                                         " de " + Animes.get(pos).getTitulo() +
                                                         " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
                                         .autoDismiss(true)
@@ -378,9 +379,9 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         String res = "";
         switch (model.getTipo()) {
             case "Anime":
-                if (model.getNumero().equals("0")) {
+                if (model.getNumero().equals("0")){
                     res = "Preestreno";
-                } else {
+                }else {
                     res = "Capitulo " + model.getNumero();
                 }
                 break;
@@ -394,11 +395,11 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         return res;
     }
 
-    private String getCap(String numero) {
-        if (numero.equals("0")) {
+    private String getCap(String numero){
+        if (numero.equals("0")){
             return "Preestreno";
-        } else {
-            return "Capitulo " + numero;
+        }else {
+            return "Capitulo "+numero;
         }
     }
 
@@ -596,14 +597,14 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Log.d("Prepare Search Download", eid);
+            Log.d("Prepare Search Download",eid);
         }
 
         @Override
         protected String doInBackground(String... params) {
-            Log.d("Start Search Download", eid);
+            Log.d("Start Search Download",eid);
             Looper.prepare();
-            SyncHttpClient httpClient = new SyncHttpClient();
+            SyncHttpClient httpClient=new SyncHttpClient();
             httpClient.setConnectTimeout(10000);
             httpClient.get(parser.getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlCached(eid) + "&certificate=" + parser.getCertificateSHA1Fingerprint(context) + "&newMain", null, new JsonHttpResponseHandler() {
                 @Override
@@ -627,7 +628,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                         }
 
                         d = new MaterialDialog.Builder(context)
-                                .title("Opciones")
+                                .title("Descarga")
                                 .titleGravity(GravityEnum.CENTER)
                                 .customView(R.layout.dialog_down, false)
                                 .cancelable(true)
@@ -691,8 +692,8 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     } catch (Exception e) {
                         MainStates.setProcessing(false, null);
                         showDownload(button);
-                        Log.e("Error Descarga", e.getMessage(), e);
-                        FileUtil.writeToFile(e.getMessage() + "   " + parser.getUrlCached(eid) + "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
+                        Log.e("Error Descarga",e.getMessage(),e);
+                        FileUtil.writeToFile(e.getMessage() +"   "+parser.getUrlCached(eid)+ "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
                         Toaster.toast("Error en JSON");
                     }
                 }
@@ -748,7 +749,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                         }
 
                         d = new MaterialDialog.Builder(context)
-                                .title("Opciones")
+                                .title("Streaming")
                                 .titleGravity(GravityEnum.CENTER)
                                 .customView(R.layout.dialog_down, false)
                                 .cancelable(true)

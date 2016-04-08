@@ -130,6 +130,9 @@
             android:title="Reiniciar Direccion SD" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Experimental">
-
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="null"
+            android:key="open_intro"
+            android:title="Abrir Into" />
     </PreferenceCategory>
 </PreferenceScreen>

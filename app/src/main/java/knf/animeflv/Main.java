@@ -460,7 +460,7 @@ public class Main extends AppCompatActivity implements
         ExceptionHandler.register(this, parser.getBaseUrl(normal, this) + "/errors/server.php?id=" + androidID);
         shouldExecuteOnResume = false;
         if (!getSharedPreferences("data", MODE_PRIVATE).getBoolean("intro", false)) {
-            startActivity(new Intent(this, Intro.class));
+            startActivity(new Intent(this, Intronew.class));
         }
         checkBan(APP);
         getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();

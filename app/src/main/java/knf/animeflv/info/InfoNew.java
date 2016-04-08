@@ -70,7 +70,6 @@ public class InfoNew extends AppCompatActivity implements Requests.callback, Log
     Toolbar toolbar;
     String ext_storage_state = Environment.getExternalStorageState();
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
-    Boolean favBoolean = false;
     Menu Amenu;
     String aid;
     String titulo = "";
@@ -178,7 +177,8 @@ public class InfoNew extends AppCompatActivity implements Requests.callback, Log
                 String infile = getStringFromFile(file_loc);
                 SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
                 editor.putString("titInfo", parser.getTit(infile)).apply();
-                getSupportActionBar().setTitle(parser.getTit(infile));
+                Log.d("Load","Title 1");
+                getSupportActionBar().setTitle(FileUtil.corregirTit(parser.getTit(infile)));
                 Bundle bundle = new Bundle();
                 bundle.putString("aid", aid);
                 FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
@@ -248,6 +248,7 @@ public class InfoNew extends AppCompatActivity implements Requests.callback, Log
     private void LoadData() {
         SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
         editor.putString("titInfo", FileUtil.corregirTit(parser.getTitCached(aid))).apply();
+        Log.d("Load","Title 2");
         getSupportActionBar().setTitle(FileUtil.corregirTit(parser.getTitCached(aid)));
         AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
         asyncHttpClient.setResponseTimeout(5000);
@@ -333,7 +334,8 @@ public class InfoNew extends AppCompatActivity implements Requests.callback, Log
             String infile = getStringFromFile(file_loc);
             SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
             editor.putString("titInfo", parser.getTit(infile)).apply();
-            titulo = FileUtil.corregirTit(aid);
+            titulo = FileUtil.corregirTit(parser.getTit(infile));
+            Log.d("Load","Title 3");
             getSupportActionBar().setTitle(titulo);
             Bundle bundle = new Bundle();
             bundle.putString("aid", aid);
@@ -610,7 +612,8 @@ public class InfoNew extends AppCompatActivity implements Requests.callback, Log
     public void sendtext1(String data, TaskType taskType) {
         SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
         editor.putString("titInfo", parser.getTit(data)).apply();
-        getSupportActionBar().setTitle(parser.getTit(data));
+        Log.d("Load","Title 4");
+        getSupportActionBar().setTitle(FileUtil.corregirTit(parser.getTit(data)));
         titulo = parser.getTit(data);
         id = parser.getAID(data);
     }

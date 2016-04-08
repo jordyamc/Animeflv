@@ -544,24 +544,6 @@ public class Parser {
         try {
             JSONObject jsonObj = new JSONObject(json);
             aid=jsonObj.getString("titulo");
-            aid=aid.replace("&#039;", "\'");
-            aid=aid.replace("&iacute;", "í");
-            aid=aid.replace("&deg;","°");
-            aid=aid.replace("&amp;","&");
-            aid=aid.replace("&acirc;","\u00C2");
-            aid=aid.replace("&egrave;","\u00E8");
-            aid=aid.replace("&middot;","\u00B7");
-            aid=aid.replace("&#333;", "\u014D");
-            aid=aid.replace("&#9834;", "\u266A");
-            aid = aid.replace("&Delta;", "\u0394");
-            aid=aid.replace("&aacute;","á");
-            aid=aid.replace("&oacute;","ó");
-            aid=aid.replace("&quot;","\"");
-            aid=aid.replace("&uuml;","\u00FC");
-            aid=aid.replace("&szlig;","\u00DF");
-            aid=aid.replace("&radic;","\u221A");
-            aid=aid.replace("&dagger;", "\u2020");
-            aid=aid.replace("&hearts;","\u2665");
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -1909,7 +1891,7 @@ public class Parser {
                     JSONObject nombreJ = jsonArray.getJSONObject(i);
                     String n = nombreJ.getString("a");
                     if (n.trim().equals(aid)) {
-                        return corregirTit(nombreJ.getString("b"));
+                        return FileUtil.corregirTit(nombreJ.getString("b"));
                     }
                 }
             } catch (Exception e) {

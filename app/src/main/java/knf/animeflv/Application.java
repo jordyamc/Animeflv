@@ -11,6 +11,8 @@ import com.google.android.gms.analytics.Tracker;
 import com.karumi.dexter.Dexter;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import knf.animeflv.Emision.EmisionChecker;
 import knf.animeflv.Utils.FileUtil;
@@ -39,7 +41,10 @@ public class Application extends android.app.Application {
             public void uncaughtException(Thread thread, Throwable e) {
                 Log.e("Uncaught", "Error", e);
                 Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
-                FileUtil.writeToFile(e.getMessage() + "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                String exceptionAsString = sw.toString();
+                FileUtil.writeToFile(e.getMessage() + "\n" + exceptionAsString, new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
                 System.exit(0);
             }
         });

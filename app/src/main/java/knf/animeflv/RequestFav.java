@@ -52,11 +52,13 @@ public class RequestFav extends AsyncTask<String,String,String> {
     MaterialDialog dialog;
     Boolean running;
     int prog = 0;
-    public RequestFav(Context con, TaskType taskType, MaterialDialog d) {
+    List<String> aids;
+    public RequestFav(Context con, TaskType taskType, MaterialDialog d, List<String> aids) {
         call=(callback) con;
         this.context = con;
         this.taskType=taskType;
         this.dialog = d;
+        this.aids=aids;
     }
 
     public static String byte2HexFormatted(byte[] arr) {
@@ -142,11 +144,8 @@ public class RequestFav extends AsyncTask<String,String,String> {
 
     @Override
     protected String doInBackground(String... params) {
-        String file_ = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-        String dir = getStringFromFile(file_);
         final List<String> list = new ArrayList<String>();
-        final int size = list.size();
-        for (final String i : params) {
+        for (final String i : aids) {
             final File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
             if (!file.exists() || !isJSONValid(getStringFromFile(file.getPath()))) {
                 Log.d("Link", new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(i) + "&certificate=" + getCertificateSHA1Fingerprint());
@@ -169,6 +168,7 @@ public class RequestFav extends AsyncTask<String,String,String> {
                     }
                 });
             }else {
+                Log.d("Link", "Loaded "+i);
                 String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt";
                 if (file.exists()) {
                     list.add(parser.getTit(getStringFromFile(file_loc)));

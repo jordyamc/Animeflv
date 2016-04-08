@@ -22,6 +22,7 @@ import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UtilDialogPref;
+import knf.animeflv.Utils.UtilSound;
 
 /**
  * Created by Jordy on 17/08/2015.
@@ -132,25 +133,8 @@ public class AdapterDialogPref extends RecyclerView.Adapter<AdapterDialogPref.Vi
     private void setMediaPlayer(int which) {
         Log.d("AdapterDialog", "Reset Player");
         if (!mp.isPlaying()) {
-            if (which == 0) {
-                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                mp = MediaPlayer.create(context, notification);
-            }
-            if (which == 1) {
-                mp = MediaPlayer.create(context, R.raw.sound);
-            }
-            if (which == 2) {
-                mp = MediaPlayer.create(context, R.raw.onii);
-            }
-            if (which == 3) {
-                mp = MediaPlayer.create(context, R.raw.sam);
-            }
-            if (which == 4) {
-                mp = MediaPlayer.create(context, R.raw.dango);
-            }
-            if (which == 5) {
-                mp = MediaPlayer.create(context, R.raw.nico);
-            }
+            mp = UtilSound.getMediaPlayer(context,which);
+            mp.setLooping(true);
             UtilDialogPref.setPlayer(mp);
         }
     }

@@ -45,6 +45,11 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.Recyclers.AdapterFavs;
@@ -68,6 +73,11 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     RequestFav favo;
     Boolean sorted = false;
     Boolean paused = false;
+    int corePoolSize = 60;
+    int maximumPoolSize = 80;
+    int keepAliveTime = 10;
+    BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(maximumPoolSize);
+    Executor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -244,8 +254,8 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                             }
                         })
                         .build();
-                favo = new RequestFav(this, TaskType.SORT_NORMAL, dialog);
-                favo.execute(favoritos);
+                favo = new RequestFav(this, TaskType.SORT_NORMAL, dialog,aids);
+                favo.executeOnExecutor(threadPoolExecutor);
                 dialog.show();
             } else {
                 new Handler().postDelayed(new Runnable() {

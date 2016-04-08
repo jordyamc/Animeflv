@@ -35,6 +35,7 @@
         <item>Onii-chan (Sam)</item>
         <item>Dango</item>
         <item>Nico Nico Ni!</item>
+        <item>Poi Poi</item>
     </string-array>
     <string-array name="players">
         <item>Interno</item>
@@ -107,4 +108,37 @@
         <item>#9C27B0</item>
         <item>#ffcc0000</item>
     </array>
+
+    <string name="intro_title_1">Bienvenido!!</string>
+    <string name="intro_desc_1">Esta es la app No Oficial de AnimeFLV</string>
+
+    <string name="intro_title_2">Recientes</string>
+    <string name="intro_desc_2">Lista con los ultimos capitulos agregados</string>
+
+    <string name="intro_title_3">Descarga y Streaming</string>
+    <string name="intro_desc_3">Descarga y Streaming disponible para todos los capitulos</string>
+
+    <string name="intro_title_4">Modo obscuro</string>
+    <string name="intro_desc_4">La pantalla gastara menos bateria&#8230; O simplemente para que se vea mas pro</string>
+
+    <string name="intro_title_5">Informacion de Anime</string>
+    <string name="intro_desc_5">Informacion, Sinopsis y Relacionados de cada anime</string>
+
+    <string name="intro_title_6">Varias Secciones</string>
+    <string name="intro_desc_6">Favoritos, Directorio, Descargas, Sugerencias</string>
+
+    <string name="intro_title_7">Favoritos</string>
+    <string name="intro_desc_7">Soporte para copia en la nube</string>
+
+    <string name="intro_title_8">Notificaciones</string>
+    <string name="intro_desc_8">Aviso cada vez que sale un capitulo nuevo</string>
+
+    <string name="intro_title_9">Configuracion</string>
+    <string name="intro_desc_9">Muchas configuraciones a modificar</string>
+
+    <string name="intro_title_10">Sin Publicidad</string>
+    <string name="intro_desc_10">100% libre de publicidad, una app de fans para fans ;)</string>
+
+    <string name="intro_title_11">Listo</string>
+    <string name="intro_desc_11">Has terminado la introduccion, puedes empezar a utilizar la app :)</string>
 </resources>

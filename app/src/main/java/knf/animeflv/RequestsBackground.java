@@ -23,6 +23,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.loopj.android.http.SyncHttpClient;
+import com.loopj.android.http.TextHttpResponseHandler;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
 import com.thin.downloadmanager.ThinDownloadManager;
@@ -55,7 +57,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Utils.UtilNotBlocker;
+import knf.animeflv.Utils.UtilSound;
 
 /**
  * Created by Jordy on 11/08/2015.
@@ -150,54 +154,28 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        StringBuilder builder = new StringBuilder();
-        HttpURLConnection c = null;
         if (isNetworkAvailable()) {
-            try {
-                URL u;
-                if (params[0].startsWith(new Parser().getBaseUrl(TaskType.NORMAL, context))) {
-                    if (params[0].endsWith(".php")) {
-                        u = new URL(params[0] + "?certificate=" + getCertificateSHA1Fingerprint());
-                    } else {
-                        u = new URL(params[0] + "&certificate=" + getCertificateSHA1Fingerprint());
-                    }
-                } else {
-                    u = new URL(params[0]);
-                }
-                c = (HttpURLConnection) u.openConnection();
-                c.setRequestProperty("Content-length", "0");
-                c.setUseCaches(false);
-                c.setAllowUserInteraction(false);
-                c.setConnectTimeout(15000);
-                c.connect();
-                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-                StringBuilder sb = new StringBuilder();
-                String line = "";
-                while ((line = br.readLine()) != null) {
-                    sb.append(line + "\n");
-                }
-                br.close();
-                Log.d("Back URL Normal", u.toString());
-                if (c.getURL() != u) {
-                    if (!c.getURL().toString().trim().startsWith("http://animeflv")) {
-                        Log.d("Back URL ERROR", c.getURL().toString());
-                        _response = "";
-                    } else {
-                        Log.d("Back URL OK", c.getURL().toString());
-                        _response = sb.toString();
-                    }
-                } else {
-                    Log.d("Back URL OK", c.getURL().toString());
-                    _response = sb.toString();
-                }
-                is = c.getInputStream();
-            } catch (Exception e) {
-                Log.e("log_tag", "Error in http connection " + e.toString());
-                _response = "";
-                if (!params[0].equals(new Parser().getInicioUrl(TaskType.SECUNDARIA, context))) {
-                    doInBackground(new Parser().getInicioUrl(TaskType.SECUNDARIA, context));
-                }
+            String url="";
+            if (taskType==TaskType.NOT){
+                url=new Parser().getInicioUrl(TaskType.NORMAL,context)+ "?certificate=" + getCertificateSHA1Fingerprint();
             }
+            if (taskType==TaskType.VERSION){
+                url="https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html";
+            }
+            SyncHttpClient client=new SyncHttpClient();
+            client.setConnectTimeout(15000);
+            client.setLoggingEnabled(false);
+            client.get(url, null, new TextHttpResponseHandler() {
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    makeDesicion("");
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                    makeDesicion(responseString);
+                }
+            });
         } else {
             Log.d("Conexion", "No hay internet");
         }
@@ -296,6 +274,10 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(final String s) {
         super.onPostExecute(s);
+
+    }
+
+    public void makeDesicion(String s){
         if (taskType == TaskType.NOT && new Parser().checkStatus(s.trim()) == 0) {
             ext_storage_state = Environment.getExternalStorageState();
             mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
@@ -370,13 +352,15 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                 String temp = "";
                                 List<String> tlist = new ArrayList<>();
                                 tlist.addAll(sts);
+                                String[] tits=new Parser().parseTitulos(s);
+                                List<String> eids=Arrays.asList(jsonDesc);
                                 for (String alone : tlist) {
                                     String[] data = alone.replace("E", "").split("_");
-                                    String tit = new Parser().getTitCached(data[0]);
+                                    //String tit = new Parser().getTitCached(data[0]);
                                     if (tlist.get(tlist.size() - 1).equals(alone)) {
-                                        temp += tit + " " + data[1];
+                                        temp += tits[eids.indexOf(alone)] + " " + data[1];
                                     } else {
-                                        temp += tit + " " + data[1] + "\n";
+                                        temp += tits[eids.indexOf(alone)] + " " + data[1] + "\n";
                                     }
                                 }
                                 if (temp.endsWith("\n")) {
@@ -393,32 +377,7 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                 mBuilder.setVibrate(new long[]{100, 200, 100, 500});
                                 mBuilder.setStyle(bigTextStyle);
                                 int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
-                                switch (not) {
-                                    case 0:
-                                        Log.d("Notificacion:", "Crear Sonido Def");
-                                        mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
-                                        break;
-                                    case 1:
-                                        Log.d("Notificacion:", "Crear Sonido Especial");
-                                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound"), AudioManager.STREAM_NOTIFICATION);
-                                        break;
-                                    case 2:
-                                        Log.d("Notificacion:", "Crear Sonido Onii-chan");
-                                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/onii"), AudioManager.STREAM_NOTIFICATION);
-                                        break;
-                                    case 3:
-                                        Log.d("Notificacion:", "Crear Sonido Sam");
-                                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sam"), AudioManager.STREAM_NOTIFICATION);
-                                        break;
-                                    case 4:
-                                        Log.d("Notificacion:", "Crear Sonido Dango");
-                                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango"), AudioManager.STREAM_NOTIFICATION);
-                                        break;
-                                    case 5:
-                                        Log.d("Notificacion:", "Crear Sonido Nico");
-                                        mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/nico"), AudioManager.STREAM_NOTIFICATION);
-                                        break;
-                                }
+                                mBuilder.setSound(UtilSound.getSoundUri(not));
                                 mBuilder.setAutoCancel(true);
                                 mBuilder.setPriority(Notification.PRIORITY_MAX);
                                 mBuilder.setLights(Color.argb(0, 255, 128, 0), 5000, 2000);
@@ -478,32 +437,7 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                         .setContentText("Nueva Version Disponible!!!");
                         mBuilder.setVibrate(new long[]{100, 200, 100, 500});
                         int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
-                        switch (not) {
-                            case 0:
-                                Log.d("Notificacion:", "Crear Sonido Def");
-                                mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
-                                break;
-                            case 1:
-                                Log.d("Notificacion:", "Crear Sonido Especial");
-                                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound"), AudioManager.STREAM_NOTIFICATION);
-                                break;
-                            case 2:
-                                Log.d("Notificacion:", "Crear Sonido Onii-chan");
-                                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/onii"), AudioManager.STREAM_NOTIFICATION);
-                                break;
-                            case 3:
-                                Log.d("Notificacion:", "Crear Sonido Sam");
-                                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sam"), AudioManager.STREAM_NOTIFICATION);
-                                break;
-                            case 4:
-                                Log.d("Notificacion:", "Crear Sonido Dango");
-                                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango"), AudioManager.STREAM_NOTIFICATION);
-                                break;
-                            case 5:
-                                Log.d("Notificacion:", "Crear Sonido Nico");
-                                mBuilder.setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/nico"), AudioManager.STREAM_NOTIFICATION);
-                                break;
-                        }
+                        mBuilder.setSound(UtilSound.getSoundUri(not));
                         mBuilder.setAutoCancel(true);
                         mBuilder.setPriority(Notification.PRIORITY_MAX);
                         mBuilder.setLights(Color.BLUE, 5000, 2000);
@@ -564,28 +498,9 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                         Log.d("Actualizacion", "OK");
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("isDescRun", false).apply();
                         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("isDescDown", Integer.parseInt(s.trim())).apply();
-                        Uri ring = Uri.parse("");
+
                         int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
-                        switch (not) {
-                            case 0:
-                                ring = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                                break;
-                            case 1:
-                                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound");
-                                break;
-                            case 2:
-                                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/onii");
-                                break;
-                            case 3:
-                                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sam");
-                                break;
-                            case 4:
-                                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango");
-                                break;
-                            case 5:
-                                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/nico");
-                                break;
-                        }
+                        Uri ring = UtilSound.getSoundUri(not);
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(context)
                                         .setSmallIcon(R.drawable.ic_not_r)
@@ -624,27 +539,7 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
 
     public void Descargar(String aid, String num, String titulo, String eid) {
         int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
-        Uri ring = Uri.parse("");
-        switch (not) {
-            case 0:
-                ring = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                break;
-            case 1:
-                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sound");
-                break;
-            case 2:
-                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/onii");
-                break;
-            case 3:
-                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/sam");
-                break;
-            case 4:
-                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/dango");
-                break;
-            case 5:
-                ring = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/nico");
-                break;
-        }
+        Uri ring = UtilSound.getSoundUri(not);
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_not_r)
@@ -669,4 +564,6 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotifyMgr.notify(mNotificationId, mBuilder.build());
     }
+
+
 }

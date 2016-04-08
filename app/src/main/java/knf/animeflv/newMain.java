@@ -229,7 +229,7 @@ public class newMain extends AppCompatActivity implements
 
     private void setUpMain() {
         if (!getSharedPreferences("data", MODE_PRIVATE).getBoolean("intro", false)) {
-            startActivity(new Intent(this, Intro.class));
+            startActivity(new Intent(this, Intronew.class));
         }
         checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         MainRegistrer.init();
@@ -699,7 +699,6 @@ public class newMain extends AppCompatActivity implements
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             toolbar = (Toolbar) findViewById(R.id.ltoolbar);
         }
-
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
             toolbar.setBackgroundColor(getResources().getColor(R.color.negro));
             toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));

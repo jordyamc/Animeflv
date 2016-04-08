@@ -46,4 +46,8 @@ public class ColorsRes {
     public static int Holo_Light(Context context) {
         return context.getResources().getColor(R.color.holo_light);
     }
+
+    public static int Prim(Context context) {
+        return context.getResources().getColor(R.color.prim);
+    }
 }

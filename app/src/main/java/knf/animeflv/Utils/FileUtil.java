@@ -5,6 +5,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.provider.DocumentFile;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,7 +48,11 @@ public class FileUtil {
                     sSDpath = fileCur.getAbsolutePath();
                     break;
                 } else {
-                    sSDpath = "_noWrite_" + sPathCur;
+                    if (DocumentFile.fromFile(fileCur).canWrite()) {
+                        sSDpath = fileCur.getAbsolutePath();
+                    } else {
+                        sSDpath = "_noWrite_" + sPathCur;
+                    }
                     break;
                 }
             }
@@ -58,7 +63,11 @@ public class FileUtil {
                         sSDpath = fileCur.getAbsolutePath();
                         break;
                     } else {
-                        sSDpath = "_noWrite_" + sPathCur;
+                        if (DocumentFile.fromFile(fileCur).canWrite()) {
+                            sSDpath = fileCur.getAbsolutePath();
+                        } else {
+                            sSDpath = "_noWrite_" + sPathCur;
+                        }
                         break;
                     }
                 }
@@ -70,7 +79,11 @@ public class FileUtil {
                         sSDpath = fileCur.getAbsolutePath();
                         break;
                     } else {
-                        sSDpath = "_noWrite_" + sPathCur;
+                        if (DocumentFile.fromFile(fileCur).canWrite()) {
+                            sSDpath = fileCur.getAbsolutePath();
+                        } else {
+                            sSDpath = "_noWrite_" + sPathCur;
+                        }
                         break;
                     }
                 }
@@ -83,7 +96,7 @@ public class FileUtil {
         List<String> sdNames = new ArrayList<>();
         List<String> exclude = Arrays.asList("expand", "media_rw", "obb", "runtime", "secure", "shared",
                 "user", "self", "sdcard", "emulated", "acct", "cache", "config", "d", "data", "dev", "etc",
-                "firmware", "fsg", "oem", "persist", "proc", "root", "sbin", "sys", "system", "vendor", "asec");
+                "firmware", "fsg", "oem", "persist", "proc", "root", "sbin", "sys", "system", "vendor", "asec", "shell");
         String intName = Environment.getExternalStorageDirectory().getName();
         File mnt = new File("/mnt");
         if (mnt.exists()) {
@@ -98,7 +111,11 @@ public class FileUtil {
                     } else {
                         if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
                             if (!sdNames.contains(dir.getName())) {
-                                sdNames.add("_noWrite_" + dir.getName());
+                                if (!DocumentFile.fromFile(dir).canWrite()) {
+                                    sdNames.add("_noWrite_" + dir.getName());
+                                } else {
+                                    sdNames.add(dir.getName());
+                                }
                             }
                         }
                     }
@@ -118,7 +135,11 @@ public class FileUtil {
                     } else {
                         if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
                             if (!sdNames.contains(dir.getName())) {
-                                sdNames.add("_noWrite_" + dir.getName());
+                                if (!DocumentFile.fromFile(dir).canWrite()) {
+                                    sdNames.add("_noWrite_" + dir.getName());
+                                } else {
+                                    sdNames.add(dir.getName());
+                                }
                             }
                         }
                     }
@@ -234,29 +255,31 @@ public class FileUtil {
 
     public static String corregirTit(String tit) {
         String array = tit;
-        array = array.replace("[\"", "");
-        array = array.replace("\"]", "");
-        array = array.replace("\",\"", ":::");
-        array = array.replace("\\/", "/");
-        array = array.replace("â\u0098\u0086", "\u2606");
-        array = array.replace("&#039;", "\'");
-        array = array.replace("&iacute;", "í");
-        array = array.replace("&deg;", "°");
-        array = array.replace("&amp;", "&");
-        array = array.replace("&Delta;", "\u0394");
-        array = array.replace("&acirc;", "\u00C2");
-        array = array.replace("&egrave;", "\u00E8");
-        array = array.replace("&middot;", "\u00B7");
-        array = array.replace("&#333;", "\u014D");
-        array = array.replace("&#9834;", "\u266A");
-        array = array.replace("&aacute;", "á");
-        array = array.replace("&oacute;", "ó");
-        array = array.replace("&quot;", "\"");
-        array = array.replace("&uuml;", "\u00FC");
-        array = array.replace("&szlig;", "\u00DF");
-        array = array.replace("&radic;", "\u221A");
-        array = array.replace("&dagger;", "\u2020");
-        array = array.replace("&hearts;", "\u2665");
+        array = array.replace("[\"", "")
+                .replace("\"]", "")
+                .replace("\",\"", ":::")
+                .replace("\\/", "/")
+                .replace("â\u0098\u0086", "\u2606")
+                .replace("&#039;", "\'")
+                .replace("&iacute;", "í")
+                .replace("&deg;", "°")
+                .replace("&amp;", "&")
+                .replace("&Delta;", "\u0394")
+                .replace("&acirc;", "\u00C2")
+                .replace("&egrave;", "\u00E8")
+                .replace("&middot;", "\u00B7")
+                .replace("&#333;", "\u014D")
+                .replace("&#9834;", "\u266A")
+                .replace("&aacute;", "á")
+                .replace("&oacute;", "ó")
+                .replace("&quot;", "\"")
+                .replace("&uuml;", "\u00FC")
+                .replace("&szlig;", "\u00DF")
+                .replace("&radic;", "\u221A")
+                .replace("&dagger;", "\u2020")
+                .replace("&hearts;", "\u2665")
+                .replace("♪", "\u266A")
+                .replace("â\u0099ª","\u266A");
         return array;
     }
 

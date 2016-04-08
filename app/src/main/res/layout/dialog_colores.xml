@@ -71,17 +71,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="1">
-    <ImageButton
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@drawable/alnek"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        style="?android:attr/borderlessButtonStyle"
-        android:id="@+id/ib_color_AlNek"
-        android:contentDescription="alnek"
-        android:layout_weight="1"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
