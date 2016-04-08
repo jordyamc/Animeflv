@@ -1,8 +1,26 @@
 {"sounds":[
-  {"name":"dango.mp3"},
-  {"name":"nico.mp3"},
-  {"name":"onii.mp3"},
-  {"name":"poipoi.mp3"},
-  {"name":"sam.mp3"},
-  {"name":"sound.mp3"}
+  {
+    "name":"Especial",
+    "file":"sound.mp3"
+  },
+  {
+    "name":"Onii-chan",
+    "file":"onii.mp3"
+  },
+  {
+    "name":"Onii-chan (Sam)",
+    "file":"sam.mp3"
+  },
+  {
+    "name":"Dango",
+    "file":"dango.mp3"
+  },
+  {
+    "name":"Nico Nico Ni!",
+    "file":"nico.mp3"
+  },
+  {
+    "name":"Poi Poi",
+    "file":"poipoi.mp3"
+  }
 ]}
