@@ -22,5 +22,37 @@
   {
     "name":"Poi Poi",
     "file":"poipoi.mp3"
+  },
+  {
+    "name": "Darude-Sandstorm",
+    "file": "darude.mp3"
+  },
+  {
+    "name": "Ara Ara",
+    "file": "araara.mp3"
+  },
+  {
+    "name": "Kurosaki-kun",
+    "file": "kurosaki.mp3"
+  },
+  {
+    "name": "Digivice",
+    "file": "digivice.mp3"
+  },
+  {
+    "name": "Yuki Yuki Yuki",
+    "file": "yukiyuki.mp3"
+  },
+  {
+    "name": "Yuki no shingun",
+    "file": "shingun.mp3"
+  },
+  {
+    "name": "Yuki no shingun",
+    "file": "shingun.mp3"
+  },
+  {
+    "name": "Katyusha Sung",
+    "file": "katyusha.mp3"
   }
 ]}
