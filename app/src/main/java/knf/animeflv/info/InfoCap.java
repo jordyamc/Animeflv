@@ -37,6 +37,7 @@ public class InfoCap extends Fragment{
     RecyclerView rvAnimes;
     FloatingActionButton button;
     AdapterInfoCaps adapter;
+    boolean blocked = false;
 
     public InfoCap() {
     }
@@ -84,15 +85,27 @@ public class InfoCap extends Fragment{
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (MainStates.isListing()) {
-                    button.setImageResource(R.drawable.ic_add_list);
-                    MainStates.setListing(false);
-                    adapter.onStopList();
+                if (!blocked) {
+                    if (MainStates.isListing()) {
+                        button.setImageResource(R.drawable.ic_add_list);
+                        MainStates.setListing(false);
+                        adapter.onStopList();
+                    } else {
+                        button.setImageResource(R.drawable.ic_done);
+                        MainStates.setListing(true);
+                        adapter.onStartList();
+                    }
                 } else {
-                    button.setImageResource(R.drawable.ic_done);
-                    MainStates.setListing(true);
-                    adapter.onStartList();
+                    blocked = false;
                 }
+            }
+        });
+        button.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                button.hide(true);
+                blocked = true;
+                return false;
             }
         });
         return view;

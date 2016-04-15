@@ -30,11 +30,11 @@ import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.io.File;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import knf.animeflv.Tutorial.TutorialActivity;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Files.FileSearchResponse;
 import knf.animeflv.Utils.NetworkUtils;
@@ -298,6 +298,13 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 context.startActivity(new Intent(context,Intronew.class));
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("open_tutorial").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                context.startActivity(new Intent(context, TutorialActivity.class));
                 return false;
             }
         });

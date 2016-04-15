@@ -48,7 +48,7 @@ public class EmisionChecker {
             checker = new EmisionChecker();
         }
         context = con;
-        Refresh();
+        //Refresh();
     }
     public static Checker init(Context context) {
         return new Checker(context);
@@ -73,28 +73,56 @@ public class EmisionChecker {
         return lcode1;
     }
 
+    public static void setLcode1(List<TimeCompareModel> lcode1) {
+        EmisionChecker.lcode1 = lcode1;
+    }
+
     public static List<TimeCompareModel> getLcode2() {
         return lcode2;
+    }
+
+    public static void setLcode2(List<TimeCompareModel> lcode2) {
+        EmisionChecker.lcode2 = lcode2;
     }
 
     public static List<TimeCompareModel> getLcode3() {
         return lcode3;
     }
 
+    public static void setLcode3(List<TimeCompareModel> lcode3) {
+        EmisionChecker.lcode3 = lcode3;
+    }
+
     public static List<TimeCompareModel> getLcode4() {
         return lcode4;
+    }
+
+    public static void setLcode4(List<TimeCompareModel> lcode4) {
+        EmisionChecker.lcode4 = lcode4;
     }
 
     public static List<TimeCompareModel> getLcode5() {
         return lcode5;
     }
 
+    public static void setLcode5(List<TimeCompareModel> lcode5) {
+        EmisionChecker.lcode5 = lcode5;
+    }
+
     public static List<TimeCompareModel> getLcode6() {
         return lcode6;
     }
 
+    public static void setLcode6(List<TimeCompareModel> lcode6) {
+        EmisionChecker.lcode6 = lcode6;
+    }
+
     public static List<TimeCompareModel> getLcode7() {
         return lcode7;
+    }
+
+    public static void setLcode7(List<TimeCompareModel> lcode7) {
+        EmisionChecker.lcode7 = lcode7;
     }
 
     public static void Refresh() {
@@ -129,6 +157,7 @@ public class EmisionChecker {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     super.onSuccess(statusCode, headers, response);
+                    Log.d("EmisionChecker", "Start Loading");
                     try {
                         Set<String> ongoing = new HashSet<String>();
                         JSONArray array = response.getJSONArray("emision");

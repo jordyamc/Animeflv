@@ -134,5 +134,9 @@
             android:defaultValue="null"
             android:key="open_intro"
             android:title="Abrir Into" />
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="null"
+            android:key="open_tutorial"
+            android:title="Abrir Tutorial" />
     </PreferenceCategory>
 </PreferenceScreen>

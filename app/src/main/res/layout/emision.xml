@@ -1,40 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <include
-        layout="@layout/toolbar"
-        android:id="@+id/emision_toolbar" />
+        android:id="@+id/emision_toolbar"
+        layout="@layout/toolbar" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/emision_loading_screen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical">
+
+            <com.github.ndczz.infinityloading.InfinityLoading
+                android:id="@+id/loader_emision"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                app:infl_backColor="@android:color/transparent"
+                app:infl_drawBack="true"
+                app:infl_progressColor="@color/rojo"
+                app:infl_reverse="true"
+                app:infl_strokeWidth="4dp" />
+        </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/LY_dir"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:id="@+id/LY_dir">
+        android:visibility="gone">
 
         <com.ogaclejapan.smarttablayout.SmartTabLayout
             android:id="@+id/st_Emision"
             android:layout_width="match_parent"
             android:layout_height="48dp"
+            android:background="@color/prim"
+            android:clipToPadding="false"
             android:paddingBottom="8dp"
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
-            android:clipToPadding="false"
-            app:stl_distributeEvenly="false"
-            app:stl_indicatorInterpolation="smart"
-            app:stl_indicatorColor="@color/dark"
-            app:stl_indicatorThickness="40dp"
-            app:stl_indicatorCornerRadius="20dp"
-            app:stl_underlineThickness="0dp"
-            app:stl_underlineColor="@android:color/transparent"
-            app:stl_dividerThickness="0dp"
-            app:stl_dividerColor="@android:color/transparent"
             app:stl_defaultTabTextColor="@android:color/white"
             app:stl_defaultTabTextHorizontalPadding="20dp"
-            android:background="@color/prim" />
+            app:stl_distributeEvenly="false"
+            app:stl_dividerColor="@android:color/transparent"
+            app:stl_dividerThickness="0dp"
+            app:stl_indicatorColor="@color/dark"
+            app:stl_indicatorCornerRadius="20dp"
+            app:stl_indicatorInterpolation="smart"
+            app:stl_indicatorThickness="40dp"
+            app:stl_underlineColor="@android:color/transparent"
+            app:stl_underlineThickness="0dp" />
 
         <android.support.v4.view.ViewPager
             android:id="@+id/vp_emision"
@@ -42,4 +67,5 @@
             android:layout_height="match_parent"
             android:layout_below="@id/st_Emision" />
     </LinearLayout>
+    </RelativeLayout>
 </LinearLayout>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent">
@@ -10,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:background="#80000000"
+        android:background="#77000000"
         android:minHeight="42dp"
         android:padding="9dp">
 
@@ -19,7 +20,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:background="@null"
-            android:src="@drawable/video_top_back" />
+            android:src="@drawable/ic_arrow_left" />
 
         <TextView
             android:id="@+id/top_title"
@@ -37,7 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#80000000"
+        android:background="#77000000"
         android:gravity="center"
         android:minHeight="42dp"
         android:orientation="horizontal"
@@ -49,7 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="4dp"
             android:background="@null"
-            android:src="@drawable/ic_media_play" />
+            android:src="@drawable/ic_play_white" />
 
 
         <TextView
@@ -63,13 +64,14 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
-        <SeekBar
+        <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
             android:id="@+id/bottom_seekbar"
-            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="0dip"
             android:layout_height="32dip"
             android:layout_gravity="center_vertical"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            app:dsb_indicatorColor="@color/dark"
+            app:dsb_rippleColor="@color/dark" />
 
         <TextView
             android:id="@+id/bottom_time"
@@ -88,9 +90,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:visibility="gone"
             android:background="@null"
-            android:src="@drawable/ic_media_fullscreen_stretch" />
+            android:src="@drawable/ic_media_fullscreen_stretch"
+            android:visibility="gone" />
 
     </LinearLayout>
 

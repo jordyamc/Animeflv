@@ -31,11 +31,15 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
+import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
+
 import java.lang.ref.WeakReference;
 import java.util.Formatter;
 import java.util.Locale;
 
+import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
+import knf.animeflv.Utils.ThemeUtils;
 
 public class VideoControllerView extends FrameLayout implements VideoGestureListener {
 
@@ -44,11 +48,12 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
     private static final int HANDLER_ANIMATE_OUT = 1;// out animate
     private static final int HANDLER_UPDATE_PROGRESS = 2;//cycle update progress
     private static final long PROGRESS_SEEK = 5000;
+    Handler handler = new Handler();
     private MediaPlayerControlListener mPlayer;// control media play
     private Activity mContext;
     private ViewGroup mAnchorView;//anchor view
     private View mRootView; // root view of this
-    private SeekBar mSeekBar;
+    private DiscreteSeekBar mSeekBar;
     private TextView mEndTime, mCurrentTime;
     private boolean mShowing;//controller view showing?
     private boolean mDragging;
@@ -73,58 +78,124 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
     private ImageButton mPauseButton;
     private ImageButton mFullscreenButton;
     private Handler mHandler = new ControllerViewHandler(this);
+    Runnable showcontrols = new Runnable() {
+        @Override
+        public void run() {
+            if (isShowing()) {
+                Message msg = mHandler.obtainMessage(HANDLER_ANIMATE_OUT);
+                mHandler.removeMessages(HANDLER_ANIMATE_OUT);
+                mHandler.sendMessageDelayed(msg, 100);
+            }
+        }
+    };
+    /**
+     * Seek bar drag listener
+     */
+    private DiscreteSeekBar.OnProgressChangeListener mOnprogress = new DiscreteSeekBar.OnProgressChangeListener() {
+        @Override
+        public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+            if (mPlayer == null) {
+                return;
+            }
 
+            if (!fromUser) {
+                return;
+            }
+
+            long duration = mPlayer.getDuration();
+            long newposition = (duration * value) / 1000L;
+            mPlayer.seekTo((int) newposition);
+            if (mCurrentTime != null)
+                mCurrentTime.setText(stringToTime((int) newposition));
+        }
+
+        @Override
+        public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
+            show();
+            mDragging = true;
+            mHandler.removeMessages(HANDLER_UPDATE_PROGRESS);
+        }
+
+        @Override
+        public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
+            mDragging = false;
+            setSeekProgress();
+            togglePausePlay();
+            show();
+            mHandler.sendEmptyMessage(HANDLER_UPDATE_PROGRESS);
+        }
+    };
+    private OnSeekBarChangeListener mSeekListener = new OnSeekBarChangeListener() {
+        public void onStartTrackingTouch(SeekBar bar) {
+            show();
+            mDragging = true;
+            mHandler.removeMessages(HANDLER_UPDATE_PROGRESS);
+        }
+
+        public void onProgressChanged(SeekBar bar, int progress, boolean fromuser) {
+            if (mPlayer == null) {
+                return;
+            }
+
+            if (!fromuser) {
+                return;
+            }
+
+            long duration = mPlayer.getDuration();
+            long newposition = (duration * progress) / 1000L;
+            mPlayer.seekTo((int) newposition);
+            if (mCurrentTime != null)
+                mCurrentTime.setText(stringToTime((int) newposition));
+        }
+
+        public void onStopTrackingTouch(SeekBar bar) {
+            mDragging = false;
+            setSeekProgress();
+            togglePausePlay();
+            show();
+            mHandler.sendEmptyMessage(HANDLER_UPDATE_PROGRESS);
+        }
+    };
+    /**
+     * set top back click listener
+     */
+    private OnClickListener mBackListener = new OnClickListener() {
+        public void onClick(View v) {
+            mPlayer.exit();
+        }
+    };
+    /**
+     * set pause click listener
+     */
+    private OnClickListener mPauseListener = new OnClickListener() {
+        public void onClick(View v) {
+            doPauseResume();
+            show();
+        }
+    };
+    /**
+     * set full screen click listener
+     */
+    private OnClickListener mFullscreenListener = new OnClickListener() {
+        public void onClick(View v) {
+            doToggleFullscreen();
+            show();
+        }
+    };
     public VideoControllerView(Activity context, AttributeSet attrs) {
         super(context, attrs);
         mRootView = null;
         mContext = context;
         Log.i(TAG, TAG);
     }
-
     public VideoControllerView(Activity context, boolean useFastForward) {
         super(context);
         mContext = context;
         Log.i(TAG, TAG);
     }
-
     public VideoControllerView(Activity context) {
         this(context, true);
         Log.i(TAG, TAG);
-    }
-
-
-    /**
-     * Handler prevent leak memory.
-     */
-    private static class ControllerViewHandler extends Handler {
-        private final WeakReference<VideoControllerView> mView;
-
-        ControllerViewHandler(VideoControllerView view) {
-            mView = new WeakReference<VideoControllerView>(view);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            VideoControllerView view = mView.get();
-            if (view == null || view.mPlayer == null) {
-                return;
-            }
-
-            int pos;
-            switch (msg.what) {
-                case HANDLER_ANIMATE_OUT:
-                    view.hide();
-                    break;
-                case HANDLER_UPDATE_PROGRESS://cycle update seek bar progress
-                    pos = view.setSeekProgress();
-                    if (!view.mDragging && view.mShowing && view.mPlayer.isPlaying()) {//just in case
-                        //cycle update
-                        msg = obtainMessage(HANDLER_UPDATE_PROGRESS);
-                        sendMessageDelayed(msg, 1000 - (pos % 1000));
-                    }
-                    break;
-            }
-        }
     }
 
     /**
@@ -144,12 +215,14 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
         //top layout
         mTopLayout = v.findViewById(R.id.layout_top);
         mBackButton = (ImageButton) v.findViewById(R.id.top_back);
+        mBackButton.setColorFilter(ThemeUtils.getAcentColor(mContext));
         if (mBackButton != null) {
             mBackButton.requestFocus();
             mBackButton.setOnClickListener(mBackListener);
         }
 
         mTitleText = (TextView) v.findViewById(R.id.top_title);
+        mTitleText.setTextColor(ThemeUtils.getAcentColor(mContext));
 
         //center layout
         mCenterLayout = v.findViewById(R.id.layout_center);
@@ -160,6 +233,7 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
         //bottom layout
         mBottomLayout = v.findViewById(R.id.layout_bottom);
         mPauseButton = (ImageButton) v.findViewById(R.id.bottom_pause);
+        mPauseButton.setColorFilter(ThemeUtils.getAcentColor(mContext));
         if (mPauseButton != null) {
             mPauseButton.requestFocus();
             mPauseButton.setOnClickListener(mPauseListener);
@@ -171,10 +245,18 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
             mFullscreenButton.setOnClickListener(mFullscreenListener);
         }
 
-        mSeekBar = (SeekBar) v.findViewById(R.id.bottom_seekbar);
+        mSeekBar = (DiscreteSeekBar) v.findViewById(R.id.bottom_seekbar);
+        mSeekBar.setIndicatorPopupEnabled(false);
+        mSeekBar.setRippleColor(ColorsRes.Prim(mContext));
+        mSeekBar.setScrubberColor(ThemeUtils.getAcentColor(mContext));
+        mSeekBar.setThumbColor(ColorsRes.Prim(mContext), ThemeUtils.getAcentColor(mContext));
+        mSeekBar.setTrackColor(ThemeUtils.getAcentColor(mContext));
+        //mSeekBar.setBackgroundColor();
+
         if (mSeekBar != null) {
-            SeekBar seeker = mSeekBar;
-            seeker.setOnSeekBarChangeListener(mSeekListener);
+            DiscreteSeekBar seeker = mSeekBar;
+            seeker.setOnProgressChangeListener(mOnprogress);
+            //seeker.setOnSeekBarChangeListener(mSeekListener);
             mSeekBar.setMax(1000);
         }
 
@@ -224,18 +306,10 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
     public void toggleContollerView() {
         if (!isShowing()) {
             show();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (isShowing()) {
-                        Message msg = mHandler.obtainMessage(HANDLER_ANIMATE_OUT);
-                        mHandler.removeMessages(HANDLER_ANIMATE_OUT);
-                        mHandler.sendMessageDelayed(msg, 100);
-                    }
-                }
-            }, 3000);
+            handler.postDelayed(showcontrols, 3000);
         } else {
             //animate out controller view
+            handler.removeCallbacks(showcontrols);
             Message msg = mHandler.obtainMessage(HANDLER_ANIMATE_OUT);
             mHandler.removeMessages(HANDLER_ANIMATE_OUT);
             mHandler.sendMessageDelayed(msg, 100);
@@ -317,9 +391,9 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
                 mSeekBar.setProgress((int) pos);
             }
             //get buffer percentage
-            int percent = mPlayer.getBufferPercentage();
+            //int percent = mPlayer.getBufferPercentage();
             //set buffer progress
-            mSeekBar.setSecondaryProgress(percent * 10);
+            //mSeekBar.setSecondaryProgress(percent * 10);
         }
 
         if (mEndTime != null)
@@ -349,9 +423,9 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
         }
 
         if (mPlayer.isPlaying()) {
-            mPauseButton.setImageResource(R.drawable.ic_media_pause);
+            mPauseButton.setImageResource(R.drawable.ic_pause);
         } else {
-            mPauseButton.setImageResource(R.drawable.ic_media_play);
+            mPauseButton.setImageResource(R.drawable.ic_play_white);
         }
     }
 
@@ -391,41 +465,6 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
         mPlayer.toggleFullScreen();
     }
 
-    /**
-     * Seek bar drag listener
-     */
-    private OnSeekBarChangeListener mSeekListener = new OnSeekBarChangeListener() {
-        public void onStartTrackingTouch(SeekBar bar) {
-            show();
-            mDragging = true;
-            mHandler.removeMessages(HANDLER_UPDATE_PROGRESS);
-        }
-
-        public void onProgressChanged(SeekBar bar, int progress, boolean fromuser) {
-            if (mPlayer == null) {
-                return;
-            }
-
-            if (!fromuser) {
-                return;
-            }
-
-            long duration = mPlayer.getDuration();
-            long newposition = (duration * progress) / 1000L;
-            mPlayer.seekTo((int) newposition);
-            if (mCurrentTime != null)
-                mCurrentTime.setText(stringToTime((int) newposition));
-        }
-
-        public void onStopTrackingTouch(SeekBar bar) {
-            mDragging = false;
-            setSeekProgress();
-            togglePausePlay();
-            show();
-            mHandler.sendEmptyMessage(HANDLER_UPDATE_PROGRESS);
-        }
-    };
-
     @Override
     public void setEnabled(boolean enabled) {
         if (mPauseButton != null) {
@@ -436,37 +475,6 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
         }
         super.setEnabled(enabled);
     }
-
-
-    /**
-     * set top back click listener
-     */
-    private OnClickListener mBackListener = new OnClickListener() {
-        public void onClick(View v) {
-            mPlayer.exit();
-        }
-    };
-
-
-    /**
-     * set pause click listener
-     */
-    private OnClickListener mPauseListener = new OnClickListener() {
-        public void onClick(View v) {
-            doPauseResume();
-            show();
-        }
-    };
-
-    /**
-     * set full screen click listener
-     */
-    private OnClickListener mFullscreenListener = new OnClickListener() {
-        public void onClick(View v) {
-            doToggleFullscreen();
-            show();
-        }
-    };
 
     /**
      * setMediaPlayerControlListener update play state
@@ -510,11 +518,15 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
         mGestureDetector = new GestureDetector(context, new ViewGestureListener(context, mVideoGestureListener));
     }
 
-
     //implement ViewGestureListener
     @Override
     public void onSingleTap() {
         toggleContollerView();
+    }
+
+    @Override
+    public void onDoubleTap() {
+        doPauseResume();
     }
 
     @Override
@@ -626,8 +638,6 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
 
     }
 
-    //end of ViewGestureListener
-
     /**
      * Interface of Media Controller View
      */
@@ -713,6 +723,42 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
          * get top title name
          */
         String getTopTitle();
+    }
+
+    //end of ViewGestureListener
+
+    /**
+     * Handler prevent leak memory.
+     */
+    private static class ControllerViewHandler extends Handler {
+        private final WeakReference<VideoControllerView> mView;
+
+        ControllerViewHandler(VideoControllerView view) {
+            mView = new WeakReference<VideoControllerView>(view);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            VideoControllerView view = mView.get();
+            if (view == null || view.mPlayer == null) {
+                return;
+            }
+
+            int pos;
+            switch (msg.what) {
+                case HANDLER_ANIMATE_OUT:
+                    view.hide();
+                    break;
+                case HANDLER_UPDATE_PROGRESS://cycle update seek bar progress
+                    pos = view.setSeekProgress();
+                    if (!view.mDragging && view.mShowing && view.mPlayer.isPlaying()) {//just in case
+                        //cycle update
+                        msg = obtainMessage(HANDLER_UPDATE_PROGRESS);
+                        sendMessageDelayed(msg, 1000 - (pos % 1000));
+                    }
+                    break;
+            }
+        }
     }
 
 }

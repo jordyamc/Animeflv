@@ -58,8 +58,8 @@
     </string-array>
     <string-array name="players_type">
         <item>Simple</item>
-        <!--<item>Avanzado</item>
-        <item>Exo</item>-->
+        <item>Avanzado</item>
+        <!--<item>Exo</item>-->
     </string-array>
     <string-array name="players_ints">
         <item>0</item>
@@ -141,4 +141,7 @@
 
     <string name="intro_title_11">Listo</string>
     <string name="intro_desc_11">Has terminado la introduccion, puedes empezar a utilizar la app :)</string>
+
+
+    <string name="tutorial_main">Bienvenido al tutorial, aquí veras una explicación rapida de las funciones de la a app.</string>
 </resources>

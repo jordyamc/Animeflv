@@ -13,6 +13,8 @@ public interface VideoGestureListener {
      */
     void onSingleTap();
 
+    void onDoubleTap();
+
     /**
      * Horizontal scroll to control progress of video
      *

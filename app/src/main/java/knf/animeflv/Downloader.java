@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
@@ -131,6 +132,11 @@ public class Downloader extends AsyncTask<String, String, String> {
                                         .setVibrate(new long[]{100, 200, 100, 500})
                                         .setContentIntent(resultPendingIntent);
                                 notificationManager.notify(idDown, builder.build());
+                                File logdir = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/logs");
+                                if (!logdir.exists()) {
+                                    logdir.mkdirs();
+                                }
+                                FileUtil.writeToFile(errorMessage, new File(logdir, eid + ".log"));
                             } else {
                                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt(eid + "status", CANCELADO).apply();
                                 notificationManager.cancel(idDown);

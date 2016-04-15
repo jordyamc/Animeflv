@@ -18,9 +18,7 @@ import knf.animeflv.Emision.EmisionChecker;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.UtilsInit;
 
-/**
- * Created by Jordy on 29/10/2015.
- */
+
 public class Application extends android.app.Application {
     Context context;
     private Tracker mTracker;
@@ -44,7 +42,11 @@ public class Application extends android.app.Application {
                 StringWriter sw = new StringWriter();
                 e.printStackTrace(new PrintWriter(sw));
                 String exceptionAsString = sw.toString();
-                FileUtil.writeToFile(e.getMessage() + "\n" + exceptionAsString, new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
+                File logdir = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/logs");
+                if (!logdir.exists()) {
+                    logdir.mkdirs();
+                }
+                FileUtil.writeToFile(e.getMessage() + "\n" + exceptionAsString, new File(logdir, "Uncaught.log"));
                 System.exit(0);
             }
         });

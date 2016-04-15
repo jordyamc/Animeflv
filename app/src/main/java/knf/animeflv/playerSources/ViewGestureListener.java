@@ -12,13 +12,12 @@ import android.view.WindowManager;
  * On 2015/10/21
  * At 9:58
  */
-public class ViewGestureListener implements GestureDetector.OnGestureListener {
+public class ViewGestureListener implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 
-    private static final String TAG = "ViewGestureListener";
-
-    private static final int SWIPE_THRESHOLD = 60;//threshold of swipe
     public static final int SWIPE_LEFT = 1;
     public static final int SWIPE_RIGHT = 2;
+    private static final String TAG = "ViewGestureListener";
+    private static final int SWIPE_THRESHOLD = 60;//threshold of swipe
     private VideoGestureListener listener;
     private Context context;
 
@@ -27,9 +26,40 @@ public class ViewGestureListener implements GestureDetector.OnGestureListener {
         this.listener = listener;
     }
 
+    public static int getDeviceWidth(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics mDisplayMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(mDisplayMetrics);
+        return mDisplayMetrics.widthPixels;
+    }
+
+    public static int getDeviceHeight(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics mDisplayMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(mDisplayMetrics);
+        return mDisplayMetrics.heightPixels;
+    }
+
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
+
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        listener.onDoubleTap();
+        return false;
+    }
+
+    @Override
+    public boolean onSingleTapConfirmed(MotionEvent e) {
         listener.onSingleTap();
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTapEvent(MotionEvent e) {
         return false;
     }
 
@@ -62,7 +92,6 @@ public class ViewGestureListener implements GestureDetector.OnGestureListener {
         return false;
     }
 
-
     @Override
     public void onLongPress(MotionEvent e) {
 
@@ -76,20 +105,6 @@ public class ViewGestureListener implements GestureDetector.OnGestureListener {
     @Override
     public void onShowPress(MotionEvent e) {
 
-    }
-
-    public static int getDeviceWidth(Context context) {
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics mDisplayMetrics = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(mDisplayMetrics);
-        return mDisplayMetrics.widthPixels;
-    }
-
-    public static int getDeviceHeight(Context context) {
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics mDisplayMetrics = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(mDisplayMetrics);
-        return mDisplayMetrics.heightPixels;
     }
 
 }

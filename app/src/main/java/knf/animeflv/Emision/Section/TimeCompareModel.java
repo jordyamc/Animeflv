@@ -15,11 +15,17 @@ public class TimeCompareModel {
     private Parser parser = new Parser();
     private SharedPreferences preferences;
     private boolean nodata = false;
+    private String image;
+    private String titulo;
+    private String time;
 
     public TimeCompareModel(String aid, Context context) {
         this.aid = aid;
         this.context = context;
         preferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+        this.image = getUrl();
+        this.titulo = settit();
+        this.time = preferences.getString(aid + "onhour", "~00:00AM");
     }
 
     public TimeCompareModel() {
@@ -36,7 +42,7 @@ public class TimeCompareModel {
 
     public String getTime() {
         if (!nodata) {
-            return preferences.getString(aid + "onhour", "~00:00AM");
+            return time;
         } else {
             return "~00:00AM";
         }
@@ -44,15 +50,23 @@ public class TimeCompareModel {
 
     public String getImage() {
         if (!nodata) {
-            return parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + parser.getCertificateSHA1Fingerprint(context) + "&thumb=" + "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
+            return image;
         } else {
             return "null";
         }
     }
 
+    private String getUrl() {
+        return parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + parser.getCertificateSHA1Fingerprint(context) + "&thumb=" + "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
+    }
+
+    private String settit() {
+        return parser.getTitCached(aid);
+    }
+
     public String getTitulo() {
         if (!nodata) {
-            return parser.getTitCached(aid);
+            return titulo;
         } else {
             return "null";
         }

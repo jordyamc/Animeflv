@@ -3,7 +3,6 @@ package knf.animeflv;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.graphics.Color;
 import android.media.AudioManager;
-import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -41,8 +39,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
@@ -344,16 +340,19 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
                                 context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", sts).apply();
                                 String mess = "";
+                                List<String> eids = Arrays.asList(jsonDesc);
+                                String[] tits = new Parser().parseTitulos(s);
+                                String NotTit;
                                 if (nCaps == 1) {
-                                    mess = "Hay " + Integer.toString(nCaps) + " nuevo capitulo disponible!!!";
+                                    mess = tits[0] + " " + eids.get(0).replace("E", "").split("_")[1];
+                                    NotTit = "Nuevo capitulo disponible!";
                                 } else {
                                     mess = "Hay " + Integer.toString(nCaps) + " nuevos capitulos disponibles!!!";
+                                    NotTit = "AnimeFLV";
                                 }
                                 String temp = "";
                                 List<String> tlist = new ArrayList<>();
                                 tlist.addAll(sts);
-                                String[] tits=new Parser().parseTitulos(s);
-                                List<String> eids=Arrays.asList(jsonDesc);
                                 for (String alone : tlist) {
                                     String[] data = alone.replace("E", "").split("_");
                                     //String tit = new Parser().getTitCached(data[0]);
@@ -372,7 +371,7 @@ public class RequestsBackground extends AsyncTask<String, String, String> {
                                 NotificationCompat.Builder mBuilder =
                                         new NotificationCompat.Builder(context)
                                                 .setSmallIcon(R.drawable.ic_not_r)
-                                                .setContentTitle("AnimeFLV")
+                                                .setContentTitle(NotTit)
                                                 .setContentText(mess);
                                 mBuilder.setVibrate(new long[]{100, 200, 100, 500});
                                 mBuilder.setStyle(bigTextStyle);

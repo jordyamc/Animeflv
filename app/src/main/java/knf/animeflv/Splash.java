@@ -27,7 +27,6 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
-import knf.animeflv.Emision.EmisionChecker;
 
 /**
  * Created by Jordy on 05/12/2015.
@@ -45,7 +44,7 @@ public class Splash extends AwesomeSplash {
     public void initSplash(ConfigSplash configSplash) {
         context = this;
         new Alarm().SetAlarm(this);
-        EmisionChecker.Refresh();
+        //EmisionChecker.Refresh();
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {

@@ -98,7 +98,6 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Directorio.Directorio;
-import knf.animeflv.Emision.EmisionChecker;
 import knf.animeflv.Emision.Section.newEmisionActivity;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
 import knf.animeflv.Recientes.MainOrganizer;
@@ -337,12 +336,13 @@ public class newMain extends AppCompatActivity implements
                                 setDir(false);
                                 break;
                             case 4:
-                                if (MainStates.isLoadingEmision() && MainStates.isFload()) {
+                                /*if (MainStates.isLoadingEmision() && MainStates.isFload()) {
                                     getWaitingSnackBar().show();
                                     EmisionWaiting.run();
                                 } else {
                                     startActivity(new Intent(context, newEmisionActivity.class));
-                                }
+                                }*/
+                                startActivity(new Intent(context, newEmisionActivity.class));
                                 result.setSelection(0);
                                 result.closeDrawer();
                                 break;
@@ -1184,7 +1184,7 @@ public class newMain extends AppCompatActivity implements
     public void getData(String json) {
         eids = parser.parseEID(json);
         tipos = parser.parseTipos(json);
-        EmisionChecker.Refresh();
+        //EmisionChecker.Refresh();
         NetworkUtils.checkVersion(this, updateButton);
         Status.reload(this);
         if (Status.getCacheStatusInt() == 1) {
@@ -1876,10 +1876,10 @@ public class newMain extends AppCompatActivity implements
     private class Registrer extends AsyncTask<String, String, String> {
         @Override
         protected String doInBackground(String... params) {
-            new SyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode), null, new TextHttpResponseHandler() {
+            new SyncHttpClient().get(new Parser().getBaseUrl(TaskType.NORMAL, context) + "contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode), null, new TextHttpResponseHandler() {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    Log.d("Registrer", throwable.getMessage());
+                    Log.e("Registrer", throwable.getMessage(), throwable);
                 }
 
                 @Override

@@ -41,6 +41,7 @@ public class InternalStream {
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         Bundle bundle = new Bundle();
         bundle.putString("url", url);
+        bundle.putString("title", parser.getTitCached(aid) + " " + numero);
         bundle.putString("ops", "cookie:::" + constructor.getCookie() + ";;;" + "User-Agent:::" + constructor.getUseAgent() + ";;;" + "Accept:::text/html, application/xhtml+xml, */*;;;" + "Accept-Language:::en-US,en;q=0.7,he;q=0.3;;;" + "Referer:::" + constructor.getReferer());
         Intent intent = parser.getPrefIntPlayer(context);
         intent.putExtras(bundle);
