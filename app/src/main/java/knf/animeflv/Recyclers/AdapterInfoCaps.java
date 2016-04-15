@@ -52,6 +52,11 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.ColorsRes;
@@ -83,6 +88,11 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
     MaterialDialog d;
     Boolean streaming = false;
     int posT;
+    int corePoolSize = 60;
+    int maximumPoolSize = 80;
+    int keepAliveTime = 10;
+    BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(maximumPoolSize);
+    Executor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
     private Context context;
 
     public AdapterInfoCaps(Context context, List<String> capitulos, String aid, List<String> eid) {
@@ -156,7 +166,7 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
                             if (!MainStates.WaitContains(eids.get(holder.getAdapterPosition()))) {
                                 if (!FileUtil.ExistAnime(eids.get(holder.getAdapterPosition()))) {
                                     showLoading(holder.ib_des);
-                                    new CheckDown(holder.web, holder.ib_des, holder.ib_ver, holder.tv_capitulo, holder.getAdapterPosition()).execute(new Parser().getUrlCached(id, item));
+                                    new CheckDown(holder.web, holder.ib_des, holder.ib_ver, holder.tv_capitulo, holder.getAdapterPosition(), new Parser().getUrlCached(id, item)).executeOnExecutor(threadPoolExecutor);
                                 } else {
                                     final String item = capitulo.get(holder.getAdapterPosition()).replace("Capitulo ", "").trim();
                                     MaterialDialog borrar = new MaterialDialog.Builder(context)
@@ -202,7 +212,7 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                                 MainStates.delFromWaitList(eids.get(holder.getAdapterPosition()));
                                                 showLoading(holder.ib_des);
-                                                new CheckDown(holder.web, holder.ib_des, holder.ib_ver, holder.tv_capitulo, holder.getAdapterPosition()).execute(new Parser().getUrlCached(id, item));
+                                                new CheckDown(holder.web, holder.ib_des, holder.ib_ver, holder.tv_capitulo, holder.getAdapterPosition(), new Parser().getUrlCached(id, item)).executeOnExecutor(threadPoolExecutor);
                                             }
                                         })
                                         .build().show();
@@ -226,7 +236,7 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
                                 StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
                             } else {
                                 showLoading(holder.ib_des);
-                                new CheckStream(holder.web, holder.tv_capitulo, holder.getAdapterPosition(), holder).execute(new Parser().getUrlCached(id, item));
+                                new CheckStream(holder.web, holder.tv_capitulo, holder.getAdapterPosition(), holder, new Parser().getUrlCached(id, item)).executeOnExecutor(threadPoolExecutor);
                             }
                         }
                     }
@@ -525,18 +535,20 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
         int pos;
         String _response;
         Spinner sp;
+        String url;
 
-        public CheckDown(WebView w, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position) {
+        public CheckDown(WebView w, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position, String url) {
             this.des = ib_des;
             this.ver = ib_ver;
             this.cap = tv_capitulo;
             this.pos = position;
             this.web = w;
+            this.url = url;
         }
 
         @Override
         protected String doInBackground(String... params) {
-            new SyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + params[0] + "&newMain", null, new JsonHttpResponseHandler() {
+            new SyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + url + "&newMain", null, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     super.onSuccess(statusCode, headers, response);
@@ -667,17 +679,19 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
         String _response;
         Spinner sp;
         AdapterInfoCaps.ViewHolder holder;
+        String url;
 
-        public CheckStream(WebView w, TextView tv_capitulo, int position, AdapterInfoCaps.ViewHolder holder) {
+        public CheckStream(WebView w, TextView tv_capitulo, int position, AdapterInfoCaps.ViewHolder holder, String url) {
             this.cap = tv_capitulo;
             this.pos = position;
             this.web = w;
             this.holder = holder;
+            this.url = url;
         }
 
         @Override
         protected String doInBackground(String... params) {
-            new SyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + params[0] + "&newMain", null, new JsonHttpResponseHandler() {
+            new SyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + url + "&newMain", null, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     super.onSuccess(statusCode, headers, response);

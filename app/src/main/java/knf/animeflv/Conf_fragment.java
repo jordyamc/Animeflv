@@ -220,7 +220,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        getPreferenceScreen().findPreference("sonido").setSummary(getResources().getStringArray(R.array.sonidos)[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("sonido", "0"))]);
+        getPreferenceScreen().findPreference("sonido").setSummary(UtilSound.getSoundsNameList()[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("sonido", "0"))]);
         getPreferenceScreen().findPreference("sonido").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {

@@ -2,19 +2,13 @@ package knf.animeflv;
 
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.view.View;
 
 import com.heinrichreimersoftware.materialintro.app.IntroActivity;
 import com.heinrichreimersoftware.materialintro.slide.SimpleSlide;
 
-/**
- * Created by Jordy on 06/04/2016.
- */
 public class Intronew extends IntroActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,11 +94,13 @@ public class Intronew extends IntroActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setNavigationBarColor(getResources().getColor(R.color.intro_1));
         }
+
         addOnPageChangeListener(new ViewPager.OnPageChangeListener(){
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 if (position==10){
                     colorCase(position);
+                    Intronew.this.getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("intro", true).apply();
                 }
             }
             @Override
@@ -169,5 +165,17 @@ public class Intronew extends IntroActivity {
             });
             colorAnimation.start();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Intronew.this.getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("intro", true).apply();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
     }
 }
