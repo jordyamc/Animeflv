@@ -1,0 +1,72 @@
+{
+  "sounds": [
+    {
+      "name": "Especial",
+      "file": "sound.mp3"
+    },
+    {
+      "name": "Onii-chan",
+      "file": "onii.mp3"
+    },
+    {
+      "name": "Onii-chan (Sam)",
+      "file": "sam.mp3"
+    },
+    {
+      "name": "Dango",
+      "file": "dango.mp3"
+    },
+    {
+      "name": "Nico Nico Ni!",
+      "file": "nico.mp3"
+    },
+    {
+      "name": "Poi Poi",
+      "file": "poipoi.mp3"
+    },
+    {
+      "name": "Darude-Sandstorm",
+      "file": "darude.mp3"
+    },
+    {
+      "name": "Ara Ara",
+      "file": "araara.mp3"
+    },
+    {
+      "name": "Kurosaki-kun",
+      "file": "kurosaki.mp3"
+    },
+    {
+      "name": "Digivice",
+      "file": "digivice.mp3"
+    },
+    {
+      "name": "Yuki Yuki Yuki",
+      "file": "yukiyuki.mp3"
+    },
+    {
+      "name": "Yuki no shingun",
+      "file": "shingun.mp3"
+    },
+    {
+      "name": "Katyusha Sung",
+      "file": "katyusha.mp3"
+    },
+    {
+      "name": "Jaka Jaka Jan!",
+      "file": "jakajaka.mp3"
+    },
+    {
+      "name": "BOOSTO!",
+      "file": "boosto.mp3"
+    },
+    {
+      "name": "Lilium",
+      "file": "lilium.mp3"
+    },
+    {
+      "name": "Tuturu!",
+      "file": "tuturu.mp3"
+    }
+  ]
+}
