@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -85,6 +86,14 @@ public class SoundsLoader {
         Log.d("Sound Check", "Finish");
     }
 
+    private static String getSoundUrl(Context context) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("betaSounds", false)) {
+            return "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/sounds-beta.json";
+        } else {
+            return "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/sounds.json";
+        }
+    }
+
     private static class Loader extends AsyncTask<String, String, String> {
         Context context;
 
@@ -94,7 +103,7 @@ public class SoundsLoader {
 
         @Override
         protected String doInBackground(String... params) {
-            new SyncHttpClient().get("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/sounds.json", null, new JsonHttpResponseHandler() {
+            new SyncHttpClient().get(getSoundUrl(context), null, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     super.onSuccess(statusCode, headers, response);

@@ -17,6 +17,12 @@
             android:key="sonido"
             android:summary="%s"
             android:title="Sonido de Notificacion" />
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="0"
+            android:enabled="true"
+            android:key="r_sounds"
+            android:summary="(Los sonidos pueden tardar en funcionar en la lista)"
+            android:title="Recargar cache de sonidos" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Conexiones">
         <com.lb.material_preferences_library.custom_preferences.Preference
@@ -138,5 +144,9 @@
             android:defaultValue="null"
             android:key="open_tutorial"
             android:title="Abrir Tutorial" />
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="betaSounds"
+            android:title="Sonidos Beta" />
     </PreferenceCategory>
 </PreferenceScreen>

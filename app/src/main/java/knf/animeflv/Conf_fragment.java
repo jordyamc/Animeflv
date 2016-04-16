@@ -38,6 +38,7 @@ import knf.animeflv.Tutorial.TutorialActivity;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Files.FileSearchResponse;
 import knf.animeflv.Utils.NetworkUtils;
+import knf.animeflv.Utils.SoundsLoader;
 import knf.animeflv.Utils.UtilDialogPref;
 import knf.animeflv.Utils.UtilSound;
 import xdroid.toaster.Toaster;
@@ -61,8 +62,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     public static boolean deleteDir(File dir) {
         if (dir != null && dir.isDirectory()) {
             String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
+            for (String child : children) {
+                boolean success = deleteDir(new File(dir, child));
                 if (!success) {
                     return false;
                 }
@@ -129,6 +130,18 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 String s = formatSize(getcachesize());
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_cache", s).commit();
                 getPreferenceScreen().findPreference("b_cache").setSummary("Tamaño de cache: " + s);
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("r_sounds").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if (NetworkUtils.isNetworkAvailable()) {
+                    Toaster.toast("Se paciente...");
+                    cleanSounds();
+                } else {
+                    Toaster.toast("Se necesita internet para esto...");
+                }
                 return false;
             }
         });
@@ -596,6 +609,14 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             case "is_amoled":
                 getActivity().recreate();
                 break;
+            case "betaSounds":
+                SoundsLoader.start(context);
+                if (UtilDialogPref.getPlayer() != null) {
+                    if (UtilDialogPref.getPlayer().isPlaying()) {
+                        UtilDialogPref.getPlayer().stop();
+                    }
+                }
+                break;
         }
     }
 
@@ -620,6 +641,14 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 }
             }
         }
+    }
+
+    private void cleanSounds() {
+        File dir = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/.sounds");
+        for (File file : dir.listFiles()) {
+            file.delete();
+        }
+        SoundsLoader.start(context);
     }
 
 
