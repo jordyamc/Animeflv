@@ -71,6 +71,18 @@
     {
       "name": "Titanic (Desafinado)",
       "file": "titanic.m4a"
+    },
+    {
+      "name": "Nico Nico Ni! Remix",
+      "file": "nico-remix.m4a"
+    },
+    {
+      "name": "Onii-chan Remix",
+      "file": "oniichan-remix.m4a"
+    },
+    {
+      "name": "PiPiru Hard",
+      "file": "pipiru-hard.m4a"
     }
   ]
 }
