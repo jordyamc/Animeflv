@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
-import android.util.Log;
 
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
@@ -19,6 +18,7 @@ import java.util.Arrays;
 
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Logger;
 
 /**
  * Created by Jordy on 29/02/2016.
@@ -189,7 +189,7 @@ public class DownloaderCookie extends AsyncTask<String, String, String> {
                 fileCur = new File("/storage/emulated", sPathCur);
                 if (fileCur.isDirectory() && fileCur.canWrite()) {
                     sSDpath = fileCur.getAbsolutePath();
-                    Log.e("path", sSDpath);
+                    Logger.Error(getClass(), new Throwable(sSDpath));
                     break;
                 }
             }

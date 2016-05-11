@@ -66,6 +66,7 @@ import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterBusquedaNew;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.SearchUtils;
+import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.eNums.SearchType;
 import xdroid.toaster.Toaster;
 
@@ -126,47 +127,7 @@ public class Directorio extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(this));
-        if (preferences.getBoolean("is_amoled", false)) {
-            if (accent == ColorsRes.Rojo(this)) {
-                setTheme(R.style.AppThemeDarkRojo);
-            }
-            if (accent == ColorsRes.Naranja(this)) {
-                setTheme(R.style.AppThemeDarkNaranja);
-            }
-            if (accent == ColorsRes.Gris(this)) {
-                setTheme(R.style.AppThemeDarkGris);
-            }
-            if (accent == ColorsRes.Verde(this)) {
-                setTheme(R.style.AppThemeDarkVerde);
-            }
-            if (accent == ColorsRes.Rosa(this)) {
-                setTheme(R.style.AppThemeDarkRosa);
-            }
-            if (accent == ColorsRes.Morado(this)) {
-                setTheme(R.style.AppThemeDarkMorado);
-            }
-        } else {
-            if (accent == ColorsRes.Rojo(this)) {
-                setTheme(R.style.AppThemeRojo);
-            }
-            if (accent == ColorsRes.Naranja(this)) {
-                setTheme(R.style.AppThemeNaranja);
-            }
-            if (accent == ColorsRes.Gris(this)) {
-                setTheme(R.style.AppThemeGris);
-            }
-            if (accent == ColorsRes.Verde(this)) {
-                setTheme(R.style.AppThemeVerde);
-            }
-            if (accent == ColorsRes.Rosa(this)) {
-                setTheme(R.style.AppThemeRosa);
-            }
-            if (accent == ColorsRes.Morado(this)) {
-                setTheme(R.style.AppThemeMorado);
-            }
-        }
+        ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         setUpAnimations();
         setContentView(R.layout.directorio);

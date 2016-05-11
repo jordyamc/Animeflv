@@ -29,11 +29,14 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -75,6 +78,7 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
@@ -93,23 +97,36 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.Emision.Section.newEmisionActivity;
+import knf.animeflv.Interfaces.EncryptionListener;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
 import knf.animeflv.Recientes.MainOrganizer;
 import knf.animeflv.Recientes.Status;
 import knf.animeflv.Recyclers.AdapterMain;
 import knf.animeflv.Recyclers.AdapterMainNoGIF;
+import knf.animeflv.Utils.ExecutorManager;
+import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Keys;
+import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
+import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UtilDialogPref;
 import knf.animeflv.Utils.UtilNotBlocker;
+import knf.animeflv.Utils.UtilSound;
+import knf.animeflv.Utils.admin.adminListeners;
+import knf.animeflv.Utils.objects.User;
 import knf.animeflv.WaitList.WaitActivity;
 import xdroid.toaster.Toaster;
+
+import static knf.animeflv.Utils.Keys.Login.EMAIL_NORMAL;
+import static knf.animeflv.Utils.Keys.Url.ADMINS;
 
 public class newMain extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener,
@@ -117,23 +134,23 @@ public class newMain extends AppCompatActivity implements
         DirGetter.callback,
         ColorChooserDialog.ColorCallback,
         MainRecyclerCallbacks {
+    public Drawer result;
+    SwitchCompat typeEncrypt;
+    TextInputEditText normalText;
+    TextInputEditText finalText;
+    TextInputLayout inputLayout;
     private Spinner etEmail;
     private EditText etSug;
     private EditText cuenta;
     private Spinner contactoS;
     private WebView webViewFeed;
     private boolean cancelPost;
-
     private boolean tbool;
     private boolean isAmoled;
-
     private boolean doubleBackToExitPressedOnce = false;
-
     private boolean verOk;
-
     private String ext_storage_state = Environment.getExternalStorageState();
     private File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
-
     private RecyclerView recyclerView;
     private LinearLayout root;
     private Toolbar toolbar;
@@ -142,43 +159,29 @@ public class newMain extends AppCompatActivity implements
     private String versionName;
     private String androidID;
     private AccountHeader headerResult;
-    private Drawer result;
     private MaterialDialog mat;
     private String headerTit;
     private Context context;
-
     private Snackbar waiting;
-
     private FloatingActionButton actionButton;
     private com.github.clans.fab.FloatingActionButton updateButton;
-
     private Parser parser = new Parser();
-
     private int intentos;
-
     private boolean shouldExecuteOnResume;
-
     private TaskType normal = TaskType.NORMAL;
     private TaskType secundario = TaskType.SECUNDARIA;
-
     private MaterialDialog RapConf;
-
     private boolean frun = false;
-
     private AdapterMain main;
     private AdapterMainNoGIF mainNo;
-
     private Switch nots;
     private Spinner sonidos;
     private Spinner conexion;
     private Spinner repVid;
     private Spinner repStream;
-
     private String[] eids;
     private String[] tipos;
-
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
-
     private Handler EmisionHandler = new Handler();
     Runnable EmisionWaiting = new Runnable() {
         @Override
@@ -284,6 +287,7 @@ public class newMain extends AppCompatActivity implements
                 .withActivity(this)
                 .withHeaderBackground(getHDraw(false))
                 .withCompactStyle(true)
+                .withDividerBelowHeader(false)
                 .withSelectionListEnabled(false)
                 .addProfiles(
                         new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withIcon(ic_main).withIdentifier(9)
@@ -303,6 +307,9 @@ public class newMain extends AppCompatActivity implements
                 .withToolbar(toolbar)
                 .withActionBarDrawerToggleAnimated(true)
                 .withAccountHeader(headerResult)
+                .withHeaderDivider(false)
+                .withFooterDivider(false)
+                .withStickyFooterDivider(false)
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName("Recientes").withIcon(FontAwesome.Icon.faw_home).withIdentifier(0),
                         new PrimaryDrawerItem().withName("Favoritos").withIcon(/*GoogleMaterial.Icon.gmd_star*/MaterialDesignIconic.Icon.gmi_star).withIdentifier(1),
@@ -558,6 +565,141 @@ public class newMain extends AppCompatActivity implements
                         new SecondaryDrawerItem().withName("Configuracion").withIcon(FontAwesome.Icon.faw_cog)
                 )
                 .build();
+        setUpAdmin(NetworkUtils.isNetworkAvailable());
+    }
+
+    private User getUser(JSONObject object) {
+        String email = PreferenceManager.getDefaultSharedPreferences(this).getString(EMAIL_NORMAL, "null");
+        if (email.equals("null")) {
+            return new User(false);
+        }
+        try {
+            JSONArray array = object.getJSONArray("admins");
+            for (int o = 0; o < array.length(); o++) {
+                if (array.getJSONObject(o).getString("email").equals(email)) {
+                    return new User(true, array.getJSONObject(o).getString("name"));
+                }
+            }
+        } catch (JSONException e) {
+            Logger.Error(getClass(), e);
+            return new User(false);
+        }
+        return new User(false);
+    }
+
+    private void setUpAdmin(boolean isNetwork) {
+        if (isNetwork) {
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.setTimeout(5000);
+            client.get(ADMINS, null, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    super.onSuccess(statusCode, headers, response);
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(Keys.Extra.JSON_ADMINS, response.toString()).apply();
+                    User current = getUser(response);
+                    if (current.isAdmin()) {
+                        addAdminOptions(current);
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                    setUpAdmin(false);
+                    Logger.Error(newMain.this.getClass(), throwable);
+                }
+            });
+        } else {
+            String json_admin = PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.JSON_ADMINS, "null");
+            if (FileUtil.isJSONValid(json_admin)) {
+                try {
+                    User current = getUser(new JSONObject(json_admin));
+                    if (current.isAdmin()) {
+                        addAdminOptions(current);
+                    }
+                } catch (JSONException e) {
+                    Logger.Error(getClass(), e);
+                }
+            }
+        }
+    }
+
+    private void addAdminOptions(User current) {
+        adminListeners listeners = new adminListeners(context);
+        result.addItem(new DividerDrawerItem());
+        result.addItem(new SecondaryDrawerItem().withName("ADMIN - " + current.getName()).withSelectable(false));
+        result.addItem(new PrimaryDrawerItem().withName("Des/Encriptor").withIcon(MaterialDesignIconic.Icon.gmi_lock_open).withOnDrawerItemClickListener(listeners.onEncButton()));
+        result.addItem(new PrimaryDrawerItem().withName("Actualizar Server").withIcon(MaterialDesignIconic.Icon.gmi_refresh_sync).withOnDrawerItemClickListener(listeners.onManualButton()));
+        result.addItem(new PrimaryDrawerItem().withName("Control de Cuentas").withIcon(MaterialDesignIconic.Icon.gmi_account_circle).withOnDrawerItemClickListener(listeners.onAccountsButton()));
+    }
+
+    public void showEncDialog() {
+        MaterialDialog encrypt = new MaterialDialog.Builder(context)
+                .customView(R.layout.encrypt_dialog, false)
+                .positiveText("COMENZAR")
+                .negativeText("CERRAR")
+                .autoDismiss(false)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        finalText.requestFocus();
+                        finalText.setHint("Procesando...");
+                        inputLayout.setHint("Procesando...");
+                        BackEncryption encryption = new BackEncryption(typeEncrypt.isChecked() ? BackEncryption.Type.DECRYPT : BackEncryption.Type.ENCRYPT, normalText.getText().toString());
+                        encryption.setOnFinishEncryptListener(new EncryptionListener() {
+                            @Override
+                            public void onFinish(final String finalString) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (finalString != null) {
+                                            finalText.setHint("OK");
+                                            inputLayout.setHint("OK");
+                                            finalText.setText(finalString);
+                                            finalText.requestFocus();
+                                        } else {
+                                            finalText.setHint("Error!");
+                                            inputLayout.setHint("Error");
+                                            finalText.setError("Error al ejecutar!");
+                                            finalText.requestFocus();
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        encryption.executeOnExecutor(ExecutorManager.getExecutor());
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                })
+                .build();
+        boolean isAmoled = ThemeUtils.isAmoled(this);
+        View root = encrypt.getCustomView();
+        typeEncrypt = (SwitchCompat) root.findViewById(R.id.switch_type);
+        typeEncrypt.setTextColor(isAmoled ? ColorsRes.Blanco(context) : ColorsRes.Prim(context));
+        inputLayout = (TextInputLayout) root.findViewById(R.id.text_input_layout);
+        normalText = (TextInputEditText) root.findViewById(R.id.normalText);
+        normalText.setHintTextColor(isAmoled ? ColorsRes.Blanco(context) : ColorsRes.Prim(context));
+        finalText = (TextInputEditText) root.findViewById(R.id.finalText);
+        finalText.setHintTextColor(ColorsRes.Blanco(context));
+        typeEncrypt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    typeEncrypt.setText("Desencriptar");
+                } else {
+                    typeEncrypt.setText("Encriptar");
+                }
+                finalText.setText("");
+                finalText.setHint("Resultado");
+                inputLayout.setHint("Resultado");
+            }
+        });
+        encrypt.show();
     }
 
     private boolean isNetworkAvailable() {
@@ -1511,9 +1653,7 @@ public class newMain extends AppCompatActivity implements
                         });
                         List<String> sonido = new ArrayList<>();
                         sonido.add("Selecciona...");
-                        for (String son : getResources().getStringArray(R.array.sonidos)) {
-                            sonido.add(son);
-                        }
+                        sonido.addAll(Arrays.asList(UtilSound.getSoundsNameList()));
                         ArrayAdapter<String> adapterSonidos = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, sonido);
                         sonidos.setAdapter(adapterSonidos);
                         sonidos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -1716,6 +1856,10 @@ public class newMain extends AppCompatActivity implements
                 @Override
                 public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
             }, permission);
+            if (!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, 5260);
+            }
         }
     }
 
@@ -1731,6 +1875,9 @@ public class newMain extends AppCompatActivity implements
     @Override
     public void onColorSelection(@NonNull ColorChooserDialog dialog, @ColorInt int selectedColor) {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("accentColor", selectedColor).apply();
+        if (UtilSound.getAudioWidget().isShown()) UtilSound.getAudioWidget().hide();
+        if (UtilSound.isNotSoundShow)
+            UtilSound.toogleNotSound(UtilSound.getCurrentMediaPlayerInt());
         recreate();
     }
 
@@ -1879,7 +2026,7 @@ public class newMain extends AppCompatActivity implements
             new SyncHttpClient().get(new Parser().getBaseUrl(TaskType.NORMAL, context) + "contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode), null, new TextHttpResponseHandler() {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    Log.e("Registrer", throwable.getMessage(), throwable);
+                    Logger.Error(Registrer.this.getClass(), throwable);
                 }
 
                 @Override

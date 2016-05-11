@@ -27,6 +27,7 @@ import java.util.Timer;
 
 import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Logger;
 
 /**
  * Created by Jordy on 08/08/2015.
@@ -432,7 +433,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
                 fileCur = new File("/storage/emulated", sPathCur);
                 if (fileCur.isDirectory() && fileCur.canWrite()) {
                     sSDpath = fileCur.getAbsolutePath();
-                    Log.e("path", sSDpath);
+                    Logger.Error(DownloadAdapter.class, new Throwable(sSDpath));
                     break;
                 }
             }

@@ -126,6 +126,7 @@ import knf.animeflv.Emision.EmisionChecker;
 import knf.animeflv.Emision.Section.EmisionActivity;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.UtilSound;
 import knf.animeflv.info.Info;
 import knf.animeflv.info.InfoNew;
 import pl.droidsonroids.gif.GifImageButton;
@@ -2826,9 +2827,7 @@ public class Main extends AppCompatActivity implements
                         });
                         List<String> sonido = new ArrayList<>();
                         sonido.add("Selecciona...");
-                        for (String son : getResources().getStringArray(R.array.sonidos)) {
-                            sonido.add(son);
-                        }
+                        sonido.addAll(Arrays.asList(UtilSound.getSoundsNameList()));
                         ArrayAdapter<String> adapterSonidos = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, sonido);
                         sonidos.setAdapter(adapterSonidos);
                         sonidos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

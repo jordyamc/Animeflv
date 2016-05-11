@@ -17,6 +17,7 @@ import java.nio.channels.FileChannel;
 import java.util.Arrays;
 
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Logger;
 
 /**
  * Created by Jordy on 12/08/2015.
@@ -144,7 +145,7 @@ public class MoveFiles extends AsyncTask<String,String,String> {
                 if( fileCur.isDirectory() && fileCur.canWrite())
                 {
                     sSDpath = fileCur.getAbsolutePath();
-                    Log.e("path",sSDpath);
+                    Logger.Error(getClass(), new Throwable(sSDpath));
                     break;
                 }
             }

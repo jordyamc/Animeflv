@@ -2034,9 +2034,6 @@ public class Parser {
             case 1:
                 intent = new Intent(context, Player.class);
                 break;
-            case 2:
-                intent = new Intent(context, PlayerExo.class);
-                break;
             default:
                 intent = new Intent(context, PlayerSimple.class);
                 break;

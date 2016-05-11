@@ -8,7 +8,6 @@ import android.content.pm.Signature;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -29,6 +28,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 import cz.msebera.android.httpclient.Header;
+import knf.animeflv.Utils.Logger;
 
 /**
  * Created by Jordy on 12/08/2015.
@@ -83,7 +83,7 @@ public class LoginServer extends AsyncTask<String,String,String> {
         client.get(u, null, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.e("LoginServer", throwable.getMessage(), throwable);
+                Logger.Error(LoginServer.this.getClass(), throwable);
                 _response="error";
             }
 

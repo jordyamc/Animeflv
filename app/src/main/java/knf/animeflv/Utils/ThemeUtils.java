@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import knf.animeflv.ColorsRes;
+import knf.animeflv.R;
 
 /**
  * Created by Jordy on 30/03/2016.
@@ -39,5 +40,53 @@ public class ThemeUtils {
             color = ColorsRes.Morado(context);
         }
         return color;
+    }
+
+    public static void setThemeOn(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(context));
+        if (preferences.getBoolean("is_amoled", false)) {
+            if (accent == ColorsRes.Rojo(context)) {
+                context.setTheme(R.style.AppThemeDarkRojo);
+            }
+            if (accent == ColorsRes.Naranja(context)) {
+                context.setTheme(R.style.AppThemeDarkNaranja);
+            }
+            if (accent == ColorsRes.Gris(context)) {
+                context.setTheme(R.style.AppThemeDarkGris);
+            }
+            if (accent == ColorsRes.Verde(context)) {
+                context.setTheme(R.style.AppThemeDarkVerde);
+            }
+            if (accent == ColorsRes.Rosa(context)) {
+                context.setTheme(R.style.AppThemeDarkRosa);
+            }
+            if (accent == ColorsRes.Morado(context)) {
+                context.setTheme(R.style.AppThemeDarkMorado);
+            }
+        } else {
+            if (accent == ColorsRes.Rojo(context)) {
+                context.setTheme(R.style.AppThemeRojo);
+            }
+            if (accent == ColorsRes.Naranja(context)) {
+                context.setTheme(R.style.AppThemeNaranja);
+            }
+            if (accent == ColorsRes.Gris(context)) {
+                context.setTheme(R.style.AppThemeGris);
+            }
+            if (accent == ColorsRes.Verde(context)) {
+                context.setTheme(R.style.AppThemeVerde);
+            }
+            if (accent == ColorsRes.Rosa(context)) {
+                context.setTheme(R.style.AppThemeRosa);
+            }
+            if (accent == ColorsRes.Morado(context)) {
+                context.setTheme(R.style.AppThemeMorado);
+            }
+        }
+    }
+
+    public static boolean isAmoled(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false);
     }
 }

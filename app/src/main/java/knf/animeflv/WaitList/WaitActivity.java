@@ -1,7 +1,6 @@
 package knf.animeflv.WaitList;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
@@ -21,8 +20,6 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
-import com.h6ah4i.android.widget.advrecyclerview.animator.SwipeDismissItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
 import com.h6ah4i.android.widget.advrecyclerview.expandable.RecyclerViewExpandableItemManager;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager;
@@ -38,12 +35,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
-import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.Interfaces.WaitDownloadCallback;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.MainStates;
+import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UrlUtils;
 import knf.animeflv.WaitList.Costructor.WaitManager;
 import xdroid.toaster.Toaster;
@@ -123,47 +120,7 @@ public class WaitActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(this));
-        if (preferences.getBoolean("is_amoled", false)) {
-            if (accent == ColorsRes.Rojo(this)) {
-                setTheme(R.style.AppThemeDarkRojo);
-            }
-            if (accent == ColorsRes.Naranja(this)) {
-                setTheme(R.style.AppThemeDarkNaranja);
-            }
-            if (accent == ColorsRes.Gris(this)) {
-                setTheme(R.style.AppThemeDarkGris);
-            }
-            if (accent == ColorsRes.Verde(this)) {
-                setTheme(R.style.AppThemeDarkVerde);
-            }
-            if (accent == ColorsRes.Rosa(this)) {
-                setTheme(R.style.AppThemeDarkRosa);
-            }
-            if (accent == ColorsRes.Morado(this)) {
-                setTheme(R.style.AppThemeDarkMorado);
-            }
-        } else {
-            if (accent == ColorsRes.Rojo(this)) {
-                setTheme(R.style.AppThemeRojo);
-            }
-            if (accent == ColorsRes.Naranja(this)) {
-                setTheme(R.style.AppThemeNaranja);
-            }
-            if (accent == ColorsRes.Gris(this)) {
-                setTheme(R.style.AppThemeGris);
-            }
-            if (accent == ColorsRes.Verde(this)) {
-                setTheme(R.style.AppThemeVerde);
-            }
-            if (accent == ColorsRes.Rosa(this)) {
-                setTheme(R.style.AppThemeRosa);
-            }
-            if (accent == ColorsRes.Morado(this)) {
-                setTheme(R.style.AppThemeMorado);
-            }
-        }
+        ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wait_list_lay);
         context = this;
@@ -209,8 +166,6 @@ public class WaitActivity extends AppCompatActivity implements
                 .progress(true, 0)
                 .cancelable(false)
                 .build();
-        GeneralItemAnimator animator = new SwipeDismissItemAnimator();
-        animator.setSupportsChangeAnimations(false);
         final Parcelable eimSavedState = (savedInstanceState != null) ? savedInstanceState.getParcelable("RecyclerViewExpandableItemManager") : null;
         mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(eimSavedState);
         // touch guard manager  (this class is required to suppress scrolling while swipe-dismiss animation is running)
@@ -229,7 +184,7 @@ public class WaitActivity extends AppCompatActivity implements
         mWrappedAdapter = mRecyclerViewSwipeManager.createWrappedAdapter(mWrappedAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
-        recyclerView.setItemAnimator(animator);
+        //recyclerView.setItemAnimator(animator);
         recyclerView.setAdapter(mWrappedAdapter);
     }
 

@@ -14,7 +14,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,6 +57,7 @@ import knf.animeflv.Emision.EmisionChecker;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
+import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.ThemeUtils;
 
 /**
@@ -338,7 +338,7 @@ public class newEmisionActivity extends AppCompatActivity {
                                     } else {
                                         daybefore = day - 2;
                                     }
-                                    comparelists.get(daybefore).add(compareModel);
+                                    comparelists.get(daybefore - 1).add(compareModel);
                                 }
                             }
                         }
@@ -385,7 +385,7 @@ public class newEmisionActivity extends AppCompatActivity {
                             }
                         });
                     } catch (Exception e) {
-                        Log.e("Error", e.getMessage(), e);
+                        Logger.Error(newEmisionActivity.this.getClass(), e);
                         finish();
                     }
                 }
@@ -393,7 +393,7 @@ public class newEmisionActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                     super.onFailure(statusCode, headers, throwable, errorResponse);
-                    Log.e("Error", throwable.getMessage(), throwable);
+                    Logger.Error(newEmisionActivity.this.getClass(), throwable);
                     finish();
                 }
             });

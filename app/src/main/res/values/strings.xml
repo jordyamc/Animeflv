@@ -23,48 +23,22 @@
         <item>Solo Datos Moviles</item>
         <item>WiFi + Datos Moviles</item>
     </string-array>
-    <string-array name="tipos_val">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-    </string-array>
-    <string-array name="sonidos">
-        <item>Por Defecto</item>
-        <item>Especial</item>
-        <item>Onii-chan</item>
-        <item>Onii-chan (Sam)</item>
-        <item>Dango</item>
-        <item>Nico Nico Ni!</item>
-        <item>Poi Poi</item>
-    </string-array>
     <string-array name="players">
         <item>Interno</item>
         <item>Externo</item>
-    </string-array>
-    <string-array name="tipos_sonidos">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
     </string-array>
     <string-array name="busqueda">
         <item>Autobusqueda</item>
         <item>Enter</item>
     </string-array>
-    <string-array name="tipos_busqueda">
-        <item>0</item>
-        <item>1</item>
-    </string-array>
     <string-array name="players_type">
         <item>Simple</item>
         <item>Avanzado</item>
-        <!--<item>Exo</item>-->
     </string-array>
-    <string-array name="players_ints">
-        <item>0</item>
-        <!--<item>1</item>
-        <item>2</item>-->
+    <string-array name="sound_ind">
+        <item>Ninguno</item>
+        <item>Notificacion</item>
+        <item>Flotante</item>
     </string-array>
     <string name="title_activity_ads">ADS</string>
     <string name="description">Player</string>

@@ -5,6 +5,7 @@ import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.h6ah4i.android.widget.advrecyclerview.expandable.ExpandableItemViewHolder;
@@ -21,11 +22,12 @@ public class GroupHolder extends AbstractDraggableSwipeableItemViewHolder implem
     public TextView titulo;
     public ImageButton start;
     public ImageButton delete;
+    public LinearLayout mContainer;
     int mExpandStateFlags;
-    View mContainer;
 
     public GroupHolder(@NonNull View itemView) {
         super(itemView);
+        //this.mContainer = (LinearLayout) itemView.findViewById(R.id.root);
         this.card = (CardView) itemView.findViewById(R.id.card_wait_main);
         this.image = (ImageView) itemView.findViewById(R.id.img_wait_group);
         this.titulo = (TextView) itemView.findViewById(R.id.tv_wait_Tit);

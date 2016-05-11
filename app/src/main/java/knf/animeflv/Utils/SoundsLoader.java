@@ -3,7 +3,6 @@ package knf.animeflv.Utils;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -43,23 +42,21 @@ public class SoundsLoader {
     }
 
     private static void checkSounds(List<String> list) {
-        File dir = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/.sounds");
-        File nomedia = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/.sounds/.nomedia");
-        if (!dir.exists()) {
-            dir.mkdirs();
+        if (!Keys.Dirs.SOUNDS.exists()) {
+            Keys.Dirs.SOUNDS.mkdirs();
         }
-        if (!nomedia.exists()) {
+        if (!Keys.Dirs.NOMEDIA.exists()) {
             try {
-                nomedia.createNewFile();
+                Keys.Dirs.NOMEDIA.createNewFile();
             } catch (Exception e) {
                 Log.e("No Media", e.getMessage(), e);
             }
         }
         ThinDownloadManager downloadManager = new ThinDownloadManager();
         for (final String name : list) {
-            File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/.sounds", name);
+            File file = new File(Keys.Dirs.SOUNDS, name);
             if (!file.exists()) {
-                Uri download = Uri.parse("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/sounds/" + name);
+                Uri download = Uri.parse(Keys.Url.SOUNDS + name);
                 DownloadRequest downloadRequest = new DownloadRequest(download)
                         .setDestinationURI(Uri.fromFile(file))
                         .setStatusListener(new DownloadStatusListenerV1() {
@@ -88,9 +85,9 @@ public class SoundsLoader {
 
     private static String getSoundUrl(Context context) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("betaSounds", false)) {
-            return "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/sounds-beta.json";
+            return Keys.Url.SOUNDS_JSON_BETA;
         } else {
-            return "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/sounds.json";
+            return Keys.Url.SOUNDS_JSON;
         }
     }
 

@@ -283,7 +283,7 @@ public class FileUtil {
         return array;
     }
 
-    private static String convertStreamToString(InputStream is) throws Exception {
+    public static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
         String line = null;

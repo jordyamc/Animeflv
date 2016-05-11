@@ -4,8 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.media.MediaPlayer;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -46,8 +44,10 @@ public class DialogSounds extends DialogFragment {
         }
         context = getActivity();
         mp = UtilDialogPref.getPlayer();
-        if (!mp.isPlaying()) {
-            setMediaPlayer(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(UtilDialogPref.getKey(), UtilDialogPref.getDef())));
+        if (!UtilDialogPref.getPlayer().isPlaying()) {
+            int selected = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(UtilDialogPref.getKey(), UtilDialogPref.getDef()));
+            setMediaPlayer(selected);
+            UtilSound.setCurrentMediaPlayerInt(selected);
         }
         UtilDialogPref.setSelected(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(UtilDialogPref.getKey(), UtilDialogPref.getDef())));
         String[] array = new String[]{};
@@ -75,12 +75,12 @@ public class DialogSounds extends DialogFragment {
         RecyclerView recyclerView = (RecyclerView) dialog.getCustomView().findViewById(R.id.dialog_pref_rv);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setAdapter(new AdapterDialogPref(array, UtilDialogPref.getKey(), UtilDialogPref.getDef(), getActivity()));
+        recyclerView.setAdapter(new AdapterDialogPref(array, getActivity()));
         return dialog;
     }
 
     private void setMediaPlayer(int which) {
-        if (!mp.isPlaying()) {
+        if (!UtilDialogPref.getPlayer().isPlaying()) {
             mp = UtilSound.getMediaPlayer(context,which);
             mp.setLooping(true);
             UtilDialogPref.setPlayer(mp);

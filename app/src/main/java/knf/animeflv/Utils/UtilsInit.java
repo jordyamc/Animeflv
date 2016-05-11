@@ -16,5 +16,6 @@ public class UtilsInit {
         WaitManager.init(context);
         UrlUtils.init(context);
         SoundsLoader.start(context);
+        Logger.init(context);
     }
 }

@@ -75,6 +75,7 @@ import knf.animeflv.Recientes.MainAnimeModel;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.UpdateUtil;
@@ -226,9 +227,13 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     holder.ib_des.setImageResource(R.drawable.ic_get_r);
                     callbacks.onDelFromList();
                 } else {
-                    MainStates.addToWaitList(Animes.get(holder.getAdapterPosition()).getEid());
-                    holder.ib_des.setImageResource(R.drawable.ic_waiting);
-                    callbacks.onPutInList();
+                    if (!FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+                        MainStates.addToWaitList(Animes.get(holder.getAdapterPosition()).getEid());
+                        holder.ib_des.setImageResource(R.drawable.ic_waiting);
+                        callbacks.onPutInList();
+                    } else {
+                        MainStates.setListing(false);
+                    }
                 }
                 return false;
             }
@@ -312,9 +317,31 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     } else {
                         if (NetworkUtils.isNetworkAvailable()) {
                             if (!MainStates.isProcessing()) {
-                                MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
-                                showLoading(holder.ib_des);
-                                new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
+                                if (MainStates.WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
+                                    final int pos = holder.getAdapterPosition();
+                                    new MaterialDialog.Builder(context)
+                                            .content(
+                                                    "El " + getCap(Animes.get(pos).getNumero()).toLowerCase() +
+                                                            " de " + Animes.get(pos).getTitulo() +
+                                                            " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
+                                            .autoDismiss(true)
+                                            .positiveText("Continuar")
+                                            .negativeText("Cancelar")
+                                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                                @Override
+                                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                    MainStates.delFromWaitList(Animes.get(pos).getEid());
+                                                    MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
+                                                    showLoading(holder.ib_des);
+                                                    new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
+                                                }
+                                            })
+                                            .build().show();
+                                } else {
+                                    MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
+                                    showLoading(holder.ib_des);
+                                    new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
+                                }
                             }
                         }
                     }
@@ -692,7 +719,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     } catch (Exception e) {
                         MainStates.setProcessing(false, null);
                         showDownload(button);
-                        Log.e("Error Descarga",e.getMessage(),e);
+                        Logger.Error(AdapterMain.this.getClass(), e);
                         FileUtil.writeToFile(e.getMessage() +"   "+parser.getUrlCached(eid)+ "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
                         Toaster.toast("Error en JSON");
                     }
@@ -702,7 +729,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                     super.onFailure(statusCode, headers, throwable, errorResponse);
                     MainStates.setProcessing(false, null);
-                    Log.e("Error", "Download", throwable);
+                    Logger.Error(AdapterMain.this.getClass(), throwable);
                     showDownload(button);
                 }
             });
@@ -821,7 +848,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                     super.onFailure(statusCode, headers, throwable, errorResponse);
                     MainStates.setProcessing(false, null);
-                    Log.e("Error", "Download", throwable);
+                    Logger.Error(AdapterMain.this.getClass(), throwable);
                     showDownload(button);
                 }
             });

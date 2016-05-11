@@ -31,19 +31,33 @@ import knf.animeflv.playerSources.VideoControllerView;
 public class Player extends AppCompatActivity implements VideoControllerView.MediaPlayerControlListener, SurfaceHolder.Callback, MediaPlayer.OnVideoSizeChangedListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
     VideoView videoView;
     View decorView;
-    private HashMap<String, String> options;
     Intent intent;
     String url;
     String ops;
     String TAG;
     MaterialDialog buff;
     VideoControllerView controller;
-    private MediaPlayer mMediaPlayer;
     ResizeSurfaceView mVideoSurface;
+    private HashMap<String, String> options;
+    private MediaPlayer mMediaPlayer;
     private int mVideoWidth;
     private int mVideoHeight;
     private View mContentView;
     private View mLoadingView;
+
+    public static int getDeviceWidth(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics mDisplayMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(mDisplayMetrics);
+        return mDisplayMetrics.widthPixels;
+    }
+
+    public static int getDeviceHeight(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics mDisplayMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(mDisplayMetrics);
+        return mDisplayMetrics.heightPixels;
+    }
 
     @TargetApi(21)
     @Override
@@ -57,7 +71,7 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
         mLoadingView = findViewById(R.id.loading);
         SurfaceHolder videoHolder = mVideoSurface.getHolder();
         videoHolder.addCallback(this);
-
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setOnVideoSizeChangedListener(this);
         controller = new VideoControllerView(this);
@@ -172,21 +186,6 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
             mMediaPlayer = null;
         }
     }
-
-    public static int getDeviceWidth(Context context) {
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics mDisplayMetrics = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(mDisplayMetrics);
-        return mDisplayMetrics.widthPixels;
-    }
-
-    public static int getDeviceHeight(Context context) {
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics mDisplayMetrics = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(mDisplayMetrics);
-        return mDisplayMetrics.heightPixels;
-    }
-
 
     // Implement SurfaceHolder.Callback
     @Override

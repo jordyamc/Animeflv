@@ -3,8 +3,6 @@ package knf.animeflv.Recyclers;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.media.MediaPlayer;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
@@ -20,6 +18,7 @@ import android.widget.TextView;
 
 import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
+import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UtilDialogPref;
 import knf.animeflv.Utils.UtilSound;
@@ -30,18 +29,12 @@ import knf.animeflv.Utils.UtilSound;
 public class AdapterDialogPref extends RecyclerView.Adapter<AdapterDialogPref.ViewHolder> {
 
     private String[] lista;
-    private String def;
-    private String key;
     private Context context;
-    private MediaPlayer mp;
     private Preference preference;
 
-    public AdapterDialogPref(String[] lista, String key, String def, Context context) {
+    public AdapterDialogPref(String[] lista, Context context) {
         this.lista = lista;
-        this.key = key;
-        this.def = def;
         this.context = context;
-        this.mp = UtilDialogPref.getPlayer();
         this.preference = UtilDialogPref.getPreference();
     }
 
@@ -87,12 +80,6 @@ public class AdapterDialogPref extends RecyclerView.Adapter<AdapterDialogPref.Vi
                 });
             } else {
                 holder.playing.setImageResource(R.drawable.ic_play);
-                UtilDialogPref.getPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-
-                    }
-                });
             }
         } else {
             holder.button.setChecked(false);
@@ -103,24 +90,68 @@ public class AdapterDialogPref extends RecyclerView.Adapter<AdapterDialogPref.Vi
             @Override
             public void onClick(View v) {
                 if (holder.getAdapterPosition() == UtilDialogPref.getSelected()) {
-                    if (mp.isPlaying()) {
-                        mp.stop();
+                    if (UtilDialogPref.getPlayer().isPlaying()) {
+                        UtilDialogPref.getPlayer().stop();
+                        tooglebyPref(holder.getAdapterPosition());
                         holder.playing.setImageResource(R.drawable.ic_play);
                     } else {
                         setMediaPlayer(holder.getAdapterPosition());
-                        mp.start();
+                        UtilDialogPref.getPlayer().start();
+                        tooglebyPref(holder.getAdapterPosition());
                         holder.playing.setImageResource(R.drawable.ic_stop);
                     }
                 } else {
-                    if (mp.isPlaying()) {
-                        mp.stop();
+                    if (UtilDialogPref.getPlayer().isPlaying()) {
+                        UtilDialogPref.getPlayer().stop();
                     }
                     setMediaPlayer(holder.getAdapterPosition());
-                    mp.start();
+                    UtilDialogPref.getPlayer().start();
+                    updatebyPref(holder.getAdapterPosition());
                     checkRadios(holder.getAdapterPosition());
                 }
+                UtilSound.setCurrentMediaPlayerInt(holder.getAdapterPosition());
             }
         });
+    }
+
+    private void tooglebyPref(int pos) {
+        int pref = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Conf.INDICADOR_SONIDOS, "0"));
+        switch (pref) {
+            case 1:
+                UtilSound.toogleNotSound(pos);
+                break;
+            case 2:
+                showHideWidget();
+                break;
+        }
+    }
+
+    private void updatebyPref(int pos) {
+        int pref = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Conf.INDICADOR_SONIDOS, "0"));
+        switch (pref) {
+            case 1:
+                if (!UtilSound.isNotSoundShow) {
+                    UtilSound.toogleNotSound(pos);
+                } else {
+                    UtilSound.UpdateNotSound(pos);
+                }
+                break;
+            case 2:
+                if (!UtilSound.getAudioWidget().isShown()) {
+                    UtilSound.getAudioWidget().show(100, 100);
+                }
+                break;
+        }
+    }
+
+    private void showHideWidget() {
+        if (!UtilSound.getCurrentMediaPlayer().isPlaying()) {
+            UtilSound.getAudioWidget().hide();
+            UtilSound.getAudioWidget().controller().stop();
+        } else {
+            UtilSound.getAudioWidget().show(100, 100);
+            UtilSound.getAudioWidget().controller().start();
+        }
     }
 
     private void checkRadios(int selected) {
@@ -132,10 +163,8 @@ public class AdapterDialogPref extends RecyclerView.Adapter<AdapterDialogPref.Vi
 
     private void setMediaPlayer(int which) {
         Log.d("AdapterDialog", "Reset Player");
-        if (!mp.isPlaying()) {
-            mp = UtilSound.getMediaPlayer(context,which);
-            mp.setLooping(true);
-            UtilDialogPref.setPlayer(mp);
+        if (!UtilDialogPref.getPlayer().isPlaying()) {
+            UtilDialogPref.setPlayer(UtilSound.getMediaPlayer(context, which));
         }
     }
 

@@ -15,6 +15,7 @@ import java.nio.channels.FileChannel;
 import java.util.Arrays;
 
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Logger;
 
 /**
  * Created by Jordy on 15/10/2015.
@@ -58,7 +59,7 @@ public class Move extends Activity {
                 if( fileCur.isDirectory() && fileCur.canWrite())
                 {
                     sSDpath = fileCur.getAbsolutePath();
-                    Log.e("path", sSDpath);
+                    Logger.Error(getClass(), new Throwable(sSDpath));
                     break;
                 }
             }

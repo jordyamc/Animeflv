@@ -20,6 +20,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
+import knf.animeflv.Utils.Logger;
+
 /**
  * Created by Jordy on 12/08/2015.
  */
@@ -30,15 +32,26 @@ public class Requests extends AsyncTask<String,String,String> {
     TaskType taskType;
     Context context;
 
-    public interface callback{
-        void sendtext1(String data, TaskType taskType);
-    }
     public Requests(Context con, TaskType taskType){
         context = con;
         call=(callback) con;
         this.taskType=taskType;
 
     }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
+
     @Override
     protected String doInBackground(String... params) {
         StringBuilder builder = new StringBuilder();
@@ -98,7 +111,7 @@ public class Requests extends AsyncTask<String,String,String> {
             }
             //String fullPage = page.asXml();
         } catch (Exception e) {
-            Log.e("Requests", "Error in http connection " + e.toString());
+            Logger.Error(Requests.this.getClass(), e);
             _response="error";
         }
         return _response;
@@ -142,22 +155,13 @@ public class Requests extends AsyncTask<String,String,String> {
         return hexString;
     }
 
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
-    }
-
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
         call.sendtext1(s,taskType);
+    }
+
+    public interface callback {
+        void sendtext1(String data, TaskType taskType);
     }
 }

@@ -68,6 +68,7 @@ import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.MainStates;
+import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UpdateUtil;
 import knf.animeflv.Utils.UrlUtils;
 import knf.animeflv.Utils.eNums.UpdateState;
@@ -233,6 +234,7 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
                     } else {
                         if (!MainStates.isProcessing()) {
                             if (FileUtil.ExistAnime(eids.get(holder.getAdapterPosition()))) {
+                                holder.tv_capitulo.setTextColor(getColor());
                                 StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
                             } else {
                                 showLoading(holder.ib_des);
@@ -431,13 +433,16 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
                     CookieConstructor constructor = new CookieConstructor(cookie, web.getSettings().getUserAgentString(), urlD);
                     if (type == 1) {
                         StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
+                        holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
                     } else {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             StreamManager.internal(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
+                            holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
                         } else {
                             if (isMXinstalled()) {
                                 toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
                                 StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
+                                holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
                             } else {
                                 toast("No hay reproductor adecuado disponible");
                             }
@@ -780,9 +785,11 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
                                             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
                                             showDownload(holder.ib_des);
                                             showCloudPlay(holder.ib_ver);
+                                            holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
                                             break;
                                         default:
                                             StreamManager.Stream(context, eids.get(holder.getAdapterPosition()), ur);
+                                            holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
                                             showDownload(holder.ib_des);
                                             showCloudPlay(holder.ib_ver);
                                             d.dismiss();

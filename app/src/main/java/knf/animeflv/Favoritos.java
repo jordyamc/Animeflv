@@ -53,6 +53,7 @@ import java.util.concurrent.TimeUnit;
 
 import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.Recyclers.AdapterFavs;
+import knf.animeflv.Utils.ThemeUtils;
 
 /**
  * Created by Jordy on 23/08/2015.
@@ -62,7 +63,6 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     Toolbar toolbar;
     Toolbar ltoolbar;
     List<String> aids;
-    List<String> Naids=new ArrayList<String>();
     String fav;
     String[] favoritos={};
     Context context;
@@ -107,47 +107,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(this));
-        if (preferences.getBoolean("is_amoled", false)) {
-            if (accent == ColorsRes.Rojo(this)) {
-                setTheme(R.style.AppThemeDarkRojo);
-            }
-            if (accent == ColorsRes.Naranja(this)) {
-                setTheme(R.style.AppThemeDarkNaranja);
-            }
-            if (accent == ColorsRes.Gris(this)) {
-                setTheme(R.style.AppThemeDarkGris);
-            }
-            if (accent == ColorsRes.Verde(this)) {
-                setTheme(R.style.AppThemeDarkVerde);
-            }
-            if (accent == ColorsRes.Rosa(this)) {
-                setTheme(R.style.AppThemeDarkRosa);
-            }
-            if (accent == ColorsRes.Morado(this)) {
-                setTheme(R.style.AppThemeDarkMorado);
-            }
-        } else {
-            if (accent == ColorsRes.Rojo(this)) {
-                setTheme(R.style.AppThemeRojo);
-            }
-            if (accent == ColorsRes.Naranja(this)) {
-                setTheme(R.style.AppThemeNaranja);
-            }
-            if (accent == ColorsRes.Gris(this)) {
-                setTheme(R.style.AppThemeGris);
-            }
-            if (accent == ColorsRes.Verde(this)) {
-                setTheme(R.style.AppThemeVerde);
-            }
-            if (accent == ColorsRes.Rosa(this)) {
-                setTheme(R.style.AppThemeRosa);
-            }
-            if (accent == ColorsRes.Morado(this)) {
-                setTheme(R.style.AppThemeMorado);
-            }
-        }
+        ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_favs);
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;

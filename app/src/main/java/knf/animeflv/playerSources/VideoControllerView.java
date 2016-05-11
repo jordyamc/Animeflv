@@ -47,7 +47,7 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
 
     private static final int HANDLER_ANIMATE_OUT = 1;// out animate
     private static final int HANDLER_UPDATE_PROGRESS = 2;//cycle update progress
-    private static final long PROGRESS_SEEK = 5000;
+    private static final long PROGRESS_SEEK = 3000;
     Handler handler = new Handler();
     private MediaPlayerControlListener mPlayer;// control media play
     private Activity mContext;
@@ -78,6 +78,7 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
     private ImageButton mPauseButton;
     private ImageButton mFullscreenButton;
     private Handler mHandler = new ControllerViewHandler(this);
+
     Runnable showcontrols = new Runnable() {
         @Override
         public void run() {
@@ -310,9 +311,13 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
         } else {
             //animate out controller view
             handler.removeCallbacks(showcontrols);
-            Message msg = mHandler.obtainMessage(HANDLER_ANIMATE_OUT);
-            mHandler.removeMessages(HANDLER_ANIMATE_OUT);
-            mHandler.sendMessageDelayed(msg, 100);
+            if (!mDragging) {
+                Message msg = mHandler.obtainMessage(HANDLER_ANIMATE_OUT);
+                mHandler.removeMessages(HANDLER_ANIMATE_OUT);
+                mHandler.sendMessageDelayed(msg, 100);
+            } else {
+                handler.postDelayed(showcontrols, 4000);
+            }
         }
     }
 
@@ -550,6 +555,9 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
         mPlayer.seekTo(pos);
         setSeekProgress();
 
+        handler.removeCallbacks(showcontrols);
+        handler.postDelayed(showcontrols, 4000);
+
         show();
     }
 
@@ -562,6 +570,9 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
         pos += PROGRESS_SEEK;
         mPlayer.seekTo(pos);
         setSeekProgress();
+
+        handler.removeCallbacks(showcontrols);
+        handler.postDelayed(showcontrols, 4000);
 
         show();
     }

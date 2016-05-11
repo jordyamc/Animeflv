@@ -74,6 +74,7 @@ import knf.animeflv.Recientes.MainAnimeModel;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.UpdateUtil;
@@ -223,9 +224,13 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                     holder.ib_des.setImageResource(R.drawable.ic_get_r);
                     callbacks.onDelFromList();
                 } else {
-                    MainStates.addToWaitList(Animes.get(holder.getAdapterPosition()).getEid());
-                    holder.ib_des.setImageResource(R.drawable.ic_waiting);
-                    callbacks.onPutInList();
+                    if (!FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+                        MainStates.addToWaitList(Animes.get(holder.getAdapterPosition()).getEid());
+                        holder.ib_des.setImageResource(R.drawable.ic_waiting);
+                        callbacks.onPutInList();
+                    } else {
+                        MainStates.setListing(false);
+                    }
                 }
                 return false;
             }
@@ -309,9 +314,31 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                     } else {
                         if (NetworkUtils.isNetworkAvailable()) {
                             if (!MainStates.isProcessing()) {
-                                MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
-                                showLoading(holder.ib_des);
-                                new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
+                                if (MainStates.WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
+                                    final int pos = holder.getAdapterPosition();
+                                    new MaterialDialog.Builder(context)
+                                            .content(
+                                                    "El " + getCap(Animes.get(pos).getNumero()).toLowerCase() +
+                                                            " de " + Animes.get(pos).getTitulo() +
+                                                            " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
+                                            .autoDismiss(true)
+                                            .positiveText("Continuar")
+                                            .negativeText("Cancelar")
+                                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                                @Override
+                                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                    MainStates.delFromWaitList(Animes.get(pos).getEid());
+                                                    MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
+                                                    showLoading(holder.ib_des);
+                                                    new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
+                                                }
+                                            })
+                                            .build().show();
+                                } else {
+                                    MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
+                                    showLoading(holder.ib_des);
+                                    new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
+                                }
                             }
                         }
                     }
@@ -683,7 +710,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                     super.onFailure(statusCode, headers, responseString, throwable);
                     MainStates.setProcessing(false, null);
-                    Log.e("Error", "Download", throwable);
+                    Logger.Error(AdapterMainNoGIF.this.getClass(), throwable);
                     showDownload(button);
                     if (parser.getUrlCached(eid).equals("null")) {
                         if (FileUtil.existDir()) {
@@ -698,7 +725,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                     super.onFailure(statusCode, headers, throwable, errorResponse);
                     MainStates.setProcessing(false, null);
-                    Log.e("Error", "Download", throwable);
+                    Logger.Error(AdapterMainNoGIF.this.getClass(), throwable);
                     showDownload(button);
                 }
             });
@@ -817,7 +844,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                     super.onFailure(statusCode, headers, responseString, throwable);
                     MainStates.setProcessing(false, null);
-                    Log.e("Error", "Download", throwable);
+                    Logger.Error(AdapterMainNoGIF.this.getClass(), throwable);
                     showDownload(button);
                     if (parser.getUrlCached(eid).equals("null")) {
                         if (FileUtil.existDir()) {
@@ -832,7 +859,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                     super.onFailure(statusCode, headers, throwable, errorResponse);
                     MainStates.setProcessing(false, null);
-                    Log.e("Error", "Download", throwable);
+                    Logger.Error(AdapterMainNoGIF.this.getClass(), throwable);
                     showDownload(button);
                 }
             });

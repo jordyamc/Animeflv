@@ -20,6 +20,12 @@
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:enabled="true"
+            android:key="ind_sounds"
+            android:summary="%s"
+            android:title="Indicador"/>
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="0"
+            android:enabled="true"
             android:key="r_sounds"
             android:summary="(Los sonidos pueden tardar en funcionar en la lista)"
             android:title="Recargar cache de sonidos" />

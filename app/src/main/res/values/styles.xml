@@ -178,7 +178,7 @@
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:textColorSecondary">@color/blanco</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@android:color/holo_red_dark</item>
         <item name="android:colorBackground">@color/negro</item>
@@ -188,6 +188,7 @@
         <item name="material_drawer_secondary_text">@color/blanco</item>
         <item name="material_drawer_selected">@color/negro</item>
         <item name="material_drawer_selected_text">@android:color/holo_red_dark</item>
+        <item name="material_drawer_divider">@android:color/holo_red_dark</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
@@ -208,6 +209,7 @@
         <item name="material_drawer_secondary_text">@color/blanco</item>
         <item name="material_drawer_selected">@color/negro</item>
         <item name="material_drawer_selected_text">@color/theme_naranja</item>
+        <item name="material_drawer_divider">@color/theme_naranja</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
@@ -228,6 +230,7 @@
         <item name="material_drawer_secondary_text">@color/blanco</item>
         <item name="material_drawer_selected">@color/negro</item>
         <item name="material_drawer_selected_text">@color/theme_gris</item>
+        <item name="material_drawer_divider">@color/theme_gris</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
@@ -248,6 +251,7 @@
         <item name="material_drawer_secondary_text">@color/blanco</item>
         <item name="material_drawer_selected">@color/negro</item>
         <item name="material_drawer_selected_text">@color/theme_verde</item>
+        <item name="material_drawer_divider">@color/theme_verde</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
@@ -268,6 +272,7 @@
         <item name="material_drawer_secondary_text">@color/blanco</item>
         <item name="material_drawer_selected">@color/negro</item>
         <item name="material_drawer_selected_text">@color/theme_rosa</item>
+        <item name="material_drawer_divider">@color/theme_rosa</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
@@ -288,6 +293,7 @@
         <item name="material_drawer_secondary_text">@color/blanco</item>
         <item name="material_drawer_selected">@color/negro</item>
         <item name="material_drawer_selected_text">@color/theme_morado</item>
+        <item name="material_drawer_divider">@color/theme_morado</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
@@ -308,6 +314,7 @@
         <item name="material_drawer_secondary_text">@color/blanco</item>
         <item name="material_drawer_selected">@color/negro</item>
         <item name="material_drawer_selected_text">@android:color/holo_red_dark</item>
+        <item name="material_drawer_divider">@android:color/holo_red_dark</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
@@ -328,6 +335,7 @@
         <item name="material_drawer_secondary_text">@color/blanco</item>
         <item name="material_drawer_selected">@color/negro</item>
         <item name="material_drawer_selected_text">@color/theme_naranja</item>
+        <item name="material_drawer_divider">@color/theme_naranja</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
@@ -348,6 +356,7 @@
         <item name="material_drawer_secondary_text">@color/blanco</item>
         <item name="material_drawer_selected">@color/negro</item>
         <item name="material_drawer_selected_text">@color/theme_gris</item>
+        <item name="material_drawer_divider">@color/theme_gris</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
@@ -368,6 +377,7 @@
         <item name="material_drawer_secondary_text">@color/blanco</item>
         <item name="material_drawer_selected">@color/negro</item>
         <item name="material_drawer_selected_text">@color/theme_verde</item>
+        <item name="material_drawer_divider">@color/theme_verde</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
@@ -388,6 +398,7 @@
         <item name="material_drawer_secondary_text">@color/blanco</item>
         <item name="material_drawer_selected">@color/negro</item>
         <item name="material_drawer_selected_text">@color/theme_rosa</item>
+        <item name="material_drawer_divider">@color/theme_rosa</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
@@ -408,6 +419,7 @@
         <item name="material_drawer_secondary_text">@color/blanco</item>
         <item name="material_drawer_selected">@color/negro</item>
         <item name="material_drawer_selected_text">@color/theme_morado</item>
+        <item name="material_drawer_divider">@color/theme_morado</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
@@ -424,6 +436,7 @@
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@color/theme_naranja</item>
+        <item name="material_drawer_divider">@color/theme_naranja</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
@@ -439,6 +452,7 @@
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@color/theme_rojo</item>
+        <item name="material_drawer_divider">@color/theme_rojo</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
@@ -454,6 +468,7 @@
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@color/theme_gris</item>
+        <item name="material_drawer_divider">@color/theme_gris</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
@@ -469,6 +484,7 @@
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@color/theme_verde</item>
+        <item name="material_drawer_divider">@color/theme_verde</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
@@ -484,6 +500,7 @@
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@color/theme_rosa</item>
+        <item name="material_drawer_divider">@color/theme_rosa</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
@@ -499,6 +516,7 @@
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@color/theme_morado</item>
+        <item name="material_drawer_divider">@color/theme_morado</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
@@ -514,6 +532,7 @@
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@color/theme_naranja</item>
+        <item name="material_drawer_divider">@color/theme_naranja</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
@@ -529,6 +548,7 @@
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@color/theme_rojo</item>
+        <item name="material_drawer_divider">@color/theme_rojo</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
@@ -544,6 +564,7 @@
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@color/theme_gris</item>
+        <item name="material_drawer_divider">@color/theme_gris</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
@@ -559,6 +580,7 @@
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@color/theme_verde</item>
+        <item name="material_drawer_divider">@color/theme_verde</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
@@ -574,6 +596,7 @@
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@color/theme_rosa</item>
+        <item name="material_drawer_divider">@color/theme_rosa</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
@@ -589,6 +612,7 @@
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@color/theme_morado</item>
+        <item name="material_drawer_divider">@color/theme_morado</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
@@ -608,6 +632,7 @@
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@color/theme_naranja</item>
+        <item name="material_drawer_divider">@color/theme_naranja</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
@@ -627,6 +652,7 @@
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
         <item name="material_drawer_selected_text">@color/theme_rojo</item>
+        <item name="material_drawer_divider">@color/theme_rojo</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
@@ -851,5 +877,11 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+    </style>
+
+    <style name="DemoButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minWidth">40dp</item>
     </style>
 </resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Obtener Informacion">
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:key="admin_get_pass"
+            android:title="Obtener contraseña por correo"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Forzar Cambio">
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:key="admin_force_mail"
+            android:title="Forzar cambio de correo"/>
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:key="admin_force_pass"
+            android:title="Forzar cambio de contraseña"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Cuentas">
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:key="admin_del_user"
+            android:title="Eliminar Cuenta"/>
+    </PreferenceCategory>
+</PreferenceScreen>

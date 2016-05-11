@@ -48,6 +48,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
+import knf.animeflv.Utils.Logger;
 import xdroid.toaster.Toaster;
 
 /**
@@ -68,6 +69,43 @@ public class BackDownload extends AppCompatActivity {
     Spinner sp;
 
     WebView web;
+
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
+        return ret;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,30 +243,6 @@ public class BackDownload extends AppCompatActivity {
 
     }
 
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-
-    public static String getStringFromFile(String filePath) {
-        String ret = "";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        } catch (IOException e) {
-        } catch (Exception e) {
-        }
-        return ret;
-    }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -335,19 +349,6 @@ public class BackDownload extends AppCompatActivity {
         return hexString;
     }
 
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
-    }
-
     public class Check extends AsyncTask<String, String, String> {
         Context context;
         String _response;
@@ -413,7 +414,7 @@ public class BackDownload extends AppCompatActivity {
                 }
                 //String fullPage = page.asXml();
             } catch (Exception e) {
-                Log.e("Requests", "Error in http connection " + e.toString());
+                Logger.Error(getClass(), e);
                 _response = "error";
             }
             return _response;
@@ -539,7 +540,7 @@ public class BackDownload extends AppCompatActivity {
                 _response = sb.toString();
                 //String fullPage = page.asXml();
             } catch (Exception e) {
-                Log.e("Requests", "Error in http connection " + e.toString());
+                Logger.Error(BackDownload.this.getClass(), e);
                 _response = "error";
             }
             return _response;

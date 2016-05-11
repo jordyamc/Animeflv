@@ -40,7 +40,6 @@ public class NetworkUtils {
     private static File descarga = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "Animeflv_Nver.apk");
     private static MaterialDialog dialog;
     private static String[] mensaje;
-    private static String urlVersion = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html";
 
     public static void init(Context con) {
         context = con;
@@ -94,7 +93,7 @@ public class NetworkUtils {
         @Override
         protected String doInBackground(String... params) {
             Looper.prepare();
-            new SyncHttpClient().get(urlVersion, null, new TextHttpResponseHandler() {
+            new SyncHttpClient().get(Keys.Url.VERSION_INT, null, new TextHttpResponseHandler() {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                     UpdateUtil.setState(UpdateState.NO_UPDATE);
@@ -183,7 +182,6 @@ public class NetworkUtils {
                         Log.d("Version", "Actualizar");
                         dialog = new MaterialDialog.Builder(Tcontext)
                                 .title("Nueva Version " + vers.trim())
-                                //.customView(R.layout.text_d_act, false)
                                 .content("Esta version (" + versionCode + ") es obsoleta, porfavor actualiza para continuar.")
                                 .autoDismiss(false)
                                 .cancelable(false)
@@ -206,7 +204,7 @@ public class NetworkUtils {
                                             }
                                         });
                                         final ThinDownloadManager downloadManager = new ThinDownloadManager();
-                                        Uri download = Uri.parse("https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true");
+                                        Uri download = Uri.parse(Keys.Url.UPDATE);
                                         final DownloadRequest downloadRequest = new DownloadRequest(download)
                                                 .setDestinationURI(Uri.fromFile(descarga))
                                                 .setStatusListener(new DownloadStatusListenerV1() {

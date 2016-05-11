@@ -20,6 +20,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
+import knf.animeflv.Utils.Logger;
+
 /**
  * Created by Jordy on 12/08/2015.
  */
@@ -30,15 +32,24 @@ public class DirGetter extends AsyncTask<String, String, String> {
     TaskType taskType;
     Context context;
 
-    public interface callback {
-        void ReqDirs(String data, TaskType taskType);
-    }
-
     public DirGetter(Context con, TaskType taskType) {
         context = con;
         call = (callback) con;
         this.taskType = taskType;
 
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
     }
 
     @Override
@@ -100,7 +111,7 @@ public class DirGetter extends AsyncTask<String, String, String> {
             }
             //String fullPage = page.asXml();
         } catch (Exception e) {
-            Log.e("Requests", "Error in http connection " + e.toString());
+            Logger.Error(DirGetter.this.getClass(), e);
             _response = "error";
         }
         return _response;
@@ -144,22 +155,13 @@ public class DirGetter extends AsyncTask<String, String, String> {
         return hexString;
     }
 
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
-    }
-
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
         call.ReqDirs(s, taskType);
+    }
+
+    public interface callback {
+        void ReqDirs(String data, TaskType taskType);
     }
 }

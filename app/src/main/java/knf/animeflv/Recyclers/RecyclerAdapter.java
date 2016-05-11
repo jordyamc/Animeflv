@@ -71,6 +71,7 @@ import knf.animeflv.R;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Logger;
 
 /**
  * Created by Jordy on 08/08/2015.
@@ -291,7 +292,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 fileCur = new File("/storage/emulated", sPathCur);
                 if (fileCur.isDirectory() && fileCur.canWrite()) {
                     sSDpath = fileCur.getAbsolutePath();
-                    Log.e("path", sSDpath);
+                    Logger.Error(RecyclerAdapter.class, new Throwable(sSDpath));
                     break;
                 }
             }
@@ -1024,7 +1025,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 _response = sb.toString();
                 //String fullPage = page.asXml();
             } catch (Exception e) {
-                Log.e("Requests", "Error in http connection " + e.toString());
+                Logger.Error(RecyclerAdapter.class, e);
                 _response = "error";
             }
             return _response;
@@ -1077,7 +1078,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 _response = sb.toString();
                 //String fullPage = page.asXml();
             } catch (Exception e) {
-                Log.e("Requests", "Error in http connection " + e.toString());
+                Logger.Error(RecyclerAdapter.class, e);
                 _response = "error";
             }
             return _response;

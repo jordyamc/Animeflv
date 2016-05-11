@@ -16,6 +16,7 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.annotation.ArrayRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.provider.DocumentFile;
@@ -33,30 +34,31 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import knf.animeflv.Tutorial.TutorialActivity;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Files.FileSearchResponse;
+import knf.animeflv.Utils.FragmentExtras;
+import knf.animeflv.Utils.Keys.Conf;
+import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.SoundsLoader;
 import knf.animeflv.Utils.UtilDialogPref;
 import knf.animeflv.Utils.UtilSound;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 16/08/2015.
- */
+//@SuppressWarnings("all")
 public class Conf_fragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, FolderChooserDialog.FolderCallback {
     Context context;
     MediaPlayer mp;
     Login login = new Login();
-    int selectedSound;
     private FragmentActivity myContext;
 
     public static String formatSize(long v) {
         if (v < 1024) return v + " B";
         int z = (63 - Long.numberOfLeadingZeros(v)) / 10;
-        return String.format("%.1f %sB", (double) v / (1L << (z * 10)), " KMGTPE".charAt(z));
+        return String.format(Locale.US, "%.1f %sB", (double) v / (1L << (z * 10)), " KMGTPE".charAt(z));
     }
 
     public static boolean deleteDir(File dir) {
@@ -96,7 +98,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         return result;
     }
 
-    //Ringtone r;
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,14 +107,18 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         if (!activado) {
             getPreferenceScreen().findPreference("tiempo").setEnabled(false);
             getPreferenceScreen().findPreference("sonido").setEnabled(false);
+            getPreferenceScreen().findPreference(Conf.INDICADOR_SONIDOS).setEnabled(false);
+            getPreferenceScreen().findPreference(Conf.RECHARGE_SOUNDS).setEnabled(false);
         } else {
             getPreferenceScreen().findPreference("tiempo").setEnabled(true);
             getPreferenceScreen().findPreference("sonido").setEnabled(true);
+            getPreferenceScreen().findPreference(Conf.INDICADOR_SONIDOS).setEnabled(true);
+            getPreferenceScreen().findPreference(Conf.RECHARGE_SOUNDS).setEnabled(true);
         }
         if (UtilDialogPref.getPlayer() != null) {
             mp = UtilDialogPref.getPlayer();
         } else {
-            mp = UtilSound.getMediaPlayer(context,0);
+            mp = UtilSound.getMediaPlayer(context, UtilSound.getSetDefMediaPlayerInt());
         }
         final File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download");
         long size = getcachesize();
@@ -133,6 +138,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
+
         getPreferenceScreen().findPreference("r_sounds").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -233,19 +239,20 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        getPreferenceScreen().findPreference("sonido").setSummary(UtilSound.getSoundsNameList()[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("sonido", "0"))]);
+        getPreferenceScreen().findPreference("sonido").setSummary(getStringfromArray(UtilSound.getSoundsNameList(), "sonido", "0"));
         getPreferenceScreen().findPreference("sonido").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 if (UtilDialogPref.getPlayer() != null) {
                     mp = UtilDialogPref.getPlayer();
                 }
+                getPreferenceScreen().findPreference("sonido").setSummary(getStringfromArray(UtilSound.getSoundsNameList(), "sonido", "0"));
                 UtilDialogPref.init(UtilSound.getSoundsNameList(), "sonido", "0", "Sonido", mp, getPreferenceScreen().findPreference("sonido"));
                 DialogSounds.create().show(myContext.getSupportFragmentManager(), "Pref");
                 return false;
             }
         });
-        getPreferenceScreen().findPreference("tiempo").setSummary("Revisar actualizaciones cada " + getResources().getStringArray(R.array.minutos)[Arrays.asList(getResources().getStringArray(R.array.min_val)).indexOf(PreferenceManager.getDefaultSharedPreferences(myContext).getString("tiempo", "60000"))]);
+        getPreferenceScreen().findPreference("tiempo").setSummary("Revisar actualizaciones cada " + getStringfromResourse(R.array.minutos, "tiempo", "60000"));
         getPreferenceScreen().findPreference("tiempo").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -254,7 +261,16 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        getPreferenceScreen().findPreference("t_conexion").setSummary(getResources().getStringArray(R.array.tipos)[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_conexion", "0"))]);
+        getPreferenceScreen().findPreference(Conf.INDICADOR_SONIDOS).setSummary(getStringfromResourse(R.array.sound_ind, Conf.INDICADOR_SONIDOS, "0"));
+        getPreferenceScreen().findPreference(Conf.INDICADOR_SONIDOS).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                UtilDialogPref.init(getResources().getStringArray(R.array.sound_ind), Conf.INDICADOR_SONIDOS, "0", "Tipo", getPreferenceScreen().findPreference(Conf.INDICADOR_SONIDOS));
+                PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("t_conexion").setSummary(getStringfromResourse(R.array.tipos, "t_conexion", "0"));
         getPreferenceScreen().findPreference("t_conexion").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -263,7 +279,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        getPreferenceScreen().findPreference("t_busqueda").setSummary(getResources().getStringArray(R.array.busqueda)[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_busqueda", "0"))]);
+        getPreferenceScreen().findPreference("t_busqueda").setSummary(getStringfromResourse(R.array.busqueda, "t_busqueda", "0"));
         getPreferenceScreen().findPreference("t_busqueda").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -272,7 +288,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        getPreferenceScreen().findPreference("t_video").setSummary("Reproductor: " + getResources().getStringArray(R.array.players)[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_video", "0"))]);
+        getPreferenceScreen().findPreference("t_video").setSummary("Reproductor: " + getStringfromResourse(R.array.players, "t_video", "0"));
         getPreferenceScreen().findPreference("t_video").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -281,7 +297,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        getPreferenceScreen().findPreference("t_streaming").setSummary("Reproductor: " + getResources().getStringArray(R.array.players)[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_streaming", "0"))]);
+        getPreferenceScreen().findPreference("t_streaming").setSummary("Reproductor: " + getStringfromResourse(R.array.players, "t_streaming", "0"));
         getPreferenceScreen().findPreference("t_streaming").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -290,7 +306,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        getPreferenceScreen().findPreference("t_player").setSummary("Tipo: " + getResources().getStringArray(R.array.players_type)[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString("t_player", "0"))]);
+        getPreferenceScreen().findPreference("t_player").setSummary("Tipo: " + getStringfromResourse(R.array.players_type, "t_player", "0"));
         getPreferenceScreen().findPreference("t_player").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -310,7 +326,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("open_intro").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                context.startActivity(new Intent(context,Intronew.class));
+                context.startActivity(new Intent(context, Intronew.class));
                 return false;
             }
         });
@@ -327,7 +343,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             getPreferenceScreen().findPreference("SDpath").setEnabled(false);
             PreferenceCategory sd = (PreferenceCategory) getPreferenceScreen().findPreference("catSD");
             getPreferenceScreen().removePreference(sd);
-        }else {
+        } else {
             if (FileUtil.getSDPath() == null) {
                 getPreferenceScreen().findPreference("b_move").setEnabled(false);
                 getPreferenceScreen().findPreference("sd_down").setEnabled(false);
@@ -440,6 +456,51 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 }
             }
         }
+        openIfExtra();
+    }
+
+    private void openIfExtra() {
+        int bundle = FragmentExtras.KEY;
+        if (bundle != -1) {
+            switch (bundle) {
+                case Configuracion.OPEN_SOUNDS:
+                    if (UtilDialogPref.getPlayer() != null) {
+                        mp = UtilDialogPref.getPlayer();
+                    }
+                    UtilDialogPref.init(UtilSound.getSoundsNameList(), "sonido", "0", "Sonido", mp, getPreferenceScreen().findPreference("sonido"));
+                    DialogSounds.create().show(myContext.getSupportFragmentManager(), "Pref");
+                    break;
+            }
+            FragmentExtras.KEY = -1;
+        } else {
+            Log.d("Conf", "No Extras");
+        }
+    }
+
+    private String getStringfromResourse(@ArrayRes int array, String key, String def) {
+        try {
+            return getResources().getStringArray(array)[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString(key, def))];
+        } catch (IndexOutOfBoundsException e) {
+            if (key.equals("tiempo")) {
+                return getResources().getStringArray(array)[Arrays.asList(getResources().getStringArray(R.array.min_val)).indexOf(PreferenceManager.getDefaultSharedPreferences(myContext).getString(key, def))];
+            } else {
+                Logger.Error(getClass(), e);
+                PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString(key, def).apply();
+                Toaster.toast("Error en " + key + ", opcion reiniciada");
+                return getResources().getStringArray(array)[0];
+            }
+        }
+    }
+
+    private String getStringfromArray(String[] array, String key, String def) {
+        try {
+            return array[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString(key, def))];
+        } catch (IndexOutOfBoundsException e) {
+            Logger.Error(getClass(), e);
+            PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString(key, def).apply();
+            Toaster.toast("Error en " + key + ", opcion reiniciada");
+            return array[0];
+        }
     }
 
     private boolean excludechar(String input) {
@@ -518,10 +579,14 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 if (!activado) {
                     getPreferenceScreen().findPreference("tiempo").setEnabled(false);
                     getPreferenceScreen().findPreference("sonido").setEnabled(false);
+                    getPreferenceScreen().findPreference(Conf.INDICADOR_SONIDOS).setEnabled(false);
+                    getPreferenceScreen().findPreference(Conf.RECHARGE_SOUNDS).setEnabled(false);
                     new Alarm().CancelAlarm(context);
                 } else {
                     getPreferenceScreen().findPreference("tiempo").setEnabled(true);
                     getPreferenceScreen().findPreference("sonido").setEnabled(true);
+                    getPreferenceScreen().findPreference(Conf.INDICADOR_SONIDOS).setEnabled(true);
+                    getPreferenceScreen().findPreference(Conf.RECHARGE_SOUNDS).setEnabled(true);
                     new Alarm().SetAlarm(context);
                 }
                 break;
@@ -617,6 +682,28 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                     }
                 }
                 break;
+            case Conf.INDICADOR_SONIDOS:
+                if (sharedPreferences.getString(key, "0").equals("0")) {
+                    if (UtilSound.getAudioWidget().isShown()) UtilSound.getAudioWidget().hide();
+                    if (UtilSound.isNotSoundShow) {
+                        UtilSound.NotManager().cancel(UtilSound.NOT_SOUND_ID);
+                        UtilSound.isNotSoundShow = false;
+                    }
+                }
+                if (sharedPreferences.getString(key, "0").equals("1")) {
+                    if (UtilSound.getAudioWidget().isShown()) UtilSound.getAudioWidget().hide();
+                    UtilSound.toogleNotSound(UtilSound.getCurrentMediaPlayerInt());
+                }
+                if (sharedPreferences.getString(key, "0").equals("2")) {
+                    if (UtilSound.isNotSoundShow) {
+                        UtilSound.NotManager().cancel(UtilSound.NOT_SOUND_ID);
+                        UtilSound.isNotSoundShow = false;
+                    }
+                    if (!UtilSound.getAudioWidget().isShown()) {
+                        UtilSound.getAudioWidget().show(100, 100);
+                    }
+                }
+                break;
         }
     }
 
@@ -634,10 +721,10 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
         if (mediaStorage.isDirectory()) {
             String[] children = mediaStorage.list();
-            for (String name:children) {
+            for (String name : children) {
                 if (!name.equals("directorio.txt") && !name.equals("data.save")) {
                     File file = new File(mediaStorage, name);
-                    if (!file.isDirectory())file.delete();
+                    if (!file.isDirectory()) file.delete();
                 }
             }
         }
@@ -650,7 +737,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         }
         SoundsLoader.start(context);
     }
-
 
     @Override
     public void onFolderSelection(@NonNull FolderChooserDialog dialog, @NonNull File folder) {
@@ -684,7 +770,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             Toaster.toast("Error al obtener permiso");
         }
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
