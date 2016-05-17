@@ -180,7 +180,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
             showDelete(holder.ib_des);
         } else {
             showCloudPlay(holder.ib_ver);
-            showDownload(holder.ib_des);
+            showDownload(holder.ib_des, holder.getAdapterPosition());
         }
         if (MainStates.isProcessing()) {
             if (MainStates.getProcessingEid().equals(Animes.get(holder.getAdapterPosition()).getEid())) {
@@ -259,14 +259,14 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                                 MainStates.delFromWaitList(Animes.get(pos).getEid());
                                                 MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
                                                 showLoading(holder.ib_des);
-                                                new DownloadGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
+                                                new DownloadGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid(), holder.getAdapterPosition()).executeOnExecutor(threadPoolExecutor);
                                             }
                                         })
                                         .build().show();
                             } else {
                                 MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
                                 showLoading(holder.ib_des);
-                                new DownloadGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
+                                new DownloadGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid(), holder.getAdapterPosition()).executeOnExecutor(threadPoolExecutor);
                             }
                         } else {
                             Toaster.toast("Procesando");
@@ -283,12 +283,12 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                         if (FileUtil.DeleteAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
                                             ManageDownload.cancel(context, Animes.get(holder.getAdapterPosition()).getEid());
-                                            showDownload(holder.ib_des);
+                                            showDownload(holder.ib_des, holder.getAdapterPosition());
                                             showCloudPlay(holder.ib_ver);
                                             Toaster.toast("Archivo Eliminado");
                                         } else {
                                             if (!FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
-                                                showDownload(holder.ib_des);
+                                                showDownload(holder.ib_des, holder.getAdapterPosition());
                                                 showCloudPlay(holder.ib_ver);
                                                 Toaster.toast("Archivo Eliminado");
                                             } else {
@@ -330,14 +330,14 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                                     MainStates.delFromWaitList(Animes.get(pos).getEid());
                                                     MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
                                                     showLoading(holder.ib_des);
-                                                    new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
+                                                    new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid(), holder.getAdapterPosition()).executeOnExecutor(threadPoolExecutor);
                                                 }
                                             })
                                             .build().show();
                                 } else {
                                     MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
                                     showLoading(holder.ib_des);
-                                    new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
+                                    new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid(), holder.getAdapterPosition()).executeOnExecutor(threadPoolExecutor);
                                 }
                             }
                         }
@@ -366,12 +366,17 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         });
     }
 
-    private void showDownload(final ImageButton button) {
+    private void showDownload(final ImageButton button, final int position) {
         ((newMain) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                button.setImageResource(R.drawable.ic_get_r);
-                button.setEnabled(true);
+                if (context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + Animes.get(position).getEid().replace("E", ""), false)) {
+                    button.setImageResource(R.drawable.listo);
+                    button.setEnabled(true);
+                } else {
+                    button.setImageResource(R.drawable.ic_get_r);
+                    button.setEnabled(true);
+                }
             }
         });
     }
@@ -468,7 +473,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                     CookieManager cookieManager = CookieManager.getInstance();
                     String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
                     CookieConstructor constructor = new CookieConstructor(cookie, web.getSettings().getUserAgentString(), urlD);
-                    showDownload(MainStates.getGifDownButton());
+                    showDownload(MainStates.getGifDownButton(), MainStates.getPosition());
                     web.loadUrl("about:blank");
                     if (type == 1) {
                         StreamManager.mx(context).Stream(eid, url, constructor);
@@ -604,12 +609,14 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         ImageButton DownState;
         WebView web;
         String eid;
+        int position;
 
-        public DownloadGetter(ImageButton button, ImageButton state, WebView web, String eid) {
+        public DownloadGetter(ImageButton button, ImageButton state, WebView web, String eid, int position) {
             this.button = button;
             this.eid = eid;
             this.DownState = state;
             this.web = web;
+            this.position = position;
         }
 
         @Override
@@ -653,7 +660,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                         Log.d("Descargar", "URL -> " + ur);
                                         switch (des.toLowerCase()) {
                                             case "zippyshare":
-                                                MainStates.setZippyState(DownloadTask.DESCARGA, ur, button, DownState);
+                                                MainStates.setZippyState(DownloadTask.DESCARGA, ur, button, DownState, position);
                                                 web.post(new Runnable() {
                                                     @Override
                                                     public void run() {
@@ -682,7 +689,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                     public void onNegative(MaterialDialog dialog) {
                                         super.onNegative(dialog);
                                         MainStates.setProcessing(false, null);
-                                        showDownload(button);
+                                        showDownload(button, position);
                                         d.dismiss();
                                     }
                                 })
@@ -691,7 +698,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                     public void onCancel(DialogInterface dialog) {
                                         d.dismiss();
                                         MainStates.setProcessing(false, null);
-                                        showDownload(button);
+                                        showDownload(button, position);
                                     }
                                 })
                                 .build();
@@ -700,7 +707,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                         d.show();
                     } catch (Exception e) {
                         MainStates.setProcessing(false, null);
-                        showDownload(button);
+                        showDownload(button, position);
                         e.printStackTrace();
                         Toaster.toast("Error en JSON");
                     }
@@ -711,7 +718,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                     super.onFailure(statusCode, headers, responseString, throwable);
                     MainStates.setProcessing(false, null);
                     Logger.Error(AdapterMainNoGIF.this.getClass(), throwable);
-                    showDownload(button);
+                    showDownload(button, position);
                     if (parser.getUrlCached(eid).equals("null")) {
                         if (FileUtil.existDir()) {
                             Toaster.toast("Error, no se escuentra el directorio, porfavor abralo manualmente y reintente descargar");
@@ -726,7 +733,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                     super.onFailure(statusCode, headers, throwable, errorResponse);
                     MainStates.setProcessing(false, null);
                     Logger.Error(AdapterMainNoGIF.this.getClass(), throwable);
-                    showDownload(button);
+                    showDownload(button, position);
                 }
             });
             Looper.loop();
@@ -739,12 +746,14 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         ImageButton DownState;
         WebView web;
         String eid;
+        int position;
 
-        public StreamGetter(ImageButton button, ImageButton state, WebView web, String eid) {
+        public StreamGetter(ImageButton button, ImageButton state, WebView web, String eid, int position) {
             this.button = button;
             this.eid = eid;
             this.DownState = state;
             this.web = web;
+            this.position = position;
         }
 
         @Override
@@ -788,7 +797,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                         Log.d("Stream", "URL -> " + ur);
                                         switch (des.toLowerCase()) {
                                             case "zippyshare":
-                                                MainStates.setZippyState(DownloadTask.STREAMING, ur, button, DownState);
+                                                MainStates.setZippyState(DownloadTask.STREAMING, ur, button, DownState, position);
                                                 web.post(new Runnable() {
                                                     @Override
                                                     public void run() {
@@ -805,7 +814,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                             default:
                                                 StreamManager.Stream(context, eid, ur);
                                                 MainStates.setProcessing(false, null);
-                                                showDownload(button);
+                                                showDownload(button, position);
                                                 d.dismiss();
                                                 break;
                                         }
@@ -816,7 +825,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                     public void onNegative(MaterialDialog dialog) {
                                         super.onNegative(dialog);
                                         MainStates.setProcessing(false, null);
-                                        showDownload(button);
+                                        showDownload(button, position);
                                         d.dismiss();
                                     }
                                 })
@@ -825,7 +834,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                     public void onCancel(DialogInterface dialog) {
                                         d.dismiss();
                                         MainStates.setProcessing(false, null);
-                                        showDownload(button);
+                                        showDownload(button, position);
                                     }
                                 })
                                 .build();
@@ -834,7 +843,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                         d.show();
                     } catch (Exception e) {
                         MainStates.setProcessing(false, null);
-                        showDownload(button);
+                        showDownload(button, position);
                         e.printStackTrace();
                         Toaster.toast("Error en JSON");
                     }
@@ -845,7 +854,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                     super.onFailure(statusCode, headers, responseString, throwable);
                     MainStates.setProcessing(false, null);
                     Logger.Error(AdapterMainNoGIF.this.getClass(), throwable);
-                    showDownload(button);
+                    showDownload(button, position);
                     if (parser.getUrlCached(eid).equals("null")) {
                         if (FileUtil.existDir()) {
                             Toaster.toast("Error, no se escuentra el directorio, porfavor abralo manualmente y reintente");
@@ -860,7 +869,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                     super.onFailure(statusCode, headers, throwable, errorResponse);
                     MainStates.setProcessing(false, null);
                     Logger.Error(AdapterMainNoGIF.this.getClass(), throwable);
-                    showDownload(button);
+                    showDownload(button, position);
                 }
             });
             Looper.loop();

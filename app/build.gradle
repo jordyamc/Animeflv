@@ -7,8 +7,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 133
-        versionName "2.9.3"
+        versionCode 134
+        versionName "2.9.3.1"
         multiDexEnabled true
     }
     buildTypes {
@@ -58,7 +58,7 @@ dependencies {
     compile files('src/trace.jar')
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'com.cleveroad:audiowidget:0.9.1'
-    compile 'com.android.support:design:23.3.0'
+    compile 'com.android.support:design:23.4.0'
     compile 'com.github.clans:fab:1.6.2'
     compile 'com.nononsenseapps:filepicker:2.5.2'
     compile 'com.github.halysongoncalves:pugnotification:1.8.1'
@@ -72,10 +72,10 @@ dependencies {
     compile 'com.github.ViksaaSkool:AwesomeSplash:v1.0.0'
     compile 'com.shamanland:xdroid-toaster:0.0.10'
     compile 'com.karumi:dexter:2.2.1'
-    compile 'com.android.support:design:23.3.0'
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:recyclerview-v7:23.3.0'
-    compile 'com.android.support:cardview-v7:23.3.0'
+    compile 'com.android.support:design:23.4.0'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:recyclerview-v7:23.4.0'
+    compile 'com.android.support:cardview-v7:23.4.0'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp:okhttp:2.4.0'

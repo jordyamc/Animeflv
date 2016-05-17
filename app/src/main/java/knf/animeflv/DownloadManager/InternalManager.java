@@ -69,12 +69,6 @@ public class InternalManager {
         epID = sharedPreferences.getString("epIDS_descarga", "");
         sharedPreferences.edit().putString("titulos_descarga", tits + aid + ":::").apply();
         sharedPreferences.edit().putString("epIDS_descarga", epID + aid + "_" + numero + ":::").apply();
-        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
-        String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-        if (!vistos.contains(eid)) {
-            vistos = vistos + eid + ":::";
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-        }
     }
 
     public void startDownload(String eid, String downUrl, CookieConstructor constructor) {
@@ -119,12 +113,6 @@ public class InternalManager {
         epID = sharedPreferences.getString("epIDS_descarga", "");
         sharedPreferences.edit().putString("titulos_descarga", tits + aid + ":::").apply();
         sharedPreferences.edit().putString("epIDS_descarga", epID + aid + "_" + numero + ":::").apply();
-        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
-        String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-        if (!vistos.contains(eid)) {
-            vistos = vistos + eid + ":::";
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-        }
     }
 
     public void cancelDownload(String eid) {

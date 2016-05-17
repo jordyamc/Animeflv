@@ -30,6 +30,7 @@ public class MainStates {
     private static String processingEid = "";
     private static boolean loadingEmision = true;
     private static boolean fload = true;
+    private static int position = -1;
 
     public static boolean isFload() {
         return fload;
@@ -47,18 +48,24 @@ public class MainStates {
         preferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
     }
 
-    public static void setZippyState(DownloadTask task1, String url, ImageButton button, ImageButton state) {
+    public static void setZippyState(DownloadTask task1, String url, ImageButton button, ImageButton state, int position) {
         task = task1;
         UrlZippy = url;
         imageButton = button;
         downState = state;
+        MainStates.position = position;
     }
 
-    public static void setZippyState(DownloadTask task1, String url, GifImageButton button, ImageButton state) {
+    public static void setZippyState(DownloadTask task1, String url, GifImageButton button, ImageButton state, int position) {
         task = task1;
         UrlZippy = url;
         gifImageButton = button;
         downState = state;
+        MainStates.position = position;
+    }
+
+    public static int getPosition() {
+        return position;
     }
 
     public static boolean isLoadingEmision() {

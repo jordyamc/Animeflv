@@ -183,7 +183,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
             showDelete(holder.ib_des);
         } else {
             showCloudPlay(holder.ib_ver);
-            showDownload(holder.ib_des);
+            showDownload(holder.ib_des, holder.getAdapterPosition());
         }
         if (MainStates.isProcessing()) {
             if (MainStates.getProcessingEid().equals(Animes.get(holder.getAdapterPosition()).getEid())) {
@@ -262,14 +262,14 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                                 MainStates.delFromWaitList(Animes.get(pos).getEid());
                                                 MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
                                                 showLoading(holder.ib_des);
-                                                new DownloadGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
+                                                new DownloadGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid(), holder.getAdapterPosition()).executeOnExecutor(threadPoolExecutor);
                                             }
                                         })
                                         .build().show();
                             } else {
                                 MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
                                 showLoading(holder.ib_des);
-                                new DownloadGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
+                                new DownloadGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid(), holder.getAdapterPosition()).executeOnExecutor(threadPoolExecutor);
                             }
                         } else {
                             Toaster.toast("Procesando");
@@ -286,12 +286,12 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                         if (FileUtil.DeleteAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
                                             ManageDownload.cancel(context, Animes.get(holder.getAdapterPosition()).getEid());
-                                            showDownload(holder.ib_des);
+                                            showDownload(holder.ib_des, holder.getAdapterPosition());
                                             showCloudPlay(holder.ib_ver);
                                             Toaster.toast("Archivo Eliminado");
                                         } else {
                                             if (!FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
-                                                showDownload(holder.ib_des);
+                                                showDownload(holder.ib_des, holder.getAdapterPosition());
                                                 showCloudPlay(holder.ib_ver);
                                                 Toaster.toast("Archivo Eliminado");
                                             } else {
@@ -333,14 +333,14 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                                     MainStates.delFromWaitList(Animes.get(pos).getEid());
                                                     MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
                                                     showLoading(holder.ib_des);
-                                                    new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
+                                                    new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid(), holder.getAdapterPosition()).executeOnExecutor(threadPoolExecutor);
                                                 }
                                             })
                                             .build().show();
                                 } else {
                                     MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
                                     showLoading(holder.ib_des);
-                                    new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid()).executeOnExecutor(threadPoolExecutor);
+                                    new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid(), holder.getAdapterPosition()).executeOnExecutor(threadPoolExecutor);
                                 }
                             }
                         }
@@ -361,13 +361,19 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         });
     }
 
-    private void showDownload(final GifImageButton button) {
+    private void showDownload(final GifImageButton button, final int position) {
         ((newMain) context).runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                button.setScaleType(ImageView.ScaleType.FIT_END);
-                button.setImageResource(R.drawable.ic_get_r);
-                button.setEnabled(true);
+                if (context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + Animes.get(position).getEid().replace("E", ""), false)) {
+                    button.setScaleType(ImageView.ScaleType.FIT_END);
+                    button.setImageResource(R.drawable.listo);
+                    button.setEnabled(true);
+                } else {
+                    button.setScaleType(ImageView.ScaleType.FIT_END);
+                    button.setImageResource(R.drawable.ic_get_r);
+                    button.setEnabled(true);
+                }
             }
         });
     }
@@ -502,7 +508,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     CookieManager cookieManager = CookieManager.getInstance();
                     String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
                     CookieConstructor constructor = new CookieConstructor(cookie, web.getSettings().getUserAgentString(), urlD);
-                    showDownload(MainStates.getGifDownButton());
+                    showDownload(MainStates.getGifDownButton(), MainStates.getPosition());
                     web.loadUrl("about:blank");
                     if (type == 1) {
                         StreamManager.mx(context).Stream(eid, url, constructor);
@@ -613,12 +619,14 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         ImageButton DownState;
         WebView web;
         String eid;
+        int position;
 
-        public DownloadGetter(GifImageButton button, ImageButton state, WebView web, String eid) {
+        public DownloadGetter(GifImageButton button, ImageButton state, WebView web, String eid, int position) {
             this.button = button;
             this.eid = eid;
             this.DownState = state;
             this.web = web;
+            this.position = position;
         }
 
         @Override
@@ -671,7 +679,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                         Log.d("Descargar", "URL -> " + ur);
                                         switch (des.toLowerCase()) {
                                             case "zippyshare":
-                                                MainStates.setZippyState(DownloadTask.DESCARGA, ur, button, DownState);
+                                                MainStates.setZippyState(DownloadTask.DESCARGA, ur, button, DownState, position);
                                                 web.post(new Runnable() {
                                                     @Override
                                                     public void run() {
@@ -700,7 +708,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                     public void onNegative(MaterialDialog dialog) {
                                         super.onNegative(dialog);
                                         MainStates.setProcessing(false, null);
-                                        showDownload(button);
+                                        showDownload(button, position);
                                         d.dismiss();
                                     }
                                 })
@@ -709,7 +717,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                     public void onCancel(DialogInterface dialog) {
                                         d.dismiss();
                                         MainStates.setProcessing(false, null);
-                                        showDownload(button);
+                                        showDownload(button, position);
                                     }
                                 })
                                 .build();
@@ -718,7 +726,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                         d.show();
                     } catch (Exception e) {
                         MainStates.setProcessing(false, null);
-                        showDownload(button);
+                        showDownload(button, position);
                         Logger.Error(AdapterMain.this.getClass(), e);
                         FileUtil.writeToFile(e.getMessage() +"   "+parser.getUrlCached(eid)+ "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
                         Toaster.toast("Error en JSON");
@@ -730,7 +738,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     super.onFailure(statusCode, headers, throwable, errorResponse);
                     MainStates.setProcessing(false, null);
                     Logger.Error(AdapterMain.this.getClass(), throwable);
-                    showDownload(button);
+                    showDownload(button, position);
                 }
             });
             Looper.loop();
@@ -743,16 +751,18 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         ImageButton DownState;
         WebView web;
         String eid;
+        int position;
 
-        public StreamGetter(GifImageButton button, ImageButton state, WebView web, String eid) {
+        public StreamGetter(GifImageButton button, ImageButton state, WebView web, String eid, int position) {
             this.button = button;
             this.eid = eid;
             this.DownState = state;
             this.web = web;
+            this.position = position;
         }
 
         @Override
-        protected String doInBackground(String... params) {
+        protected String doInBackground(final String... params) {
             Looper.prepare();
             new SyncHttpClient().get(parser.getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlCached(eid) + "&certificate=" + parser.getCertificateSHA1Fingerprint(context) + "&newMain", null, new JsonHttpResponseHandler() {
                 @Override
@@ -792,7 +802,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                         Log.d("Stream", "URL -> " + ur);
                                         switch (des.toLowerCase()) {
                                             case "zippyshare":
-                                                MainStates.setZippyState(DownloadTask.STREAMING, ur, button, DownState);
+                                                MainStates.setZippyState(DownloadTask.STREAMING, ur, button, DownState, position);
                                                 web.post(new Runnable() {
                                                     @Override
                                                     public void run() {
@@ -809,7 +819,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                             default:
                                                 StreamManager.Stream(context, eid, ur);
                                                 MainStates.setProcessing(false, null);
-                                                showDownload(button);
+                                                showDownload(button, position);
                                                 d.dismiss();
                                                 break;
                                         }
@@ -820,7 +830,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                     public void onNegative(MaterialDialog dialog) {
                                         super.onNegative(dialog);
                                         MainStates.setProcessing(false, null);
-                                        showDownload(button);
+                                        showDownload(button, position);
                                         d.dismiss();
                                     }
                                 })
@@ -829,7 +839,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                     public void onCancel(DialogInterface dialog) {
                                         d.dismiss();
                                         MainStates.setProcessing(false, null);
-                                        showDownload(button);
+                                        showDownload(button, position);
                                     }
                                 })
                                 .build();
@@ -838,7 +848,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                         d.show();
                     } catch (Exception e) {
                         MainStates.setProcessing(false, null);
-                        showDownload(button);
+                        showDownload(button, position);
                         e.printStackTrace();
                         Toaster.toast("Error en JSON");
                     }
@@ -849,7 +859,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     super.onFailure(statusCode, headers, throwable, errorResponse);
                     MainStates.setProcessing(false, null);
                     Logger.Error(AdapterMain.this.getClass(), throwable);
-                    showDownload(button);
+                    showDownload(button, position);
                 }
             });
             Looper.loop();
