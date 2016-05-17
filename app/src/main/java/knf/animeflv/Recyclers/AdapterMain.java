@@ -791,7 +791,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                 .customView(R.layout.dialog_down, false)
                                 .cancelable(true)
                                 .autoDismiss(false)
-                                .positiveText("Reproducirr")
+                                .positiveText("Reproducir")
                                 .negativeText("Cancelar")
                                 .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
