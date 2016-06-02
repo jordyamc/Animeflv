@@ -58,6 +58,7 @@ import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
 /**
@@ -180,6 +181,7 @@ public class BackDownloadDeep extends AppCompatActivity {
                 .content("Deseas descargar el capitulo " + num + " de " + titulo + "?")
                 .positiveText("DESCARGAR")
                 .negativeText("Streaming")
+                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                 .cancelable(true)
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
@@ -627,6 +629,7 @@ public class BackDownloadDeep extends AppCompatActivity {
                             .autoDismiss(false)
                             .positiveText("Descargar")
                             .negativeText("Cancelar")
+                            .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                             .callback(new MaterialDialog.ButtonCallback() {
                                 @Override
                                 public void onPositive(MaterialDialog dialog) {
@@ -676,6 +679,7 @@ public class BackDownloadDeep extends AppCompatActivity {
                             .build();
                     sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
                     sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
+                    sp.setBackgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context));
                     d.show();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -772,6 +776,7 @@ public class BackDownloadDeep extends AppCompatActivity {
                             .autoDismiss(false)
                             .positiveText("Ver")
                             .negativeText("Cancelar")
+                            .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                             .callback(new MaterialDialog.ButtonCallback() {
                                 @Override
                                 public void onPositive(MaterialDialog dialog) {
@@ -821,6 +826,7 @@ public class BackDownloadDeep extends AppCompatActivity {
                             .build();
                     sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
                     sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
+                    sp.setBackgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context));
                     d.show();
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -55,12 +55,14 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Application;
+import knf.animeflv.ColorsRes;
 import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Requests;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.ThemeUtils;
 
 /**
  * Created by Jordy on 07/03/2016.
@@ -555,6 +557,7 @@ public class InfoNew extends AppCompatActivity implements Requests.callback, Log
             case R.id.comentarios:
                 dialog = new MaterialDialog.Builder(this)
                         .title("COMENTARIOS")
+                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                         .titleGravity(GravityEnum.CENTER)
                         .customView(R.layout.comentarios, false)
                         .positiveText("SALIR")

@@ -32,6 +32,7 @@ import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.MainStates;
+import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.WaitList.Costructor.WaitManager;
 import knf.animeflv.WaitList.Holders.ChildHolder;
 import knf.animeflv.WaitList.Holders.GroupHolder;
@@ -148,6 +149,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
                         .content("Desea empezar a descargar los " + animesCapList.get(groupPosition).size() + " capitulos?")
                         .positiveText("Descargar")
                         .negativeText("Cancelar")
+                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {

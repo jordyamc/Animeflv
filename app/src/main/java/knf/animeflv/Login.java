@@ -18,10 +18,12 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.loopj.android.http.SyncHttpClient;
 import com.loopj.android.http.TextHttpResponseHandler;
 
 import cz.msebera.android.httpclient.Header;
+import knf.animeflv.Utils.ThemeUtils;
 import se.simbio.encryption.Encryption;
 
 /**
@@ -68,7 +70,9 @@ public class Login extends DialogFragment{
                 .title("Sincronizar")
                 .titleGravity(GravityEnum.CENTER)
                 .customView(customView, false)
+                .backgroundColor(ThemeUtils.isAmoled(getActivity()) ? ColorsRes.Prim(getActivity()) : ColorsRes.Blanco(getActivity()))
                 .autoDismiss(false)
+                .theme(Theme.DARK)
                 .build();
                     email = (EditText)dialog.getCustomView().findViewById(R.id.email);
                     email.setTextColor(getResources().getColor(R.color.black));

@@ -53,11 +53,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import knf.animeflv.ColorsRes;
 import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Requests;
 import knf.animeflv.TaskType;
+import knf.animeflv.Utils.ThemeUtils;
 
 /**
  * Created by Jordy on 12/08/2015.
@@ -76,6 +78,51 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
     Spinner spinner;
     Context context;
     WebView webView;
+
+    public static boolean isXLargeScreen(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ret;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,9 +188,11 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
         SmartTabLayout viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab1);
         viewPagerTab.setViewPager(viewPager);
     }
+
     public void toast(String texto){
         Toast.makeText(this, texto, Toast.LENGTH_SHORT).show();
     }
+
     public String getJson() {
         String json="";
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
@@ -159,6 +208,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
         }
         return json;
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Amenu=menu;
@@ -248,6 +298,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
             case R.id.comentarios:
                 dialog=new MaterialDialog.Builder(this)
                         .title("COMENTARIOS")
+                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                         .titleGravity(GravityEnum.CENTER)
                         .customView(R.layout.comentarios,false)
                         .positiveText("SALIR")
@@ -309,11 +360,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
         titulo=parser.getTit(data);
         id=parser.getAID(data);
     }
-    public static boolean isXLargeScreen(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
+
     @Override
     public void onConfigurationChanged (Configuration newConfig)
     {
@@ -323,29 +370,7 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
             return;
         }
     }
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-    public static String getStringFromFile (String filePath) {
-        String ret="";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        } catch (IOException e) {
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ret;
-    }
+
     public String getUrl(String titulo,String capitulo) {
         String ftitulo = "";
         String atitulo = titulo.toLowerCase();
@@ -448,19 +473,6 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
             e.printStackTrace();
         }
         return hexString;
-    }
-
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
     }
 
     @Override

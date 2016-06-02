@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.Interfaces.WaitDownloadCallback;
 import knf.animeflv.Parser;
@@ -164,6 +165,7 @@ public class WaitActivity extends AppCompatActivity implements
         processing = new MaterialDialog.Builder(this)
                 .content("Procesando...")
                 .progress(true, 0)
+                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                 .cancelable(false)
                 .build();
         final Parcelable eimSavedState = (savedInstanceState != null) ? savedInstanceState.getParcelable("RecyclerViewExpandableItemManager") : null;

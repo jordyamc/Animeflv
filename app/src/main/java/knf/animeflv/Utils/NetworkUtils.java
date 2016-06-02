@@ -25,6 +25,7 @@ import com.thin.downloadmanager.ThinDownloadManager;
 import java.io.File;
 
 import cz.msebera.android.httpclient.Header;
+import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 import knf.animeflv.Utils.eNums.UpdateState;
 import knf.animeflv.newMain;
@@ -133,6 +134,7 @@ public class NetworkUtils {
                                         .cancelable(Boolean.valueOf(mensaje[3].trim()))
                                         .titleGravity(GravityEnum.CENTER)
                                         .positiveText(mensaje[4])
+                                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                         .callback(new MaterialDialog.ButtonCallback() {
                                             @Override
                                             public void onPositive(MaterialDialog dialog) {
@@ -188,6 +190,7 @@ public class NetworkUtils {
                                 .titleGravity(GravityEnum.CENTER)
                                 .positiveText("Actualizar")
                                 .negativeText("Salir")
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                 .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
                                     public void onPositive(final MaterialDialog dialog) {

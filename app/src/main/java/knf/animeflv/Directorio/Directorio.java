@@ -227,6 +227,7 @@ public class Directorio extends AppCompatActivity {
                         .autoDismiss(false)
                         .cancelable(false)
                         .positiveText("OK")
+                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                         .alwaysCallMultiChoiceCallback()
                         .itemsCallbackMultiChoice(SearchConstructor.getGenerosInt(), new MaterialDialog.ListCallbackMultiChoice() {
                             @Override

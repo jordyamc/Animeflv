@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -65,6 +66,9 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
         super.onCreate(savedInstanceState);
         TAG = "PLAYER INT";
         setContentView(R.layout.player);
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         controller = new VideoControllerView(this);
         mVideoSurface = (ResizeSurfaceView) findViewById(R.id.videoSurface);
         mContentView = findViewById(R.id.video_container);
@@ -286,7 +290,7 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
 
     @Override
     public boolean isFullScreen() {
-        return getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ? true : false;
+        return getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
     }
 
     @Override

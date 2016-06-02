@@ -50,6 +50,7 @@ import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.MainStates;
+import knf.animeflv.Utils.ThemeUtils;
 
 /**
  * Created by Jordy on 05/03/2016.
@@ -345,6 +346,7 @@ public class EmisionActivity extends AppCompatActivity {
             dialog = new MaterialDialog.Builder(context)
                     .progress(true, 0)
                     .content("Actualizando lista...")
+                    .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                     .build();
             dialog.show();
         }

@@ -104,6 +104,7 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.Emision.Section.newEmisionActivity;
+import knf.animeflv.Explorer.ExplorerRoot;
 import knf.animeflv.Interfaces.EncryptionListener;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
 import knf.animeflv.Recientes.MainOrganizer;
@@ -315,34 +316,30 @@ public class newMain extends AppCompatActivity implements
                         new PrimaryDrawerItem().withName("Favoritos").withIcon(/*GoogleMaterial.Icon.gmd_star*/MaterialDesignIconic.Icon.gmi_star).withIdentifier(1),
                         new PrimaryDrawerItem().withName("Directorio").withIcon(MaterialDesignIconic.Icon.gmi_view_list_alt).withIdentifier(2),
                         new PrimaryDrawerItem().withName("Emision").withIcon(MaterialDesignIconic.Icon.gmi_alarm_check).withIdentifier(3),
-                        //new PrimaryDrawerItem().withName("Descargas").withIcon(GoogleMaterial.Icon.gmd_file_download).withIdentifier(3),
+                        new PrimaryDrawerItem().withName("Explorador").withIcon(MaterialDesignIconic.Icon.gmi_folder).withIdentifier(9),
                         new PrimaryDrawerItem().withName("Lista").withIcon(MaterialDesignIconic.Icon.gmi_assignment_returned).withIdentifier(4),
                         new PrimaryDrawerItem().withName("Sugerencias").withIcon(MaterialDesignIconic.Icon.gmi_assignment).withIdentifier(5),
                         new PrimaryDrawerItem().withName("Pagina Oficial").withIcon(FontAwesome.Icon.faw_facebook).withIdentifier(6),
-                        //new PrimaryDrawerItem().withName("Chat").withIcon(GoogleMaterial.Icon.gmd_message).withIdentifier(6),
                         new PrimaryDrawerItem().withName("Web Oficial").withIcon(MaterialDesignIconic.Icon.gmi_view_web).withIdentifier(7),
                         new PrimaryDrawerItem().withName("Publicidad").withIcon(MaterialDesignIconic.Icon.gmi_cloud).withIdentifier(8)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int i, IDrawerItem iDrawerItem) {
-                        switch (i) {
-                            case -1:
-                                Intent intent = new Intent(context, Configuracion.class);
-                                startActivity(intent);
-                                result.closeDrawer();
-                                result.setSelection(0);
+                        switch ((int) iDrawerItem.getIdentifier()) {
+                            case 0:
+                                result.setSelection(0, false);
                                 break;
-                            case 2:
-                                result.setSelection(0);
+                            case 1:
                                 Intent in = new Intent(context, Favoritos.class);
                                 startActivity(in);
+                                result.setSelection(0, false);
+                                break;
+                            case 2:
+                                setDir(false);
+                                result.setSelection(0, false);
                                 break;
                             case 3:
-                                result.setSelection(0);
-                                setDir(false);
-                                break;
-                            case 4:
                                 /*if (MainStates.isLoadingEmision() && MainStates.isFload()) {
                                     getWaitingSnackBar().show();
                                     EmisionWaiting.run();
@@ -350,22 +347,17 @@ public class newMain extends AppCompatActivity implements
                                     startActivity(new Intent(context, newEmisionActivity.class));
                                 }*/
                                 startActivity(new Intent(context, newEmisionActivity.class));
-                                result.setSelection(0);
+                                result.setSelection(0, false);
+                                result.closeDrawer();
+                                break;
+                            case 4:
+                                startActivity(new Intent(context, WaitActivity.class));
+                                result.setSelection(0, false);
                                 result.closeDrawer();
                                 break;
                             case 5:
-                                startActivity(new Intent(context, WaitActivity.class));
-                                result.setSelection(0);
                                 result.closeDrawer();
-                                break;
-                            /*case 4:
-                                result.setSelection(0);
-                                Intent intent2 = new Intent(context, Descargas.class);
-                                startActivity(intent2);
-                                break;*/
-                            case 6://5
-                                result.closeDrawer();
-                                result.setSelection(0);
+                                result.setSelection(0, false);
                                 mat = new MaterialDialog.Builder(context)
                                         .title("Sugerencias")
                                         .titleGravity(GravityEnum.CENTER)
@@ -373,6 +365,7 @@ public class newMain extends AppCompatActivity implements
                                         .positiveText("Enviar")
                                         .negativeText("Cancelar")
                                         .autoDismiss(false)
+                                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                         .callback(new MaterialDialog.ButtonCallback() {
                                             @Override
                                             public void onPositive(MaterialDialog dialog) {
@@ -525,7 +518,7 @@ public class newMain extends AppCompatActivity implements
                                 cancelPost = false;
                                 mat.show();
                                 break;
-                            case 7://6
+                            case 6:
                                 String facebookUrl = "https://www.facebook.com/animeflv.app.jordy";
                                 Uri uri;
                                 try {
@@ -535,34 +528,36 @@ public class newMain extends AppCompatActivity implements
                                     uri = Uri.parse(facebookUrl);
                                 }
                                 startActivity(new Intent(Intent.ACTION_VIEW, uri));
-                                result.setSelection(0);
+                                result.setSelection(0, false);
                                 result.closeDrawer();
                                 break;
-                            /*case 7:
-                                if (isNetworkAvailable()) {
-                                    checkBan(CHAT);
-                                } else {
-                                    toast("Se necesita internet");
-                                }
-                                result.setSelection(0);
-                                result.closeDrawer();
-                                break;*/
-                            case 8://8
+                            case 7:
                                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(parser.getBaseUrl(TaskType.NORMAL, context))));
-                                result.setSelection(0);
+                                result.setSelection(0, false);
                                 result.closeDrawer();
                                 break;
-                            case 9://9
+                            case 8:
                                 startActivity(new Intent(context, ADS.class));
-                                result.setSelection(0);
+                                result.setSelection(0, false);
                                 result.closeDrawer();
+                                break;
+                            case 9:
+                                result.setSelection(0, false);
+                                Intent intent2 = new Intent(context, ExplorerRoot.class);
+                                startActivity(intent2);
+                                break;
+                            default:
+                                Intent intent = new Intent(context, Configuracion.class);
+                                startActivity(intent);
+                                result.closeDrawer();
+                                result.setSelection(0, false);
                                 break;
                         }
                         return false;
                     }
                 })
                 .addStickyDrawerItems(
-                        new SecondaryDrawerItem().withName("Configuracion").withIcon(FontAwesome.Icon.faw_cog)
+                        new SecondaryDrawerItem().withName("Configuracion").withIcon(FontAwesome.Icon.faw_cog).withIdentifier(-1)
                 )
                 .build();
         setUpAdmin(NetworkUtils.isNetworkAvailable());
@@ -638,6 +633,7 @@ public class newMain extends AppCompatActivity implements
                 .customView(R.layout.encrypt_dialog, false)
                 .positiveText("COMENZAR")
                 .negativeText("CERRAR")
+                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                 .autoDismiss(false)
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
@@ -912,6 +908,7 @@ public class newMain extends AppCompatActivity implements
                 .positiveText("OK")
                 .negativeText("CERRAR")
                 .neutralText("OCULTAR")
+                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                 .onNeutral(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -1582,6 +1579,7 @@ public class newMain extends AppCompatActivity implements
                                 .negativeText("NO")
                                 .autoDismiss(true)
                                 .cancelable(true)
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                 .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
                                     public void onPositive(MaterialDialog dialog) {
@@ -1622,6 +1620,7 @@ public class newMain extends AppCompatActivity implements
                                 .positiveText("CONTINUAR")
                                 .autoDismiss(false)
                                 .cancelable(false)
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                 .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
                                     public void onPositive(MaterialDialog dialog) {
@@ -1835,6 +1834,7 @@ public class newMain extends AppCompatActivity implements
                                 .positiveText("ACEPTAR")
                                 .cancelable(false)
                                 .autoDismiss(true)
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                 .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
                                     public void onPositive(MaterialDialog dialog) {

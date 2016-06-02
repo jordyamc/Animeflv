@@ -176,6 +176,7 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
                                             .content("Desea eliminar el capitulo " + item + "?")
                                             .positiveText("Eliminar")
                                             .negativeText("Cancelar")
+                                            .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                                 @Override
                                                 public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
@@ -208,6 +209,7 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
                                         .autoDismiss(true)
                                         .positiveText("Continuar")
                                         .negativeText("Cancelar")
+                                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                                             @Override
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -233,12 +235,41 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
                         Toaster.toast("Actualizacion descargada, instalar para continuar");
                     } else {
                         if (!MainStates.isProcessing()) {
-                            if (FileUtil.ExistAnime(eids.get(holder.getAdapterPosition()))) {
-                                holder.tv_capitulo.setTextColor(getColor());
-                                StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
+                            if (!MainStates.WaitContains(eids.get(holder.getAdapterPosition()))) {
+                                if (FileUtil.ExistAnime(eids.get(holder.getAdapterPosition()))) {
+                                    holder.tv_capitulo.setTextColor(getColor());
+                                    StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
+                                } else {
+                                    showLoading(holder.ib_des);
+                                    new CheckStream(holder.web, holder.tv_capitulo, holder.getAdapterPosition(), holder, new Parser().getUrlCached(id, item)).executeOnExecutor(threadPoolExecutor);
+                                }
                             } else {
-                                showLoading(holder.ib_des);
-                                new CheckStream(holder.web, holder.tv_capitulo, holder.getAdapterPosition(), holder, new Parser().getUrlCached(id, item)).executeOnExecutor(threadPoolExecutor);
+                                String[] data = eids.get(holder.getAdapterPosition()).replace("E", "").split("_");
+                                String aid = data[0];
+                                String num = data[1];
+                                new MaterialDialog.Builder(context)
+                                        .content(
+                                                "El capitulo " + num +
+                                                        " de " + UrlUtils.getTitCached(aid) +
+                                                        " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
+                                        .autoDismiss(true)
+                                        .positiveText("Continuar")
+                                        .negativeText("Cancelar")
+                                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                            @Override
+                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                MainStates.delFromWaitList(eids.get(holder.getAdapterPosition()));
+                                                if (FileUtil.ExistAnime(eids.get(holder.getAdapterPosition()))) {
+                                                    holder.tv_capitulo.setTextColor(getColor());
+                                                    StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
+                                                } else {
+                                                    showLoading(holder.ib_des);
+                                                    new CheckStream(holder.web, holder.tv_capitulo, holder.getAdapterPosition(), holder, new Parser().getUrlCached(id, item)).executeOnExecutor(threadPoolExecutor);
+                                                }
+                                            }
+                                        })
+                                        .build().show();
                             }
                         }
                     }
@@ -612,63 +643,69 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    d = new MaterialDialog.Builder(context)
-                            .title("Opciones")
-                            .titleGravity(GravityEnum.CENTER)
-                            .customView(R.layout.dialog_down, false)
-                            .cancelable(true)
-                            .autoDismiss(false)
-                            .positiveText("Descargar")
-                            .negativeText("Cancelar")
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction dialogAction) {
-                                    String desc = nombres.get(sp.getSelectedItemPosition());
-                                    final String ur = urls.get(sp.getSelectedItemPosition());
-                                    Log.d("Descargar", "URL -> " + ur);
-                                    switch (desc.toLowerCase()) {
-                                        case "zippyshare":
-                                            web.post(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    web.loadUrl(ur);
-                                                }
-                                            });
-                                            d.dismiss();
-                                            break;
-                                        case "mega":
-                                            d.dismiss();
-                                            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
-                                            showCloudPlay(ver);
-                                            showDownload(des);
-                                            break;
-                                        default:
-                                            ManageDownload.chooseDownDir(context, eids.get(pos), ur);
-                                            showPlay(ver);
-                                            showDelete(des);
-                                            d.dismiss();
-                                            break;
+                    if (nombres.size() != 0) {
+                        d = new MaterialDialog.Builder(context)
+                                .title("Opciones")
+                                .titleGravity(GravityEnum.CENTER)
+                                .customView(R.layout.dialog_down, false)
+                                .cancelable(true)
+                                .autoDismiss(false)
+                                .positiveText("Descargar")
+                                .negativeText("Cancelar")
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction dialogAction) {
+                                        String desc = nombres.get(sp.getSelectedItemPosition());
+                                        final String ur = urls.get(sp.getSelectedItemPosition());
+                                        Log.d("Descargar", "URL -> " + ur);
+                                        switch (desc.toLowerCase()) {
+                                            case "zippyshare":
+                                                web.post(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        web.loadUrl(ur);
+                                                    }
+                                                });
+                                                d.dismiss();
+                                                break;
+                                            case "mega":
+                                                d.dismiss();
+                                                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
+                                                showCloudPlay(ver);
+                                                showDownload(des);
+                                                break;
+                                            default:
+                                                ManageDownload.chooseDownDir(context, eids.get(pos), ur);
+                                                showPlay(ver);
+                                                showDelete(des);
+                                                d.dismiss();
+                                                break;
+                                        }
                                     }
-                                }
-                            })
-                            .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
-                                    materialDialog.dismiss();
-                                    showDownload(des);
-                                }
-                            })
-                            .cancelListener(new DialogInterface.OnCancelListener() {
-                                @Override
-                                public void onCancel(DialogInterface dialog) {
-                                    showDownload(des);
-                                    d.dismiss();
-                                }
-                            })
-                            .build();
-                    sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
-                    sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
-                    d.show();
+                                })
+                                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                        materialDialog.dismiss();
+                                        showDownload(des);
+                                    }
+                                })
+                                .cancelListener(new DialogInterface.OnCancelListener() {
+                                    @Override
+                                    public void onCancel(DialogInterface dialog) {
+                                        showDownload(des);
+                                        d.dismiss();
+                                    }
+                                })
+                                .build();
+                        sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
+                        sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
+                        d.show();
+                    } else {
+                        Toaster.toast("No hay links!!! Intenta mas tarde!!!");
+                        showDownload(des);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(context, "Error en JSON", Toast.LENGTH_SHORT).show();
@@ -677,7 +714,7 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
         }
     }
 
-    public class CheckStream extends AsyncTask<String, String, String> {
+    private class CheckStream extends AsyncTask<String, String, String> {
         WebView web;
         TextView cap;
         int pos;
@@ -686,7 +723,7 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
         AdapterInfoCaps.ViewHolder holder;
         String url;
 
-        public CheckStream(WebView w, TextView tv_capitulo, int position, AdapterInfoCaps.ViewHolder holder, String url) {
+        private CheckStream(WebView w, TextView tv_capitulo, int position, AdapterInfoCaps.ViewHolder holder, String url) {
             this.cap = tv_capitulo;
             this.pos = position;
             this.web = w;
@@ -754,67 +791,73 @@ public class AdapterInfoCaps extends RecyclerView.Adapter<AdapterInfoCaps.ViewHo
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    d = new MaterialDialog.Builder(context)
-                            .title("Opciones")
-                            .titleGravity(GravityEnum.CENTER)
-                            .customView(R.layout.dialog_down, false)
-                            .cancelable(true)
-                            .autoDismiss(false)
-                            .positiveText("Reproducir")
-                            .negativeText("Cancelar")
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction dialogAction) {
-                                    String desc = nombres.get(sp.getSelectedItemPosition());
-                                    final String ur = urls.get(sp.getSelectedItemPosition());
-                                    Log.d("Streaming", "URL -> " + ur);
-                                    switch (desc.toLowerCase()) {
-                                        case "zippyshare":
-                                            streaming = true;
-                                            posT = pos;
-                                            web.post(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    web.loadUrl(ur);
-                                                }
-                                            });
-                                            d.dismiss();
-                                            break;
-                                        case "mega":
-                                            d.dismiss();
-                                            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
-                                            showDownload(holder.ib_des);
-                                            showCloudPlay(holder.ib_ver);
-                                            holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
-                                            break;
-                                        default:
-                                            StreamManager.Stream(context, eids.get(holder.getAdapterPosition()), ur);
-                                            holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
-                                            showDownload(holder.ib_des);
-                                            showCloudPlay(holder.ib_ver);
-                                            d.dismiss();
-                                            break;
+                    if (nombres.size() != 0) {
+                        d = new MaterialDialog.Builder(context)
+                                .title("Opciones")
+                                .titleGravity(GravityEnum.CENTER)
+                                .customView(R.layout.dialog_down, false)
+                                .cancelable(true)
+                                .autoDismiss(false)
+                                .positiveText("Reproducir")
+                                .negativeText("Cancelar")
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction dialogAction) {
+                                        String desc = nombres.get(sp.getSelectedItemPosition());
+                                        final String ur = urls.get(sp.getSelectedItemPosition());
+                                        Log.d("Streaming", "URL -> " + ur);
+                                        switch (desc.toLowerCase()) {
+                                            case "zippyshare":
+                                                streaming = true;
+                                                posT = pos;
+                                                web.post(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        web.loadUrl(ur);
+                                                    }
+                                                });
+                                                d.dismiss();
+                                                break;
+                                            case "mega":
+                                                d.dismiss();
+                                                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
+                                                showDownload(holder.ib_des);
+                                                showCloudPlay(holder.ib_ver);
+                                                holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
+                                                break;
+                                            default:
+                                                StreamManager.Stream(context, eids.get(holder.getAdapterPosition()), ur);
+                                                holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
+                                                showDownload(holder.ib_des);
+                                                showCloudPlay(holder.ib_ver);
+                                                d.dismiss();
+                                                break;
+                                        }
                                     }
-                                }
-                            })
-                            .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
-                                    showDownload(holder.ib_des);
-                                    materialDialog.dismiss();
-                                }
-                            })
-                            .cancelListener(new DialogInterface.OnCancelListener() {
-                                @Override
-                                public void onCancel(DialogInterface dialog) {
-                                    showDownload(holder.ib_des);
-                                    d.dismiss();
-                                }
-                            })
-                            .build();
-                    sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
-                    sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
-                    d.show();
+                                })
+                                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                        showDownload(holder.ib_des);
+                                        materialDialog.dismiss();
+                                    }
+                                })
+                                .cancelListener(new DialogInterface.OnCancelListener() {
+                                    @Override
+                                    public void onCancel(DialogInterface dialog) {
+                                        showDownload(holder.ib_des);
+                                        d.dismiss();
+                                    }
+                                })
+                                .build();
+                        sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
+                        sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
+                        d.show();
+                    } else {
+                        Toaster.toast("No hay links!!! Intenta mas tarde!!!");
+                        showDownload(holder.ib_des);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(context, "Error en JSON", Toast.LENGTH_SHORT).show();

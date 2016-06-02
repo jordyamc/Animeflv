@@ -126,6 +126,7 @@ import knf.animeflv.Emision.EmisionChecker;
 import knf.animeflv.Emision.Section.EmisionActivity;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UtilSound;
 import knf.animeflv.info.Info;
 import knf.animeflv.info.InfoNew;
@@ -2756,6 +2757,7 @@ public class Main extends AppCompatActivity implements
                                 .negativeText("NO")
                                 .autoDismiss(true)
                                 .cancelable(true)
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                 .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
                                     public void onPositive(MaterialDialog dialog) {
@@ -2796,6 +2798,7 @@ public class Main extends AppCompatActivity implements
                                 .positiveText("CONTINUAR")
                                 .autoDismiss(false)
                                 .cancelable(false)
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                 .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
                                     public void onPositive(MaterialDialog dialog) {
@@ -3809,6 +3812,7 @@ public class Main extends AppCompatActivity implements
                                 .title(titulo)
                                 .content(desc)
                                 .positiveText("ACEPTAR")
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                 .cancelable(false)
                                 .autoDismiss(true)
                                 .callback(new MaterialDialog.ButtonCallback() {

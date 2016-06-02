@@ -78,6 +78,7 @@ import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
+import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UpdateUtil;
 import knf.animeflv.Utils.eNums.DownloadTask;
 import knf.animeflv.Utils.eNums.UpdateState;
@@ -256,6 +257,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                         .autoDismiss(true)
                                         .positiveText("Continuar")
                                         .negativeText("Cancelar")
+                                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                                             @Override
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -281,6 +283,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                 .content("Desea eliminar el " + getCap(Animes.get(holder.getAdapterPosition()).getNumero()).toLowerCase() + " de " + Animes.get(holder.getAdapterPosition()).getTitulo() + "?")
                                 .positiveText("Eliminar")
                                 .negativeText("Cancelar")
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -327,6 +330,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                             .autoDismiss(true)
                                             .positiveText("Continuar")
                                             .negativeText("Cancelar")
+                                            .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                                 @Override
                                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -661,75 +665,86 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                        if (nombres.size() != 0) {
+                            d = new MaterialDialog.Builder(context)
+                                    .title("Descarga")
+                                    .titleGravity(GravityEnum.CENTER)
+                                    .customView(R.layout.dialog_down, false)
+                                    .cancelable(true)
+                                    .autoDismiss(false)
+                                    .positiveText("Descargar")
+                                    .negativeText("Cancelar")
+                                    .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                    .callback(new MaterialDialog.ButtonCallback() {
+                                        @Override
+                                        public void onPositive(MaterialDialog dialog) {
+                                            super.onPositive(dialog);
+                                            String des = nombres.get(sp.getSelectedItemPosition());
+                                            final String ur = urls.get(sp.getSelectedItemPosition());
+                                            Log.d("Descargar", "URL -> " + ur);
+                                            switch (des.toLowerCase()) {
+                                                case "zippyshare":
+                                                    MainStates.setZippyState(DownloadTask.DESCARGA, ur, button, DownState, position);
+                                                    web.post(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            web.loadUrl(ur);
+                                                        }
+                                                    });
+                                                    d.dismiss();
+                                                    break;
+                                                case "mega":
+                                                    d.dismiss();
+                                                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
+                                                    MainStates.setProcessing(false, null);
+                                                    break;
+                                                default:
+                                                    ManageDownload.chooseDownDir(context, eid, ur);
+                                                    MainStates.setProcessing(false, null);
+                                                    showDelete(button);
+                                                    showPlay(DownState);
+                                                    d.dismiss();
+                                                    break;
+                                            }
 
-                        d = new MaterialDialog.Builder(context)
-                                .title("Descarga")
-                                .titleGravity(GravityEnum.CENTER)
-                                .customView(R.layout.dialog_down, false)
-                                .cancelable(true)
-                                .autoDismiss(false)
-                                .positiveText("Descargar")
-                                .negativeText("Cancelar")
-                                .callback(new MaterialDialog.ButtonCallback() {
-                                    @Override
-                                    public void onPositive(MaterialDialog dialog) {
-                                        super.onPositive(dialog);
-                                        String des = nombres.get(sp.getSelectedItemPosition());
-                                        final String ur = urls.get(sp.getSelectedItemPosition());
-                                        Log.d("Descargar", "URL -> " + ur);
-                                        switch (des.toLowerCase()) {
-                                            case "zippyshare":
-                                                MainStates.setZippyState(DownloadTask.DESCARGA, ur, button, DownState, position);
-                                                web.post(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        web.loadUrl(ur);
-                                                    }
-                                                });
-                                                d.dismiss();
-                                                break;
-                                            case "mega":
-                                                d.dismiss();
-                                                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
-                                                MainStates.setProcessing(false, null);
-                                                break;
-                                            default:
-                                                ManageDownload.chooseDownDir(context, eid, ur);
-                                                MainStates.setProcessing(false, null);
-                                                showDelete(button);
-                                                showPlay(DownState);
-                                                d.dismiss();
-                                                break;
                                         }
 
-                                    }
-
-                                    @Override
-                                    public void onNegative(MaterialDialog dialog) {
-                                        super.onNegative(dialog);
-                                        MainStates.setProcessing(false, null);
-                                        showDownload(button, position);
-                                        d.dismiss();
-                                    }
-                                })
-                                .cancelListener(new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialog) {
-                                        d.dismiss();
-                                        MainStates.setProcessing(false, null);
-                                        showDownload(button, position);
-                                    }
-                                })
-                                .build();
-                        sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
-                        sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
-                        d.show();
+                                        @Override
+                                        public void onNegative(MaterialDialog dialog) {
+                                            super.onNegative(dialog);
+                                            MainStates.setProcessing(false, null);
+                                            showDownload(button, position);
+                                            d.dismiss();
+                                        }
+                                    })
+                                    .cancelListener(new DialogInterface.OnCancelListener() {
+                                        @Override
+                                        public void onCancel(DialogInterface dialog) {
+                                            d.dismiss();
+                                            MainStates.setProcessing(false, null);
+                                            showDownload(button, position);
+                                        }
+                                    })
+                                    .build();
+                            sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
+                            sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
+                            sp.setBackgroundColor((ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context)));
+                            d.show();
+                        } else {
+                            Toaster.toast("No hay links!!! Intenta mas tarde!!!");
+                            MainStates.setProcessing(false, null);
+                            showDownload(button, position);
+                        }
                     } catch (Exception e) {
                         MainStates.setProcessing(false, null);
                         showDownload(button, position);
                         Logger.Error(AdapterMain.this.getClass(), e);
                         FileUtil.writeToFile(e.getMessage() +"   "+parser.getUrlCached(eid)+ "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
-                        Toaster.toast("Error en JSON");
+                        if (!parser.getUrlCached(eid).equals("null")) {
+                            Toaster.toast("Error en JSON");
+                        } else {
+                            Toaster.toast("Anime no encontrado en directorio!");
+                        }
                     }
                 }
 
@@ -784,73 +799,84 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                        if (nombres.size() != 0) {
+                            d = new MaterialDialog.Builder(context)
+                                    .title("Streaming")
+                                    .titleGravity(GravityEnum.CENTER)
+                                    .customView(R.layout.dialog_down, false)
+                                    .cancelable(true)
+                                    .autoDismiss(false)
+                                    .positiveText("Reproducir")
+                                    .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                    .negativeText("Cancelar")
+                                    .callback(new MaterialDialog.ButtonCallback() {
+                                        @Override
+                                        public void onPositive(MaterialDialog dialog) {
+                                            super.onPositive(dialog);
+                                            String des = nombres.get(sp.getSelectedItemPosition());
+                                            final String ur = urls.get(sp.getSelectedItemPosition());
+                                            Log.d("Stream", "URL -> " + ur);
+                                            switch (des.toLowerCase()) {
+                                                case "zippyshare":
+                                                    MainStates.setZippyState(DownloadTask.STREAMING, ur, button, DownState, position);
+                                                    web.post(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            web.loadUrl(ur);
+                                                        }
+                                                    });
+                                                    d.dismiss();
+                                                    break;
+                                                case "mega":
+                                                    d.dismiss();
+                                                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
+                                                    MainStates.setProcessing(false, null);
+                                                    break;
+                                                default:
+                                                    StreamManager.Stream(context, eid, ur);
+                                                    MainStates.setProcessing(false, null);
+                                                    showDownload(button, position);
+                                                    d.dismiss();
+                                                    break;
+                                            }
 
-                        d = new MaterialDialog.Builder(context)
-                                .title("Streaming")
-                                .titleGravity(GravityEnum.CENTER)
-                                .customView(R.layout.dialog_down, false)
-                                .cancelable(true)
-                                .autoDismiss(false)
-                                .positiveText("Reproducir")
-                                .negativeText("Cancelar")
-                                .callback(new MaterialDialog.ButtonCallback() {
-                                    @Override
-                                    public void onPositive(MaterialDialog dialog) {
-                                        super.onPositive(dialog);
-                                        String des = nombres.get(sp.getSelectedItemPosition());
-                                        final String ur = urls.get(sp.getSelectedItemPosition());
-                                        Log.d("Stream", "URL -> " + ur);
-                                        switch (des.toLowerCase()) {
-                                            case "zippyshare":
-                                                MainStates.setZippyState(DownloadTask.STREAMING, ur, button, DownState, position);
-                                                web.post(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        web.loadUrl(ur);
-                                                    }
-                                                });
-                                                d.dismiss();
-                                                break;
-                                            case "mega":
-                                                d.dismiss();
-                                                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
-                                                MainStates.setProcessing(false, null);
-                                                break;
-                                            default:
-                                                StreamManager.Stream(context, eid, ur);
-                                                MainStates.setProcessing(false, null);
-                                                showDownload(button, position);
-                                                d.dismiss();
-                                                break;
                                         }
 
-                                    }
-
-                                    @Override
-                                    public void onNegative(MaterialDialog dialog) {
-                                        super.onNegative(dialog);
-                                        MainStates.setProcessing(false, null);
-                                        showDownload(button, position);
-                                        d.dismiss();
-                                    }
-                                })
-                                .cancelListener(new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialog) {
-                                        d.dismiss();
-                                        MainStates.setProcessing(false, null);
-                                        showDownload(button, position);
-                                    }
-                                })
-                                .build();
-                        sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
-                        sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
-                        d.show();
+                                        @Override
+                                        public void onNegative(MaterialDialog dialog) {
+                                            super.onNegative(dialog);
+                                            MainStates.setProcessing(false, null);
+                                            showDownload(button, position);
+                                            d.dismiss();
+                                        }
+                                    })
+                                    .cancelListener(new DialogInterface.OnCancelListener() {
+                                        @Override
+                                        public void onCancel(DialogInterface dialog) {
+                                            d.dismiss();
+                                            MainStates.setProcessing(false, null);
+                                            showDownload(button, position);
+                                        }
+                                    })
+                                    .build();
+                            sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
+                            sp.setBackgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context));
+                            sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
+                            d.show();
+                        } else {
+                            Toaster.toast("No hay links!!! Intenta mas tarde!!!");
+                            MainStates.setProcessing(false, null);
+                            showDownload(button, position);
+                        }
                     } catch (Exception e) {
                         MainStates.setProcessing(false, null);
                         showDownload(button, position);
                         e.printStackTrace();
-                        Toaster.toast("Error en JSON");
+                        if (!parser.getUrlCached(eid).equals("null")) {
+                            Toaster.toast("Error en JSON");
+                        } else {
+                            Toaster.toast("Anime no encontrado en directorio!");
+                        }
                     }
                 }
 

@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import knf.animeflv.Recyclers.AdapterDialogPrefSimple;
+import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UtilDialogPref;
 
 /**
@@ -54,6 +55,7 @@ public class PrefDialogSimple extends DialogFragment {
                 .titleGravity(GravityEnum.CENTER)
                 .customView(customView, false)
                 .canceledOnTouchOutside(true)
+                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                 .build();
 
         if (UtilDialogPref.getLista() != null) {

@@ -6,7 +6,7 @@
 
     <include
         android:id="@+id/toolbar_tuto"
-        layout="@layout/toolbar" />
+        layout="@layout/toolbar"/>
 
     <ScrollView
         android:layout_width="match_parent"

@@ -112,6 +112,7 @@ public class Configuracion extends AppCompatActivity implements LoginServer.call
         super.onOptionsItemSelected(item);
         MaterialDialog dialog = new MaterialDialog.Builder(this)
                 .title("Codigo de referencia")
+                .backgroundColor(ThemeUtils.isAmoled(this) ? ColorsRes.Prim(this) : ColorsRes.Blanco(this))
                 .titleGravity(GravityEnum.CENTER)
                 .customView(R.layout.lay_info, false)
                 .build();

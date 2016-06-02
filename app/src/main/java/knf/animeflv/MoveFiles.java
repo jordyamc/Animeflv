@@ -18,6 +18,7 @@ import java.util.Arrays;
 
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Logger;
+import knf.animeflv.Utils.ThemeUtils;
 
 /**
  * Created by Jordy on 12/08/2015.
@@ -38,6 +39,7 @@ public class MoveFiles extends AsyncTask<String,String,String> {
         dialog = new MaterialDialog.Builder(d_context)
                 .title("Moviendo Animes...")
                 .titleGravity(GravityEnum.CENTER)
+                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                 .progress(false, count(), true)
                 .cancelable(false)
                 .build();
@@ -166,6 +168,7 @@ public class MoveFiles extends AsyncTask<String,String,String> {
                     .title("Moviendo Animes...")
                     .titleGravity(GravityEnum.CENTER)
                     .progress(false, children.length, true)
+                    .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                     .cancelable(false)
                     .build();
             dialog.show();

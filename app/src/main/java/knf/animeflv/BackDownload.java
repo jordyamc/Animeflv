@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import knf.animeflv.Utils.Logger;
+import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
 /**
@@ -449,6 +450,7 @@ public class BackDownload extends AppCompatActivity {
                             .autoDismiss(false)
                             .positiveText("Descargar")
                             .negativeText("Cancelar")
+                            .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                             .callback(new MaterialDialog.ButtonCallback() {
                                 @Override
                                 public void onPositive(MaterialDialog dialog) {
@@ -498,6 +500,7 @@ public class BackDownload extends AppCompatActivity {
                             .build();
                     sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
                     sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
+                    sp.setBackgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context));
                     d.show();
                 } catch (Exception e) {
                     e.printStackTrace();

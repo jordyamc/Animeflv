@@ -32,7 +32,6 @@ import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.lb.material_preferences_library.custom_preferences.ListPreference;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
@@ -56,11 +55,13 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Application;
+import knf.animeflv.ColorsRes;
 import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Requests;
 import knf.animeflv.TaskType;
+import knf.animeflv.Utils.ThemeUtils;
 
 /**
  * Created by Jordy on 07/03/2016.
@@ -271,6 +272,60 @@ public class InfoNewDeep extends AppCompatActivity implements Requests.callback,
         }
     }
 
+    private boolean isNetworkAvailable() {
+        Boolean net = false;
+        int Tcon = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        switch (Tcon) {
+            case 0:
+                NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                net = Wifi.isConnected();
+                break;
+            case 1:
+                NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net = mobile.isConnected();
+                break;
+            case 2:
+                NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                net = WifiA.isConnected() || mobileA.isConnected();
+                break;
+        }
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && net;
+    }
+
+    public void writeToFile(String body, File file) {
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file);
+            fos.write(body.getBytes());
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void toast(String texto) {
+        Toast.makeText(this, texto, Toast.LENGTH_SHORT).show();
+    }
+
+    public String getJson() {
+        String json = "";
+        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+            if (!mediaStorage.exists()) {
+                mediaStorage.mkdirs();
+            }
+        }
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + id + ".txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + id + ".txt";
+        if (file.exists()) {
+            Log.d("Archivo", "Existe");
+            json = getStringFromFile(file_loc);
+        }
+        return json;
+    }
+
     private void setJson(JSONObject json) {
         String s = json.toString();
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
@@ -328,60 +383,6 @@ public class InfoNewDeep extends AppCompatActivity implements Requests.callback,
                 viewPagerTab.setViewPager(viewPager);
             }
         }
-    }
-
-    private boolean isNetworkAvailable() {
-        Boolean net = false;
-        int Tcon = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        switch (Tcon) {
-            case 0:
-                NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                net = Wifi.isConnected();
-                break;
-            case 1:
-                NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                net = mobile.isConnected();
-                break;
-            case 2:
-                NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                net = WifiA.isConnected() || mobileA.isConnected();
-                break;
-        }
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && net;
-    }
-
-    public void writeToFile(String body, File file) {
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
-            fos.write(body.getBytes());
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void toast(String texto) {
-        Toast.makeText(this, texto, Toast.LENGTH_SHORT).show();
-    }
-
-    public String getJson() {
-        String json = "";
-        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-            if (!mediaStorage.exists()) {
-                mediaStorage.mkdirs();
-            }
-        }
-        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + id + ".txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + id + ".txt";
-        if (file.exists()) {
-            Log.d("Archivo", "Existe");
-            json = getStringFromFile(file_loc);
-        }
-        return json;
     }
 
     @Override
@@ -471,6 +472,7 @@ public class InfoNewDeep extends AppCompatActivity implements Requests.callback,
             case R.id.comentarios:
                 dialog = new MaterialDialog.Builder(this)
                         .title("COMENTARIOS")
+                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                         .titleGravity(GravityEnum.CENTER)
                         .customView(R.layout.comentarios, false)
                         .positiveText("SALIR")

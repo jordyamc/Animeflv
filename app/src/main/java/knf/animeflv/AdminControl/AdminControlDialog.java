@@ -25,6 +25,7 @@ import cz.msebera.android.httpclient.Header;
 import knf.animeflv.AdminControl.ControlEnum.AdminBundle;
 import knf.animeflv.AdminControl.ControlEnum.Control;
 import knf.animeflv.BackEncryption;
+import knf.animeflv.ColorsRes;
 import knf.animeflv.Interfaces.EncryptionListener;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
@@ -64,6 +65,7 @@ public class AdminControlDialog extends DialogFragment {
                 .cancelable(false)
                 .positiveText("COMENZAR")
                 .negativeText("CANCELAR")
+                .backgroundColor(ThemeUtils.isAmoled(getActivity()) ? ColorsRes.Prim(getActivity()) : ColorsRes.Blanco(getActivity()))
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {

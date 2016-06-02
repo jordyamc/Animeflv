@@ -25,9 +25,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 
+import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Logger;
+import knf.animeflv.Utils.ThemeUtils;
 
 /**
  * Created by Jordy on 08/08/2015.
@@ -381,6 +383,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
                 .content("Desea eliminar la descarga del capitulo "+capitulo.get(position)+" de "+titulo.get(position)+"?")
                 .positiveText("ACEPTAR")
                 .negativeText("CANCELAR")
+                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                 .callback(new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {

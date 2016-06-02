@@ -18,6 +18,7 @@ import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import knf.animeflv.Recyclers.AdapterDialogPref;
+import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UtilDialogPref;
 import knf.animeflv.Utils.UtilSound;
 
@@ -55,6 +56,7 @@ public class DialogSounds extends DialogFragment {
                 .title(UtilDialogPref.getTitulo())
                 .titleGravity(GravityEnum.CENTER)
                 .customView(customView, false)
+                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                 .canceledOnTouchOutside(true)
                 .cancelListener(new DialogInterface.OnCancelListener() {
                     @Override

@@ -44,6 +44,7 @@ import knf.animeflv.Utils.Keys.Conf;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.SoundsLoader;
+import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UtilDialogPref;
 import knf.animeflv.Utils.UtilSound;
 import xdroid.toaster.Toaster;
@@ -159,6 +160,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                         .title("ELIMINAR")
                         .titleGravity(GravityEnum.CENTER)
                         .content("Desea eliminar TODOS los animes descargados?")
+                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                         .positiveText("SI")
                         .negativeText("CANCELAR")
                         .callback(new MaterialDialog.ButtonCallback() {
@@ -383,6 +385,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                                     new MaterialDialog.Builder(myContext)
                                             .title("Nombre de SD")
                                             .titleGravity(GravityEnum.CENTER)
+                                            .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                             .items(response.list())
                                             .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
                                                 @Override
@@ -413,6 +416,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                             new MaterialDialog.Builder(myContext)
                                     .title("Direccion")
                                     .titleGravity(GravityEnum.CENTER)
+                                    .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                     .items(new String[]{"/mnt", "/storage"})
                                     .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
                                         @Override

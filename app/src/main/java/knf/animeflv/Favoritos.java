@@ -205,6 +205,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                 dialog = new MaterialDialog.Builder(context)
                         .content("Actualizando Favoritos")
                         .progress(true, 0)
+                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                         .cancelable(true)
                         .cancelListener(new DialogInterface.OnCancelListener() {
                             @Override

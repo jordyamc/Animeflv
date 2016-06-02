@@ -15,6 +15,8 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import knf.animeflv.Utils.ThemeUtils;
+
 /**
  * Created by Jordy on 04/09/2015.
  */
@@ -38,6 +40,7 @@ public class ChangelogDialog extends DialogFragment {
                 .title("ChangeLog")
                 .customView(customView, false)
                 .positiveText(android.R.string.ok)
+                .backgroundColor(ThemeUtils.isAmoled(getActivity()) ? ColorsRes.Prim(getActivity()) : ColorsRes.Blanco(getActivity()))
                 .build();
 
         final WebView webView = (WebView) customView.findViewById(R.id.webview);
