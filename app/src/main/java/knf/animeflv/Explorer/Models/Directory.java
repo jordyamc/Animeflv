@@ -10,9 +10,11 @@ import knf.animeflv.TaskType;
 
 public class Directory {
     private File src;
+    private String title;
 
     public Directory(File src) {
         this.src = src;
+        this.title = new Parser().getTitCached(getID());
     }
 
     public String getPath() {
@@ -32,7 +34,7 @@ public class Directory {
     }
 
     public String getTitle() {
-        return new Parser().getTitCached(getID());
+        return title;
     }
 
     public String getFilesNumber() {

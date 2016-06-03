@@ -51,6 +51,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         if (ThemeUtils.isAmoled(this)) {
+            textView.getRootView().setBackgroundColor(ColorsRes.Negro(this));
             textView.setTextColor(ColorsRes.Holo_Dark(this));
             toolbar.setBackgroundColor(ColorsRes.Negro(this));
         }

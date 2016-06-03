@@ -6,8 +6,11 @@ import android.preference.PreferenceManager;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import knf.animeflv.Explorer.DirectoryComparator;
+import knf.animeflv.Explorer.VideoComparator;
 import knf.animeflv.Utils.FileUtil;
 
 public class ModelFactory {
@@ -23,6 +26,7 @@ public class ModelFactory {
                 }
             }
         }
+        Collections.sort(files, new DirectoryComparator());
         return files;
     }
 
@@ -33,6 +37,7 @@ public class ModelFactory {
                 files.add(new VideoFile(video));
             }
         }
+        Collections.sort(files, new VideoComparator());
         return files;
     }
 

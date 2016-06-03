@@ -13,12 +13,10 @@ import java.io.File;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import knf.animeflv.ColorsRes;
 import knf.animeflv.Explorer.Adapters.VideoFileAdapter;
 import knf.animeflv.R;
-
-/**
- * Created by Jordy on 01/06/2016.
- */
+import knf.animeflv.Utils.ThemeUtils;
 
 public class VideoFilesFragment extends Fragment {
     @Bind(R.id.recycler)
@@ -33,6 +31,8 @@ public class VideoFilesFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View root = inflater.inflate(R.layout.explorer_fragment, container, false);
         ButterKnife.bind(this, root);
+        if (ThemeUtils.isAmoled(getActivity()))
+            root.getRootView().setBackgroundColor(ColorsRes.Negro(getActivity()));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(new VideoFileAdapter(getActivity(), new File(getArguments().getString("path"))));
         return root;

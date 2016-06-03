@@ -66,7 +66,7 @@ public class VideoFile {
         );
     }
 
-    private String getCapNumber() {
+    public String getCapNumber() {
         return getEID().replace("E", "").split("_")[1];
     }
 
