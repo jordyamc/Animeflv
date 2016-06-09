@@ -5,6 +5,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,17 +15,24 @@ import knf.animeflv.Explorer.VideoComparator;
 import knf.animeflv.Utils.FileUtil;
 
 public class ModelFactory {
+    private static FileFilter dirFilter = new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+            if (pathname.isDirectory()) {
+                if (pathname.list().length > 0) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    };
     public static List<Directory> createDirectoryList(Context context) {
         List<Directory> files = new ArrayList<>();
         if (!getDirectoryFile(context).exists()) {
             getDirectoryFile(context).mkdirs();
         }
-        for (File file : getDirectoryFile(context).listFiles()) {
-            if (file.isDirectory()) {
-                if (file.listFiles().length > 0) {
-                    files.add(new Directory(file));
-                }
-            }
+        for (File file : getDirectoryFile(context).listFiles(dirFilter)) {
+            files.add(new Directory(file));
         }
         Collections.sort(files, new DirectoryComparator());
         return files;

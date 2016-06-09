@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="knf.animeflv"
-    android:installLocation="auto">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="knf.animeflv"
+          android:installLocation="auto">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
@@ -42,9 +42,9 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -63,73 +63,73 @@
             android:label="@string/app_name"
             android:theme="@style/FilePickerTheme">
             <intent-filter>
-                <action android:name="android.intent.action.GET_CONTENT" />
+                <action android:name="android.intent.action.GET_CONTENT"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".Tutorial.TutorialActivity"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"/>
         <activity
             android:name=".WebDescarga"
             android:label="@string/app_name"
             android:theme="@style/Theme.Transparent">
             <intent-filter>
-                <action android:name="android.intent.action.WEB_SEARCH" />
+                <action android:name="android.intent.action.WEB_SEARCH"/>
 
-                <category android:name="android.intent.category.APP_BROWSER" />
+                <category android:name="android.intent.category.APP_BROWSER"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.smaato.soma.ExpandedBannerActivity" />
-        <activity android:name="com.smaato.soma.interstitial.InterstitialActivity" />
-        <activity android:name="com.smaato.soma.video.VASTAdActivity" />
+        <activity android:name="com.smaato.soma.ExpandedBannerActivity"/>
+        <activity android:name="com.smaato.soma.interstitial.InterstitialActivity"/>
+        <activity android:name="com.smaato.soma.video.VASTAdActivity"/>
         <activity
             android:name=".Favoritos"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"/>
         <activity
             android:name=".Chat"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"/>
         <activity
             android:name=".Directorio.Directorio"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"/>
         <activity
             android:name=".Descargas"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"/>
         <activity
             android:name=".WaitList.WaitActivity"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"/>
         <activity
             android:name=".Intronew"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"/>
         <activity
             android:name=".Move"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Transparent" />
+            android:theme="@style/Theme.Transparent"/>
         <activity
             android:name=".BackDownload"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Transparent" />
+            android:theme="@style/Theme.Transparent"/>
         <activity
             android:name=".Retry"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Transparent" />
+            android:theme="@style/Theme.Transparent"/>
         <activity
             android:name=".Configuracion"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".info.Info"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"/>
         <activity
             android:name=".info.InfoNew"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"/>
         <activity
             android:name=".Emision.Section.EmisionActivity"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"/>
         <activity
             android:name=".Emision.Section.newEmisionActivity"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"/>
         <activity
             android:name=".Player"
             android:label="@string/app_name"/>
@@ -151,6 +151,9 @@
             android:name=".Explorer.ExplorerRoot"
             android:label="@string/app_name"/>
         <activity
+            android:name=".info.InfoNewMaterial"
+            android:label="@string/app_name"/>
+        <activity
             android:name=".Utils.logs.LogViewer"
             android:excludeFromRecents="true"
             android:label="@string/app_name">
@@ -164,37 +167,37 @@
             android:name=".info.InfoNewDeep"
             android:label="@string/app_name">
             <intent-filter android:label="@string/app_name">
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
 
                 <data
                     android:host="animeflv.net"
                     android:pathPrefix="/anime/"
-                    android:scheme="http" />
+                    android:scheme="http"/>
             </intent-filter>
             <intent-filter android:label="@string/app_name">
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
                     android:host="animeflv.net"
                     android:pathPrefix="/ova/"
-                    android:scheme="http" />
+                    android:scheme="http"/>
             </intent-filter>
             <intent-filter android:label="@string/app_name">
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
                     android:host="animeflv.net"
                     android:pathPrefix="/pelicula/"
-                    android:scheme="http" />
+                    android:scheme="http"/>
             </intent-filter>
         </activity>
         <activity
@@ -202,15 +205,15 @@
             android:label="@string/app_name"
             android:theme="@style/Theme.Transparent">
             <intent-filter android:label="@string/app_name">
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
 
                 <data
                     android:host="animeflv.net"
                     android:pathPrefix="/ver/"
-                    android:scheme="http" />
+                    android:scheme="http"/>
             </intent-filter>
         </activity>
 
@@ -218,49 +221,49 @@
             android:name=".Alarm"
             android:exported="true">
             <intent-filter>
-                <action android:name="knf.animeflv.START_ALARM" />
+                <action android:name="knf.animeflv.START_ALARM"/>
             </intent-filter>
         </receiver>
         <receiver android:name=".AutoStart">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
 
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:value="@integer/google_play_services_version"/>
 
         <activity
             android:name=".ADS"
-            android:label="@string/title_activity_ads" />
+            android:label="@string/title_activity_ads"/>
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-            android:theme="@android:style/Theme.Translucent" />
+            android:theme="@android:style/Theme.Translucent"/>
 
         <receiver
             android:name="com.google.android.gms.analytics.AnalyticsReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH" />
+                <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH"/>
             </intent-filter>
         </receiver>
 
         <service
             android:name="com.google.android.gms.analytics.AnalyticsService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"/>
 
         <receiver
             android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER" />
+                <action android:name="com.android.vending.INSTALL_REFERRER"/>
             </intent-filter>
         </receiver>
 
-        <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
+        <service android:name="com.google.android.gms.analytics.CampaignTrackingService"/>
 
         <receiver
             android:name=".Widget.Provider"

@@ -1,9 +1,7 @@
 package knf.animeflv.Explorer.Adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,13 +22,14 @@ import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.Explorer.ExplorerInterfaces;
+import knf.animeflv.Explorer.ExplorerRoot;
 import knf.animeflv.Explorer.Models.Directory;
 import knf.animeflv.Explorer.Models.ModelFactory;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.ThemeUtils;
-import knf.animeflv.info.InfoNew;
+import knf.animeflv.info.Helper.InfoHelper;
 import xdroid.toaster.Toaster;
 
 /**
@@ -110,11 +109,12 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
         holder.root.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Bundle bundleInfo = new Bundle();
-                bundleInfo.putString("aid", list.get(holder.getAdapterPosition()).getID());
-                Intent intent = new Intent(context, InfoNew.class);
-                intent.putExtras(bundleInfo);
-                context.startActivity(intent);
+                InfoHelper.open(
+                        ((ExplorerRoot) context),
+                        new InfoHelper.SharedItem(holder.img, "img"),
+                        new InfoHelper.BundleItem("aid", list.get(holder.getAdapterPosition()).getID()),
+                        new InfoHelper.BundleItem("title", list.get(holder.getAdapterPosition()).getTitle())
+                );
                 return true;
             }
         });

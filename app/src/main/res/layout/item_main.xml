@@ -44,7 +44,8 @@
                 android:layout_centerVertical="true"
                 android:gravity="center_vertical"
                 android:padding="5dp"
-                android:src="@drawable/ic_block_r" />
+                android:src="@drawable/ic_block_r"
+                android:transitionName="img"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -70,7 +71,8 @@
                     android:lines="1"
                     android:maxLines="1"
                     android:scrollHorizontally="true"
-                    android:text="Titulo" />
+                    android:text="Titulo"
+                    android:transitionName="title"/>
 
                 <TextView
                     android:id="@+id/tv_main_Cap"

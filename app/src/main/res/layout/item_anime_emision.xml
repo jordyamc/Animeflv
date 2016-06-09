@@ -38,7 +38,7 @@
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     android:padding="5dp"
-                    android:src="@drawable/ic_block_r" />
+                    android:src="@drawable/ic_block_r"/>
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -89,7 +89,6 @@
                         android:layout_alignParentRight="true"
                         android:paddingTop="15dp"
                         android:src="@drawable/ic_done"
-                        android:tint="@color/abc_primary_text_disable_only_material_light"
                         android:visibility="gone" />
                 </RelativeLayout>
 

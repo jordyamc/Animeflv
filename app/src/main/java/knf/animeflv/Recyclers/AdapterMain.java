@@ -11,7 +11,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.Looper;
 import android.preference.PreferenceManager;
@@ -82,7 +81,7 @@ import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UpdateUtil;
 import knf.animeflv.Utils.eNums.DownloadTask;
 import knf.animeflv.Utils.eNums.UpdateState;
-import knf.animeflv.info.InfoNew;
+import knf.animeflv.info.Helper.InfoHelper;
 import knf.animeflv.newMain;
 import pl.droidsonroids.gif.GifImageButton;
 import xdroid.toaster.Toaster;
@@ -208,11 +207,12 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     Toaster.toast("Actualizacion descargada, instalar para continuar");
                 } else {
                     if (!MainStates.isListing()) {
-                        Bundle bundleInfo = new Bundle();
-                        bundleInfo.putString("aid", Animes.get(holder.getAdapterPosition()).getAid());
-                        Intent intent = new Intent(context, InfoNew.class);
-                        intent.putExtras(bundleInfo);
-                        context.startActivity(intent);
+                        InfoHelper.open(
+                                ((newMain) context),
+                                new InfoHelper.SharedItem(holder.iv_main, "img"),
+                                new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
+                                new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getTitulo())
+                        );
                     } else {
                         MainStates.setListing(false);
                     }
@@ -251,7 +251,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                 final int pos = holder.getAdapterPosition();
                                 new MaterialDialog.Builder(context)
                                         .content(
-                                                "El "+ getCap(Animes.get(pos).getNumero()).toLowerCase() +
+                                                "El " + getCap(Animes.get(pos).getNumero()).toLowerCase() +
                                                         " de " + Animes.get(pos).getTitulo() +
                                                         " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
                                         .autoDismiss(true)
@@ -416,9 +416,9 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         String res = "";
         switch (model.getTipo()) {
             case "Anime":
-                if (model.getNumero().equals("0")){
+                if (model.getNumero().equals("0")) {
                     res = "Preestreno";
-                }else {
+                } else {
                     res = "Capitulo " + model.getNumero();
                 }
                 break;
@@ -432,11 +432,11 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         return res;
     }
 
-    private String getCap(String numero){
-        if (numero.equals("0")){
+    private String getCap(String numero) {
+        if (numero.equals("0")) {
             return "Preestreno";
-        }else {
-            return "Capitulo "+numero;
+        } else {
+            return "Capitulo " + numero;
         }
     }
 
@@ -636,14 +636,14 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Log.d("Prepare Search Download",eid);
+            Log.d("Prepare Search Download", eid);
         }
 
         @Override
         protected String doInBackground(String... params) {
-            Log.d("Start Search Download",eid);
+            Log.d("Start Search Download", eid);
             Looper.prepare();
-            SyncHttpClient httpClient=new SyncHttpClient();
+            SyncHttpClient httpClient = new SyncHttpClient();
             httpClient.setConnectTimeout(10000);
             httpClient.get(parser.getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlCached(eid) + "&certificate=" + parser.getCertificateSHA1Fingerprint(context) + "&newMain", null, new JsonHttpResponseHandler() {
                 @Override
@@ -739,7 +739,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                         MainStates.setProcessing(false, null);
                         showDownload(button, position);
                         Logger.Error(AdapterMain.this.getClass(), e);
-                        FileUtil.writeToFile(e.getMessage() +"   "+parser.getUrlCached(eid)+ "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
+                        FileUtil.writeToFile(e.getMessage() + "   " + parser.getUrlCached(eid) + "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
                         if (!parser.getUrlCached(eid).equals("null")) {
                             Toaster.toast("Error en JSON");
                         } else {

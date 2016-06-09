@@ -362,60 +362,12 @@ public class Info extends AppCompatActivity implements Requests.callback, LoginS
     }
 
     @Override
-    public void onConfigurationChanged (Configuration newConfig)
-    {
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
         if (!isXLargeScreen(getApplicationContext()) ) {
             return;
         }
-    }
-
-    public String getUrl(String titulo,String capitulo) {
-        String ftitulo = "";
-        String atitulo = titulo.toLowerCase();
-        atitulo = atitulo.replace("*", "-");
-        atitulo = atitulo.replace(":", "");
-        atitulo = atitulo.replace(",", "");
-        atitulo = atitulo.replace(" \u2606 ", "-");
-        atitulo = atitulo.replace("\u2606", "-");
-        atitulo = atitulo.replace("  ", "-");
-        atitulo = atitulo.replace("@", "a");
-        atitulo = atitulo.replace("/", "-");
-        atitulo = atitulo.replace(".", "");
-        atitulo = atitulo.replace("\"", "");
-        atitulo = atitulo.replace("♥", "-");
-        for (int x = 0; x < atitulo.length(); x++) {
-            if (atitulo.charAt(x) != ' ') {
-                ftitulo += atitulo.charAt(x);
-            } else {
-                if (atitulo.charAt(x) == ' ') {
-                    ftitulo += "-";
-                }
-            }
-        }
-        ftitulo = ftitulo.replace("!!!", "-3");
-        ftitulo = ftitulo.replace("!", "");
-        ftitulo = ftitulo.replace("°", "");
-        ftitulo = ftitulo.replace("&deg;", "");
-        ftitulo = ftitulo.replace("(", "");
-        ftitulo = ftitulo.replace(")", "");
-        ftitulo = ftitulo.replace("2nd-season", "2");
-        ftitulo = ftitulo.replace("'", "");
-        if (ftitulo.trim().equals("gintama")) {
-            ftitulo = ftitulo + "-2015";
-        }
-        if (ftitulo.trim().equals("miss-monochrome-the-animation-2")) {
-            ftitulo = "miss-monochrome-the-animation-2nd-season";
-        }
-        if (ftitulo.trim().equals("ore-ga-ojousama-gakkou-ni-shomin-sample-toshite-gets-sareta-ken")) {
-            ftitulo = "ore-ga-ojousama-gakkou-ni-shomin-sample-toshite-gets-sareta-";
-        }
-        if (ftitulo.trim().equals("diabolik-lovers-moreblood")) {
-            ftitulo = "diabolik-lovers-more-blood";
-        }
-        String link = ftitulo + "-" + capitulo + ".html";
-        return link;
     }
 
     @Override

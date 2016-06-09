@@ -1,18 +1,21 @@
 package knf.animeflv.Utils.logs;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
@@ -37,7 +40,7 @@ import xdroid.toaster.Toaster;
 
 public class LogViewer extends AppCompatActivity {
     @Bind(R.id.et_correo)
-    EditText correo;
+    AppCompatEditText correo;
     @Bind(R.id.phone_info)
     TextView phone_info;
     @Bind(R.id.complete_log)
@@ -49,6 +52,12 @@ public class LogViewer extends AppCompatActivity {
 
     String correoS;
     File current;
+
+    public static boolean isXLargeScreen(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
 
     @SuppressWarnings("all")
     @Override
@@ -71,6 +80,8 @@ public class LogViewer extends AppCompatActivity {
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
             toolbar.setBackgroundColor(ColorsRes.Negro(this));
             toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
+            phone_info.setTextColor(ColorsRes.Holo_Dark(this));
+            complete_info.setTextColor(ColorsRes.Holo_Dark(this));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -79,10 +90,21 @@ public class LogViewer extends AppCompatActivity {
                 getWindow().setNavigationBarColor(ColorsRes.Negro(this));
             }
         }
+        if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Informe de Error");
         correoS = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email", "");
-        correo.setText(correoS);
+        if (correoS.equals("")) {
+            correo.requestFocus();
+        } else {
+            correo.setText(correoS);
+            correo.clearFocus();
+
+        }
     }
 
     private void ToastError(Throwable e) {
@@ -136,7 +158,6 @@ public class LogViewer extends AppCompatActivity {
             correo.setError("Correo Invalido");
         }
     }
-
     private void Upload() {
         RequestParams params = new RequestParams();
         try {
@@ -162,5 +183,14 @@ public class LogViewer extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (!isXLargeScreen(getApplicationContext())) {
+            return;
+        }
     }
 }

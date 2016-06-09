@@ -29,19 +29,45 @@ import knf.animeflv.Recyclers.AdapterDirPeliculaNew;
  * Created by Jordy on 30/08/2015.
  */
 public class Peliculas extends Fragment {
-    public Peliculas(){}
     RecyclerView rvAnimes;
     View view;
     Parser parser=new Parser();
-
     String ext_storage_state = Environment.getExternalStorageState();
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
+
+    public Peliculas() {
+    }
+
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
+        return ret;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.directorio_peliculas,container,false);
         rvAnimes = (RecyclerView) view.findViewById(R.id.rv_peliculas);
         rvAnimes.setHasFixedSize(true);
-        rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
+        rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity()));
         String json=getJson();
         int genero=getActivity().getSharedPreferences("data", Context.MODE_PRIVATE).getInt("genero", 0);
         List<AnimeClass> animes = parser.DirPelis(json);
@@ -63,10 +89,11 @@ public class Peliculas extends Fragment {
             links.add(link);
         }*/
         //AdapterDirPelicula adapter = new AdapterDirPelicula(getActivity().getApplicationContext(), titOrdPeliculas, indexOrd, links, json);
-        AdapterDirPeliculaNew adapter = new AdapterDirPeliculaNew(getActivity().getApplicationContext(), animes);
+        AdapterDirPeliculaNew adapter = new AdapterDirPeliculaNew(getActivity(), animes);
         rvAnimes.setAdapter(adapter);
         return view;
     }
+
     public String getJson() {
         String json = "";
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
@@ -81,25 +108,5 @@ public class Peliculas extends Fragment {
             json = getStringFromFile(file_loc);
         }
         return json;
-    }
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-    public static String getStringFromFile (String filePath) {
-        String ret="";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        }catch (IOException e){}catch (Exception e){}
-        return ret;
     }
 }

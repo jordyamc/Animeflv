@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
@@ -31,11 +30,12 @@ import java.util.TimeZone;
 
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Emision.Section.TimeCompareModel;
+import knf.animeflv.Emision.Section.newEmisionActivity;
 import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
-import knf.animeflv.info.InfoNew;
+import knf.animeflv.info.Helper.InfoHelper;
 
 /**
  * Created by Jordy on 22/08/2015.
@@ -101,13 +101,14 @@ public class AdapterEmision extends RecyclerView.Adapter<AdapterEmision.ViewHold
             holder.card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("aid", Animes.get(holder.getAdapterPosition()).getAid());
-                    bundle.putString("link", new Parser().getUrlAnimeCached(Animes.get(holder.getAdapterPosition()).getAid()));
-                    Intent intent = new Intent(context, InfoNew.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtras(bundle);
-                    context.startActivity(intent);
+                    InfoHelper.open(
+                            ((newEmisionActivity) context),
+                            new InfoHelper.SharedItem(holder.iv_rel, "img"),
+                            Intent.FLAG_ACTIVITY_NEW_TASK,
+                            new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
+                            new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getTitulo()),
+                            new InfoHelper.BundleItem("link", new Parser().getUrlAnimeCached(Animes.get(holder.getAdapterPosition()).getAid()))
+                    );
                 }
             });
             Boolean resaltar = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar", true);

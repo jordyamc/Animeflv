@@ -546,6 +546,12 @@ public class newMain extends AppCompatActivity implements
                                 Intent intent2 = new Intent(context, ExplorerRoot.class);
                                 startActivity(intent2);
                                 break;
+                            case 55:
+                                break;
+                            case 56:
+                                break;
+                            case 57:
+                                break;
                             default:
                                 Intent intent = new Intent(context, Configuracion.class);
                                 startActivity(intent);
@@ -623,9 +629,9 @@ public class newMain extends AppCompatActivity implements
         adminListeners listeners = new adminListeners(context);
         result.addItem(new DividerDrawerItem());
         result.addItem(new SecondaryDrawerItem().withName("ADMIN - " + current.getName()).withSelectable(false));
-        result.addItem(new PrimaryDrawerItem().withName("Des/Encriptor").withIcon(MaterialDesignIconic.Icon.gmi_lock_open).withOnDrawerItemClickListener(listeners.onEncButton()));
-        result.addItem(new PrimaryDrawerItem().withName("Actualizar Server").withIcon(MaterialDesignIconic.Icon.gmi_refresh_sync).withOnDrawerItemClickListener(listeners.onManualButton()));
-        result.addItem(new PrimaryDrawerItem().withName("Control de Cuentas").withIcon(MaterialDesignIconic.Icon.gmi_account_circle).withOnDrawerItemClickListener(listeners.onAccountsButton()));
+        result.addItem(new PrimaryDrawerItem().withName("Des/Encriptor").withIcon(MaterialDesignIconic.Icon.gmi_lock_open).withOnDrawerItemClickListener(listeners.onEncButton()).withIdentifier(55));
+        result.addItem(new PrimaryDrawerItem().withName("Actualizar Server").withIcon(MaterialDesignIconic.Icon.gmi_refresh_sync).withOnDrawerItemClickListener(listeners.onManualButton()).withIdentifier(56));
+        result.addItem(new PrimaryDrawerItem().withName("Control de Cuentas").withIcon(MaterialDesignIconic.Icon.gmi_account_circle).withOnDrawerItemClickListener(listeners.onAccountsButton()).withIdentifier(57));
     }
 
     public void showEncDialog() {

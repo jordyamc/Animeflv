@@ -28,7 +28,7 @@
                 android:inputType="text"
                 android:lines="1"
                 android:maxLines="1"
-                android:visibility="visible" />
+                android:visibility="visible"/>
 
     </android.support.v7.widget.Toolbar>
     <LinearLayout

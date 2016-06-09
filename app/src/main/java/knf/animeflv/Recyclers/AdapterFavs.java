@@ -2,11 +2,9 @@ package knf.animeflv.Recyclers;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
@@ -32,11 +30,12 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import knf.animeflv.Favoritos;
 import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
-import knf.animeflv.info.InfoNew;
+import knf.animeflv.info.Helper.InfoHelper;
 
 /**
  * Created by Jordy on 22/08/2015.
@@ -99,7 +98,7 @@ public class AdapterFavs extends RecyclerView.Adapter<AdapterFavs.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(AdapterFavs.ViewHolder holder, final int position) {
+    public void onBindViewHolder(final AdapterFavs.ViewHolder holder, final int position) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
             holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
             holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
@@ -111,20 +110,21 @@ public class AdapterFavs extends RecyclerView.Adapter<AdapterFavs.ViewHolder> {
             public void onClick(View v) {
                 String file = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + aids.get(position) + ".txt";
                 String json = getStringFromFile(file);
-                Bundle bundle = new Bundle();
-                bundle.putString("aid", aids.get(position));
                 File directorio = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+                InfoHelper.BundleItem item;
                 if (directorio.exists()) {
-                    bundle.putString("link", new Parser().getUrlFavs(getStringFromFile(directorio.getPath()), aids.get(position)));
+                    item = new InfoHelper.BundleItem("link", new Parser().getUrlFavs(getStringFromFile(directorio.getPath()), aids.get(position)));
                 } else {
-                    bundle.putString("link", getUrlInfo(titulosCard.get(position), new Parser().getTipoAnime(json)));
+                    item = new InfoHelper.BundleItem("link", getUrlInfo(titulosCard.get(position), new Parser().getTipoAnime(json)));
                 }
-                Intent intent = new Intent(context, InfoNew.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtras(bundle);
-                SharedPreferences.Editor sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
-                sharedPreferences.putString("aid", aids.get(position)).commit();
-                context.startActivity(intent);
+                InfoHelper.open(
+                        ((Favoritos) context),
+                        new InfoHelper.SharedItem(holder.iv_rel, "img"),
+                        Intent.FLAG_ACTIVITY_NEW_TASK,
+                        new InfoHelper.BundleItem("aid", aids.get(holder.getAdapterPosition())),
+                        new InfoHelper.BundleItem("title", titulosCard.get(holder.getAdapterPosition())),
+                        item
+                );
             }
         });
     }

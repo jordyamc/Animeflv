@@ -11,7 +11,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -81,7 +80,7 @@ import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UpdateUtil;
 import knf.animeflv.Utils.eNums.DownloadTask;
 import knf.animeflv.Utils.eNums.UpdateState;
-import knf.animeflv.info.InfoNew;
+import knf.animeflv.info.Helper.InfoHelper;
 import knf.animeflv.newMain;
 import xdroid.toaster.Toaster;
 
@@ -205,11 +204,12 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                     Toaster.toast("Actualizacion descargada, instalar para continuar");
                 } else {
                     if (!MainStates.isListing()) {
-                        Bundle bundleInfo = new Bundle();
-                        bundleInfo.putString("aid", Animes.get(holder.getAdapterPosition()).getAid());
-                        Intent intent = new Intent(context, InfoNew.class);
-                        intent.putExtras(bundleInfo);
-                        context.startActivity(intent);
+                        InfoHelper.open(
+                                ((newMain) context),
+                                new InfoHelper.SharedItem(holder.iv_main, "img"),
+                                new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
+                                new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getTitulo())
+                        );
                     } else {
                         MainStates.setListing(false);
                     }

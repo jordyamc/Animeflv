@@ -59,6 +59,7 @@ import knf.animeflv.R;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.ThemeUtils;
+import xdroid.toaster.Toaster;
 
 /**
  * Created by Jordy on 05/03/2016.
@@ -293,7 +294,11 @@ public class newEmisionActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            new SyncHttpClient().get(new Parser().getBaseUrl(TaskType.NORMAL, context) + "emisionlist.php", null, new JsonHttpResponseHandler() {
+            SyncHttpClient client = new SyncHttpClient();
+            client.setTimeout(10000);
+            client.setConnectTimeout(10000);
+            client.setResponseTimeout(10000);
+            client.get(new Parser().getBaseUrl(TaskType.NORMAL, context) + "emisionlist.php", null, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     super.onSuccess(statusCode, headers, response);
@@ -394,6 +399,8 @@ public class newEmisionActivity extends AppCompatActivity {
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                     super.onFailure(statusCode, headers, throwable, errorResponse);
                     Logger.Error(newEmisionActivity.this.getClass(), throwable);
+                    if (throwable instanceof java.net.SocketTimeoutException)
+                        Toaster.toast("Time Out!");
                     finish();
                 }
             });

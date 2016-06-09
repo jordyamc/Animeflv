@@ -29,13 +29,39 @@ import knf.animeflv.Recyclers.AdapterDirAnimeNew;
  * Created by Jordy on 30/08/2015.
  */
 public class Ovas extends Fragment {
-    public Ovas(){}
     RecyclerView rvAnimes;
     View view;
     Parser parser=new Parser();
-
     String ext_storage_state = Environment.getExternalStorageState();
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
+
+    public Ovas() {
+    }
+
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
+
+    public static String getStringFromFile(String filePath) {
+        String ret = "";
+        try {
+            File fl = new File(filePath);
+            FileInputStream fin = new FileInputStream(fl);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
+        return ret;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.directorio_ovas,container,false);
@@ -63,10 +89,11 @@ public class Ovas extends Fragment {
             links.add(link);
         }*/
         //AdapterDirova adapter = new AdapterDirova(getActivity().getApplicationContext(), titOrdOvas, indexOrd, links, json);
-        AdapterDirAnimeNew adapter = new AdapterDirAnimeNew(getActivity().getApplicationContext(), animes);
+        AdapterDirAnimeNew adapter = new AdapterDirAnimeNew(getActivity(), animes);
         rvAnimes.setAdapter(adapter);
         return view;
     }
+
     public String getJson() {
         String json = "";
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
@@ -81,25 +108,5 @@ public class Ovas extends Fragment {
             json = getStringFromFile(file_loc);
         }
         return json;
-    }
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-    public static String getStringFromFile (String filePath) {
-        String ret="";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        }catch (IOException e){}catch (Exception e){}
-        return ret;
     }
 }

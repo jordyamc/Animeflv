@@ -3,7 +3,6 @@ package knf.animeflv.WaitList;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -36,7 +35,7 @@ import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.WaitList.Costructor.WaitManager;
 import knf.animeflv.WaitList.Holders.ChildHolder;
 import knf.animeflv.WaitList.Holders.GroupHolder;
-import knf.animeflv.info.InfoNew;
+import knf.animeflv.info.Helper.InfoHelper;
 
 /**
  * Created by Jordy on 31/03/2016.
@@ -109,11 +108,13 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundleInfo = new Bundle();
-                bundleInfo.putString("aid", animes.get(groupPosition));
-                Intent intent = new Intent(context, InfoNew.class);
-                intent.putExtras(bundleInfo);
-                context.startActivity(intent);
+                InfoHelper.open(
+                        ((WaitActivity) context),
+                        new InfoHelper.SharedItem(holder.image, "img"),
+                        Intent.FLAG_ACTIVITY_NEW_TASK,
+                        new InfoHelper.BundleItem("aid", animes.get(groupPosition)),
+                        new InfoHelper.BundleItem("title", parser.getTitCached(animes.get(groupPosition)))
+                );
             }
         });
         holder.card.setOnClickListener(new View.OnClickListener() {

@@ -80,6 +80,34 @@ public class Parser {
         return ret;
     }
 
+    public static String ValidateSinopsis(String sin) {
+        if (sin.trim().equals("")) {
+            return "Sin Sinopsis.";
+        }
+        String url = sin;
+        url = url.replace("&aacute;", "\u00E1");
+        url = url.replace("&eacute;", "\u00E9");
+        url = url.replace("&iacute;", "\u00ED");
+        url = url.replace("&oacute;", "\u00F3");
+        url = url.replace("&uacute;", "\u00FA");
+        url = url.replace("&Aacute;", "\u00C1");
+        url = url.replace("&Eacute;", "\u00C9");
+        url = url.replace("&Iacute;", "\u00CD");
+        url = url.replace("&Oacute;", "\u00D3");
+        url = url.replace("&Uacute;", "\u00DA");
+        url = url.replace("&ntilde;", "\u00F1");
+        url = url.replace("&ldquo;", "\u201C");
+        url = url.replace("&rdquo;", "\u201D");
+        url = url.replace("&rsquo;", "\u2019");
+        url = url.replace("&iquest;", "\u00BF");
+        url = url.replace("&hellip;", "\u2026");
+        url = url.replace("&#333;", "\u014D");
+        url = url.replace("&uuml;", "\u00FC");
+        url = url.replace("&iexcl;", "¡");
+        url = url.replace("&quot;", "\"");
+        return url;
+    }
+
     public String[] parseLinks(String json){
         List<String> linkArray=new ArrayList<String>();
         String[] urls;

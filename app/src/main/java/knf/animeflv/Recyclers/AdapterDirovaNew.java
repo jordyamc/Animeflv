@@ -2,11 +2,9 @@ package knf.animeflv.Recyclers;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -27,36 +25,36 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
-import knf.animeflv.info.InfoNew;
+import knf.animeflv.info.Helper.InfoHelper;
 
 /**
  * Created by Jordy on 22/08/2015.
  */
 public class AdapterDirovaNew extends RecyclerView.Adapter<AdapterDirovaNew.ViewHolder> {
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView iv_rel;
-        public TextView tv_tit;
-        public CardView card;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            this.iv_rel = (ImageView) itemView.findViewById(R.id.imgCardInfoRel);
-            this.tv_tit = (TextView) itemView.findViewById(R.id.tv_info_rel_tit);
-            this.card = (CardView) itemView.findViewById(R.id.cardRel);
-        }
-    }
-
-    private Context context;
     List<AnimeClass> Animes;
-
+    private Context context;
     public AdapterDirovaNew(Context context, List<AnimeClass> animes) {
         this.context = context;
         this.Animes = animes;
+    }
+
+    public static String byte2HexFormatted(byte[] arr) {
+        StringBuilder str = new StringBuilder(arr.length * 2);
+        for (int i = 0; i < arr.length; i++) {
+            String h = Integer.toHexString(arr[i]);
+            int l = h.length();
+            if (l == 1) h = "0" + h;
+            if (l > 2) h = h.substring(l - 2, l);
+            str.append(h.toUpperCase());
+            if (i < (arr.length - 1)) str.append(':');
+        }
+        return str.toString();
     }
 
     @Override
@@ -77,15 +75,14 @@ public class AdapterDirovaNew extends RecyclerView.Adapter<AdapterDirovaNew.View
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString("aid", Animes.get(holder.getAdapterPosition()).getAid());
-                bundle.putString("link", new Parser().getUrlAnimeCached(Animes.get(holder.getAdapterPosition()).getAid()));
-                Intent intent = new Intent(context, InfoNew.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtras(bundle);
-                SharedPreferences.Editor sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
-                sharedPreferences.putString("aid", Animes.get(holder.getAdapterPosition()).getAid()).apply();
-                context.startActivity(intent);
+                InfoHelper.open(
+                        ((Directorio) context),
+                        new InfoHelper.SharedItem(holder.iv_rel, "img"),
+                        Intent.FLAG_ACTIVITY_NEW_TASK,
+                        new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
+                        new InfoHelper.BundleItem("link", new Parser().getUrlAnimeCached(Animes.get(holder.getAdapterPosition()).getAid())),
+                        new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getNombre())
+                );
             }
         });
     }
@@ -128,21 +125,21 @@ public class AdapterDirovaNew extends RecyclerView.Adapter<AdapterDirovaNew.View
         return hexString;
     }
 
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
-    }
-
     @Override
     public int getItemCount() {
         return Animes.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public ImageView iv_rel;
+        public TextView tv_tit;
+        public CardView card;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            this.iv_rel = (ImageView) itemView.findViewById(R.id.imgCardInfoRel);
+            this.tv_tit = (TextView) itemView.findViewById(R.id.tv_info_rel_tit);
+            this.card = (CardView) itemView.findViewById(R.id.cardRel);
+        }
     }
 }

@@ -39,7 +39,7 @@ public class Logger {
     }
 
     private static String getTime() {
-        return new SimpleDateFormat("_hh:mmaa", Locale.ENGLISH).format(new Date());
+        return new SimpleDateFormat("_hh:mm:ssaa@dd|MM|yyyy$", Locale.ENGLISH).format(new Date());
     }
 
     private static void WriteLog(log object, boolean show) {
@@ -50,11 +50,9 @@ public class Logger {
         String body =
                 object.getThrowable().getCause() + "\n\n" +
                         sw.toString();
-        File writed = new File(folderlog, object.getName() + getTime() + ".log");
+        File writed = new File(folderlog, object.getName() + getTime() + +System.currentTimeMillis() + ".log");
         FileUtil.writeToFile(body, writed);
-        if (show) {
-            ShowNot(writed);
-        }
+        if (show) ShowNot(writed);
     }
 
     private static void ShowNot(File file) {

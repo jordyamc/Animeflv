@@ -66,4 +66,9 @@ public class ColorsRes {
     public static int Amarillo(Context context) {
         return context.getResources().getColor(R.color.newCap);
     }
+
+    @ColorInt
+    public static int Transparent(Context context) {
+        return context.getResources().getColor(android.R.color.transparent);
+    }
 }

@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
@@ -37,7 +36,8 @@ import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
-import knf.animeflv.info.InfoNew;
+import knf.animeflv.info.Helper.InfoHelper;
+import knf.animeflv.info.InfoNewMaterial;
 
 /**
  * Created by Jordy on 17/08/2015.
@@ -102,7 +102,7 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(AdapterRel.ViewHolder holder, final int position) {
+    public void onBindViewHolder(final AdapterRel.ViewHolder holder, final int position) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
             holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
             holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
@@ -117,15 +117,14 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
                 String file = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
                 String json = getStringFromFile(file);
                 String link = new Parser().getUrlFavs(json, aids[position]);
-                Bundle bundle=new Bundle();
-                bundle.putString("aid", aids[position]);
-                bundle.putString("link", link);
-                Intent intent = new Intent(context, InfoNew.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtras(bundle);
-                SharedPreferences.Editor sharedPreferences=context.getSharedPreferences("data",Context.MODE_PRIVATE).edit();
-                sharedPreferences.putString("aid",aids[position]).commit();
-                context.startActivity(intent);
+                InfoHelper.open(
+                        ((InfoNewMaterial) context),
+                        new InfoHelper.SharedItem(holder.iv_rel, "img"),
+                        Intent.FLAG_ACTIVITY_NEW_TASK,
+                        new InfoHelper.BundleItem("aid", aids[position]),
+                        new InfoHelper.BundleItem("link", link),
+                        new InfoHelper.BundleItem("title", titulosCard.get(position))
+                );
             }
         });
     }

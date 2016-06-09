@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
@@ -34,12 +33,13 @@ import java.util.List;
 
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.ThemeUtils;
-import knf.animeflv.info.InfoNew;
+import knf.animeflv.info.Helper.InfoHelper;
 
 /**
  * Created by Jordy on 17/08/2015.
@@ -116,15 +116,16 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
                 if (!Animes.get(holder.getAdapterPosition()).getTipo().equals("none")) {
                     String file = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
                     String json = getStringFromFile(file);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("aid", Animes.get(holder.getAdapterPosition()).getAid());
-                    bundle.putString("link", new Parser().getUrlFavs(json, Animes.get(holder.getAdapterPosition()).getAid()));
-                    Intent intent = new Intent(context, InfoNew.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtras(bundle);
                     SharedPreferences.Editor sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
                     sharedPreferences.putString("aid", Animes.get(holder.getAdapterPosition()).getAid()).apply();
-                    context.startActivity(intent);
+                    InfoHelper.open(
+                            ((Directorio) context),
+                            new InfoHelper.SharedItem(holder.iv_rel, "img"),
+                            Intent.FLAG_ACTIVITY_NEW_TASK,
+                            new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
+                            new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getNombre()),
+                            new InfoHelper.BundleItem("link", new Parser().getUrlFavs(json, Animes.get(holder.getAdapterPosition()).getAid()))
+                    );
                 }
             }
         });
