@@ -30,6 +30,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -73,6 +74,7 @@ import knf.animeflv.Recyclers.AdapterRel;
 import knf.animeflv.ServerReload.Adapter.CustomRecycler;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
@@ -108,6 +110,10 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
     CustomRecycler rv_rel;
     @Bind(R.id.coordinator)
     CoordinatorLayout layout;
+    @Bind(R.id.frame_rv)
+    FrameLayout frameLayout;
+    @Bind(R.id.action_list)
+    com.melnykov.fab.FloatingActionButton button_list;
     String ext_storage_state = Environment.getExternalStorageState();
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
     Parser parser = new Parser();
@@ -118,7 +124,9 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
     String aid;
     Menu Amenu;
     String json = "{}";
+    AdapterInfoCapsMaterial adapter_caps;
     boolean isInInfo = true;
+    boolean blocked = false;
 
     public static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -185,13 +193,14 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                 if (isInInfo) {
                     button.setImageResource(R.drawable.information);
                     nestedScrollView.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
+                    frameLayout.setVisibility(View.VISIBLE);
+                    button_list.show(true);
                     barLayout.setExpanded(false, true);
                     isInInfo = false;
                 } else {
                     button.setImageResource(R.drawable.playlist);
                     nestedScrollView.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
+                    frameLayout.setVisibility(View.GONE);
                     scrollToTop();
                     isInInfo = true;
                 }
@@ -235,6 +244,35 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         txt_estado.setTextColor(color);
         txt_generos.setTextColor(color);
         txt_debug.setTextColor(color);
+        //button_list.attachToRecyclerView(recyclerView);
+        button_list.setColorNormal(ThemeUtils.getAcentColor(this));
+        button_list.setColorPressed(ThemeUtils.getAcentColor(this));
+        button_list.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!blocked) {
+                    if (MainStates.isListing()) {
+                        button_list.setImageResource(R.drawable.ic_add_list);
+                        MainStates.setListing(false);
+                        adapter_caps.onStopList();
+                    } else {
+                        button_list.setImageResource(R.drawable.ic_done);
+                        MainStates.setListing(true);
+                        adapter_caps.onStartList();
+                    }
+                } else {
+                    blocked = false;
+                }
+            }
+        });
+        button_list.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                button_list.hide(true);
+                blocked = true;
+                return false;
+            }
+        });
         if (NetworkUtils.isNetworkAvailable()) {
             getJsonfromApi();
         } else {
@@ -483,9 +521,10 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
     }
 
     private void setRecyclerView(final String json) {
+        adapter_caps = new AdapterInfoCapsMaterial(context, parser.parseNumerobyEID(json), aid, parser.parseEidsbyEID(json));
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(new AdapterInfoCapsMaterial(context, parser.parseNumerobyEID(json), aid, parser.parseEidsbyEID(json)));
+        recyclerView.setAdapter(adapter_caps);
     }
 
     private String getCertificateSHA1Fingerprint() {
@@ -683,7 +722,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         if (!isInInfo) {
             button.setImageResource(R.drawable.playlist);
             nestedScrollView.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
+            frameLayout.setVisibility(View.GONE);
             scrollToTop();
             isInInfo = true;
         } else {
