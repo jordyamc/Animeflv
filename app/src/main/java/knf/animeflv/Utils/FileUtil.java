@@ -279,7 +279,8 @@ public class FileUtil {
                 .replace("&dagger;", "\u2020")
                 .replace("&hearts;", "\u2665")
                 .replace("♪", "\u266A")
-                .replace("â\u0099ª","\u266A");
+                .replace("â\u0099ª","\u266A")
+                .replace("&Psi;","\u03A8");
         return array;
     }
 

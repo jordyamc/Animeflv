@@ -1,5 +1,6 @@
 package knf.animeflv.StreamManager;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,7 +12,9 @@ import android.util.Log;
 
 import java.io.File;
 
+import knf.animeflv.Parser;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.history.adapter.HistoryHelper;
 
 /**
  * Created by Jordy on 04/03/2016.
@@ -29,10 +32,12 @@ public class StreamManager {
         return new MXStream(context);
     }
 
-    public static void Play(Context context, String eid) {
+    public static void Play(Activity context, String eid) {
         String[] data = eid.replace("E", "").split("_");
         String aid = data[0];
         String semi = eid.replace("E", "");
+        String cap = data[1].replace("E", "");
+        HistoryHelper.addToList(context,aid,new Parser().getTitCached(aid),cap);
         File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
         File sd = new File(FileUtil.getSDPath() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
         int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_video", "0"));
@@ -56,10 +61,15 @@ public class StreamManager {
                     }
                 }
                 break;
+
         }
     }
 
-    public static void Stream(Context context, String eid, String url) {
+    public static void Stream(Activity context, String eid, String url) {
+        String[] data = eid.replace("E", "").split("_");
+        String aid = data[0];
+        String cap = data[1].replace("E", "");
+        HistoryHelper.addToList(context,aid,new Parser().getTitCached(aid),cap);
         int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
         Log.d("Streaming", PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
         switch (type) {
@@ -72,7 +82,7 @@ public class StreamManager {
         }
     }
 
-    private static void StreamingExtbyURL(Context context, String eid, String url) {
+    private static void StreamingExtbyURL(Activity context, String eid, String url) {
         Intent i = (new Intent(Intent.ACTION_VIEW, Uri.parse(url)).setType("application/mp4"));
         PackageManager pm = context.getPackageManager();
         final ResolveInfo mInfo = pm.resolveActivity(i, 0);

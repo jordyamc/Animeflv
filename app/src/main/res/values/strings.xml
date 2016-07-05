@@ -31,9 +31,16 @@
         <item>Autobusqueda</item>
         <item>Enter</item>
     </string-array>
+
+    <string-array name="busqueda_sort">
+        <item>Por Nombre</item>
+        <item>Por Fecha de Salida</item>
+        <item>Por Fecha de Salida (Invertido)</item>
+    </string-array>
     <string-array name="players_type">
         <item>Simple</item>
         <item>Avanzado</item>
+        <!--<item>Exo</item>     Desactivado-->
     </string-array>
     <string-array name="sound_ind">
         <item>Ninguno</item>

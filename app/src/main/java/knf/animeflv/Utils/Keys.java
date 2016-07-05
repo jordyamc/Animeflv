@@ -10,9 +10,12 @@ public class Keys {
         public static final File LOGS = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/logs");
         public static final File SOUNDS = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/.sounds");
         public static final File CACHE = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
+        public static final File CACHE_MINI = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/mini");
+        public static final File CACHE_PORTADA = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/portada");
+        public static final File CACHE_THUMBS = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/thumbs");
         public static final File DOWNLOADS = new File(Environment.getExternalStorageDirectory() + "/Animeflv/downloads");
         public static final File UPDATE = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "Animeflv_Nver.apk");
-        public static final File NOMEDIA = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/.sounds/.nomedia");
+        public static final File SOUNDS_NOMEDIA = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/.sounds/.nomedia");
     }
 
     public static class Url {

@@ -1,16 +1,18 @@
 package knf.animeflv;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.SyncHttpClient;
 import com.loopj.android.http.TextHttpResponseHandler;
 
@@ -19,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
+import java.io.EOFException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -33,24 +36,27 @@ import knf.animeflv.Utils.Logger;
 /**
  * Created by Jordy on 12/08/2015.
  */
-public class LoginServer extends AsyncTask<String,String,String> {
+public class LoginServer {
     InputStream is;
     String _response;
     TaskType taskType;
-    Context context;
+    Activity context;
     String email;
     String email_coded;
     String pass_coded;
     MaterialDialog materialDialog;
     callback call;
-    public LoginServer(Context c,TaskType taskType,@Nullable String mail,@Nullable String email_c,@Nullable String pass_c,@Nullable MaterialDialog dialog){
-        this.context=c;
-        this.taskType=taskType;
+    String url;
+
+    public LoginServer(Activity c, TaskType taskType, @Nullable String mail, @Nullable String email_c, @Nullable String pass_c, @Nullable MaterialDialog dialog, String url) {
+        this.context = c;
+        this.taskType = taskType;
         call = (callback) c;
-        if (mail!=null)this.email=mail;
-        if (email_c!=null)this.email_coded=email_c;
-        if (pass_c!=null)this.pass_coded=pass_c;
-        if (dialog!=null)this.materialDialog=dialog;
+        if (mail != null) this.email = mail;
+        if (email_c != null) this.email_coded = email_c;
+        if (pass_c != null) this.pass_coded = pass_c;
+        if (dialog != null) this.materialDialog = dialog;
+        this.url = url;
     }
 
     public static String byte2HexFormatted(byte[] arr) {
@@ -66,110 +72,140 @@ public class LoginServer extends AsyncTask<String,String,String> {
         return str.toString();
     }
 
-    @Override
-    protected String doInBackground(String... params) {
-        SyncHttpClient client = new SyncHttpClient();
+    public void execute() {
+        AsyncHttpClient client = new AsyncHttpClient();
         client.setConnectTimeout(15000);
         String u;
-        if (params[0].startsWith(new Parser().getBaseUrl(TaskType.NORMAL, context))) {
-            if (params[0].endsWith(".php")) {
-                u = params[0] + "?certificate=" + getCertificateSHA1Fingerprint();
+        if (url.startsWith(new Parser().getBaseUrl(TaskType.NORMAL, context))) {
+            if (url.endsWith(".php")) {
+                u = url + "?certificate=" + getCertificateSHA1Fingerprint();
             } else {
-                u = params[0] + "&certificate=" + getCertificateSHA1Fingerprint();
+                u = url + "&certificate=" + getCertificateSHA1Fingerprint();
             }
         } else {
-            u = params[0];
+            u = url;
         }
+        Log.d("Load", u);
         client.get(u, null, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Logger.Error(LoginServer.this.getClass(), throwable);
-                _response="error";
+                Process("Error");
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                _response = responseString;
+                Process(responseString);
             }
         });
-        return _response;
     }
 
-    @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-        String state=s.toLowerCase().trim();
-        if (taskType==TaskType.NEW_USER) {
-            if (s.toLowerCase().trim().equals("exito")) {
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email", email).apply();
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", email_coded).apply();
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", pass_coded).apply();
+    public void executeSync() {
+        SyncHttpClient client = new SyncHttpClient();
+        client.setConnectTimeout(15000);
+        String u;
+        if (url.startsWith(new Parser().getBaseUrl(TaskType.NORMAL, context))) {
+            if (url.endsWith(".php")) {
+                u = url + "?certificate=" + getCertificateSHA1Fingerprint();
+            } else {
+                u = url + "&certificate=" + getCertificateSHA1Fingerprint();
             }
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            sharedPreferences.edit().putString("nCuenta_Status", state).apply();
-            call.response("OK", taskType);
+        } else {
+            u = url;
         }
-        if (taskType==TaskType.GET_FAV){
-            SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
-            defsharedPreferences.edit().putString("GET_Status", state).apply();
-            if (isJSONValid(s.trim())) {
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email", email).apply();
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", email_coded).apply();
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", pass_coded).apply();
-                new Parser().saveBackup(context);
-                String favs = new Parser().getUserFavs(s.trim());
-                String vistos = new Parser().getUserVistos(s.trim());
-                SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                sharedPreferences.edit().putString("favoritos", favs).apply();
-                sharedPreferences.edit().putString("vistos", vistos).apply();
-                defsharedPreferences.edit().putString("GET_Status", "exito").apply();
-                materialDialog.dismiss();
-                Toast.makeText(context, "Sesion Iniciada!!", Toast.LENGTH_SHORT).show();
+        Log.d("Load", u);
+        client.get(u, null, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Logger.Error(LoginServer.this.getClass(), throwable);
+                Process("Error");
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Process(responseString);
+            }
+        });
+    }
+
+    private void Process(String s) {
+        try {
+            String state = s.toLowerCase().trim();
+            if (taskType == TaskType.NEW_USER) {
+                if (s.toLowerCase().trim().equals("exito")) {
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email", email).apply();
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", email_coded).apply();
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", pass_coded).apply();
+                }
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                sharedPreferences.edit().putString("nCuenta_Status", state).apply();
                 call.response("OK", taskType);
             }
-        }
-        if (taskType==TaskType.GET_FAV_SL){
-            SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
-            defsharedPreferences.edit().putString("GETSL_Status", state).apply();
-            if (isJSONValid(s.trim())) {
-                String favs = new Parser().getUserFavs(s.trim());
-                String vistos = new Parser().getUserVistos(s.trim());
-                SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                sharedPreferences.edit().putString("favoritos", favs).apply();
-                sharedPreferences.edit().putString("vistos", vistos).apply();
-                defsharedPreferences.edit().putString("GETSL_Status", "exito").apply();
+            if (taskType == TaskType.GET_FAV) {
+                SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
+                defsharedPreferences.edit().putString("GET_Status", state).apply();
+                if (isJSONValid(s.trim())) {
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email", email).apply();
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", email_coded).apply();
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", pass_coded).apply();
+                    new Parser().saveBackup(context);
+                    String favs = new Parser().getUserFavs(s.trim());
+                    String vistos = new Parser().getUserVistos(s.trim());
+                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+                    sharedPreferences.edit().putString("favoritos", favs).apply();
+                    sharedPreferences.edit().putString("vistos", vistos).apply();
+                    defsharedPreferences.edit().putString("GET_Status", "exito").apply();
+                    materialDialog.dismiss();
+                    toastOnUI("Sesion Iniciada!!");
+                    call.response("OK", taskType);
+                }
             }
-        }
-        if (taskType==TaskType.LIST_USERS){
-            String format = s.replace("../user_favs/", "").replace(".txt", "");
-            SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            defsharedPreferences.edit().putString("lista", format).apply();
-        }
-        if (taskType==TaskType.cCorreo){
-            SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
-            defsharedPreferences.edit().putString("cCorreo_Status", state).apply();
-            if (s.toLowerCase().trim().equals("exito")) {
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email", email).apply();
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", email_coded).apply();
-                new Parser().saveBackup(context);
-                materialDialog.dismiss();
-                Toast.makeText(context, "Email Cambiado!!", Toast.LENGTH_SHORT).show();
+            if (taskType == TaskType.GET_FAV_SL) {
+                SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
+                defsharedPreferences.edit().putString("GETSL_Status", state).apply();
+                if (isJSONValid(s.trim())) {
+                    String favs = new Parser().getUserFavs(s.trim());
+                    String vistos = new Parser().getUserVistos(s.trim());
+                    SharedPreferences sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+                    sharedPreferences.edit().putString("favoritos", favs).apply();
+                    sharedPreferences.edit().putString("vistos", vistos).apply();
+                    defsharedPreferences.edit().putString("GETSL_Status", "exito").apply();
+                }
             }
-        }
-        if (taskType==TaskType.cPass){
-            SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
-            defsharedPreferences.edit().putString("cPass_Status", state).apply();
-            if (s.toLowerCase().trim().equals("exito")) {
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", pass_coded).apply();
-                new Parser().saveBackup(context);
-                materialDialog.dismiss();
-                Toast.makeText(context, "Contraseña Cambiada!!", Toast.LENGTH_SHORT).show();
+            if (taskType == TaskType.LIST_USERS) {
+                String format = s.replace("../user_favs/", "").replace(".txt", "");
+                SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                defsharedPreferences.edit().putString("lista", format).apply();
             }
+            if (taskType == TaskType.cCorreo) {
+                SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
+                defsharedPreferences.edit().putString("cCorreo_Status", state).apply();
+                if (s.toLowerCase().trim().equals("exito")) {
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email", email).apply();
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", email_coded).apply();
+                    new Parser().saveBackup(context);
+                    materialDialog.dismiss();
+                    toastOnUI("Email Cambiado!!");
+                }
+            }
+            if (taskType == TaskType.cPass) {
+                SharedPreferences defsharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                //defsharedPreferences.edit().putString("GET_Status", s.toLowerCase().trim()).apply();
+                defsharedPreferences.edit().putString("cPass_Status", state).apply();
+                if (s.toLowerCase().trim().equals("exito")) {
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", pass_coded).apply();
+                    new Parser().saveBackup(context);
+                    materialDialog.dismiss();
+                    toastOnUI("Contraseña Cambiada!!");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
     private String getCertificateSHA1Fingerprint() {
@@ -208,6 +244,15 @@ public class LoginServer extends AsyncTask<String,String,String> {
             e.printStackTrace();
         }
         return hexString;
+    }
+
+    private void toastOnUI(final String text) {
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public boolean isJSONValid(String test) {

@@ -23,7 +23,7 @@ import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.List;
 
-import knf.animeflv.AnimeCompare;
+import knf.animeflv.AnimeSorter;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterDirAnimeNew;
@@ -69,9 +69,7 @@ public class Animes extends Fragment{
         rvAnimes.setHasFixedSize(true);
         rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         String json=getJson();
-        int genero=getActivity().getSharedPreferences("data",Context.MODE_PRIVATE).getInt("genero",0);
-        List<AnimeClass> animes = parser.DirAnimes(json);
-        Collections.sort(animes, new AnimeCompare());
+        List<AnimeClass> animes = AnimeSorter.sortByName(parser.DirAnimes(json));
         AdapterDirAnimeNew adapter = new AdapterDirAnimeNew(getActivity(), animes);
         rvAnimes.setAdapter(adapter);
         return view;
@@ -90,7 +88,6 @@ public class Animes extends Fragment{
             Log.d("Archivo", "Existe");
             json = getStringFromFile(file_loc);
         }
-        //Log.d("json",json);
         return json;
     }
 }

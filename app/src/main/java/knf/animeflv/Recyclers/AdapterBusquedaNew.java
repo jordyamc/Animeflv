@@ -1,5 +1,6 @@
 package knf.animeflv.Recyclers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -35,9 +36,8 @@ import knf.animeflv.ColorsRes;
 import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.Parser;
-import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
-import knf.animeflv.TaskType;
+import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
 
@@ -47,9 +47,9 @@ import knf.animeflv.info.Helper.InfoHelper;
 public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.ViewHolder> {
 
     List<AnimeClass> Animes;
-    private Context context;
+    private Activity context;
 
-    public AdapterBusquedaNew(Context context, List<AnimeClass> animes) {
+    public AdapterBusquedaNew(Activity context, List<AnimeClass> animes) {
         this.context = context;
         this.Animes = animes;
     }
@@ -107,7 +107,8 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
             holder.tv_noC.setTextColor(context.getResources().getColor(R.color.blanco));
         }
         holder.tv_tipo.setTextColor(ThemeUtils.getAcentColor(context));
-        PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + Animes.get(holder.getAdapterPosition()).getImagen()).error(R.drawable.ic_block_r).into(holder.iv_rel);
+        //PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + Animes.get(holder.getAdapterPosition()).getImagen()).error(R.drawable.ic_block_r).into(holder.iv_rel);
+        new CacheManager().mini(context,Animes.get(holder.getAdapterPosition()).getAid(),holder.iv_rel);
         holder.tv_tit.setText(Animes.get(holder.getAdapterPosition()).getNombre());
         holder.tv_tipo.setText(Animes.get(holder.getAdapterPosition()).getTipo());
         holder.card.setOnClickListener(new View.OnClickListener() {

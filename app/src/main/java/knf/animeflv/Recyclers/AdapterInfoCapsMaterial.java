@@ -1,5 +1,6 @@
 package knf.animeflv.Recyclers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -94,10 +95,10 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     int keepAliveTime = 10;
     BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(maximumPoolSize);
     Executor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
-    private Context context;
+    private Activity context;
     private int lastPosition = 0;
 
-    public AdapterInfoCapsMaterial(Context context, List<String> capitulos, String aid, List<String> eid) {
+    public AdapterInfoCapsMaterial(Activity context, List<String> capitulos, String aid, List<String> eid) {
         this.capitulo = capitulos;
         this.context = context;
         this.id = aid;

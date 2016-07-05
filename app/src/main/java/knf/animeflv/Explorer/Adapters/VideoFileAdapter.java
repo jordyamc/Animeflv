@@ -1,5 +1,6 @@
 package knf.animeflv.Explorer.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -37,11 +38,11 @@ import xdroid.toaster.Toaster;
 public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.ViewHolder> {
 
     List<VideoFile> list;
-    private Context context;
+    private Activity context;
     private ExplorerInterfaces interfaces;
     private File current;
 
-    public VideoFileAdapter(Context context, File file) {
+    public VideoFileAdapter(Activity context, File file) {
         this.context = context;
         this.list = ModelFactory.createVideosList(file);
         this.interfaces = (ExplorerInterfaces) context;

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.devbrackets.android.exomedia.ui.widget.FitsSystemWindowRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/root">
+
+    <LinearLayout
+        android:id="@+id/exomedia_controls_text_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/exomedia_default_controls_text_background"
+        android:orientation="horizontal"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="16dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageButton
+            android:id="@+id/top_back"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@android:color/transparent"
+            android:minHeight="46dp"
+            android:minWidth="@dimen/exomedia_min_button_height"
+            android:src="@drawable/ic_arrow_left" />
+
+        <TextView
+            android:id="@+id/exomedia_controls_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="The Video Title"
+            android:paddingLeft="10dp"
+            android:paddingStart="10dp"
+            android:layout_gravity="center_vertical"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/exomedia_controls_interactive_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/exomedia_default_controls_interactive_background"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/exomedia_controls_play_pause_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:minHeight="46dp"
+                android:minWidth="@dimen/exomedia_min_button_height"
+                android:src="@drawable/exomedia_ic_play_arrow_white"
+                tools:ignore="ContentDescription"/>
+
+            <TextView
+                android:id="@+id/exomedia_controls_current_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="2dp"
+                android:paddingRight="2dp"
+                android:textColor="@android:color/white"
+                tools:ignore="RtlHardcoded"
+                tools:text="1:06:29"
+                android:layout_gravity="center_vertical"/>
+
+            <SeekBar
+                android:id="@+id/exomedia_controls_video_seek"
+                style="?android:seekBarStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                tools:ignore="RtlHardcoded"
+                android:layout_gravity="center_vertical"/>
+
+            <TextView
+                android:id="@+id/exomedia_controls_end_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="2dp"
+                android:paddingRight="2dp"
+                android:textColor="@android:color/white"
+                tools:ignore="RtlHardcoded"
+                tools:text="1:23:49"
+                android:layout_gravity="center_vertical"/>
+
+            <LinearLayout
+                android:id="@+id/exomedia_controls_extra_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                tools:ignore="RtlHardcoded,UselessLeaf"/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/exomedia_controls_video_loading"
+        style="?android:progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"/>
+</com.devbrackets.android.exomedia.ui.widget.FitsSystemWindowRelativeLayout>

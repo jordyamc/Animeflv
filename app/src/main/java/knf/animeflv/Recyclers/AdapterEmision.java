@@ -1,5 +1,6 @@
 package knf.animeflv.Recyclers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,8 +33,8 @@ import knf.animeflv.ColorsRes;
 import knf.animeflv.Emision.Section.TimeCompareModel;
 import knf.animeflv.Emision.Section.newEmisionActivity;
 import knf.animeflv.Parser;
-import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
+import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.info.Helper.InfoHelper;
 
@@ -43,14 +44,14 @@ import knf.animeflv.info.Helper.InfoHelper;
 public class AdapterEmision extends RecyclerView.Adapter<AdapterEmision.ViewHolder> {
 
     List<TimeCompareModel> Animes;
-    private Context context;
+    private Activity context;
     private boolean show = false;
     private int carddark = Color.parseColor("#212121");
     private int blanco;
     private int accent;
     private List<String> inMain;
     private int lastPosition = 0;
-    public AdapterEmision(Context context, List<TimeCompareModel> animes) {
+    public AdapterEmision(Activity context, List<TimeCompareModel> animes) {
         this.context = context;
         this.Animes = animes;
         blanco = ColorsRes.Blanco(context);
@@ -58,7 +59,7 @@ public class AdapterEmision extends RecyclerView.Adapter<AdapterEmision.ViewHold
         inMain = ListInMain();
     }
 
-    public AdapterEmision(Context context, List<TimeCompareModel> animes, boolean show) {
+    public AdapterEmision(Activity context, List<TimeCompareModel> animes, boolean show) {
         this.context = context;
         this.Animes = animes;
         this.show = show;
@@ -77,7 +78,8 @@ public class AdapterEmision extends RecyclerView.Adapter<AdapterEmision.ViewHold
     @Override
     public void onBindViewHolder(final AdapterEmision.ViewHolder holder, final int position) {
         if (!Animes.get(holder.getAdapterPosition()).getAid().equals("-1")) {
-            PicassoCache.getPicassoInstance(context).load(Animes.get(holder.getAdapterPosition()).getImage()).error(R.drawable.ic_block_r).into(holder.iv_rel);
+            //PicassoCache.getPicassoInstance(context).load(Animes.get(holder.getAdapterPosition()).getImage()).error(R.drawable.ic_block_r).into(holder.iv_rel);
+            new CacheManager().mini(context,Animes.get(holder.getAdapterPosition()).getAid(),holder.iv_rel);
             holder.iv_check.setColorFilter(accent);
             holder.tv_time.setTextColor(accent);
             if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {

@@ -46,7 +46,7 @@ public class UtilSound {
         switch (which){
             case 0:
                 MediaPlayer defplayer = MediaPlayer.create(cont, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
-                defplayer.setLooping(true);
+                if (defplayer!=null)defplayer.setLooping(true);
                 setCurrentMediaPlayer(defplayer);
                 return getCurrentMediaPlayer();
             default:

@@ -13,6 +13,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -78,6 +79,8 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.BadgeStyle;
+import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
@@ -124,6 +127,7 @@ import knf.animeflv.Utils.UtilSound;
 import knf.animeflv.Utils.admin.adminListeners;
 import knf.animeflv.Utils.objects.User;
 import knf.animeflv.WaitList.WaitActivity;
+import knf.animeflv.history.HistoryActivity;
 import xdroid.toaster.Toaster;
 
 import static knf.animeflv.Utils.Keys.Login.EMAIL_NORMAL;
@@ -313,10 +317,11 @@ public class newMain extends AppCompatActivity implements
                 .withStickyFooterDivider(false)
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName("Recientes").withIcon(FontAwesome.Icon.faw_home).withIdentifier(0),
-                        new PrimaryDrawerItem().withName("Favoritos").withIcon(/*GoogleMaterial.Icon.gmd_star*/MaterialDesignIconic.Icon.gmi_star).withIdentifier(1),
+                        new PrimaryDrawerItem().withName("Favoritos").withIcon(MaterialDesignIconic.Icon.gmi_star).withIdentifier(1),
                         new PrimaryDrawerItem().withName("Directorio").withIcon(MaterialDesignIconic.Icon.gmi_view_list_alt).withIdentifier(2),
                         new PrimaryDrawerItem().withName("Emision").withIcon(MaterialDesignIconic.Icon.gmi_alarm_check).withIdentifier(3),
                         new PrimaryDrawerItem().withName("Explorador").withIcon(MaterialDesignIconic.Icon.gmi_folder).withIdentifier(9),
+                        new PrimaryDrawerItem().withName("Historial").withIcon(MaterialDesignIconic.Icon.gmi_eye).withIdentifier(10),
                         new PrimaryDrawerItem().withName("Lista").withIcon(MaterialDesignIconic.Icon.gmi_assignment_returned).withIdentifier(4),
                         new PrimaryDrawerItem().withName("Sugerencias").withIcon(MaterialDesignIconic.Icon.gmi_assignment).withIdentifier(5),
                         new PrimaryDrawerItem().withName("Pagina Oficial").withIcon(FontAwesome.Icon.faw_facebook).withIdentifier(6),
@@ -546,6 +551,10 @@ public class newMain extends AppCompatActivity implements
                                 Intent intent2 = new Intent(context, ExplorerRoot.class);
                                 startActivity(intent2);
                                 break;
+                            case 10:
+                                result.setSelection(0, false);
+                                startActivity(new Intent(context, HistoryActivity.class));
+                                break;
                             case 55:
                                 break;
                             case 56:
@@ -706,7 +715,7 @@ public class newMain extends AppCompatActivity implements
 
     private boolean isNetworkAvailable() {
         Boolean net = false;
-        int Tcon = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
+        int Tcon = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "2"));
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         switch (Tcon) {
             case 0:
@@ -1373,7 +1382,7 @@ public class newMain extends AppCompatActivity implements
             String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
             String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
             if (!email_coded.equals("null") && !pass_coded.equals("null")) {
-                new FavLoader().execute(parser.getBaseUrl(normal, context) + "fav-server.php?certificate=" + parser.getCertificateSHA1Fingerprint(context) + "&tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded);
+                new FavLoader(parser.getBaseUrl(normal, context) + "fav-server.php?certificate=" + parser.getCertificateSHA1Fingerprint(context) + "&tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded).executeOnExecutor(ExecutorManager.getExecutor());
             }
         }
     }
@@ -1426,7 +1435,7 @@ public class newMain extends AppCompatActivity implements
                                 getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
                             }
                             getData(data);
-                            getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true);
+                            getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true).apply();
                             intentos = 0;
                         } else {
                             Log.d("Archivo 1", "Existe");
@@ -1440,7 +1449,7 @@ public class newMain extends AppCompatActivity implements
                                     } else {
                                         getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
                                     }
-                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true);
+                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true).apply();
                                     getData(data);
                                     intentos = 0;
                                 } else {
@@ -1450,7 +1459,7 @@ public class newMain extends AppCompatActivity implements
                                     } else {
                                         getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
                                     }
-                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true);
+                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true).apply();
                                     getData(infile);
                                     intentos = 0;
                                 }
@@ -1473,7 +1482,7 @@ public class newMain extends AppCompatActivity implements
                                     loadSecJson();
                                     intentos++;
                                 } else {
-                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", false);
+                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", false).apply();
                                     toast("Error en servidor, sin cache para mostrar");
                                     intentos = 0;
                                 }
@@ -1500,7 +1509,7 @@ public class newMain extends AppCompatActivity implements
                                 } else {
                                     file.delete();
                                     toast("Error en cache, sin conexion");
-                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", false);
+                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", false).apply();
                                 }
                             } else {
                                 loadSecJson();
@@ -1517,7 +1526,7 @@ public class newMain extends AppCompatActivity implements
                                 loadSecJson();
                                 intentos++;
                             } else {
-                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", false);
+                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", false).apply();
                                 toast("Error en servidor, sin cache para mostrar");
                                 intentos = 0;
                             }
@@ -1561,7 +1570,7 @@ public class newMain extends AppCompatActivity implements
                                 getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
                             }
                             if (isJSONValid(infile)) {
-                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true);
+                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true).apply();
                                 getData(infile);
                             } else {
                                 file.delete();
@@ -1819,6 +1828,11 @@ public class newMain extends AppCompatActivity implements
                         checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
                     } else if (permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
                         checkPermission(Manifest.permission.GET_ACCOUNTS);
+                    } else {
+                        if (!Settings.canDrawOverlays(context)) {
+                            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+                            startActivityForResult(intent, 5260);
+                        }
                     }
                 }
 
@@ -1862,10 +1876,6 @@ public class newMain extends AppCompatActivity implements
                 @Override
                 public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
             }, permission);
-            if (!Settings.canDrawOverlays(this)) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, 5260);
-            }
         }
     }
 
@@ -2045,9 +2055,17 @@ public class newMain extends AppCompatActivity implements
     }
 
     private class FavLoader extends AsyncTask<String, String, String> {
+        String url;
+
+        public FavLoader(String url) {
+            this.url = url;
+        }
+
         @Override
         protected String doInBackground(String... params) {
-            new SyncHttpClient().get(params[0], null, new JsonHttpResponseHandler() {
+            SyncHttpClient client=new SyncHttpClient();
+            client.setLoggingEnabled(false);
+            client.get(url, null, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     super.onSuccess(statusCode, headers, response);
@@ -2057,21 +2075,23 @@ public class newMain extends AppCompatActivity implements
                         if (visto.equals("")) {
                             String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
                             if (!favs.equals(favoritos)) {
-                                getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).commit();
+                                getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).apply();
                                 //new Requests(context, TaskType.GET_INICIO).execute(getInicio());
                                 loadMainJson();
+                                Log.d("Reload","Main");
                             }
                         } else {
                             String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
                             if (!favs.equals(favoritos)) {
-                                getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).commit();
+                                getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).apply();
                                 //new Requests(context, TaskType.GET_INICIO).execute(getInicio());
                                 loadMainJson();
+                                Log.d("Reload","Main");
                             }
                             String vistos = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
                             try {
                                 if (!vistos.equals(visto)) {
-                                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("vistos", visto).commit();
+                                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("vistos", visto).apply();
                                     String[] v = visto.split(";;;");
                                     for (String s : v) {
                                         getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, true).apply();

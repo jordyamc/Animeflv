@@ -1,5 +1,6 @@
 package knf.animeflv;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -53,6 +54,7 @@ import java.util.concurrent.TimeUnit;
 
 import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.Recyclers.AdapterFavs;
+import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.ThemeUtils;
 
 /**
@@ -65,7 +67,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     List<String> aids;
     String fav;
     String[] favoritos={};
-    Context context;
+    Activity context;
     boolean shouldExecuteOnResume;
     Handler handler = new Handler();
     Parser parser = new Parser();
@@ -160,7 +162,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         final String email_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
         final String pass_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
         if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-            new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null).execute(new Parser().getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&certificate=" + getCertificateSHA1Fingerprint());
+            new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null,new Parser().getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&certificate=" + getCertificateSHA1Fingerprint()).execute();
         }
         getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", false).apply();
         new Handler().postDelayed(new Runnable() {
@@ -231,7 +233,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
 
     private boolean isNetworkAvailable() {
         Boolean net=false;
-        int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "0"));
+        int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "2"));
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         switch (Tcon){
             case 0:
@@ -436,10 +438,10 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         aids.toArray(favoritos);
         switch (item.getItemId()) {
             case R.id.sort_alph:
-                new RequestFavSort(context, TaskType.SORT_ALPH).execute(favoritos);
+                new RequestFavSort(context, TaskType.SORT_ALPH,favoritos).executeOnExecutor(ExecutorManager.getExecutor());
                 break;
             case R.id.sort_num:
-                new RequestFavSort(context, TaskType.SORT_NUM).execute(favoritos);
+                new RequestFavSort(context, TaskType.SORT_NUM,favoritos).executeOnExecutor(ExecutorManager.getExecutor());
                 break;
         }
         return true;
@@ -456,16 +458,21 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         final String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
         String Svistos = getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
         if (!email_coded.equals("null") && !email_coded.equals("null")) {
-            new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + fin + ":;:" + Svistos);
-            new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute(parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + fin + ":;:" + Svistos);
+            new LoginServer(this, TaskType.UPDATE, null, null, null, null,parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + fin + ":;:" + Svistos).execute();
+            new LoginServer(this, TaskType.UPDATE, null, null, null, null,parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + fin + ":;:" + Svistos).execute();
         }
     }
 
     @Override
-    public void favCallSort(List<AnimeClass> list, TaskType taskType) {
+    public void favCallSort(List<AnimeClass> list, TaskType taskType, final MaterialDialog dialogo) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dialogo.setContent("Finalizando...");
+            }
+        });
         if (taskType == TaskType.SORT_ALPH) {
-            List<AnimeClass> alph = list;
-            Collections.sort(alph, new AnimeCompare());
+            List<AnimeClass> alph = AnimeSorter.sortByName(list);
             List<String> links = new ArrayList<>();
             List<String> aids = new ArrayList<>();
             List<String> titulos = new ArrayList<>();
@@ -477,6 +484,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             AdapterFavs adapter = new AdapterFavs(context, titulos, aids, links);
             recyclerView.setAdapter(adapter);
             savefavs(aids);
+            dialogo.dismiss();
         }
 
         if (taskType == TaskType.SORT_NUM) {
@@ -493,6 +501,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             AdapterFavs adapter = new AdapterFavs(context, titulos, aids, links);
             recyclerView.setAdapter(adapter);
             savefavs(aids);
+            dialogo.dismiss();
         }
     }
 }

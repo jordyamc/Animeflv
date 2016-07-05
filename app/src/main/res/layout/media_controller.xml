@@ -17,8 +17,8 @@
 
         <ImageButton
             android:id="@+id/top_back"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:background="@null"
             android:src="@drawable/ic_arrow_left" />
 
@@ -46,11 +46,12 @@
 
         <ImageButton
             android:id="@+id/bottom_pause"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginRight="10dp"
             android:background="@null"
-            android:src="@drawable/ic_play_white" />
+            android:src="@drawable/ic_play_white"
+            android:layout_marginEnd="10dp"/>
 
 
         <TextView

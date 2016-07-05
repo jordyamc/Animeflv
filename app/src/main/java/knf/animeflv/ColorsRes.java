@@ -8,6 +8,15 @@ import android.support.annotation.ColorInt;
  */
 public class ColorsRes {
     @ColorInt
+    public static int SecondaryTextDark(Context context) {
+        return context.getResources().getColor(android.R.color.secondary_text_dark);
+    }
+
+    public static int SecondaryTextLight(Context context) {
+        return context.getResources().getColor(android.R.color.secondary_text_light);
+    }
+
+    @ColorInt
     public static int Naranja(Context context) {
         return context.getResources().getColor(R.color.theme_naranja);
     }

@@ -29,7 +29,7 @@ public class PlayerSimple extends AppCompatActivity {
     Intent intent;
     String ops;
     String url;
-    View decorView;
+    int stopPosition=0;
     Map<String, String> options;
     Handler handler = new Handler();
     Context context;
@@ -44,8 +44,11 @@ public class PlayerSimple extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if( savedInstanceState != null ) {
+            stopPosition = savedInstanceState.getInt("position");
+        }
         setContentView(R.layout.player_simple);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         context = this;
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -112,6 +115,23 @@ public class PlayerSimple extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (videoView!=null){
+            videoView.start();
+            videoView.seekTo(stopPosition);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        stopPosition = videoView.getCurrentPosition();
+        videoView.pause();
+        outState.putInt("position", stopPosition);
     }
 
     private void hideSystemUI() {

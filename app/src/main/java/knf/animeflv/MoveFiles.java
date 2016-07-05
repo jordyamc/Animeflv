@@ -20,9 +20,6 @@ import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.ThemeUtils;
 
-/**
- * Created by Jordy on 12/08/2015.
- */
 public class MoveFiles extends AsyncTask<String,String,String> {
     MaterialDialog dialog;
     Context context;

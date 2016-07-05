@@ -45,9 +45,9 @@ public class SoundsLoader {
         if (!Keys.Dirs.SOUNDS.exists()) {
             Keys.Dirs.SOUNDS.mkdirs();
         }
-        if (!Keys.Dirs.NOMEDIA.exists()) {
+        if (!Keys.Dirs.SOUNDS_NOMEDIA.exists()) {
             try {
-                Keys.Dirs.NOMEDIA.createNewFile();
+                Keys.Dirs.SOUNDS_NOMEDIA.createNewFile();
             } catch (Exception e) {
                 Log.e("No Media", e.getMessage(), e);
             }

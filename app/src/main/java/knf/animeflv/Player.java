@@ -30,13 +30,11 @@ import knf.animeflv.playerSources.VideoControllerView;
 
 
 public class Player extends AppCompatActivity implements VideoControllerView.MediaPlayerControlListener, SurfaceHolder.Callback, MediaPlayer.OnVideoSizeChangedListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
-    VideoView videoView;
     View decorView;
     Intent intent;
     String url;
     String ops;
     String TAG;
-    MaterialDialog buff;
     VideoControllerView controller;
     ResizeSurfaceView mVideoSurface;
     private HashMap<String, String> options;
@@ -79,12 +77,10 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setOnVideoSizeChangedListener(this);
         controller = new VideoControllerView(this);
-        //VideoView videoView=(VideoView) findViewById(R.id.video);
         mLoadingView.setVisibility(View.VISIBLE);
         decorView = getWindow().getDecorView();
         hideSystemUI();
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        //videoView=(VideoView) findViewById(R.id.vitamio_videoView);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         try {
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mMediaPlayer.setOnPreparedListener(this);
@@ -98,17 +94,14 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
                     String[] temp = split.split(":::");
                     options.put(temp[0], temp[1]);
                 }
-                //videoView.setVideoURI(Uri.parse(url), options);
                 mMediaPlayer.setDataSource(this, Uri.parse(url), options);
             } else {
                 url = intent.getStringExtra("url");
                 if (url != null) {
-                    //videoView.setVideoURI(Uri.parse(url));
                     mMediaPlayer.setDataSource(this, Uri.parse(url));
                 } else {
                     String file = intent.getStringExtra("file");
                     if (file != null) {
-                        //videoView.setVideoPath(file);
                         mMediaPlayer.setDataSource(file);
                     } else {
                         Log.d(TAG, "No URL, No File");
@@ -317,5 +310,6 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
     public void onCompletion(MediaPlayer mp) {
         mp.reset();
         mp.release();
+        finish();
     }
 }

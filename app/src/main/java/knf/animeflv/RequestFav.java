@@ -1,5 +1,6 @@
 package knf.animeflv;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -48,12 +49,12 @@ public class RequestFav extends AsyncTask<String,String,String> {
     Parser parser=new Parser();
     HttpURLConnection c = null;
     URL u;
-    Context context;
+    Activity context;
     MaterialDialog dialog;
     Boolean running;
     int prog = 0;
     List<String> aids;
-    public RequestFav(Context con, TaskType taskType, MaterialDialog d, List<String> aids) {
+    public RequestFav(Activity con, TaskType taskType, MaterialDialog d, List<String> aids) {
         call=(callback) con;
         this.context = con;
         this.taskType=taskType;
@@ -139,6 +140,12 @@ public class RequestFav extends AsyncTask<String,String,String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dialog.setContent("Actualizando Favoritos\n"+"("+prog+"/"+aids.size()+")");
+            }
+        });
         running = true;
     }
 
@@ -155,6 +162,7 @@ public class RequestFav extends AsyncTask<String,String,String> {
                         super.onSuccess(statusCode, headers, response);
                         writeToFile(response.toString(), file);
                         list.add(parser.getTit(response.toString()));
+                        updateDialog();
                     }
 
                     @Override
@@ -165,6 +173,7 @@ public class RequestFav extends AsyncTask<String,String,String> {
                         if (file1.exists()) {
                             list.add(parser.getTit(getStringFromFile(file_loc)));
                         }
+                        updateDialog();
                     }
                 });
             }else {
@@ -173,8 +182,8 @@ public class RequestFav extends AsyncTask<String,String,String> {
                 if (file.exists()) {
                     list.add(parser.getTit(getStringFromFile(file_loc)));
                 }
+                updateDialog();
             }
-            prog++;
         }
         String[] favoritos=new String[list.size()];
         list.toArray(favoritos);
@@ -184,6 +193,16 @@ public class RequestFav extends AsyncTask<String,String,String> {
         }
         _response=builder.toString();
         return _response;
+    }
+
+    private void updateDialog(){
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                prog++;
+                dialog.setContent("Actualizando Favoritos\n"+"("+prog+"/"+aids.size()+")");
+            }
+        });
     }
 
     public  void writeToFile(String body,File file){

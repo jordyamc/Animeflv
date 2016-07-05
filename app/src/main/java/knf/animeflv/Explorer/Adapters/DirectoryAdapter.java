@@ -1,7 +1,6 @@
 package knf.animeflv.Explorer.Adapters;
 
-import android.content.Context;
-import android.net.Uri;
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,8 +24,8 @@ import knf.animeflv.Explorer.ExplorerInterfaces;
 import knf.animeflv.Explorer.ExplorerRoot;
 import knf.animeflv.Explorer.Models.Directory;
 import knf.animeflv.Explorer.Models.ModelFactory;
-import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
+import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
@@ -38,10 +37,10 @@ import xdroid.toaster.Toaster;
 public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.ViewHolder> {
 
     List<Directory> list;
-    private Context context;
+    private Activity context;
     private ExplorerInterfaces interfaces;
 
-    public DirectoryAdapter(Context context) {
+    public DirectoryAdapter(Activity context) {
         this.context = context;
         this.list = ModelFactory.createDirectoryList(context);
         this.interfaces = (ExplorerInterfaces) context;
@@ -56,7 +55,8 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
 
     @Override
     public void onBindViewHolder(final DirectoryAdapter.ViewHolder holder, final int position) {
-        PicassoCache.getPicassoInstance(context).load(Uri.parse(list.get(holder.getAdapterPosition()).getImageUrl(context))).error(R.drawable.ic_block_r).into(holder.img);
+        //PicassoCache.getPicassoInstance(context).load(Uri.parse(list.get(holder.getAdapterPosition()).getImageUrl(context))).error(R.drawable.ic_block_r).into(holder.img);
+        new CacheManager().mini(context,list.get(holder.getAdapterPosition()).getID(),holder.img);
         holder.titulo.setText(list.get(holder.getAdapterPosition()).getTitle());
         String caps = list.get(holder.getAdapterPosition()).getFilesNumber();
         if (caps.startsWith("1 ")) {

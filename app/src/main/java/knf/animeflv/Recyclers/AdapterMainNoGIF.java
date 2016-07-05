@@ -1,5 +1,6 @@
 package knf.animeflv.Recyclers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -72,6 +73,7 @@ import knf.animeflv.R;
 import knf.animeflv.Recientes.MainAnimeModel;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.TaskType;
+import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
@@ -92,14 +94,14 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
     int keepAliveTime = 10;
     BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(maximumPoolSize);
     Executor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
-    private Context context;
+    private Activity context;
     private List<MainAnimeModel> Animes = new ArrayList<>();
     private MainRecyclerCallbacks callbacks;
     private Parser parser = new Parser();
     private Spinner sp;
     private MaterialDialog d;
 
-    public AdapterMainNoGIF(Context context) {
+    public AdapterMainNoGIF(Activity context) {
         this.context = context;
         this.callbacks = (MainRecyclerCallbacks) context;
     }
@@ -172,7 +174,8 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         }
         setUpWeb(holder.webView);
         holder.tv_num.setTextColor(getColor());
-        PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + "http://cdn.animeflv.net/img/portada/thumb_80/" + Animes.get(holder.getAdapterPosition()).getAid() + ".jpg").error(R.drawable.ic_block_r).into(holder.iv_main);
+        //PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + "http://cdn.animeflv.net/img/portada/thumb_80/" + Animes.get(holder.getAdapterPosition()).getAid() + ".jpg").error(R.drawable.ic_block_r).into(holder.iv_main);
+        new CacheManager().mini(context,Animes.get(holder.getAdapterPosition()).getAid(),holder.iv_main);
         holder.tv_tit.setText(Animes.get(position).getTitulo());
         holder.tv_num.setText(getCap(holder.getAdapterPosition()));
         if (FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
@@ -203,16 +206,21 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 if (UpdateUtil.getState() == UpdateState.WAITING_TO_UPDATE) {
                     Toaster.toast("Actualizacion descargada, instalar para continuar");
                 } else {
-                    if (!MainStates.isListing()) {
-                        InfoHelper.open(
-                                ((newMain) context),
-                                new InfoHelper.SharedItem(holder.iv_main, "img"),
-                                new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
-                                new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getTitulo())
-                        );
-                    } else {
-                        MainStates.setListing(false);
+                    try {
+                        if (!MainStates.isListing()) {
+                            InfoHelper.open(
+                                    context,
+                                    new InfoHelper.SharedItem(holder.iv_main, "img"),
+                                    new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
+                                    new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getTitulo())
+                            );
+                        } else {
+                            MainStates.setListing(false);
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
                     }
+
                 }
             }
         });
@@ -497,6 +505,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 MainStates.setProcessing(false, null);
             }
         });
+        web.loadUrl(parser.getBaseUrl(TaskType.NORMAL,context));
     }
 
     private int getColor() {

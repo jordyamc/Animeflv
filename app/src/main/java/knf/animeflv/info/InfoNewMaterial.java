@@ -1,5 +1,6 @@
 package knf.animeflv.info;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -26,6 +27,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
@@ -67,18 +70,20 @@ import cz.msebera.android.httpclient.Header;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
-import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterInfoCapsMaterial;
 import knf.animeflv.Recyclers.AdapterRel;
 import knf.animeflv.ServerReload.Adapter.CustomRecycler;
 import knf.animeflv.TaskType;
+import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.info.Helper.LinearLayoutManagerWithSmoothScroller;
 import xdroid.toaster.Toaster;
 
+@SuppressWarnings("WeakerAccess")
 public class InfoNewMaterial extends AppCompatActivity implements LoginServer.callback {
     @Bind(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbarLayout;
@@ -100,6 +105,8 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
     TextView txt_titulo;
     @Bind(R.id.tipo)
     TextView txt_tipo;
+    @Bind(R.id.fsalida)
+    TextView txt_fsalida;
     @Bind(R.id.estado)
     TextView txt_estado;
     @Bind(R.id.generos)
@@ -119,12 +126,13 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
     Parser parser = new Parser();
     MaterialDialog dialog;
     Spinner spinner;
-    Context context;
+    Activity context;
     WebView webView;
     String aid;
     Menu Amenu;
     String json = "{}";
     AdapterInfoCapsMaterial adapter_caps;
+    LinearLayoutManagerWithSmoothScroller layoutManager;
     boolean isInInfo = true;
     boolean blocked = false;
 
@@ -183,10 +191,22 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
         setSupportActionBar(toolbar);
-        aid = getIntent().getExtras().getString("aid");
         context = this;
-        setCollapsingToolbarLayoutTitle(getIntent().getExtras().getString("title"));
-        PicassoCache.getPicassoInstance(this).load(parser.getBaseUrl(TaskType.NORMAL, this) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&hd=http://cdn.animeflv.net/img/portada/" + aid + ".jpg").error(R.drawable.ic_block_r).into(imageView);
+        aid = getIntent().getExtras().getString("aid");
+        if (aid==null){
+            String url = getIntent().getDataString().replace("http://animeflv.net/", "").replace(".html", "");
+            String[] data = url.split("/");
+            aid = parser.getAidCached(data[1]);
+            if (aid!=null){
+                setCollapsingToolbarLayoutTitle(parser.getTitCached(aid));
+            }else {
+                Toaster.toast("Error al abrir informacion!!!");
+                finish();
+            }
+        }else {
+            setCollapsingToolbarLayoutTitle(getIntent().getExtras().getString("title"));
+        }
+        new CacheManager().portada(this, aid, imageView);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -219,11 +239,13 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         if (ThemeUtils.isAmoled(this)) {
             layout.setBackgroundColor(ColorsRes.Negro(this));
             txt_sinopsis.setTextColor(getResources().getColor(R.color.blanco));
+            TextView tit0 = (TextView) findViewById(R.id.info_titles0);
             TextView tit1 = (TextView) findViewById(R.id.info_titles1);
             TextView tit2 = (TextView) findViewById(R.id.info_titles2);
             TextView tit3 = (TextView) findViewById(R.id.info_titles3);
             TextView tit4 = (TextView) findViewById(R.id.info_titles4);
             TextView tit5 = (TextView) findViewById(R.id.info_titles5);
+            tit0.setTextColor(getResources().getColor(R.color.blanco));
             tit1.setTextColor(getResources().getColor(R.color.blanco));
             tit2.setTextColor(getResources().getColor(R.color.blanco));
             tit3.setTextColor(getResources().getColor(R.color.blanco));
@@ -241,10 +263,11 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         int color = ThemeUtils.getAcentColor(this);
         txt_titulo.setTextColor(color);
         txt_tipo.setTextColor(color);
+        txt_fsalida.setTextColor(color);
         txt_estado.setTextColor(color);
         txt_generos.setTextColor(color);
         txt_debug.setTextColor(color);
-        //button_list.attachToRecyclerView(recyclerView);
+        button.hide();
         button_list.setColorNormal(ThemeUtils.getAcentColor(this));
         button_list.setColorPressed(ThemeUtils.getAcentColor(this));
         button_list.setOnClickListener(new View.OnClickListener() {
@@ -452,6 +475,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
             txt_sinopsis.setText(animeDetail.getSinopsis());
             txt_titulo.setText(animeDetail.getTitulo());
             txt_tipo.setText(animeDetail.getTid());
+            txt_fsalida.setText(animeDetail.getFsalida());
             txt_estado.setText(animeDetail.getEstado());
             txt_generos.setText(animeDetail.getGeneros());
             txt_debug.setText(aid);
@@ -467,7 +491,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                 AdapterRel adapter = new AdapterRel(this, titulos, tipos, urls, aids);
                 rv_rel.setAdapter(adapter);
             }
-            nestedScrollView.setVisibility(View.VISIBLE);
+            showInitInfo();
             setRecyclerView(json);
         } else {
             Log.d("Archivo", "Existe");
@@ -476,6 +500,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                 txt_sinopsis.setText(animeDetail.getSinopsis());
                 txt_titulo.setText(animeDetail.getTitulo());
                 txt_tipo.setText(animeDetail.getTid());
+                txt_fsalida.setText(animeDetail.getFsalida());
                 txt_estado.setText(animeDetail.getEstado());
                 txt_generos.setText(animeDetail.getGeneros());
                 txt_debug.setText(aid);
@@ -491,13 +516,14 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                     AdapterRel adapter = new AdapterRel(this, titulos, tipos, urls, aids);
                     rv_rel.setAdapter(adapter);
                 }
-                nestedScrollView.setVisibility(View.VISIBLE);
+                showInitInfo();
                 setRecyclerView(json);
             } else {
                 FileUtil.writeToFile(json, file);
                 txt_sinopsis.setText(animeDetail.getSinopsis());
                 txt_titulo.setText(animeDetail.getTitulo());
                 txt_tipo.setText(animeDetail.getTid());
+                txt_fsalida.setText(animeDetail.getFsalida());
                 txt_estado.setText(animeDetail.getEstado());
                 txt_generos.setText(animeDetail.getGeneros());
                 txt_debug.setText(aid);
@@ -513,18 +539,39 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                     AdapterRel adapter = new AdapterRel(this, titulos, tipos, urls, aids);
                     rv_rel.setAdapter(adapter);
                 }
-                nestedScrollView.setVisibility(View.VISIBLE);
+                showInitInfo();
                 setRecyclerView(json);
             }
         }
         scrollToTop();
+        String pos=getIntent().getStringExtra("position");
+        final int position=pos==null?-1:Integer.valueOf(pos);
+        if (position!=-1){
+            button.setImageResource(R.drawable.information);
+            nestedScrollView.setVisibility(View.GONE);
+            frameLayout.setVisibility(View.VISIBLE);
+            barLayout.setExpanded(false, true);
+            button_list.show(true);
+            isInInfo = false;
+            layoutManager.smoothScrollToPosition(recyclerView, new RecyclerView.State(),position);
+        }
+    }
+
+    private void showInitInfo(){
+        if (getIntent().getStringExtra("position")==null) {
+            Animation bottomUp = AnimationUtils.loadAnimation(context, R.anim.slide_from_bottom);
+            nestedScrollView.startAnimation(bottomUp);
+        }
+        nestedScrollView.setVisibility(View.VISIBLE);
     }
 
     private void setRecyclerView(final String json) {
         adapter_caps = new AdapterInfoCapsMaterial(context, parser.parseNumerobyEID(json), aid, parser.parseEidsbyEID(json));
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        layoutManager = new LinearLayoutManagerWithSmoothScroller(context);
+        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter_caps);
+        button.show();
     }
 
     private String getCertificateSHA1Fingerprint() {
@@ -628,11 +675,11 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                     builder.append(":::" + i);
                 }
                 Toaster.toast("Favorito Eliminado");
-                getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builder.toString()).commit();
+                getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builder.toString()).apply();
                 String vistos = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
                 if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString() + ":;:" + vistos);
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute(parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString() + ":;:" + vistos);
+                    new LoginServer(this, TaskType.UPDATE, null, null, null, null,parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString() + ":;:" + vistos).execute();
+                    new LoginServer(this, TaskType.UPDATE, null, null, null, null,parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString() + ":;:" + vistos).execute();
                 }
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_no, Amenu);
@@ -650,11 +697,11 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                     builderNo.append(":::" + i);
                 }
                 Toaster.toast("Favorito Agregado");
-                getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builderNo.toString()).commit();
+                getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builderNo.toString()).apply();
                 String vistos1 = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
                 if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString() + ":;:" + vistos1);
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null).execute(parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString() + ":;:" + vistos1);
+                    new LoginServer(this, TaskType.UPDATE, null, null, null, null,parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString() + ":;:" + vistos1).execute();
+                    new LoginServer(this, TaskType.UPDATE, null, null, null, null,parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString() + ":;:" + vistos1).execute();
                 }
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_si, Amenu);

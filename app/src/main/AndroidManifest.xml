@@ -25,17 +25,16 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:theme="@style/AppTheme"
-        tools:replace="icon,label">
-        <activity
-            android:name=".Main"
-            android:configChanges="orientation|screenSize|keyboard"
-            android:label="@string/app_name"
-            android:theme="@style/AppThemeNoAn"/>
+        tools:replace="icon,label"
+        android:manageSpaceActivity=".Utils.CacheControl">
         <activity
             android:name=".newMain"
             android:configChanges="orientation|screenSize|keyboard"
             android:label="@string/app_name"
             android:theme="@style/AppThemeNoAn"/>
+        <activity
+            android:name=".Utils.CacheControl"
+            android:label="@string/app_name"/>
         <activity
             android:name=".Splash"
             android:configChanges="orientation|screenSize|keyboard"
@@ -119,12 +118,6 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme"/>
         <activity
-            android:name=".info.Info"
-            android:label="@string/app_name"/>
-        <activity
-            android:name=".info.InfoNew"
-            android:label="@string/app_name"/>
-        <activity
             android:name=".Emision.Section.EmisionActivity"
             android:label="@string/app_name"/>
         <activity
@@ -135,6 +128,12 @@
             android:label="@string/app_name"/>
         <activity
             android:name=".PlayerSimple"
+            android:label="@string/app_name"/>
+        <activity
+            android:name=".PlayerExo"
+            android:label="@string/app_name"/>
+        <activity
+            android:name=".PlayerExoSimple"
             android:label="@string/app_name"/>
         <activity
             android:name=".Utils.FastActivity"
@@ -151,7 +150,7 @@
             android:name=".Explorer.ExplorerRoot"
             android:label="@string/app_name"/>
         <activity
-            android:name=".info.InfoNewMaterial"
+            android:name=".history.HistoryActivity"
             android:label="@string/app_name"/>
         <activity
             android:name=".Utils.logs.LogViewer"
@@ -164,7 +163,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".info.InfoNewDeep"
+            android:name=".info.InfoNewMaterial"
             android:label="@string/app_name">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.VIEW"/>
@@ -276,7 +275,7 @@
                 android:resource="@xml/widget_info"/>
         </receiver>
 
-        <!--<service
+        <service
             android:name=".Tile.QuickSetting"
             android:label="@string/app_name"
             android:icon="@drawable/app_icon_intro"
@@ -284,7 +283,7 @@
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
-        </service>-->
+        </service>
     </application>
 
 </manifest>

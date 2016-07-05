@@ -20,7 +20,7 @@ import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.List;
 
-import knf.animeflv.AnimeCompare;
+import knf.animeflv.AnimeSorter;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterDirAnimeNew;
@@ -70,8 +70,7 @@ public class Ovas extends Fragment {
         rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         String json=getJson();
         int genero=getActivity().getSharedPreferences("data", Context.MODE_PRIVATE).getInt("genero", 0);
-        List<AnimeClass> animes = parser.DirOvas(json);
-        Collections.sort(animes, new AnimeCompare());
+        List<AnimeClass> animes = AnimeSorter.sortByName(parser.DirOvas(json));
         /*List<String> titulosOvas = parser.DirTitulosOvasA(json, genero);
         List<String> indexes = parser.DirIntsOvasA(json, genero);
         List<String> titOrdOvas = parser.DirTitulosOvasA(json, genero);

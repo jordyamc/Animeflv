@@ -1,6 +1,6 @@
 package knf.animeflv.Recyclers;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -33,9 +33,8 @@ import java.util.List;
 
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Parser;
-import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
-import knf.animeflv.TaskType;
+import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.info.Helper.InfoHelper;
 import knf.animeflv.info.InfoNewMaterial;
 
@@ -48,8 +47,8 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
     List<String> tiposCard;
     String[] url;
     String[] aids;
-    private Context context;
-    public AdapterRel(Context context, List<String> titulos, List<String> tipos, String[] urls, String[] aid) {
+    private Activity context;
+    public AdapterRel(Activity context, List<String> titulos, List<String> tipos, String[] urls, String[] aid) {
         this.context = context;
         this.titulosCard = titulos;
         this.tiposCard = tipos;
@@ -108,7 +107,8 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
             holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
         }
         holder.tv_tipo.setTextColor(getColor());
-        PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[position]).error(R.drawable.ic_block_r).into(holder.iv_rel);
+        //PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + url[position]).error(R.drawable.ic_block_r).into(holder.iv_rel);
+        new CacheManager().mini(context,aids[position],holder.iv_rel);
         holder.tv_tit.setText(titulosCard.get(position));
         holder.tv_tipo.setText(tiposCard.get(position));
         holder.card.setOnClickListener(new View.OnClickListener() {

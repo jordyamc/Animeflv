@@ -1,5 +1,6 @@
 package knf.animeflv;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -7,6 +8,7 @@ import android.content.pm.Signature;
 import android.os.AsyncTask;
 import android.os.Environment;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.SyncHttpClient;
 
@@ -35,10 +37,8 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Utils.ThemeUtils;
 
-/**
- * Created by Jordy on 22/08/2015.
- */
 public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<AnimeClass>> {
     InputStream is;
     List<AnimeClass> _response;
@@ -47,15 +47,16 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
     Parser parser = new Parser();
     StringBuilder builder = new StringBuilder();
     HttpURLConnection c = null;
-    URL u;
-    Context context;
-    Boolean running;
+    Activity context;
+    MaterialDialog dialog;
+    String[] favs;
     int prog = 0;
 
-    public RequestFavSort(Context con, TaskType taskType) {
+    public RequestFavSort(Activity con, TaskType taskType,String[] favs) {
         call = (callback) con;
         this.context = con;
         this.taskType = taskType;
+        this.favs=favs;
     }
 
     public static String byte2HexFormatted(byte[] arr) {
@@ -134,11 +135,25 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
     }
 
     @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        dialog=new MaterialDialog.Builder(context)
+                .content("Reacomodando...\n"+"("+prog+"/"+favs.length+")")
+                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                .progress(true,0)
+                .build();
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dialog.show();
+            }
+        });
+    }
+
+    @Override
     protected List<AnimeClass> doInBackground(String... params) {
-        String file_ = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-        String dir = getStringFromFile(file_);
         final List<AnimeClass> list = new ArrayList<AnimeClass>();
-        for (final String i : params) {
+        for (final String i : favs) {
             final File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
             if (!file.exists() || !isJSONValid(getStringFromFile(file.getPath()))) {
                 new SyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(i) + "&certificate=" + getCertificateSHA1Fingerprint(), null, new JsonHttpResponseHandler() {
@@ -147,6 +162,7 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
                         super.onSuccess(statusCode, headers, response);
                         writeToFile(response.toString(), file);
                         list.add(new AnimeClass(response.toString()));
+                        updateDialog();
                     }
 
                     @Override
@@ -157,6 +173,7 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
                         if (file1.exists()) {
                             list.add(new AnimeClass(getStringFromFile(file_loc)));
                         }
+                        updateDialog();
                     }
                 });
             } else {
@@ -164,9 +181,20 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
                 if (file.exists()) {
                     list.add(new AnimeClass(getStringFromFile(file_loc)));
                 }
+                updateDialog();
             }
         }
         return list;
+    }
+
+    private void updateDialog(){
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                prog++;
+                dialog.setContent("Reacomodando...\n"+"("+prog+"/"+favs.length+")");
+            }
+        });
     }
 
     public void writeToFile(String body, File file) {
@@ -196,10 +224,10 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
     @Override
     protected void onPostExecute(List<AnimeClass> s) {
         super.onPostExecute(s);
-        call.favCallSort(s, taskType);
+        call.favCallSort(s, taskType, dialog);
     }
 
     public interface callback {
-        void favCallSort(List<AnimeClass> list, TaskType taskType);
+        void favCallSort(List<AnimeClass> list, TaskType taskType, MaterialDialog dialog);
     }
 }

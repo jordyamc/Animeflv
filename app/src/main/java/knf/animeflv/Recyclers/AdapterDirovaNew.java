@@ -1,6 +1,6 @@
 package knf.animeflv.Recyclers;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -27,9 +27,8 @@ import java.util.List;
 import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.Parser;
-import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
-import knf.animeflv.TaskType;
+import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.info.Helper.InfoHelper;
 
 /**
@@ -38,8 +37,8 @@ import knf.animeflv.info.Helper.InfoHelper;
 public class AdapterDirovaNew extends RecyclerView.Adapter<AdapterDirovaNew.ViewHolder> {
 
     List<AnimeClass> Animes;
-    private Context context;
-    public AdapterDirovaNew(Context context, List<AnimeClass> animes) {
+    private Activity context;
+    public AdapterDirovaNew(Activity context, List<AnimeClass> animes) {
         this.context = context;
         this.Animes = animes;
     }
@@ -70,7 +69,8 @@ public class AdapterDirovaNew extends RecyclerView.Adapter<AdapterDirovaNew.View
             holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
             holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
         }
-        PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + Animes.get(holder.getAdapterPosition()).getImagen()).error(R.drawable.ic_block_r).into(holder.iv_rel);
+        //PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + Animes.get(holder.getAdapterPosition()).getImagen()).error(R.drawable.ic_block_r).into(holder.iv_rel);
+        new CacheManager().mini(context,Animes.get(holder.getAdapterPosition()).getAid(),holder.iv_rel);
         holder.tv_tit.setText(Animes.get(holder.getAdapterPosition()).getNombre());
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override

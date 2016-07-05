@@ -32,7 +32,7 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="Conexiones">
         <com.lb.material_preferences_library.custom_preferences.Preference
-            android:defaultValue="0"
+            android:defaultValue="2"
             android:key="t_conexion"
             android:summary="%s"
             android:title="Usar Conexion" />
@@ -49,6 +49,11 @@
             android:key="t_busqueda"
             android:summary="%s"
             android:title="Tipo de busqueda" />
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="0"
+            android:key="ord_busqueda"
+            android:summary="%s"
+            android:title="Orden de busqueda" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Reproductores">
         <com.lb.material_preferences_library.custom_preferences.Preference
@@ -98,18 +103,12 @@
             android:defaultValue="false"
             android:key="statusShown"
             android:title="Ocultar informacion de Server" />
-        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
-            android:defaultValue="false"
-            android:key="debug"
-            android:summary="(Informacion de Anime)"
-            android:title="Mostrar ID de Anime" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Almacenamiento">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="b_cache"
-            android:summary="Tamaño de cache: %s MB"
-            android:title="Borrar Cache" />
+            android:title="Administrador de Cache" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="b_video"

@@ -1,6 +1,7 @@
 package knf.animeflv.Directorio;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -58,7 +59,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import knf.animeflv.AnimeCompare;
+import knf.animeflv.AnimeSorter;
 import knf.animeflv.Application;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Parser;
@@ -84,7 +85,7 @@ public class Directorio extends AppCompatActivity {
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
     Parser parser = new Parser();
     String json = "";
-    Context context;
+    Activity context;
     EditText.OnEditorActionListener listener;
     int t_busqueda;
     ViewPager viewPager;
@@ -240,8 +241,7 @@ public class Directorio extends AppCompatActivity {
                                     SearchConstructor.SetSearch(SearchType.GENEROS, which);
                                     editText.setHint("Generos: " + which.length);
                                 }
-                                List<AnimeClass> animes = SearchUtils.Search(json, editText.getEditableText().toString());
-                                Collections.sort(animes, new AnimeCompare());
+                                List<AnimeClass> animes = AnimeSorter.sort(Directorio.this,SearchUtils.Search(json, editText.getEditableText().toString()));
                                 AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                                 recyclerView.setAdapter(adapterBusqueda);
                                 return true;
@@ -326,8 +326,7 @@ public class Directorio extends AppCompatActivity {
                             } else {
                                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                             }
-                            List<AnimeClass> animes = SearchUtils.Search(json, null);
-                            Collections.sort(animes, new AnimeCompare());
+                            List<AnimeClass> animes = AnimeSorter.sort(Directorio.this,SearchUtils.Search(json, null));
                             AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                             recyclerView.setAdapter(adapterBusqueda);
                         }
@@ -411,8 +410,7 @@ public class Directorio extends AppCompatActivity {
                                     }
                                 }
                             }
-                            List<AnimeClass> animes = SearchUtils.Search(json, s.toString());
-                            Collections.sort(animes, new AnimeCompare());
+                            List<AnimeClass> animes = AnimeSorter.sort(Directorio.this,SearchUtils.Search(json, s.toString()));
                             AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                             recyclerView.setAdapter(adapterBusqueda);
                         } else {
@@ -470,8 +468,7 @@ public class Directorio extends AppCompatActivity {
                             getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                         }
                     }
-                    List<AnimeClass> animes = SearchUtils.Search(json, s.toString());
-                    Collections.sort(animes, new AnimeCompare());
+                    List<AnimeClass> animes = AnimeSorter.sort(Directorio.this,SearchUtils.Search(json, s.toString()));
                     AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                     recyclerView.setAdapter(adapterBusqueda);
                 }
@@ -572,8 +569,7 @@ public class Directorio extends AppCompatActivity {
                 frameLayout.setVisibility(View.VISIBLE);
             }
         }
-        List<AnimeClass> animes = SearchUtils.Search(json, null);
-        Collections.sort(animes, new AnimeCompare());
+        List<AnimeClass> animes = AnimeSorter.sort(Directorio.this,SearchUtils.Search(json, null));
         AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
         recyclerView.setAdapter(adapterBusqueda);
     }

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <TextView
+        android:text="Miniaturas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="normal|bold"
+        android:paddingEnd="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingStart="5dp"
+        android:id="@+id/tit_mini"/>
+
+    <TextView
+        android:text="Cache local de las miniaturas de anime, se genera cada vez que se carga una miniatura."
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/desc_mini"
+        android:textSize="18sp"
+        android:paddingEnd="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingStart="5dp"/>
+
+    <android.support.v7.widget.SwitchCompat
+        android:text="Guardar cache local"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/switch_mini"
+        android:textSize="18sp"
+        android:textColor="?android:attr/textColorTertiary"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        android:checked="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"/>
+
+    <Button
+        android:text="Vaciar (...)"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/clear_mini"
+        android:textSize="16sp"
+        style="?android:attr/borderlessButtonStyle"
+        android:textColor="?android:attr/textColorTertiary"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"/>
+
+    <View
+        android:alpha="0.12"
+        android:background="@android:color/black"
+        android:layout_height="1dp"
+        android:layout_width="match_parent"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"/>
+</LinearLayout>

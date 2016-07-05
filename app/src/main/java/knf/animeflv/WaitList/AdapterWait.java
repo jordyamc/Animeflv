@@ -1,8 +1,7 @@
 package knf.animeflv.WaitList;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -27,9 +26,9 @@ import java.util.List;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Interfaces.WaitDownloadCallback;
 import knf.animeflv.Parser;
-import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
+import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.WaitList.Costructor.WaitManager;
@@ -47,11 +46,11 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
     List<List<Float>> animesCapList;
     RecyclerViewExpandableItemManager manager;
     RecyclerViewSwipeManager swipeManager;
-    Context context;
+    Activity context;
     Parser parser = new Parser();
     WaitDownloadCallback callback;
 
-    public AdapterWait(Context context, RecyclerViewExpandableItemManager manager, RecyclerViewSwipeManager swipeManager) {
+    public AdapterWait(Activity context, RecyclerViewExpandableItemManager manager, RecyclerViewSwipeManager swipeManager) {
         setHasStableIds(true);
         this.manager = manager;
         this.swipeManager = swipeManager;
@@ -103,7 +102,8 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
             holder.delete.setColorFilter(ColorsRes.Holo_Dark(context));
             holder.start.setColorFilter(ColorsRes.Holo_Dark(context));
         }
-        PicassoCache.getPicassoInstance(context).load(Uri.parse(getUrlImg(animes.get(groupPosition)))).error(R.drawable.ic_block_r).into(holder.image);
+        //PicassoCache.getPicassoInstance(context).load(Uri.parse(getUrlImg(animes.get(groupPosition)))).error(R.drawable.ic_block_r).into(holder.image);
+        new CacheManager().mini(context,animes.get(groupPosition),holder.image);
         holder.titulo.setText(parser.getTitCached(animes.get(groupPosition)));
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -284,6 +284,16 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
     @Override
     public void onSetChildItemSwipeBackground(ChildHolder holder, int groupPosition, int childPosition, int type) {
 
+    }
+
+    @Override
+    public boolean onCheckGroupCanDrop(int draggingGroupPosition, int dropGroupPosition) {
+        return false;
+    }
+
+    @Override
+    public boolean onCheckChildCanDrop(int draggingGroupPosition, int draggingChildPosition, int dropGroupPosition, int dropChildPosition) {
+        return false;
     }
 
     private interface Expandable extends ExpandableItemConstants {

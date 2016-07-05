@@ -15,6 +15,7 @@ public class AnimeDetail {
     private String tid = "null";
     private String titulo = "null";
     private String sinopsis = "null";
+    private String fsalida = "null";
     private String estado = "null";
     private String generos = "null";
 
@@ -35,6 +36,7 @@ public class AnimeDetail {
                 } else {
                     s = "Terminado";
                 }
+                fsalida = object.getString("fecha_inicio").trim().equals("")?"Sin Fecha":object.getString("fecha_inicio").trim();
                 estado = s;
                 generos = object.getString("generos");
             } catch (Exception e) {
@@ -61,6 +63,10 @@ public class AnimeDetail {
 
     public String getSinopsis() {
         return sinopsis;
+    }
+
+    public String getFsalida() {
+        return fsalida;
     }
 
     public String getEstado() {

@@ -1,6 +1,6 @@
 package knf.animeflv.Recyclers;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -32,9 +32,8 @@ import java.util.List;
 
 import knf.animeflv.Favoritos;
 import knf.animeflv.Parser;
-import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
-import knf.animeflv.TaskType;
+import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.info.Helper.InfoHelper;
 
 /**
@@ -45,8 +44,8 @@ public class AdapterFavs extends RecyclerView.Adapter<AdapterFavs.ViewHolder> {
     List<String> titulosCard;
     List<String> aids;
     List<String> links;
-    private Context context;
-    public AdapterFavs(Context context, List<String> titulos, List<String> aid, List<String> aidlinks) {
+    private Activity context;
+    public AdapterFavs(Activity context, List<String> titulos, List<String> aid, List<String> aidlinks) {
         this.context = context;
         this.titulosCard = titulos;
         this.aids = aid;
@@ -103,7 +102,8 @@ public class AdapterFavs extends RecyclerView.Adapter<AdapterFavs.ViewHolder> {
             holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
             holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
         }
-        PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + links.get(position)).error(R.drawable.ic_block_r).into(holder.iv_rel);
+        //PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + links.get(position)).error(R.drawable.ic_block_r).into(holder.iv_rel);
+        new CacheManager().mini(context,aids.get(holder.getAdapterPosition()),holder.iv_rel);
         holder.tv_tit.setText(titulosCard.get(position));
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override

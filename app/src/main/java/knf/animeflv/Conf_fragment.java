@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Locale;
 
 import knf.animeflv.Tutorial.TutorialActivity;
+import knf.animeflv.Utils.CacheControl;
+import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Files.FileSearchResponse;
 import knf.animeflv.Utils.FragmentExtras;
@@ -122,20 +124,15 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             mp = UtilSound.getMediaPlayer(context, UtilSound.getSetDefMediaPlayerInt());
         }
         final File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download");
-        long size = getcachesize();
         long dirsize = getFileSize(file);
-        final String tamano = formatSize(size);
         String vidsize = formatSize(dirsize);
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_cache", tamano).commit();
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_video", vidsize).commit();
-        getPreferenceScreen().findPreference("b_cache").setSummary("Tamaño de cache: " + tamano);
+
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_video", vidsize).apply();
         getPreferenceScreen().findPreference("b_cache").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                clearApplicationData();
-                String s = formatSize(getcachesize());
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("b_cache", s).commit();
-                getPreferenceScreen().findPreference("b_cache").setSummary("Tamaño de cache: " + s);
+                getActivity().finish();
+                getActivity().startActivity(new Intent(getActivity(), CacheControl.class));
                 return false;
             }
         });
@@ -272,11 +269,11 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        getPreferenceScreen().findPreference("t_conexion").setSummary(getStringfromResourse(R.array.tipos, "t_conexion", "0"));
+        getPreferenceScreen().findPreference("t_conexion").setSummary(getStringfromResourse(R.array.tipos, "t_conexion", "2"));
         getPreferenceScreen().findPreference("t_conexion").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                UtilDialogPref.init(getResources().getStringArray(R.array.tipos), "t_conexion", "0", "Usar Conexion", getPreferenceScreen().findPreference("t_conexion"));
+                UtilDialogPref.init(getResources().getStringArray(R.array.tipos), "t_conexion", "2", "Usar Conexion", getPreferenceScreen().findPreference("t_conexion"));
                 PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
                 return false;
             }
@@ -286,6 +283,15 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 UtilDialogPref.init(getResources().getStringArray(R.array.busqueda), "t_busqueda", "0", "Tipo de busqueda", getPreferenceScreen().findPreference("t_busqueda"));
+                PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("ord_busqueda").setSummary(getStringfromResourse(R.array.busqueda_sort, "ord_busqueda", "0"));
+        getPreferenceScreen().findPreference("ord_busqueda").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                UtilDialogPref.init(getResources().getStringArray(R.array.busqueda_sort), "ord_busqueda", "0", "Orden de busqueda", getPreferenceScreen().findPreference("ord_busqueda"));
                 PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
                 return false;
             }
@@ -540,12 +546,26 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         File[] files = context.getCacheDir().listFiles();
         File[] mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache").listFiles();
         for (File f : files) {
-            size = size + f.length();
+            size = size + getSize(f);
         }
         if (mediaStorage != null) {
             for (File f1 : mediaStorage) {
-                size = size + f1.length();
+                size = size + getSize(f1);
             }
+        }
+        return size;
+    }
+
+    private long getSize(File file){
+        long size = 0;
+        if (file.isDirectory()){
+            if (!file.getName().startsWith(".")) {
+                for (File f : file.listFiles()) {
+                    size = size + getSize(f);
+                }
+            }
+        }else {
+            size = size + file.length();
         }
         return size;
     }
@@ -598,8 +618,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 int tiempo = Integer.parseInt(sharedPreferences.getString(key, "60000"));
                 new Alarm().CancelAlarm(context);
                 new Alarm().SetAlarm(context, tiempo);
-                break;
-            case "b_cache":
                 break;
             case "nCuenta_Status":
                 String status = sharedPreferences.getString("nCuenta_Status", "NULL");
