@@ -46,7 +46,7 @@ public class MXStream {
             case "com.mxtech.videoplayer.pro":
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 Uri videoUri = Uri.parse(url);
-                intent.setDataAndType(videoUri, "application/mp4");
+                intent.setDataAndType(videoUri, "video/mp4");
                 intent.setPackage("com.mxtech.videoplayer.pro");
                 intent.putExtra("title", parser.getTitCached(aid) + " " + numero);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -61,7 +61,7 @@ public class MXStream {
             case "com.mxtech.videoplayer.ad":
                 Intent intentad = new Intent(Intent.ACTION_VIEW);
                 Uri videoUriad = Uri.parse(url);
-                intentad.setDataAndType(videoUriad, "application/mp4");
+                intentad.setDataAndType(videoUriad, "video/mp4");
                 intentad.setPackage("com.mxtech.videoplayer.ad");
                 intentad.putExtra("title", parser.getTitCached(aid) + " " + numero);
                 intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

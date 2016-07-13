@@ -131,8 +131,9 @@ public class WaitActivity extends AppCompatActivity implements
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
         toolbar = (Toolbar) findViewById(R.id.toolbar_wait);
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+        if (ThemeUtils.isAmoled(this)) {
             toolbar.setBackgroundColor(getResources().getColor(android.R.color.black));
+            toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);

@@ -13,14 +13,12 @@ import com.devbrackets.android.exomedia.listener.OnCompletionListener;
 import com.devbrackets.android.exomedia.listener.OnErrorListener;
 import com.devbrackets.android.exomedia.listener.OnPreparedListener;
 import com.devbrackets.android.exomedia.ui.widget.EMVideoView;
-import com.devbrackets.android.exomedia.ui.widget.VideoControls;
 
 import java.util.HashMap;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import knf.animeflv.Utils.ThemeUtils;
-import knf.animeflv.playerSources.EMVideoViewSpecial;
 import knf.animeflv.playerSources.VideoControlsEsp;
 import xdroid.toaster.Toaster;
 

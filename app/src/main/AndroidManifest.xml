@@ -87,9 +87,6 @@
             android:name=".Favoritos"
             android:label="@string/app_name"/>
         <activity
-            android:name=".Chat"
-            android:label="@string/app_name"/>
-        <activity
             android:name=".Directorio.Directorio"
             android:label="@string/app_name"/>
         <activity
@@ -263,17 +260,6 @@
         </receiver>
 
         <service android:name="com.google.android.gms.analytics.CampaignTrackingService"/>
-
-        <receiver
-            android:name=".Widget.Provider"
-            android:permission="android.permission.BIND_REMOTEVIEWS">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_info"/>
-        </receiver>
 
         <service
             android:name=".Tile.QuickSetting"

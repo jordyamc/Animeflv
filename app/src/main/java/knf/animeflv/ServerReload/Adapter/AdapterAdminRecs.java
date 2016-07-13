@@ -1,6 +1,7 @@
 package knf.animeflv.ServerReload.Adapter;
 
 import android.content.Context;
+import android.support.annotation.ColorInt;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import knf.animeflv.R;
 import knf.animeflv.ServerReload.manualServerReload;
 import knf.animeflv.ServerReload.manualServerReload.State;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.ThemeUtils;
 
 /**
  * Created by Jordy on 17/08/2015.
@@ -45,13 +47,19 @@ public class AdapterAdminRecs extends RecyclerView.Adapter<AdapterAdminRecs.View
 
     @Override
     public void onBindViewHolder(final AdapterAdminRecs.ViewHolder holder, final int position) {
+        if (ThemeUtils.isAmoled(context)){
+            holder.titulo.setTextColor(ColorsRes.SecondaryTextDark(context));
+        }else {
+            holder.titulo.setTextColor(ColorsRes.SecondaryTextLight(context));
+        }
+        holder.root.setBackgroundColor(ColorsRes.Transparent(context));
         holder.titulo.setText(objects.get(holder.getAdapterPosition()).getName());
-        holder.state.setTextColor(ColorsRes.Prim(context));
+        holder.state.setTextColor(ThemeUtils.isAmoled(context)?ColorsRes.Blanco(context):ColorsRes.Prim(context));
         holder.state.setText("Cargando...");
         holder.root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.state.setTextColor(ColorsRes.Prim(context));
+                holder.state.setTextColor(ThemeUtils.isAmoled(context)?ColorsRes.Blanco(context):ColorsRes.Prim(context));
                 holder.state.setText("Cargando...");
                 updateState(holder.state, objects.get(holder.getAdapterPosition()), RecObject.Type.BYPASS);
             }

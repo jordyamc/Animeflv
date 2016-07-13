@@ -1,7 +1,10 @@
 package knf.animeflv.Utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.preference.PreferenceManager;
 
 import knf.animeflv.ColorsRes;
@@ -42,7 +45,7 @@ public class ThemeUtils {
         return color;
     }
 
-    public static void setThemeOn(Context context) {
+    public static void setThemeOn(Activity context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         int accent = preferences.getInt("accentColor", ColorsRes.Naranja(context));
         if (preferences.getBoolean("is_amoled", false)) {
@@ -83,6 +86,18 @@ public class ThemeUtils {
             if (accent == ColorsRes.Morado(context)) {
                 context.setTheme(R.style.AppThemeMorado);
             }
+        }
+        setOrientation(context);
+    }
+
+    public static void setOrientation(Activity activity){
+        boolean isXLargeScreen=(activity.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+        if (!isXLargeScreen) { //Portrait
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
     }
 

@@ -92,6 +92,7 @@ public class CacheManager {
         if (Integer.parseInt(file.getName().replace(".jpg", "")) < 2418) {
             return true;
         } else {
+            Log.d("Imagen",""+options.outHeight+" - "+options.outWidth);
             return options.outWidth > 100;
         }
     }

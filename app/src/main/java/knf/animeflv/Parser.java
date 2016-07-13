@@ -624,6 +624,45 @@ public class Parser {
         return FileUtil.corregirTit(ret);
     }
 
+    public static String getTypeCached(String aid) {
+        String ret = "null";
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject nombreJ = jsonArray.getJSONObject(i);
+                    String n = nombreJ.getString("a");
+                    if (n.trim().equals(aid)) {
+                        return FileUtil.corregirTit(nombreJ.getString("c"));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public static int getLastAidCached() {
+        int aid = 2500;
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                JSONObject nombreJ = jsonArray.getJSONObject(jsonArray.length());
+                return Integer.parseInt(nombreJ.getString("a"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return aid;
+    }
+
     public String getAidCached(String tipe, String url) {
         String ret = "0";
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";

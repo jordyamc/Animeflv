@@ -59,6 +59,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -114,6 +115,7 @@ import knf.animeflv.Recientes.MainOrganizer;
 import knf.animeflv.Recientes.Status;
 import knf.animeflv.Recyclers.AdapterMain;
 import knf.animeflv.Recyclers.AdapterMainNoGIF;
+import knf.animeflv.Tutorial.TutorialActivity;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Keys;
@@ -156,6 +158,7 @@ public class newMain extends AppCompatActivity implements
     private boolean verOk;
     private String ext_storage_state = Environment.getExternalStorageState();
     private File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
+    private File DirFile = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
     private RecyclerView recyclerView;
     private LinearLayout root;
     private Toolbar toolbar;
@@ -228,7 +231,7 @@ public class newMain extends AppCompatActivity implements
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        setTheme();
+        ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_main);
         setUpMain();
@@ -278,6 +281,7 @@ public class newMain extends AppCompatActivity implements
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(listener);
+        if (!DirFile.exists())loadMainDir(false,false);
     }
 
     private void setUpDrawer() {
@@ -323,7 +327,6 @@ public class newMain extends AppCompatActivity implements
                         new PrimaryDrawerItem().withName("Explorador").withIcon(MaterialDesignIconic.Icon.gmi_folder).withIdentifier(9),
                         new PrimaryDrawerItem().withName("Historial").withIcon(MaterialDesignIconic.Icon.gmi_eye).withIdentifier(10),
                         new PrimaryDrawerItem().withName("Lista").withIcon(MaterialDesignIconic.Icon.gmi_assignment_returned).withIdentifier(4),
-                        new PrimaryDrawerItem().withName("Sugerencias").withIcon(MaterialDesignIconic.Icon.gmi_assignment).withIdentifier(5),
                         new PrimaryDrawerItem().withName("Pagina Oficial").withIcon(FontAwesome.Icon.faw_facebook).withIdentifier(6),
                         new PrimaryDrawerItem().withName("Web Oficial").withIcon(MaterialDesignIconic.Icon.gmi_view_web).withIdentifier(7),
                         new PrimaryDrawerItem().withName("Publicidad").withIcon(MaterialDesignIconic.Icon.gmi_cloud).withIdentifier(8)
@@ -345,12 +348,6 @@ public class newMain extends AppCompatActivity implements
                                 result.setSelection(0, false);
                                 break;
                             case 3:
-                                /*if (MainStates.isLoadingEmision() && MainStates.isFload()) {
-                                    getWaitingSnackBar().show();
-                                    EmisionWaiting.run();
-                                } else {
-                                    startActivity(new Intent(context, newEmisionActivity.class));
-                                }*/
                                 startActivity(new Intent(context, newEmisionActivity.class));
                                 result.setSelection(0, false);
                                 result.closeDrawer();
@@ -359,169 +356,6 @@ public class newMain extends AppCompatActivity implements
                                 startActivity(new Intent(context, WaitActivity.class));
                                 result.setSelection(0, false);
                                 result.closeDrawer();
-                                break;
-                            case 5:
-                                result.closeDrawer();
-                                result.setSelection(0, false);
-                                mat = new MaterialDialog.Builder(context)
-                                        .title("Sugerencias")
-                                        .titleGravity(GravityEnum.CENTER)
-                                        .customView(R.layout.feedback, true)
-                                        .positiveText("Enviar")
-                                        .negativeText("Cancelar")
-                                        .autoDismiss(false)
-                                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                        .callback(new MaterialDialog.ButtonCallback() {
-                                            @Override
-                                            public void onPositive(MaterialDialog dialog) {
-                                                super.onPositive(dialog);
-                                                mat.getActionButton(DialogAction.POSITIVE).setEnabled(false);
-                                                String email = etEmail.getSelectedItem().toString();
-                                                String feedback = etSug.getText().toString();
-                                                String Scuenta = cuenta.getText().toString();
-                                                String type = contactoS.getSelectedItem().toString().toLowerCase().trim();
-                                                int tipo;
-                                                if (type.equals("email")) {
-                                                    tipo = 0;
-                                                } else {
-                                                    tipo = 1;
-                                                }
-                                                boolean ok = false;
-                                                if (tipo == 0) {
-                                                    ok = true;
-                                                }
-                                                if (tipo == 1) {
-                                                    ok = !Scuenta.trim().equals("");
-                                                }
-                                                feedback = feedback
-                                                        .replace("&", "")
-                                                        .replace("=", "")
-                                                        .replace("?", "")
-                                                        .replace("á", "%a")
-                                                        .replace("é", "%e")
-                                                        .replace("í", "%i")
-                                                        .replace("ó", "%o")
-                                                        .replace("ú", "%u")
-                                                        .replace(".", "")
-                                                        .replace(":::", "");
-                                                if (!type.equals("selecciona")) {
-                                                    if (ok) {
-                                                        if (!feedback.trim().equals("")) {
-                                                            if (isNetworkAvailable()) {
-                                                                if (tipo == 0) {
-                                                                    //webViewFeed.loadUrl("http://animeflvapp.x10.mx/feedback.php?tipo=" + type + "&cuenta=" + email + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
-                                                                    new Requests(context, TaskType.FEEDBACK).execute(parser.getBaseUrl(normal, context) + "feedback.php?tipo=" + type + "&cuenta=" + email + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
-                                                                    new Requests(context, TaskType.FEEDBACK).execute(parser.getBaseUrl(secundario, context) + "feedback.php?tipo=" + type + "&cuenta=" + email + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
-                                                                } else {
-                                                                    if (type.equals("twitter") && !Scuenta.startsWith("@")) {
-                                                                        Scuenta = "@" + Scuenta;
-                                                                    }
-                                                                    //webViewFeed.loadUrl("http://animeflvapp.x10.mx/feedback.php?tipo=" + type + "&cuenta=" + Scuenta.replace(" ", "_") + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
-                                                                    new Requests(context, TaskType.FEEDBACK).execute(parser.getBaseUrl(normal, context) + "feedback.php?tipo=" + type + "&cuenta=" + Scuenta.replace(" ", "_") + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
-                                                                    new Requests(context, TaskType.FEEDBACK).execute(parser.getBaseUrl(secundario, context) + "feedback.php?tipo=" + type + "&cuenta=" + Scuenta.replace(" ", "_") + "&nombre=" + email.toLowerCase() + "&data=" + feedback.replace(" ", "_"));
-                                                                }
-                                                            } else {
-                                                                toast("No hay conexion");
-                                                                mat.dismiss();
-                                                            }
-                                                        } else {
-                                                            etSug.setError("Por favor escribe algo");
-                                                        }
-                                                    } else {
-                                                        cuenta.setError("Cuenta necesaria");
-                                                        if (feedback.trim().equals("")) {
-                                                            etSug.setError("Por favor escribe algo");
-                                                        }
-                                                    }
-                                                } else {
-                                                    toast("Selecciona medio de contacto");
-                                                    if (feedback.trim().equals("")) {
-                                                        etSug.setError("Por favor escribe algo");
-                                                    }
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onNegative(MaterialDialog dialog) {
-                                                super.onPositive(dialog);
-                                                cancelPost = true;
-                                                mat.dismiss();
-                                            }
-
-                                        })
-                                        .cancelable(false)
-                                        .build();
-                                AccountManager manager = (AccountManager) getSystemService(ACCOUNT_SERVICE);
-                                Account[] list = manager.getAccounts();
-                                etEmail = (Spinner) mat.getCustomView().findViewById(R.id.et_correo);
-                                etSug = (EditText) mat.getCustomView().findViewById(R.id.et_sug);
-                                cuenta = (EditText) mat.getCustomView().findViewById(R.id.cuenta);
-                                cuenta.setTextColor(getResources().getColor(R.color.prim));
-                                contactoS = (Spinner) mat.getCustomView().findViewById(R.id.et_contacto);
-                                contactoS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                    @Override
-                                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                        switch (position) {
-                                            case 0:
-                                                cuenta.setVisibility(View.GONE);
-                                            case 1:
-                                                cuenta.setVisibility(View.GONE);
-                                                etSug.requestFocus();
-                                                break;
-                                            case 2:
-                                                cuenta.setHint("Nombre");
-                                                cuenta.setVisibility(View.VISIBLE);
-                                                cuenta.requestFocus();
-                                                break;
-                                            case 3:
-                                                cuenta.setHint("@Cuenta");
-                                                cuenta.setVisibility(View.VISIBLE);
-                                                cuenta.requestFocus();
-                                                break;
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onNothingSelected(AdapterView<?> parent) {
-
-                                    }
-                                });
-                                webViewFeed = (WebView) mat.getCustomView().findViewById(R.id.wv_feedback);
-                                webViewFeed.setWebViewClient(new WebViewClient() {
-                                    @Override
-                                    public void onPageFinished(WebView view, String url) {
-                                        if (url.trim().equals(new Parser().getBaseUrl(TaskType.NORMAL, context) + "feedback.php?ok=ok") && !cancelPost) {
-                                            view.loadUrl("about:blank");
-                                            cancelPost = true;
-                                            toast("Sugerencia enviada");
-                                            mat.dismiss();
-                                        }
-                                    }
-
-                                    @Override
-                                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                                        view.loadUrl(url);
-                                        return true;
-                                    }
-                                });
-                                List<String> emails = new ArrayList<String>();
-                                for (Account account : list) {
-                                    if (account.name.contains("@") && !emails.contains(account.name)) {
-                                        Log.d("Agregar", account.name);
-                                        emails.add(account.name);
-                                    }
-                                }
-                                String[] mails = new String[emails.size()];
-                                emails.toArray(mails);
-                                String[] contacto = {"Selecciona", "Email", "Facebook", "Twitter"};
-                                if (list.length > 0) {
-                                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, mails);
-                                    etEmail.setAdapter(arrayAdapter);
-                                }
-                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, contacto);
-                                contactoS.setAdapter(adapter);
-                                cancelPost = false;
-                                mat.show();
                                 break;
                             case 6:
                                 String facebookUrl = "https://www.facebook.com/animeflv.app.jordy";
@@ -737,10 +571,16 @@ public class newMain extends AppCompatActivity implements
     }
 
     private void cambiarColor() {
-        Resources getRes = getResources();
-        int[] colorl = new int[]{getRes.getColor(R.color.theme_naranja), getRes.getColor(R.color.theme_rojo), getRes.getColor(R.color.theme_gris), getRes.getColor(R.color.theme_verde), getRes.getColor(R.color.theme_rosa), getRes.getColor(R.color.theme_morado)};
-
+        int[] colorl = new int[]{
+                ColorsRes.Naranja(this),
+                ColorsRes.Rojo(this),
+                ColorsRes.Gris(this),
+                ColorsRes.Verde(this),
+                ColorsRes.Rosa(this),
+                ColorsRes.Morado(this)
+        };
         ColorChooserDialog dialog = new ColorChooserDialog.Builder(this, R.string.color_chooser)
+                .theme(ThemeUtils.isAmoled(this)? Theme.DARK:Theme.LIGHT)
                 .customColors(colorl, null)
                 .dynamicButtonColor(true)
                 .allowUserColorInput(false)
@@ -959,50 +799,6 @@ public class newMain extends AppCompatActivity implements
         return color;
     }
 
-    private void setTheme() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(this));
-        if (preferences.getBoolean("is_amoled", false)) {
-            if (accent == ColorsRes.Rojo(this)) {
-                setTheme(R.style.AppThemeDarkNoRojo);
-            }
-            if (accent == ColorsRes.Naranja(this)) {
-                setTheme(R.style.AppThemeDarkNoNaranja);
-            }
-            if (accent == ColorsRes.Gris(this)) {
-                setTheme(R.style.AppThemeDarkNoGris);
-            }
-            if (accent == ColorsRes.Verde(this)) {
-                setTheme(R.style.AppThemeDarkNoVerde);
-            }
-            if (accent == ColorsRes.Rosa(this)) {
-                setTheme(R.style.AppThemeDarkNoRosa);
-            }
-            if (accent == ColorsRes.Morado(this)) {
-                setTheme(R.style.AppThemeDarkNoMorado);
-            }
-        } else {
-            if (accent == ColorsRes.Rojo(this)) {
-                setTheme(R.style.AppThemeNoRojo);
-            }
-            if (accent == ColorsRes.Naranja(this)) {
-                setTheme(R.style.AppThemeNoNaranja);
-            }
-            if (accent == ColorsRes.Gris(this)) {
-                setTheme(R.style.AppThemeNoGris);
-            }
-            if (accent == ColorsRes.Verde(this)) {
-                setTheme(R.style.AppThemeNoVerde);
-            }
-            if (accent == ColorsRes.Rosa(this)) {
-                setTheme(R.style.AppThemeNoRosa);
-            }
-            if (accent == ColorsRes.Morado(this)) {
-                setTheme(R.style.AppThemeNoMorado);
-            }
-        }
-    }
-
     private void setUpVersion() {
         context = this;
         androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -1023,7 +819,7 @@ public class newMain extends AppCompatActivity implements
         tbool = busqueda;
         if (!busqueda) {
             if (isNetworkAvailable()) {
-                loadMainDir(busqueda);
+                loadMainDir(busqueda,true);
             } else {
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!mediaStorage.exists()) {
@@ -1046,7 +842,7 @@ public class newMain extends AppCompatActivity implements
             }
         } else {
             if (isNetworkAvailable()) {
-                loadMainDir(busqueda);
+                loadMainDir(busqueda,true);
             } else {
                 if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!mediaStorage.exists()) {
@@ -1073,27 +869,35 @@ public class newMain extends AppCompatActivity implements
         }
     }
 
-    public void loadMainDir(final boolean search) {
+    public void loadMainDir(final boolean search,final boolean open) {
         AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
         asyncHttpClient.setResponseTimeout(-1);
         asyncHttpClient.get(getDirectorio() + "?certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 super.onSuccess(statusCode, headers, response);
-                if (search) {
-                    loadDir(response.toString(), true);
-                } else {
-                    loadDir(response.toString());
+                if (open) {
+                    if (search) {
+                        loadDir(response.toString(), true);
+                    } else {
+                        loadDir(response.toString());
+                    }
+                }else {
+                    loadLocalDir(response.toString());
                 }
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
-                if (search) {
-                    loadDir(response.toString(), true);
-                } else {
-                    loadDir(response.toString());
+                if (open) {
+                    if (search) {
+                        loadDir(response.toString(), true);
+                    } else {
+                        loadDir(response.toString());
+                    }
+                }else {
+                    loadLocalDir(response.toString());
                 }
             }
 
@@ -1173,7 +977,6 @@ public class newMain extends AppCompatActivity implements
                 }
             }
         } else {
-            //new DirGetter(context, TaskType.DIRECTORIO1).execute(getDirectorioSec());
             loadSecDir(true);
         }
     }
@@ -1248,6 +1051,44 @@ public class newMain extends AppCompatActivity implements
                 //Toaster.toast("Servidor fallando y no hay datos en cache");
                 //new DirGetter(context, TaskType.DIRECTORIO).execute(getDirectorioSec());
                 loadSecDir(false);
+            }
+        }
+    }
+
+    public void loadLocalDir(String data) {
+        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+            if (!mediaStorage.exists()) {
+                mediaStorage.mkdirs();
+            }
+        }
+        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        if (isNetworkAvailable() && !data.trim().equals("error")) {
+            String trimed = data.trim();
+            if (!file.exists()) {
+                Log.d("Archivo:", "No existe");
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    Log.d("Archivo:", "Error al crear archivo");
+                }
+
+                if (isJSONValid(trimed)) {
+                    writeToFile(trimed, file);
+                } else {
+                    Toaster.toast("Error en Servidor");
+                }
+            } else {
+                Log.d("Archivo", "Existe");
+                String infile = getStringFromFile(file_loc);
+                if (!infile.trim().equals(trimed)) {
+                    if (isJSONValid(infile)) {
+                        if (isJSONValid(trimed)) {
+                            Log.d("Cargar", "Json nuevo");
+                            writeToFile(trimed, file);
+                        }
+                    }
+                }
             }
         }
     }
@@ -2014,9 +1855,9 @@ public class newMain extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         if (isXLargeScreen()) {
-            getMenuInflater().inflate(R.menu.menu_main_dark, menu);
+            getMenuInflater().inflate(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("new_user",true)?R.menu.menu_main_dark_new:R.menu.menu_main_dark, menu);
         } else {
-            getMenuInflater().inflate(R.menu.menu_main, menu);
+            getMenuInflater().inflate(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("new_user",true)?R.menu.menu_main_new:R.menu.menu_main, menu);
         }
         return true;
     }
@@ -2024,7 +1865,17 @@ public class newMain extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
-        setDir(true);
+        switch (item.getItemId()){
+            case R.id.search:
+                setDir(true);
+                break;
+            case R.id.new_user:
+                PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("new_user",false).apply();
+                startActivity(new Intent(this, TutorialActivity.class));
+                invalidateOptionsMenu();
+                break;
+        }
+
         return true;
     }
 

@@ -2,6 +2,7 @@ package knf.animeflv.Explorer.Adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -28,6 +29,7 @@ import knf.animeflv.Explorer.Models.VideoFile;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.StreamManager.StreamManager;
+import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
@@ -58,7 +60,18 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
 
     @Override
     public void onBindViewHolder(final VideoFileAdapter.ViewHolder holder, final int position) {
-        PicassoCache.getPicassoInstance(context).load(list.get(holder.getAdapterPosition()).getThumbImage()).error(R.drawable.ic_block_r).into(holder.img);
+        new AsyncTask<String,String,String>(){
+            @Override
+            protected String doInBackground(String... strings) {
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        PicassoCache.getPicassoInstance(context).load(list.get(holder.getAdapterPosition()).getThumbImage()).error(R.drawable.ic_block_r).into(holder.img);
+                    }
+                });
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
         holder.titulo.setText(list.get(holder.getAdapterPosition()).getTitle());
         holder.cap.setText(list.get(holder.getAdapterPosition()).getDuration(context));
         holder.cap.setTextColor(ThemeUtils.getAcentColor(context));

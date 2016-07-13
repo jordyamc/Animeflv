@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.annotation.Dimension;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -23,6 +24,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -132,7 +134,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
     Menu Amenu;
     String json = "{}";
     AdapterInfoCapsMaterial adapter_caps;
-    LinearLayoutManagerWithSmoothScroller layoutManager;
+    LinearLayoutManager layoutManager;
     boolean isInInfo = true;
     boolean blocked = false;
 
@@ -268,6 +270,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         txt_generos.setTextColor(color);
         txt_debug.setTextColor(color);
         button.hide();
+        MainStates.setListing(false);
         button_list.setColorNormal(ThemeUtils.getAcentColor(this));
         button_list.setColorPressed(ThemeUtils.getAcentColor(this));
         button_list.setOnClickListener(new View.OnClickListener() {
@@ -301,6 +304,17 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         } else {
             getJsonfromFile();
         }
+        imageView.setOnClickListener(getExpandListener());
+        toolbar.setOnClickListener(getExpandListener());
+    }
+
+    private View.OnClickListener getExpandListener(){
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                barLayout.setExpanded(true,true);
+            }
+        };
     }
 
     private void scrollToTop() {
@@ -310,7 +324,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         int[] consumed = new int[2];
         //behavior.onNestedPreScroll(layout, barLayout, null, 0, -1000, consumed);
         behavior.onNestedFling(layout, barLayout, null, 0, -10000, true);*/
-        nestedScrollView.scrollTo(0, -1000);
+        nestedScrollView.scrollTo(0, 1*-1000);
     }
 
     private void getJsonfromApi() {
@@ -553,7 +567,6 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
             barLayout.setExpanded(false, true);
             button_list.show(true);
             isInInfo = false;
-            layoutManager.smoothScrollToPosition(recyclerView, new RecyclerView.State(),position);
         }
     }
 
@@ -567,7 +580,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
 
     private void setRecyclerView(final String json) {
         adapter_caps = new AdapterInfoCapsMaterial(context, parser.parseNumerobyEID(json), aid, parser.parseEidsbyEID(json));
-        layoutManager = new LinearLayoutManagerWithSmoothScroller(context);
+        layoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter_caps);
@@ -783,5 +796,26 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         if (!isXLargeScreen(getApplicationContext())) {
             return;
         }
+    }
+
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        super.onKeyLongPress(keyCode, event);
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (!isInInfo) {
+                button.setImageResource(R.drawable.playlist);
+                nestedScrollView.setVisibility(View.VISIBLE);
+                frameLayout.setVisibility(View.GONE);
+                scrollToTop();
+                isInInfo = true;
+            } else {
+                button.setImageResource(R.drawable.information);
+                nestedScrollView.setVisibility(View.GONE);
+                frameLayout.setVisibility(View.VISIBLE);
+                barLayout.setExpanded(false,true);
+                isInInfo = false;
+            }
+        }
+        return true;
     }
 }

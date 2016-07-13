@@ -26,6 +26,7 @@
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginEnd="64dp"
             app:expandedTitleMarginStart="48dp"
+            android:clickable="true"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
@@ -34,6 +35,7 @@
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
                 android:fitsSystemWindows="true"
+                android:clickable="true"
                 android:maxHeight="300dp"
                 android:minHeight="300dp"
                 android:scaleType="centerCrop"
@@ -45,6 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
+                android:clickable="true"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>

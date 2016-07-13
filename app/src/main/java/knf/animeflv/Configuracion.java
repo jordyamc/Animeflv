@@ -55,11 +55,6 @@ public class Configuracion extends AppCompatActivity implements LoginServer.call
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.configuracion);
-        if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -120,6 +115,7 @@ public class Configuracion extends AppCompatActivity implements LoginServer.call
         TextView textView = (TextView) dialog.getCustomView().findViewById(R.id.help_id);
         TextView cert = (TextView) dialog.getCustomView().findViewById(R.id.help_certification);
         textView.setText(id);
+        textView.setTextColor(ThemeUtils.getAcentColor(this));
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -85,7 +85,6 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     String id;
     List<String> eids;
     String ext_storage_state = Environment.getExternalStorageState();
-    Parser parser = new Parser();
     MaterialDialog dialog;
     MaterialDialog d;
     Boolean streaming = false;
@@ -96,7 +95,6 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(maximumPoolSize);
     Executor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
     private Activity context;
-    private int lastPosition = 0;
 
     public AdapterInfoCapsMaterial(Activity context, List<String> capitulos, String aid, List<String> eid) {
         this.capitulo = capitulos;
@@ -281,6 +279,23 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                         }
                     }
                 }
+            }
+        });
+        holder.card.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                if (!MainStates.isListing()) {
+                    if (!FileUtil.ExistAnime(eids.get(holder.getAdapterPosition()))) {
+                        if (MainStates.WaitContains(eids.get(holder.getAdapterPosition()))) {
+                            MainStates.delFromWaitList(eids.get(holder.getAdapterPosition()));
+                            showDownload(holder.ib_des);
+                        } else {
+                            MainStates.addToWaitList(eids.get(holder.getAdapterPosition()));
+                            holder.ib_des.setImageResource(R.drawable.ic_waiting);
+                        }
+                    }
+                }
+                return true;
             }
         });
         holder.card.setOnClickListener(new View.OnClickListener() {

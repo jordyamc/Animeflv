@@ -66,6 +66,8 @@ public class InfoHelper {
     public static class BundleItem {
         public String key;
         public String value;
+        public static final String KEY_AID="aid";
+        public static final String KEY_TITLE="title";
 
         public BundleItem(String key, String value) {
             this.key = key;

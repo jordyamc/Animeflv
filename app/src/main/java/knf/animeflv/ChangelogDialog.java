@@ -52,9 +52,11 @@ public class ChangelogDialog extends DialogFragment {
             while ((str = in.readLine()) != null)
                 buf.append(str);
             in.close();
-            //webView.loadData(buf.toString(), "text/html", "UTF-8");
             webView.setBackgroundColor(Color.TRANSPARENT);
-            webView.loadUrl("file:///android_asset/log.html");
+            String html=buf.toString();
+            html = html.replace("black",ThemeUtils.isAmoled(getActivity())?"white":"black");
+            webView.loadData(html, "text/html", "UTF-8");
+            //webView.loadUrl("file:///android_asset/log.html");
         } catch (Throwable e) {
             webView.loadData("<h1>Unable to load</h1><p>" + e.getLocalizedMessage() + "</p>", "text/html", "UTF-8");
         }

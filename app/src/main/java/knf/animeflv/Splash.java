@@ -76,6 +76,7 @@ public class Splash extends AwesomeSplash {
             configSplash.setTitleTextSize(30f); //float value
             configSplash.setAnimTitleDuration(750);
             configSplash.setAnimTitleTechnique(Techniques.FlipInX);
+
         } else {
             finish();
             startActivity(new Intent(context, newMain.class));
@@ -191,6 +192,7 @@ public class Splash extends AwesomeSplash {
     @Override
     public void animationsFinished() {
         //new back(context, TaskType.ACT_LIKNS).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/links.html");
+
         AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
         asyncHttpClient.setConnectTimeout(2000);
         asyncHttpClient.get("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/links.html", null, new JsonHttpResponseHandler() {

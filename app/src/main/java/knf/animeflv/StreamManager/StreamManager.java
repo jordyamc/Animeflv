@@ -83,15 +83,22 @@ public class StreamManager {
     }
 
     private static void StreamingExtbyURL(Activity context, String eid, String url) {
-        Intent i = (new Intent(Intent.ACTION_VIEW, Uri.parse(url)).setType("application/mp4"));
-        PackageManager pm = context.getPackageManager();
-        final ResolveInfo mInfo = pm.resolveActivity(i, 0);
-        String id = mInfo.activityInfo.applicationInfo.processName;
-        if (id.startsWith("com.mxtech.videoplayer")) {
+        Intent i = (new Intent(Intent.ACTION_VIEW, Uri.parse(url)).setDataAndType(Uri.parse(url),"video/mp4"));
+        if (getDefaultId(context,i).startsWith("com.mxtech.videoplayer")) {
             StreamManager.mx(context).Stream(eid, url);
         } else {
             StreamManager.external(context).Stream(eid, url);
 
+        }
+    }
+
+    private static String getDefaultId(Activity context,Intent i){
+        try {
+            PackageManager pm = context.getPackageManager();
+            final ResolveInfo mInfo = pm.resolveActivity(i, 0);
+            return mInfo.activityInfo.applicationInfo.processName;
+        }catch (Exception e){
+            return "null";
         }
     }
 }

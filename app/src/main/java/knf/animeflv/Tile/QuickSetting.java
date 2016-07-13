@@ -15,4 +15,5 @@ public class QuickSetting extends TileService {
     public void onClick() {
         startActivity(new Intent(getApplicationContext(), Splash.class));
     }
+
 }

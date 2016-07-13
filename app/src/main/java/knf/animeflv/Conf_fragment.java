@@ -331,13 +331,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        getPreferenceScreen().findPreference("open_intro").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                context.startActivity(new Intent(context, Intronew.class));
-                return false;
-            }
-        });
         getPreferenceScreen().findPreference("open_tutorial").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {

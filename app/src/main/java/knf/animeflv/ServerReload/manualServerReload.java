@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -40,8 +41,8 @@ import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.ThemeUtils;
 
 public class manualServerReload extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
-    Parser parser = new Parser();
-    TaskType NORMAL = TaskType.NORMAL;
+    private Parser parser = new Parser();
+    private TaskType NORMAL = TaskType.NORMAL;
     @Bind(R.id.toolbar)
     Toolbar toolbar;
     @Bind(R.id.ib_admin_recientes_reload)
@@ -58,6 +59,16 @@ public class manualServerReload extends AppCompatActivity implements SwipeRefres
     SwipeRefreshLayout refreshLayout;
     @Bind(R.id.rv_rec_animes)
     CustomRecycler rec_animes;
+    @Bind(R.id.card_main)
+    CardView card_rec;
+    @Bind(R.id.card_animes)
+    CardView card_animes;
+    @Bind(R.id.card_dir)
+    CardView card_dir;
+    @Bind(R.id.tv_admin_recientes)
+    TextView tit_rec;
+    @Bind(R.id.tv_admin_dir)
+    TextView tit_dir;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -84,6 +95,28 @@ public class manualServerReload extends AppCompatActivity implements SwipeRefres
         rec_reload.setColorFilter(ThemeUtils.getAcentColor(this));
         dir_reload.setColorFilter(ThemeUtils.getAcentColor(this));
         refreshLayout.setOnRefreshListener(this);
+        if (ThemeUtils.isAmoled(this)){
+            toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
+            toolbar.setBackgroundColor(ColorsRes.Negro(this));
+            card_rec.setBackgroundColor(ColorsRes.Prim(this));
+            card_dir.setBackgroundColor(ColorsRes.Prim(this));
+            card_animes.setBackgroundColor(ColorsRes.Prim(this));
+            tit_rec.setTextColor(ColorsRes.SecondaryTextDark(this));
+            tit_dir.setTextColor(ColorsRes.SecondaryTextDark(this));
+            last_rec.setTextColor(ColorsRes.SecondaryTextDark(this));
+            state_dir.setTextColor(ColorsRes.Blanco(this));
+            state_rec.setTextColor(ColorsRes.Blanco(this));
+        }else {
+            toolbar.getRootView().setBackgroundColor(ColorsRes.Blanco(this));
+            card_rec.setBackgroundColor(ColorsRes.Blanco(this));
+            card_dir.setBackgroundColor(ColorsRes.Blanco(this));
+            card_animes.setBackgroundColor(ColorsRes.Blanco(this));
+            tit_rec.setTextColor(ColorsRes.SecondaryTextLight(this));
+            tit_dir.setTextColor(ColorsRes.SecondaryTextLight(this));
+            last_rec.setTextColor(ColorsRes.SecondaryTextLight(this));
+            state_dir.setTextColor(ColorsRes.Negro(this));
+            state_rec.setTextColor(ColorsRes.Negro(this));
+        }
         rec_reload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
