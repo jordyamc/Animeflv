@@ -160,4 +160,10 @@ public class SQLiteHelper {
             return null;
         }
     }
+
+    public void updateProgress(String eid, String progress) {
+        ContentValues args = new ContentValues();
+        args.put(KEY_PROGRESS, progress);
+        db.update(DOWNLOAD_TABLE_NAME, args, KEY_TABLE_ID + "=" + context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + "_download_table_id", -1), null);
+    }
 }
