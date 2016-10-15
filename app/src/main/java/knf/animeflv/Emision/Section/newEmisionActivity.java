@@ -298,7 +298,7 @@ public class newEmisionActivity extends AppCompatActivity {
             client.setTimeout(10000);
             client.setConnectTimeout(10000);
             client.setResponseTimeout(10000);
-            client.get(new Parser().getBaseUrl(TaskType.NORMAL, context) + "emisionlist.php", null, new JsonHttpResponseHandler() {
+            client.get(new Parser().getBaseUrl(TaskType.NORMAL, context) + "emisionlist-test.php", null, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     super.onSuccess(statusCode, headers, response);

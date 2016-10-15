@@ -7,7 +7,8 @@ public enum Control {
     PASS_BY_EMAIL(0),
     FORCE_EMAIL(1),
     FORCE_PASS(2),
-    DELETE(3);
+    DELETE(3),
+    ADD_EMAIL(4);
     int value;
 
     Control(int value) {

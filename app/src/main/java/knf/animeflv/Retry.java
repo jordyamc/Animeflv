@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import java.io.File;
 
+import knf.animeflv.Utils.ExecutorManager;
 import xdroid.toaster.Toaster;
 
 /**
@@ -23,7 +24,7 @@ public class Retry extends AppCompatActivity {
             String numero = bundle.getString("numero");
             String url = bundle.getString("url");
             File file = new File(bundle.getString("file"));
-            new Downloader(this, eid, aid, titulo, numero, file).execute(url);
+            new Downloader(this, url, eid, aid, titulo, numero, file).executeOnExecutor(ExecutorManager.getExecutor());
             Toaster.toast("Reintentando");
             finish();
         } else {

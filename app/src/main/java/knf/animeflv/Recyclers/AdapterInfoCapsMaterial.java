@@ -2,23 +2,14 @@ package knf.animeflv.Recyclers;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,31 +18,15 @@ import android.webkit.CookieSyncManager;
 import android.webkit.DownloadListener;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.SyncHttpClient;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
@@ -59,19 +34,20 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import cz.msebera.android.httpclient.Header;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.CookieConstructor;
+import knf.animeflv.DownloadManager.InternalManager;
 import knf.animeflv.DownloadManager.ManageDownload;
-import knf.animeflv.Parser;
+import knf.animeflv.JsonFactory.DownloadGetter;
 import knf.animeflv.R;
 import knf.animeflv.StreamManager.StreamManager;
-import knf.animeflv.TaskType;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UpdateUtil;
 import knf.animeflv.Utils.UrlUtils;
+import knf.animeflv.Utils.eNums.DownloadTask;
 import knf.animeflv.Utils.eNums.UpdateState;
 import knf.animeflv.info.InfoNewMaterial;
 import xdroid.toaster.Toaster;
@@ -85,7 +61,6 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     String id;
     List<String> eids;
     String ext_storage_state = Environment.getExternalStorageState();
-    MaterialDialog dialog;
     MaterialDialog d;
     Boolean streaming = false;
     int posT;
@@ -131,8 +106,13 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             showDelete(holder.ib_des);
             showPlay(holder.ib_ver);
         } else {
-            showCloudPlay(holder.ib_ver);
-            showDownload(holder.ib_des);
+            if (InternalManager.isDownloading(context, eids.get(holder.getAdapterPosition()))) {
+                showDelete(holder.ib_des);
+                showPlay(holder.ib_ver);
+            } else {
+                showCloudPlay(holder.ib_ver);
+                showDownload(holder.ib_des);
+            }
         }
         holder.tv_capitulo.setText(capitulo.get(position));
         Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
@@ -170,9 +150,9 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                     } else {
                         if (!MainStates.isProcessing()) {
                             if (!MainStates.WaitContains(eids.get(holder.getAdapterPosition()))) {
-                                if (!FileUtil.ExistAnime(eids.get(holder.getAdapterPosition()))) {
+                                if (!FileUtil.ExistAnime(eids.get(holder.getAdapterPosition())) && !InternalManager.isDownloading(context, eids.get(holder.getAdapterPosition()))) {
                                     showLoading(holder.ib_des);
-                                    new CheckDown(holder.web, holder.ib_des, holder.ib_ver, holder.tv_capitulo, holder.getAdapterPosition(), new Parser().getUrlCached(id, item)).executeOnExecutor(threadPoolExecutor);
+                                    searchDownload(holder);
                                 } else {
                                     final String item = capitulo.get(holder.getAdapterPosition()).replace("Capitulo ", "").trim();
                                     MaterialDialog borrar = new MaterialDialog.Builder(context)
@@ -185,12 +165,11 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                                 @Override
                                                 public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
-                                                    if (FileUtil.DeleteAnime(eids.get(holder.getAdapterPosition()))) {
-                                                        showDownload(holder.ib_des);
-                                                        showCloudPlay(holder.ib_ver);
-                                                        ManageDownload.cancel(context, eids.get(holder.getAdapterPosition()));
-                                                        Toast.makeText(context, "Archivo Eliminado", Toast.LENGTH_SHORT).show();
-                                                    }
+                                                    FileUtil.DeleteAnime(eids.get(holder.getAdapterPosition()));
+                                                    showDownload(holder.ib_des);
+                                                    showCloudPlay(holder.ib_ver);
+                                                    ManageDownload.cancel(context, eids.get(holder.getAdapterPosition()));
+                                                    Toast.makeText(context, "Archivo Eliminado", Toast.LENGTH_SHORT).show();
                                                 }
                                             })
                                             .onNegative(new MaterialDialog.SingleButtonCallback() {
@@ -220,7 +199,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                                 MainStates.delFromWaitList(eids.get(holder.getAdapterPosition()));
                                                 showLoading(holder.ib_des);
-                                                new CheckDown(holder.web, holder.ib_des, holder.ib_ver, holder.tv_capitulo, holder.getAdapterPosition(), new Parser().getUrlCached(id, item)).executeOnExecutor(threadPoolExecutor);
+                                                searchDownload(holder);
                                             }
                                         })
                                         .build().show();
@@ -246,7 +225,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                     StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
                                 } else {
                                     showLoading(holder.ib_des);
-                                    new CheckStream(holder.web, holder.tv_capitulo, holder.getAdapterPosition(), holder, new Parser().getUrlCached(id, item)).executeOnExecutor(threadPoolExecutor);
+                                    searchStream(holder);
                                 }
                             } else {
                                 String[] data = eids.get(holder.getAdapterPosition()).replace("E", "").split("_");
@@ -270,7 +249,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                                     StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
                                                 } else {
                                                     showLoading(holder.ib_des);
-                                                    new CheckStream(holder.web, holder.tv_capitulo, holder.getAdapterPosition(), holder, new Parser().getUrlCached(id, item)).executeOnExecutor(threadPoolExecutor);
+                                                    searchStream(holder);
                                                 }
                                             }
                                         })
@@ -302,14 +281,12 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             @Override
             public void onClick(View v) {
                 if (!MainStates.isListing()) {
-                    String item = capitulo.get(holder.getAdapterPosition()).replace("Capitulo ", "").trim();
-                    Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
                     context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("cambio", true).apply();
-                    if (!vistos) {
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, true).apply();
+                    if (!FileUtil.isInSeen(eids.get(holder.getAdapterPosition()))) {
+                        FileUtil.setSeenState(eids.get(holder.getAdapterPosition()), true);
                         holder.tv_capitulo.setTextColor(getColor());
                     } else {
-                        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + id + "_" + item, false).apply();
+                        FileUtil.setSeenState(eids.get(holder.getAdapterPosition()), false);
                         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
                             holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.blanco));
                         } else {
@@ -387,29 +364,80 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
         });
     }
 
+    @ColorInt
     private int getColor() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(context));
-        int color = ColorsRes.Naranja(context);
-        if (accent == ColorsRes.Rojo(context)) {
-            color = ColorsRes.Rojo(context);
-        }
-        if (accent == ColorsRes.Naranja(context)) {
-            color = ColorsRes.Naranja(context);
-        }
-        if (accent == ColorsRes.Gris(context)) {
-            color = ColorsRes.Gris(context);
-        }
-        if (accent == ColorsRes.Verde(context)) {
-            color = ColorsRes.Verde(context);
-        }
-        if (accent == ColorsRes.Rosa(context)) {
-            color = ColorsRes.Rosa(context);
-        }
-        if (accent == ColorsRes.Morado(context)) {
-            color = ColorsRes.Morado(context);
-        }
-        return color;
+        return ThemeUtils.getAcentColor(context);
+    }
+
+    private void searchDownload(final ViewHolder holder) {
+        DownloadGetter.search(context, eids.get(holder.getAdapterPosition()), new DownloadGetter.ActionsInterface() {
+            @Override
+            public boolean isStream() {
+                return false;
+            }
+
+            @Override
+            public void onStartDownload() {
+                showDelete(holder.ib_des);
+                showPlay(holder.ib_ver);
+            }
+
+            @Override
+            public void onStartZippy(final String url) {
+                MainStates.setZippyState(DownloadTask.DESCARGA, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
+                holder.web.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        holder.web.loadUrl(url);
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelDownload() {
+                showDownload(holder.ib_des);
+            }
+
+            @Override
+            public void onLogError(Exception e) {
+                Logger.Error(AdapterInfoCapsMaterial.this.getClass(), e);
+            }
+        });
+    }
+
+    private void searchStream(final ViewHolder holder) {
+        DownloadGetter.search(context, eids.get(holder.getAdapterPosition()), new DownloadGetter.ActionsInterface() {
+            @Override
+            public boolean isStream() {
+                return true;
+            }
+
+            @Override
+            public void onStartDownload() {
+                showDownload(holder.ib_des);
+            }
+
+            @Override
+            public void onStartZippy(final String url) {
+                MainStates.setZippyState(DownloadTask.STREAMING, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
+                holder.web.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        holder.web.loadUrl(url);
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelDownload() {
+                showDownload(holder.ib_des);
+            }
+
+            @Override
+            public void onLogError(Exception e) {
+                Logger.Error(AdapterInfoCapsMaterial.this.getClass(), e);
+            }
+        });
     }
 
     public void onStartList() {
@@ -492,7 +520,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                             StreamManager.internal(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
                             holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
                         } else {
-                            if (isMXinstalled()) {
+                            if (FileUtil.isMXinstalled()) {
                                 toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
                                 StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
                                 holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
@@ -504,63 +532,6 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                 }
             }
         });
-    }
-
-    public boolean isMXinstalled() {
-        List<ApplicationInfo> packages;
-        PackageManager pm;
-        pm = context.getPackageManager();
-        packages = pm.getInstalledApplications(0);
-        String pack = "null";
-        for (ApplicationInfo packageInfo : packages) {
-            if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
-                pack = "com.mxtech.videoplayer.pro";
-                break;
-            }
-            if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
-                pack = "com.mxtech.videoplayer.ad";
-                break;
-            }
-        }
-        return !pack.equals("null");
-    }
-
-    private String getCertificateSHA1Fingerprint() {
-        PackageManager pm = context.getPackageManager();
-        String packageName = context.getPackageName();
-        int flags = PackageManager.GET_SIGNATURES;
-        PackageInfo packageInfo = null;
-        try {
-            packageInfo = pm.getPackageInfo(packageName, flags);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        Signature[] signatures = packageInfo.signatures;
-        byte[] cert = signatures[0].toByteArray();
-        InputStream input = new ByteArrayInputStream(cert);
-        CertificateFactory cf = null;
-        try {
-            cf = CertificateFactory.getInstance("X509");
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        X509Certificate c = null;
-        try {
-            c = (X509Certificate) cf.generateCertificate(input);
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        String hexString = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA1");
-            byte[] publicKey = md.digest(c.getEncoded());
-            hexString = byte2HexFormatted(publicKey);
-        } catch (NoSuchAlgorithmException e1) {
-            e1.printStackTrace();
-        } catch (CertificateEncodingException e) {
-            e.printStackTrace();
-        }
-        return hexString;
     }
 
     public void toast(String text) {
@@ -582,309 +553,6 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             this.ib_des = (ImageButton) itemView.findViewById(R.id.ib_descargar_rv);
             this.card = (CardView) itemView.findViewById(R.id.card_descargas_info);
             this.web = (WebView) itemView.findViewById(R.id.wv_anime_zippy);
-        }
-    }
-
-    public class CheckDown extends AsyncTask<String, String, String> {
-        ImageButton des;
-        ImageButton ver;
-        WebView web;
-        TextView cap;
-        int pos;
-        String _response;
-        Spinner sp;
-        String url;
-
-        public CheckDown(WebView w, ImageButton ib_des, ImageButton ib_ver, TextView tv_capitulo, int position, String url) {
-            this.des = ib_des;
-            this.ver = ib_ver;
-            this.cap = tv_capitulo;
-            this.pos = position;
-            this.web = w;
-            this.url = url;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            new SyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + url + "&newMain", null, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    super.onSuccess(statusCode, headers, response);
-                    _response = response.toString();
-                }
-
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                    super.onSuccess(statusCode, headers, responseString);
-                    _response = responseString;
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    super.onFailure(statusCode, headers, responseString, throwable);
-                    _response = "error";
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                    _response = "error";
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                    _response = "error";
-                }
-            });
-            return _response;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (s.equals("error")) {
-                dialog.dismiss();
-                showDownload(des);
-                Toast.makeText(context, "Error en servidor", Toast.LENGTH_SHORT).show();
-            } else {
-                try {
-                    JSONObject jsonObject = new JSONObject(s.trim());
-                    JSONArray jsonArray = jsonObject.getJSONArray("downloads");
-                    final List<String> nombres = new ArrayList<>();
-                    final List<String> urls = new ArrayList<>();
-                    try {
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject object = jsonArray.getJSONObject(i);
-                            String u = object.getString("url");
-                            if (!u.trim().equals("null")) {
-                                nombres.add(object.getString("name"));
-                                urls.add(u);
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    if (nombres.size() != 0) {
-                        d = new MaterialDialog.Builder(context)
-                                .title("Opciones")
-                                .titleGravity(GravityEnum.CENTER)
-                                .customView(R.layout.dialog_down, false)
-                                .cancelable(true)
-                                .autoDismiss(false)
-                                .positiveText("Descargar")
-                                .negativeText("Cancelar")
-                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction dialogAction) {
-                                        String desc = nombres.get(sp.getSelectedItemPosition());
-                                        final String ur = urls.get(sp.getSelectedItemPosition());
-                                        Log.d("Descargar", "URL -> " + ur);
-                                        switch (desc.toLowerCase()) {
-                                            case "zippyshare":
-                                                web.post(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        web.loadUrl(ur);
-                                                    }
-                                                });
-                                                d.dismiss();
-                                                break;
-                                            case "mega":
-                                                d.dismiss();
-                                                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
-                                                showCloudPlay(ver);
-                                                showDownload(des);
-                                                break;
-                                            default:
-                                                ManageDownload.chooseDownDir(context, eids.get(pos), ur);
-                                                showPlay(ver);
-                                                showDelete(des);
-                                                d.dismiss();
-                                                break;
-                                        }
-                                    }
-                                })
-                                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
-                                        materialDialog.dismiss();
-                                        showDownload(des);
-                                    }
-                                })
-                                .cancelListener(new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialog) {
-                                        showDownload(des);
-                                        d.dismiss();
-                                    }
-                                })
-                                .build();
-                        sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
-                        sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
-                        d.show();
-                    } else {
-                        Toaster.toast("No hay links!!! Intenta mas tarde!!!");
-                        showDownload(des);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(context, "Error en JSON", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
-
-    private class CheckStream extends AsyncTask<String, String, String> {
-        WebView web;
-        TextView cap;
-        int pos;
-        String _response;
-        Spinner sp;
-        AdapterInfoCapsMaterial.ViewHolder holder;
-        String url;
-
-        private CheckStream(WebView w, TextView tv_capitulo, int position, AdapterInfoCapsMaterial.ViewHolder holder, String url) {
-            this.cap = tv_capitulo;
-            this.pos = position;
-            this.web = w;
-            this.holder = holder;
-            this.url = url;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            new SyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?certificate=" + getCertificateSHA1Fingerprint() + "&url=" + url + "&newMain", null, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    super.onSuccess(statusCode, headers, response);
-                    _response = response.toString();
-                }
-
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                    super.onSuccess(statusCode, headers, responseString);
-                    _response = responseString;
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    super.onFailure(statusCode, headers, responseString, throwable);
-                    _response = "error";
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                    _response = "error";
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                    _response = "error";
-                }
-            });
-            return _response;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (s.equals("error")) {
-                dialog.dismiss();
-                Toast.makeText(context, "Error en servidor", Toast.LENGTH_SHORT).show();
-            } else {
-                try {
-                    JSONObject jsonObject = new JSONObject(s.trim());
-                    JSONArray jsonArray = jsonObject.getJSONArray("downloads");
-                    final List<String> nombres = new ArrayList<>();
-                    final List<String> urls = new ArrayList<>();
-                    try {
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject object = jsonArray.getJSONObject(i);
-                            String u = object.getString("url");
-                            if (!u.trim().equals("null")) {
-                                nombres.add(object.getString("name"));
-                                urls.add(u);
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    if (nombres.size() != 0) {
-                        d = new MaterialDialog.Builder(context)
-                                .title("Opciones")
-                                .titleGravity(GravityEnum.CENTER)
-                                .customView(R.layout.dialog_down, false)
-                                .cancelable(true)
-                                .autoDismiss(false)
-                                .positiveText("Reproducir")
-                                .negativeText("Cancelar")
-                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction dialogAction) {
-                                        String desc = nombres.get(sp.getSelectedItemPosition());
-                                        final String ur = urls.get(sp.getSelectedItemPosition());
-                                        Log.d("Streaming", "URL -> " + ur);
-                                        switch (desc.toLowerCase()) {
-                                            case "zippyshare":
-                                                streaming = true;
-                                                posT = pos;
-                                                web.post(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        web.loadUrl(ur);
-                                                    }
-                                                });
-                                                d.dismiss();
-                                                break;
-                                            case "mega":
-                                                d.dismiss();
-                                                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
-                                                showDownload(holder.ib_des);
-                                                showCloudPlay(holder.ib_ver);
-                                                holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
-                                                break;
-                                            default:
-                                                StreamManager.Stream(context, eids.get(holder.getAdapterPosition()), ur);
-                                                holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
-                                                showDownload(holder.ib_des);
-                                                showCloudPlay(holder.ib_ver);
-                                                d.dismiss();
-                                                break;
-                                        }
-                                    }
-                                })
-                                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
-                                        showDownload(holder.ib_des);
-                                        materialDialog.dismiss();
-                                    }
-                                })
-                                .cancelListener(new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialog) {
-                                        showDownload(holder.ib_des);
-                                        d.dismiss();
-                                    }
-                                })
-                                .build();
-                        sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
-                        sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
-                        d.show();
-                    } else {
-                        Toaster.toast("No hay links!!! Intenta mas tarde!!!");
-                        showDownload(holder.ib_des);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(context, "Error en JSON", Toast.LENGTH_SHORT).show();
-                }
-            }
         }
     }
 

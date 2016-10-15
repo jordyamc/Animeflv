@@ -132,6 +132,11 @@
         android:key="catSD"
         android:title="Tarjeta SD">
         <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="null"
+            android:key="sd_access"
+            android:summary="En caso de tener errores al descargar/eliminar animes"
+            android:title="Conceder permisos de escritura"/>
+        <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="b_move"
             android:title="Mover videos a SD" />

@@ -31,6 +31,7 @@ public class Keys {
         public static final String SOUNDS = "sonido";
         public static final String INDICADOR_SONIDOS = "ind_sounds";
         public static final String RECHARGE_SOUNDS = "r_sounds";
+        public static final String SD_ACCESS = "sd_access";
     }
 
     public static class Login {
@@ -41,5 +42,6 @@ public class Keys {
 
     public static class Extra {
         public static final String JSON_ADMINS = "json_admins";
+        public static final String EXTERNAL_SD_ACCESS_URI = "sd_uri";
     }
 }

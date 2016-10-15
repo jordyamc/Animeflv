@@ -15,6 +15,9 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="Cuentas">
         <com.lb.material_preferences_library.custom_preferences.Preference
+            android:key="admin_add_email"
+            android:title="Agregar Email"/>
+        <com.lb.material_preferences_library.custom_preferences.Preference
             android:key="admin_del_user"
             android:title="Eliminar Cuenta"/>
     </PreferenceCategory>

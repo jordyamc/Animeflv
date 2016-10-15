@@ -32,6 +32,34 @@ public class InternalManager {
         sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
     }
 
+    private static int getDownloadSate(Context context, String eid) {
+        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager.Query q = new DownloadManager.Query();
+        q.setFilterById(Long.parseLong(context.getSharedPreferences("data", Context.MODE_PRIVATE).getString(eid, "0")));
+        Cursor cursor = manager.query(q);
+        cursor.moveToFirst();
+        try {
+            return cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    public static boolean isDownloading(Context context, String eid) {
+        switch (getDownloadSate(context, eid)) {
+            case DownloadManager.STATUS_RUNNING:
+                return true;
+            case DownloadManager.STATUS_SUCCESSFUL:
+                return true;
+            case DownloadManager.STATUS_PENDING:
+                return true;
+            case DownloadManager.STATUS_PAUSED:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     public void startDownload(String eid, String downUrl) {
         Application application = (Application) context.getApplicationContext();
         Tracker mTracker = application.getDefaultTracker();
@@ -146,7 +174,7 @@ public class InternalManager {
         int bytes_downloaded = cursor.getInt(cursor
                 .getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
         int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-        return (int) ((bytes_downloaded * 100l) / bytes_total);
+        return (int) ((bytes_downloaded * 100L) / bytes_total);
     }
 
     public DownloadState getState(String eid) {
@@ -180,33 +208,20 @@ public class InternalManager {
     }
 
     public String getStateString(String eid) {
-        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        DownloadManager.Query q = new DownloadManager.Query();
-        q.setFilterById(Long.parseLong(sharedPreferences.getString(eid, "0")));
-        Cursor cursor = manager.query(q);
-        cursor.moveToFirst();
-        String state;
-        switch (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))) {
+        switch (getDownloadSate(context, eid)) {
             case 2:
-                state = "DESCARGANDO";
-                break;
+                return "DESCARGANDO";
             case 8:
-                state = "COMPLETADO";
-                break;
+                return "COMPLETADO";
             case 16:
-                state = "ERROR";
-                break;
+                return "ERROR";
             case 4:
-                state = "PAUSA";
-                break;
+                return "PAUSA";
             case 1:
-                state = "EN LISTA";
-                break;
+                return "EN LISTA";
             default:
-                state = "SIN ESTADO";
-                break;
+                return "SIN ESTADO";
         }
-        return state;
     }
 
     public boolean isDownloading(String eid) {

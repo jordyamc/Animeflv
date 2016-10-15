@@ -32,6 +32,15 @@ import com.smaato.soma.video.Video;
 import xdroid.toaster.Toaster;
 
 public class ADS extends AppCompatActivity implements InterstitialAdListener, VASTAdListener {
+    Toolbar toolbar;
+    int ad1_id;
+    int ad2_id;
+    int ad3_id;
+    int ad4_id;
+    int inter1_id;
+    int inter2_id;
+    int inter3_id;
+    int publisher_id;
     // Remove the below line after defining your own ad unit ID.
     private Button inter_ad1;
     private Button inter_ad2;
@@ -48,18 +57,11 @@ public class ADS extends AppCompatActivity implements InterstitialAdListener, VA
     private BannerView ad3;
     private BannerView ad4;
 
-    Toolbar toolbar;
-
-    int ad1_id;
-    int ad2_id;
-    int ad3_id;
-    int ad4_id;
-
-    int inter1_id;
-    int inter2_id;
-    int inter3_id;
-
-    int publisher_id;
+    public static boolean isXLargeScreen(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +69,7 @@ public class ADS extends AppCompatActivity implements InterstitialAdListener, VA
             setTheme(R.style.AppThemeDark);
         }
         super.onCreate(savedInstanceState);
+        setUpAnimations();
         setContentView(R.layout.activity_ads);
         Toaster.toast("Si aprecias esta app, considera hacerle click a algunos anuncios y/o botones :D");
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
@@ -109,6 +112,9 @@ public class ADS extends AppCompatActivity implements InterstitialAdListener, VA
         inter_ad1 = ((Button) findViewById(R.id.pop_ad_1));
         inter_ad2 = ((Button) findViewById(R.id.pop_ad_2));
         inter_ad3 = ((Button) findViewById(R.id.pop_ad_3));
+        inter_ad1.setEnabled(false);
+        inter_ad2.setEnabled(false);
+        inter_ad3.setEnabled(false);
         inter_ad1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -150,9 +156,84 @@ public class ADS extends AppCompatActivity implements InterstitialAdListener, VA
         mInterstitialAd2 = new Interstitial(this);
         mInterstitialAd3 = new Interstitial(this);
 
-        //mInterstitialAd1.setInterstitialAdListener(this);
-        mInterstitialAd2.setInterstitialAdListener(this);
-        mInterstitialAd3.setInterstitialAdListener(this);
+        mInterstitialAd1.setVastAdListener(new VASTAdListener() {
+            @Override
+            public void onReadyToShow() {
+                inter_ad1.setEnabled(true);
+            }
+
+            @Override
+            public void onWillShow() {
+
+            }
+
+            @Override
+            public void onWillOpenLandingPage() {
+
+            }
+
+            @Override
+            public void onWillClose() {
+
+            }
+
+            @Override
+            public void onFailedToLoadAd() {
+
+            }
+        });
+        mInterstitialAd2.setInterstitialAdListener(new InterstitialAdListener() {
+            @Override
+            public void onReadyToShow() {
+                inter_ad2.setEnabled(true);
+            }
+
+            @Override
+            public void onWillShow() {
+
+            }
+
+            @Override
+            public void onWillOpenLandingPage() {
+
+            }
+
+            @Override
+            public void onWillClose() {
+
+            }
+
+            @Override
+            public void onFailedToLoadAd() {
+
+            }
+        });
+        mInterstitialAd3.setInterstitialAdListener(new InterstitialAdListener() {
+            @Override
+            public void onReadyToShow() {
+                inter_ad3.setEnabled(true);
+            }
+
+            @Override
+            public void onWillShow() {
+
+            }
+
+            @Override
+            public void onWillOpenLandingPage() {
+
+            }
+
+            @Override
+            public void onWillClose() {
+
+            }
+
+            @Override
+            public void onFailedToLoadAd() {
+
+            }
+        });
 
         loadInterstitial1();
         loadInterstitial2();
@@ -208,7 +289,6 @@ public class ADS extends AppCompatActivity implements InterstitialAdListener, VA
             getWindow().setReturnTransition(slide);
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -304,11 +384,5 @@ public class ADS extends AppCompatActivity implements InterstitialAdListener, VA
         if (!isXLargeScreen(getApplicationContext())) {
             return;
         }
-    }
-
-    public static boolean isXLargeScreen(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 }

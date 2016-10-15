@@ -1,9 +1,5 @@
 package knf.animeflv;
 
-import android.Manifest;
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,8 +8,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -45,12 +39,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -63,25 +54,18 @@ import com.afollestad.materialdialogs.Theme;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.single.PermissionListener;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.SyncHttpClient;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.melnykov.fab.FloatingActionButton;
+import com.mikepenz.community_material_typeface_library.CommunityMaterial;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.holder.BadgeStyle;
-import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
@@ -93,13 +77,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -108,9 +88,14 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.Emision.Section.newEmisionActivity;
+import knf.animeflv.Emision.Section.newEmisionTest;
 import knf.animeflv.Explorer.ExplorerRoot;
 import knf.animeflv.Interfaces.EncryptionListener;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
+import knf.animeflv.JsonFactory.BaseGetter;
+import knf.animeflv.JsonFactory.JsonTypes.INICIO;
+import knf.animeflv.JsonFactory.ServerGetter;
+import knf.animeflv.Random.RandomActivity;
 import knf.animeflv.Recientes.MainOrganizer;
 import knf.animeflv.Recientes.Status;
 import knf.animeflv.Recyclers.AdapterMain;
@@ -122,6 +107,7 @@ import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
+import knf.animeflv.Utils.NoLogInterface;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UtilDialogPref;
 import knf.animeflv.Utils.UtilNotBlocker;
@@ -146,13 +132,6 @@ public class newMain extends AppCompatActivity implements
     TextInputEditText normalText;
     TextInputEditText finalText;
     TextInputLayout inputLayout;
-    private Spinner etEmail;
-    private EditText etSug;
-    private EditText cuenta;
-    private Spinner contactoS;
-    private WebView webViewFeed;
-    private boolean cancelPost;
-    private boolean tbool;
     private boolean isAmoled;
     private boolean doubleBackToExitPressedOnce = false;
     private boolean verOk;
@@ -167,19 +146,18 @@ public class newMain extends AppCompatActivity implements
     private String versionName;
     private String androidID;
     private AccountHeader headerResult;
-    private MaterialDialog mat;
     private String headerTit;
     private Context context;
     private Snackbar waiting;
     private FloatingActionButton actionButton;
     private com.github.clans.fab.FloatingActionButton updateButton;
     private Parser parser = new Parser();
-    private int intentos;
     private boolean shouldExecuteOnResume;
     private TaskType normal = TaskType.NORMAL;
     private TaskType secundario = TaskType.SECUNDARIA;
     private MaterialDialog RapConf;
-    private boolean frun = false;
+    private boolean frun = true;
+    private boolean tbool = false;
     private AdapterMain main;
     private AdapterMainNoGIF mainNo;
     private Switch nots;
@@ -187,8 +165,6 @@ public class newMain extends AppCompatActivity implements
     private Spinner conexion;
     private Spinner repVid;
     private Spinner repStream;
-    private String[] eids;
-    private String[] tipos;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
     private Handler EmisionHandler = new Handler();
     Runnable EmisionWaiting = new Runnable() {
@@ -204,30 +180,7 @@ public class newMain extends AppCompatActivity implements
             }
         }
     };
-
-    private static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = "";
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-
-    private static String getStringFromFile(String filePath) {
-        String ret = "";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ret;
-    }
+    private String currUser = "null";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -241,7 +194,6 @@ public class newMain extends AppCompatActivity implements
         if (!getSharedPreferences("data", MODE_PRIVATE).getBoolean("intro", false)) {
             startActivity(new Intent(this, Intronew.class));
         }
-        checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         MainRegistrer.init();
         setUpVersion();
         setUpViews();
@@ -254,6 +206,7 @@ public class newMain extends AppCompatActivity implements
         mTracker.setScreenName("Recientes");
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
         SharedPreferences prefs = this.getSharedPreferences("data", MODE_PRIVATE);
+        frun = true;
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                 if (key.equals("reload") && !UtilNotBlocker.isPaused()) {
@@ -281,16 +234,16 @@ public class newMain extends AppCompatActivity implements
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(listener);
-        if (!DirFile.exists())loadMainDir(false,false);
+        if (!DirFile.exists()) ServerGetter.backupDir(this);
     }
 
     private void setUpDrawer() {
         Drawable ic_main;
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (preferences.getBoolean("is_amoled", false)) {
-            ic_main = getResources().getDrawable(R.mipmap.ic_launcher_dark);
+            ic_main = ContextCompat.getDrawable(this, R.mipmap.ic_launcher_dark);
         } else {
-            ic_main = getResources().getDrawable(R.mipmap.ic_launcher);
+            ic_main = ContextCompat.getDrawable(this, R.mipmap.ic_launcher);
         }
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -324,6 +277,7 @@ public class newMain extends AppCompatActivity implements
                         new PrimaryDrawerItem().withName("Favoritos").withIcon(MaterialDesignIconic.Icon.gmi_star).withIdentifier(1),
                         new PrimaryDrawerItem().withName("Directorio").withIcon(MaterialDesignIconic.Icon.gmi_view_list_alt).withIdentifier(2),
                         new PrimaryDrawerItem().withName("Emision").withIcon(MaterialDesignIconic.Icon.gmi_alarm_check).withIdentifier(3),
+                        new PrimaryDrawerItem().withName("Random").withIcon(MaterialDesignIconic.Icon.gmi_shuffle).withIdentifier(11),
                         new PrimaryDrawerItem().withName("Explorador").withIcon(MaterialDesignIconic.Icon.gmi_folder).withIdentifier(9),
                         new PrimaryDrawerItem().withName("Historial").withIcon(MaterialDesignIconic.Icon.gmi_eye).withIdentifier(10),
                         new PrimaryDrawerItem().withName("Lista").withIcon(MaterialDesignIconic.Icon.gmi_assignment_returned).withIdentifier(4),
@@ -348,7 +302,7 @@ public class newMain extends AppCompatActivity implements
                                 result.setSelection(0, false);
                                 break;
                             case 3:
-                                startActivity(new Intent(context, newEmisionActivity.class));
+                                startActivity(new Intent(context, newEmisionTest.class));
                                 result.setSelection(0, false);
                                 result.closeDrawer();
                                 break;
@@ -389,15 +343,17 @@ public class newMain extends AppCompatActivity implements
                                 result.setSelection(0, false);
                                 startActivity(new Intent(context, HistoryActivity.class));
                                 break;
-                            case 55:
+                            case 11:
+                                result.setSelection(0, false);
+                                startActivity(new Intent(context, RandomActivity.class));
                                 break;
-                            case 56:
-                                break;
-                            case 57:
-                                break;
-                            default:
+                            case -1:
                                 Intent intent = new Intent(context, Configuracion.class);
                                 startActivity(intent);
+                                result.closeDrawer();
+                                result.setSelection(0, false);
+                                break;
+                            default:
                                 result.closeDrawer();
                                 result.setSelection(0, false);
                                 break;
@@ -475,6 +431,7 @@ public class newMain extends AppCompatActivity implements
         result.addItem(new PrimaryDrawerItem().withName("Des/Encriptor").withIcon(MaterialDesignIconic.Icon.gmi_lock_open).withOnDrawerItemClickListener(listeners.onEncButton()).withIdentifier(55));
         result.addItem(new PrimaryDrawerItem().withName("Actualizar Server").withIcon(MaterialDesignIconic.Icon.gmi_refresh_sync).withOnDrawerItemClickListener(listeners.onManualButton()).withIdentifier(56));
         result.addItem(new PrimaryDrawerItem().withName("Control de Cuentas").withIcon(MaterialDesignIconic.Icon.gmi_account_circle).withOnDrawerItemClickListener(listeners.onAccountsButton()).withIdentifier(57));
+        result.addItem(new PrimaryDrawerItem().withName("Filtrar Emision").withIcon(CommunityMaterial.Icon.cmd_filter_remove).withOnDrawerItemClickListener(listeners.onFilterList()).withIdentifier(58));
     }
 
     public void showEncDialog() {
@@ -580,7 +537,7 @@ public class newMain extends AppCompatActivity implements
                 ColorsRes.Morado(this)
         };
         ColorChooserDialog dialog = new ColorChooserDialog.Builder(this, R.string.color_chooser)
-                .theme(ThemeUtils.isAmoled(this)? Theme.DARK:Theme.LIGHT)
+                .theme(ThemeUtils.isAmoled(this) ? Theme.DARK : Theme.LIGHT)
                 .customColors(colorl, null)
                 .dynamicButtonColor(true)
                 .allowUserColorInput(false)
@@ -626,23 +583,24 @@ public class newMain extends AppCompatActivity implements
         }
 
         if (set) {
-            Drawable ic_main;
-            SharedPreferences preferences1 = PreferenceManager.getDefaultSharedPreferences(this);
-            if (preferences1.getBoolean("is_amoled", false)) {
-                ic_main = getResources().getDrawable(R.mipmap.ic_launcher_dark);
-            } else {
-                ic_main = getResources().getDrawable(R.mipmap.ic_launcher);
-            }
             ArrayList<IProfile> profile = new ArrayList<>();
-            profile.add(new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withIcon(ic_main).withIdentifier(9));
+            profile.add(new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withIcon(getHeaderDrawable()).withIdentifier(9));
             headerResult.setBackgroundRes(drawable);
             headerResult.setProfiles(profile);
         }
         return drawable;
     }
 
+    private Drawable getHeaderDrawable() {
+        if (ThemeUtils.isAmoled(this)) {
+            return ContextCompat.getDrawable(this, R.mipmap.ic_launcher_dark);
+        } else {
+            return ContextCompat.getDrawable(this, R.mipmap.ic_launcher);
+        }
+    }
+
     private void toast(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+        Toaster.toast(text);
     }
 
     public void writeToFile(String body, File file) {
@@ -815,122 +773,14 @@ public class newMain extends AppCompatActivity implements
         new Registrer().execute();
     }
 
-    public void setDir(Boolean busqueda) {
-        tbool = busqueda;
-        if (!busqueda) {
-            if (isNetworkAvailable()) {
-                loadMainDir(busqueda,true);
-            } else {
-                if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-                    if (!mediaStorage.exists()) {
-                        mediaStorage.mkdirs();
-                    }
-                }
-                File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
-                String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-                if (file.exists()) {
-                    if (isJSONValid(getStringFromFile(file_loc))) {
-                        Intent intent = new Intent(context, Directorio.class);
-                        startActivity(intent);
-                    } else {
-                        file.delete();
-                        setDir(tbool);
-                    }
-                } else {
-                    toast("No hay datos guardados");
-                }
-            }
-        } else {
-            if (isNetworkAvailable()) {
-                loadMainDir(busqueda,true);
-            } else {
-                if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-                    if (!mediaStorage.exists()) {
-                        mediaStorage.mkdirs();
-                    }
-                }
-                File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
-                String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-                if (file.exists()) {
-                    if (isJSONValid(file_loc)) {
-                        Intent intent = new Intent(context, Directorio.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putString("tipo", "Busqueda");
-                        intent.putExtras(bundle);
-                        startActivity(intent);
-                    } else {
-                        file.delete();
-                        setDir(tbool);
-                    }
-                } else {
-                    toast("No hay datos guardados");
-                }
-            }
+    public void setDir(Boolean search) {
+        Intent intent = new Intent(this, Directorio.class);
+        if (search) {
+            Bundle bundle = new Bundle();
+            bundle.putString("tipo", "Busqueda");
+            intent.putExtras(bundle);
         }
-    }
-
-    public void loadMainDir(final boolean search,final boolean open) {
-        AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-        asyncHttpClient.setResponseTimeout(-1);
-        asyncHttpClient.get(getDirectorio() + "?certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                super.onSuccess(statusCode, headers, response);
-                if (open) {
-                    if (search) {
-                        loadDir(response.toString(), true);
-                    } else {
-                        loadDir(response.toString());
-                    }
-                }else {
-                    loadLocalDir(response.toString());
-                }
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                if (open) {
-                    if (search) {
-                        loadDir(response.toString(), true);
-                    } else {
-                        loadDir(response.toString());
-                    }
-                }else {
-                    loadLocalDir(response.toString());
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                if (search) {
-                    loadDir("error", true);
-                } else {
-                    loadDir("error");
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                if (search) {
-                    loadDir("error", true);
-                } else {
-                    loadDir("error");
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
-                if (search) {
-                    loadDir("error", true);
-                } else {
-                    loadDir("error");
-                }
-            }
-        });
+        startActivity(intent);
     }
 
     public void loadDir(String data, boolean search) {
@@ -958,7 +808,7 @@ public class newMain extends AppCompatActivity implements
                 startActivity(intent);
             } else {
                 Log.d("Archivo", "Existe");
-                String infile = getStringFromFile(file_loc);
+                String infile = FileUtil.getStringFromFile(file_loc);
                 if (!infile.trim().equals(data.trim())) {
                     Log.d("Cargar", "Json nuevo");
                     writeToFile(trimed, file);
@@ -1008,7 +858,7 @@ public class newMain extends AppCompatActivity implements
                 }
             } else {
                 Log.d("Archivo", "Existe");
-                String infile = getStringFromFile(file_loc);
+                String infile = FileUtil.getStringFromFile(file_loc);
                 if (!infile.trim().equals(trimed)) {
                     if (isJSONValid(infile)) {
                         if (isJSONValid(trimed)) {
@@ -1044,51 +894,13 @@ public class newMain extends AppCompatActivity implements
             }
             File fileoff = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
             String file_loc_off = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-            if (fileoff.exists() && isJSONValid(getStringFromFile(file_loc_off))) {
+            if (fileoff.exists() && isJSONValid(FileUtil.getStringFromFile(file_loc_off))) {
                 Intent intent = new Intent(context, Directorio.class);
                 startActivity(intent);
             } else {
                 //Toaster.toast("Servidor fallando y no hay datos en cache");
                 //new DirGetter(context, TaskType.DIRECTORIO).execute(getDirectorioSec());
                 loadSecDir(false);
-            }
-        }
-    }
-
-    public void loadLocalDir(String data) {
-        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-            if (!mediaStorage.exists()) {
-                mediaStorage.mkdirs();
-            }
-        }
-        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-        if (isNetworkAvailable() && !data.trim().equals("error")) {
-            String trimed = data.trim();
-            if (!file.exists()) {
-                Log.d("Archivo:", "No existe");
-                try {
-                    file.createNewFile();
-                } catch (IOException e) {
-                    Log.d("Archivo:", "Error al crear archivo");
-                }
-
-                if (isJSONValid(trimed)) {
-                    writeToFile(trimed, file);
-                } else {
-                    Toaster.toast("Error en Servidor");
-                }
-            } else {
-                Log.d("Archivo", "Existe");
-                String infile = getStringFromFile(file_loc);
-                if (!infile.trim().equals(trimed)) {
-                    if (isJSONValid(infile)) {
-                        if (isJSONValid(trimed)) {
-                            Log.d("Cargar", "Json nuevo");
-                            writeToFile(trimed, file);
-                        }
-                    }
-                }
             }
         }
     }
@@ -1168,7 +980,7 @@ public class newMain extends AppCompatActivity implements
         } else {
             verOk = false;
             if (file.exists()) {
-                String infile = getStringFromFile(file_loc);
+                String infile = FileUtil.getStringFromFile(file_loc);
                 getData(infile);
             } else {
                 toast("No hay datos guardados");
@@ -1176,46 +988,63 @@ public class newMain extends AppCompatActivity implements
         }
     }
 
-    public void getData(String json) {
-        eids = parser.parseEID(json);
-        tipos = parser.parseTipos(json);
-        //EmisionChecker.Refresh();
-        NetworkUtils.checkVersion(this, updateButton);
-        Status.reload(this);
-        if (Status.getCacheStatusInt() == 1) {
-            getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
-            if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("statusShown", false)) {
-                actionButton.hide(true);
-                actionButton.setVisibility(View.VISIBLE);
-                actionButton.show();
+    public void getData(final String json) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //eids = parser.parseEID(json);
+                //tipos = parser.parseTipos(json);
+                //EmisionChecker.Refresh();
+                NetworkUtils.checkVersion(newMain.this, updateButton);
+                Status.reload(newMain.this);
+                if (Status.getCacheStatusInt() == 1) {
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
+                    if (!PreferenceManager.getDefaultSharedPreferences(newMain.this).getBoolean("statusShown", false)) {
+                        actionButton.hide(true);
+                        actionButton.setVisibility(View.VISIBLE);
+                        actionButton.show();
+                    }
+                } else {
+                    PreferenceManager.getDefaultSharedPreferences(newMain.this).edit().putBoolean("statusShown", false).apply();
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
+                    if (actionButton.isVisible()) {
+                        actionButton.hide();
+                        actionButton.setVisibility(View.GONE);
+                    } else {
+                        actionButton.setVisibility(View.GONE);
+                    }
+                }
+                ActualizarFavoritos();
+                if (PreferenceManager.getDefaultSharedPreferences(newMain.this).getBoolean("noGif", true)) {
+                    if (mainNo == null) {
+                        recreate();
+                    } else {
+                        if (frun) {
+                            mainNo = new AdapterMainNoGIF(newMain.this, MainOrganizer.init(json).list());
+                            recyclerView.setAdapter(mainNo);
+                            frun = false;
+                        } else {
+                            mainNo.setData(MainOrganizer.init(json).list());
+                        }
+                    }
+                } else {
+                    if (main == null) {
+                        recreate();
+                    } else {
+                        if (frun) {
+                            main = new AdapterMain(newMain.this, MainOrganizer.init(json).list());
+                            recyclerView.setAdapter(main);
+                            frun = false;
+                        } else {
+                            main.setData(MainOrganizer.init(json).list());
+                        }
+                    }
+                }
+                mswipe.setRefreshing(false);
+                isFirst();
+                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isF", false).apply();
             }
-        } else {
-            PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("statusShown", false).apply();
-            getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
-            if (actionButton.isVisible()) {
-                actionButton.hide();
-                actionButton.setVisibility(View.GONE);
-            } else {
-                actionButton.setVisibility(View.GONE);
-            }
-        }
-        ActualizarFavoritos();
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("noGif", true)) {
-            if (mainNo == null) {
-                recreate();
-            } else {
-                mainNo.setData(MainOrganizer.init(json).list());
-            }
-        } else {
-            if (main == null) {
-                recreate();
-            } else {
-                main.setData(MainOrganizer.init(json).list());
-            }
-        }
-        mswipe.setRefreshing(false);
-        isFirst();
-        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isF", false).apply();
+        });
     }
 
     public void ActualizarFavoritos() {
@@ -1223,7 +1052,51 @@ public class newMain extends AppCompatActivity implements
             String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
             String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
             if (!email_coded.equals("null") && !pass_coded.equals("null")) {
-                new FavLoader(parser.getBaseUrl(normal, context) + "fav-server.php?certificate=" + parser.getCertificateSHA1Fingerprint(context) + "&tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded).executeOnExecutor(ExecutorManager.getExecutor());
+                knf.animeflv.LoginActivity.LoginServer.login(this, email_coded, pass_coded, PreferenceManager.getDefaultSharedPreferences(this).getString("login_email", "null"), new knf.animeflv.LoginActivity.LoginServer.ServerInterface() {
+                    @Override
+                    public void onServerResponse(JSONObject object) {
+                        try {
+                            if (object.getString("response").equals("ok")) {
+                                String favoritos = parser.getUserFavs(object.toString());
+                                String visto = parser.getUserVistos(object.toString());
+                                if (visto.equals("")) {
+                                    String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
+                                    if (!favs.equals(favoritos)) {
+                                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).apply();
+                                        loadMainJson();
+                                        Log.d("Reload", "Main");
+                                    }
+                                } else {
+                                    String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
+                                    if (!favs.equals(favoritos)) {
+                                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).apply();
+                                        loadMainJson();
+                                        Log.d("Reload", "Main");
+                                    }
+                                    String vistos = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
+                                    try {
+                                        if (!vistos.equals(visto)) {
+                                            getSharedPreferences("data", MODE_PRIVATE).edit().putString("vistos", visto).apply();
+                                            String[] v = visto.split(";;;");
+                                            for (String s : v) {
+                                                getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, true).apply();
+                                            }
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            Log.e("GetFavs", e.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onServerError() {
+                        Log.e("FavLoader-Main", "TimeOut!!!!!");
+                    }
+                });
             }
         }
     }
@@ -1244,480 +1117,183 @@ public class newMain extends AppCompatActivity implements
 
     }
 
-    public void loadInicio(String da) {
-        String data = da.replace("<!-- Hosting24 Analytics Code -->\n" +
-                "                                                         <script type=\"text/javascript\" src=\"http://stats.hosting24.com/count.php\"></script>\n" +
-                "                                                         <!-- End Of Analytics Code -->", "").trim();
+    public void load(String s) {
         Boolean isF = getSharedPreferences("data", MODE_PRIVATE).getBoolean("isF", true);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED || isF) {
-            if (!isF) {
-                frun = false;
-                if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-                    if (!mediaStorage.exists()) {
-                        mediaStorage.mkdirs();
-                    }
+        if (!isF) {
+            frun = false;
+            if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                if (!mediaStorage.exists()) {
+                    mediaStorage.mkdirs();
                 }
-                File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt");
-                String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
-                if (isNetworkAvailable() && !data.trim().equals("error")) {
-                    if (isJSONValid(data)) {
-                        if (!file.exists()) {
-                            Log.d("Archivo 1:", "No existe");
-                            Log.d("Json", data);
-                            try {
-                                file.createNewFile();
-                            } catch (IOException e) {
-                                Log.d("Archivo 1:", "Error al crear archivo");
-                            }
-                            writeToFile(data, file);
-                            if (parser.checkStatus(data) == 1) {
-                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", true).apply();
-                            } else {
-                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
-                            }
-                            getData(data);
-                            getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true).apply();
-                            intentos = 0;
-                        } else {
-                            Log.d("Archivo 1", "Existe");
-                            String infile = getStringFromFile(file_loc);
-                            if (isJSONValid(infile) && isJSONValid(data)) {
-                                if (!infile.trim().equals(data.trim())) {
-                                    Log.d("Cargar 1", "Json nuevo");
-                                    writeToFile(data, file);
-                                    if (parser.checkStatus(data) == 1) {
-                                        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", true).apply();
-                                    } else {
-                                        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
-                                    }
-                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true).apply();
-                                    getData(data);
-                                    intentos = 0;
-                                } else {
-                                    Log.d("Cargar 1", "Json existente");
-                                    if (parser.checkStatus(data) == 1) {
-                                        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", true).apply();
-                                    } else {
-                                        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
-                                    }
-                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true).apply();
-                                    getData(infile);
-                                    intentos = 0;
-                                }
-                            } else {
-                                file.delete();
-                                toast("Error en cache, volviendo a cargar");
-                                //new Requests(context, TaskType.GET_INICIO).execute(getInicio());
-                                loadMainJson();
-                                //web.loadUrl("http://animeflvapp.x10.mx/getHtml.php");
-                            }
-                        }
-                    } else {
-                        if (!file.exists()) {
-                            Log.d("Archivo 2:", "No existe");
-                            if (data.trim().equals("error")) {
-                                //toast("Error en servidor, sin cache para mostrar");
-                                if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
-                                if (intentos < 1) {
-                                    //new Requests(context, TaskType.GET_INICIO).execute(getInicioSec());
-                                    loadSecJson();
-                                    intentos++;
-                                } else {
-                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", false).apply();
-                                    toast("Error en servidor, sin cache para mostrar");
-                                    intentos = 0;
-                                }
-                            }
-                            if (!isNetworkAvailable()) {
-                                toast("Sin cache para mostrar");
-                                if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
-                            }
-                        } else {
-                            Log.d("Archivo 2", "Existe");
-                            String infile = getStringFromFile(file_loc);
-                            if (data.trim().equals("error"))
-                                toast("Error en servidor");
-                            if (!isNetworkAvailable()) {
-                                toast("Cargando desde cache");
-                                Log.d("Cargar 2", "Json existente");
-                                if (isJSONValid(infile)) {
-                                    if (parser.checkStatus(data) == 1) {
-                                        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", true).apply();
-                                    } else {
-                                        getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
-                                    }
-                                    getData(infile);
-                                } else {
-                                    file.delete();
-                                    toast("Error en cache, sin conexion");
-                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", false).apply();
-                                }
-                            } else {
-                                loadSecJson();
-                            }
-                        }
-                    }
-                } else {
-                    if (!file.exists()) {
-                        Log.d("Archivo 3:", "No existe");
-                        if (data.trim().equals("error")) {
-                            //toast("Error en servidor, sin cache para mostrar");
-                            if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
-                            if (intentos < 1) {
-                                loadSecJson();
-                                intentos++;
-                            } else {
-                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", false).apply();
-                                toast("Error en servidor, sin cache para mostrar");
-                                intentos = 0;
-                            }
-                        }
-                        if (!isNetworkAvailable()) {
-                            toast("Sin cache para mostrar");
-                            if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
-                        }
-                    } else {
-                        if (!data.trim().equals("error") && isNetworkAvailable()) {
-                            if (intentos < 1) {
-                                loadSecJson();
-                                intentos++;
-                            } else {
-                                toast("Error en servidor, sin cache para mostrar");
-                                Log.d("Archivo 3", "Existe");
-                                String infile = getStringFromFile(file_loc);
-                                toast("Cargando desde cache");
-                                Log.d("Cargar 3", "Json existente");
-                                if (parser.checkStatus(data) == 1) {
-                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", true).apply();
-                                } else {
-                                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
-                                }
-                                if (isJSONValid(infile)) {
-                                    getData(infile);
-                                } else {
-                                    file.delete();
-                                    if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
-                                }
-                                intentos = 0;
-                            }
-                        } else {
-                            Log.d("Archivo 3", "Existe");
-                            String infile = getStringFromFile(file_loc);
-                            toast("Cargando desde cache");
-                            Log.d("Cargar 3", "Json existente");
-                            if (parser.checkStatus(data) == 1) {
-                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", true).apply();
-                            } else {
-                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
-                            }
-                            if (isJSONValid(infile)) {
-                                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("online", true).apply();
-                                getData(infile);
-                            } else {
-                                file.delete();
-                                if (mswipe.isRefreshing()) mswipe.setRefreshing(false);
-                            }
-                            intentos = 0;
-                        }
-                    }
-                }
+            }
+            if (s.equals("null")) {
+                toast("Sin cache para mostrar");
             } else {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    frun = true;
-                    new DirGetter(context, TaskType.ACT_DIR_MAIN).execute(getDirectorio());
-                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isF", false).apply();
-                    final File saveData = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/data.save");
-                    if (saveData.exists()) {
-                        new MaterialDialog.Builder(context)
-                                .title("Respaldo")
-                                .content("Se ah encontrado un respaldo de la configuracion, ¿Desea restaurarlo?")
-                                .positiveText("SI")
-                                .negativeText("NO")
-                                .autoDismiss(true)
-                                .cancelable(true)
-                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                .callback(new MaterialDialog.ButtonCallback() {
-                                    @Override
-                                    public void onPositive(MaterialDialog dialog) {
-                                        super.onPositive(dialog);
-                                        String save = getStringFromFile(saveData.getPath());
-                                        if (parser.restoreBackup(save, context) != Parser.Response.OK) {
-                                            toast("Error al restaurar");
-                                            saveData.delete();
-                                        } else {
-                                            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
-                                                recreate();
-                                            } else {
-                                                loadMainJson();
-                                                getHDraw(true);
-                                            }
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onNegative(MaterialDialog dialog) {
-                                        super.onNegative(dialog);
-                                        saveData.delete();
-                                        parser.saveBackup(context);
-                                    }
-                                })
-                                .cancelListener(new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialog) {
-                                        saveData.delete();
-                                        parser.saveBackup(context);
-                                    }
-                                }).build().show();
-                    } else {
-                        RapConf = new MaterialDialog.Builder(context)
-                                .title("Configuracion rapida")
-                                .titleGravity(GravityEnum.CENTER)
-                                .customView(R.layout.rap_conf, false)
-                                .positiveText("CONTINUAR")
-                                .autoDismiss(false)
-                                .cancelable(false)
-                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                .callback(new MaterialDialog.ButtonCallback() {
-                                    @Override
-                                    public void onPositive(MaterialDialog dialog) {
-                                        super.onPositive(dialog);
-                                        if (sonidos.getSelectedItemPosition() > 0 && conexion.getSelectedItemPosition() > 0 && repVid.getSelectedItemPosition() > 0 && repStream.getSelectedItemPosition() > 0) {
-                                            toast("Se pueden volver a modificar desde configuracion");
-                                            RapConf.dismiss();
-                                            parser.saveBackup(context);
-                                            new Login().show(getSupportFragmentManager(), "Login");
-                                        } else {
-                                            toast("Falta cambiar configuraciones!!!");
-                                        }
-                                    }
-                                }).build();
-                        nots = (Switch) RapConf.getCustomView().findViewById(R.id.switch_not_conf);
-                        sonidos = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_sonido_conf);
-                        conexion = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_conexion_conf);
-                        repVid = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_rep_vid);
-                        repStream = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_rep_stream);
-                        nots.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                            @Override
-                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                if (isChecked) {
-                                    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", true).apply();
-                                } else {
-                                    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", false).apply();
-                                }
-                            }
-                        });
-                        List<String> sonido = new ArrayList<>();
-                        sonido.add("Selecciona...");
-                        sonido.addAll(Arrays.asList(UtilSound.getSoundsNameList()));
-                        ArrayAdapter<String> adapterSonidos = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, sonido);
-                        sonidos.setAdapter(adapterSonidos);
-                        sonidos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                            @Override
-                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                if (position > 0)
-                                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sonido", Integer.toString(position - 1)).apply();
-                            }
-
-                            @Override
-                            public void onNothingSelected(AdapterView<?> parent) {
-                            }
-                        });
-                        List<String> tipos = new ArrayList<>();
-                        tipos.add("Selecciona...");
-                        for (String dat : getResources().getStringArray(R.array.tipos)) {
-                            tipos.add(dat);
-                        }
-                        ArrayAdapter<String> adapterConx = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, tipos);
-                        conexion.setAdapter(adapterConx);
-                        conexion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                            @Override
-                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                if (position > 0)
-                                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_conexion", Integer.toString(position - 1)).apply();
-                            }
-
-                            @Override
-                            public void onNothingSelected(AdapterView<?> parent) {
-                            }
-                        });
-                        List<String> repVids = new ArrayList<>();
-                        repVids.add("Selecciona...");
-                        for (String dat : getResources().getStringArray(R.array.players)) {
-                            repVids.add(dat);
-                        }
-                        ArrayAdapter<String> adapterreps = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, repVids);
-                        repVid.setAdapter(adapterreps);
-                        repStream.setAdapter(adapterreps);
-                        repVid.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                            @Override
-                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                if (position > 0)
-                                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_video", Integer.toString(position - 1)).apply();
-                            }
-
-                            @Override
-                            public void onNothingSelected(AdapterView<?> parent) {
-
-                            }
-                        });
-                        repStream.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                            @Override
-                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                if (position > 0)
-                                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_streaming", Integer.toString(position - 1)).apply();
-                            }
-
-                            @Override
-                            public void onNothingSelected(AdapterView<?> parent) {
-
-                            }
-                        });
-                        RapConf.show();
-                    }
-                }
-                loadMainJson();
+                getData(s);
             }
         } else {
-            toast("El permiso de almacenamiento es necesario para continuar");
-            finish();
-            Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            i.addCategory(Intent.CATEGORY_DEFAULT);
-            i.setData(Uri.parse("package:" + getPackageName()));
-            startActivity(i);
+            frun = true;
+            new DirGetter(context, TaskType.ACT_DIR_MAIN).execute(getDirectorio());
+            getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isF", false).apply();
+            final File saveData = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/data.save");
+            if (saveData.exists()) {
+                new MaterialDialog.Builder(context)
+                        .title("Respaldo")
+                        .content("Se ah encontrado un respaldo de la configuracion, ¿Desea restaurarlo?")
+                        .positiveText("SI")
+                        .negativeText("NO")
+                        .autoDismiss(true)
+                        .cancelable(true)
+                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                String save = FileUtil.getStringFromFile(saveData.getPath());
+                                if (parser.restoreBackup(save, context) != Parser.Response.OK) {
+                                    toast("Error al restaurar");
+                                    saveData.delete();
+                                } else {
+                                    if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
+                                        recreate();
+                                    } else {
+                                        loadMainJson();
+                                        getHDraw(true);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onNegative(MaterialDialog dialog) {
+                                super.onNegative(dialog);
+                                saveData.delete();
+                                parser.saveBackup(context);
+                            }
+                        })
+                        .cancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                saveData.delete();
+                                parser.saveBackup(context);
+                            }
+                        }).build().show();
+            } else {
+                RapConf = new MaterialDialog.Builder(context)
+                        .title("Configuracion rapida")
+                        .titleGravity(GravityEnum.CENTER)
+                        .customView(R.layout.rap_conf, false)
+                        .positiveText("CONTINUAR")
+                        .autoDismiss(false)
+                        .cancelable(false)
+                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                        .callback(new MaterialDialog.ButtonCallback() {
+                            @Override
+                            public void onPositive(MaterialDialog dialog) {
+                                super.onPositive(dialog);
+                                if (sonidos.getSelectedItemPosition() > 0 && conexion.getSelectedItemPosition() > 0 && repVid.getSelectedItemPosition() > 0 && repStream.getSelectedItemPosition() > 0) {
+                                    toast("Se pueden volver a modificar desde configuracion");
+                                    RapConf.dismiss();
+                                    parser.saveBackup(context);
+                                    new Login().show(getSupportFragmentManager(), "Login");
+                                } else {
+                                    toast("Falta cambiar configuraciones!!!");
+                                }
+                            }
+                        }).build();
+                nots = (Switch) RapConf.getCustomView().findViewById(R.id.switch_not_conf);
+                sonidos = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_sonido_conf);
+                conexion = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_conexion_conf);
+                repVid = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_rep_vid);
+                repStream = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_rep_stream);
+                nots.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", true).apply();
+                        } else {
+                            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", false).apply();
+                        }
+                    }
+                });
+                List<String> sonido = new ArrayList<>();
+                sonido.add("Selecciona...");
+                sonido.addAll(Arrays.asList(UtilSound.getSoundsNameList()));
+                ArrayAdapter<String> adapterSonidos = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, sonido);
+                sonidos.setAdapter(adapterSonidos);
+                sonidos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if (position > 0)
+                            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sonido", Integer.toString(position - 1)).apply();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
+                List<String> tipos = new ArrayList<>();
+                tipos.add("Selecciona...");
+                for (String dat : getResources().getStringArray(R.array.tipos)) {
+                    tipos.add(dat);
+                }
+                ArrayAdapter<String> adapterConx = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, tipos);
+                conexion.setAdapter(adapterConx);
+                conexion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if (position > 0)
+                            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_conexion", Integer.toString(position - 1)).apply();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
+                List<String> repVids = new ArrayList<>();
+                repVids.add("Selecciona...");
+                for (String dat : getResources().getStringArray(R.array.players)) {
+                    repVids.add(dat);
+                }
+                ArrayAdapter<String> adapterreps = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, repVids);
+                repVid.setAdapter(adapterreps);
+                repStream.setAdapter(adapterreps);
+                repVid.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if (position > 0)
+                            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_video", Integer.toString(position - 1)).apply();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+                repStream.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if (position > 0)
+                            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_streaming", Integer.toString(position - 1)).apply();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+                RapConf.show();
+            }
+            loadMainJson();
         }
     }
 
     public void loadMainJson() {
-        AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-        asyncHttpClient.setResponseTimeout(10000);
-        asyncHttpClient.get(getInicio() + "?certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
+        BaseGetter.getJson(this, new INICIO(), new BaseGetter.AsyncInterface() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                loadInicio(response.toString());
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                super.onSuccess(statusCode, headers, response);
-                loadInicio(response.toString());
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                super.onSuccess(statusCode, headers, responseString);
-                loadInicio(responseString);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                loadInicio("error");
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                loadInicio("error");
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
-                loadInicio("error");
+            public void onFinish(String json) {
+                load(json);
             }
         });
-    }
-
-    public void loadSecJson() {
-        AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-        asyncHttpClient.setResponseTimeout(10000);
-        asyncHttpClient.get(getInicioSec() + "?certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                loadInicio(response.toString());
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                loadInicio("error");
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                loadInicio("error");
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
-                loadInicio("error");
-            }
-        });
-    }
-
-    @TargetApi(23)
-    public void checkPermission(final String permission) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Dexter.checkPermission(new PermissionListener() {
-                @Override
-                public void onPermissionGranted(PermissionGrantedResponse response) {
-                    if (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                        checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
-                    } else if (permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                        checkPermission(Manifest.permission.GET_ACCOUNTS);
-                    } else {
-                        if (!Settings.canDrawOverlays(context)) {
-                            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
-                            startActivityForResult(intent, 5260);
-                        }
-                    }
-                }
-
-                @Override
-                public void onPermissionDenied(PermissionDeniedResponse response) {
-                    if (!response.isPermanentlyDenied()) {
-                        String titulo;
-                        String desc;
-                        if (response.getPermissionName().equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) || response.getPermissionName().equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                            titulo = "Leer/Escribir archivos";
-                            desc = "Este permiso es necesario para descargar los animes, asi como para funcionar sin conexion";
-                        } else {
-                            titulo = "Obtener cuentas";
-                            desc = "Este permiso es necesario para obtener tu correo en las sugerencias y sincronixar favoritos";
-                        }
-                        new MaterialDialog.Builder(context)
-                                .title(titulo)
-                                .content(desc)
-                                .positiveText("ACEPTAR")
-                                .cancelable(false)
-                                .autoDismiss(true)
-                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                .callback(new MaterialDialog.ButtonCallback() {
-                                    @Override
-                                    public void onPositive(MaterialDialog dialog) {
-                                        super.onPositive(dialog);
-                                        checkPermission(permission);
-                                    }
-                                })
-                                .build().show();
-                    } else {
-                        toast("El permiso es necesario, por favor activalo");
-                        finish();
-                        Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        i.addCategory(Intent.CATEGORY_DEFAULT);
-                        i.setData(Uri.parse("package:" + getPackageName()));
-                        startActivity(i);
-                    }
-                }
-
-                @Override
-                public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
-            }, permission);
-        }
     }
 
     private Snackbar getWaitingSnackBar() {
@@ -1788,16 +1364,19 @@ public class newMain extends AppCompatActivity implements
             NotificationManager notificationManager = (NotificationManager) this
                     .getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.cancel(6991);
+            if (!currUser.equals(PreferenceManager.getDefaultSharedPreferences(this).getString("login_email", "null"))) {
+                setUpDrawer();
+            }
         } else {
             shouldExecuteOnResume = true;
         }
-
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         UtilNotBlocker.setPaused(true);
+        currUser = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email", "null");
     }
 
     @Override
@@ -1839,6 +1418,7 @@ public class newMain extends AppCompatActivity implements
                 UtilDialogPref.setPlayer(null);
             }
         }
+        new Parser().saveBackup(this);
     }
 
     @Override
@@ -1855,22 +1435,23 @@ public class newMain extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         if (isXLargeScreen()) {
-            getMenuInflater().inflate(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("new_user",true)?R.menu.menu_main_dark_new:R.menu.menu_main_dark, menu);
+            getMenuInflater().inflate(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("new_user", true) ? R.menu.menu_main_dark_new : R.menu.menu_main_dark, menu);
         } else {
-            getMenuInflater().inflate(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("new_user",true)?R.menu.menu_main_new:R.menu.menu_main, menu);
+            getMenuInflater().inflate(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("new_user", true) ? R.menu.menu_main_new : R.menu.menu_main, menu);
         }
+        menu.removeItem(R.id.carg);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.search:
                 setDir(true);
                 break;
             case R.id.new_user:
-                PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("new_user",false).apply();
+                PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("new_user", false).apply();
                 startActivity(new Intent(this, TutorialActivity.class));
                 invalidateOptionsMenu();
                 break;
@@ -1890,74 +1471,18 @@ public class newMain extends AppCompatActivity implements
     private class Registrer extends AsyncTask<String, String, String> {
         @Override
         protected String doInBackground(String... params) {
-            new SyncHttpClient().get(new Parser().getBaseUrl(TaskType.NORMAL, context) + "contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode), null, new TextHttpResponseHandler() {
+            SyncHttpClient client = new SyncHttpClient();
+            client.setLogInterface(new NoLogInterface());
+            client.setLoggingEnabled(false);
+            client.get(new Parser().getBaseUrl(TaskType.NORMAL, context) + "contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode), null, new TextHttpResponseHandler() {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    Logger.Error(Registrer.this.getClass(), throwable);
+                    //Logger.Error(Registrer.this.getClass(), throwable);
                 }
 
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String responseString) {
                     Log.d("Registrer", "OK");
-                }
-            });
-            return null;
-        }
-    }
-
-    private class FavLoader extends AsyncTask<String, String, String> {
-        String url;
-
-        public FavLoader(String url) {
-            this.url = url;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            SyncHttpClient client=new SyncHttpClient();
-            client.setLoggingEnabled(false);
-            client.get(url, null, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    super.onSuccess(statusCode, headers, response);
-                    if (isJSONValid(response.toString())) {
-                        String favoritos = parser.getUserFavs(response.toString());
-                        String visto = parser.getUserVistos(response.toString());
-                        if (visto.equals("")) {
-                            String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
-                            if (!favs.equals(favoritos)) {
-                                getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).apply();
-                                //new Requests(context, TaskType.GET_INICIO).execute(getInicio());
-                                loadMainJson();
-                                Log.d("Reload","Main");
-                            }
-                        } else {
-                            String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
-                            if (!favs.equals(favoritos)) {
-                                getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).apply();
-                                //new Requests(context, TaskType.GET_INICIO).execute(getInicio());
-                                loadMainJson();
-                                Log.d("Reload","Main");
-                            }
-                            String vistos = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
-                            try {
-                                if (!vistos.equals(visto)) {
-                                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("vistos", visto).apply();
-                                    String[] v = visto.split(";;;");
-                                    for (String s : v) {
-                                        getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, true).apply();
-                                    }
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
                 }
             });
             return null;

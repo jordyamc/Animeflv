@@ -14,6 +14,7 @@ public class Intronew extends IntroActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addSlide(new SimpleSlide.Builder()
+                .layout(R.layout.simple_slide)
                 .title(R.string.intro_title_1)
                 .description(R.string.intro_desc_1)
                 .image(R.drawable.app_icon_intro)
@@ -21,6 +22,7 @@ public class Intronew extends IntroActivity {
                 .backgroundDark(R.color.intro_1_dark)
                 .build());
         addSlide(new SimpleSlide.Builder()
+                .layout(R.layout.simple_slide)
                 .title(R.string.intro_title_2)
                 .description(R.string.intro_desc_2)
                 .image(R.drawable.recientes)
@@ -28,6 +30,7 @@ public class Intronew extends IntroActivity {
                 .backgroundDark(R.color.intro_2_dark)
                 .build());
         addSlide(new SimpleSlide.Builder()
+                .layout(R.layout.simple_slide)
                 .title(R.string.intro_title_3)
                 .description(R.string.intro_desc_3)
                 .image(R.drawable.desc_stream_rez)
@@ -35,6 +38,7 @@ public class Intronew extends IntroActivity {
                 .backgroundDark(R.color.intro_3_dark)
                 .build());
         addSlide(new SimpleSlide.Builder()
+                .layout(R.layout.simple_slide)
                 .title(R.string.intro_title_4)
                 .description(R.string.intro_desc_4)
                 .image(R.drawable.comparacion_rez)
@@ -42,6 +46,7 @@ public class Intronew extends IntroActivity {
                 .backgroundDark(R.color.intro_4_dark)
                 .build());
         addSlide(new SimpleSlide.Builder()
+                .layout(R.layout.simple_slide)
                 .title(R.string.intro_title_5)
                 .description(R.string.intro_desc_5)
                 .image(R.drawable.info_rez_comp)
@@ -49,6 +54,7 @@ public class Intronew extends IntroActivity {
                 .backgroundDark(R.color.intro_5_dark)
                 .build());
         addSlide(new SimpleSlide.Builder()
+                .layout(R.layout.simple_slide)
                 .title(R.string.intro_title_6)
                 .description(R.string.intro_desc_6)
                 .image(R.drawable.secs)
@@ -56,6 +62,7 @@ public class Intronew extends IntroActivity {
                 .backgroundDark(R.color.intro_6_dark)
                 .build());
         addSlide(new SimpleSlide.Builder()
+                .layout(R.layout.simple_slide)
                 .title(R.string.intro_title_7)
                 .description(R.string.intro_desc_7)
                 .image(R.drawable.fav)
@@ -63,6 +70,7 @@ public class Intronew extends IntroActivity {
                 .backgroundDark(R.color.intro_7_dark)
                 .build());
         addSlide(new SimpleSlide.Builder()
+                .layout(R.layout.simple_slide)
                 .title(R.string.intro_title_8)
                 .description(R.string.intro_desc_8)
                 .image(R.drawable.nots)
@@ -70,6 +78,7 @@ public class Intronew extends IntroActivity {
                 .backgroundDark(R.color.intro_8_dark)
                 .build());
         addSlide(new SimpleSlide.Builder()
+                .layout(R.layout.simple_slide)
                 .title(R.string.intro_title_9)
                 .description(R.string.intro_desc_9)
                 .image(R.drawable.conf)
@@ -77,6 +86,7 @@ public class Intronew extends IntroActivity {
                 .backgroundDark(R.color.intro_9_dark)
                 .build());
         addSlide(new SimpleSlide.Builder()
+                .layout(R.layout.simple_slide)
                 .title(R.string.intro_title_10)
                 .description(R.string.intro_desc_10)
                 .image(R.drawable.block)
@@ -84,6 +94,7 @@ public class Intronew extends IntroActivity {
                 .backgroundDark(R.color.intro_10_dark)
                 .build());
         addSlide(new SimpleSlide.Builder()
+                .layout(R.layout.simple_slide)
                 .title(R.string.intro_title_11)
                 .description(R.string.intro_desc_11)
                 .image(R.drawable.listo)

@@ -1,7 +1,6 @@
 package knf.animeflv.DownloadManager;
 
 import android.content.Context;
-import android.preference.PreferenceManager;
 
 import knf.animeflv.Utils.NetworkUtils;
 import xdroid.toaster.Toaster;
@@ -93,7 +92,7 @@ public class ManageDownload {
     }
 
     public static void chooseDownDir(Context context, String eid, String url) {
-        Boolean inSD = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
+        Boolean inSD = false;//PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
         if (inSD) {
             DescargarSD(context, eid, url);
         } else {
@@ -102,7 +101,7 @@ public class ManageDownload {
     }
 
     public static void chooseDownDir(Context context, String eid, String url, CookieConstructor constructor) {
-        Boolean inSD = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
+        Boolean inSD = false;//PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
         if (inSD) {
             DescargarSD(context, eid, url, constructor);
         } else {

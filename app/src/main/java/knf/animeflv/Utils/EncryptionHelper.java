@@ -9,13 +9,6 @@ import java.util.List;
 import se.simbio.encryption.Encryption;
 
 public class EncryptionHelper {
-    public interface EncryptionListenerSingle{
-        void onFinish(final String result);
-    }
-
-    public interface EncryptionListenerMultiple{
-        void onFinish(final String[] results);
-    }
     public static void asyncEncrypt(final String request,final EncryptionListenerSingle encryption){
         new AsyncTask<String,String,String>(){
             @Override
@@ -66,5 +59,23 @@ public class EncryptionHelper {
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    public static void asyncEncryptLow(final String request, final EncryptionListenerSingle encryption) {
+        new AsyncTask<String, String, String>() {
+            @Override
+            protected String doInBackground(String... strings) {
+                encryption.onFinish(Encryption.getLowIteration("Key", "Salt", new byte[16]).encryptOrNull(request));
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    public interface EncryptionListenerSingle {
+        void onFinish(final String result);
+    }
+
+    public interface EncryptionListenerMultiple {
+        void onFinish(final String[] results);
     }
 }

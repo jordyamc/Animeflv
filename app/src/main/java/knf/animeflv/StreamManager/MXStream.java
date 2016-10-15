@@ -12,6 +12,7 @@ import java.util.List;
 
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.Parser;
+import knf.animeflv.Utils.FileUtil;
 
 /**
  * Created by Jordy on 04/03/2016.
@@ -51,12 +52,7 @@ public class MXStream {
                 intent.putExtra("title", parser.getTitCached(aid) + " " + numero);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
-                String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                if (!vistos.contains(eid)) {
-                    vistos = vistos + eid + ":::";
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-                }
+                FileUtil.setSeenState(eid, true);
                 break;
             case "com.mxtech.videoplayer.ad":
                 Intent intentad = new Intent(Intent.ACTION_VIEW);
@@ -66,12 +62,7 @@ public class MXStream {
                 intentad.putExtra("title", parser.getTitCached(aid) + " " + numero);
                 intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intentad);
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
-                String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                if (!vistosad.contains(eid)) {
-                    vistosad = vistosad + eid + ":::";
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
-                }
+                FileUtil.setSeenState(eid, true);
                 break;
             default:
                 Toast.makeText(context, "MX player no instalado", Toast.LENGTH_SHORT).show();
@@ -108,12 +99,7 @@ public class MXStream {
                 String[] headers = {"cookie", constructor.getCookie(), "User-Agent", constructor.getUseAgent(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", constructor.getReferer()};
                 intent.putExtra("headers", headers);
                 context.startActivity(intent);
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
-                String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                if (!vistos.contains(eid)) {
-                    vistos = vistos + eid + ":::";
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-                }
+                FileUtil.setSeenState(eid, true);
                 break;
             case "com.mxtech.videoplayer.ad":
                 Intent intentad = new Intent(Intent.ACTION_VIEW);
@@ -125,12 +111,7 @@ public class MXStream {
                 String[] headers1 = {"cookie", constructor.getCookie(), "User-Agent", constructor.getUseAgent(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", constructor.getReferer()};
                 intentad.putExtra("headers", headers1);
                 context.startActivity(intentad);
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
-                String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                if (!vistosad.contains(eid)) {
-                    vistosad = vistosad + eid + ":::";
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
-                }
+                FileUtil.setSeenState(eid, true);
                 break;
             default:
                 Toast.makeText(context, "MX player no instalado", Toast.LENGTH_SHORT).show();
@@ -165,12 +146,7 @@ public class MXStream {
                 intent.putExtra("title", parser.getTitCached(aid) + " " + numero);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
-                String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                if (!vistos.contains(eid)) {
-                    vistos = vistos + eid + ":::";
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-                }
+                FileUtil.setSeenState(eid, true);
                 break;
             case "com.mxtech.videoplayer.ad":
                 Intent intentad = new Intent(Intent.ACTION_VIEW);
@@ -180,12 +156,7 @@ public class MXStream {
                 intentad.putExtra("title", parser.getTitCached(aid) + " " + numero);
                 intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intentad);
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
-                String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-                if (!vistosad.contains(eid)) {
-                    vistosad = vistosad + eid + ":::";
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
-                }
+                FileUtil.setSeenState(eid, true);
                 break;
             default:
                 Toast.makeText(context, "MX player no instalado", Toast.LENGTH_SHORT).show();

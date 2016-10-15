@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorRes;
 
 import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
@@ -67,6 +69,9 @@ public class ThemeUtils {
             if (accent == ColorsRes.Morado(context)) {
                 context.setTheme(R.style.AppThemeDarkMorado);
             }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                context.getWindow().setNavigationBarColor(context.getResources().getColor(R.color.negro));
+            }
         } else {
             if (accent == ColorsRes.Rojo(context)) {
                 context.setTheme(R.style.AppThemeRojo);
@@ -86,8 +91,34 @@ public class ThemeUtils {
             if (accent == ColorsRes.Morado(context)) {
                 context.setTheme(R.style.AppThemeMorado);
             }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                context.getWindow().setNavigationBarColor(context.getResources().getColor(R.color.prim));
+            }
         }
         setOrientation(context);
+    }
+
+    public static void setSplashTheme(Activity activity, @ColorRes int color) {
+        switch (color) {
+            case R.color.nmain:
+                activity.setTheme(R.style.SplashNormal);
+                break;
+            case R.color.prim:
+                activity.setTheme(R.style.SplashDark);
+                break;
+            case R.color.navidad:
+                activity.setTheme(R.style.SplashNavidad);
+                break;
+            case R.color.anuevo:
+                activity.setTheme(R.style.SplashAnuevo);
+                break;
+            case R.color.amor:
+                activity.setTheme(R.style.SplashAmor);
+                break;
+            case R.color.negro:
+                activity.setTheme(R.style.SplashNegro);
+                break;
+        }
     }
 
     public static void setOrientation(Activity activity){

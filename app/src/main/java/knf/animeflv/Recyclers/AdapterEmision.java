@@ -31,7 +31,6 @@ import java.util.TimeZone;
 
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Emision.Section.TimeCompareModel;
-import knf.animeflv.Emision.Section.newEmisionActivity;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
@@ -104,7 +103,7 @@ public class AdapterEmision extends RecyclerView.Adapter<AdapterEmision.ViewHold
                 @Override
                 public void onClick(View v) {
                     InfoHelper.open(
-                            ((newEmisionActivity) context),
+                            context,
                             new InfoHelper.SharedItem(holder.iv_rel, "img"),
                             Intent.FLAG_ACTIVITY_NEW_TASK,
                             new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),

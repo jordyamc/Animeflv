@@ -28,6 +28,16 @@ public class TimeCompareModel {
         this.time = preferences.getString(aid + "onhour", "~00:00AM");
     }
 
+    public TimeCompareModel(String aid, String time, Context context) {
+        this.aid = aid;
+        this.context = context;
+        this.image = getUrl();
+        this.titulo = settit();
+        this.time = time;
+    }
+
+
+
     public TimeCompareModel() {
         this.nodata = true;
     }

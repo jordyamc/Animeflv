@@ -1,7 +1,10 @@
 package knf.animeflv.DownloadManager;
 
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -10,6 +13,8 @@ import java.io.File;
 
 import knf.animeflv.Application;
 import knf.animeflv.DManager;
+import knf.animeflv.DownloadService.DownloadService;
+import knf.animeflv.DownloadService.DownloaderIntentService;
 import knf.animeflv.Downloader;
 import knf.animeflv.DownloaderCookie;
 import knf.animeflv.Parser;
@@ -39,7 +44,14 @@ public class ExternalManager {
         String titulo = parser.getTitCached(aid);
         File f = new File(FileUtil.getSDPath() + "/Animeflv/download/" + aid, aid + "_" + numero + ".mp4");
         sharedPreferences.edit().putString(eid + "dtype", EXTERNA).apply();
-        new Downloader(context, eid, aid, titulo, numero, f).execute(url);
+        //new Downloader(context, url, eid, aid, titulo, numero, f).executeOnExecutor(ExecutorManager.getExecutor());
+        Intent intent = new Intent(context, DownloadService.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("url", url);
+        bundle.putString("eid", eid);
+        bundle.putString("titulo", titulo);
+        intent.putExtras(bundle);
+        context.startService(intent);
     }
 
     public void startDownload(String eid, String url, CookieConstructor constructor) {
@@ -71,6 +83,7 @@ public class ExternalManager {
         String epID = sharedPreferences.getString("epIDS_descarga", "");
         sharedPreferences.edit().putString("titulos_descarga", tits.replace(titulo + ":::", "")).apply();
         sharedPreferences.edit().putString("epIDS_descarga", epID.replace(aid + "_" + numero + ":::", "")).apply();
+        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt(eid + "status", Downloader.CANCELADO).commit();
     }
 
     public int getProgress(String eid) {
@@ -161,5 +174,15 @@ public class ExternalManager {
 
     public String getError(String eid) {
         return sharedPreferences.getString(eid + "errmessage", "Sin Errores");
+    }
+
+    private boolean isDownloadServiceRunning() {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (DownloaderIntentService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

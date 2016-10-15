@@ -2,6 +2,7 @@ package knf.animeflv;
 
 import android.content.Context;
 import android.support.annotation.ColorInt;
+import android.support.v4.content.ContextCompat;
 
 /**
  * Created by Jordy on 16/03/2016.
@@ -9,75 +10,76 @@ import android.support.annotation.ColorInt;
 public class ColorsRes {
     @ColorInt
     public static int SecondaryTextDark(Context context) {
-        return context.getResources().getColor(android.R.color.secondary_text_dark);
+        return ContextCompat.getColor(context, android.R.color.secondary_text_dark);
     }
 
+    @ColorInt
     public static int SecondaryTextLight(Context context) {
-        return context.getResources().getColor(android.R.color.secondary_text_light);
+        return ContextCompat.getColor(context, android.R.color.secondary_text_light);
     }
 
     @ColorInt
     public static int Naranja(Context context) {
-        return context.getResources().getColor(R.color.theme_naranja);
+        return ContextCompat.getColor(context, R.color.theme_naranja);
     }
 
     @ColorInt
     public static int Rojo(Context context) {
-        return context.getResources().getColor(R.color.theme_rojo);
+        return ContextCompat.getColor(context, R.color.theme_rojo);
     }
 
     @ColorInt
     public static int Gris(Context context) {
-        return context.getResources().getColor(R.color.theme_gris);
+        return ContextCompat.getColor(context, R.color.theme_gris);
     }
 
     @ColorInt
     public static int Verde(Context context) {
-        return context.getResources().getColor(R.color.theme_verde);
+        return ContextCompat.getColor(context, R.color.theme_verde);
     }
 
     @ColorInt
     public static int Rosa(Context context) {
-        return context.getResources().getColor(R.color.theme_rosa);
+        return ContextCompat.getColor(context, R.color.theme_rosa);
     }
 
     @ColorInt
     public static int Morado(Context context) {
-        return context.getResources().getColor(R.color.theme_morado);
+        return ContextCompat.getColor(context, R.color.theme_morado);
     }
 
     @ColorInt
     public static int Blanco(Context context) {
-        return context.getResources().getColor(R.color.theme_blanco);
+        return ContextCompat.getColor(context, R.color.theme_blanco);
     }
 
     @ColorInt
     public static int Negro(Context context) {
-        return context.getResources().getColor(R.color.negro);
+        return ContextCompat.getColor(context, R.color.negro);
     }
 
     @ColorInt
     public static int Holo_Dark(Context context) {
-        return context.getResources().getColor(R.color.holo_dark);
+        return ContextCompat.getColor(context, R.color.holo_dark);
     }
 
     @ColorInt
     public static int Holo_Light(Context context) {
-        return context.getResources().getColor(R.color.holo_light);
+        return ContextCompat.getColor(context, R.color.holo_light);
     }
 
     @ColorInt
     public static int Prim(Context context) {
-        return context.getResources().getColor(R.color.prim);
+        return ContextCompat.getColor(context, R.color.prim);
     }
 
     @ColorInt
     public static int Amarillo(Context context) {
-        return context.getResources().getColor(R.color.newCap);
+        return ContextCompat.getColor(context, R.color.newCap);
     }
 
     @ColorInt
     public static int Transparent(Context context) {
-        return context.getResources().getColor(android.R.color.transparent);
+        return ContextCompat.getColor(context, android.R.color.transparent);
     }
 }

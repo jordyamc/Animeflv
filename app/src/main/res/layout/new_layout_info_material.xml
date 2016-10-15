@@ -20,13 +20,13 @@
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clickable="true"
             android:fitsSystemWindows="true"
             android:transitionName="title"
             app:collapsedTitleGravity="start|center_vertical"
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginEnd="64dp"
             app:expandedTitleMarginStart="48dp"
-            android:clickable="true"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
@@ -34,8 +34,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                android:fitsSystemWindows="true"
                 android:clickable="true"
+                android:fitsSystemWindows="true"
                 android:maxHeight="300dp"
                 android:minHeight="300dp"
                 android:scaleType="centerCrop"
@@ -46,8 +46,8 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
                 android:clickable="true"
+                app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
@@ -67,7 +67,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
         <com.melnykov.fab.FloatingActionButton
@@ -77,6 +77,7 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
             android:src="@drawable/ic_add_list"
+            android:visibility="gone"
             fab:fab_colorNormal="@color/dark"
             fab:fab_colorPressed="@color/prim"
             fab:fab_colorRipple="@color/dark"/>
@@ -87,11 +88,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:animateLayoutChanges="true"
         android:clipToPadding="false"
         android:paddingTop="28dp"
         android:visibility="gone"
         app:layout_anchorGravity="top|start"
-        android:animateLayoutChanges="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -99,12 +100,19 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
+            <!--<TextView
                 android:id="@+id/info_descripcion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="Descripcion"/>
+                android:text="Descripcion"/>-->
+            <knf.animeflv.CustomViews.TextViewExpandableAnimation
+                android:id="@+id/info_descripcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                app:tvea_expandLines="3"
+                app:tvea_textContentSize="@dimen/md_content_textsize"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -272,7 +280,7 @@
             <knf.animeflv.ServerReload.Adapter.CustomRecycler
                 android:id="@+id/rv_relacionados"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

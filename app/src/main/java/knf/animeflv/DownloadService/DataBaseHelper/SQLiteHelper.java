@@ -7,23 +7,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import knf.animeflv.DownloadService.DownloadTask;
 import knf.animeflv.DownloadService.ServiceHolder.ServiceManager;
 
 public class SQLiteHelper {
-    class DownloadItem {
-        public long _table_id;
-        public long _download_id;
-        public String progress;
-        public String url;
-        public String eid;
-        public String aid;
-        public String numero;
-        public String titulo;
-        public boolean isEmpty = false;
-    }
-
     private static final String DOWNLOAD_TABLE_NAME = "DownloadData";
-
     private static final String KEY_TABLE_ID = "_table_id";
     private static final String KEY_DOWNLOAD_ID = "_download_id";
     private static final String KEY_URL = "url";
@@ -32,11 +20,9 @@ public class SQLiteHelper {
     private static final String KEY_NUMERO = "numero";
     private static final String KEY_TITULO = "titulo";
     private static final String KEY_PROGRESS = "progress";
-
-    private Context context;
-
+    private static final String KEY_STATE = "state";
     private static final String DATABASE_CREATE =
-            "create table if not exist" + DOWNLOAD_TABLE_NAME + "("
+            "CREATE TABLE IF NOT EXISTS " + DOWNLOAD_TABLE_NAME + "("
                     + KEY_TABLE_ID + " integer primary key autoincrement, "
                     + KEY_DOWNLOAD_ID + " integer, "
                     + KEY_URL + " text not null, "
@@ -44,12 +30,12 @@ public class SQLiteHelper {
                     + KEY_AID + " text not null, "
                     + KEY_NUMERO + " text not null, "
                     + KEY_TITULO + " text not null, "
-                    + KEY_PROGRESS + " text not null"
+                    + KEY_PROGRESS + " text not null, "
+                    + KEY_STATE + " integer"
                     + ");";
     private static final String DATABASE_NAME = "DOWNLOAD_SERVICE_DATABASE";
-
     private static final int DATABASE_VERSION = 1;
-
+    private Context context;
     private SQLiteDatabase db;
 
     public SQLiteHelper(Context context) {
@@ -71,19 +57,25 @@ public class SQLiteHelper {
     }
 
     public boolean addElement(ServiceManager.DownloadConstructor constructor) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_DOWNLOAD_ID, constructor.id);
-        values.put(KEY_URL, constructor.url);
-        values.put(KEY_EID, constructor.eid);
-        values.put(KEY_AID, constructor.aid);
-        values.put(KEY_NUMERO, constructor.numero);
-        values.put(KEY_TITULO, constructor.titulo);
-        values.put(KEY_PROGRESS, "0");
-        long id = db.insert(DOWNLOAD_TABLE_NAME, null, values);
-        if (id != -1) {
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putLong(constructor.eid + "_download_table_id", id).apply();
-            return true;
+        if (!downloadExist(constructor.eid)) {
+            ContentValues values = new ContentValues();
+            values.put(KEY_DOWNLOAD_ID, constructor.id);
+            values.put(KEY_URL, constructor.url);
+            values.put(KEY_EID, constructor.eid);
+            values.put(KEY_AID, constructor.aid);
+            values.put(KEY_NUMERO, constructor.numero);
+            values.put(KEY_TITULO, constructor.titulo);
+            values.put(KEY_PROGRESS, "0");
+            values.put(KEY_STATE, DownloadTask.DESCARGANDO);
+            long id = db.insert(DOWNLOAD_TABLE_NAME, null, values);
+            if (id != -1) {
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putLong(constructor.eid + "_download_table_id", id).apply();
+                return true;
+            } else {
+                return false;
+            }
         } else {
+            Log.e("SQLHelper", "Download Already Exist!!!!");
             return false;
         }
     }
@@ -106,7 +98,8 @@ public class SQLiteHelper {
                 KEY_AID,
                 KEY_NUMERO,
                 KEY_TITULO,
-                KEY_PROGRESS
+                KEY_PROGRESS,
+                KEY_STATE
         }, KEY_TABLE_ID + "=" + context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + "_download_table_id", -1), null, null, null, null);
         if (c.getCount() > 0) {
             c.moveToFirst();
@@ -118,6 +111,7 @@ public class SQLiteHelper {
             item.numero = c.getString(5);
             item.titulo = c.getString(6);
             item.progress = c.getString(7);
+            item.state = c.getLong(8);
             c.close();
             return item;
         } else {
@@ -125,6 +119,60 @@ public class SQLiteHelper {
             c.close();
             return item;
         }
+    }
+
+    public DownloadItem getDownloadInfo(String eid, boolean autoclose) {
+        DownloadItem item = new DownloadItem();
+        Cursor c = db.query(DOWNLOAD_TABLE_NAME, new String[]{
+                KEY_TABLE_ID,
+                KEY_DOWNLOAD_ID,
+                KEY_URL,
+                KEY_EID,
+                KEY_AID,
+                KEY_NUMERO,
+                KEY_TITULO,
+                KEY_PROGRESS,
+                KEY_STATE
+        }, KEY_TABLE_ID + "=" + context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + "_download_table_id", -1), null, null, null, null);
+        close();
+        if (c.getCount() > 0) {
+            c.moveToFirst();
+            item._table_id = c.getLong(0);
+            item._download_id = c.getLong(1);
+            item.url = c.getString(2);
+            item.eid = c.getString(3);
+            item.aid = c.getString(4);
+            item.numero = c.getString(5);
+            item.titulo = c.getString(6);
+            item.progress = c.getString(7);
+            item.state = c.getLong(8);
+            c.close();
+            return item;
+        } else {
+            item.isEmpty = true;
+            c.close();
+            return item;
+        }
+    }
+
+    public int getTotalDownloads(boolean autoclose) {
+        Cursor c = db.query(DOWNLOAD_TABLE_NAME, new String[]{
+                KEY_TABLE_ID
+        }, null, null, null, null, null);
+        close();
+        int total = c.getCount();
+        c.close();
+        return total;
+    }
+
+    public boolean downloadExist(String eid, boolean autoclose) {
+        Cursor c = db.query(DOWNLOAD_TABLE_NAME, new String[]{
+                KEY_TABLE_ID
+        }, KEY_TABLE_ID + "=" + context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + "_download_table_id", -1), null, null, null, null);
+        close();
+        boolean exist = c.getCount() > 0;
+        c.close();
+        return exist;
     }
 
     public int getTotalDownloads() {
@@ -161,9 +209,100 @@ public class SQLiteHelper {
         }
     }
 
+    @Nullable
+    public String getProgress(String eid, boolean autoclose) {
+        Cursor c = db.query(DOWNLOAD_TABLE_NAME, new String[]{
+                KEY_TABLE_ID,
+                KEY_PROGRESS
+        }, KEY_TABLE_ID + "=" + context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + "_download_table_id", -1), null, null, null, null);
+        close();
+        if (c.getCount() > 0) {
+            String progress = c.getString(1);
+            c.close();
+            return progress;
+        } else {
+            c.close();
+            return null;
+        }
+    }
+
+    public long getState(String eid, boolean autoclose) {
+        Cursor c = db.query(DOWNLOAD_TABLE_NAME, new String[]{
+                KEY_TABLE_ID,
+                KEY_STATE
+        }, KEY_TABLE_ID + "=" + context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + "_download_table_id", -1), null, null, null, null);
+        close();
+        if (c.getCount() > 0) {
+            long progress = c.getLong(1);
+            c.close();
+            return progress;
+        } else {
+            c.close();
+            return -1;
+        }
+    }
+
+    public long getState(String eid) {
+        Cursor c = db.query(DOWNLOAD_TABLE_NAME, new String[]{
+                KEY_TABLE_ID,
+                KEY_STATE
+        }, KEY_TABLE_ID + "=" + context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + "_download_table_id", -1), null, null, null, null);
+        close();
+        if (c.getCount() > 0) {
+            long progress = c.getLong(1);
+            c.close();
+            return progress;
+        } else {
+            c.close();
+            return -1;
+        }
+    }
+
+    public void updateProgress(String eid, String progress, boolean autoclose) {
+        ContentValues args = new ContentValues();
+        args.put(KEY_PROGRESS, progress);
+        db.update(DOWNLOAD_TABLE_NAME, args, KEY_TABLE_ID + "=" + context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + "_download_table_id", -1), null);
+        close();
+    }
+
     public void updateProgress(String eid, String progress) {
         ContentValues args = new ContentValues();
         args.put(KEY_PROGRESS, progress);
         db.update(DOWNLOAD_TABLE_NAME, args, KEY_TABLE_ID + "=" + context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + "_download_table_id", -1), null);
+    }
+
+    public void updateState(String eid, long state, boolean autoclose) {
+        ContentValues args = new ContentValues();
+        args.put(KEY_STATE, state);
+        db.update(DOWNLOAD_TABLE_NAME, args, KEY_TABLE_ID + "=" + context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + "_download_table_id", -1), null);
+        close();
+    }
+
+    public void updateState(String eid, long state) {
+        ContentValues args = new ContentValues();
+        args.put(KEY_STATE, state);
+        db.update(DOWNLOAD_TABLE_NAME, args, KEY_TABLE_ID + "=" + context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + "_download_table_id", -1), null);
+    }
+
+    public void resetTable(boolean autoclose) {
+        db.execSQL("delete from " + DOWNLOAD_TABLE_NAME);
+        close();
+    }
+
+    public void resetTable() {
+        db.execSQL("delete from " + DOWNLOAD_TABLE_NAME);
+    }
+
+    public class DownloadItem {
+        public long _table_id;
+        public long _download_id;
+        public long state;
+        public String progress;
+        public String url;
+        public String eid;
+        public String aid;
+        public String numero;
+        public String titulo;
+        public boolean isEmpty = false;
     }
 }

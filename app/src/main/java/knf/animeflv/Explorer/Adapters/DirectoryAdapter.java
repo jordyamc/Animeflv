@@ -21,7 +21,6 @@ import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.Explorer.ExplorerInterfaces;
-import knf.animeflv.Explorer.ExplorerRoot;
 import knf.animeflv.Explorer.Models.Directory;
 import knf.animeflv.Explorer.Models.ModelFactory;
 import knf.animeflv.R;
@@ -40,9 +39,9 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
     private Activity context;
     private ExplorerInterfaces interfaces;
 
-    public DirectoryAdapter(Activity context) {
+    public DirectoryAdapter(Activity context, List<Directory> list) {
         this.context = context;
-        this.list = ModelFactory.createDirectoryList(context);
+        this.list = list;
         this.interfaces = (ExplorerInterfaces) context;
     }
 
@@ -57,6 +56,7 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
     public void onBindViewHolder(final DirectoryAdapter.ViewHolder holder, final int position) {
         //PicassoCache.getPicassoInstance(context).load(Uri.parse(list.get(holder.getAdapterPosition()).getImageUrl(context))).error(R.drawable.ic_block_r).into(holder.img);
         new CacheManager().mini(context,list.get(holder.getAdapterPosition()).getID(),holder.img);
+        holder.iV_visto.setVisibility(View.GONE);
         holder.titulo.setText(list.get(holder.getAdapterPosition()).getTitle());
         String caps = list.get(holder.getAdapterPosition()).getFilesNumber();
         if (caps.startsWith("1 ")) {
@@ -95,12 +95,10 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
                                 }
                                 if (list.get(holder.getAdapterPosition()).getFile().list().length == 0) {
                                     Toaster.toast("Archivos eliminados");
-                                    list = ModelFactory.createDirectoryList(context);
-                                    notifyDataSetChanged();
+                                    recreateList();
                                 } else {
                                     Toaster.toast("Error al eliminar");
-                                    list = ModelFactory.createDirectoryList(context);
-                                    notifyDataSetChanged();
+                                    recreateList();
                                 }
                             }
                         }).build().show();
@@ -110,7 +108,7 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
             @Override
             public boolean onLongClick(View v) {
                 InfoHelper.open(
-                        ((ExplorerRoot) context),
+                        context,
                         new InfoHelper.SharedItem(holder.img, "img"),
                         new InfoHelper.BundleItem("aid", list.get(holder.getAdapterPosition()).getID()),
                         new InfoHelper.BundleItem("title", list.get(holder.getAdapterPosition()).getTitle())
@@ -120,9 +118,61 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
         });
     }
 
+    private void recreateList() {
+        ModelFactory.createDirectoryListAsync(context, new ModelFactory.AsyncDirectoryListener() {
+            @Override
+            public void onCreated(List<Directory> l) {
+                list = l;
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        notifyDataSetChanged();
+                    }
+                });
+            }
+        });
+    }
+
+    public void recreateList(Activity activity) {
+        context = activity;
+        ModelFactory.createDirectoryListAsync(context, new ModelFactory.AsyncDirectoryListener() {
+            @Override
+            public void onCreated(List<Directory> l) {
+                list = l;
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        notifyDataSetChanged();
+                    }
+                });
+            }
+        });
+    }
+
+    public void recreateList(Activity activity, final OnFinishListListener listener) {
+        context = activity;
+        ModelFactory.createDirectoryListAsync(context, new ModelFactory.AsyncDirectoryListener() {
+            @Override
+            public void onCreated(List<Directory> l) {
+                list = l;
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        notifyDataSetChanged();
+                    }
+                });
+                listener.onFinish(l.size());
+            }
+        });
+    }
+
     @Override
     public int getItemCount() {
         return list.size();
+    }
+
+    public interface OnFinishListListener {
+        void onFinish(int count);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -138,6 +188,8 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
         public ImageButton ver;
         @Bind(R.id.ib_del)
         public ImageButton del;
+        @Bind(R.id.seen)
+        public ImageView iV_visto;
 
         public ViewHolder(View itemView) {
             super(itemView);

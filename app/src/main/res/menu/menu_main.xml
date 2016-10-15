@@ -2,9 +2,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".Main">
     <item
-        android:icon="@drawable/ic_buscar"
-        android:id="@+id/search"
+        android:id="@+id/carg"
+        android:enabled="false"
         android:orderInCategory="100"
+        android:title="Cargando"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/ic_buscar"
+        android:orderInCategory="200"
         android:title="Buscar"
         app:showAsAction="always"/>
+
 </menu>

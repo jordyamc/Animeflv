@@ -1,17 +1,30 @@
 package knf.animeflv;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.Window;
-import android.view.WindowManager;
+import android.provider.Settings;
+import android.support.annotation.ColorRes;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.daimajia.androidanimations.library.Techniques;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.viksaa.sssplash.lib.activity.AwesomeSplash;
@@ -27,10 +40,10 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
+import knf.animeflv.Utils.NetworkUtils;
+import knf.animeflv.Utils.ThemeUtils;
+import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 05/12/2015.
- */
 public class Splash extends AwesomeSplash {
     Context context;
 
@@ -38,6 +51,12 @@ public class Splash extends AwesomeSplash {
         return (context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
                 >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        ThemeUtils.setSplashTheme(this, getSplashColor());
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -50,70 +69,58 @@ public class Splash extends AwesomeSplash {
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
-        if (isNetworkAvailable()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = getWindow();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                /*Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                getWindow().setNavigationBarColor(getResources().getColor(getSplashColor()));
-                getWindow().setStatusBarColor(getResources().getColor(getSplashColor()));
-            }
-            //Customize Circular Reveal
-            configSplash.setBackgroundColor(getSplashColor()); //any color you want form colors.xml
-            configSplash.setAnimCircularRevealDuration(500); //int ms
-            configSplash.setRevealFlagX(Flags.REVEAL_RIGHT);  //or Flags.REVEAL_LEFT
-            configSplash.setRevealFlagY(Flags.REVEAL_BOTTOM); //or Flags.REVEAL_TOP
-
-            //Customize Logo
-            configSplash.setLogoSplash(getSplashImage()); //or any other drawable
-            configSplash.setAnimLogoSplashDuration(500); //int ms
-            configSplash.setAnimLogoSplashTechnique(Techniques.Bounce); //choose one form Techniques (ref: https://github.com/daimajia/AndroidViewAnimations)
-
-
-            //Customize Title
-            configSplash.setTitleSplash(getSplashText());
-            configSplash.setTitleTextColor(R.color.blanco);
-            configSplash.setTitleTextSize(30f); //float value
-            configSplash.setAnimTitleDuration(750);
-            configSplash.setAnimTitleTechnique(Techniques.FlipInX);
-
-        } else {
-            finish();
-            startActivity(new Intent(context, newMain.class));
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);*/
+            getWindow().setNavigationBarColor(ContextCompat.getColor(this, getSplashColor()));
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, getSplashColor()));
         }
-        //getSplashImage();
+        //Customize Circular Reveal
+        configSplash.setBackgroundColor(getSplashColor()); //any color you want form colors.xml
+        configSplash.setAnimCircularRevealDuration(500); //int ms
+        configSplash.setRevealFlagX(Flags.REVEAL_RIGHT);  //or Flags.REVEAL_LEFT
+        configSplash.setRevealFlagY(Flags.REVEAL_BOTTOM); //or Flags.REVEAL_TOP
+
+        //Customize Logo
+        configSplash.setLogoSplash(getSplashImage()); //or any other drawable
+        configSplash.setAnimLogoSplashDuration(500); //int ms
+        configSplash.setAnimLogoSplashTechnique(Techniques.Bounce); //choose one form Techniques (ref: https://github.com/daimajia/AndroidViewAnimations)
+
+
+        //Customize Title
+        configSplash.setTitleSplash(getSplashText());
+        configSplash.setTitleTextColor(R.color.blanco);
+        configSplash.setTitleTextSize(30f); //float value
+        configSplash.setAnimTitleDuration(750);
+        configSplash.setAnimTitleTechnique(Techniques.FlipInX);
+
     }
 
+    @ColorRes
     public int getSplashColor() {
-        int splash;
+        if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("isDown", false))
+            return R.color.negro;
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         String fecha = dateFormat.format(calendar.getTime());
         String trim = fecha.substring(0, fecha.lastIndexOf("-"));
         switch (trim) {
             case "24-12":
-                splash = R.color.navidad;
-                break;
+                return R.color.navidad;
             case "31-12":
-                splash = R.color.anuevo;
-                break;
+                return R.color.anuevo;
             case "01-01":
-                splash = R.color.anuevo;
-                break;
+                return R.color.anuevo;
             case "14-02":
-                splash = R.color.amor;
-                break;
+                return R.color.amor;
             default:
                 if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
-                    splash = R.color.prim;
+                    return R.color.prim;
                 } else {
-                    splash = R.color.nmain;
+                    return R.color.nmain;
                 }
-                break;
         }
-        if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("isDown", false))
-            splash = R.color.negro;
-        return splash;
     }
 
     public int getSplashImage() {
@@ -191,48 +198,50 @@ public class Splash extends AwesomeSplash {
 
     @Override
     public void animationsFinished() {
-        //new back(context, TaskType.ACT_LIKNS).execute("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/links.html");
+        if (NetworkUtils.isNetworkAvailable()) {
+            AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+            asyncHttpClient.setConnectTimeout(2000);
+            asyncHttpClient.get("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/links.html", null, new JsonHttpResponseHandler() {
 
-        AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-        asyncHttpClient.setConnectTimeout(2000);
-        asyncHttpClient.get("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/links.html", null, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    super.onSuccess(statusCode, headers, response);
+                    actlinks(response.toString());
+                }
 
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                actlinks(response.toString());
-            }
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                    super.onSuccess(statusCode, headers, response);
+                    actlinks(response.toString());
+                }
 
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                super.onSuccess(statusCode, headers, response);
-                actlinks(response.toString());
-            }
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                    super.onSuccess(statusCode, headers, responseString);
+                    actlinks(responseString);
+                }
 
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                super.onSuccess(statusCode, headers, responseString);
-                actlinks(responseString);
-            }
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    super.onFailure(statusCode, headers, responseString, throwable);
+                    actlinks("error");
+                }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
-                actlinks("error");
-            }
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                    actlinks("error");
+                }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                actlinks("error");
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                actlinks("error");
-            }
-        });
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                    actlinks("error");
+                }
+            });
+        } else {
+            checkPermission();
+        }
     }
 
     @Override
@@ -244,46 +253,98 @@ public class Splash extends AwesomeSplash {
         }
     }
 
-    private boolean isNetworkAvailable() {
-        Boolean net = false;
-        int Tcon = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "2"));
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        switch (Tcon) {
-            case 0:
-                NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                net = Wifi.isConnected();
-                break;
-            case 1:
-                NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                net = mobile.isConnected();
-                break;
-            case 2:
-                NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                net = WifiA.isConnected() || mobileA.isConnected();
-                break;
-        }
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && net;
-    }
-
     public void actlinks(String s) {
         if (!s.equals("error")) {
             try {
                 JSONObject jsonObject = new JSONObject(s.trim());
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_base", jsonObject.getString("base")).apply();
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_base_back", jsonObject.getString("base_back")).apply();
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_inicio", jsonObject.getString("inicio")).apply();
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_inicio_back", jsonObject.getString("inicio_back")).apply();
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_directorio", jsonObject.getString("directorio")).apply();
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("dir_directorio_back", jsonObject.getString("directorio_back")).apply();
-                finish();
-                startActivity(new Intent(context, newMain.class));
+                SharedPreferences.Editor preferences = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
+                preferences.putString("dir_base", jsonObject.getString("base")).apply();
+                preferences.putString("dir_base_back", jsonObject.getString("base_back")).apply();
+                preferences.putString("dir_inicio", jsonObject.getString("inicio")).apply();
+                preferences.putString("dir_inicio_back", jsonObject.getString("inicio_back")).apply();
+                preferences.putString("dir_directorio", jsonObject.getString("directorio")).apply();
+                preferences.putString("dir_directorio_back", jsonObject.getString("directorio_back")).apply();
+                checkPermission();
             } catch (Exception e) {
                 e.printStackTrace();
-                finish();
-                startActivity(new Intent(context, newMain.class));
+                checkPermission();
             }
+        } else {
+            checkPermission();
+        }
+    }
+
+    @TargetApi(23)
+    public void checkPermission() {
+        final String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Dexter.checkPermission(new PermissionListener() {
+                @Override
+                public void onPermissionGranted(PermissionGrantedResponse response) {
+                    if (!Settings.canDrawOverlays(context)) {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+                        startActivityForResult(intent, 5260);
+                    }
+                    finish();
+                    startActivity(new Intent(context, newMain.class));
+                }
+
+                @Override
+                public void onPermissionDenied(PermissionDeniedResponse response) {
+                    if (!response.isPermanentlyDenied()) {
+                        String titulo = "Leer/Escribir archivos";
+                        String desc = "Este permiso es necesario para descargar los animes, asi como para funcionar sin conexion";
+                        new MaterialDialog.Builder(context)
+                                .title(titulo)
+                                .content(desc)
+                                .positiveText("ACTIVAR")
+                                .cancelable(false)
+                                .autoDismiss(true)
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                        checkPermission();
+                                    }
+                                })
+                                .build().show();
+                    } else {
+                        Toaster.toast("El permiso es necesario, por favor activalo");
+                        finish();
+                        Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        i.addCategory(Intent.CATEGORY_DEFAULT);
+                        i.setData(Uri.parse("package:" + getPackageName()));
+                        startActivity(i);
+                    }
+                }
+
+                @Override
+                public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                    String titulo = "Leer/Escribir archivos";
+                    String desc = "Este permiso es necesario para descargar los animes, asi como para funcionar sin conexion";
+                    new MaterialDialog.Builder(context)
+                            .title(titulo)
+                            .content(desc)
+                            .positiveText("ACTIVAR")
+                            .cancelable(false)
+                            .autoDismiss(true)
+                            .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    finish();
+                                    Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                    i.addCategory(Intent.CATEGORY_DEFAULT);
+                                    i.setData(Uri.parse("package:" + getPackageName()));
+                                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivityForResult(i, 5548);
+                                }
+                            })
+                            .build().show();
+                }
+
+
+            }, permission);
         } else {
             finish();
             startActivity(new Intent(context, newMain.class));

@@ -4,15 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.annotation.Dimension;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -48,20 +44,9 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -70,6 +55,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.ColorsRes;
+import knf.animeflv.CustomViews.TextViewExpandableAnimation;
 import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
@@ -82,7 +68,6 @@ import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
-import knf.animeflv.info.Helper.LinearLayoutManagerWithSmoothScroller;
 import xdroid.toaster.Toaster;
 
 @SuppressWarnings("WeakerAccess")
@@ -102,7 +87,8 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
     @Bind(R.id.nested)
     NestedScrollView nestedScrollView;
     @Bind(R.id.info_descripcion)
-    TextView txt_sinopsis;
+    //TextView txt_sinopsis;
+            TextViewExpandableAnimation txt_sinopsis;
     @Bind(R.id.titulo)
     TextView txt_titulo;
     @Bind(R.id.tipo)
@@ -137,43 +123,6 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
     LinearLayoutManager layoutManager;
     boolean isInInfo = true;
     boolean blocked = false;
-
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-
-    public static String getStringFromFile(String filePath) {
-        String ret = "";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        } catch (IOException e) {
-        } catch (Exception e) {
-        }
-        return ret;
-    }
-
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
-    }
 
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
@@ -263,6 +212,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         }
 
         int color = ThemeUtils.getAcentColor(this);
+        txt_sinopsis.setStateColorFilter(color);
         txt_titulo.setTextColor(color);
         txt_tipo.setTextColor(color);
         txt_fsalida.setTextColor(color);
@@ -415,7 +365,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                 }
             } else {
                 Log.d("Archivo", "Existe");
-                String infile = getStringFromFile(file_loc);
+                String infile = FileUtil.getStringFromFile(file_loc);
                 if (!infile.trim().equals(trimed)) {
                     if (FileUtil.isJSONValid(infile)) {
                         if (FileUtil.isJSONValid(trimed)) {
@@ -446,7 +396,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + aid + ".txt";
         if (file.exists()) {
             Log.d("Archivo", "Existe");
-            String infile = getStringFromFile(file_loc);
+            String infile = FileUtil.getStringFromFile(file_loc);
             setInfo(infile);
         } else {
             Toaster.toast("No hay cache para mostrar");
@@ -465,7 +415,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + aid + ".txt";
         if (file.exists()) {
             Log.d("Archivo", "Existe");
-            json = getStringFromFile(file_loc);
+            json = FileUtil.getStringFromFile(file_loc);
         }
         return json;
     }
@@ -509,7 +459,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
             setRecyclerView(json);
         } else {
             Log.d("Archivo", "Existe");
-            String infile = getStringFromFile(file_loc);
+            String infile = FileUtil.getStringFromFile(file_loc);
             if (json.equals(infile.trim())) {
                 txt_sinopsis.setText(animeDetail.getSinopsis());
                 txt_titulo.setText(animeDetail.getTitulo());
@@ -560,6 +510,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         scrollToTop();
         String pos=getIntent().getStringExtra("position");
         final int position=pos==null?-1:Integer.valueOf(pos);
+        button_list.setVisibility(View.VISIBLE);
         if (position!=-1){
             button.setImageResource(R.drawable.information);
             nestedScrollView.setVisibility(View.GONE);
@@ -587,43 +538,6 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         button.show();
     }
 
-    private String getCertificateSHA1Fingerprint() {
-        PackageManager pm = getPackageManager();
-        String packageName = getPackageName();
-        int flags = PackageManager.GET_SIGNATURES;
-        PackageInfo packageInfo = null;
-        try {
-            packageInfo = pm.getPackageInfo(packageName, flags);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        Signature[] signatures = packageInfo.signatures;
-        byte[] cert = signatures[0].toByteArray();
-        InputStream input = new ByteArrayInputStream(cert);
-        CertificateFactory cf = null;
-        try {
-            cf = CertificateFactory.getInstance("X509");
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        X509Certificate c = null;
-        try {
-            c = (X509Certificate) cf.generateCertificate(input);
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        String hexString = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA1");
-            byte[] publicKey = md.digest(c.getEncoded());
-            hexString = byte2HexFormatted(publicKey);
-        } catch (NoSuchAlgorithmException e1) {
-            e1.printStackTrace();
-        } catch (CertificateEncodingException e) {
-            e.printStackTrace();
-        }
-        return hexString;
-    }
 
     private void setCollapsingToolbarLayoutTitle(String title) {
         collapsingToolbarLayout.setTitle(title);
@@ -691,8 +605,8 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                 getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builder.toString()).apply();
                 String vistos = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
                 if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null,parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString() + ":;:" + vistos).execute();
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null,parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString() + ":;:" + vistos).execute();
+                    new LoginServer(this, TaskType.UPDATE, null, null, null, null, parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + Parser.getCertificateSHA1Fingerprint(this) + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString() + ":;:" + vistos).execute();
+                    new LoginServer(this, TaskType.UPDATE, null, null, null, null, parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + Parser.getCertificateSHA1Fingerprint(this) + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString() + ":;:" + vistos).execute();
                 }
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_no, Amenu);
@@ -700,7 +614,6 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                 break;
             case R.id.favorito_no:
                 String[] favoritosNo = {getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "")};
-                String titNo = getSharedPreferences("data", MODE_PRIVATE).getString("aid", "");
                 List<String> Listno = new ArrayList<String>(Arrays.asList(favoritosNo));
                 Listno.add(aid);
                 favoritos = new String[Listno.size()];
@@ -713,8 +626,8 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                 getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builderNo.toString()).apply();
                 String vistos1 = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
                 if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null,parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString() + ":;:" + vistos1).execute();
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null,parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString() + ":;:" + vistos1).execute();
+                    new LoginServer(this, TaskType.UPDATE, null, null, null, null, parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + Parser.getCertificateSHA1Fingerprint(this) + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString() + ":;:" + vistos1).execute();
+                    new LoginServer(this, TaskType.UPDATE, null, null, null, null, parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + Parser.getCertificateSHA1Fingerprint(this) + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString() + ":;:" + vistos1).execute();
                 }
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_si, Amenu);
@@ -817,5 +730,11 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
             }
         }
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        knf.animeflv.LoginActivity.LoginServer.RefreshData(this);
+        super.onDestroy();
     }
 }

@@ -10,4 +10,8 @@ public interface ExplorerInterfaces {
     void OnDirectoryClicked(File file, String name);
 
     void OnFileClicked(File file);
+
+    void OnDirectoryFileChange();
+
+    void OnDirectoryEmpty(String aid);
 }

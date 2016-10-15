@@ -16,9 +16,6 @@ import knf.animeflv.Parser;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.history.adapter.HistoryHelper;
 
-/**
- * Created by Jordy on 04/03/2016.
- */
 public class StreamManager {
     public static InternalStream internal(Context context) {
         return new InternalStream(context);

@@ -663,7 +663,7 @@ public class Login extends DialogFragment {
 
         @Override
         protected String doInBackground(String... params) {
-            new SyncHttpClient().get(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=list&certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new TextHttpResponseHandler() {
+            new SyncHttpClient().get(parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=list&certificate=" + Parser.getCertificateSHA1Fingerprint(context), null, new TextHttpResponseHandler() {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                     if (responseString != null) {

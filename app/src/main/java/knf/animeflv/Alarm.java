@@ -9,11 +9,8 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import knf.animeflv.BackgroundChecker.startBackground;
+import knf.animeflv.Utils.ExecutorManager;
 
 public class Alarm extends BroadcastReceiver {
     @Override
@@ -21,17 +18,28 @@ public class Alarm extends BroadcastReceiver {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
         wl.acquire();
-        String url = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("dir_inicio", "http://animeflvapps.x10.mx/getHtml.php");//new Parser().getInicioUrl(TaskType.NORMAL, context);
         Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones",true);
         if (not) {
-            int corePoolSize = 60;
-            int maximumPoolSize = 80;
-            int keepAliveTime = 10;
-            BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(maximumPoolSize);
-            Executor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
             Log.d("Service", "Servicio Iniciado");
-            new RequestsBackground(context, TaskType.NOT).executeOnExecutor(threadPoolExecutor);
-            new RequestsBackground(context,TaskType.VERSION).executeOnExecutor(threadPoolExecutor);
+            //new RequestsBackground(context, TaskType.NOT).executeOnExecutor(ExecutorManager.getExecutor());
+            //new RequestsBackground(context,TaskType.VERSION).executeOnExecutor(ExecutorManager.getExecutor());
+            startBackground.compareNots(context);
+            startBackground.checkUpdate(context);
+        } else {
+            Log.d("Service", "Servicio Desactivado");
+        }
+        wl.release();
+    }
+
+    public void StartAlarm(Context context) {
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
+        wl.acquire();
+        Boolean not = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
+        if (not) {
+            Log.d("Service", "Servicio Iniciado");
+            new RequestsBackground(context, TaskType.NOT).executeOnExecutor(ExecutorManager.getExecutor());
+            new RequestsBackground(context, TaskType.VERSION).executeOnExecutor(ExecutorManager.getExecutor());
         }else {Log.d("Service", "Servicio Desactivado");}
         wl.release();
     }

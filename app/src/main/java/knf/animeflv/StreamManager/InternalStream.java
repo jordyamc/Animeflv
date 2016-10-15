@@ -8,6 +8,7 @@ import java.io.File;
 
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.Parser;
+import knf.animeflv.Utils.FileUtil;
 
 /**
  * Created by Jordy on 04/03/2016.
@@ -28,12 +29,7 @@ public class InternalStream {
         interno.putExtra("title", parser.getTitCached(aid) + " " + numero);
         interno.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(interno);
-        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
-        String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-        if (!vistosad.contains(eid)) {
-            vistosad = vistosad + eid + ":::";
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
-        }
+        FileUtil.setSeenState(eid, true);
     }
 
     public void Stream(String eid, String url, CookieConstructor constructor) {
@@ -47,12 +43,7 @@ public class InternalStream {
         intent.putExtras(bundle);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
-        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
-        String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-        if (!vistosad.contains(eid)) {
-            vistosad = vistosad + eid + ":::";
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
-        }
+        FileUtil.setSeenState(eid, true);
     }
 
     public void Play(String eid, File file) {
@@ -63,11 +54,6 @@ public class InternalStream {
         interno.putExtra("title", parser.getTitCached(aid) + " " + numero);
         interno.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(interno);
-        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
-        String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-        if (!vistosad.contains(eid)) {
-            vistosad = vistosad + eid + ":::";
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
-        }
+        FileUtil.setSeenState(eid, true);
     }
 }

@@ -51,7 +51,7 @@ public class Status {
                 cache = object.getString("cache");
                 late = object.getString("last");
             } catch (Exception e) {
-                e.printStackTrace();
+
             }
         }
         new EmisionCkeck(context).execute();

@@ -8,10 +8,12 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import com.cleveroad.audiowidget.AudioWidget;
@@ -207,6 +209,31 @@ public class UtilSound {
                     configurations.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(configurations);
                 }
+
+                @Override
+                public void onPlaylistLongClicked() {
+
+                }
+
+                @Override
+                public void onPreviousLongClicked() {
+
+                }
+
+                @Override
+                public void onPlayPauseLongClicked() {
+
+                }
+
+                @Override
+                public void onNextLongClicked() {
+
+                }
+
+                @Override
+                public void onAlbumLongClicked() {
+                    widget.collapse();
+                }
             });
         }
         return widget;
@@ -225,12 +252,19 @@ public class UtilSound {
                     File file=new File(Environment.getExternalStorageDirectory()+"/Animeflv/cache/.sounds",getSoundsFileName(not));
                     if (file.exists()) {
                         file.setReadable(true,false);
-                        return Uri.fromFile(file);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            Uri uri = FileProvider.getUriForFile(context, "knf.animeflv.RequestsBackground", file);
+                            context.grantUriPermission("com.android.systemui", uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            return uri;
+                        } else {
+                            return Uri.fromFile(file);
+                        }
                     }else {
                         Log.d("Sound Uri","Not found");
                         return getSoundUri(0);
                     }
                 }catch (Exception e){
+                    e.printStackTrace();
                     return getSoundUri(0);
                 }
         }

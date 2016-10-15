@@ -1,12 +1,12 @@
 package knf.animeflv;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -36,12 +36,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import knf.animeflv.LoginActivity.LoginBase;
+import knf.animeflv.LoginActivity.LoginUser;
 import knf.animeflv.Tutorial.TutorialActivity;
 import knf.animeflv.Utils.CacheControl;
-import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Files.FileSearchResponse;
 import knf.animeflv.Utils.FragmentExtras;
+import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.Keys.Conf;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.NetworkUtils;
@@ -53,9 +55,10 @@ import xdroid.toaster.Toaster;
 
 //@SuppressWarnings("all")
 public class Conf_fragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, FolderChooserDialog.FolderCallback {
-    Context context;
+    Activity context;
     MediaPlayer mp;
     Login login = new Login();
+    private int REQUEST_CODE_LOGIN = 58458;
     private FragmentActivity myContext;
 
     public static String formatSize(long v) {
@@ -199,7 +202,12 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 if (NetworkUtils.isNetworkAvailable()) {
-                    login.show(myContext.getSupportFragmentManager(), "login");
+                    String login_email = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null");
+                    if (login_email.equals("null")) {
+                        startActivityForResult(new Intent(context, LoginBase.class), REQUEST_CODE_LOGIN);
+                    } else {
+                        startActivityForResult(new Intent(context, LoginUser.class), REQUEST_CODE_LOGIN);
+                    }
                 } else {
                     Toast.makeText(getActivity(), "Necesitas Internet!!!", Toast.LENGTH_SHORT).show();
                 }
@@ -222,13 +230,38 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("b_move").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-                Cursor c = downloadManager.query(new DownloadManager.Query()
-                        .setFilterByStatus(DownloadManager.STATUS_PAUSED
-                                | DownloadManager.STATUS_RUNNING));
                 if (FileUtil.getSDPath() != null) {
                     if (count() > 0) {
-                        new MoveFiles(context, myContext).execute();
+                        final MaterialDialog dialog = new MaterialDialog.Builder(context)
+                                .title("Moviendo Animes...")
+                                .titleGravity(GravityEnum.CENTER)
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                .progress(false, count(), true)
+                                .cancelable(false)
+                                .build();
+                        dialog.show();
+                        FileMover.PrepareMove(context, new FileMover.OnProgressListener() {
+                            @Override
+                            public void onStep(int progress, int total) {
+                                if (progress < total) {
+                                    dialog.setMaxProgress(total);
+                                    dialog.setProgress(progress);
+                                } else {
+                                    dialog.dismiss();
+                                }
+                            }
+
+                            @Override
+                            public void onSemiStep(String name, int progress) {
+
+                            }
+
+                            @Override
+                            public void onError(String name) {
+                                Toaster.toast("Error al Mover " + name);
+                            }
+                        });
+                        //new MoveFiles(context, myContext).execute();
                     } else {
                         Toast.makeText(context, "No hay archivos para mover", Toast.LENGTH_LONG).show();
                     }
@@ -338,7 +371,18 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        getPreferenceScreen().findPreference(Conf.SD_ACCESS).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if (FileUtil.RootFileHaveAccess()) {
+                    Toaster.toast("La SD ya tiene permiso de escritura!!!");
+                } else {
+                    openAccessFramework();
+                }
+                return false;
+            }
+        });
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.CUPCAKE) {
             getPreferenceScreen().findPreference("SDpath").setTitle("SD Desactivada");
             getPreferenceScreen().findPreference("SDpath").setSummary("Las funciones para SD estan desactivadas en android 6+");
             getPreferenceScreen().findPreference("SDpath").setEnabled(false);
@@ -365,8 +409,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                             getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                                 @Override
                                 public boolean onPreferenceClick(Preference preference) {
-                                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                                    startActivityForResult(intent, 15889);
+                                    openAccessFramework();
                                     return false;
                                 }
                             });
@@ -456,10 +499,17 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                     getPreferenceScreen().findPreference("SDpath").setTitle("SD Encontrada");
                     getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.getSDPath());
                     getPreferenceScreen().findPreference("SDpath").setEnabled(false);
+
                 }
             }
         }
         openIfExtra();
+    }
+
+    @TargetApi(21)
+    private void openAccessFramework() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        startActivityForResult(intent, 15889);
     }
 
     private void openIfExtra() {
@@ -472,6 +522,10 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                     }
                     UtilDialogPref.init(UtilSound.getSoundsNameList(), "sonido", "0", "Sonido", mp, getPreferenceScreen().findPreference("sonido"));
                     DialogSounds.create().show(myContext.getSupportFragmentManager(), "Pref");
+                    break;
+                case Configuracion.GET_WRITE_PERMISSIONS:
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                    startActivityForResult(intent, 15890);
                     break;
             }
             FragmentExtras.KEY = -1;
@@ -549,15 +603,15 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         return size;
     }
 
-    private long getSize(File file){
+    private long getSize(File file) {
         long size = 0;
-        if (file.isDirectory()){
+        if (file.isDirectory()) {
             if (!file.getName().startsWith(".")) {
                 for (File f : file.listFiles()) {
                     size = size + getSize(f);
                 }
             }
-        }else {
+        } else {
             size = size + file.length();
         }
         return size;
@@ -770,22 +824,23 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     @TargetApi(19)
     private void takePermission(Intent data) {
         Uri treeUri = data.getData();
-        context.getContentResolver().takePersistableUriPermission(treeUri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION |
-                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        final int takeFlags = (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        context.getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
+        PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, treeUri.toString()).apply();
         DocumentFile pickedDir = DocumentFile.fromTreeUri(context, treeUri);
         DocumentFile newFile = pickedDir.createFile("text/plain", "Prueba");
         try {
             OutputStream out = context.getContentResolver().openOutputStream(newFile.getUri());
             out.write("Prueba".getBytes());
             out.close();
-            getActivity().recreate();
+            newFile.delete();
         } catch (Exception e) {
             e.printStackTrace();
             Toaster.toast("Error al obtener permiso");
         }
     }
 
+    @SuppressLint("CommitPrefEdits")
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -794,7 +849,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             if (excludechar(uri.toString())) {
                 Toaster.toast("Directorio no valido");
             } else {
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", uri.toString().substring(uri.toString().lastIndexOf("/") + 1).trim()).apply();
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", uri.toString().substring(uri.toString().lastIndexOf("/") + 1).trim()).commit();
                 if (FileUtil.getSDPath() != null) {
                     getActivity().recreate();
                 } else {
@@ -806,6 +861,39 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         if (requestCode == 15889) {
             if (resultCode == Activity.RESULT_OK) {
                 takePermission(data);
+            }
+        }
+        if (requestCode == 15890) {
+            if (resultCode == Activity.RESULT_OK) {
+                takePermission(data);
+                getActivity().finish();
+            }
+        }
+        if (requestCode == REQUEST_CODE_LOGIN && resultCode == LoginBase.LOGIN_RESPONSE_CODE) {
+            String login_email = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null");
+            if (!login_email.equals("null")) {
+                getPreferenceScreen().findPreference("login").setSummary(login_email);
+            }
+            Toaster.toast("Sesion Iniciada!!");
+        }
+
+        if (requestCode == REQUEST_CODE_LOGIN && resultCode == LoginBase.SIGNUP_RESPONSE_CODE) {
+            String login_email = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null");
+            if (!login_email.equals("null")) {
+                getPreferenceScreen().findPreference("login").setSummary(login_email);
+            }
+            Toaster.toast("Cuenta Creada!!");
+        }
+
+        if (requestCode == REQUEST_CODE_LOGIN && resultCode == LoginUser.LOGOFF_RESPONSE_CODE) {
+            getPreferenceScreen().findPreference("login").setSummary("Iniciar Sesion");
+            Toaster.toast("Sesion Cerrada!!");
+        }
+
+        if (requestCode == REQUEST_CODE_LOGIN && resultCode == LoginUser.CHANGE_EMAIL_RESPONSE_CODE) {
+            String login_email = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null");
+            if (!login_email.equals("null")) {
+                getPreferenceScreen().findPreference("login").setSummary(login_email);
             }
         }
     }

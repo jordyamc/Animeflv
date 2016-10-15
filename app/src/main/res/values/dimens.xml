@@ -3,4 +3,5 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="vertical_swipe_threshold">10dp</dimen>
+    <dimen name="sp_txt_size_content">14sp</dimen>
 </resources>

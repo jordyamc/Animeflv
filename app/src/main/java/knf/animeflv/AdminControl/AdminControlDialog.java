@@ -27,6 +27,7 @@ import knf.animeflv.AdminControl.ControlEnum.Control;
 import knf.animeflv.BackEncryption;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Interfaces.EncryptionListener;
+import knf.animeflv.LoginActivity.LoginUser;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
@@ -88,7 +89,7 @@ public class AdminControlDialog extends DialogFragment {
     }
 
     private void Steps() {
-        String email;
+        final String email;
         final String n_email;
         switch (AdminBundle.control.value()) {
             case 0:
@@ -100,7 +101,7 @@ public class AdminControlDialog extends DialogFragment {
                             .setOnFinishEncryptListener(new EncryptionListener() {
                                 @Override
                                 public void onFinish(String finalString) {
-                                    Start(finalString, null);
+                                    Start(finalString, (String) null);
                                 }
                             })
                             .executeOnExecutor(ExecutorManager.getExecutor());
@@ -190,7 +191,7 @@ public class AdminControlDialog extends DialogFragment {
                             .setOnFinishEncryptListener(new EncryptionListener() {
                                 @Override
                                 public void onFinish(String finalString) {
-                                    Start(finalString, null);
+                                    Start(LoginUser.stringServer(finalString), email);
                                 }
                             })
                             .executeOnExecutor(ExecutorManager.getExecutor());
@@ -203,11 +204,11 @@ public class AdminControlDialog extends DialogFragment {
         }
     }
 
-    private void Start(String email_coded, @Nullable String extra) {
-        Log.d("Final url", getUrl(email_coded, extra));
+    private void Start(String email_coded, @Nullable String... extras) {
+        Log.d("Final url", getUrl(email_coded, extras));
         setTextOnUi(et_2, "");
         setHintOnUi(et_2, "Cargando servidor...");
-        new SyncHttpClient().get(getUrl(email_coded, extra), null, new JsonHttpResponseHandler() {
+        new SyncHttpClient().get(getUrl(email_coded, extras), null, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
@@ -229,6 +230,8 @@ public class AdminControlDialog extends DialogFragment {
                                     .executeOnExecutor(ExecutorManager.getExecutor());
                         } else {
                             if (AdminBundle.control == Control.DELETE) {
+                                setTextOnUi(et_1, "");
+                                showStart();
                                 Toaster.toast("Cuenta Eliminada");
                             } else {
                                 et_2.requestFocus();
@@ -317,16 +320,17 @@ public class AdminControlDialog extends DialogFragment {
         }
     }
 
-    private String getUrl(String email_coded, @Nullable String extra) {
+
+    private String getUrl(String email_coded, @Nullable String... extras) {
         switch (AdminBundle.control.value()) {
             case 0:
                 return base_url + "&email_coded=" + email_coded + "&g_pass";
             case 1:
-                return base_url + "&email_coded=" + email_coded + "&new_email_coded=" + extra + "&f_c_email";
+                return base_url + "&email_coded=" + email_coded + "&new_email_coded=" + extras[0] + "&f_c_email";
             case 2:
-                return base_url + "&email_coded=" + email_coded + "&new_pass_coded=" + extra + "&f_c_pass";
+                return base_url + "&email_coded=" + email_coded + "&new_pass_coded=" + extras[0] + "&f_c_pass";
             case 3:
-                return base_url + "&email_coded=" + email_coded + "&new_pass_coded=" + extra + "&delete";
+                return base_url + "&email_coded=" + email_coded + "&email_normal=" + extras[0] + "&delete";
             default:
                 return "Error";
         }

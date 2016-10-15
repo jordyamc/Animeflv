@@ -1,7 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <style name="AppThemeDarkNoRojo" parent="AppThemeDarkNo">
+        <item name="android:navigationBarColor">@color/negro</item>
+        <item name="colorAccent">@android:color/holo_red_dark</item>
+        <item name="material_drawer_selected_text">@android:color/holo_red_dark</item>
+        <item name="material_drawer_divider">@android:color/holo_red_dark</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+    </style>
+
     <style name="player" parent="AppTheme">
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <style name="SplashNormal" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:colorPrimaryDark">@color/nmain</item>
+        <item name="android:navigationBarColor">@color/nmain</item>
+    </style>
+
+    <style name="SplashDark" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:colorPrimaryDark">@color/prim</item>
+        <item name="android:navigationBarColor">@color/prim</item>
+    </style>
+
+    <style name="SplashNavidad" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:colorPrimaryDark">@color/navidad</item>
+        <item name="android:navigationBarColor">@color/navidad</item>
+    </style>
+
+    <style name="SplashAnuevo" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:colorPrimaryDark">@color/anuevo</item>
+        <item name="android:navigationBarColor">@color/anuevo</item>
+    </style>
+
+    <style name="SplashAmor" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:colorPrimaryDark">@color/amor</item>
+        <item name="android:navigationBarColor">@color/amor</item>
+    </style>
+
+    <style name="SplashNegro" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:colorPrimaryDark">@color/negro</item>
+        <item name="android:navigationBarColor">@color/negro</item>
     </style>
 </resources>

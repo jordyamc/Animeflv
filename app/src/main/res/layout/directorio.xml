@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/prim"
-        android:theme="@style/toolbar">
+        android:theme="@style/toolbar"
+        android:visibility="gone">
         <Spinner
             android:id="@+id/spinner_generos"
             android:layout_width="130dp"
@@ -31,38 +32,54 @@
                 android:visibility="visible"/>
 
     </android.support.v7.widget.Toolbar>
-    <LinearLayout
+
+    <RelativeLayout
         android:id="@+id/LY_dir"
         android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:id="@+id/loading"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-    <com.ogaclejapan.smarttablayout.SmartTabLayout
-        android:id="@+id/viewpagertab2"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@color/prim"
-        android:clipToPadding="false"
-        android:paddingBottom="8dp"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp"
-        app:stl_defaultTabTextColor="@android:color/white"
-        app:stl_defaultTabTextHorizontalPadding="20dp"
-        app:stl_distributeEvenly="true"
-        app:stl_dividerColor="@android:color/transparent"
-        app:stl_dividerThickness="0dp"
-        app:stl_indicatorColor="@color/dark"
-        app:stl_indicatorCornerRadius="20dp"
-        app:stl_indicatorInterpolation="smart"
-        app:stl_indicatorThickness="40dp"
-        app:stl_underlineColor="@android:color/transparent"
-        app:stl_underlineThickness="0dp" />
 
-    <android.support.v4.view.ViewPager
+            <com.ogaclejapan.smarttablayout.SmartTabLayout
+                android:id="@+id/viewpagertab2"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@color/prim"
+                android:clipToPadding="false"
+                android:paddingBottom="8dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:visibility="gone"
+                app:stl_defaultTabTextColor="@android:color/white"
+                app:stl_defaultTabTextHorizontalPadding="20dp"
+                app:stl_distributeEvenly="true"
+                app:stl_dividerColor="@android:color/transparent"
+                app:stl_dividerThickness="0dp"
+                app:stl_indicatorColor="@color/dark"
+                app:stl_indicatorCornerRadius="20dp"
+                app:stl_indicatorInterpolation="smart"
+                app:stl_indicatorThickness="40dp"
+                app:stl_underlineColor="@android:color/transparent"
+                app:stl_underlineThickness="0dp"/>
+
+            <android.support.v4.view.ViewPager
         android:id="@+id/viewpager2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/viewpagertab2"/>
     </LinearLayout>
+    </RelativeLayout>
 
     <FrameLayout
         android:id="@+id/frame_dir"

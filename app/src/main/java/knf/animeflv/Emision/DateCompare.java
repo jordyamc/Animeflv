@@ -9,11 +9,8 @@ import java.util.TimeZone;
 
 import knf.animeflv.Emision.Section.TimeCompareModel;
 
-/**
- * Created by Jordy on 05/03/2016.
- */
 public class DateCompare implements Comparator<TimeCompareModel> {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("~hh:mmaa");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("~hh:mmaa", Locale.ENGLISH);
 
     @Override
     public int compare(TimeCompareModel lhs, TimeCompareModel rhs) {

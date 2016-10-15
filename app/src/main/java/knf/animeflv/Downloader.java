@@ -7,47 +7,57 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
+import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.NotificationCompat;
 
-import com.thin.downloadmanager.DownloadRequest;
-import com.thin.downloadmanager.DownloadStatusListenerV1;
-import com.thin.downloadmanager.ThinDownloadManager;
-
+import java.io.BufferedInputStream;
 import java.io.File;
-import java.util.Arrays;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 
 import knf.animeflv.Utils.FileUtil;
-import knf.animeflv.Utils.Logger;
 
-/**
- * Created by Jordy on 29/02/2016.
- */
 public class Downloader extends AsyncTask<String, String, String> {
+    public static final int DESCARGANDO = 0;
+    public static final int COMPLETADO = 1;
+    public static final int ERROR = 2;
+    public static final int CANCELADO = 3;
+    public static final int PRE_DOWNLOAD = 4;
+    public static final int NONE = 5;
+    private final int TIMEOUT_CONNECTION = 10000;//10sec
+    public int idDown;
+    public NotificationCompat.Builder builder;
     String eid;
     String aid;
     String titulo;
     String numero;
+    String url;
     String _response;
     Context context;
     File ext_dir;
-    int idDown;
     boolean isdown = false;
     NotificationManager notificationManager;
-    NotificationCompat.Builder builder;
+    boolean isCancelled = false;
+    private OnFinishListener listener;
 
-    int DESCARGANDO = 0;
-    int COMPLETADO = 1;
-    int ERROR = 2;
-    int CANCELADO = 3;
-
-    public Downloader(Context c, String eid, String aid, String titulo, String numero, File ext) {
+    public Downloader(Context c, String url, String eid, String aid, String titulo, String numero, File ext) {
+        this.url = url;
         this.eid = eid;
         this.titulo = titulo;
         this.numero = numero;
         this.aid = aid;
         this.context = c;
         this.ext_dir = ext;
+        this.idDown = Math.abs(eid.hashCode());
+        builder = new NotificationCompat.Builder(context);
+        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        builder.setContentTitle(titulo)
+                .setContentText("Capitulo " + numero)
+                .setOngoing(true)
+                .setSmallIcon(android.R.drawable.stat_sys_download);
     }
 
     @Override
@@ -57,12 +67,6 @@ public class Downloader extends AsyncTask<String, String, String> {
         if (!Dstorage.exists()) {
             Dstorage.mkdirs();
         }
-        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        builder = new NotificationCompat.Builder(context);
-        builder.setContentTitle(titulo)
-                .setContentText("Capitulo " + numero)
-                .setOngoing(true)
-                .setSmallIcon(android.R.drawable.stat_sys_download);
         String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");
         String epID = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("epIDS_descarga", "");
         if (descargados.contains(eid)) {
@@ -87,112 +91,135 @@ public class Downloader extends AsyncTask<String, String, String> {
     protected String doInBackground(final String... params) {
         builder.setProgress(100, 0, false);
         try {
+            int status = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt(eid + "status", NONE);
+            if (status == PRE_DOWNLOAD || status == DESCARGANDO) {
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt(eid + "status", DESCARGANDO).commit();
+            } else {
+                if (listener != null) listener.onFinish();
+                notificationManager.cancel(idDown);
+                if (status == CANCELADO) {
+                    try {
+                        FileUtil.getFileFromAccess(eid).delete();
+                    } catch (Exception e) {
+                    }
+                }
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eid + "long_prog", "0").apply();
+                return null;
+            }
             isdown = true;
-            final ThinDownloadManager downloadManager = DManager.getManager();
-            Uri download = Uri.parse(params[0]);
-            final DownloadRequest downloadRequest = new DownloadRequest(download)
-                    .setDestinationURI(Uri.fromFile(ext_dir))
-                    .setStatusListener(new DownloadStatusListenerV1() {
-                        @Override
-                        public void onDownloadComplete(DownloadRequest downloadRequest) {
-                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt(eid + "status", COMPLETADO).apply();
-                            Intent resultIntent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(ext_dir))
-                                    .setDataAndType(Uri.fromFile(ext_dir), "video/mp4");
-                            PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                            builder.setContentText("Descarga Completada")
-                                    .setProgress(0, 0, false)
-                                    .setOngoing(false)
-                                    .setAutoCancel(true)
-                                    .setSmallIcon(R.drawable.ic_not_r)
-                                    .setVibrate(new long[]{100, 200, 100, 500})
-                                    .setContentIntent(resultPendingIntent);
-                            notificationManager.notify(idDown, builder.build());
-                        }
+            URL urll = new URL(url);
+            URLConnection ucon = urll.openConnection();
+            ucon.setReadTimeout(TIMEOUT_CONNECTION);
+            ucon.connect();
+            if (((HttpURLConnection) ucon).getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+                onError();
+                return null;
+            }
+            int total = ucon.getContentLength();
+            InputStream is = ucon.getInputStream();
+            BufferedInputStream inStream = new BufferedInputStream(is, 1024 * 5);
+            byte[] buff = new byte[8 * 1024]; //8kb
+            long progress = 0;
+            String semi_prog = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString(eid + "long_prog", null);
+            if (semi_prog != null) {
+                DocumentFile cFile = FileUtil.getFileFromAccess(eid);
+                if (cFile != null && cFile.exists()) {
+                    long c = Long.parseLong(semi_prog);
+                    inStream.skip(c);
+                    progress = c;
+                }
+            }
+            final OutputStream outStream = FileUtil.getOutputStreamFromAccess(eid);
+            int current = 0;
+            int len;
+            while ((len = inStream.read(buff)) != -1) {
+                if (context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt(eid + "status", DESCARGANDO) == CANCELADO) {
+                    isCancelled = true;
+                    if (listener != null) listener.onFinish();
+                    notificationManager.cancel(idDown);
+                    try {
+                        FileUtil.getFileFromAccess(eid).delete();
+                    } catch (Exception e) {
+                    }
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eid + "long_prog", "0").apply();
+                    break;
+                }
+                progress += +len;
+                int p = (int) ((progress * 100) / total);
+                if (p != current) {
+                    current = p;
+                    builder.setProgress(100, current, false);
+                    notificationManager.notify(idDown, builder.build());
+                }
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eid + "long_prog", String.valueOf(progress)).commit();
+                outStream.write(buff, 0, len);
+            }
 
-                        @Override
-                        public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
-                            if (!errorMessage.toLowerCase().contains("cancelled")) {
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt(eid + "status", ERROR).apply();
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eid + "errmessage", errorMessage).apply();
-                                Bundle bundle = new Bundle();
-                                bundle.putString("aid", aid);
-                                bundle.putString("eid", eid);
-                                bundle.putString("titulo", titulo);
-                                bundle.putString("numero", numero);
-                                bundle.putString("file", ext_dir.getAbsolutePath());
-                                bundle.putString("url", params[0]);
-                                Intent resultIntent = new Intent(context, Retry.class)
-                                        .putExtras(bundle);
-                                PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                                builder.setContentText("Descarga Fallida")
-                                        .setProgress(0, 0, false)
-                                        .setOngoing(false)
-                                        .setAutoCancel(true)
-                                        .setSmallIcon(R.drawable.ic_not_r)
-                                        .setVibrate(new long[]{100, 200, 100, 500})
-                                        .setContentIntent(resultPendingIntent);
-                                notificationManager.notify(idDown, builder.build());
-                                File logdir = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/logs");
-                                if (!logdir.exists()) {
-                                    logdir.mkdirs();
-                                }
-                                FileUtil.writeToFile(errorMessage, new File(logdir, eid + ".log"));
-                            } else {
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt(eid + "status", CANCELADO).apply();
-                                notificationManager.cancel(idDown);
-                            }
-                        }
-
-                        @Override
-                        public void onProgress(DownloadRequest downloadRequest, long totalBytes, long downloadedBytes, int progress) {
-                            builder.setProgress(100, progress, false);
-                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eid + "prog", String.valueOf(progress)).apply();
-                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt(eid + "status", DESCARGANDO).apply();
-                            notificationManager.notify(idDown, builder.build());
-                        }
-                    });
-            idDown = downloadManager.add(downloadRequest);
-            notificationManager.notify(idDown, builder.build());
+            //clean up
+            outStream.flush();
+            outStream.close();
+            inStream.close();
+            if (!isCancelled) onFinish();
             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eid, Long.toString(idDown)).apply();
-            _response = "0";
         } catch (Exception e) {
             e.printStackTrace();
-            _response = "1";
+            onError();
         }
-        return _response;
+        return null;
     }
 
-    @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
+    private void onError() {
+        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt(eid + "status", ERROR).apply();
+        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eid + "long_prog", "0").apply();
+        Bundle bundle = new Bundle();
+        bundle.putString("aid", aid);
+        bundle.putString("eid", eid);
+        bundle.putString("titulo", titulo);
+        bundle.putString("numero", numero);
+        bundle.putString("file", ext_dir.getAbsolutePath());
+        bundle.putString("url", url);
+        Intent resultIntent = new Intent(context, Retry.class)
+                .putExtras(bundle);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if (listener != null) listener.onFinish();
+        builder = new NotificationCompat.Builder(context);
+        builder.setContentText("Descarga Fallida")
+                .setContentTitle(titulo + " " + numero)
+                .setProgress(0, 0, false)
+                .setOngoing(false)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_exit_r)
+                .setVibrate(new long[]{100, 200, 100, 500})
+                .setContentIntent(resultPendingIntent);
+        notificationManager.notify(idDown, builder.build());
     }
 
-    public String getSD1() {
-        String sSDpath = null;
-        File fileCur = null;
-        for (String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard", "8E84-7E70")) {
-            fileCur = new File("/mnt/", sPathCur);
-            if (fileCur.isDirectory() && fileCur.canWrite()) {
-                sSDpath = fileCur.getAbsolutePath();
-                break;
-            }
-            if (sSDpath == null) {
-                fileCur = new File("/storage/", sPathCur);
-                if (fileCur.isDirectory() && fileCur.canWrite()) {
-                    sSDpath = fileCur.getAbsolutePath();
-                    break;
-                }
-            }
-            if (sSDpath == null) {
-                fileCur = new File("/storage/emulated", sPathCur);
-                if (fileCur.isDirectory() && fileCur.canWrite()) {
-                    sSDpath = fileCur.getAbsolutePath();
-                    Logger.Error(getClass(), new Throwable(sSDpath));
-                    break;
-                }
-            }
-        }
-        return sSDpath;
+    private void onFinish() {
+        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt(eid + "status", COMPLETADO).apply();
+        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eid + "long_prog", "0").apply();
+        Intent resultIntent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(ext_dir))
+                .setDataAndType(Uri.fromFile(ext_dir), "video/mp4");
+        resultIntent.putExtra("title", titulo + " " + numero);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if (listener != null) listener.onFinish();
+        builder = new NotificationCompat.Builder(context);
+        builder.setContentText("Descarga Completada")
+                .setContentTitle(titulo + " " + numero)
+                .setProgress(0, 0, false)
+                .setOngoing(false)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_done)
+                .setVibrate(new long[]{100, 200, 100, 500})
+                .setContentIntent(resultPendingIntent);
+        notificationManager.notify(idDown, builder.build());
+    }
+
+    public void setOnFinishListener(OnFinishListener listener) {
+        this.listener = listener;
+    }
+
+    public interface OnFinishListener {
+        void onFinish();
     }
 
 }

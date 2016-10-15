@@ -4,6 +4,9 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+    <string name="expand">expand</string>
+    <string name="shrink">shrink</string>
+
     <string-array name="minutos">
         <item>1 minuto</item>
         <item>5 minutos</item>

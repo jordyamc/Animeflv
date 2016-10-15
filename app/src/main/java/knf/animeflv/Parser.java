@@ -8,7 +8,6 @@ import android.content.pm.Signature;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -32,11 +31,11 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.objects.MainObject;
 
 /**
  * Created by Jordy on 10/08/2015.
@@ -65,6 +64,35 @@ public class Parser {
         }
         reader.close();
         return sb.toString();
+    }
+
+    public static List<MainObject> parseMainList(JSONObject object) {
+        List<MainObject> objects = new ArrayList<>();
+        try {
+            JSONArray array = object.getJSONArray("lista");
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject jsonObject = array.getJSONObject(i);
+                objects.add(new MainObject(jsonObject.getString("aid"), jsonObject.getString("numero"), FileUtil.corregirTit(jsonObject.getString("titulo")), jsonObject.getString("eid")));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return objects;
+    }
+
+    public static List<MainObject> parseMainList(String s) {
+        List<MainObject> objects = new ArrayList<>();
+        try {
+            JSONObject object = new JSONObject(s);
+            JSONArray array = object.getJSONArray("lista");
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject jsonObject = array.getJSONObject(i);
+                objects.add(new MainObject(jsonObject.getString("aid"), jsonObject.getString("numero"), FileUtil.corregirTit(jsonObject.getString("titulo")), jsonObject.getString("eid")));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return objects;
     }
 
     public static String getStringFromFile(String filePath) {
@@ -109,6 +137,120 @@ public class Parser {
         url = url.replace("&lt;", "<");
         url = url.replace("&gt;", ">");
         return url;
+    }
+
+    public static List<String> getEids(JSONObject jsonObj) {
+        List<String> eidsArray = new ArrayList<String>();
+        try {
+            JSONArray jsonArray = jsonObj.getJSONArray("lista");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject childJSONObject = jsonArray.getJSONObject(i);
+                String eid = childJSONObject.getString("eid");
+                eidsArray.add(eid);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return eidsArray;
+    }
+
+    public static String getCertificateSHA1Fingerprint(Context context) {
+        PackageManager pm = context.getPackageManager();
+        String packageName = context.getPackageName();
+        int flags = PackageManager.GET_SIGNATURES;
+        PackageInfo packageInfo = null;
+        try {
+            packageInfo = pm.getPackageInfo(packageName, flags);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        Signature[] signatures = packageInfo.signatures;
+        byte[] cert = signatures[0].toByteArray();
+        InputStream input = new ByteArrayInputStream(cert);
+        CertificateFactory cf = null;
+        try {
+            cf = CertificateFactory.getInstance("X509");
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        }
+        X509Certificate c = null;
+        try {
+            c = (X509Certificate) cf.generateCertificate(input);
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        }
+        String hexString = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA1");
+            byte[] publicKey = md.digest(c.getEncoded());
+            hexString = byte2HexFormatted(publicKey);
+        } catch (NoSuchAlgorithmException e1) {
+            e1.printStackTrace();
+        } catch (CertificateEncodingException e) {
+            e.printStackTrace();
+        }
+        return hexString;
+    }
+
+    public static String getTitleCached(String aid) {
+        String ret = "null";
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject nombreJ = jsonArray.getJSONObject(i);
+                    String n = nombreJ.getString("a");
+                    if (n.trim().equals(aid)) {
+                        return FileUtil.corregirTit(nombreJ.getString("b"));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return FileUtil.corregirTit(ret);
+    }
+
+    public static String getTypeCached(String aid) {
+        String ret = "null";
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject nombreJ = jsonArray.getJSONObject(i);
+                    String n = nombreJ.getString("a");
+                    if (n.trim().equals(aid)) {
+                        return FileUtil.corregirTit(nombreJ.getString("c"));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public static int getLastAidCached() {
+        int aid = 2500;
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                JSONObject nombreJ = jsonArray.getJSONObject(jsonArray.length() - 1);
+                return Integer.parseInt(nombreJ.getString("a"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return aid;
     }
 
     public String[] parseTitulos(String json) {
@@ -354,7 +496,6 @@ public class Parser {
         return FileUtil.corregirTit(aid);
     }
 
-
     public String[] parseAID(String json) {
         List<String> aidsArray = new ArrayList<String>();
         String[] aids;
@@ -465,7 +606,6 @@ public class Parser {
         return array;
     }
 
-
     public String getTipoAnime(String json) {
         String tipo = "";
         try {
@@ -564,44 +704,6 @@ public class Parser {
         return ret;
     }
 
-    public String getCertificateSHA1Fingerprint(Context context) {
-        PackageManager pm = context.getPackageManager();
-        String packageName = context.getPackageName();
-        int flags = PackageManager.GET_SIGNATURES;
-        PackageInfo packageInfo = null;
-        try {
-            packageInfo = pm.getPackageInfo(packageName, flags);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        Signature[] signatures = packageInfo.signatures;
-        byte[] cert = signatures[0].toByteArray();
-        InputStream input = new ByteArrayInputStream(cert);
-        CertificateFactory cf = null;
-        try {
-            cf = CertificateFactory.getInstance("X509");
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        X509Certificate c = null;
-        try {
-            c = (X509Certificate) cf.generateCertificate(input);
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        String hexString = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA1");
-            byte[] publicKey = md.digest(c.getEncoded());
-            hexString = byte2HexFormatted(publicKey);
-        } catch (NoSuchAlgorithmException e1) {
-            e1.printStackTrace();
-        } catch (CertificateEncodingException e) {
-            e.printStackTrace();
-        }
-        return hexString;
-    }
-
     public String getTitCached(String aid) {
         String ret = "null";
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
@@ -622,45 +724,6 @@ public class Parser {
             }
         }
         return FileUtil.corregirTit(ret);
-    }
-
-    public static String getTypeCached(String aid) {
-        String ret = "null";
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-        File file = new File(file_loc);
-        if (file.exists()) {
-            try {
-                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
-                JSONArray jsonArray = jsonObj.getJSONArray("lista");
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject nombreJ = jsonArray.getJSONObject(i);
-                    String n = nombreJ.getString("a");
-                    if (n.trim().equals(aid)) {
-                        return FileUtil.corregirTit(nombreJ.getString("c"));
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return ret;
-    }
-
-    public static int getLastAidCached() {
-        int aid = 2500;
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-        File file = new File(file_loc);
-        if (file.exists()) {
-            try {
-                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
-                JSONArray jsonArray = jsonObj.getJSONArray("lista");
-                JSONObject nombreJ = jsonArray.getJSONObject(jsonArray.length());
-                return Integer.parseInt(nombreJ.getString("a"));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return aid;
     }
 
     public String getAidCached(String tipe, String url) {
@@ -721,25 +784,30 @@ public class Parser {
     }
 
     public int checkStatus(String json) {
-        int status = 0;
         try {
             JSONObject jsonObject = new JSONObject(json);
-            status = Integer.parseInt(jsonObject.getString("cache"));
+            return Integer.parseInt(jsonObject.getString("cache"));
         } catch (Exception e) {
-            e.printStackTrace();
+            return 0;
         }
-        return status;
+    }
+
+    public int checkStatus(JSONObject json) {
+        try {
+            return Integer.parseInt(json.getString("cache"));
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public String getUserFavs(String json) {
-        String response = "";
         try {
             JSONObject jsonObject = new JSONObject(json);
-            response = jsonObject.getString("favs");
+            return jsonObject.getString("favs");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return response;
+        return null;
     }
 
     public String getUserVistos(String json) {

@@ -3,7 +3,6 @@ package knf.animeflv;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -26,11 +25,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import knf.animeflv.Utils.ThemeUtils;
 
-/**
- * Created by Jordy on 16/08/2015.
- */
 public class Configuracion extends AppCompatActivity implements LoginServer.callback {
     public static final int OPEN_SOUNDS = 1;
+    public static final int GET_WRITE_PERMISSIONS = 2;
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
@@ -88,6 +85,9 @@ public class Configuracion extends AppCompatActivity implements LoginServer.call
             }
         });
         getFragmentManager().beginTransaction().replace(R.id.container_conf, new Conf_fragment()).commitAllowingStateLoss();
+        if (getIntent().getExtras() != null) {
+            setResult(getIntent().getIntExtra("return", -1));
+        }
     }
 
     @Override

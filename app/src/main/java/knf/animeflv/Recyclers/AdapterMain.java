@@ -2,23 +2,12 @@ package knf.animeflv.Recyclers;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Environment;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +16,6 @@ import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -36,25 +24,13 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.SyncHttpClient;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -63,13 +39,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import cz.msebera.android.httpclient.Header;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.CookieConstructor;
+import knf.animeflv.DownloadManager.InternalManager;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
+import knf.animeflv.JsonFactory.DownloadGetter;
 import knf.animeflv.Parser;
-import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.Recientes.MainAnimeModel;
 import knf.animeflv.StreamManager.StreamManager;
@@ -84,7 +60,6 @@ import knf.animeflv.Utils.UpdateUtil;
 import knf.animeflv.Utils.eNums.DownloadTask;
 import knf.animeflv.Utils.eNums.UpdateState;
 import knf.animeflv.info.Helper.InfoHelper;
-import knf.animeflv.newMain;
 import pl.droidsonroids.gif.GifImageButton;
 import xdroid.toaster.Toaster;
 
@@ -107,6 +82,12 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     public AdapterMain(Activity context) {
         this.context = context;
         this.callbacks = (MainRecyclerCallbacks) context;
+    }
+
+    public AdapterMain(Activity context, List<MainAnimeModel> data) {
+        this.context = context;
+        this.callbacks = (MainRecyclerCallbacks) context;
+        this.Animes = data;
     }
 
     public static String convertStreamToString(InputStream is) throws Exception {
@@ -176,17 +157,21 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 holder.card.setCardBackgroundColor(Color.argb(100, 26, 206, 246));
         }
         setUpWeb(holder.webView);
-        holder.tv_num.setTextColor(getColor());
-        //PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + "http://cdn.animeflv.net/img/portada/thumb_80/" + Animes.get(holder.getAdapterPosition()).getAid() + ".jpg").error(R.drawable.ic_block_r).into(holder.iv_main);
-        new CacheManager().mini(context,Animes.get(holder.getAdapterPosition()).getAid(),holder.iv_main);
+        holder.tv_num.setTextColor(ThemeUtils.getAcentColor(context));
+        new CacheManager().mini(context, Animes.get(holder.getAdapterPosition()).getAid(), holder.iv_main);
         holder.tv_tit.setText(Animes.get(position).getTitulo());
         holder.tv_num.setText(getCap(holder.getAdapterPosition()));
         if (FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
             showPlay(holder.ib_ver);
             showDelete(holder.ib_des);
         } else {
-            showCloudPlay(holder.ib_ver);
-            showDownload(holder.ib_des, holder.getAdapterPosition());
+            if (InternalManager.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+                showPlay(holder.ib_ver);
+                showDelete(holder.ib_des);
+            } else {
+                showCloudPlay(holder.ib_ver);
+                showDownload(holder.ib_des, holder.getAdapterPosition());
+            }
         }
         if (MainStates.isProcessing()) {
             if (MainStates.getProcessingEid().equals(Animes.get(holder.getAdapterPosition()).getEid())) {
@@ -195,8 +180,14 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         }
         if (MainStates.WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
             if (!FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
-                showCloudPlay(holder.ib_ver);
-                holder.ib_des.setImageResource(R.drawable.ic_waiting);
+                if (InternalManager.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+                    showPlay(holder.ib_ver);
+                    showDelete(holder.ib_des);
+                    MainStates.delFromWaitList(Animes.get(holder.getAdapterPosition()).getEid());
+                } else {
+                    showCloudPlay(holder.ib_ver);
+                    holder.ib_des.setImageResource(R.drawable.ic_waiting);
+                }
             } else {
                 showPlay(holder.ib_ver);
                 showDelete(holder.ib_des);
@@ -217,7 +208,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                     new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
                                     new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getTitulo())
                             );
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
 
@@ -233,10 +224,10 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 MainStates.setListing(true);
                 if (MainStates.WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
                     MainStates.delFromWaitList(Animes.get(holder.getAdapterPosition()).getEid());
-                    holder.ib_des.setImageResource(R.drawable.ic_get_r);
+                    showDownload(holder.ib_des, holder.getAdapterPosition());
                     callbacks.onDelFromList();
                 } else {
-                    if (!FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+                    if (!FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid()) && !InternalManager.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
                         MainStates.addToWaitList(Animes.get(holder.getAdapterPosition()).getEid());
                         holder.ib_des.setImageResource(R.drawable.ic_waiting);
                         callbacks.onPutInList();
@@ -253,7 +244,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 if (UpdateUtil.getState() == UpdateState.WAITING_TO_UPDATE) {
                     Toaster.toast("Actualizacion descargada, instalar para continuar");
                 } else {
-                    if (!FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+                    if (!FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid()) && !InternalManager.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
                         if (!MainStates.isProcessing()) {
                             if (MainStates.WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
                                 final int pos = holder.getAdapterPosition();
@@ -272,14 +263,14 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                                 MainStates.delFromWaitList(Animes.get(pos).getEid());
                                                 MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
                                                 showLoading(holder.ib_des);
-                                                new DownloadGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid(), holder.getAdapterPosition()).executeOnExecutor(threadPoolExecutor);
+                                                searchDownload(holder);
                                             }
                                         })
                                         .build().show();
                             } else {
                                 MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
                                 showLoading(holder.ib_des);
-                                new DownloadGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid(), holder.getAdapterPosition()).executeOnExecutor(threadPoolExecutor);
+                                searchDownload(holder);
                             }
                         } else {
                             Toaster.toast("Procesando");
@@ -302,6 +293,9 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                             Toaster.toast("Archivo Eliminado");
                                         } else {
                                             if (!FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+                                                if (InternalManager.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+                                                    ManageDownload.cancel(context, Animes.get(holder.getAdapterPosition()).getEid());
+                                                }
                                                 showDownload(holder.ib_des, holder.getAdapterPosition());
                                                 showCloudPlay(holder.ib_ver);
                                                 Toaster.toast("Archivo Eliminado");
@@ -326,33 +320,37 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     if (FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
                         StreamManager.Play(context, Animes.get(holder.getAdapterPosition()).getEid());
                     } else {
-                        if (NetworkUtils.isNetworkAvailable()) {
-                            if (!MainStates.isProcessing()) {
-                                if (MainStates.WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
-                                    final int pos = holder.getAdapterPosition();
-                                    new MaterialDialog.Builder(context)
-                                            .content(
-                                                    "El " + getCap(Animes.get(pos).getNumero()).toLowerCase() +
-                                                            " de " + Animes.get(pos).getTitulo() +
-                                                            " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
-                                            .autoDismiss(true)
-                                            .positiveText("Continuar")
-                                            .negativeText("Cancelar")
-                                            .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                                @Override
-                                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                    MainStates.delFromWaitList(Animes.get(pos).getEid());
-                                                    MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
-                                                    showLoading(holder.ib_des);
-                                                    new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid(), holder.getAdapterPosition()).executeOnExecutor(threadPoolExecutor);
-                                                }
-                                            })
-                                            .build().show();
-                                } else {
-                                    MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
-                                    showLoading(holder.ib_des);
-                                    new StreamGetter(holder.ib_des, holder.ib_ver, holder.webView, Animes.get(holder.getAdapterPosition()).getEid(), holder.getAdapterPosition()).executeOnExecutor(threadPoolExecutor);
+                        if (InternalManager.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+                            Toaster.toast("Descarga en proceso");
+                        } else {
+                            if (NetworkUtils.isNetworkAvailable()) {
+                                if (!MainStates.isProcessing()) {
+                                    if (MainStates.WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
+                                        final int pos = holder.getAdapterPosition();
+                                        new MaterialDialog.Builder(context)
+                                                .content(
+                                                        "El " + getCap(Animes.get(pos).getNumero()).toLowerCase() +
+                                                                " de " + Animes.get(pos).getTitulo() +
+                                                                " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
+                                                .autoDismiss(true)
+                                                .positiveText("Continuar")
+                                                .negativeText("Cancelar")
+                                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                                    @Override
+                                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                        MainStates.delFromWaitList(Animes.get(pos).getEid());
+                                                        MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
+                                                        showLoading(holder.ib_des);
+                                                        searchStream(holder);
+                                                    }
+                                                })
+                                                .build().show();
+                                    } else {
+                                        MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
+                                        showLoading(holder.ib_des);
+                                        searchStream(holder);
+                                    }
                                 }
                             }
                         }
@@ -362,8 +360,79 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         });
     }
 
+    private void searchDownload(final ViewHolder holder) {
+        DownloadGetter.search(context, Animes.get(holder.getAdapterPosition()).getEid(), new DownloadGetter.ActionsInterface() {
+            @Override
+            public boolean isStream() {
+                return false;
+            }
+
+            @Override
+            public void onStartDownload() {
+                showDelete(holder.ib_des);
+                showPlay(holder.ib_ver);
+            }
+
+            @Override
+            public void onStartZippy(final String url) {
+                MainStates.setZippyState(DownloadTask.DESCARGA, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
+                holder.webView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        holder.webView.loadUrl(url);
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelDownload() {
+                showDownload(holder.ib_des, holder.getAdapterPosition());
+            }
+
+            @Override
+            public void onLogError(Exception e) {
+                Logger.Error(AdapterMain.this.getClass(), e);
+            }
+        });
+    }
+
+    private void searchStream(final ViewHolder holder) {
+        DownloadGetter.search(context, Animes.get(holder.getAdapterPosition()).getEid(), new DownloadGetter.ActionsInterface() {
+            @Override
+            public boolean isStream() {
+                return true;
+            }
+
+            @Override
+            public void onStartDownload() {
+                showDownload(holder.ib_des, holder.getAdapterPosition());
+            }
+
+            @Override
+            public void onStartZippy(final String url) {
+                MainStates.setZippyState(DownloadTask.STREAMING, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
+                holder.webView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        holder.webView.loadUrl(url);
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelDownload() {
+                showDownload(holder.ib_des, holder.getAdapterPosition());
+            }
+
+            @Override
+            public void onLogError(Exception e) {
+                Logger.Error(AdapterMain.this.getClass(), e);
+            }
+        });
+    }
+
     private void showLoading(final GifImageButton button) {
-        ((newMain) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
@@ -374,14 +443,20 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     }
 
     private void showDownload(final GifImageButton button, final int position) {
-        ((newMain) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + Animes.get(position).getEid().replace("E", ""), false)) {
-                    button.setScaleType(ImageView.ScaleType.FIT_END);
-                    button.setImageResource(R.drawable.listo);
-                    button.setEnabled(true);
-                } else {
+                try {
+                    if (context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + Animes.get(position).getEid().replace("E", ""), false)) {
+                        button.setScaleType(ImageView.ScaleType.FIT_END);
+                        button.setImageResource(R.drawable.listo);
+                        button.setEnabled(true);
+                    } else {
+                        button.setScaleType(ImageView.ScaleType.FIT_END);
+                        button.setImageResource(R.drawable.ic_get_r);
+                        button.setEnabled(true);
+                    }
+                } catch (Exception e) {
                     button.setScaleType(ImageView.ScaleType.FIT_END);
                     button.setImageResource(R.drawable.ic_get_r);
                     button.setEnabled(true);
@@ -391,7 +466,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     }
 
     private void showDelete(final GifImageButton button) {
-        ((newMain) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.setScaleType(ImageView.ScaleType.FIT_END);
@@ -402,7 +477,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     }
 
     private void showCloudPlay(final ImageButton button) {
-        ((newMain) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.setImageResource(R.drawable.ic_cloud_play);
@@ -411,7 +486,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     }
 
     private void showPlay(final ImageButton button) {
-        ((newMain) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.setImageResource(R.drawable.ic_play);
@@ -446,31 +521,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         } else {
             return "Capitulo " + numero;
         }
-    }
-
-    private int getColor() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(context));
-        int color = ColorsRes.Naranja(context);
-        if (accent == ColorsRes.Rojo(context)) {
-            color = ColorsRes.Rojo(context);
-        }
-        if (accent == ColorsRes.Naranja(context)) {
-            color = ColorsRes.Naranja(context);
-        }
-        if (accent == ColorsRes.Gris(context)) {
-            color = ColorsRes.Gris(context);
-        }
-        if (accent == ColorsRes.Verde(context)) {
-            color = ColorsRes.Verde(context);
-        }
-        if (accent == ColorsRes.Rosa(context)) {
-            color = ColorsRes.Rosa(context);
-        }
-        if (accent == ColorsRes.Morado(context)) {
-            color = ColorsRes.Morado(context);
-        }
-        return color;
     }
 
     private void setUpWeb(final WebView web) {
@@ -540,7 +590,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 MainStates.setProcessing(false, null);
             }
         });
-        web.loadUrl(parser.getBaseUrl(TaskType.NORMAL,context));
+        web.loadUrl(parser.getBaseUrl(TaskType.NORMAL, context));
     }
 
     public void setData(List<MainAnimeModel> data) {
@@ -586,281 +636,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         public void showHTML(String html) {
             String s_html_i = html.substring(21);
             String s_html_f = "{" + s_html_i.substring(0, s_html_i.length() - 7);
-        }
-    }
-
-    private class DownloadGetter extends AsyncTask<String, String, String> {
-        GifImageButton button;
-        ImageButton DownState;
-        WebView web;
-        String eid;
-        int position;
-
-        public DownloadGetter(GifImageButton button, ImageButton state, WebView web, String eid, int position) {
-            this.button = button;
-            this.eid = eid;
-            this.DownState = state;
-            this.web = web;
-            this.position = position;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            Log.d("Prepare Search Download", eid);
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            Log.d("Start Search Download", eid);
-            Looper.prepare();
-            SyncHttpClient httpClient = new SyncHttpClient();
-            httpClient.setConnectTimeout(10000);
-            httpClient.get(parser.getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlCached(eid) + "&certificate=" + parser.getCertificateSHA1Fingerprint(context) + "&newMain", null, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject jsonObject) {
-                    super.onSuccess(statusCode, headers, jsonObject);
-                    try {
-                        JSONArray jsonArray = jsonObject.getJSONArray("downloads");
-                        final List<String> nombres = new ArrayList<>();
-                        final List<String> urls = new ArrayList<>();
-                        try {
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                JSONObject object = jsonArray.getJSONObject(i);
-                                String u = object.getString("url");
-                                if (!u.trim().equals("null")) {
-                                    nombres.add(object.getString("name"));
-                                    urls.add(u);
-                                }
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        if (nombres.size() != 0) {
-                            d = new MaterialDialog.Builder(context)
-                                    .title("Descarga")
-                                    .titleGravity(GravityEnum.CENTER)
-                                    .customView(R.layout.dialog_down, false)
-                                    .cancelable(true)
-                                    .autoDismiss(false)
-                                    .positiveText("Descargar")
-                                    .negativeText("Cancelar")
-                                    .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                    .callback(new MaterialDialog.ButtonCallback() {
-                                        @Override
-                                        public void onPositive(MaterialDialog dialog) {
-                                            super.onPositive(dialog);
-                                            String des = nombres.get(sp.getSelectedItemPosition());
-                                            final String ur = urls.get(sp.getSelectedItemPosition());
-                                            Log.d("Descargar", "URL -> " + ur);
-                                            switch (des.toLowerCase()) {
-                                                case "zippyshare":
-                                                    MainStates.setZippyState(DownloadTask.DESCARGA, ur, button, DownState, position);
-                                                    web.post(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            web.loadUrl(ur);
-                                                        }
-                                                    });
-                                                    d.dismiss();
-                                                    break;
-                                                case "mega":
-                                                    d.dismiss();
-                                                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
-                                                    MainStates.setProcessing(false, null);
-                                                    break;
-                                                default:
-                                                    ManageDownload.chooseDownDir(context, eid, ur);
-                                                    MainStates.setProcessing(false, null);
-                                                    showDelete(button);
-                                                    showPlay(DownState);
-                                                    d.dismiss();
-                                                    break;
-                                            }
-
-                                        }
-
-                                        @Override
-                                        public void onNegative(MaterialDialog dialog) {
-                                            super.onNegative(dialog);
-                                            MainStates.setProcessing(false, null);
-                                            showDownload(button, position);
-                                            d.dismiss();
-                                        }
-                                    })
-                                    .cancelListener(new DialogInterface.OnCancelListener() {
-                                        @Override
-                                        public void onCancel(DialogInterface dialog) {
-                                            d.dismiss();
-                                            MainStates.setProcessing(false, null);
-                                            showDownload(button, position);
-                                        }
-                                    })
-                                    .build();
-                            sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
-                            sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
-                            sp.setBackgroundColor((ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context)));
-                            d.show();
-                        } else {
-                            Toaster.toast("No hay links!!! Intenta mas tarde!!!");
-                            MainStates.setProcessing(false, null);
-                            showDownload(button, position);
-                        }
-                    } catch (Exception e) {
-                        MainStates.setProcessing(false, null);
-                        showDownload(button, position);
-                        Logger.Error(AdapterMain.this.getClass(), e);
-                        FileUtil.writeToFile(e.getMessage() + "   " + parser.getUrlCached(eid) + "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
-                        if (!parser.getUrlCached(eid).equals("null")) {
-                            Toaster.toast("Error en JSON");
-                        } else {
-                            Toaster.toast("Anime no encontrado en directorio!");
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                    MainStates.setProcessing(false, null);
-                    Logger.Error(AdapterMain.this.getClass(), throwable);
-                    showDownload(button, position);
-                }
-            });
-            Looper.loop();
-            return null;
-        }
-    }
-
-    private class StreamGetter extends AsyncTask<String, String, String> {
-        GifImageButton button;
-        ImageButton DownState;
-        WebView web;
-        String eid;
-        int position;
-
-        public StreamGetter(GifImageButton button, ImageButton state, WebView web, String eid, int position) {
-            this.button = button;
-            this.eid = eid;
-            this.DownState = state;
-            this.web = web;
-            this.position = position;
-        }
-
-        @Override
-        protected String doInBackground(final String... params) {
-            Looper.prepare();
-            new SyncHttpClient().get(parser.getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlCached(eid) + "&certificate=" + parser.getCertificateSHA1Fingerprint(context) + "&newMain", null, new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject jsonObject) {
-                    super.onSuccess(statusCode, headers, jsonObject);
-                    try {
-                        JSONArray jsonArray = jsonObject.getJSONArray("downloads");
-                        final List<String> nombres = new ArrayList<>();
-                        final List<String> urls = new ArrayList<>();
-                        try {
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                JSONObject object = jsonArray.getJSONObject(i);
-                                String u = object.getString("url");
-                                if (!u.trim().equals("null")) {
-                                    nombres.add(object.getString("name"));
-                                    urls.add(u);
-                                }
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        if (nombres.size() != 0) {
-                            d = new MaterialDialog.Builder(context)
-                                    .title("Streaming")
-                                    .titleGravity(GravityEnum.CENTER)
-                                    .customView(R.layout.dialog_down, false)
-                                    .cancelable(true)
-                                    .autoDismiss(false)
-                                    .positiveText("Reproducir")
-                                    .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                    .negativeText("Cancelar")
-                                    .callback(new MaterialDialog.ButtonCallback() {
-                                        @Override
-                                        public void onPositive(MaterialDialog dialog) {
-                                            super.onPositive(dialog);
-                                            String des = nombres.get(sp.getSelectedItemPosition());
-                                            final String ur = urls.get(sp.getSelectedItemPosition());
-                                            Log.d("Stream", "URL -> " + ur);
-                                            switch (des.toLowerCase()) {
-                                                case "zippyshare":
-                                                    MainStates.setZippyState(DownloadTask.STREAMING, ur, button, DownState, position);
-                                                    web.post(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            web.loadUrl(ur);
-                                                        }
-                                                    });
-                                                    d.dismiss();
-                                                    break;
-                                                case "mega":
-                                                    d.dismiss();
-                                                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
-                                                    MainStates.setProcessing(false, null);
-                                                    break;
-                                                default:
-                                                    StreamManager.Stream(context, eid, ur);
-                                                    MainStates.setProcessing(false, null);
-                                                    showDownload(button, position);
-                                                    d.dismiss();
-                                                    break;
-                                            }
-
-                                        }
-
-                                        @Override
-                                        public void onNegative(MaterialDialog dialog) {
-                                            super.onNegative(dialog);
-                                            MainStates.setProcessing(false, null);
-                                            showDownload(button, position);
-                                            d.dismiss();
-                                        }
-                                    })
-                                    .cancelListener(new DialogInterface.OnCancelListener() {
-                                        @Override
-                                        public void onCancel(DialogInterface dialog) {
-                                            d.dismiss();
-                                            MainStates.setProcessing(false, null);
-                                            showDownload(button, position);
-                                        }
-                                    })
-                                    .build();
-                            sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
-                            sp.setBackgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context));
-                            sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
-                            d.show();
-                        } else {
-                            Toaster.toast("No hay links!!! Intenta mas tarde!!!");
-                            MainStates.setProcessing(false, null);
-                            showDownload(button, position);
-                        }
-                    } catch (Exception e) {
-                        MainStates.setProcessing(false, null);
-                        showDownload(button, position);
-                        e.printStackTrace();
-                        if (!parser.getUrlCached(eid).equals("null")) {
-                            Toaster.toast("Error en JSON");
-                        } else {
-                            Toaster.toast("Anime no encontrado en directorio!");
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                    MainStates.setProcessing(false, null);
-                    Logger.Error(AdapterMain.this.getClass(), throwable);
-                    showDownload(button, position);
-                }
-            });
-            Looper.loop();
-            return null;
         }
     }
 

@@ -5,12 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.content.res.Configuration;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -34,15 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -55,18 +42,16 @@ import java.util.concurrent.TimeUnit;
 import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.Recyclers.AdapterFavs;
 import knf.animeflv.Utils.ExecutorManager;
+import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
 
-/**
- * Created by Jordy on 23/08/2015.
- */
 public class Favoritos extends AppCompatActivity implements RequestFav.callback, LoginServer.callback, Requests.callback, RequestFavSort.callback {
     RecyclerView recyclerView;
     Toolbar toolbar;
     Toolbar ltoolbar;
     List<String> aids;
     String fav;
-    String[] favoritos={};
+    String[] favoritos = {};
     Activity context;
     boolean shouldExecuteOnResume;
     Handler handler = new Handler();
@@ -94,19 +79,6 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                 >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ThemeUtils.setThemeOn(this);
@@ -116,9 +88,9 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            ltoolbar=(Toolbar) findViewById(R.id.ltoolbar_fav);
+            ltoolbar = (Toolbar) findViewById(R.id.ltoolbar_fav);
         }
-        context=this;
+        context = this;
         shouldExecuteOnResume = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
@@ -127,10 +99,10 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             window.setStatusBarColor(getResources().getColor(R.color.dark));
             getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
         }
-        toolbar=(Toolbar) findViewById(R.id.favs_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.favs_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Favoritos");
-        if (isXLargeScreen(context)){
+        if (isXLargeScreen(context)) {
             ltoolbar.setNavigationIcon(R.drawable.ic_back_r);
             ltoolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
@@ -138,7 +110,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                     finish();
                 }
             });
-        }else {
+        } else {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -159,10 +131,10 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                 getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
             }
         }
-        final String email_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
-        final String pass_coded=PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
-        if (!email_coded.equals("null")&&!email_coded.equals("null")) {
-            new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null,new Parser().getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&certificate=" + getCertificateSHA1Fingerprint()).execute();
+        final String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
+        final String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
+        if (!email_coded.equals("null") && !email_coded.equals("null")) {
+            new LoginServer(this, TaskType.GET_FAV_SL, null, null, null, null, new Parser().getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&certificate=" + Parser.getCertificateSHA1Fingerprint(this)).execute();
         }
         getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", false).apply();
         new Handler().postDelayed(new Runnable() {
@@ -170,37 +142,37 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             public void run() {
                 init();
             }
-        },500);
+        }, 500);
         handler.postDelayed(runnable, 1000);
     }
 
     public void ActualizarFavoritos() {
-        if (isNetworkAvailable()) {
+        if (NetworkUtils.isNetworkAvailable()) {
             String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
             String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
             if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                new Requests(this, TaskType.GET_FAV).execute(new Parser().getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&certificate=" + getCertificateSHA1Fingerprint());
+                new Requests(this, TaskType.GET_FAV).execute(new Parser().getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?tipo=get&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&certificate=" + Parser.getCertificateSHA1Fingerprint(this));
             }
         }
     }
 
-    public void init(){
-        SharedPreferences sharedPreferences=getSharedPreferences("data", MODE_PRIVATE);
-        fav=sharedPreferences.getString("favoritos", "");
-        favoritos=fav.split(":::");
-        Log.d("favoritos",fav);
-        aids=new ArrayList<String>();
-        for (String i:favoritos){
+    public void init() {
+        SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+        fav = sharedPreferences.getString("favoritos", "");
+        favoritos = fav.split(":::");
+        Log.d("favoritos", fav);
+        aids = new ArrayList<String>();
+        for (String i : favoritos) {
             if (!i.equals("")) {
                 aids.add(i);
             }
         }
-        favoritos=new String[aids.size()];
+        favoritos = new String[aids.size()];
         aids.toArray(favoritos);
-        recyclerView=(RecyclerView) findViewById(R.id.rv_favs);
-        if (aids.size()==0){
-            Toast.makeText(context,"No hay favoritos",Toast.LENGTH_LONG).show();
-        }else {
+        recyclerView = (RecyclerView) findViewById(R.id.rv_favs);
+        if (aids.size() == 0) {
+            Toast.makeText(context, "No hay favoritos", Toast.LENGTH_LONG).show();
+        } else {
             if (!paused) {
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -217,7 +189,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                             }
                         })
                         .build();
-                favo = new RequestFav(this, TaskType.SORT_NORMAL, dialog,aids);
+                favo = new RequestFav(this, TaskType.SORT_NORMAL, dialog, aids);
                 favo.executeOnExecutor(threadPoolExecutor);
                 dialog.show();
             } else {
@@ -231,31 +203,8 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         }
     }
 
-    private boolean isNetworkAvailable() {
-        Boolean net=false;
-        int Tcon=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "2"));
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        switch (Tcon){
-            case 0:
-                NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                net=Wifi.isConnected();
-                break;
-            case 1:
-                NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                net=mobile.isConnected();
-                break;
-            case 2:
-                NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                net=WifiA.isConnected()||mobileA.isConnected();
-                break;
-        }
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && net;
-    }
-
     @Override
-    public void favCall(String data,TaskType taskType){
+    public void favCall(String data, TaskType taskType) {
         dialog.dismiss();
         if (!data.trim().equals("")) {
             String[] crop = data.split(":::");
@@ -267,35 +216,30 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             }
             List<String> links = new ArrayList<String>();
             for (String aid : aids) {
-                /*if (isNetworkAvailable()) {
+                File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + aid + ".txt");
+                if (file.exists()) {
                     links.add("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg");
-                }else {*/
-                    File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/"+aid+".txt");
-                    if (file.exists()){
-                        links.add("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg");
-                    }
-                //}
+                }
             }
             Log.d("Ntitulos", Integer.toString(titulos.size()));
             Log.d("Naids", Integer.toString(aids.size()));
             Log.d("Nlinks", Integer.toString(links.size()));
-            if (!isNetworkAvailable()){
-                if (favoritos.length!=links.size())
-                Toast.makeText(context,"Sin conexion, cargando favoritos con cache disponible",Toast.LENGTH_SHORT).show();
+            if (!NetworkUtils.isNetworkAvailable()) {
+                if (favoritos.length != links.size())
+                    Toast.makeText(context, "Sin conexion, cargando favoritos con cache disponible", Toast.LENGTH_SHORT).show();
             }
             AdapterFavs adapter = new AdapterFavs(context, titulos, aids, links);
             recyclerView.setAdapter(adapter);
-        }else {
-            Toast.makeText(context,"Error de red",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(context, "Error de red", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public void onConfigurationChanged (Configuration newConfig)
-    {
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        if (!isXLargeScreen(getApplicationContext()) ) {
+        if (!isXLargeScreen(getApplicationContext())) {
             return;
         }
     }
@@ -358,14 +302,14 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     @Override
     protected void onResume() {
         super.onResume();
-        if(shouldExecuteOnResume){
+        if (shouldExecuteOnResume) {
             paused = false;
             Boolean cambiado = getSharedPreferences("data", MODE_PRIVATE).getBoolean("cambio_fav", false);
             if (cambiado) {
                 init();
                 getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", false).apply();
             }
-        } else{
+        } else {
             shouldExecuteOnResume = true;
         }
     }
@@ -376,44 +320,6 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         if (shouldExecuteOnResume) {
             paused = true;
         }
-    }
-
-    private String getCertificateSHA1Fingerprint() {
-        PackageManager pm = context.getPackageManager();
-        String packageName = context.getPackageName();
-        int flags = PackageManager.GET_SIGNATURES;
-        PackageInfo packageInfo = null;
-        try {
-            packageInfo = pm.getPackageInfo(packageName, flags);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        Signature[] signatures = packageInfo.signatures;
-        byte[] cert = signatures[0].toByteArray();
-        InputStream input = new ByteArrayInputStream(cert);
-        CertificateFactory cf = null;
-        try {
-            cf = CertificateFactory.getInstance("X509");
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        X509Certificate c = null;
-        try {
-            c = (X509Certificate) cf.generateCertificate(input);
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        String hexString = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA1");
-            byte[] publicKey = md.digest(c.getEncoded());
-            hexString = byte2HexFormatted(publicKey);
-        } catch (NoSuchAlgorithmException e1) {
-            e1.printStackTrace();
-        } catch (CertificateEncodingException e) {
-            e.printStackTrace();
-        }
-        return hexString;
     }
 
     @Override
@@ -438,10 +344,10 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         aids.toArray(favoritos);
         switch (item.getItemId()) {
             case R.id.sort_alph:
-                new RequestFavSort(context, TaskType.SORT_ALPH,favoritos).executeOnExecutor(ExecutorManager.getExecutor());
+                new RequestFavSort(context, TaskType.SORT_ALPH, favoritos).executeOnExecutor(ExecutorManager.getExecutor());
                 break;
             case R.id.sort_num:
-                new RequestFavSort(context, TaskType.SORT_NUM,favoritos).executeOnExecutor(ExecutorManager.getExecutor());
+                new RequestFavSort(context, TaskType.SORT_NUM, favoritos).executeOnExecutor(ExecutorManager.getExecutor());
                 break;
         }
         return true;
@@ -458,8 +364,8 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         final String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
         String Svistos = getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
         if (!email_coded.equals("null") && !email_coded.equals("null")) {
-            new LoginServer(this, TaskType.UPDATE, null, null, null, null,parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + fin + ":;:" + Svistos).execute();
-            new LoginServer(this, TaskType.UPDATE, null, null, null, null,parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + getCertificateSHA1Fingerprint() + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + fin + ":;:" + Svistos).execute();
+            new LoginServer(this, TaskType.UPDATE, null, null, null, null, parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + Parser.getCertificateSHA1Fingerprint(this) + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + fin + ":;:" + Svistos).execute();
+            new LoginServer(this, TaskType.UPDATE, null, null, null, null, parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + Parser.getCertificateSHA1Fingerprint(this) + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + fin + ":;:" + Svistos).execute();
         }
     }
 

@@ -46,20 +46,36 @@
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:textColorSecondary">@color/blanco</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
         <item name="android:colorForeground">@color/foreground_light</item>
-        <item name="colorAccent">@android:color/holo_red_dark</item>
         <item name="android:colorBackground">@color/negro</item>
         <item name="material_drawer_background">@color/negro</item>
         <item name="material_drawer_primary_text">@color/blanco</item>
         <item name="material_drawer_primary_icon">@color/blanco</item>
         <item name="material_drawer_secondary_text">@color/blanco</item>
         <item name="material_drawer_selected">@color/negro</item>
-        <item name="material_drawer_selected_text">@android:color/holo_red_dark</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
+    <style name="AppThemeDarkNo" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
+        <item name="android:colorForeground">@color/foreground_light</item>
+        <item name="android:colorBackground">@color/negro</item>
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+        <item name="material_drawer_selected">@color/negro</item>
+        <item name="android:editTextColor">@color/blanco</item>
+        <item name="android:textColorHint">@color/dark</item>
+        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
+        <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
     </style>
 
     <style name="AppThemeNoAn" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -174,24 +190,10 @@
     </style>
 
 
-    <style name="AppThemeDarkNoRojo" parent="MaterialDrawerTheme.Light.DarkToolbar">
-        <item name="colorPrimary">@color/negro</item>
-        <item name="colorPrimaryDark">@color/negro</item>
-        <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:textColorSecondary">@color/blanco</item>
-        <item name="android:colorForeground">@color/foreground_light</item>
+    <style name="AppThemeDarkNoRojo" parent="AppThemeDarkNo">
         <item name="colorAccent">@android:color/holo_red_dark</item>
-        <item name="android:colorBackground">@color/negro</item>
-        <item name="material_drawer_background">@color/negro</item>
-        <item name="material_drawer_primary_text">@color/blanco</item>
-        <item name="material_drawer_primary_icon">@color/blanco</item>
-        <item name="material_drawer_secondary_text">@color/blanco</item>
-        <item name="material_drawer_selected">@color/negro</item>
         <item name="material_drawer_selected_text">@android:color/holo_red_dark</item>
         <item name="material_drawer_divider">@android:color/holo_red_dark</item>
-        <item name="android:editTextColor">@color/blanco</item>
-        <item name="android:textColorHint">@color/dark</item>
-        <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
     </style>
 
@@ -199,7 +201,7 @@
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_naranja</item>
         <item name="android:colorBackground">@color/negro</item>
@@ -220,7 +222,7 @@
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_gris</item>
         <item name="android:colorBackground">@color/negro</item>
@@ -241,7 +243,7 @@
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_verde</item>
         <item name="android:colorBackground">@color/negro</item>
@@ -262,7 +264,7 @@
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_rosa</item>
         <item name="android:colorBackground">@color/negro</item>
@@ -283,7 +285,7 @@
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_morado</item>
         <item name="android:colorBackground">@color/negro</item>
@@ -303,7 +305,7 @@
     <style name="AppThemeDarkRojo" parent="MaterialDrawerTheme.Light.DarkToolbar">
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
-        <item name="android:textColorSecondary">@color/blanco</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
         <item name="android:textColorPrimary">@color/blanco</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@android:color/holo_red_dark</item>
@@ -325,7 +327,7 @@
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_naranja</item>
         <item name="android:colorBackground">@color/negro</item>
@@ -346,7 +348,7 @@
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_gris</item>
         <item name="android:colorBackground">@color/negro</item>
@@ -367,7 +369,7 @@
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_verde</item>
         <item name="android:colorBackground">@color/negro</item>
@@ -388,7 +390,7 @@
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_rosa</item>
         <item name="android:colorBackground">@color/negro</item>
@@ -409,7 +411,7 @@
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="android:textColorPrimary">@color/blanco</item>
-        <item name="android:textColorSecondary">@color/dark</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_dark</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_morado</item>
         <item name="android:colorBackground">@color/negro</item>
@@ -431,6 +433,7 @@
         <item name="colorPrimary">@color/prim</item>
         <item name="colorPrimaryDark">@color/dark</item>
         <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_light</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_naranja</item>
         <item name="android:colorBackground">@color/blanco</item>
@@ -447,6 +450,7 @@
         <item name="colorPrimary">@color/prim</item>
         <item name="colorPrimaryDark">@color/dark</item>
         <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_light</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_rojo</item>
         <item name="android:colorBackground">@color/blanco</item>
@@ -462,7 +466,7 @@
     <style name="AppThemeNoGris" parent="MaterialDrawerTheme.Light.DarkToolbar">
         <item name="colorPrimary">@color/prim</item>
         <item name="colorPrimaryDark">@color/dark</item>
-        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_light</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/dark</item>
         <item name="android:colorBackground">@color/blanco</item>
@@ -479,6 +483,7 @@
         <item name="colorPrimary">@color/prim</item>
         <item name="colorPrimaryDark">@color/dark</item>
         <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_light</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_verde</item>
         <item name="android:colorBackground">@color/blanco</item>
@@ -495,6 +500,7 @@
         <item name="colorPrimary">@color/prim</item>
         <item name="colorPrimaryDark">@color/dark</item>
         <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_light</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_rosa</item>
         <item name="android:colorBackground">@color/blanco</item>
@@ -511,6 +517,7 @@
         <item name="colorPrimary">@color/prim</item>
         <item name="colorPrimaryDark">@color/dark</item>
         <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_light</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_morado</item>
         <item name="android:colorBackground">@color/blanco</item>
@@ -527,6 +534,7 @@
         <item name="colorPrimary">@color/prim</item>
         <item name="colorPrimaryDark">@color/dark</item>
         <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@android:color/secondary_text_light</item>
         <item name="android:colorForeground">@color/foreground_light</item>
         <item name="colorAccent">@color/theme_naranja</item>
         <item name="android:colorBackground">@color/blanco</item>
@@ -905,6 +913,30 @@
     <style name="ContentStyle" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@color/blanco</item>
         <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="SplashNormal" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@color/nmain</item>
+    </style>
+
+    <style name="SplashDark" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@color/prim</item>
+    </style>
+
+    <style name="SplashNavidad" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@color/navidad</item>
+    </style>
+
+    <style name="SplashAnuevo" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@color/anuevo</item>
+    </style>
+
+    <style name="SplashAmor" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@color/amor</item>
+    </style>
+
+    <style name="SplashNegro" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@color/negro</item>
     </style>
 
 </resources>

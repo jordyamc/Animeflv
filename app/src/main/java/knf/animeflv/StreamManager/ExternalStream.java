@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.List;
 
 import knf.animeflv.Parser;
+import knf.animeflv.Utils.FileUtil;
 import xdroid.toaster.Toaster;
 
 public class ExternalStream {
@@ -24,12 +25,7 @@ public class ExternalStream {
             String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
             String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).setDataAndType(Uri.parse(url),"video/mp4").putExtra("title", new Parser().getTitCached(aid) + " " + numero));
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + eid.replace("E", ""), true).apply();
-            String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-            if (!vistosad.contains(eid)) {
-                vistosad = vistosad + eid + ":::";
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
-            }
+            FileUtil.setSeenState(eid, true);
         }catch (Exception e){
             e.printStackTrace();
             Toaster.toast("No hay Aplicaciones dispnibles para reproducir el video!!!");
@@ -46,12 +42,7 @@ public class ExternalStream {
             intent.setDataAndType(Uri.fromFile(file), "video/mp4");
             intent.putExtra("title", new Parser().getTitCached(aid) + " " + numero);
             context.startActivity(intent);
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + aid + "_" + numero, true).apply();
-            String vistosad = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-            if (!vistosad.contains(eid)) {
-                vistosad = vistosad + eid + ":::";
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistosad).apply();
-            }
+            FileUtil.setSeenState(eid, true);
         }
     }
 

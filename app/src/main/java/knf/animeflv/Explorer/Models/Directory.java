@@ -1,20 +1,31 @@
 package knf.animeflv.Explorer.Models;
 
 import android.content.Context;
+import android.os.Environment;
+import android.support.v4.provider.DocumentFile;
 
 import java.io.File;
 
 import knf.animeflv.Parser;
 import knf.animeflv.TaskType;
+import knf.animeflv.Utils.FileUtil;
 
 
 public class Directory {
     private File src;
     private String title;
+    private DocumentFile srcAccess;
+    private boolean inSD;
 
     public Directory(File src) {
         this.src = src;
         this.title = new Parser().getTitCached(getID());
+    }
+
+    public Directory(DocumentFile src, boolean inSD) {
+        this.srcAccess = src;
+        this.title = new Parser().getTitCached(getID());
+        this.inSD = inSD;
     }
 
     public String getPath() {
@@ -22,11 +33,23 @@ public class Directory {
     }
 
     public File getFile() {
-        return src;
+        if (src != null) {
+            return src;
+        } else {
+            if (inSD) {
+                return new File(FileUtil.getSDPath() + "/Animeflv/download/" + srcAccess.getName());
+            } else {
+                return new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + srcAccess.getName());
+            }
+        }
     }
 
     public String getID() {
-        return src.getName();
+        if (src != null) {
+            return src.getName();
+        } else {
+            return srcAccess.getName();
+        }
     }
 
     public String getImageUrl(Context context) {
@@ -38,6 +61,10 @@ public class Directory {
     }
 
     public String getFilesNumber() {
-        return String.valueOf(src.list().length) + " archivos";
+        if (src != null) {
+            return String.valueOf(src.list().length) + " archivos";
+        } else {
+            return String.valueOf(srcAccess.listFiles().length) + " archivos";
+        }
     }
 }

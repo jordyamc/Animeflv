@@ -5,9 +5,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.SyncHttpClient;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -21,10 +18,10 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
-import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Emision.Section.TimeCompareModel;
-import knf.animeflv.Parser;
-import knf.animeflv.TaskType;
+import knf.animeflv.JsonFactory.BaseGetter;
+import knf.animeflv.JsonFactory.JsonTypes.EMISION;
+import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.MainStates;
 
 
@@ -126,43 +123,36 @@ public class EmisionChecker {
     }
 
     public static void Refresh() {
-        new EmisionCkeck(context).execute();
+        new EmisionCkeck(context).check();
     }
 
-    private static class EmisionCkeck extends AsyncTask<String, String, String> {
-        Context context;
+    private static class EmisionCkeck {
+        private Context context;
 
         public EmisionCkeck(Context context) {
             this.context = context;
         }
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            MainStates.setLoadingEmision(true);
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            MainStates.setLoadingEmision(false);
-            MainStates.setFload(false);
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            String url = new Parser().getBaseUrl(TaskType.NORMAL, context) + "emisionlist.php";
-            Log.d("EmisionUrl", url);
-            new SyncHttpClient().get(url, null, new JsonHttpResponseHandler() {
+        public void check() {
+            BaseGetter.getJson(context, new EMISION(), new BaseGetter.AsyncInterface() {
                 @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    super.onSuccess(statusCode, headers, response);
-                    Log.d("EmisionChecker", "Start Loading");
+                public void onFinish(String json) {
+                    start(json);
+                }
+            });
+        }
+
+        private void start(final String json) {
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    MainStates.setLoadingEmision(true);
                     try {
-                        Set<String> ongoing = new HashSet<String>();
+                        JSONObject response = new JSONObject(json);
+                        Set<String> ongoing = new HashSet<>();
                         JSONArray array = response.getJSONArray("emision");
                         SharedPreferences preferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                        List<List<TimeCompareModel>> comparelists = new ArrayList<List<TimeCompareModel>>();
+                        List<List<TimeCompareModel>> comparelists = new ArrayList<>();
                         comparelists.add(lcode1);
                         comparelists.add(lcode2);
                         comparelists.add(lcode3);
@@ -186,7 +176,7 @@ public class EmisionChecker {
                                     ongoing.add(aid);
                                 }
                             }
-                            preferences.edit().putStringSet("ongoingSet", ongoing);
+                            preferences.edit().putStringSet("ongoingSet", ongoing).apply();
                             Collections.sort(organizar, new DateCompare());
                             for (TimeCompareModel compareModel : organizar) {
                                 int day = preferences.getInt(compareModel.getAid() + "onday", 0);
@@ -210,21 +200,14 @@ public class EmisionChecker {
                     } catch (Exception e) {
                         e.printStackTrace();
                         Log.d("EmisionChecker", "Error " + e.getCause());
+                        MainStates.setLoadingEmision(false);
+                        MainStates.setFload(false);
                     }
                     MainStates.setLoadingEmision(false);
                     MainStates.setFload(false);
+                    return null;
                 }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                    throwable.printStackTrace();
-                    MainStates.setLoadingEmision(false);
-                    MainStates.setFload(false);
-                    Log.d("EmisionChecker", "Error " + throwable.getCause());
-                }
-            });
-            return "";
+            }.executeOnExecutor(ExecutorManager.getExecutor());
         }
     }
 

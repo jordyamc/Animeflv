@@ -1,7 +1,7 @@
 package knf.animeflv.Explorer.Adapters;
 
 import android.app.Activity;
-import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.squareup.picasso.Callback;
 
 import java.io.File;
 import java.util.List;
@@ -34,21 +35,20 @@ import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 22/08/2015.
- */
 public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.ViewHolder> {
 
     List<VideoFile> list;
     private Activity context;
     private ExplorerInterfaces interfaces;
     private File current;
+    private DirectoryAdapter.OnFinishListListener listListener;
 
-    public VideoFileAdapter(Activity context, File file) {
+    public VideoFileAdapter(Activity context, File file, List<VideoFile> list, DirectoryAdapter.OnFinishListListener listListener) {
         this.context = context;
-        this.list = ModelFactory.createVideosList(file);
+        this.list = list;
         this.interfaces = (ExplorerInterfaces) context;
         this.current = file;
+        this.listListener = listListener;
     }
 
     @Override
@@ -66,12 +66,25 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        PicassoCache.getPicassoInstance(context).load(list.get(holder.getAdapterPosition()).getThumbImage()).error(R.drawable.ic_block_r).into(holder.img);
+                        PicassoCache.getPicassoInstance(context).load(list.get(holder.getAdapterPosition()).getThumbImage()).error(R.drawable.ic_block_r).resize(90, 100).centerInside().into(holder.img, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                if (FileUtil.isInSeen(list.get(holder.getAdapterPosition()).getEID())) {
+                                    showAsSeen(holder);
+                                }
+                            }
+
+                            @Override
+                            public void onError() {
+
+                            }
+                        });
                     }
                 });
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
+        holder.iV_visto.setColorFilter(ThemeUtils.getAcentColor(context));
         holder.titulo.setText(list.get(holder.getAdapterPosition()).getTitle());
         holder.cap.setText(list.get(holder.getAdapterPosition()).getDuration(context));
         holder.cap.setTextColor(ThemeUtils.getAcentColor(context));
@@ -84,6 +97,19 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
             holder.ver.setColorFilter(ColorsRes.Holo_Light(context));
             holder.del.setColorFilter(ColorsRes.Holo_Light(context));
         }
+        holder.root.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (FileUtil.isInSeen(list.get(holder.getAdapterPosition()).getEID())) {
+                    hideAsSeen(holder);
+                    FileUtil.setSeenState(list.get(holder.getAdapterPosition()).getEID(), false);
+                } else {
+                    showAsSeen(holder);
+                    FileUtil.setSeenState(list.get(holder.getAdapterPosition()).getEID(), true);
+                }
+                return false;
+            }
+        });
         holder.ver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,18 +128,49 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                 ManageDownload.cancel(context, list.get(holder.getAdapterPosition()).getEID());
-                                FileUtil.DeleteAnime(list.get(holder.getAdapterPosition()).getEID());
-                                if (!list.get(holder.getAdapterPosition()).getFile().exists()) {
+                                if (FileUtil.DeleteAnime(list.get(holder.getAdapterPosition()).getEID())) {
+                                    if (list.size() - 1 < 1) {
+                                        try {
+                                            interfaces.OnDirectoryEmpty(list.get(0).getID());
+                                        } catch (Exception e) {
+                                        }
+                                    }
                                     Toaster.toast("Archivo eliminado");
-                                    list = ModelFactory.createVideosList(current);
-                                    notifyDataSetChanged();
+                                    notifyItemRemoved(holder.getAdapterPosition());
+                                    recreateList();
                                 } else {
                                     Toaster.toast("Error al eliminar");
-                                    list = ModelFactory.createVideosList(current);
-                                    notifyDataSetChanged();
+                                    recreateList();
                                 }
                             }
                         }).build().show();
+            }
+        });
+    }
+
+    private void showAsSeen(ViewHolder holder) {
+        holder.img.setColorFilter(Color.argb(150, 138, 138, 138));
+        holder.iV_visto.setVisibility(View.VISIBLE);
+    }
+
+    private void hideAsSeen(ViewHolder holder) {
+        holder.img.setColorFilter(null);
+        holder.iV_visto.setVisibility(View.GONE);
+    }
+
+    private void recreateList() {
+        interfaces.OnDirectoryFileChange();
+        ModelFactory.createVideosListAsync(current, new ModelFactory.AsyncFileListener() {
+            @Override
+            public void onCreated(List<VideoFile> l) {
+                list = l;
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        notifyDataSetChanged();
+                    }
+                });
+                listListener.onFinish(l.size());
             }
         });
     }
@@ -136,7 +193,8 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
         public ImageButton ver;
         @Bind(R.id.ib_del)
         public ImageButton del;
-
+        @Bind(R.id.seen)
+        public ImageView iV_visto;
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);

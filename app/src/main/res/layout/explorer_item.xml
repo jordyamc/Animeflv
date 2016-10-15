@@ -7,26 +7,55 @@
     android:clickable="true"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/img"
+    <RelativeLayout
+        android:id="@+id/relative"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:clickable="false"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
         android:gravity="center_vertical"
-        android:padding="5dp"
-        android:src="@drawable/ic_block_r"
-        android:transitionName="img"/>
+        android:maxWidth="120dp"
+        android:padding="5dp">
+
+        <ImageView
+            android:id="@+id/img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:clickable="false"
+            android:gravity="center_vertical"
+            android:maxWidth="70dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_block_r"
+            android:transitionName="img"/>
+
+        <ImageView
+            android:id="@+id/seen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentStart="false"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:clickable="false"
+            android:gravity="center_vertical"
+            android:maxWidth="70dp"
+            android:padding="5dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_done"
+            android:visibility="gone"/>
+    </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toEndOf="@+id/img"
+        android:layout_toEndOf="@+id/relative"
         android:layout_toLeftOf="@+id/botones1"
-        android:layout_toRightOf="@+id/img"
+        android:layout_toRightOf="@+id/relative"
         android:layout_toStartOf="@+id/botones1"
         android:background="@android:color/transparent"
         android:gravity="center_vertical"

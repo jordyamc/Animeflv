@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -340,12 +339,16 @@ public class WaitActivity extends AppCompatActivity implements
                             if (downarray != null) {
                                 JSONObject sub = downarray.getJSONObject(0);
                                 String izanagiurl = sub.getString("url");
-                                if (izanagiurl.contains("/d.php")) {
-                                    urls.add("_noData_");
-                                    new getTrueIzanagi(izanagiurl, eid).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                                } else {
-                                    Log.d("Url Add", izanagiurl);
+                                if (!izanagiurl.equals("null")) {
                                     urls.add(izanagiurl);
+                                } else {
+                                    sub = downarray.getJSONObject(1);
+                                    String yotta = sub.getString("url");
+                                    if (!yotta.equals("null")) {
+                                        urls.add(yotta);
+                                    } else {
+                                        urls.add("_noData_");
+                                    }
                                 }
                             } else {
                                 urls.add("_noData_");
@@ -421,12 +424,16 @@ public class WaitActivity extends AppCompatActivity implements
                             if (downarray != null) {
                                 JSONObject sub = downarray.getJSONObject(0);
                                 String izanagiurl = sub.getString("url");
-                                if (izanagiurl.contains("/d.php")) {
-                                    urls.add("_noData_");
-                                    new getTrueIzanagi(izanagiurl, eid).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                                } else {
-                                    Log.d("Url Add", izanagiurl);
+                                if (!izanagiurl.equals("null")) {
                                     urls.add(izanagiurl);
+                                } else {
+                                    sub = downarray.getJSONObject(1);
+                                    String yotta = sub.getString("url");
+                                    if (!yotta.equals("null")) {
+                                        urls.add(yotta);
+                                    } else {
+                                        urls.add("_noData_");
+                                    }
                                 }
                             } else {
                                 urls.add("_noData_");
