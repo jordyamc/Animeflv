@@ -178,8 +178,8 @@ public class Directorio extends AppCompatActivity {
                         if (new Parser().checkStatus(json) == new Parser().checkStatus(j))
                             initAsync(json);
                     }
-                    menuGlobal.removeItem(R.id.carg);
                     loaded = true;
+                    invalidateOptionsMenu();
                 } else {
                     Toaster.toast("Error al abrir el directorio");
                     finish();

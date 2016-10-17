@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import knf.animeflv.ColorsRes;
+import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
 import knf.animeflv.Parser;
@@ -29,6 +30,7 @@ import knf.animeflv.R;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.MainStates;
+import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
@@ -43,11 +45,11 @@ public class DownloadGetter {
                     Looper.prepare();
                 } catch (Exception e) {
                 }
-                ;
                 try {
                     JSONArray jsonArray = new JSONObject(json).getJSONArray("downloads");
                     final List<String> nombres = new ArrayList<>();
                     final List<String> urls = new ArrayList<>();
+                    final List<String> datas = new ArrayList<>();
                     try {
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject object = jsonArray.getJSONObject(i);
@@ -55,6 +57,10 @@ public class DownloadGetter {
                             if (!u.trim().equals("null")) {
                                 nombres.add(object.getString("name"));
                                 urls.add(u);
+                                try {
+                                    datas.add(object.getString("data"));
+                                } catch (Exception e) {
+                                }
                             }
                         }
                     } catch (Exception e) {
@@ -79,6 +85,11 @@ public class DownloadGetter {
                                             case "zippyshare":
                                                 actionsInterface.onStartZippy(ur);
                                                 dialog.dismiss();
+                                                break;
+                                            case "zippyshare fast":
+                                                dialog.dismiss();
+                                                startDownload(actionsInterface.isStream(), context, eid, ur, new CookieConstructor(datas.get(0)));
+                                                actionsInterface.onStartDownload();
                                                 break;
                                             case "mega":
                                                 dialog.dismiss();
@@ -124,12 +135,16 @@ public class DownloadGetter {
                     MainStates.setProcessing(false, null);
                     actionsInterface.onCancelDownload();
                     actionsInterface.onLogError(e);
-                    Parser parser = new Parser();
-                    FileUtil.writeToFile(e.getMessage() + "   " + parser.getUrlCached(eid) + "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
-                    if (!parser.getUrlCached(eid).equals("null")) {
-                        Toaster.toast("Error en JSON");
+                    if (NetworkUtils.isNetworkAvailable()) {
+                        Parser parser = new Parser();
+                        FileUtil.writeToFile(e.getMessage() + "   " + parser.getUrlCached(eid) + "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
+                        if (!parser.getUrlCached(eid).equals("null")) {
+                            Toaster.toast("Error en JSON");
+                        } else {
+                            Toaster.toast("Anime no encontrado en directorio!");
+                        }
                     } else {
-                        Toaster.toast("Anime no encontrado en directorio!");
+                        Toaster.toast("No hay internet!!!");
                     }
                 }
                 Looper.loop();
@@ -142,6 +157,14 @@ public class DownloadGetter {
             StreamManager.Stream(context, eid, url);
         } else {
             ManageDownload.chooseDownDir(context, eid, url);
+        }
+    }
+
+    private static void startDownload(boolean isStreaming, Activity context, String eid, String url, CookieConstructor cookieConstructor) {
+        if (isStreaming) {
+            StreamManager.Stream(context, eid, url);
+        } else {
+            ManageDownload.chooseDownDir(context, eid, url, cookieConstructor);
         }
     }
 

@@ -170,6 +170,7 @@ public class SelfGetter {
                     asyncInterface.onFinish(object.toString());
                 } catch (Exception e) {
                     e.printStackTrace();
+                    asyncInterface.onFinish("null");
                 }
                 return null;
             }

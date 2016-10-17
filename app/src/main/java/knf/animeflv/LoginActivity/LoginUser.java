@@ -151,6 +151,9 @@ public class LoginUser extends AppCompatActivity {
                     }
                     isEmailChanged = false;
                 } else {
+                    if (userList.contains(s.toString())) {
+                        input_email.setError("La cuenta ya existe!!");
+                    }
                     if (isPassReady) {
                         showRCont();
                         if (isListReady) {

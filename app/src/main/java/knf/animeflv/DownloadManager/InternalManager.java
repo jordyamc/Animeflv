@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
@@ -121,10 +122,13 @@ public class InternalManager {
         request.setDescription("Capitulo " + numero);
         request.setMimeType("video/mp4");
         request.addRequestHeader("cookie", constructor.getCookie());
-        request.addRequestHeader("User-Agent", constructor.getUseAgent());
+        Log.e("Cookie", constructor.getCookie());
+        if (constructor.getReferer() != null)
+            request.addRequestHeader("Referer", constructor.getReferer());
+        if (constructor.getReferer() != null)
+            request.addRequestHeader("User-Agent", constructor.getUseAgent());
         request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
         request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
-        request.addRequestHeader("Referer", constructor.getReferer());
         request.setDestinationInExternalPublicDir("Animeflv/download/" + aid, aid + "_" + numero + ".mp4");
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         long l = manager.enqueue(request);

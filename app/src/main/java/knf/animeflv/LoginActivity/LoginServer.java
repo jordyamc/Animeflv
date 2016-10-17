@@ -35,7 +35,7 @@ public class LoginServer {
     }
 
     private static String getServerUrl(Context context) {
-        return new Parser().getBaseUrl(TaskType.NORMAL, context) + "fav-server-test.php?certificate=" + Parser.getCertificateSHA1Fingerprint(context);
+        return new Parser().getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + Parser.getCertificateSHA1Fingerprint(context);
     }
 
     public static void login(Activity activity, String email_c, String pass_c, String email_normal, final ServerInterface serverInterface) {

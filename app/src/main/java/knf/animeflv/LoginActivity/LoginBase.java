@@ -51,7 +51,7 @@ public class LoginBase extends AppCompatActivity {
     private final String ERROR_NO_INFO = "no-info";
     protected String en_email;
     protected String en_password;
-    protected List<String> userList;
+    protected List<String> userList = new ArrayList<>();
     @Bind(R.id.img_login)
     ImageView image;
     @Bind(R.id.input_email)
@@ -107,6 +107,9 @@ public class LoginBase extends AppCompatActivity {
                 en_email = null;
                 isEmailOK = false;
                 input_email.setError(null);
+                if (isInSignUp && userList.contains(s.toString())) {
+                    input_email.setError("La cuenta ya existe!!");
+                }
             }
 
             @Override
