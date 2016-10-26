@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:fab="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:fab="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_search"
         android:layout_width="match_parent"
@@ -12,24 +13,20 @@
         android:background="@color/prim"
         android:theme="@style/toolbar"
         android:visibility="gone">
-        <Spinner
-            android:id="@+id/spinner_generos"
-            android:layout_width="130dp"
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/et_busqueda"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:gravity="right"
-            android:visibility="gone"/>
-            <EditText
-                android:id="@+id/et_busqueda"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:hint="Buscar..."
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:lines="1"
-                android:maxLines="1"
-                android:visibility="visible"/>
+            android:gravity="center_vertical"
+            android:hint="Buscar..."
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:lines="1"
+            android:maxLines="1"
+            android:visibility="visible"
+            app:met_floatingLabelText=""
+            app:met_hideUnderline="true"/>
 
     </android.support.v7.widget.Toolbar>
 
@@ -38,18 +35,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ProgressBar
-            android:id="@+id/loading"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_centerVertical="true"/>
-
         <LinearLayout
             android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <com.ogaclejapan.smarttablayout.SmartTabLayout
                 android:id="@+id/viewpagertab2"
@@ -74,11 +63,11 @@
                 app:stl_underlineThickness="0dp"/>
 
             <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager2"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/viewpagertab2"/>
-    </LinearLayout>
+                android:id="@+id/viewpager2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/viewpagertab2"/>
+        </LinearLayout>
     </RelativeLayout>
 
     <FrameLayout
@@ -88,10 +77,10 @@
         android:visibility="gone">
 
         <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_busqueda"
+            android:id="@+id/rv_busqueda"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-        android:visibility="gone"/>
+            android:visibility="gone"/>
 
         <com.github.clans.fab.FloatingActionMenu
             android:id="@+id/search_menu"
@@ -128,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_search_text"
                 fab:fab_label="Nombre"
-                fab:fab_size="mini" />
+                fab:fab_size="mini"/>
 
             <com.github.clans.fab.FloatingActionButton
                 android:id="@+id/search_menu_generos"
@@ -136,7 +125,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_search_generos"
                 fab:fab_label="Genero"
-                fab:fab_size="mini" />
+                fab:fab_size="mini"/>
 
             <com.github.clans.fab.FloatingActionButton
                 android:id="@+id/search_menu_id"
@@ -144,7 +133,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_search_id"
                 fab:fab_label="ID"
-                fab:fab_size="mini" />
+                fab:fab_size="mini"/>
 
         </com.github.clans.fab.FloatingActionMenu>
     </FrameLayout>

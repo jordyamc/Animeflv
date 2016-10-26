@@ -93,6 +93,17 @@
         <item>#ffcc0000</item>
     </array>
 
+    <array name="days">
+        <item>Sin Dia</item>
+        <item>Lunes</item>
+        <item>Martes</item>
+        <item>Miercoles</item>
+        <item>Jueves</item>
+        <item>Viernes</item>
+        <item>Sabado</item>
+        <item>Domingo</item>
+    </array>
+
     <string name="intro_title_1">Bienvenido!!</string>
     <string name="intro_desc_1">Esta es la app No Oficial de AnimeFLV</string>
 

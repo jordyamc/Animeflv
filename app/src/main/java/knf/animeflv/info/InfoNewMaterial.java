@@ -42,6 +42,7 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -65,10 +66,15 @@ import knf.animeflv.ServerReload.Adapter.CustomRecycler;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Keys;
+import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.Utils.objects.User;
 import xdroid.toaster.Toaster;
+
+import static knf.animeflv.Utils.Keys.Login.EMAIL_NORMAL;
 
 @SuppressWarnings("WeakerAccess")
 public class InfoNewMaterial extends AppCompatActivity implements LoginServer.callback {
@@ -255,6 +261,15 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
             getJsonfromFile();
         }
         imageView.setOnClickListener(getExpandListener());
+        if (isUserAdmin() && NetworkUtils.isNetworkAvailable()) {
+            imageView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    EmisionEditDialog.create(aid).show(getSupportFragmentManager(), "dialog");
+                    return true;
+                }
+            });
+        }
         toolbar.setOnClickListener(getExpandListener());
     }
 
@@ -265,6 +280,36 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                 barLayout.setExpanded(true,true);
             }
         };
+    }
+
+    private boolean isUserAdmin() {
+        String json_admin = PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.JSON_ADMINS, "null");
+        if (FileUtil.isJSONValid(json_admin)) {
+            try {
+                return getUser(new JSONObject(json_admin)).isAdmin();
+            } catch (JSONException e) {
+            }
+        }
+        return false;
+    }
+
+    private User getUser(JSONObject object) {
+        String email = PreferenceManager.getDefaultSharedPreferences(context).getString(EMAIL_NORMAL, "null");
+        if (email.equals("null")) {
+            return new User(false);
+        }
+        try {
+            JSONArray array = object.getJSONArray("admins");
+            for (int o = 0; o < array.length(); o++) {
+                if (array.getJSONObject(o).getString("email").equals(email)) {
+                    return new User(true, array.getJSONObject(o).getString("name"));
+                }
+            }
+        } catch (JSONException e) {
+            Logger.Error(getClass(), e);
+            return new User(false);
+        }
+        return new User(false);
     }
 
     private void scrollToTop() {

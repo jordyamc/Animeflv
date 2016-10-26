@@ -202,7 +202,10 @@ public class LoginServer {
                     Listno.toArray(favoritos);
                     StringBuilder builderNo = new StringBuilder();
                     for (String i : favoritos) {
-                        builderNo.append(":::" + i);
+                        if (!i.equals("") && !i.equals("null")) {
+                            builderNo.append(":::");
+                            builderNo.append(i);
+                        }
                     }
                     String vistos = activity.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
                     AsyncHttpClient client = getClient();

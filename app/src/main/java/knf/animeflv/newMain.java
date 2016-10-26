@@ -37,7 +37,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -86,6 +85,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.Emision.Section.newEmisionActivity;
 import knf.animeflv.Emision.Section.newEmisionTest;
@@ -95,6 +95,7 @@ import knf.animeflv.Interfaces.MainRecyclerCallbacks;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
 import knf.animeflv.JsonFactory.ServerGetter;
+import knf.animeflv.LoginActivity.LoginBase;
 import knf.animeflv.Random.RandomActivity;
 import knf.animeflv.Recientes.MainOrganizer;
 import knf.animeflv.Recientes.Status;
@@ -141,6 +142,7 @@ public class newMain extends AppCompatActivity implements
     private RecyclerView recyclerView;
     private LinearLayout root;
     private Toolbar toolbar;
+    private Toolbar menu_toolbar;
     private SwipeRefreshLayout mswipe;
     private int versionCode;
     private String versionName;
@@ -266,7 +268,7 @@ public class newMain extends AppCompatActivity implements
                 .build();
         result = new DrawerBuilder()
                 .withActivity(this)
-                .withToolbar(toolbar)
+                .withToolbar(menu_toolbar)
                 .withActionBarDrawerToggleAnimated(true)
                 .withAccountHeader(headerResult)
                 .withHeaderDivider(false)
@@ -629,16 +631,32 @@ public class newMain extends AppCompatActivity implements
     }
 
     private void setUpAmoled() {
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
+        if (ThemeUtils.isAmoled(this)) {
+            isAmoled = true;
             toolbar.setBackgroundColor(getResources().getColor(R.color.negro));
-            toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(getResources().getColor(R.color.negro));
-                getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
+            if (!isXLargeScreen()) {
+                toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
+            } else {
+                findViewById(R.id.frame).setBackgroundColor(ColorsRes.Negro(this));
+                toolbar.getRootView().setBackgroundColor(ColorsRes.Prim(this));
+                findViewById(R.id.cardMain).setBackgroundColor(ColorsRes.Negro(this));
             }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (!isXLargeScreen()) {
+                    getWindow().setStatusBarColor(getResources().getColor(R.color.negro));
+                    getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
+                } else {
+                    getWindow().setStatusBarColor(ColorsRes.Prim(this));
+                    getWindow().setNavigationBarColor(ColorsRes.Negro(this));
+                }
+            }
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                getWindow().setNavigationBarColor(ColorsRes.Prim(this));
         }
     }
 
@@ -646,29 +664,12 @@ public class newMain extends AppCompatActivity implements
         if (!isXLargeScreen()) { //Portrait
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+            menu_toolbar = toolbar;
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            toolbar = (Toolbar) findViewById(R.id.ltoolbar);
-        }
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
-            toolbar.setBackgroundColor(getResources().getColor(R.color.negro));
-            toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(getResources().getColor(R.color.negro));
-                getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
-            }
-            isAmoled = true;
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(getResources().getColor(R.color.dark));
-                getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
-            }
+            toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+            menu_toolbar = (Toolbar) findViewById(R.id.ltoolbar);
+
         }
         root = (LinearLayout) findViewById(R.id.main_root);
         recyclerView = (RecyclerView) findViewById(R.id.rv_main);
@@ -733,40 +734,39 @@ public class newMain extends AppCompatActivity implements
     }
 
     private int getColor() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(context));
-        int color = ColorsRes.Naranja(context);
-        if (accent == ColorsRes.Rojo(context)) {
-            color = ColorsRes.Rojo(context);
-        }
-        if (accent == ColorsRes.Naranja(context)) {
-            color = ColorsRes.Naranja(context);
-        }
-        if (accent == ColorsRes.Gris(context)) {
-            color = ColorsRes.Gris(context);
-        }
-        if (accent == ColorsRes.Verde(context)) {
-            color = ColorsRes.Verde(context);
-        }
-        if (accent == ColorsRes.Rosa(context)) {
-            color = ColorsRes.Rosa(context);
-        }
-        if (accent == ColorsRes.Morado(context)) {
-            color = ColorsRes.Morado(context);
-        }
-        return color;
+        return ThemeUtils.getAcentColor(this);
     }
 
     private void setUpVersion() {
         context = this;
         androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         try {
-            versionCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+            versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (Exception e) {
             e.printStackTrace();
         }
         try {
-            versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            versionCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+            int ant_ver = PreferenceManager.getDefaultSharedPreferences(this).getInt(Keys.Conf.CURRENT_VERSION, -1);
+            if (ant_ver == -1) {
+                PreferenceManager.getDefaultSharedPreferences(this).edit().putInt(Keys.Conf.CURRENT_VERSION, versionCode).apply();
+                ant_ver = versionCode;
+            }
+            if (versionCode > ant_ver) {
+                PreferenceManager.getDefaultSharedPreferences(this).edit().putInt(Keys.Conf.CURRENT_VERSION, versionCode).apply();
+                new MaterialDialog.Builder(this)
+                        .title(versionName)
+                        .titleGravity(GravityEnum.CENTER)
+                        .content("Nueva version detectada!!!")
+                        .positiveText("changelog")
+                        .negativeText("cerrar")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                startActivity(new Intent(newMain.this, ChangelogActivity.class));
+                            }
+                        }).build().show();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1194,7 +1194,7 @@ public class newMain extends AppCompatActivity implements
                                     toast("Se pueden volver a modificar desde configuracion");
                                     RapConf.dismiss();
                                     parser.saveBackup(context);
-                                    new Login().show(getSupportFragmentManager(), "Login");
+                                    openSingInDialog();
                                 } else {
                                     toast("Falta cambiar configuraciones!!!");
                                 }
@@ -1294,6 +1294,19 @@ public class newMain extends AppCompatActivity implements
                 load(json);
             }
         });
+    }
+
+    private void openSingInDialog() {
+        new MaterialDialog.Builder(this)
+                .content("Desea crear una cuenta en el servidor para guardar los favoritos en la nube?")
+                .positiveText("Si")
+                .negativeText("No")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        startActivity(new Intent(newMain.this, LoginBase.class));
+                    }
+                }).build().show();
     }
 
     private Snackbar getWaitingSnackBar() {

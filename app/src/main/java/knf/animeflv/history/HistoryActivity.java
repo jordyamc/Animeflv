@@ -43,6 +43,12 @@ public class HistoryActivity extends AppCompatActivity implements HistoryAdapter
         getSupportActionBar().setTitle("Historial");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
         RecyclerViewSwipeManager swipeMgr = new RecyclerViewSwipeManager();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(swipeMgr.createWrappedAdapter(new HistoryAdapter(this)));

@@ -1,10 +1,6 @@
 package knf.animeflv.Recyclers;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -14,19 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.List;
 
 import knf.animeflv.Directorio.AnimeClass;
-import knf.animeflv.Directorio.Directorio;
-import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.info.Helper.InfoHelper;
@@ -76,53 +62,13 @@ public class AdapterDirAnimeNew extends RecyclerView.Adapter<AdapterDirAnimeNew.
             @Override
             public void onClick(View v) {
                 InfoHelper.open(
-                        ((Directorio) context),
+                        context,
                         new InfoHelper.SharedItem(holder.iv_rel, "img"),
-                        Intent.FLAG_ACTIVITY_NEW_TASK,
                         new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
-                        new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getNombre()),
-                        new InfoHelper.BundleItem("link", new Parser().getUrlAnimeCached(Animes.get(holder.getAdapterPosition()).getAid()))
+                        new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getNombre())
                 );
             }
         });
-    }
-
-    private String getCertificateSHA1Fingerprint() {
-        PackageManager pm = context.getPackageManager();
-        String packageName = context.getPackageName();
-        int flags = PackageManager.GET_SIGNATURES;
-        PackageInfo packageInfo = null;
-        try {
-            packageInfo = pm.getPackageInfo(packageName, flags);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        Signature[] signatures = packageInfo.signatures;
-        byte[] cert = signatures[0].toByteArray();
-        InputStream input = new ByteArrayInputStream(cert);
-        CertificateFactory cf = null;
-        try {
-            cf = CertificateFactory.getInstance("X509");
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        X509Certificate c = null;
-        try {
-            c = (X509Certificate) cf.generateCertificate(input);
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        String hexString = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA1");
-            byte[] publicKey = md.digest(c.getEncoded());
-            hexString = byte2HexFormatted(publicKey);
-        } catch (NoSuchAlgorithmException e1) {
-            e1.printStackTrace();
-        } catch (CertificateEncodingException e) {
-            e.printStackTrace();
-        }
-        return hexString;
     }
 
     @Override

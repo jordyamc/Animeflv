@@ -3,7 +3,6 @@ package knf.animeflv.Emision.Section;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
@@ -14,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +43,6 @@ import java.util.TimeZone;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import knf.animeflv.Application;
-import knf.animeflv.ColorsRes;
 import knf.animeflv.Emision.DateCompare;
 import knf.animeflv.Emision.EmisionChecker;
 import knf.animeflv.JsonFactory.BaseGetter;
@@ -53,6 +52,7 @@ import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.Utils.TimeCompare;
 import xdroid.toaster.Toaster;
 
 public class newEmisionTest extends AppCompatActivity {
@@ -90,7 +90,7 @@ public class newEmisionTest extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        setTheme();
+        ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.emision);
         initActivity();
@@ -112,6 +112,7 @@ public class newEmisionTest extends AppCompatActivity {
             toolbar.setBackgroundColor(getResources().getColor(android.R.color.black));
             viewPagerTab.setBackgroundColor(getResources().getColor(android.R.color.black));
             viewPagerTab.setSelectedIndicatorColors(getResources().getColor(R.color.prim));
+            viewPagerTab.setDistributeEvenly(isXLargeScreen(this));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -121,50 +122,6 @@ public class newEmisionTest extends AppCompatActivity {
             }
         }
         new Loader(this).check();
-    }
-
-    private void setTheme() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(this));
-        if (preferences.getBoolean("is_amoled", false)) {
-            if (accent == ColorsRes.Rojo(this)) {
-                setTheme(R.style.AppThemeDarkRojo);
-            }
-            if (accent == ColorsRes.Naranja(this)) {
-                setTheme(R.style.AppThemeDarkNaranja);
-            }
-            if (accent == ColorsRes.Gris(this)) {
-                setTheme(R.style.AppThemeDarkGris);
-            }
-            if (accent == ColorsRes.Verde(this)) {
-                setTheme(R.style.AppThemeDarkVerde);
-            }
-            if (accent == ColorsRes.Rosa(this)) {
-                setTheme(R.style.AppThemeDarkRosa);
-            }
-            if (accent == ColorsRes.Morado(this)) {
-                setTheme(R.style.AppThemeDarkMorado);
-            }
-        } else {
-            if (accent == ColorsRes.Rojo(this)) {
-                setTheme(R.style.AppThemeRojo);
-            }
-            if (accent == ColorsRes.Naranja(this)) {
-                setTheme(R.style.AppThemeNaranja);
-            }
-            if (accent == ColorsRes.Gris(this)) {
-                setTheme(R.style.AppThemeGris);
-            }
-            if (accent == ColorsRes.Verde(this)) {
-                setTheme(R.style.AppThemeVerde);
-            }
-            if (accent == ColorsRes.Rosa(this)) {
-                setTheme(R.style.AppThemeRosa);
-            }
-            if (accent == ColorsRes.Morado(this)) {
-                setTheme(R.style.AppThemeMorado);
-            }
-        }
     }
 
     private int getActualDayCode() {
@@ -222,6 +179,14 @@ public class newEmisionTest extends AppCompatActivity {
         if (!isXLargeScreen(getApplicationContext())) {
             return;
         }
+    }
+
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            recreate();
+        }
+        return true;
     }
 
     @Override
@@ -334,15 +299,12 @@ public class newEmisionTest extends AppCompatActivity {
                                     String hora = object.getString("hour");
                                     if (!hora.equals("null")) {
                                         String aid = object.getString("aid");
-                                        boolean isotherday = hora.contains("AM") && UTCtoLocalEm(hora).contains("PM");
+                                        int formatedday = TimeCompare.getFormatedDaycodeFromUTC(hora + "-" + (i + 1));
+                                        boolean isotherday = i + 1 != formatedday;
                                         if (!isotherday) {
                                             codes.get(i).add(new TimeCompareModel(aid, hora, context));
                                         } else {
-                                            if (i - 1 <= -1) {
-                                                codes.get(6).add(new TimeCompareModel(aid, hora, context));
-                                            } else {
-                                                codes.get(i - 1).add(new TimeCompareModel(aid, hora, context));
-                                            }
+                                            codes.get(formatedday - 1).add(new TimeCompareModel(aid, hora, context));
                                         }
                                     }
                                 }

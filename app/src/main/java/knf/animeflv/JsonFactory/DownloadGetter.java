@@ -95,6 +95,7 @@ public class DownloadGetter {
                                                 dialog.dismiss();
                                                 context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
                                                 MainStates.setProcessing(false, null);
+                                                actionsInterface.onStartDownload();
                                                 break;
                                             default:
                                                 startDownload(actionsInterface.isStream(), context, eid, ur);

@@ -9,10 +9,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -41,6 +45,8 @@ import xdroid.toaster.Toaster;
 public class LogViewer extends AppCompatActivity {
     @Bind(R.id.et_correo)
     AppCompatEditText correo;
+    @Bind(R.id.text_input)
+    TextInputLayout inputLayout;
     @Bind(R.id.phone_info)
     TextView phone_info;
     @Bind(R.id.complete_log)
@@ -77,11 +83,12 @@ public class LogViewer extends AppCompatActivity {
             finish();
             return;
         }
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+        if (ThemeUtils.isAmoled(this)) {
             toolbar.setBackgroundColor(ColorsRes.Negro(this));
             toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
             phone_info.setTextColor(ColorsRes.Holo_Dark(this));
             complete_info.setTextColor(ColorsRes.Holo_Dark(this));
+            correo.setTextColor(ColorsRes.Blanco(this));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -89,6 +96,8 @@ public class LogViewer extends AppCompatActivity {
                 window.setStatusBarColor(ColorsRes.Negro(this));
                 getWindow().setNavigationBarColor(ColorsRes.Negro(this));
             }
+        } else {
+            correo.setTextColor(ColorsRes.Negro(this));
         }
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -105,6 +114,22 @@ public class LogViewer extends AppCompatActivity {
             correo.clearFocus();
 
         }
+        correo.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                inputLayout.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
 
     private void ToastError(Throwable e) {
@@ -152,10 +177,10 @@ public class LogViewer extends AppCompatActivity {
 
     public void send(View view) {
         String mail = correo.getText().toString();
-        if (mail.contains("@") && mail.contains(".") && mail.length() > 6) {
+        if (Patterns.EMAIL_ADDRESS.matcher(mail).matches()) {
             Upload();
         } else {
-            correo.setError("Correo Invalido");
+            inputLayout.setError("Correo Invalido");
         }
     }
     private void Upload() {

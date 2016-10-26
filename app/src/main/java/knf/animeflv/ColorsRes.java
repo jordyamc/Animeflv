@@ -74,8 +74,33 @@ public class ColorsRes {
     }
 
     @ColorInt
+    public static int Dark(Context context) {
+        return ContextCompat.getColor(context, R.color.dark);
+    }
+
+    @ColorInt
     public static int Amarillo(Context context) {
         return ContextCompat.getColor(context, R.color.newCap);
+    }
+
+    @ColorInt
+    public static int LogNew(Context context) {
+        return ContextCompat.getColor(context, R.color.log_new);
+    }
+
+    @ColorInt
+    public static int LogImportante(Context context) {
+        return ContextCompat.getColor(context, R.color.log_importante);
+    }
+
+    @ColorInt
+    public static int LogCorregido(Context context) {
+        return ContextCompat.getColor(context, R.color.log_corregido);
+    }
+
+    @ColorInt
+    public static int LogCambio(Context context) {
+        return ContextCompat.getColor(context, R.color.log_cambio);
     }
 
     @ColorInt

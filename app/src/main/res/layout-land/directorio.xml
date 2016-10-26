@@ -9,6 +9,7 @@
     <include
         android:id="@+id/toolbar_l"
         layout="@layout/toolbar"/>
+
     <com.ogaclejapan.smarttablayout.SmartTabLayout
         android:id="@+id/viewpagertab2"
         android:layout_width="match_parent"
@@ -29,12 +30,15 @@
         app:stl_indicatorThickness="40dp"
         app:stl_underlineColor="@android:color/transparent"
         app:stl_underlineThickness="0dp"/>
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/background_material_light" >
+        android:layout_height="match_parent">
+
         <include layout="@layout/toolbar"/>
+
         <android.support.v7.widget.CardView
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/cardMain"
@@ -47,46 +51,47 @@
             card_view:cardBackgroundColor="@android:color/white"
             card_view:cardCornerRadius="3dp"
             card_view:cardElevation="8dp">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar_search"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/blanco"
-        android:theme="@style/toolbarBlanco">
-        <Spinner
-            android:id="@+id/spinner_generos"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="right"
-            android:visibility="gone"/>
-        <EditText
-            android:id="@+id/et_busqueda"
-            style="@style/CustomEdit"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:hint="Buscar..."
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            android:lines="1"
-            android:maxLines="1"/>
-    </android.support.v7.widget.Toolbar>
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="@color/blanco"
+                    android:theme="@style/toolbarBlanco">
+
+                    <com.rengwuxian.materialedittext.MaterialEditText
+                        android:id="@+id/et_busqueda"
+                        style="@style/CustomEdit"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:hint="Buscar..."
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"
+                        android:lines="1"
+                        android:maxLines="1"
+                        app:met_floatingLabelText=""
+                        app:met_hideUnderline="true"/>
+                </android.support.v7.widget.Toolbar>
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:alpha="0.12"
-                    android:background="@android:color/black" />
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager2"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/viewpagertab2"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"/>
+                    android:background="@android:color/black"/>
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/viewpager2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/viewpagertab2"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginRight="50dp"/>
 
                 <FrameLayout
                     android:id="@+id/frame_dir"

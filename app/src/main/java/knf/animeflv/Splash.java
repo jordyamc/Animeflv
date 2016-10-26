@@ -200,6 +200,8 @@ public class Splash extends AwesomeSplash {
     public void animationsFinished() {
         if (NetworkUtils.isNetworkAvailable()) {
             AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+            asyncHttpClient.setTimeout(2000);
+            asyncHttpClient.setResponseTimeout(2000);
             asyncHttpClient.setConnectTimeout(2000);
             asyncHttpClient.get("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/links.html", null, new JsonHttpResponseHandler() {
 

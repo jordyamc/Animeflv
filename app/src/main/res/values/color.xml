@@ -4,7 +4,13 @@
     <color name="dark">#454545</color>
     <color name="blanco">#ffffff</color>
     <color name="rojo">#F20000</color>
+
     <color name="newCap">#FDFA5D</color>
+
+    <color name="log_new">#FFD700</color>
+    <color name="log_importante">#800080</color>
+    <color name="log_corregido">#FF0000</color>
+    <color name="log_cambio">#008000</color>
 
     <color name="color_divider_line_gray">#e2e2e2</color>
     <color name="color_gray_light_content_text">#5d5d5d</color>

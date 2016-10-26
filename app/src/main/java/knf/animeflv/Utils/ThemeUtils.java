@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorRes;
+import android.view.View;
 
 import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
@@ -45,6 +46,19 @@ public class ThemeUtils {
             color = ColorsRes.Morado(context);
         }
         return color;
+    }
+
+    public static void setStatusBarPadding(Activity activity, View toolbar) {
+        toolbar.setPadding(0, getStatusBarHeight(activity), 0, 0);
+    }
+
+    private static int getStatusBarHeight(Activity activity) {
+        int result = 0;
+        int resourceId = activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = activity.getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 
     public static void setThemeOn(Activity context) {

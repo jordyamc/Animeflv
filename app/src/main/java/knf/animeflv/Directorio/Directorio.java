@@ -22,13 +22,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +39,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -73,12 +72,11 @@ public class Directorio extends AppCompatActivity {
     Toolbar toolbarS;
     Menu menuGlobal;
     @Bind(R.id.et_busqueda)
-    EditText editText;
+    MaterialEditText editText;
     @Bind(R.id.rv_busqueda)
     RecyclerView recyclerView;
     @Bind(R.id.frame_dir)
     FrameLayout frameLayout;
-    @Bind(R.id.LY_dir)
     RelativeLayout linearLayout;
     Activity context;
     EditText.OnEditorActionListener listener;
@@ -86,8 +84,6 @@ public class Directorio extends AppCompatActivity {
     ViewPager viewPager;
     @Bind(R.id.viewpagertab2)
     SmartTabLayout viewPagerTab;
-    @Bind(R.id.spinner_generos)
-    Spinner generosS;
     @Bind(R.id.search_menu_text)
     FloatingActionButton nombre;
     @Bind(R.id.search_menu_generos)
@@ -138,34 +134,59 @@ public class Directorio extends AppCompatActivity {
         ButterKnife.bind(this);
         setSupportActionBar(toolbarS);
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
+            linearLayout = (RelativeLayout) findViewById(R.id.LY_dir);
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (isXLargeScreen(this)) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    getWindow().setFlags(
+                            WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
+                            WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                }
+            }
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
         if (ThemeUtils.isAmoled(this)) {
             toolbarS.setBackgroundColor(getResources().getColor(android.R.color.black));
-            toolbarS.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
-            viewPagerTab.setBackgroundColor(getResources().getColor(android.R.color.black));
-            viewPagerTab.setSelectedIndicatorColors(getResources().getColor(R.color.prim));
+            editText.setTextColor(ColorsRes.Blanco(this));
+            editText.setHintTextColor(ColorsRes.SecondaryTextDark(this));
+            editText.setHighlightColor(ColorsRes.Negro(this));
+            if (!isXLargeScreen(this)) {
+                toolbarS.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
+                viewPagerTab.setBackgroundColor(getResources().getColor(android.R.color.black));
+                viewPagerTab.setSelectedIndicatorColors(getResources().getColor(R.color.prim));
+            } else {
+                toolbarS.getRootView().setBackgroundColor(ColorsRes.Prim(this));
+                findViewById(R.id.cardMain).setBackgroundColor(ColorsRes.Negro(this));
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(getResources().getColor(R.color.negro));
-                getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
+                if (!isXLargeScreen(this)) {
+                    getWindow().setStatusBarColor(getResources().getColor(R.color.negro));
+                    getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
+                } else {
+                    getWindow().setStatusBarColor(ColorsRes.Prim(this));
+                    getWindow().setNavigationBarColor(ColorsRes.Transparent(this));
+                }
             }
         } else {
+            editText.setTextColor(ColorsRes.Negro(this));
+            editText.setHintTextColor(ColorsRes.SecondaryTextLight(this));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(getResources().getColor(R.color.dark));
-                getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
+                if (!isXLargeScreen(this)) {
+                    getWindow().setStatusBarColor(getResources().getColor(R.color.dark));
+                    getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
+                } else {
+                    getWindow().setStatusBarColor(ColorsRes.Dark(this));
+                    getWindow().setNavigationBarColor(ColorsRes.Transparent(this));
+                }
             }
         }
         final String j = OfflineGetter.getDirectorio();
         if (!j.equals("null")) {
-            findViewById(R.id.loading).setVisibility(View.GONE);
             toolbarS.setVisibility(View.VISIBLE);
             viewPagerTab.setVisibility(View.VISIBLE);
             init(j);
@@ -263,7 +284,6 @@ public class Directorio extends AppCompatActivity {
                     case R.id.search:
                         getSupportActionBar().setTitle("");
                         editText.setVisibility(View.VISIBLE);
-                        generosS.setVisibility(View.GONE);
                         editText.setText("");
                         editText.requestFocus();
                         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -538,6 +558,7 @@ public class Directorio extends AppCompatActivity {
             });
         } else {
             Toolbar ltoolbar = (Toolbar) findViewById(R.id.toolbar_l);
+            ThemeUtils.setStatusBarPadding(this, ltoolbar);
             ltoolbar.setNavigationIcon(R.drawable.ic_back_r);
             ltoolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
@@ -582,7 +603,6 @@ public class Directorio extends AppCompatActivity {
                     case R.id.search:
                         getSupportActionBar().setTitle("");
                         editText.setVisibility(View.VISIBLE);
-                        generosS.setVisibility(View.GONE);
                         editText.setText("");
                         editText.requestFocus();
                         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -791,8 +811,6 @@ public class Directorio extends AppCompatActivity {
             mTracker.setScreenName("Directorio");
             mTracker.send(new HitBuilders.ScreenViewBuilder().build());
             editText.setVisibility(View.GONE);
-            //generosS.setVisibility(View.VISIBLE);
-            generosS.setVisibility(View.GONE);
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
             menuGlobal.clear();
@@ -852,8 +870,6 @@ public class Directorio extends AppCompatActivity {
     public void cancelar() {
         editText.setText("");
         editText.setVisibility(View.GONE);
-        //generosS.setVisibility(View.VISIBLE);
-        generosS.setVisibility(View.GONE);
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
         menuGlobal.clear();

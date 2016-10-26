@@ -62,12 +62,17 @@ public class VideoFilesFragment extends Fragment {
                             loading.setVisibility(View.GONE);
                             recyclerView.setAdapter(new VideoFileAdapter(getActivity(), file, list, new DirectoryAdapter.OnFinishListListener() {
                                 @Override
-                                public void onFinish(int count) {
-                                    if (count == 0) {
-                                        noAnime.setVisibility(View.VISIBLE);
-                                    } else {
-                                        noAnime.setVisibility(View.GONE);
-                                    }
+                                public void onFinish(final int count) {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (count == 0) {
+                                                noAnime.setVisibility(View.VISIBLE);
+                                            } else {
+                                                noAnime.setVisibility(View.GONE);
+                                            }
+                                        }
+                                    });
                                 }
                             }));
                             if (list.size() == 0) {

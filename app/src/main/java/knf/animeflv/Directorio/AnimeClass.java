@@ -51,7 +51,11 @@ public class AnimeClass {
     }
 
     public int getAidInt() {
-        return Integer.parseInt(aid);
+        try {
+            return Integer.parseInt(aid);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public int getIndex() {

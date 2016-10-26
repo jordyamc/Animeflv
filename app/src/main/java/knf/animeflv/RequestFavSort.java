@@ -1,7 +1,6 @@
 package knf.animeflv;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -25,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
@@ -37,6 +35,7 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.ThemeUtils;
 
 public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<AnimeClass>> {
@@ -171,7 +170,12 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
                         File file1 = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
                         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt";
                         if (file1.exists()) {
-                            list.add(new AnimeClass(getStringFromFile(file_loc)));
+                            String json = getStringFromFile(file_loc);
+                            if (FileUtil.isJSONValid(json)) {
+                                list.add(new AnimeClass(json));
+                            } else {
+                                file1.delete();
+                            }
                         }
                         updateDialog();
                     }
@@ -179,7 +183,12 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
             } else {
                 String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt";
                 if (file.exists()) {
-                    list.add(new AnimeClass(getStringFromFile(file_loc)));
+                    String json = getStringFromFile(file_loc);
+                    if (FileUtil.isJSONValid(json)) {
+                        list.add(new AnimeClass(json));
+                    } else {
+                        file.delete();
+                    }
                 }
                 updateDialog();
             }

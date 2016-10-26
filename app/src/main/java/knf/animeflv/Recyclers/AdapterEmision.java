@@ -3,7 +3,6 @@ package knf.animeflv.Recyclers;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -35,6 +34,7 @@ import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
 
 /**
@@ -50,20 +50,13 @@ public class AdapterEmision extends RecyclerView.Adapter<AdapterEmision.ViewHold
     private int accent;
     private List<String> inMain;
     private int lastPosition = 0;
-    public AdapterEmision(Activity context, List<TimeCompareModel> animes) {
-        this.context = context;
-        this.Animes = animes;
-        blanco = ColorsRes.Blanco(context);
-        accent = getColor();
-        inMain = ListInMain();
-    }
 
     public AdapterEmision(Activity context, List<TimeCompareModel> animes, boolean show) {
         this.context = context;
         this.Animes = animes;
         this.show = show;
         blanco = ColorsRes.Blanco(context);
-        accent = getColor();
+        accent = ThemeUtils.getAcentColor(context);
         inMain = ListInMain();
     }
 
@@ -173,31 +166,6 @@ public class AdapterEmision extends RecyclerView.Adapter<AdapterEmision.ViewHold
             convert = utc + "-UTC--->" + e.getMessage();
         }
         return convert;
-    }
-
-    private int getColor() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(context));
-        int color = ColorsRes.Naranja(context);
-        if (accent == ColorsRes.Rojo(context)) {
-            color = ColorsRes.Rojo(context);
-        }
-        if (accent == ColorsRes.Naranja(context)) {
-            color = ColorsRes.Naranja(context);
-        }
-        if (accent == ColorsRes.Gris(context)) {
-            color = ColorsRes.Gris(context);
-        }
-        if (accent == ColorsRes.Verde(context)) {
-            color = ColorsRes.Verde(context);
-        }
-        if (accent == ColorsRes.Rosa(context)) {
-            color = ColorsRes.Rosa(context);
-        }
-        if (accent == ColorsRes.Morado(context)) {
-            color = ColorsRes.Morado(context);
-        }
-        return color;
     }
 
     public void updatefavs() {

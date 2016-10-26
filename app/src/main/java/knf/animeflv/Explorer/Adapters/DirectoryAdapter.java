@@ -94,6 +94,7 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
                                     FileUtil.DeleteAnime(file.replace(".mp4", "E"));
                                 }
                                 if (list.get(holder.getAdapterPosition()).getFile().list().length == 0) {
+                                    notifyItemRemoved(holder.getAdapterPosition());
                                     Toaster.toast("Archivos eliminados");
                                     recreateList();
                                 } else {

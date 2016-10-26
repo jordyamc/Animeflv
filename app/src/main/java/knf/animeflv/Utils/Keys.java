@@ -32,6 +32,7 @@ public class Keys {
         public static final String INDICADOR_SONIDOS = "ind_sounds";
         public static final String RECHARGE_SOUNDS = "r_sounds";
         public static final String SD_ACCESS = "sd_access";
+        public static final String CURRENT_VERSION = "c_ver";
     }
 
     public static class Login {

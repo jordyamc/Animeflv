@@ -53,11 +53,7 @@ public class newDayFragment extends Fragment {
         if (list.isEmpty()) {
             list.add(new TimeCompareModel());
         }
-        if (diaCode == getActualDayCode()) {
-            emision = new AdapterEmision(getActivity(), list, true);
-        } else {
-            emision = new AdapterEmision(getActivity(), list);
-        }
+        emision = new AdapterEmision(getActivity(), list, diaCode == getActualDayCode());
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         recyclerView.setAdapter(emision);

@@ -277,6 +277,14 @@ public class LoginUser extends AppCompatActivity {
             email.setTextColor(ColorsRes.SecondaryTextLight(this));
             password.setTextColor(ColorsRes.SecondaryTextLight(this));
             r_password.setTextColor(ColorsRes.SecondaryTextLight(this));
+            image.getRootView().setBackgroundColor(ColorsRes.Blanco(this));
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setNavigationBarColor(ColorsRes.Negro(this));
+            }
+            email.setTextColor(ColorsRes.SecondaryTextDark(this));
+            password.setTextColor(ColorsRes.SecondaryTextDark(this));
+            r_password.setTextColor(ColorsRes.SecondaryTextDark(this));
             image.getRootView().setBackgroundColor(ColorsRes.Negro(this));
         }
     }

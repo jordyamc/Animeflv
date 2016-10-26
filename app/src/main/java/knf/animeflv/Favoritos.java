@@ -120,15 +120,34 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                 }
             });
         }
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (isXLargeScreen(this)) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    ThemeUtils.setStatusBarPadding(this, ltoolbar);
+                    getWindow().setFlags(
+                            WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
+                            WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                }
+            }
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
+        if (ThemeUtils.isAmoled(this)) {
             toolbar.setBackgroundColor(getResources().getColor(android.R.color.black));
-            toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
+            if (!isXLargeScreen(this)) {
+                toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
+            } else {
+                toolbar.getRootView().setBackgroundColor(ColorsRes.Prim(this));
+                findViewById(R.id.cardMain).setBackgroundColor(ColorsRes.Negro(this));
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(getResources().getColor(R.color.negro));
-                getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
+                if (!isXLargeScreen(this)) {
+                    getWindow().setStatusBarColor(getResources().getColor(R.color.negro));
+                    getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
+                } else {
+                    getWindow().setStatusBarColor(ColorsRes.Prim(this));
+                    getWindow().setNavigationBarColor(ColorsRes.Transparent(this));
+                }
             }
         }
         final String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
@@ -163,7 +182,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         Log.d("favoritos", fav);
         aids = new ArrayList<String>();
         for (String i : favoritos) {
-            if (!i.equals("")) {
+            if (!i.equals("") && !i.equals("null")) {
                 aids.add(i);
             }
         }
@@ -200,6 +219,9 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                     }
                 }, 1000);
             }
+        }
+        if (NetworkUtils.isNetworkAvailable()) {
+            knf.animeflv.LoginActivity.LoginServer.RefreshData(this);
         }
     }
 
@@ -324,7 +346,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_sort_fav, menu);
+        getMenuInflater().inflate(ThemeUtils.isAmoled(this) ? R.menu.menu_sort_fav : R.menu.menu_sort_fav_dark, menu);
         return true;
     }
 
@@ -336,7 +358,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         Log.d("favoritos", fav);
         aids = new ArrayList<>();
         for (String i : sem) {
-            if (!i.equals("")) {
+            if (!i.equals("") && !i.equals("null")) {
                 aids.add(i);
             }
         }

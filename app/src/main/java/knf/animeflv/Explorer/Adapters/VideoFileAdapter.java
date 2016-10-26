@@ -113,6 +113,7 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
         holder.ver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                showAsSeen(holder);
                 StreamManager.Play(context, list.get(holder.getAdapterPosition()).getEID());
             }
         });

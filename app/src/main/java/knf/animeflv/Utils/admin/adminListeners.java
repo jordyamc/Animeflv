@@ -2,6 +2,7 @@ package knf.animeflv.Utils.admin;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 
 import com.afollestad.materialdialogs.GravityEnum;
@@ -115,6 +116,7 @@ public class adminListeners {
                     @Override
                     public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                         super.onFailure(statusCode, headers, responseString, throwable);
+                        Log.e("Clean Emision", responseString);
                         Toaster.toast("Error al filtrar lista");
                     }
                 });

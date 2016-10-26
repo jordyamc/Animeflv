@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.LoginActivity.LoginBase;
 import knf.animeflv.LoginActivity.LoginUser;
 import knf.animeflv.Tutorial.TutorialActivity;
@@ -188,9 +189,9 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("b_log").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                ChangelogDialog.create()
-                        .show(myContext.getSupportFragmentManager(), "changelog");
-
+                /*ChangelogDialog.create()
+                        .show(myContext.getSupportFragmentManager(), "changelog");*/
+                startActivity(new Intent(getActivity(), ChangelogActivity.class));
                 return false;
             }
         });

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/sort_alph"
+        android:icon="@drawable/ic_sort_alph_dark"
+        android:orderInCategory="100"
+        android:title="Reordenar por Nombre"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/sort_num"
+        android:icon="@drawable/ic_sort_num_dark"
+        android:orderInCategory="200"
+        android:title="Reordenar por ID"
+        app:showAsAction="always"/>
+</menu>
