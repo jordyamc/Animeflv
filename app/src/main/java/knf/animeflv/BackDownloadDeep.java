@@ -1,5 +1,6 @@
 package knf.animeflv;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -73,7 +74,7 @@ public class BackDownloadDeep extends AppCompatActivity {
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
 
     Parser parser = new Parser();
-    Context context;
+    Activity context;
     String link;
     MaterialDialog d;
     Spinner sp;
@@ -170,7 +171,7 @@ public class BackDownloadDeep extends AppCompatActivity {
         context = this;
         setupWeb();
         String url = getIntent().getDataString().replace("http://animeflv.net/ver/", "").replace(".html", "");
-        String cortado = url.substring(0, url.lastIndexOf("-"));
+        final String cortado = url.substring(0, url.lastIndexOf("-"));
         aid = parser.getAidCached(cortado);
         num = url.substring(url.lastIndexOf("-") + 1);
         titulo = parser.getTitCached(aid);
@@ -204,7 +205,7 @@ public class BackDownloadDeep extends AppCompatActivity {
                             Toaster.toast("El anime ya existe, reproduciendo");
                             int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_video", "0"));
                             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid, eid.replace("E", "") + ".mp4");
-                            File sd = new File(FileUtil.getSDPath() + "/Animeflv/download/" + aid, eid.replace("E", "") + ".mp4");
+                            File sd = new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + aid, eid.replace("E", "") + ".mp4");
                             switch (type) {
                                 case 0:
                                     if (file.exists()) {
@@ -241,7 +242,7 @@ public class BackDownloadDeep extends AppCompatActivity {
     }
 
     public boolean animeExist() {
-        return new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid, eid.replace("E", "") + ".mp4").exists() || new File(FileUtil.getSDPath() + "/Animeflv/download/" + aid, eid.replace("E", "") + ".mp4").exists();
+        return new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid, eid.replace("E", "") + ".mp4").exists() || new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + aid, eid.replace("E", "") + ".mp4").exists();
     }
 
     public void setupWeb() {

@@ -22,7 +22,7 @@ import knf.animeflv.Utils.logs.LogViewer;
 public class Logger {
     private static Context context;
 
-    public static void init(Context context) {
+    public static void initial(Context context) {
         Logger.context = context;
     }
 

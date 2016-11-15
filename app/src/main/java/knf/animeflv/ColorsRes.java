@@ -79,6 +79,11 @@ public class ColorsRes {
     }
 
     @ColorInt
+    public static int AccentNormal(Context context) {
+        return ContextCompat.getColor(context, R.color.nmain);
+    }
+
+    @ColorInt
     public static int Amarillo(Context context) {
         return ContextCompat.getColor(context, R.color.newCap);
     }

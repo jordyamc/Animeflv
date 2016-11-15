@@ -39,7 +39,7 @@ public class UtilSound {
     private static AudioWidget widget;
     private static int currentMediaPlayerInt = 0;
 
-    public static void init(Context context){
+    public static void initial(Context context) {
         UtilSound.context=context;
     }
 

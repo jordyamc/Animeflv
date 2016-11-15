@@ -78,7 +78,7 @@
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
     </style>
 
-    <style name="AppThemeNoAn" parent="MaterialDrawerTheme.Light.DarkToolbar">
+    <style name="AppThemeNoAn" parent="AppTheme">
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
     </style>
 

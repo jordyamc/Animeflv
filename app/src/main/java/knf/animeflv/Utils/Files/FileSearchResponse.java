@@ -8,13 +8,19 @@ import java.util.List;
  */
 public class FileSearchResponse {
     private List<String> sdNames = new ArrayList<>();
+    private List<String> sdDirs = new ArrayList<>();
 
-    public FileSearchResponse(List<String> sdNames) {
+    public FileSearchResponse(List<String> sdNames, List<String> sdDirs) {
         this.sdNames = sdNames;
+        this.sdDirs = sdDirs;
     }
 
     public List<String> list() {
         return sdNames;
+    }
+
+    public List<String> listDisrs() {
+        return sdDirs;
     }
 
     public boolean existSD() {

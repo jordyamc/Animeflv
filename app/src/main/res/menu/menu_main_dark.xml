@@ -2,15 +2,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".Main">
     <item
+        android:id="@+id/media_route"
+        android:orderInCategory="100"
+        android:title="Cast"
+        app:showAsAction="always"/>
+    <item
         android:id="@+id/carg"
         android:enabled="false"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:title="Cargando"
         app:showAsAction="always"/>
     <item
         android:id="@+id/search"
         android:icon="@drawable/ic_buscar_d"
-        android:orderInCategory="200"
+        android:orderInCategory="300"
         android:title="Buscar"
         app:showAsAction="always"/>
 </menu>

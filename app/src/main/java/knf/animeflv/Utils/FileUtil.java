@@ -34,104 +34,45 @@ import java.util.List;
 import knf.animeflv.Utils.Files.FileSearchResponse;
 
 public class FileUtil {
-    private static FileUtil util = new FileUtil();
-    private static Context context;
+    private static FileUtil util;
+    private Context context;
 
-    public static void init(Context cont) {
+    public FileUtil(Context context) {
+        this.context = context;
+    }
+
+    public static FileUtil init(Context cont) {
         if (util == null) {
-            util = new FileUtil();
+            util = new FileUtil(cont);
         }
-        context = cont;
+        return util;
     }
 
-    public static String getSDPath() {
-        String sSDpath = null;
-        File fileCur = null;
-        for (String sPathCur : Arrays.asList("MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard", PreferenceManager.getDefaultSharedPreferences(context).getString("SDPath", "null"))) {
-            fileCur = new File("/mnt/", sPathCur);
-            if (fileCur.isDirectory()) {
-                if (fileCur.canWrite()) {
-                    sSDpath = fileCur.getAbsolutePath();
-                    break;
-                } else {
-                    if (DocumentFile.fromFile(fileCur).canWrite()) {
-                        sSDpath = fileCur.getAbsolutePath();
-                    } else {
-                        if (RootFileHaveAccess()) {
-                            sSDpath = fileCur.getAbsolutePath();
-                        } else {
-                            sSDpath = "_noWrite_" + sPathCur;
-                        }
-                    }
-                    break;
-                }
-            }
-            if (sSDpath == null) {
-                fileCur = new File("/storage/", sPathCur);
-                if (fileCur.isDirectory()) {
-                    if (fileCur.canWrite()) {
-                        sSDpath = fileCur.getAbsolutePath();
-                        break;
-                    } else {
-                        if (DocumentFile.fromFile(fileCur).canWrite()) {
-                            sSDpath = fileCur.getAbsolutePath();
-                        } else {
-                            if (RootFileHaveAccess()) {
-                                sSDpath = fileCur.getAbsolutePath();
-                            } else {
-                                sSDpath = "_noWrite_" + sPathCur;
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-            if (sSDpath == null) {
-                fileCur = new File("/storage/emulated", sPathCur);
-                if (fileCur.isDirectory()) {
-                    if (fileCur.canWrite()) {
-                        sSDpath = fileCur.getAbsolutePath();
-                        break;
-                    } else {
-                        if (DocumentFile.fromFile(fileCur).canWrite()) {
-                            sSDpath = fileCur.getAbsolutePath();
-                        } else {
-                            if (RootFileHaveAccess()) {
-                                sSDpath = fileCur.getAbsolutePath();
-                            } else {
-                                sSDpath = "_noWrite_" + sPathCur;
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        return sSDpath;
+    public static boolean haveSDPermission(Context context) {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP || PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null) != null;
     }
 
-    public static FileSearchResponse searchforSD() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return getResponseAccess();
-        } else {
-            return getResponseNormal();
-        }
+    public static List<String> getExcludeDirList() {
+        return Arrays.asList("expand", "media_rw", "obb", "runtime", "secure", "shared",
+                "user", "self", "sdcard", "emulated", "acct", "cache", "config", "d", "data",
+                "dev", "etc", "firmware", "fsg", "oem", "persist", "proc", "root", "sbin", "sys",
+                "system", "vendor", "asec", "shell", "knox", "cd-rom",/*provicional*/"sdcard0");
     }
 
     private static FileSearchResponse getResponseNormal() {
         List<String> sdNames = new ArrayList<>();
-        List<String> exclude = Arrays.asList("expand", "media_rw", "obb", "runtime", "secure", "shared",
-                "user", "self", "sdcard", "emulated", "acct", "cache", "config", "d", "data", "dev", "etc",
-                "firmware", "fsg", "oem", "persist", "proc", "root", "sbin", "sys", "system", "vendor", "asec", "shell");
+        List<String> sdDirs = new ArrayList<>();
+        List<String> exclude = getExcludeDirList();
         String intName = Environment.getExternalStorageDirectory().getName();
-        File mnt = new File("/mnt");
-        if (mnt.exists()) {
-            for (File dir : mnt.listFiles()) {
+        File storage = new File("/storage");
+        if (storage.exists()) {
+            for (File dir : storage.listFiles()) {
                 if (dir.isDirectory()) {
                     if (dir.canWrite()) {
                         if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
                             if (!sdNames.contains(dir.getName())) {
                                 sdNames.add(dir.getName());
+                                sdDirs.add(dir.getAbsolutePath());
                             }
                         }
                     } else {
@@ -142,185 +83,19 @@ public class FileUtil {
                                 } else {
                                     sdNames.add(dir.getName());
                                 }
+                                sdDirs.add(dir.getAbsolutePath());
                             }
                         }
                     }
                 }
             }
         }
-        File storage = new File("/storage");
-        if (storage.exists()) {
-            for (File dir : storage.listFiles()) {
-                if (dir.isDirectory()) {
-                    if (dir.canWrite()) {
-                        if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
-                            if (!sdNames.contains(dir.getName())) {
-                                sdNames.add(dir.getName());
-                            }
-                        }
-                    } else {
-                        if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
-                            if (!sdNames.contains(dir.getName())) {
-                                if (!DocumentFile.fromFile(dir).canWrite()) {
-                                    sdNames.add("_noWrite_" + dir.getName());
-                                } else {
-                                    sdNames.add(dir.getName());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return new FileSearchResponse(sdNames);
-    }
-
-    private static FileSearchResponse getResponseAccess() {
-        List<String> sdNames = new ArrayList<>();
-        List<String> exclude = Arrays.asList("expand", "media_rw", "obb", "runtime", "secure", "shared",
-                "user", "self", "sdcard", "emulated", "acct", "cache", "config", "d", "data", "dev", "etc",
-                "firmware", "fsg", "oem", "persist", "proc", "root", "sbin", "sys", "system", "vendor", "asec", "shell");
-        String intName = Environment.getExternalStorageDirectory().getName();
-        File mnt = new File("/mnt");
-        if (mnt.exists()) {
-            for (File dir : mnt.listFiles()) {
-                if (dir.isDirectory()) {
-                    if (dir.canWrite()) {
-                        if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
-                            if (!sdNames.contains(dir.getName())) {
-                                sdNames.add(dir.getName());
-                            }
-                        }
-                    } else {
-                        if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
-                            if (!sdNames.contains(dir.getName())) {
-                                if (!DocumentFile.fromFile(dir).canWrite()) {
-                                    if (RootFileHaveAccess()) {
-                                        sdNames.add(dir.getName());
-                                    } else {
-                                        sdNames.add("_noWrite_" + dir.getName());
-                                    }
-                                } else {
-                                    sdNames.add(dir.getName());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        File storage = new File("/storage");
-        if (storage.exists()) {
-            for (File dir : storage.listFiles()) {
-                if (dir.isDirectory()) {
-                    if (dir.canWrite()) {
-                        if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
-                            if (!sdNames.contains(dir.getName())) {
-                                sdNames.add(dir.getName());
-                            }
-                        }
-                    } else {
-                        if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
-                            if (!sdNames.contains(dir.getName())) {
-                                if (!DocumentFile.fromFile(dir).canWrite()) {
-                                    if (RootFileHaveAccess()) {
-                                        sdNames.add(dir.getName());
-                                    } else {
-                                        sdNames.add("_noWrite_" + dir.getName());
-                                    }
-                                } else {
-                                    sdNames.add(dir.getName());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return new FileSearchResponse(sdNames);
-    }
-
-    public static boolean ExistAnime(String eid) {
-        String[] data = eid.replace("E", "").split("_");
-        File internal = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + data[0], eid.replace("E", "") + ".mp4");
-        File external = new File(getSDPath() + "/Animeflv/download/" + data[0], eid.replace("E", "") + ".mp4");
-        return internal.exists() || external.exists();
-    }
-
-    public static boolean DeleteAnime(String eid) {
-        String[] data = eid.replace("E", "").split("_");
-        File internal = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + data[0], eid.replace("E", "") + ".mp4");
-        File external = new File(getSDPath() + "/Animeflv/download/" + data[0], eid.replace("E", "") + ".mp4");
-        try {
-            return internal.delete() || external.delete() || getFileFromAccess(eid).delete();
-        } catch (NullPointerException e) {
-            return internal.delete() || external.delete();
-        }
-    }
-
-    public static DocumentFile getFileFromAccess(String eid) {
-        String[] data = eid.replace("E", "").split("_");
-        Uri treeUri;
-        try {
-            treeUri = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null));
-        } catch (Exception e) {
-            return DocumentFile.fromFile(new File(Environment.getExternalStorageDirectory(), "adahsjkdhuaiohaudusws.txt"));
-        }
-        if (treeUri != null) {
-            DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
-            return findFileFromAccess(findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), data[0]), eid.replace("E", "") + ".mp4");
-        } else {
-            return DocumentFile.fromFile(new File(Environment.getExternalStorageDirectory(), "adahsjkdhuaiohaudusws.txt"));
-        }
-    }
-
-    public static File getFileNormal(String eid) {
-        return new File(getSDPath() + "/Animeflv/download/" + eid.split("_")[0], eid.replace("E", "") + ".mp4");
-    }
-
-    @Nullable
-    public static DocumentFile getDownloadFromAccess(File file) {
-        String name = file.getName();
-        Uri treeUri;
-        try {
-            treeUri = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null));
-        } catch (Exception e) {
-            return null;
-        }
-        if (treeUri != null) {
-            DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
-            DocumentFile animeFile = findFileFromAccess(findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), name.replace(".mp4", "").split("_")[0]), name);
-            if (animeFile == null) {
-                findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), name.replace(".mp4", "").split("_")[0]).createFile("video/mp4", name.replace(".mp4", ""));
-            } else {
-                animeFile.delete();
-                findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), name.replace(".mp4", "").split("_")[0]).createFile("video/mp4", name.replace(".mp4", ""));
-            }
-            return findFileFromAccess(findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), name.replace(".mp4", "").split("_")[0]), name);
-        } else {
-            return null;
-        }
-    }
-
-    @Nullable
-    public static DocumentFile getDownloadDirFromAccess() {
-        Uri treeUri;
-        try {
-            treeUri = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null));
-        } catch (Exception e) {
-            return null;
-        }
-        if (treeUri != null) {
-            DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
-            return findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download");
-        } else {
-            return null;
-        }
+        return new FileSearchResponse(sdNames, sdDirs);
     }
 
     @Nullable
     public static ParcelFileDescriptor getFileDescriptorFromAccess(Activity activity, File file) {
-        DocumentFile sdFile = getDownloadFromAccess(file);
+        DocumentFile sdFile = FileUtil.init(activity).getDownloadFromAccess(file);
         if (sdFile != null) {
             try {
                 return activity.getContentResolver().openFileDescriptor(sdFile.getUri(), "rw");
@@ -335,7 +110,7 @@ public class FileUtil {
 
     @Nullable
     public static OutputStream getOutputStreamFromAccess(Activity activity, File file) {
-        DocumentFile sdFile = getDownloadFromAccess(file);
+        DocumentFile sdFile = FileUtil.init(activity).getDownloadFromAccess(file);
         if (sdFile != null) {
             try {
                 return activity.getContentResolver().openOutputStream(sdFile.getUri(), "rw");
@@ -345,55 +120,6 @@ public class FileUtil {
 
         } else {
             return null;
-        }
-    }
-
-    public static boolean RootFileHaveAccess() {
-        Uri treeUri;
-        try {
-            treeUri = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null));
-        } catch (Exception e) {
-            return false;
-        }
-        if (treeUri != null) {
-            DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
-            if (sdFile != null) {
-                return sdFile.canWrite();
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    @Nullable
-    public static OutputStream getOutputStreamFromAccess(String eid) {
-        String[] data = eid.replace("E", "").split("_");
-        Uri treeUri = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null));
-        if (treeUri != null) {
-            DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
-            DocumentFile animeFile = findFileFromAccess(findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), data[0]), eid.replace("E", "") + ".mp4");
-            if (animeFile == null) {
-                animeFile = findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), data[0]).createFile("video/mp4", eid.replace("E", ""));
-            }
-            try {
-                return context.getContentResolver().openOutputStream(animeFile.getUri());
-            } catch (Exception e) {
-                animeFile.delete();
-                e.printStackTrace();
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    public static OutputStream getOutputStream(String eid) throws FileNotFoundException {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return getOutputStreamFromAccess(eid);
-        } else {
-            return (OutputStream) new FileOutputStream(getFileNormal(eid));
         }
     }
 
@@ -408,45 +134,6 @@ public class FileUtil {
             Log.d("File Not Exist", name);
         }
         return file;
-    }
-
-    public static boolean isInSeen(String eid) {
-        return context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + eid.replace("E", ""), false);
-    }
-
-    public static void setSeenState(String eid, boolean seen) {
-        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + eid.replace("E", ""), seen).apply();
-        if (seen) {
-            String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-            if (!vistos.contains(eid)) {
-                vistos = vistos + eid + ":::";
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-            } else {
-                if (vistos.contains(eid + ":::")) {
-                    vistos = vistos.replace(eid + ":::", "");
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-                }
-            }
-        }
-    }
-
-    public static boolean isMXinstalled() {
-        List<ApplicationInfo> packages;
-        PackageManager pm;
-        pm = context.getPackageManager();
-        packages = pm.getInstalledApplications(0);
-        String pack = "null";
-        for (ApplicationInfo packageInfo : packages) {
-            if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
-                pack = "com.mxtech.videoplayer.pro";
-                break;
-            }
-            if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
-                pack = "com.mxtech.videoplayer.ad";
-                break;
-            }
-        }
-        return !pack.equals("null");
     }
 
     public static boolean isJSONValid(String test) {
@@ -534,8 +221,8 @@ public class FileUtil {
                 .replace("&hearts;", "\u2665")
                 .replace("&infin;", "\u221E")
                 .replace("♪", "\u266A")
-                .replace("â\u0099ª","\u266A")
-                .replace("&Psi;","\u03A8");
+                .replace("â\u0099ª", "\u266A")
+                .replace("&Psi;", "\u03A8");
         return array;
     }
 
@@ -552,5 +239,287 @@ public class FileUtil {
 
     public static boolean existDir() {
         return new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt").exists();
+    }
+
+    public String getSDPath() {
+        String sSDpath = null;
+        File fileCur = null;
+        for (String sPathCur : Arrays.asList(PreferenceManager.getDefaultSharedPreferences(context).getString("SDPath", "null"), "MicroSD", "external_SD", "sdcard1", "ext_card", "external_sd", "ext_sd", "external", "extSdCard", "externalSdCard")) {
+            if (sSDpath == null) {
+                fileCur = new File("/storage/", sPathCur);
+                if (fileCur.isDirectory()) {
+                    if (fileCur.canWrite()) {
+                        sSDpath = fileCur.getAbsolutePath();
+                        break;
+                    } else {
+                        if (DocumentFile.fromFile(fileCur).canWrite()) {
+                            sSDpath = fileCur.getAbsolutePath();
+                        } else {
+                            if (RootFileHaveAccess()) {
+                                sSDpath = fileCur.getAbsolutePath();
+                            } else {
+                                sSDpath = "_noWrite_" + sPathCur;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            if (sSDpath == null) {
+                fileCur = new File("/storage/emulated", sPathCur);
+                if (fileCur.isDirectory()) {
+                    if (fileCur.canWrite()) {
+                        sSDpath = fileCur.getAbsolutePath();
+                        break;
+                    } else {
+                        if (DocumentFile.fromFile(fileCur).canWrite()) {
+                            sSDpath = fileCur.getAbsolutePath();
+                        } else {
+                            if (RootFileHaveAccess()) {
+                                sSDpath = fileCur.getAbsolutePath();
+                            } else {
+                                sSDpath = "_noWrite_" + sPathCur;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        return sSDpath;
+    }
+
+    public FileSearchResponse searchforSD() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return getResponseAccess();
+        } else {
+            return getResponseNormal();
+        }
+    }
+
+    private FileSearchResponse getResponseAccess() {
+        List<String> sdNames = new ArrayList<>();
+        List<String> sdDirs = new ArrayList<>();
+        List<String> exclude = getExcludeDirList();
+        String intName = Environment.getExternalStorageDirectory().getName();
+        File storage = new File("/storage");
+        if (storage.exists()) {
+            for (File dir : storage.listFiles()) {
+                if (dir.isDirectory()) {
+                    if (dir.canWrite()) {
+                        if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
+                            if (!sdNames.contains(dir.getName())) {
+                                sdNames.add(dir.getName());
+                                sdDirs.add(dir.getAbsolutePath());
+                            }
+                        }
+                    } else {
+                        if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
+                            if (!sdNames.contains(dir.getName())) {
+                                if (!DocumentFile.fromFile(dir).canWrite()) {
+                                    if (RootFileHaveAccess()) {
+                                        sdNames.add(dir.getName());
+                                    } else {
+                                        sdNames.add("_noWrite_" + dir.getName());
+                                    }
+                                    sdDirs.add(dir.getAbsolutePath());
+                                } else {
+                                    sdNames.add(dir.getName());
+                                    sdDirs.add(dir.getAbsolutePath());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return new FileSearchResponse(sdNames, sdDirs);
+    }
+
+    public boolean ExistAnime(String eid) {
+        String[] data = eid.replace("E", "").split("_");
+        File internal = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + data[0], eid.replace("E", "") + ".mp4");
+        File external = new File(getSDPath() + "/Animeflv/download/" + data[0], eid.replace("E", "") + ".mp4");
+        return internal.exists() || external.exists();
+    }
+
+    public boolean DeleteAnime(String eid) {
+        String[] data = eid.replace("E", "").split("_");
+        File internal = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + data[0], eid.replace("E", "") + ".mp4");
+        File external = new File(getSDPath() + "/Animeflv/download/" + data[0], eid.replace("E", "") + ".mp4");
+        try {
+            return internal.delete() || external.delete() || getFileFromAccess(eid).delete();
+        } catch (NullPointerException e) {
+            return internal.delete() || external.delete();
+        }
+    }
+
+    public boolean DeleteAnimeDir(String aid) {
+        File internal = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid);
+        File external = new File(getSDPath() + "/Animeflv/download/" + aid);
+        try {
+            return internal.delete() || external.delete() || getDirFromAccess(aid).delete();
+        } catch (NullPointerException e) {
+            return internal.delete() || external.delete();
+        }
+    }
+
+    public DocumentFile getFileFromAccess(String eid) {
+        String[] data = eid.replace("E", "").split("_");
+        Uri treeUri;
+        try {
+            treeUri = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null));
+        } catch (Exception e) {
+            return DocumentFile.fromFile(new File(Environment.getExternalStorageDirectory(), "adahsjkdhuaiohaudusws.txt"));
+        }
+        if (treeUri != null) {
+            DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
+            return findFileFromAccess(findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), data[0]), eid.replace("E", "") + ".mp4");
+        } else {
+            return DocumentFile.fromFile(new File(Environment.getExternalStorageDirectory(), "adahsjkdhuaiohaudusws.txt"));
+        }
+    }
+
+    public DocumentFile getDirFromAccess(String aid) {
+        Uri treeUri;
+        try {
+            treeUri = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null));
+        } catch (Exception e) {
+            return DocumentFile.fromFile(new File(Environment.getExternalStorageDirectory(), "adahsjkdhuaiohaudusws.txt"));
+        }
+        if (treeUri != null) {
+            DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
+            return findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), aid);
+        } else {
+            return DocumentFile.fromFile(new File(Environment.getExternalStorageDirectory(), "adahsjkdhuaiohaudusws.txt"));
+        }
+    }
+
+    public File getFileNormal(String eid) {
+        return new File(getSDPath() + "/Animeflv/download/" + eid.split("_")[0], eid.replace("E", "") + ".mp4");
+    }
+
+    @Nullable
+    public DocumentFile getDownloadFromAccess(File file) {
+        String name = file.getName();
+        Uri treeUri;
+        try {
+            treeUri = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null));
+        } catch (Exception e) {
+            return null;
+        }
+        if (treeUri != null) {
+            DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
+            DocumentFile animeFile = findFileFromAccess(findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), name.replace(".mp4", "").split("_")[0]), name);
+            if (animeFile == null) {
+                findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), name.replace(".mp4", "").split("_")[0]).createFile("video/mp4", name.replace(".mp4", ""));
+            } else {
+                animeFile.delete();
+                findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), name.replace(".mp4", "").split("_")[0]).createFile("video/mp4", name.replace(".mp4", ""));
+            }
+            return findFileFromAccess(findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), name.replace(".mp4", "").split("_")[0]), name);
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    public DocumentFile getDownloadDirFromAccess() {
+        Uri treeUri;
+        try {
+            treeUri = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null));
+        } catch (Exception e) {
+            return null;
+        }
+        if (treeUri != null) {
+            DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
+            return findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download");
+        } else {
+            return null;
+        }
+    }
+
+    public boolean RootFileHaveAccess() {
+        Uri treeUri;
+        try {
+            treeUri = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null));
+            if (treeUri != null) {
+                DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
+                return sdFile != null && sdFile.canWrite();
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Nullable
+    public OutputStream getOutputStreamFromAccess(String eid) {
+        String[] data = eid.replace("E", "").split("_");
+        Uri treeUri = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null));
+        if (treeUri != null) {
+            DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
+            DocumentFile animeFile = findFileFromAccess(findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), data[0]), eid.replace("E", "") + ".mp4");
+            if (animeFile == null) {
+                animeFile = findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), data[0]).createFile("video/mp4", eid.replace("E", ""));
+            }
+            try {
+                return context.getContentResolver().openOutputStream(animeFile.getUri());
+            } catch (Exception e) {
+                animeFile.delete();
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public OutputStream getOutputStream(String eid) throws FileNotFoundException {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return getOutputStreamFromAccess(eid);
+        } else {
+            return new FileOutputStream(getFileNormal(eid));
+        }
+    }
+
+    public boolean isInSeen(String eid) {
+        return context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + eid.replace("E", ""), false);
+    }
+
+    public void setSeenState(String eid, boolean seen) {
+        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + eid.replace("E", ""), seen).apply();
+        if (seen) {
+            String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+            if (!vistos.contains(eid)) {
+                vistos = vistos + eid + ":::";
+                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
+            } else {
+                if (vistos.contains(eid + ":::")) {
+                    vistos = vistos.replace(eid + ":::", "");
+                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
+                }
+            }
+        }
+    }
+
+    public boolean isMXinstalled() {
+        List<ApplicationInfo> packages;
+        PackageManager pm;
+        pm = context.getPackageManager();
+        packages = pm.getInstalledApplications(0);
+        String pack = "null";
+        for (ApplicationInfo packageInfo : packages) {
+            if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
+                pack = "com.mxtech.videoplayer.pro";
+                break;
+            }
+            if (packageInfo.packageName.equals("com.mxtech.videoplayer.ad")) {
+                pack = "com.mxtech.videoplayer.ad";
+                break;
+            }
+        }
+        return !pack.equals("null");
     }
 }

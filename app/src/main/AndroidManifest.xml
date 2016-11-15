@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
@@ -56,6 +57,10 @@
                     android:pathPrefix="/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true"
                     android:scheme="http"/>
             </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts"/>
         </activity>
         <activity
             android:name="com.nononsenseapps.filepicker.FilePickerActivity"
@@ -98,10 +103,6 @@
         <activity
             android:name=".Intronew"
             android:label="@string/app_name"/>
-        <activity
-            android:name=".Move"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Transparent"/>
         <activity
             android:name=".BackDownload"
             android:label="@string/app_name"
@@ -154,6 +155,12 @@
             android:label="@string/app_name"/>
         <activity
             android:name=".Changelog.ChangelogActivity"
+            android:label="@string/app_name"/>
+        <activity
+            android:name=".HallFame.HallActivity"
+            android:label="@string/app_name"/>
+        <activity
+            android:name=".SDControl.SDManager"
             android:label="@string/app_name"/>
         <activity
             android:name=".Utils.logs.LogViewer"
@@ -247,38 +254,6 @@
         <activity
             android:name=".LoginActivity.LoginUser"
             android:label="@string/app_name"/>
-        <activity
-            android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-            android:theme="@android:style/Theme.Translucent"/>
-
-        <receiver
-            android:name="com.google.android.gms.analytics.AnalyticsReceiver"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH"/>
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name="com.google.android.gms.analytics.AnalyticsService"
-            android:enabled="true"
-            android:exported="false"/>
-
-        <receiver
-            android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER"/>
-            </intent-filter>
-        </receiver>
-
-        <service android:name="com.google.android.gms.analytics.CampaignTrackingService"/>
-
-        <service
-            android:name=".DownloadService.DownloaderIntentService"
-            android:exported="false"
-            android:label="@string/app_name"/>
 
         <service
             android:name=".Tile.QuickSetting"
@@ -291,7 +266,7 @@
         </service>
 
         <service
-            android:name=".DownloadService.DownloadService"
+            android:name=".DownloadService.DownloaderService"
             android:exported="false"
             android:label="@string/app_name"/>
 

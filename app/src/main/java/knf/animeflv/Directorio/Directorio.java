@@ -34,8 +34,6 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
@@ -48,12 +46,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import knf.animeflv.AnimeSorter;
-import knf.animeflv.Application;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.DIRECTORIO;
@@ -92,6 +90,7 @@ public class Directorio extends AppCompatActivity {
     FloatingActionButton byid;
     @Bind(R.id.search_menu)
     FloatingActionMenu actionMenu;
+    List<Integer> lastSearch = Arrays.asList(new Integer[]{0});
     boolean loaded = false;
 
     public static String convertStreamToString(InputStream is) throws Exception {
@@ -173,8 +172,8 @@ public class Directorio extends AppCompatActivity {
                 }
             }
         } else {
-            editText.setTextColor(ColorsRes.Negro(this));
-            editText.setHintTextColor(ColorsRes.SecondaryTextLight(this));
+            editText.setTextColor(ColorsRes.Blanco(this));
+            editText.setHintTextColor(ColorsRes.SecondaryTextDark(this));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 if (!isXLargeScreen(this)) {
                     getWindow().setStatusBarColor(getResources().getColor(R.color.dark));
@@ -200,7 +199,7 @@ public class Directorio extends AppCompatActivity {
                             initAsync(json);
                     }
                     loaded = true;
-                    invalidateOptionsMenu();
+                    supportInvalidateOptionsMenu();
                 } else {
                     Toaster.toast("Error al abrir el directorio");
                     finish();
@@ -216,7 +215,7 @@ public class Directorio extends AppCompatActivity {
             public void onClick(View v) {
                 actionMenu.close(false);
                 actionMenu.getMenuIconView().setImageResource(R.drawable.ic_search_generos);
-                editText.setInputType(InputType.TYPE_CLASS_TEXT);
+                editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
                 SearchConstructor.SetSearch(SearchType.GENEROS, SearchConstructor.getGenerosInt());
                 editText.setText(editText.getEditableText().toString());
                 editText.setHint("Generos: TODOS");
@@ -230,12 +229,22 @@ public class Directorio extends AppCompatActivity {
                         .itemsCallbackMultiChoice(SearchConstructor.getGenerosInt(), new MaterialDialog.ListCallbackMultiChoice() {
                             @Override
                             public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
-                                if (Arrays.asList(which).contains(0)) {
+                                List<Integer> current = Arrays.asList(which);
+                                if (!lastSearch.contains(0) && current.contains(0)) {
+                                    lastSearch = Arrays.asList(new Integer[]{0});
                                     SearchConstructor.SetSearch(SearchType.GENEROS, which);
                                     dialog.setSelectedIndices(new Integer[]{0});
                                     editText.setHint("Generos: TODOS");
                                 } else {
-                                    SearchConstructor.SetSearch(SearchType.GENEROS, which);
+                                    List<Integer> l = new LinkedList<Integer>(Arrays.asList(which));
+                                    if (l.contains(0)) {
+                                        l.remove(0);
+                                    }
+                                    lastSearch = l;
+                                    Integer[] nArray = new Integer[l.size()];
+                                    l.toArray(nArray);
+                                    dialog.setSelectedIndices(nArray);
+                                    SearchConstructor.SetSearch(SearchType.GENEROS, nArray);
                                     editText.setHint("Generos: " + which.length);
                                 }
                                 List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, editText.getEditableText().toString()));
@@ -469,7 +478,7 @@ public class Directorio extends AppCompatActivity {
                     editText.setHint("Buscar...");
                 }
                 actionMenu.close(true);
-                editText.setInputType(InputType.TYPE_CLASS_TEXT);
+                editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
                 SearchConstructor.SetSearch(SearchType.NOMBRE, null);
                 actionMenu.getMenuIconView().setImageResource(R.drawable.ic_search_text);
                 editText.setText(editText.getEditableText().toString());
@@ -480,7 +489,7 @@ public class Directorio extends AppCompatActivity {
             public void onClick(View v) {
                 actionMenu.close(false);
                 actionMenu.getMenuIconView().setImageResource(R.drawable.ic_search_generos);
-                editText.setInputType(InputType.TYPE_CLASS_TEXT);
+                editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
                 SearchConstructor.SetSearch(SearchType.GENEROS, SearchConstructor.getGenerosInt());
                 editText.setText(editText.getEditableText().toString());
                 editText.setHint("Generos: TODOS");
@@ -494,12 +503,22 @@ public class Directorio extends AppCompatActivity {
                         .itemsCallbackMultiChoice(SearchConstructor.getGenerosInt(), new MaterialDialog.ListCallbackMultiChoice() {
                             @Override
                             public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
-                                if (Arrays.asList(which).contains(0)) {
+                                List<Integer> current = Arrays.asList(which);
+                                if (!lastSearch.contains(0) && current.contains(0)) {
+                                    lastSearch = Arrays.asList(new Integer[]{0});
                                     SearchConstructor.SetSearch(SearchType.GENEROS, which);
                                     dialog.setSelectedIndices(new Integer[]{0});
                                     editText.setHint("Generos: TODOS");
                                 } else {
-                                    SearchConstructor.SetSearch(SearchType.GENEROS, which);
+                                    List<Integer> l = new LinkedList<Integer>(Arrays.asList(which));
+                                    if (l.contains(0)) {
+                                        l.remove(0);
+                                    }
+                                    lastSearch = l;
+                                    Integer[] nArray = new Integer[l.size()];
+                                    l.toArray(nArray);
+                                    dialog.setSelectedIndices(nArray);
+                                    SearchConstructor.SetSearch(SearchType.GENEROS, nArray);
                                     editText.setHint("Generos: " + which.length);
                                 }
                                 List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, editText.getEditableText().toString()));
@@ -630,7 +649,7 @@ public class Directorio extends AppCompatActivity {
         });
         editText.setEnabled(true);
         editText.setClickable(true);
-        editText.setInputType(InputType.TYPE_CLASS_TEXT);
+        editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(final Editable s) {
@@ -763,7 +782,7 @@ public class Directorio extends AppCompatActivity {
     }
 
     private String[] getGeneros() {
-        String[] generos = {
+        return new String[]{
                 "Todos",
                 "Accion",
                 "Aventuras",
@@ -798,7 +817,6 @@ public class Directorio extends AppCompatActivity {
                 "Vampiros",
                 "Yaoi",
                 "Yuri"};
-        return generos;
     }
 
     @Override
@@ -806,10 +824,6 @@ public class Directorio extends AppCompatActivity {
         menuGlobal = menu;
         Bundle bundle = getIntent().getExtras();
         if (bundle == null) {
-            Application application = (Application) getApplication();
-            Tracker mTracker = application.getDefaultTracker();
-            mTracker.setScreenName("Directorio");
-            mTracker.send(new HitBuilders.ScreenViewBuilder().build());
             editText.setVisibility(View.GONE);
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
@@ -826,16 +840,13 @@ public class Directorio extends AppCompatActivity {
                 menu.removeItem(R.id.carg);
             }
         } else {
-            Application application = (Application) getApplication();
-            Tracker mTracker = application.getDefaultTracker();
-            mTracker.setScreenName("Busqueda");
-            mTracker.send(new HitBuilders.ScreenViewBuilder().build());
             if (!isXLargeScreen(context)) {
                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menu);
             } else {
                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menu);
             }
         }
+        menu.removeItem(R.id.media_route);
         return true;
     }
 
@@ -875,11 +886,10 @@ public class Directorio extends AppCompatActivity {
         menuGlobal.clear();
         if (!isXLargeScreen(context)) {
             getMenuInflater().inflate(R.menu.menu_main, menuGlobal);
-            invalidateOptionsMenu();
         } else {
             getMenuInflater().inflate(R.menu.menu_main_dark, menuGlobal);
-            invalidateOptionsMenu();
         }
+        supportInvalidateOptionsMenu();
         getSupportActionBar().setTitle("Directorio");
         if (!isXLargeScreen(context)) {
             recyclerView.setVisibility(View.GONE);

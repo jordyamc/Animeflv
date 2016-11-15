@@ -139,4 +139,15 @@
 
 
     <string name="tutorial_main">Bienvenido al tutorial, aquí veras una explicación rapida de las funciones de la a app.</string>
+
+    <string name="shortcut_dir">Directorio</string>
+    <string name="shortcut_dir_long">Abrir Directorio</string>
+
+    <string name="shortcut_favs">Favoritos</string>
+    <string name="shortcut_favs_long">Abrir Favoritos</string>
+
+    <string name="shortcut_em">Emision</string>
+    <string name="shortcut_em_long">Abrir Emision</string>
+
+    <string name="no_open">No se puede abrir</string>
 </resources>

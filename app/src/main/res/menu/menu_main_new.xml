@@ -2,15 +2,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".Main">
     <item
-        android:icon="@drawable/ic_buscar"
         android:id="@+id/search"
-        android:orderInCategory="200"
+        android:icon="@drawable/ic_buscar"
+        android:orderInCategory="300"
         android:title="Buscar"
         app:showAsAction="ifRoom"/>
     <item
-        android:icon="@drawable/ic_new_user"
         android:id="@+id/new_user"
-        android:orderInCategory="100"
+        android:icon="@drawable/ic_new_user"
+        android:orderInCategory="200"
         android:title="Tutorial"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/media_route"
+        android:orderInCategory="100"
+        android:title="Cast"
         app:showAsAction="ifRoom"/>
 </menu>

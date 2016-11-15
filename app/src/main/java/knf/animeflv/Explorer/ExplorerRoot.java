@@ -91,16 +91,16 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         if (downloadInSD()) {
-            if (!FileUtil.searchforSD().existSD()) {
+            if (!FileUtil.init(this).searchforSD().existSD()) {
                 Toaster.toast("No se encontro la memoria SD");
                 commitDownloadInSD(false);
             } else {
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-                    if (PreferenceManager.getDefaultSharedPreferences(this).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null) != null) {
+                    if (PreferenceManager.getDefaultSharedPreferences(this).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null) == null) {
                         Toaster.toast("Se necesitan permisos de escritura!!");
                         waitForResult = true;
                         FragmentExtras.KEY = Configuracion.GET_WRITE_PERMISSIONS;
-                        Intent intent = new Intent(this, Configuration.class);
+                        Intent intent = new Intent(this, Configuracion.class);
                         intent.putExtra("return", 12877);
                         startActivityForResult(intent, 1547);
                     }
@@ -111,11 +111,23 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
             textView.setText(ModelFactory.getDirectoryFile(this).getAbsolutePath());
             directoryFragment = new DirectoryFragment();
             videoFilesFragment = new VideoFilesFragment();
-            showDirectory();
+            String aid_extra = getIntent().getStringExtra("aid");
+            if (aid_extra == null) {
+                showDirectory();
+            } else {
+                File file = new File(ModelFactory.getDirectoryFile(this), aid_extra);
+                isDirectory = false;
+                textView.setText(file.getAbsolutePath());
+                getSupportActionBar().setTitle(new Parser().getTitCached(aid_extra));
+                showVideoFile(file);
+                supportInvalidateOptionsMenu();
+            }
         }
     }
 
     private void showDirectory() {
+        isDirectory = true;
+        textView.setText(ModelFactory.getDirectoryFile(this).getAbsolutePath());
         directoryFragment.recharge(this);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -124,12 +136,12 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
         } else {
             transaction.add(R.id.root, directoryFragment, TAG_DIRECTORY);
         }
-        if (videoFilesFragment.isAdded()) transaction.hide(videoFilesFragment);
+        if (videoFilesFragment.isAdded()) transaction.remove(videoFilesFragment);
         transaction.commit();
     }
 
     private void showVideoFile(File file) {
-        //videoFilesFragment.recharge(this,file);
+        isDirectory = false;
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         if (videoFilesFragment.isAdded()) transaction.remove(videoFilesFragment);
@@ -152,7 +164,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
             textView.setText(ModelFactory.getDirectoryFile(this).getAbsolutePath());
             showDirectory();
             isDirectory = true;
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         } else {
             finish();
         }
@@ -164,7 +176,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
         textView.setText(file.getAbsolutePath());
         getSupportActionBar().setTitle(name);
         showVideoFile(file);
-        invalidateOptionsMenu();
+        supportInvalidateOptionsMenu();
     }
 
     @Override
@@ -180,6 +192,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
     @Override
     public void OnDirectoryEmpty(String aid) {
         directoryFragment.deleteDirectory(this, aid);
+        showDirectory();
     }
 
     @Override
@@ -191,7 +204,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
     }
 
     private void rechargePath() {
-        invalidateOptionsMenu();
+        supportInvalidateOptionsMenu();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -214,7 +227,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
     public boolean onKeyLongPress(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (!downloadInSD()) {
-                if (FileUtil.searchforSD().existSD()) {
+                if (FileUtil.init(this).searchforSD().existSD()) {
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                         PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("sd_down", !downloadInSD()).commit();
                         getSupportFragmentManager().beginTransaction().remove(directoryFragment).commit();
@@ -247,7 +260,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
         menu.clear();
         boolean isInSD = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("sd_down", false);
         if (!isInSD && isDirectory && count() > 0) {
-            if (FileUtil.searchforSD().existSD()) {
+            if (FileUtil.init(this).searchforSD().existSD()) {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     getMenuInflater().inflate(R.menu.menu_move, menu);
                 } else {

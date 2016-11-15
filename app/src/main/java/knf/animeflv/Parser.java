@@ -253,6 +253,22 @@ public class Parser {
         return aid;
     }
 
+    public static String getTrimedList(String body, String separator) {
+        if (body.trim().length() > 0) {
+            StringBuilder builder = new StringBuilder();
+            String[] trimed = body.split(separator);
+            for (String part : trimed) {
+                if (!part.trim().equals("") && !part.equals("null")) {
+                    builder.append(part);
+                    builder.append(separator);
+                }
+            }
+            return builder.toString();
+        } else {
+            return "";
+        }
+    }
+
     public String[] parseTitulos(String json) {
         List<String> titulosArray = new ArrayList<String>();
         String[] titulos;
@@ -844,7 +860,7 @@ public class Parser {
             jsonObject.put("email_login", PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null"));
             jsonObject.put("email_coded", PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null"));
             jsonObject.put("pass_coded", PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null"));
-            jsonObject.put("color", context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("color", 0));
+            jsonObject.put("accentColor", PreferenceManager.getDefaultSharedPreferences(context).getInt("accentColor", ColorsRes.Naranja(context)));
             jsonObject.put("favoritos", context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", ""));
             jsonObject.put("vistos", context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", ""));
             JSONArray jsonArray = new JSONArray();
@@ -914,7 +930,7 @@ public class Parser {
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email", j.getString("email_login")).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", j.getString("email_coded")).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", j.getString("pass_coded")).apply();
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("color", j.getInt("color")).apply();
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("accentColor", j.getInt("accentColor")).apply();
             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("favoritos", j.getString("favoritos")).apply();
             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", j.getString("vistos")).apply();
             JSONArray jsonArray = j.getJSONArray("preferencias");

@@ -35,14 +35,14 @@ import xdroid.toaster.Toaster;
  * Created by Jordy on 28/03/2016.
  */
 public class NetworkUtils {
-    private static Context context;
     private static boolean disM = false;
     private static int versionCode = 0;
     private static File descarga = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "Animeflv_Nver.apk");
     private static MaterialDialog dialog;
     private static String[] mensaje;
+    private static Context context;
 
-    public static void init(Context con) {
+    public static void initial(Context con) {
         context = con;
         try {
             versionCode = con.getPackageManager().getPackageInfo(con.getPackageName(), 0).versionCode;
@@ -78,7 +78,7 @@ public class NetworkUtils {
         Log.d("CheckVersion", "Start");
         if (UpdateUtil.getState() == UpdateState.NO_UPDATE) {
             UpdateUtil.setState(UpdateState.START_UPDATE_CHECK);
-            new checkAct(Tcontext, button).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            new checkAct(Tcontext, button).executeOnExecutor(ExecutorManager.getExecutor());
         }
     }
 
@@ -94,7 +94,7 @@ public class NetworkUtils {
         @Override
         protected String doInBackground(String... params) {
             Looper.prepare();
-            new SyncHttpClient().get(Keys.Url.VERSION_INT, null, new TextHttpResponseHandler() {
+            new SyncHttpClient().get(Keys.Url.VERSION_INT_TEST, null, new TextHttpResponseHandler() {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                     UpdateUtil.setState(UpdateState.NO_UPDATE);
@@ -134,7 +134,7 @@ public class NetworkUtils {
                                         .cancelable(Boolean.valueOf(mensaje[3].trim()))
                                         .titleGravity(GravityEnum.CENTER)
                                         .positiveText(mensaje[4])
-                                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                        .backgroundColor(ThemeUtils.isAmoled(Tcontext) ? ColorsRes.Prim(Tcontext) : ColorsRes.Blanco(Tcontext))
                                         .callback(new MaterialDialog.ButtonCallback() {
                                             @Override
                                             public void onPositive(MaterialDialog dialog) {
@@ -190,7 +190,7 @@ public class NetworkUtils {
                                 .titleGravity(GravityEnum.CENTER)
                                 .positiveText("Actualizar")
                                 .negativeText("Salir")
-                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                .backgroundColor(ThemeUtils.isAmoled(Tcontext) ? ColorsRes.Prim(Tcontext) : ColorsRes.Blanco(Tcontext))
                                 .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
                                     public void onPositive(final MaterialDialog dialog) {

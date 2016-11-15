@@ -2,7 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/root"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
     android:orientation="vertical">
@@ -19,22 +19,23 @@
 
         <ImageView
             android:id="@+id/img"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"
             android:layout_centerVertical="true"
             android:clickable="false"
             android:gravity="center_vertical"
             android:maxWidth="70dp"
-            android:scaleType="centerCrop"
             android:src="@drawable/ic_block_r"
             android:transitionName="img"/>
 
+        <!--android:scaleType="centerCrop"-->
+
         <ImageView
             android:id="@+id/seen"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_alignParentLeft="false"
             android:layout_alignParentStart="false"
             android:layout_centerInParent="true"
@@ -119,4 +120,12 @@
             android:scaleType="fitEnd"
             android:src="@drawable/ic_borrar_r"/>
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/relative"
+        android:visibility="gone"/>
 </RelativeLayout>

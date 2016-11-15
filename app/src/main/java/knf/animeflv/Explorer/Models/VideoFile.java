@@ -51,38 +51,50 @@ public class VideoFile {
         }
     }
 
+    public File recreateThumbImage() {
+        File file = new File(tmp, src.getName().replace(".mp4", ".png"));
+        if (file.exists()) {
+            file.delete();
+        }
+        return saveBitmap(ThumbnailUtils.createVideoThumbnail(src.getAbsolutePath(), MediaStore.Images.Thumbnails.MINI_KIND), src);
+    }
+
     public String getTitle() {
         return "Capitulo " + getCapNumber();
     }
 
     public String getDuration(Context context) {
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(context, Uri.fromFile(src));
-        long duration = Long.parseLong(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
-        String dur = String.format(Locale.getDefault(), "%d:%d:%d",
-                TimeUnit.MILLISECONDS.toHours(duration),
-                TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration)),
-                TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
-        );
-        String[] divided = dur.split(":");
-        String hours = divided[0];
-        String minutes = divided[1];
-        String seconds = divided[2];
-        String f = "";
-        if (!hours.equals("0")) {
-            f += hours + ":";
+        try {
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(context, Uri.fromFile(src));
+            long duration = Long.parseLong(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+            String dur = String.format(Locale.getDefault(), "%d:%d:%d",
+                    TimeUnit.MILLISECONDS.toHours(duration),
+                    TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(duration)),
+                    TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
+            );
+            String[] divided = dur.split(":");
+            String hours = divided[0];
+            String minutes = divided[1];
+            String seconds = divided[2];
+            String f = "";
+            if (!hours.equals("0")) {
+                f += hours + ":";
+            }
+            if (minutes.length() < 2) {
+                f += "0" + minutes + ":";
+            } else {
+                f += minutes + ":";
+            }
+            if (seconds.length() < 2) {
+                f += "0" + seconds;
+            } else {
+                f += seconds;
+            }
+            return f;
+        } catch (Exception e) {
+            return "";
         }
-        if (minutes.length() < 2) {
-            f += "0" + minutes + ":";
-        } else {
-            f += minutes + ":";
-        }
-        if (seconds.length() < 2) {
-            f += "0" + seconds;
-        } else {
-            f += seconds;
-        }
-        return f;
     }
 
     public String getCapNumber() {

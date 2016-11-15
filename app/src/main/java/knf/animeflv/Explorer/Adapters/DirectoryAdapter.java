@@ -55,6 +55,9 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
     @Override
     public void onBindViewHolder(final DirectoryAdapter.ViewHolder holder, final int position) {
         //PicassoCache.getPicassoInstance(context).load(Uri.parse(list.get(holder.getAdapterPosition()).getImageUrl(context))).error(R.drawable.ic_block_r).into(holder.img);
+        if (list.get(holder.getAdapterPosition()).getFilesNumber().startsWith("0")) {
+            holder.root.setVisibility(View.GONE);
+        }
         new CacheManager().mini(context,list.get(holder.getAdapterPosition()).getID(),holder.img);
         holder.iV_visto.setVisibility(View.GONE);
         holder.titulo.setText(list.get(holder.getAdapterPosition()).getTitle());
@@ -75,7 +78,7 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
         holder.root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                interfaces.OnDirectoryClicked(list.get(holder.getAdapterPosition()).getFile(), list.get(holder.getAdapterPosition()).getTitle());
+                interfaces.OnDirectoryClicked(list.get(holder.getAdapterPosition()).getFile(context), list.get(holder.getAdapterPosition()).getTitle());
             }
         });
         holder.del.setOnClickListener(new View.OnClickListener() {
@@ -89,11 +92,13 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                for (String file : list.get(holder.getAdapterPosition()).getFile().list()) {
+                                for (String file : list.get(holder.getAdapterPosition()).getFile(context).list()) {
                                     ManageDownload.cancel(context, file.replace(".mp4", "E"));
-                                    FileUtil.DeleteAnime(file.replace(".mp4", "E"));
+                                    FileUtil.init(context).DeleteAnime(file.replace(".mp4", "E"));
                                 }
-                                if (list.get(holder.getAdapterPosition()).getFile().list().length == 0) {
+                                if (list.get(holder.getAdapterPosition()).getFile(context).list().length == 0) {
+                                    FileUtil.init(context).DeleteAnimeDir(list.get(holder.getAdapterPosition()).getID());
+                                    list.remove(holder.getAdapterPosition());
                                     notifyItemRemoved(holder.getAdapterPosition());
                                     Toaster.toast("Archivos eliminados");
                                     recreateList();

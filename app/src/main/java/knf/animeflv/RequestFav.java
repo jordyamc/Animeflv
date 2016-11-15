@@ -20,6 +20,7 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.NoLogInterface;
 
 public class RequestFav extends AsyncTask<String,String,String> {
     InputStream is;
@@ -57,10 +58,14 @@ public class RequestFav extends AsyncTask<String,String,String> {
     @Override
     protected String doInBackground(String... params) {
         final List<String> list = new ArrayList<String>();
+        Log.e("Loading Favs", "Start");
         for (final String i : aids) {
             final File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
             if (!file.exists() || !FileUtil.isJSONValid(FileUtil.getStringFromFile(file.getPath()))) {
-                new SyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(i) + "&certificate=" + Parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
+                SyncHttpClient client = new SyncHttpClient();
+                client.setTimeout(5000);
+                client.setLogInterface(new NoLogInterface());
+                client.get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(i) + "&certificate=" + Parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         super.onSuccess(statusCode, headers, response);
@@ -86,7 +91,6 @@ public class RequestFav extends AsyncTask<String,String,String> {
                     }
                 });
             }else {
-                Log.d("Link", "Loaded "+i);
                 String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt";
                 if (file.exists()) {
                     String json = FileUtil.getStringFromFile(file_loc);

@@ -8,8 +8,6 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -47,7 +45,6 @@ import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.ExecutorManager;
-import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
@@ -221,7 +218,7 @@ public class TutorialActivity extends AppCompatActivity implements SwipeRefreshL
                             tits[position].setText(title);
                             caps[position].setText(result);
                             String eid = id + "_1E";
-                            if (MainStates.WaitContains(eid)){
+                            if (MainStates.init(TutorialActivity.this).WaitContains(eid)) {
                                 dButtons[position].setImageResource(R.drawable.ic_waiting);
                             }else {
                                 dButtons[position].setImageResource(R.drawable.ic_get_r);
@@ -231,11 +228,11 @@ public class TutorialActivity extends AppCompatActivity implements SwipeRefreshL
                                 public void onClick(View view) {
                                     if (MainStates.isListing()) {
                                         String eid = id + "_1E";
-                                        if (MainStates.WaitContains(eid)) {
-                                            MainStates.delFromWaitList(eid);
+                                        if (MainStates.init(TutorialActivity.this).WaitContains(eid)) {
+                                            MainStates.init(TutorialActivity.this).delFromWaitList(eid);
                                             dButtons[position].setImageResource(R.drawable.ic_get_r);
                                         } else {
-                                            MainStates.addToWaitList(eid);
+                                            MainStates.init(TutorialActivity.this).addToWaitList(eid);
                                             dButtons[position].setImageResource(R.drawable.ic_waiting);
                                         }
                                     } else {
@@ -253,11 +250,11 @@ public class TutorialActivity extends AppCompatActivity implements SwipeRefreshL
                                 public boolean onLongClick(View view) {
                                     if (!MainStates.isListing()) {
                                         String eid = id + "_1E";
-                                        if (MainStates.WaitContains(eid)) {
-                                            MainStates.delFromWaitList(eid);
+                                        if (MainStates.init(TutorialActivity.this).WaitContains(eid)) {
+                                            MainStates.init(TutorialActivity.this).delFromWaitList(eid);
                                             dButtons[position].setImageResource(R.drawable.ic_get_r);
                                         } else {
-                                            MainStates.addToWaitList(eid);
+                                            MainStates.init(TutorialActivity.this).addToWaitList(eid);
                                             dButtons[position].setImageResource(R.drawable.ic_waiting);
                                         }
                                     }

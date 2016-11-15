@@ -136,7 +136,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
                     manager.collapseGroup(groupPosition);
                 }
                 holder.card.setVisibility(View.GONE);
-                MainStates.delFromGlobalWaitList(animes.get(groupPosition));
+                MainStates.init(context).delFromGlobalWaitList(animes.get(groupPosition));
                 WaitManager.Refresh();
                 animes = WaitManager.getAnimesList();
                 animesCapList = WaitManager.getNumerosList();
@@ -189,7 +189,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
             @Override
             public void onClick(View v) {
                 holder.card.setVisibility(View.GONE);
-                MainStates.delFromWaitList(animes.get(groupPosition) + "_" + animesCapList.get(groupPosition).get(childPosition) + "E");
+                MainStates.init(context).delFromWaitList(animes.get(groupPosition) + "_" + animesCapList.get(groupPosition).get(childPosition) + "E");
                 WaitManager.Refresh();
                 animesCapList = WaitManager.getNumerosList();
                 notifyDataSetChanged();
@@ -230,7 +230,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
         String tmp = animes.get(fromGroupPosition);
         animes.remove(fromGroupPosition);
         animes.add(toGroupPosition, tmp);
-        MainStates.UpdateWaitList("GlobalWaiting", animes);
+        MainStates.init(context).UpdateWaitList("GlobalWaiting", animes);
         WaitManager.Refresh();
         animesCapList = WaitManager.getNumerosList();
         notifyDataSetChanged();
@@ -254,7 +254,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
     @Override
     public SwipeResultAction onSwipeGroupItem(GroupHolder holder, int groupPosition, int result) {
         animes.remove(groupPosition);
-        MainStates.UpdateWaitList("GlobalWaiting", animes);
+        MainStates.init(context).UpdateWaitList("GlobalWaiting", animes);
         WaitManager.Refresh();
         animesCapList = WaitManager.getNumerosList();
         notifyDataSetChanged();

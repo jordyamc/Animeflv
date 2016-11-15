@@ -100,12 +100,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!--<TextView
-                android:id="@+id/info_descripcion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="Descripcion"/>-->
             <knf.animeflv.CustomViews.TextViewExpandableAnimation
                 android:id="@+id/info_descripcion"
                 android:layout_width="match_parent"

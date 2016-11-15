@@ -16,6 +16,7 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.ArrayRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
@@ -39,6 +40,9 @@ import java.util.Locale;
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.LoginActivity.LoginBase;
 import knf.animeflv.LoginActivity.LoginUser;
+import knf.animeflv.SDControl.SDManager;
+import knf.animeflv.SDControl.SDResultContainer;
+import knf.animeflv.SDControl.SDSearcher;
 import knf.animeflv.Tutorial.TutorialActivity;
 import knf.animeflv.Utils.CacheControl;
 import knf.animeflv.Utils.FileUtil;
@@ -231,7 +235,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("b_move").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                if (FileUtil.getSDPath() != null) {
+                if (FileUtil.init(context).getSDPath() != null) {
                     if (count() > 0) {
                         final MaterialDialog dialog = new MaterialDialog.Builder(context)
                                 .title("Moviendo Animes...")
@@ -360,7 +364,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("Rpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", "null").apply();
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", "null").commit();
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null).commit();
                 getActivity().recreate();
                 return false;
             }
@@ -375,133 +380,111 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference(Conf.SD_ACCESS).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                if (FileUtil.RootFileHaveAccess()) {
-                    Toaster.toast("La SD ya tiene permiso de escritura!!!");
-                } else {
-                    openAccessFramework();
-                }
+                openAccessFramework();
                 return false;
             }
         });
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.CUPCAKE) {
-            getPreferenceScreen().findPreference("SDpath").setTitle("SD Desactivada");
-            getPreferenceScreen().findPreference("SDpath").setSummary("Las funciones para SD estan desactivadas en android 6+");
-            getPreferenceScreen().findPreference("SDpath").setEnabled(false);
-            PreferenceCategory sd = (PreferenceCategory) getPreferenceScreen().findPreference("catSD");
-            getPreferenceScreen().removePreference(sd);
-        } else {
-            if (FileUtil.getSDPath() == null) {
-                getPreferenceScreen().findPreference("b_move").setEnabled(false);
-                getPreferenceScreen().findPreference("sd_down").setEnabled(false);
-                getPreferenceScreen().findPreference("b_move").setSummary("Tarjeta SD no encontrada");
-                final FileSearchResponse response = FileUtil.searchforSD();
-                if (response.existSD()) {
-                    if (response.isOnlyOne()) {
-                        if (!response.getUniqueName().contains("_noWrite_")) {
-                            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", response.getUniqueName()).apply();
-                            getPreferenceScreen().findPreference("SDpath").setTitle("SD Encontrada");
-                            getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.getSDPath());
-                            getPreferenceScreen().findPreference("SDpath").setEnabled(false);
-                            getActivity().recreate();
-                        } else {
-                            Toaster.toast("Se requiere autorizacion manual para escribir en " + response.getUniqueName().replace("_noWrite_", ""));
-                            getPreferenceScreen().findPreference("SDpath").setTitle("No se puede escribir en SD");
-                            getPreferenceScreen().findPreference("SDpath").setSummary("Solicitar Permiso");
-                            getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                                @Override
-                                public boolean onPreferenceClick(Preference preference) {
-                                    openAccessFramework();
-                                    return false;
-                                }
-                            });
-                            PreferenceCategory sd = (PreferenceCategory) getPreferenceScreen().findPreference("catSD");
-                            getPreferenceScreen().removePreference(sd);
-                        }
+        getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                openAccessFramework();
+                return false;
+            }
+        });
+
+        if (FileUtil.init(context).getSDPath() == null) {
+            getPreferenceScreen().findPreference("b_move").setEnabled(false);
+            getPreferenceScreen().findPreference("sd_down").setEnabled(false);
+            getPreferenceScreen().findPreference("b_move").setSummary("Tarjeta SD no encontrada");
+            final FileSearchResponse response = FileUtil.init(context).searchforSD();
+            if (response.existSD()) {
+                if (response.isOnlyOne()) {
+                    if (!response.getUniqueName().contains("_noWrite_")) {
+                        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", response.getUniqueName()).apply();
+                        getPreferenceScreen().findPreference("SDpath").setTitle("Cambiar SD");
+                        getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.init(context).getSDPath());
+                        getPreferenceScreen().findPreference("SDpath").setEnabled(true);
+                        getActivity().recreate();
                     } else {
-                        if (response.list().size() > 1) {
-                            getPreferenceScreen().findPreference("SDpath").setTitle("Multiples SD Encontrados");
-                            getPreferenceScreen().findPreference("SDpath").setSummary("Precione para seleccionar");
-                            getPreferenceScreen().findPreference("SDpath").setEnabled(true);
-                            getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                                @Override
-                                public boolean onPreferenceClick(Preference preference) {
-                                    new MaterialDialog.Builder(myContext)
-                                            .title("Nombre de SD")
-                                            .titleGravity(GravityEnum.CENTER)
-                                            .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                            .items(response.list())
-                                            .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
-                                                @Override
-                                                public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", response.list().get(which).replace("_noWrite_", "")).apply();
-                                                    Toaster.toast(response.list().get(which).replace("_noWrite_", ""));
-                                                    if (FileUtil.getSDPath() != null) {
-                                                        getPreferenceScreen().findPreference("SDpath").setTitle("SD Encontrada");
-                                                        getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.getSDPath());
-                                                        getPreferenceScreen().findPreference("SDpath").setEnabled(false);
-                                                        getActivity().recreate();
-                                                    }
-                                                    return true;
-                                                }
-                                            })
-                                            .show();
-                                    return false;
-                                }
-                            });
-                        }
+                        Toaster.toast("Se requiere autorizacion manual para escribir en " + response.getUniqueName().replace("_noWrite_", ""));
+                        getPreferenceScreen().findPreference("SDpath").setTitle("No se puede escribir en SD");
+                        getPreferenceScreen().findPreference("SDpath").setSummary("Solicitar Permiso");
+                        getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                            @Override
+                            public boolean onPreferenceClick(Preference preference) {
+                                openAccessFramework();
+                                return false;
+                            }
+                        });
+                        PreferenceCategory sd = (PreferenceCategory) getPreferenceScreen().findPreference("catSD");
+                        sd.setEnabled(false);
+                        /*getPreferenceScreen().removePreference(sd);
+                        getPreferenceScreen().findPreference("").setEnabled(false);*/
                     }
                 } else {
-                    getPreferenceScreen().findPreference("SDpath").setTitle("SD No Encontrada");
-                    getPreferenceScreen().findPreference("SDpath").setSummary("Seleccionar manualmente");
-                    getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                        @Override
-                        public boolean onPreferenceClick(Preference preference) {
-                            new MaterialDialog.Builder(myContext)
-                                    .title("Direccion")
-                                    .titleGravity(GravityEnum.CENTER)
-                                    .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                    .items(new String[]{"/mnt", "/storage"})
-                                    .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
-                                        @Override
-                                        public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                                            Intent i = new Intent(context, FilePickerActivity.class);
-                                            i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
-                                            i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
-                                            i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
-                                            i.putExtra(FilePickerActivity.EXTRA_START_PATH, text);
-                                            startActivityForResult(i, 6991);
-                                            return false;
-                                        }
-                                    }).build().show();
-                            return false;
-                        }
-                    });
-                    PreferenceCategory sd = (PreferenceCategory) getPreferenceScreen().findPreference("catSD");
-                    getPreferenceScreen().removePreference(sd);
+                    if (response.list().size() > 1) {
+                        getPreferenceScreen().findPreference("SDpath").setTitle("Multiples SD Encontrados");
+                        getPreferenceScreen().findPreference("SDpath").setSummary("Precione para seleccionar");
+                        getPreferenceScreen().findPreference("SDpath").setEnabled(true);
+                        getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                            @Override
+                            public boolean onPreferenceClick(Preference preference) {
+                                openAccessFramework();
+                                return false;
+                            }
+                        });
+                    }
                 }
             } else {
-                if (FileUtil.getSDPath().contains("_noWrite_")) {
-                    Toaster.toast("Se requiere autorizacion manual para escribir en " + FileUtil.getSDPath().replace("_noWrite_", ""));
-                    getPreferenceScreen().findPreference("SDpath").setTitle("No se puede escribir en SD");
-                    getPreferenceScreen().findPreference("SDpath").setSummary("Solicitar Permiso");
-                    getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                        @Override
-                        public boolean onPreferenceClick(Preference preference) {
-                            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                            startActivityForResult(intent, 15889);
-                            return false;
-                        }
-                    });
-                    PreferenceCategory sd = (PreferenceCategory) getPreferenceScreen().findPreference("catSD");
-                    getPreferenceScreen().removePreference(sd);
-                } else {
-                    getPreferenceScreen().findPreference("sd_down").setEnabled(true);
-                    getPreferenceScreen().findPreference("b_move").setEnabled(true);
-                    getPreferenceScreen().findPreference("SDpath").setTitle("SD Encontrada");
-                    getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.getSDPath());
-                    getPreferenceScreen().findPreference("SDpath").setEnabled(false);
+                getPreferenceScreen().findPreference("SDpath").setTitle("SD No Encontrada");
+                getPreferenceScreen().findPreference("SDpath").setSummary("Seleccionar manualmente");
+                getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        new MaterialDialog.Builder(myContext)
+                                .title("Direccion")
+                                .titleGravity(GravityEnum.CENTER)
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                .items(new String[]{"/mnt", "/storage"})
+                                .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                                    @Override
+                                    public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                                        Intent i = new Intent(context, FilePickerActivity.class);
+                                        i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
+                                        i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
+                                        i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
+                                        i.putExtra(FilePickerActivity.EXTRA_START_PATH, text);
+                                        startActivityForResult(i, 6991);
+                                        return false;
+                                    }
+                                }).build().show();
+                        return false;
+                    }
+                });
+                PreferenceCategory sd = (PreferenceCategory) getPreferenceScreen().findPreference("catSD");
+                getPreferenceScreen().removePreference(sd);
+            }
+        } else {
+            if (FileUtil.init(context).getSDPath().contains("_noWrite_")) {
+                Toaster.toast("Se requiere autorizacion manual para escribir en " + FileUtil.init(context).getSDPath().replace("_noWrite_", ""));
+                getPreferenceScreen().findPreference("SDpath").setTitle("No se puede escribir en SD");
+                getPreferenceScreen().findPreference("SDpath").setSummary("Solicitar Permiso");
+                getPreferenceScreen().findPreference("SDpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        openAccessFramework();
+                        return false;
+                    }
+                });
+                PreferenceCategory sd = (PreferenceCategory) getPreferenceScreen().findPreference("catSD");
+                getPreferenceScreen().removePreference(sd);
+            } else {
+                getPreferenceScreen().findPreference("sd_down").setEnabled(true);
+                getPreferenceScreen().findPreference("b_move").setEnabled(true);
+                getPreferenceScreen().findPreference("SDpath").setTitle("Cambiar SD");
+                getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.init(context).getSDPath());
+                getPreferenceScreen().findPreference("SDpath").setEnabled(true);
 
-                }
             }
         }
         openIfExtra();
@@ -509,8 +492,11 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
 
     @TargetApi(21)
     private void openAccessFramework() {
+        startActivityForResult(new Intent(context, SDManager.class), SDManager.REQUEST_CODE);
+        /*
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
         startActivityForResult(intent, 15889);
+        */
     }
 
     private void openIfExtra() {
@@ -553,18 +539,16 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     private String getStringfromArray(String[] array, String key, String def) {
         try {
             return array[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString(key, def))];
-        } catch (IndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             Logger.Error(getClass(), e);
             PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString(key, def).apply();
             Toaster.toast("Error en " + key + ", opcion reiniciada");
-            return array[0];
+            return "Cargando...";
         }
     }
 
     private boolean excludechar(String input) {
-        List<String> exclude = Arrays.asList("expand", "media_rw", "obb", "runtime", "secure", "shared",
-                "user", "self", "sdcard", "emulated", "acct", "cache", "config", "d", "data", "dev", "etc",
-                "firmware", "fsg", "oem", "persist", "proc", "root", "sbin", "sys", "system", "vendor", "asec");
+        List<String> exclude = FileUtil.getExcludeDirList();
         for (String i : exclude) {
             if (input.contains("/" + i)) {
                 return true;
@@ -587,35 +571,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             }
         }
         return count;
-    }
-
-    public long getcachesize() {
-        long size = 0;
-        File[] files = context.getCacheDir().listFiles();
-        File[] mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache").listFiles();
-        for (File f : files) {
-            size = size + getSize(f);
-        }
-        if (mediaStorage != null) {
-            for (File f1 : mediaStorage) {
-                size = size + getSize(f1);
-            }
-        }
-        return size;
-    }
-
-    private long getSize(File file) {
-        long size = 0;
-        if (file.isDirectory()) {
-            if (!file.getName().startsWith(".")) {
-                for (File f : file.listFiles()) {
-                    size = size + getSize(f);
-                }
-            }
-        } else {
-            size = size + file.length();
-        }
-        return size;
     }
 
     public void deleteDownload(File dir) {
@@ -735,7 +690,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 break;
             case "sd_down":
                 if (sharedPreferences.getBoolean(key, false)) {
-                    if (FileUtil.getSDPath() == null) {
+                    if (FileUtil.init(context).getSDPath() == null) {
                         getPreferenceScreen().findPreference(key).setEnabled(false);
                         sharedPreferences.edit().putBoolean(key, false);
                     }
@@ -770,33 +725,19 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                         UtilSound.isNotSoundShow = false;
                     }
                     if (!UtilSound.getAudioWidget().isShown()) {
-                        UtilSound.getAudioWidget().show(100, 100);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            if (!Settings.canDrawOverlays(context)) {
+                                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
+                                startActivityForResult(intent, 5260);
+                            } else {
+                                UtilSound.getAudioWidget().show(100, 100);
+                            }
+                        } else {
+                            UtilSound.getAudioWidget().show(100, 100);
+                        }
                     }
                 }
                 break;
-        }
-    }
-
-    public void clearApplicationData() {
-        File cache = context.getCacheDir();
-        File appDir = new File(cache.getParent());
-        if (appDir.exists()) {
-            String[] children = appDir.list();
-            for (String s : children) {
-                if (!s.equals("lib")) {
-                    deleteDir(new File(appDir, s));
-                }
-            }
-        }
-        File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
-        if (mediaStorage.isDirectory()) {
-            String[] children = mediaStorage.list();
-            for (String name : children) {
-                if (!name.equals("directorio.txt") && !name.equals("data.save")) {
-                    File file = new File(mediaStorage, name);
-                    if (!file.isDirectory()) file.delete();
-                }
-            }
         }
     }
 
@@ -851,7 +792,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 Toaster.toast("Directorio no valido");
             } else {
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", uri.toString().substring(uri.toString().lastIndexOf("/") + 1).trim()).commit();
-                if (FileUtil.getSDPath() != null) {
+                if (FileUtil.init(context).getSDPath() != null) {
                     getActivity().recreate();
                 } else {
                     Toaster.toast(uri.toString().substring(uri.toString().lastIndexOf("/") + 1) + " Directorio no encontrado o invalido");
@@ -897,5 +838,18 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 getPreferenceScreen().findPreference("login").setSummary(login_email);
             }
         }
+        if (requestCode == SDManager.REQUEST_CODE && SDResultContainer.getResult() == SDSearcher.SD_SELECTED) {
+            getPreferenceScreen().findPreference("sd_down").setEnabled(true);
+            getPreferenceScreen().findPreference("b_move").setEnabled(true);
+            getPreferenceScreen().findPreference("SDpath").setTitle("Cambiar SD");
+            getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.init(context).getSDPath());
+            getPreferenceScreen().findPreference("SDpath").setEnabled(true);
+            PreferenceCategory sd = (PreferenceCategory) getPreferenceScreen().findPreference("catSD");
+            sd.setEnabled(true);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            if (requestCode == 5260 & Settings.canDrawOverlays(context)) {
+                UtilSound.getAudioWidget().show(100, 100);
+            }
     }
 }

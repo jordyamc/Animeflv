@@ -1,6 +1,7 @@
 package knf.animeflv;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
@@ -16,6 +17,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
 
@@ -25,7 +27,7 @@ public class FileMover {
             @Override
             protected String doInBackground(String... strings) {
                 Looper.prepare();
-                List<File> files = getFileList();
+                List<File> files = getFileList(activity);
                 if (files.size() == 0) {
                     listener.onStep(0, 0);
                 } else {
@@ -38,13 +40,13 @@ public class FileMover {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
-    private static List<File> getFileList() {
+    private static List<File> getFileList(Activity activity) {
         File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download");
         List<File> list = new ArrayList<>();
         for (File directory : file.listFiles()) {
             if (directory.isDirectory()) {
                 for (File f : directory.listFiles()) {
-                    if (f.isFile() && f.getName().endsWith(".mp4")) {
+                    if (f.isFile() && f.getName().endsWith(".mp4") && !ManageDownload.isDownloading(activity, f.getName().replace(".mp4", "E"))) {
                         list.add(f);
                     }
                 }
@@ -59,7 +61,7 @@ public class FileMover {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 moveAccess(activity, file, listener);
             } else {
-                moveNormal(file, listener);
+                moveNormal(activity, file, listener);
             }
             prog++;
             Log.d("Moved", prog + " of " + files.size());
@@ -67,29 +69,13 @@ public class FileMover {
         }
     }
 
-    /*private static void moveNormal(File file, OnProgressListener listener) {
-        String name = file.getName();
-        try {
-            FileChannel inChannel = new FileInputStream(file).getChannel();
-            FileChannel outChannel = new FileOutputStream(new File(FileUtil.getSDPath() + "/Animeflv/download/" + name.replace(".mp4", "").split("_")[0] + "/" + name)).getChannel();
-            inChannel.transferTo(0, inChannel.size(), outChannel);
-            if (inChannel != null)
-                inChannel.close();
-            if (outChannel != null)
-                outChannel.close();
-        } catch (Exception e) {
-            Log.e("Move Error", file.getName() + " Error:" + e.getMessage());
-            listener.onError(name);
-        }
-    }*/
-
-    private static void moveNormal(File file, OnProgressListener listener) {
+    private static void moveNormal(Context context, File file, OnProgressListener listener) {
         String[] name = file.getName().replace(".mp4", "").split("_");
         String title = Parser.getTitleCached(name[0]) + " " + name[1];
-        DocumentFile fileout = FileUtil.getFileFromAccess(file.getName().replace(".mp4", "E"));
+        DocumentFile fileout = FileUtil.init(context).getFileFromAccess(file.getName().replace(".mp4", "E"));
         try {
             FileInputStream in = new FileInputStream(file);
-            FileOutputStream out = new FileOutputStream(new File(FileUtil.getSDPath() + "/Animeflv/download/" + name[0] + "/" + file.getName()));
+            FileOutputStream out = new FileOutputStream(new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + name[0] + "/" + file.getName()));
             long totalBytes = in.available();
             // Start progress meter bar
             int r;
@@ -106,7 +92,12 @@ public class FileMover {
             out.close();
             in.close();
             if (file.exists() && fileout.exists())
-                file.delete();
+                if (file.delete()) {
+                    try {
+                        file.getParentFile().delete();
+                    } catch (Exception e) {
+                    }
+                }
         } catch (Exception e) {
             fileout.delete();
             Log.e("Move Error", file.getName() + " Error:" + e.getMessage());
@@ -118,7 +109,7 @@ public class FileMover {
     private static void moveAccess(Activity activity, File file, OnProgressListener listener) {
         String[] name = file.getName().replace(".mp4", "").split("_");
         String title = Parser.getTitleCached(name[0]) + " " + name[1];
-        DocumentFile fileout = FileUtil.getFileFromAccess(file.getName().replace(".mp4", "E"));
+        DocumentFile fileout = FileUtil.init(activity).getFileFromAccess(file.getName().replace(".mp4", "E"));
         try {
             InputStream in = new FileInputStream(file);
             OutputStream out = FileUtil.getOutputStreamFromAccess(activity, file);
@@ -138,7 +129,12 @@ public class FileMover {
             in.close();
             try {
                 if (file.exists() && fileout.exists())
-                    file.delete();
+                    if (file.delete()) {
+                        try {
+                            file.getParentFile().delete();
+                        } catch (Exception e) {
+                        }
+                    }
             } catch (Exception e) {
                 if (file.exists()) {
                     file.delete();
@@ -154,22 +150,6 @@ public class FileMover {
             listener.onError(file.getName());
         }
     }
-
-    /*private static void moveAccess(Activity activity,File file, OnProgressListener listener) {
-        try {
-            FileChannel inChannel = new FileInputStream(file).getChannel();
-            FileChannel outChannel = new FileOutputStream(FileUtil.getFileDescriptorFromAccess(activity,file).getFileDescriptor()).getChannel();
-            inChannel.transferTo(0, inChannel.size(), outChannel);
-            if (inChannel != null)
-                inChannel.close();
-            if (outChannel != null)
-                outChannel.close();
-            if (file.exists()&&FileUtil.getFileFromAccess(file.getName().replace(".mp4","E")).exists())file.delete();
-        } catch (Exception e){
-            Log.e("Move Error",file.getName()+" Error:"+e.getMessage());
-            listener.onError(file.getName());
-        }
-    }*/
 
     public interface OnProgressListener {
         void onStep(int progress, int total);

@@ -102,4 +102,9 @@ public class VideoFilesFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        ((VideoFileAdapter) recyclerView.getAdapter()).performDestroy();
+        super.onDestroy();
+    }
 }

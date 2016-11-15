@@ -2,6 +2,7 @@ package knf.animeflv.info;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -9,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -36,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.loopj.android.http.AsyncHttpClient;
@@ -123,6 +126,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
     Activity context;
     WebView webView;
     String aid;
+    String u;
     Menu Amenu;
     String json = "{}";
     AdapterInfoCapsMaterial adapter_caps;
@@ -150,18 +154,20 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         setSupportActionBar(toolbar);
         context = this;
         aid = getIntent().getExtras().getString("aid");
-        if (aid==null){
-            String url = getIntent().getDataString().replace("http://animeflv.net/", "").replace(".html", "");
+        if (aid == null) {
+            u = getIntent().getDataString();
+            String url = u.replace("http://animeflv.net/", "").replace(".html", "");
             String[] data = url.split("/");
             aid = parser.getAidCached(data[1]);
-            if (aid!=null){
+            if (aid != null) {
                 setCollapsingToolbarLayoutTitle(parser.getTitCached(aid));
-            }else {
+            } else {
                 Toaster.toast("Error al abrir informacion!!!");
                 finish();
             }
-        }else {
+        } else {
             setCollapsingToolbarLayoutTitle(getIntent().getExtras().getString("title"));
+            u = parser.getUrlAnimeCached(aid);
         }
         new CacheManager().portada(this, aid, imageView);
         button.setOnClickListener(new View.OnClickListener() {
@@ -261,23 +267,54 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
             getJsonfromFile();
         }
         imageView.setOnClickListener(getExpandListener());
-        if (isUserAdmin() && NetworkUtils.isNetworkAvailable()) {
-            imageView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    EmisionEditDialog.create(aid).show(getSupportFragmentManager(), "dialog");
-                    return true;
+        imageView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (isUserAdmin()) {
+                    new MaterialDialog.Builder(InfoNewMaterial.this)
+                            .title("Administrador")
+                            .titleGravity(GravityEnum.CENTER)
+                            .content("Seleccione accion")
+                            .positiveText("editar")
+                            .neutralText("compartir")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    if (NetworkUtils.isNetworkAvailable()) {
+                                        EmisionEditDialog.create(aid).show(getSupportFragmentManager(), "dialog");
+                                    } else {
+                                        Toaster.toast("Se necesita internet!!!");
+                                    }
+                                }
+                            })
+                            .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    shareAid();
+                                }
+                            }).build().show();
+                } else {
+                    shareAid();
                 }
-            });
-        }
+                return true;
+            }
+        });
         toolbar.setOnClickListener(getExpandListener());
     }
 
-    private View.OnClickListener getExpandListener(){
+    private void shareAid() {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_TEXT, u);
+        intent.setType("text/plain");
+        startActivity(Intent.createChooser(intent, "Compartir Link"));
+    }
+
+    private View.OnClickListener getExpandListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                barLayout.setExpanded(true,true);
+                barLayout.setExpanded(true, true);
             }
         };
     }
@@ -319,7 +356,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         int[] consumed = new int[2];
         //behavior.onNestedPreScroll(layout, barLayout, null, 0, -1000, consumed);
         behavior.onNestedFling(layout, barLayout, null, 0, -10000, true);*/
-        nestedScrollView.scrollTo(0, 1*-1000);
+        nestedScrollView.scrollTo(0, 1 * -1000);
     }
 
     private void getJsonfromApi() {
@@ -553,10 +590,10 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
             }
         }
         scrollToTop();
-        String pos=getIntent().getStringExtra("position");
-        final int position=pos==null?-1:Integer.valueOf(pos);
+        String pos = getIntent().getStringExtra("position");
+        final int position = pos == null ? -1 : Integer.valueOf(pos);
         button_list.setVisibility(View.VISIBLE);
-        if (position!=-1){
+        if (position != -1) {
             button.setImageResource(R.drawable.information);
             nestedScrollView.setVisibility(View.GONE);
             frameLayout.setVisibility(View.VISIBLE);
@@ -566,8 +603,8 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         }
     }
 
-    private void showInitInfo(){
-        if (getIntent().getStringExtra("position")==null) {
+    private void showInitInfo() {
+        if (getIntent().getStringExtra("position") == null) {
             Animation bottomUp = AnimationUtils.loadAnimation(context, R.anim.slide_from_bottom);
             nestedScrollView.startAnimation(bottomUp);
         }
@@ -770,7 +807,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                 button.setImageResource(R.drawable.information);
                 nestedScrollView.setVisibility(View.GONE);
                 frameLayout.setVisibility(View.VISIBLE);
-                barLayout.setExpanded(false,true);
+                barLayout.setExpanded(false, true);
                 isInInfo = false;
             }
         }

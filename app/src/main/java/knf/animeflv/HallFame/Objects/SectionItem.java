@@ -7,8 +7,4 @@ public class SectionItem extends ListItem {
         this.id = id;
     }
 
-    @Override
-    public boolean isTitle() {
-        return super.isTitle();
-    }
 }

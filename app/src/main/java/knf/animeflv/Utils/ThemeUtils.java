@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorRes;
@@ -24,32 +25,15 @@ public class ThemeUtils {
     }
 
     public static int getAcentColor(Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(context));
-        int color = ColorsRes.Naranja(context);
-        if (accent == ColorsRes.Rojo(context)) {
-            color = ColorsRes.Rojo(context);
-        }
-        if (accent == ColorsRes.Naranja(context)) {
-            color = ColorsRes.Naranja(context);
-        }
-        if (accent == ColorsRes.Gris(context)) {
-            color = ColorsRes.Gris(context);
-        }
-        if (accent == ColorsRes.Verde(context)) {
-            color = ColorsRes.Verde(context);
-        }
-        if (accent == ColorsRes.Rosa(context)) {
-            color = ColorsRes.Rosa(context);
-        }
-        if (accent == ColorsRes.Morado(context)) {
-            color = ColorsRes.Morado(context);
-        }
-        return color;
+        return PreferenceManager.getDefaultSharedPreferences(context).getInt("accentColor", ColorsRes.Naranja(context));
     }
 
     public static void setStatusBarPadding(Activity activity, View toolbar) {
         toolbar.setPadding(0, getStatusBarHeight(activity), 0, 0);
+    }
+
+    public static void setNavigationBarPadding(Activity activity, View view) {
+        view.setPadding(0, 0, 0, getNavigationBarHeight(activity));
     }
 
     private static int getStatusBarHeight(Activity activity) {
@@ -61,9 +45,18 @@ public class ThemeUtils {
         return result;
     }
 
+    private static int getNavigationBarHeight(Activity activity) {
+        Resources resources = activity.getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return resources.getDimensionPixelSize(resourceId);
+        }
+        return 0;
+    }
+
     public static void setThemeOn(Activity context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(context));
+        int accent = getAcentColor(context);
         if (preferences.getBoolean("is_amoled", false)) {
             if (accent == ColorsRes.Rojo(context)) {
                 context.setTheme(R.style.AppThemeDarkRojo);
@@ -135,11 +128,14 @@ public class ThemeUtils {
         }
     }
 
-    public static void setOrientation(Activity activity){
-        boolean isXLargeScreen=(activity.getResources().getConfiguration().screenLayout
+    public static boolean isTablet(Activity activity) {
+        return (activity.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
                 >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-        if (!isXLargeScreen) { //Portrait
+    }
+
+    public static void setOrientation(Activity activity) {
+        if (!isTablet(activity)) { //Portrait
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);

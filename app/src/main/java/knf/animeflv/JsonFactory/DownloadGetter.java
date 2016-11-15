@@ -26,6 +26,7 @@ import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
 import knf.animeflv.Parser;
+import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.R;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Utils.FileUtil;
@@ -67,7 +68,7 @@ public class DownloadGetter {
                         e.printStackTrace();
                     }
                     if (nombres.size() != 0) {
-                        final MaterialDialog d = new MaterialDialog.Builder(context)
+                        final MaterialDialog.Builder d = new MaterialDialog.Builder(context)
                                 .title(actionsInterface.isStream() ? "Streaming" : "Descarga")
                                 .titleGravity(GravityEnum.CENTER)
                                 .customView(R.layout.dialog_down, false)
@@ -121,12 +122,29 @@ public class DownloadGetter {
                                         MainStates.setProcessing(false, null);
                                         actionsInterface.onCancelDownload();
                                     }
-                                })
-                                .build();
-                        sp = (Spinner) d.getCustomView().findViewById(R.id.spinner_down);
+                                });
+                        if (CastPlayBackManager.get(context).isDeviceConnected() && actionsInterface.isStream()) {
+                            d.neutralText("CAST");
+                            d.onNeutral(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    String url = urls.get(sp.getSelectedItemPosition());
+                                    if (!url.toLowerCase().contains("zippyshare")) {
+                                        CastPlayBackManager.get(context).play(url, eid);
+                                        dialog.dismiss();
+                                    } else {
+                                        Toaster.toast("No se puede reproducir desde Zippyshare!!!");
+                                        dialog.dismiss();
+                                    }
+                                    actionsInterface.onStartCasting();
+                                }
+                            });
+                        }
+                        MaterialDialog builded = d.build();
+                        sp = (Spinner) builded.getCustomView().findViewById(R.id.spinner_down);
                         sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
                         sp.setBackgroundColor((ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context)));
-                        d.show();
+                        builded.show();
                     } else {
                         Toaster.toast("No hay links!!! Intenta mas tarde!!!");
                         MainStates.setProcessing(false, null);
@@ -177,6 +195,8 @@ public class DownloadGetter {
         void onStartZippy(String u);
 
         void onCancelDownload();
+
+        void onStartCasting();
 
         void onLogError(Exception e);
     }

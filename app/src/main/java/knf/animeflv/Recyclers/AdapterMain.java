@@ -2,6 +2,7 @@ package knf.animeflv.Recyclers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.preference.PreferenceManager;
@@ -39,13 +40,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import es.munix.multidisplaycast.CastControlsActivity;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.CookieConstructor;
-import knf.animeflv.DownloadManager.InternalManager;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
 import knf.animeflv.JsonFactory.DownloadGetter;
 import knf.animeflv.Parser;
+import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.R;
 import knf.animeflv.Recientes.MainAnimeModel;
 import knf.animeflv.StreamManager.StreamManager;
@@ -161,16 +163,20 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         new CacheManager().mini(context, Animes.get(holder.getAdapterPosition()).getAid(), holder.iv_main);
         holder.tv_tit.setText(Animes.get(position).getTitulo());
         holder.tv_num.setText(getCap(holder.getAdapterPosition()));
-        if (FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+        if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
             showPlay(holder.ib_ver);
             showDelete(holder.ib_des);
         } else {
-            if (InternalManager.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+            if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
                 showPlay(holder.ib_ver);
                 showDelete(holder.ib_des);
             } else {
-                showCloudPlay(holder.ib_ver);
                 showDownload(holder.ib_des, holder.getAdapterPosition());
+                if (CastPlayBackManager.get(context).getCastingEid().equals(Animes.get(holder.getAdapterPosition()).getEid())) {
+                    showCastPlay(holder.ib_ver);
+                } else {
+                    showCloudPlay(holder.ib_ver);
+                }
             }
         }
         if (MainStates.isProcessing()) {
@@ -178,12 +184,12 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 showLoading(holder.ib_des);
             }
         }
-        if (MainStates.WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
-            if (!FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
-                if (InternalManager.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+        if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
+            if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+                if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
                     showPlay(holder.ib_ver);
                     showDelete(holder.ib_des);
-                    MainStates.delFromWaitList(Animes.get(holder.getAdapterPosition()).getEid());
+                    MainStates.init(context).delFromWaitList(Animes.get(holder.getAdapterPosition()).getEid());
                 } else {
                     showCloudPlay(holder.ib_ver);
                     holder.ib_des.setImageResource(R.drawable.ic_waiting);
@@ -191,7 +197,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
             } else {
                 showPlay(holder.ib_ver);
                 showDelete(holder.ib_des);
-                MainStates.delFromWaitList(Animes.get(holder.getAdapterPosition()).getEid());
+                MainStates.init(context).delFromWaitList(Animes.get(holder.getAdapterPosition()).getEid());
             }
         }
         holder.card.setOnClickListener(new View.OnClickListener() {
@@ -222,13 +228,13 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
             @Override
             public boolean onLongClick(View v) {
                 MainStates.setListing(true);
-                if (MainStates.WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
-                    MainStates.delFromWaitList(Animes.get(holder.getAdapterPosition()).getEid());
+                if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
+                    MainStates.init(context).delFromWaitList(Animes.get(holder.getAdapterPosition()).getEid());
                     showDownload(holder.ib_des, holder.getAdapterPosition());
                     callbacks.onDelFromList();
                 } else {
-                    if (!FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid()) && !InternalManager.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
-                        MainStates.addToWaitList(Animes.get(holder.getAdapterPosition()).getEid());
+                    if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid()) && !ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+                        MainStates.init(context).addToWaitList(Animes.get(holder.getAdapterPosition()).getEid());
                         holder.ib_des.setImageResource(R.drawable.ic_waiting);
                         callbacks.onPutInList();
                     } else {
@@ -244,9 +250,9 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 if (UpdateUtil.getState() == UpdateState.WAITING_TO_UPDATE) {
                     Toaster.toast("Actualizacion descargada, instalar para continuar");
                 } else {
-                    if (!FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid()) && !InternalManager.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+                    if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid()) && !ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
                         if (!MainStates.isProcessing()) {
-                            if (MainStates.WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
+                            if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
                                 final int pos = holder.getAdapterPosition();
                                 new MaterialDialog.Builder(context)
                                         .content(
@@ -260,7 +266,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                                             @Override
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                MainStates.delFromWaitList(Animes.get(pos).getEid());
+                                                MainStates.init(context).delFromWaitList(Animes.get(pos).getEid());
                                                 MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
                                                 showLoading(holder.ib_des);
                                                 searchDownload(holder);
@@ -286,14 +292,14 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        if (FileUtil.DeleteAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+                                        if (FileUtil.init(context).DeleteAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
                                             ManageDownload.cancel(context, Animes.get(holder.getAdapterPosition()).getEid());
                                             showDownload(holder.ib_des, holder.getAdapterPosition());
                                             showCloudPlay(holder.ib_ver);
                                             Toaster.toast("Archivo Eliminado");
                                         } else {
-                                            if (!FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
-                                                if (InternalManager.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+                                            if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+                                                if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
                                                     ManageDownload.cancel(context, Animes.get(holder.getAdapterPosition()).getEid());
                                                 }
                                                 showDownload(holder.ib_des, holder.getAdapterPosition());
@@ -317,39 +323,43 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 if (UpdateUtil.getState() == UpdateState.WAITING_TO_UPDATE) {
                     Toaster.toast("Actualizacion descargada, instalar para continuar");
                 } else {
-                    if (FileUtil.ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+                    if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
                         StreamManager.Play(context, Animes.get(holder.getAdapterPosition()).getEid());
                     } else {
-                        if (InternalManager.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+                        if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
                             Toaster.toast("Descarga en proceso");
                         } else {
-                            if (NetworkUtils.isNetworkAvailable()) {
-                                if (!MainStates.isProcessing()) {
-                                    if (MainStates.WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
-                                        final int pos = holder.getAdapterPosition();
-                                        new MaterialDialog.Builder(context)
-                                                .content(
-                                                        "El " + getCap(Animes.get(pos).getNumero()).toLowerCase() +
-                                                                " de " + Animes.get(pos).getTitulo() +
-                                                                " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
-                                                .autoDismiss(true)
-                                                .positiveText("Continuar")
-                                                .negativeText("Cancelar")
-                                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                                    @Override
-                                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                        MainStates.delFromWaitList(Animes.get(pos).getEid());
-                                                        MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
-                                                        showLoading(holder.ib_des);
-                                                        searchStream(holder);
-                                                    }
-                                                })
-                                                .build().show();
-                                    } else {
-                                        MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
-                                        showLoading(holder.ib_des);
-                                        searchStream(holder);
+                            if (CastPlayBackManager.get(context).getCastingEid().equals(Animes.get(holder.getAdapterPosition()).getEid())) {
+                                context.startActivity(new Intent(context, CastControlsActivity.class));
+                            } else {
+                                if (NetworkUtils.isNetworkAvailable()) {
+                                    if (!MainStates.isProcessing()) {
+                                        if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
+                                            final int pos = holder.getAdapterPosition();
+                                            new MaterialDialog.Builder(context)
+                                                    .content(
+                                                            "El " + getCap(Animes.get(pos).getNumero()).toLowerCase() +
+                                                                    " de " + Animes.get(pos).getTitulo() +
+                                                                    " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
+                                                    .autoDismiss(true)
+                                                    .positiveText("Continuar")
+                                                    .negativeText("Cancelar")
+                                                    .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                                        @Override
+                                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                            MainStates.init(context).delFromWaitList(Animes.get(pos).getEid());
+                                                            MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
+                                                            showLoading(holder.ib_des);
+                                                            searchStream(holder);
+                                                        }
+                                                    })
+                                                    .build().show();
+                                        } else {
+                                            MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
+                                            showLoading(holder.ib_des);
+                                            searchStream(holder);
+                                        }
                                     }
                                 }
                             }
@@ -358,6 +368,22 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 }
             }
         });
+    }
+
+    private void resetIcon() {
+        String eid = CastPlayBackManager.get(context).getCastingEid();
+        int pos = AnimesContainsEid(eid);
+        if (pos != -1) {
+            notifyItemChanged(pos);
+        }
+    }
+
+    private int AnimesContainsEid(String eid) {
+        for (int i = 0; i < Animes.size(); i++) {
+            if (Animes.get(i).getEid().equals(eid))
+                return i;
+        }
+        return -1;
     }
 
     private void searchDownload(final ViewHolder holder) {
@@ -369,6 +395,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
 
             @Override
             public void onStartDownload() {
+                MainStates.setProcessing(false, null);
                 showDelete(holder.ib_des);
                 showPlay(holder.ib_ver);
             }
@@ -386,7 +413,13 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
 
             @Override
             public void onCancelDownload() {
+                MainStates.setProcessing(false, null);
                 showDownload(holder.ib_des, holder.getAdapterPosition());
+            }
+
+            @Override
+            public void onStartCasting() {
+
             }
 
             @Override
@@ -405,6 +438,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
 
             @Override
             public void onStartDownload() {
+                MainStates.setProcessing(false, null);
                 showDownload(holder.ib_des, holder.getAdapterPosition());
             }
 
@@ -421,7 +455,17 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
 
             @Override
             public void onCancelDownload() {
+                MainStates.setProcessing(false, null);
                 showDownload(holder.ib_des, holder.getAdapterPosition());
+                showCloudPlay(holder.ib_ver);
+            }
+
+            @Override
+            public void onStartCasting() {
+                MainStates.setProcessing(false, null);
+                showDownload(holder.ib_des, holder.getAdapterPosition());
+                showCastPlay(holder.ib_ver);
+                resetIcon();
             }
 
             @Override
@@ -472,6 +516,15 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 button.setScaleType(ImageView.ScaleType.FIT_END);
                 button.setImageResource(R.drawable.ic_borrar_r);
                 button.setEnabled(true);
+            }
+        });
+    }
+
+    private void showCastPlay(final ImageButton button) {
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                button.setImageResource(R.drawable.cast_c);
             }
         });
     }
@@ -549,7 +602,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
                 String eid = fileName.replace(".mp4", "") + "E";
                 if (MainStates.getDowloadTask() == DownloadTask.DESCARGA) {
-                    if (!FileUtil.ExistAnime(eid) && MainStates.isProcessing()) {
+                    if (!FileUtil.init(context).ExistAnime(eid) && MainStates.isProcessing()) {
                         showDelete(MainStates.getGifDownButton());
                         showPlay(MainStates.getDownStateButton());
                         String urlD = MainStates.getUrlZippy();
@@ -578,7 +631,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             StreamManager.internal(context).Stream(eid, url, constructor);
                         } else {
-                            if (FileUtil.isMXinstalled()) {
+                            if (FileUtil.init(context).isMXinstalled()) {
                                 Toaster.toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
                                 StreamManager.mx(context).Stream(eid, url, constructor);
                             } else {

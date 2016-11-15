@@ -1,16 +1,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".Main">
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".Main">
     <item
-        android:icon="@drawable/ic_buscar_d"
         android:id="@+id/search"
-        android:orderInCategory="200"
+        android:icon="@drawable/ic_buscar_d"
+        android:orderInCategory="300"
         android:title="Buscar"
         app:showAsAction="ifRoom"/>
     <item
-        android:icon="@drawable/ic_new_user_dark"
         android:id="@+id/new_user"
-        android:orderInCategory="100"
+        android:icon="@drawable/ic_new_user_dark"
+        android:orderInCategory="200"
         android:title="Tutorial"
         app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/media_route"
+        android:orderInCategory="100"
+        android:title="Cast"
+        app:showAsAction="always"/>
 </menu>

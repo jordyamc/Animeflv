@@ -20,6 +20,7 @@ public class Keys {
 
     public static class Url {
         public static final String VERSION_INT = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html";
+        public static final String VERSION_INT_TEST = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version_test.html";
         public static final String UPDATE = "https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true";
         public static final String SOUNDS = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/sounds/";
         public static final String SOUNDS_JSON = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/sounds.json";

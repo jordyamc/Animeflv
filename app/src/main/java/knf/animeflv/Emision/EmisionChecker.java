@@ -201,10 +201,8 @@ public class EmisionChecker {
                         e.printStackTrace();
                         Log.d("EmisionChecker", "Error " + e.getCause());
                         MainStates.setLoadingEmision(false);
-                        MainStates.setFload(false);
                     }
                     MainStates.setLoadingEmision(false);
-                    MainStates.setFload(false);
                     return null;
                 }
             }.executeOnExecutor(ExecutorManager.getExecutor());

@@ -32,12 +32,12 @@ public class Directory {
         return src.getAbsolutePath();
     }
 
-    public File getFile() {
+    public File getFile(Context context) {
         if (src != null) {
             return src;
         } else {
             if (inSD) {
-                return new File(FileUtil.getSDPath() + "/Animeflv/download/" + srcAccess.getName());
+                return new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + srcAccess.getName());
             } else {
                 return new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + srcAccess.getName());
             }

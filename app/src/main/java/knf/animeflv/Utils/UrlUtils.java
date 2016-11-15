@@ -17,7 +17,7 @@ import knf.animeflv.TaskType;
 public class UrlUtils {
     private static Context context;
 
-    public static void init(Context c) {
+    public static void initial(Context c) {
         context = c;
     }
 

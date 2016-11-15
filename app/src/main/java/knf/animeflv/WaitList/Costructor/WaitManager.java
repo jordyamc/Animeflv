@@ -15,12 +15,12 @@ public class WaitManager {
     private static List<String> animesList = new ArrayList<>();
     private static List<List<Float>> numerosList = new ArrayList<>();
 
-    public static void init(Context c) {
+    public static void initial(Context c) {
         context = c;
     }
 
     public static void Refresh() {
-        animesList = MainStates.getGlobalWaitList();
+        animesList = MainStates.init(context).getGlobalWaitList();
         numerosList.clear();
         for (String s : animesList) {
             numerosList.add(ChildListCreator.getList(context, s));

@@ -236,7 +236,7 @@ public class DownloadAdapterNew extends RecyclerView.Adapter<DownloadAdapterNew.
                             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("epIDS_descarga", epID2.replace(file.get(position) + ":::", "")).apply();
                             break;
                         case DESCARGANDO:
-                            File fileD = new File(FileUtil.getSDPath() + "/Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")) + "/" + fileT + ".mp4");
+                            File fileD = new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")) + "/" + fileT + ".mp4");
                             if (fileD.exists()) {
                                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromFile(fileD));
                                 intent.setDataAndType(Uri.fromFile(fileD), "video/mp4");
@@ -252,7 +252,7 @@ public class DownloadAdapterNew extends RecyclerView.Adapter<DownloadAdapterNew.
                             }
                             break;
                         case COMPLETADO:
-                            File file1 = new File(FileUtil.getSDPath() + "/Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")) + "/" + fileT + ".mp4");
+                            File file1 = new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")) + "/" + fileT + ".mp4");
                             if (file1.exists()) {
                                 Intent intent1 = new Intent(Intent.ACTION_VIEW, Uri.fromFile(file1));
                                 intent1.setDataAndType(Uri.fromFile(file1), "video/mp4");
@@ -349,7 +349,7 @@ public class DownloadAdapterNew extends RecyclerView.Adapter<DownloadAdapterNew.
                     }
                     switch (context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt(eid + "status", CANCELADO)) {
                         case COMPLETADO:
-                            File file1 = new File(FileUtil.getSDPath() + "/Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")) + "/" + fileT + ".mp4");
+                            File file1 = new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")) + "/" + fileT + ".mp4");
                             if (file1.exists()) {
                                 holder.progress.setVisibility(View.GONE);
                                 holder.ib_des.setImageResource(R.drawable.ic_borrar_r);

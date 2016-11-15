@@ -51,8 +51,6 @@ import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.SyncHttpClient;
@@ -90,12 +88,15 @@ import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.Emision.Section.newEmisionActivity;
 import knf.animeflv.Emision.Section.newEmisionTest;
 import knf.animeflv.Explorer.ExplorerRoot;
+import knf.animeflv.HallFame.HallActivity;
 import knf.animeflv.Interfaces.EncryptionListener;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
 import knf.animeflv.JsonFactory.ServerGetter;
 import knf.animeflv.LoginActivity.LoginBase;
+import knf.animeflv.PlayBack.CastPlayBackManager;
+import knf.animeflv.PlayBack.PlayBackManager;
 import knf.animeflv.Random.RandomActivity;
 import knf.animeflv.Recientes.MainOrganizer;
 import knf.animeflv.Recientes.Status;
@@ -203,10 +204,6 @@ public class newMain extends AppCompatActivity implements
         setUpDrawer();
         getJson();
         NetworkUtils.checkVersion(this, updateButton);
-        Application application = (Application) getApplication();
-        Tracker mTracker = application.getDefaultTracker();
-        mTracker.setScreenName("Recientes");
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
         SharedPreferences prefs = this.getSharedPreferences("data", MODE_PRIVATE);
         frun = true;
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -283,6 +280,7 @@ public class newMain extends AppCompatActivity implements
                         new PrimaryDrawerItem().withName("Explorador").withIcon(MaterialDesignIconic.Icon.gmi_folder).withIdentifier(9),
                         new PrimaryDrawerItem().withName("Historial").withIcon(MaterialDesignIconic.Icon.gmi_eye).withIdentifier(10),
                         new PrimaryDrawerItem().withName("Lista").withIcon(MaterialDesignIconic.Icon.gmi_assignment_returned).withIdentifier(4),
+                        new PrimaryDrawerItem().withName("VIP").withIcon(CommunityMaterial.Icon.cmd_crown).withIdentifier(15),
                         new PrimaryDrawerItem().withName("Pagina Oficial").withIcon(FontAwesome.Icon.faw_facebook).withIdentifier(6),
                         new PrimaryDrawerItem().withName("Web Oficial").withIcon(MaterialDesignIconic.Icon.gmi_view_web).withIdentifier(7),
                         new PrimaryDrawerItem().withName("Publicidad").withIcon(MaterialDesignIconic.Icon.gmi_cloud).withIdentifier(8)
@@ -348,6 +346,10 @@ public class newMain extends AppCompatActivity implements
                             case 11:
                                 result.setSelection(0, false);
                                 startActivity(new Intent(context, RandomActivity.class));
+                                break;
+                            case 15:
+                                result.setSelection(0, false);
+                                startActivity(new Intent(context, HallActivity.class));
                                 break;
                             case -1:
                                 Intent intent = new Intent(context, Configuracion.class);
@@ -563,7 +565,7 @@ public class newMain extends AppCompatActivity implements
         int drawable = R.drawable.cargando;
         headerTit = "Animeflv";
         String e = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email", "null");
-        int accent = preferences.getInt("accentColor", ColorsRes.Naranja(this));
+        int accent = ThemeUtils.getAcentColor(this);
         if (!e.equals("null")) headerTit = e;
         if (accent == ColorsRes.Rojo(this)) {
             drawable = R.drawable.rojo;
@@ -1153,12 +1155,18 @@ public class newMain extends AppCompatActivity implements
                                 if (parser.restoreBackup(save, context) != Parser.Response.OK) {
                                     toast("Error al restaurar");
                                     saveData.delete();
+                                    parser.saveBackup(context);
+                                    showFastConf();
                                 } else {
-                                    if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
+                                    if (ThemeUtils.isAmoled(context)) {
                                         recreate();
                                     } else {
-                                        loadMainJson();
-                                        getHDraw(true);
+                                        if (!knf.animeflv.LoginActivity.LoginServer.getEmailNormal(context).equals("null")) {
+                                            loadMainJson();
+                                            getHDraw(true);
+                                        } else {
+                                            openSingInDialog();
+                                        }
                                     }
                                 }
                             }
@@ -1168,6 +1176,7 @@ public class newMain extends AppCompatActivity implements
                                 super.onNegative(dialog);
                                 saveData.delete();
                                 parser.saveBackup(context);
+                                showFastConf();
                             }
                         })
                         .cancelListener(new DialogInterface.OnCancelListener() {
@@ -1175,116 +1184,121 @@ public class newMain extends AppCompatActivity implements
                             public void onCancel(DialogInterface dialog) {
                                 saveData.delete();
                                 parser.saveBackup(context);
+                                showFastConf();
                             }
                         }).build().show();
             } else {
-                RapConf = new MaterialDialog.Builder(context)
-                        .title("Configuracion rapida")
-                        .titleGravity(GravityEnum.CENTER)
-                        .customView(R.layout.rap_conf, false)
-                        .positiveText("CONTINUAR")
-                        .autoDismiss(false)
-                        .cancelable(false)
-                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                        .callback(new MaterialDialog.ButtonCallback() {
-                            @Override
-                            public void onPositive(MaterialDialog dialog) {
-                                super.onPositive(dialog);
-                                if (sonidos.getSelectedItemPosition() > 0 && conexion.getSelectedItemPosition() > 0 && repVid.getSelectedItemPosition() > 0 && repStream.getSelectedItemPosition() > 0) {
-                                    toast("Se pueden volver a modificar desde configuracion");
-                                    RapConf.dismiss();
-                                    parser.saveBackup(context);
-                                    openSingInDialog();
-                                } else {
-                                    toast("Falta cambiar configuraciones!!!");
-                                }
-                            }
-                        }).build();
-                nots = (Switch) RapConf.getCustomView().findViewById(R.id.switch_not_conf);
-                sonidos = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_sonido_conf);
-                conexion = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_conexion_conf);
-                repVid = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_rep_vid);
-                repStream = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_rep_stream);
-                nots.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked) {
-                            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", true).apply();
-                        } else {
-                            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", false).apply();
-                        }
-                    }
-                });
-                List<String> sonido = new ArrayList<>();
-                sonido.add("Selecciona...");
-                sonido.addAll(Arrays.asList(UtilSound.getSoundsNameList()));
-                ArrayAdapter<String> adapterSonidos = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, sonido);
-                sonidos.setAdapter(adapterSonidos);
-                sonidos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        if (position > 0)
-                            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sonido", Integer.toString(position - 1)).apply();
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                    }
-                });
-                List<String> tipos = new ArrayList<>();
-                tipos.add("Selecciona...");
-                for (String dat : getResources().getStringArray(R.array.tipos)) {
-                    tipos.add(dat);
-                }
-                ArrayAdapter<String> adapterConx = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, tipos);
-                conexion.setAdapter(adapterConx);
-                conexion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        if (position > 0)
-                            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_conexion", Integer.toString(position - 1)).apply();
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                    }
-                });
-                List<String> repVids = new ArrayList<>();
-                repVids.add("Selecciona...");
-                for (String dat : getResources().getStringArray(R.array.players)) {
-                    repVids.add(dat);
-                }
-                ArrayAdapter<String> adapterreps = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, repVids);
-                repVid.setAdapter(adapterreps);
-                repStream.setAdapter(adapterreps);
-                repVid.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        if (position > 0)
-                            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_video", Integer.toString(position - 1)).apply();
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-
-                    }
-                });
-                repStream.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        if (position > 0)
-                            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_streaming", Integer.toString(position - 1)).apply();
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-
-                    }
-                });
-                RapConf.show();
+                showFastConf();
             }
             loadMainJson();
         }
+    }
+
+    private void showFastConf() {
+        RapConf = new MaterialDialog.Builder(context)
+                .title("Configuracion rapida")
+                .titleGravity(GravityEnum.CENTER)
+                .customView(R.layout.rap_conf, false)
+                .positiveText("CONTINUAR")
+                .autoDismiss(false)
+                .cancelable(false)
+                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                        if (sonidos.getSelectedItemPosition() > 0 && conexion.getSelectedItemPosition() > 0 && repVid.getSelectedItemPosition() > 0 && repStream.getSelectedItemPosition() > 0) {
+                            toast("Se pueden volver a modificar desde configuracion");
+                            RapConf.dismiss();
+                            parser.saveBackup(context);
+                            openSingInDialog();
+                        } else {
+                            toast("Falta cambiar configuraciones!!!");
+                        }
+                    }
+                }).build();
+        nots = (Switch) RapConf.getCustomView().findViewById(R.id.switch_not_conf);
+        sonidos = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_sonido_conf);
+        conexion = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_conexion_conf);
+        repVid = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_rep_vid);
+        repStream = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_rep_stream);
+        nots.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", true).apply();
+                } else {
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", false).apply();
+                }
+            }
+        });
+        List<String> sonido = new ArrayList<>();
+        sonido.add("Selecciona...");
+        sonido.addAll(Arrays.asList(UtilSound.getSoundsNameList()));
+        ArrayAdapter<String> adapterSonidos = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, sonido);
+        sonidos.setAdapter(adapterSonidos);
+        sonidos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0)
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sonido", Integer.toString(position - 1)).apply();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+        List<String> tipos = new ArrayList<>();
+        tipos.add("Selecciona...");
+        for (String dat : getResources().getStringArray(R.array.tipos)) {
+            tipos.add(dat);
+        }
+        ArrayAdapter<String> adapterConx = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, tipos);
+        conexion.setAdapter(adapterConx);
+        conexion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0)
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_conexion", Integer.toString(position - 1)).apply();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+        List<String> repVids = new ArrayList<>();
+        repVids.add("Selecciona...");
+        for (String dat : getResources().getStringArray(R.array.players)) {
+            repVids.add(dat);
+        }
+        ArrayAdapter<String> adapterreps = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, repVids);
+        repVid.setAdapter(adapterreps);
+        repStream.setAdapter(adapterreps);
+        repVid.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0)
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_video", Integer.toString(position - 1)).apply();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        repStream.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0)
+                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_streaming", Integer.toString(position - 1)).apply();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        RapConf.show();
     }
 
     public void loadMainJson() {
@@ -1421,9 +1435,9 @@ public class newMain extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        CastPlayBackManager.get(this).destroyManager();
         MainStates.setProcessing(false, "destroyed");
         MainStates.setLoadingEmision(false);
-        MainStates.setFload(true);
         if (UtilDialogPref.getPlayer() != null) {
             if (UtilDialogPref.getPlayer().isPlaying()) {
                 UtilDialogPref.getPlayer().stop();
@@ -1453,6 +1467,12 @@ public class newMain extends AppCompatActivity implements
             getMenuInflater().inflate(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("new_user", true) ? R.menu.menu_main_new : R.menu.menu_main, menu);
         }
         menu.removeItem(R.id.carg);
+        /*MenuItem mediaRouteMenuItem = menu.findItem(R.id.media_route);
+        MediaRouteActionProvider mediaRouteActionProvider =
+                (MediaRouteActionProvider) MenuItemCompat.getActionProvider(
+                        mediaRouteMenuItem);
+        mediaRouteActionProvider.setRouteSelector(PlayBackManager.get(this).getSelector());*/
+        CastPlayBackManager.get(this).registrerMenu(menu, R.id.media_route);
         return true;
     }
 
@@ -1466,7 +1486,7 @@ public class newMain extends AppCompatActivity implements
             case R.id.new_user:
                 PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("new_user", false).apply();
                 startActivity(new Intent(this, TutorialActivity.class));
-                invalidateOptionsMenu();
+                supportInvalidateOptionsMenu();
                 break;
         }
 
@@ -1479,6 +1499,18 @@ public class newMain extends AppCompatActivity implements
         if (!isXLargeScreen()) {
             return;
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        PlayBackManager.get(this).addCallbacks();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        PlayBackManager.get(this).removeCallbacks();
     }
 
     private class Registrer extends AsyncTask<String, String, String> {

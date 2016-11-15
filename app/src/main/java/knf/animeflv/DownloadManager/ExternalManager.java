@@ -1,77 +1,70 @@
 package knf.animeflv.DownloadManager;
 
-import android.app.ActivityManager;
+import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-
 import java.io.File;
 
-import knf.animeflv.Application;
 import knf.animeflv.DManager;
-import knf.animeflv.DownloadService.DownloadService;
-import knf.animeflv.DownloadService.DownloaderIntentService;
-import knf.animeflv.Downloader;
+import knf.animeflv.DownloadService.DownloadListManager;
+import knf.animeflv.DownloadService.DownloadObject;
+import knf.animeflv.DownloadService.DownloaderService;
+import knf.animeflv.DownloadService.SQLiteHelperDownloads;
 import knf.animeflv.DownloaderCookie;
 import knf.animeflv.Parser;
 import knf.animeflv.Utils.FileUtil;
 
-/**
- * Created by Jordy on 04/03/2016.
- */
 public class ExternalManager {
-    Context context;
+    Activity context;
     SharedPreferences sharedPreferences;
     String EXTERNA = "1";
     Parser parser = new Parser();
 
-    public ExternalManager(Context context) {
+    public ExternalManager(Activity context) {
         this.context = context;
         sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
     }
 
+    public static boolean isDownloading(Activity activity, String eid) {
+        return new SQLiteHelperDownloads(activity).downloadExist(eid);
+    }
+
+    public static int getDownloadState(Activity activity, String eid) {
+        return new SQLiteHelperDownloads(activity).getState(eid);
+    }
+
     public void startDownload(String eid, String url) {
-        Application application = (Application) context.getApplicationContext();
-        Tracker mTracker = application.getDefaultTracker();
-        mTracker.setScreenName("Download");
-        mTracker.send(new HitBuilders.EventBuilder("Download", "Download Ext " + eid).build());
-        String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
-        String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
-        String titulo = parser.getTitCached(aid);
-        File f = new File(FileUtil.getSDPath() + "/Animeflv/download/" + aid, aid + "_" + numero + ".mp4");
         sharedPreferences.edit().putString(eid + "dtype", EXTERNA).apply();
-        //new Downloader(context, url, eid, aid, titulo, numero, f).executeOnExecutor(ExecutorManager.getExecutor());
-        Intent intent = new Intent(context, DownloadService.class);
+        long downloadID = System.currentTimeMillis();
+        sharedPreferences.edit().putLong(eid + "_downloadID", downloadID).commit();
+        Intent intent = new Intent(context, DownloaderService.class);
         Bundle bundle = new Bundle();
         bundle.putString("url", url);
         bundle.putString("eid", eid);
-        bundle.putString("titulo", titulo);
+        bundle.putLong("downloadID", downloadID);
         intent.putExtras(bundle);
+        DownloadListManager.add(context, eid + "_" + downloadID);
+        new SQLiteHelperDownloads(context)
+                .addElement(new DownloadObject(downloadID, url, eid))
+                .updateState(eid, DownloadManager.STATUS_PENDING)
+                .close();
         context.startService(intent);
     }
 
     public void startDownload(String eid, String url, CookieConstructor constructor) {
-        Application application = (Application) context.getApplicationContext();
-        Tracker mTracker = application.getDefaultTracker();
-        mTracker.setScreenName("Download");
-        mTracker.send(new HitBuilders.EventBuilder("Download", "Download Ext Zippy" + eid).build());
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         String titulo = parser.getTitCached(aid);
-        File f = new File(FileUtil.getSDPath() + "/Animeflv/download/" + aid, aid + "_" + numero + ".mp4");
+        File f = new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + aid, aid + "_" + numero + ".mp4");
         sharedPreferences.edit().putString(eid + "dtype", EXTERNA).apply();
         new DownloaderCookie(context, eid, aid, titulo, numero, f, constructor).execute(url);
     }
 
     public void cancelDownload(String eid) {
-        Application application = (Application) context.getApplicationContext();
-        Tracker mTracker = application.getDefaultTracker();
-        mTracker.setScreenName("Download");
-        mTracker.send(new HitBuilders.EventBuilder("Download", "Cancel Ext " + eid).build());
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         String titulo = parser.getTitCached(aid);
@@ -83,106 +76,11 @@ public class ExternalManager {
         String epID = sharedPreferences.getString("epIDS_descarga", "");
         sharedPreferences.edit().putString("titulos_descarga", tits.replace(titulo + ":::", "")).apply();
         sharedPreferences.edit().putString("epIDS_descarga", epID.replace(aid + "_" + numero + ":::", "")).apply();
-        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt(eid + "status", Downloader.CANCELADO).commit();
+        new SQLiteHelperDownloads(context).updateState(eid, DownloaderService.CANCELED).delete(eid);
+        DownloadListManager.delete(context, eid + "_" + sharedPreferences.getLong(eid + "_downloadID", -1));
     }
 
     public int getProgress(String eid) {
-        return Integer.parseInt(sharedPreferences.getString(eid + "prog", "0"));
-    }
-
-    public DownloadState getState(String eid) {
-        DownloadState state;
-        switch (sharedPreferences.getInt(eid + "status", 6)) {
-            case 0:
-                state = DownloadState.DOWNLOADING;
-                break;
-            case 1:
-                state = DownloadState.SUCCESS;
-                break;
-            case 2:
-                state = DownloadState.ERROR;
-                break;
-            case 3:
-                state = DownloadState.CANCELED;
-                break;
-            case 4:
-                state = DownloadState.PAUSED;
-                break;
-            case 5:
-                state = DownloadState.INLIST;
-                break;
-            case 6:
-                state = DownloadState.NULL;
-                break;
-            default:
-                state = DownloadState.NULL;
-                break;
-        }
-        return state;
-    }
-
-    public String getStateString(String eid) {
-        String state;
-        switch (sharedPreferences.getInt(eid + "status", 6)) {
-            case 0:
-                state = "DESCARGANDO";
-                break;
-            case 1:
-                state = "COMPLETADO";
-                break;
-            case 2:
-                state = "ERROR";
-                break;
-            case 3:
-                state = "CANCELADO";
-                break;
-            case 4:
-                state = "PAUSA";
-                break;
-            case 5:
-                state = "EN LISTA";
-                break;
-            case 6:
-                state = "SIN ESTADO";
-                break;
-            default:
-                state = "SIN ESTADO";
-                break;
-        }
-        return state;
-    }
-
-    public boolean isDownloading(String eid) {
-        return getState(eid) == DownloadState.DOWNLOADING;
-    }
-
-    public boolean isSuccess(String eid) {
-        return getState(eid) == DownloadState.SUCCESS;
-    }
-
-    public boolean isError(String eid) {
-        return getState(eid) == DownloadState.ERROR;
-    }
-
-    public boolean isCanceled(String eid) {
-        return getState(eid) == DownloadState.CANCELED;
-    }
-
-    public String getDownloadTitle(String eid) {
-        return parser.getTitCached(eid.substring(0, eid.lastIndexOf("_")));
-    }
-
-    public String getError(String eid) {
-        return sharedPreferences.getString(eid + "errmessage", "Sin Errores");
-    }
-
-    private boolean isDownloadServiceRunning() {
-        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (DownloaderIntentService.class.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
+        return new SQLiteHelperDownloads(context).getProgress(eid);
     }
 }

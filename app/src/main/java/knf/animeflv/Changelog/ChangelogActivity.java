@@ -51,6 +51,7 @@ public class ChangelogActivity extends AppCompatActivity {
                     public void run() {
                         recyclerView.setAdapter(new VersionAdapter(ChangelogActivity.this, versions));
                         progressBar.setVisibility(View.GONE);
+                        ThemeUtils.setStatusBarPadding(ChangelogActivity.this, recyclerView);
                     }
                 });
             }

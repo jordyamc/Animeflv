@@ -17,8 +17,7 @@ import pl.droidsonroids.gif.GifImageButton;
  * Created by Jordy on 26/03/2016.
  */
 public class MainStates {
-    private static MainStates states = new MainStates();
-    private static Context context;
+    private static MainStates states;
     private static SharedPreferences preferences;
     private static boolean listing = false;
     private static boolean isprocessing = false;
@@ -29,23 +28,17 @@ public class MainStates {
     private static ImageButton downState;
     private static String processingEid = "";
     private static boolean loadingEmision = true;
-    private static boolean fload = true;
     private static int position = -1;
 
-    public static boolean isFload() {
-        return fload;
-    }
-
-    public static void setFload(boolean fload) {
-        MainStates.fload = fload;
-    }
-
-    public static void init(Context con) {
-        if (states == null) {
-            states = new MainStates();
-        }
-        context = con;
+    public MainStates(Context context) {
         preferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+    }
+
+    public static MainStates init(Context con) {
+        if (states == null) {
+            states = new MainStates(con);
+        }
+        return states;
     }
 
     public static void setZippyState(DownloadTask task1, String url, ImageButton button, ImageButton state, int position) {
@@ -80,10 +73,6 @@ public class MainStates {
         return downState;
     }
 
-    public static ImageButton getDownButton() {
-        return imageButton;
-    }
-
     public static GifImageButton getGifDownButton() {
         return gifImageButton;
     }
@@ -104,27 +93,44 @@ public class MainStates {
         listing = value;
     }
 
-    public static List<String> getGlobalWaitList() {
+    public static void setProcessing(boolean value, @Nullable String eid) {
+        isprocessing = value;
+        if (eid != null) {
+            processingEid = eid;
+        } else {
+            processingEid = "null";
+        }
+    }
+
+    public static String getProcessingEid() {
+        return processingEid;
+    }
+
+    public static boolean isProcessing() {
+        return isprocessing;
+    }
+
+    public List<String> getGlobalWaitList() {
         Set<String> set = preferences.getStringSet("GlobalWaiting", new HashSet<String>());
         List<String> list = new ArrayList<>();
         list.addAll(set);
         return list;
     }
 
-    public static List<String> getWaitList(String aid) {
+    public List<String> getWaitList(String aid) {
         Set<String> set = preferences.getStringSet(aid + "waiting", new HashSet<String>());
         List<String> list = new ArrayList<>();
         list.addAll(set);
         return list;
     }
 
-    public static void UpdateWaitList(String key, List<String> list) {
+    public void UpdateWaitList(String key, List<String> list) {
         Set<String> set = new HashSet<>();
         set.addAll(list);
         preferences.edit().putStringSet(key, set).apply();
     }
 
-    public static void addToWaitList(String eid) {
+    public void addToWaitList(String eid) {
         String[] data = eid.replace("E", "").split("_");
         String key = data[0] + "waiting";
         Set<String> set = preferences.getStringSet(key, new HashSet<String>());
@@ -143,7 +149,7 @@ public class MainStates {
         }
     }
 
-    public static void delFromWaitList(String eid) {
+    public void delFromWaitList(String eid) {
         String[] data = eid.replace("E", "").split("_");
         String key = data[0] + "waiting";
         Set<String> set = preferences.getStringSet(key, new HashSet<String>());
@@ -162,7 +168,7 @@ public class MainStates {
         }
     }
 
-    public static void delFromGlobalWaitList(String aid) {
+    public void delFromGlobalWaitList(String aid) {
         Set<String> set = preferences.getStringSet("GlobalWaiting", new HashSet<String>());
         List<String> list = new ArrayList<>();
         list.addAll(set);
@@ -174,38 +180,8 @@ public class MainStates {
         }
     }
 
-    public static void delFromGlobalWaitListbyEid(String eid) {
-        String aid = eid.split("_")[0];
-        Set<String> set = preferences.getStringSet("GlobalWaiting", new HashSet<String>());
-        List<String> list = new ArrayList<>();
-        list.addAll(set);
-        if (list.contains(aid)) {
-            list.remove(list.indexOf(aid));
-            UpdateWaitList("GlobalWaiting", list);
-            list.clear();
-            UpdateWaitList(aid + "waiting", list);
-        }
-    }
-
-    public static boolean WaitContains(String eid) {
+    public boolean WaitContains(String eid) {
         String[] data = eid.replace("E", "").split("_");
         return getGlobalWaitList().contains(data[0]) && getWaitList(data[0]).contains(data[1]);
-    }
-
-    public static void setProcessing(boolean value, @Nullable String eid) {
-        isprocessing = value;
-        if (eid != null) {
-            processingEid = eid;
-        } else {
-            processingEid = "null";
-        }
-    }
-
-    public static String getProcessingEid() {
-        return processingEid;
-    }
-
-    public static boolean isProcessing() {
-        return isprocessing;
     }
 }

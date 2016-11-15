@@ -1,12 +1,10 @@
 package knf.animeflv;
 
 import android.content.Context;
-import android.support.multidex.MultiDex;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.Tracker;
 import com.karumi.dexter.Dexter;
 
+import es.munix.multidisplaycast.CastManager;
 import knf.animeflv.Emision.EmisionChecker;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.UtilsInit;
@@ -15,7 +13,6 @@ import xdroid.toaster.Toaster;
 
 public class Application extends android.app.Application {
     Context context;
-    private Tracker mTracker;
 
     @Override
     public void onCreate() {
@@ -36,19 +33,6 @@ public class Application extends android.app.Application {
                 System.exit(0);
             }
         });
-    }
-
-    synchronized public Tracker getDefaultTracker() {
-        if (mTracker == null) {
-            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
-            mTracker = analytics.newTracker(R.xml.app_tracker);
-        }
-        return mTracker;
-    }
-
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-        MultiDex.install(this);
+        CastManager.register(getApplicationContext());
     }
 }

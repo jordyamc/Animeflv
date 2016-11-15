@@ -80,7 +80,7 @@ public class ModelFactory {
 
     public static File getDirectoryFile(Context context) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false)) {
-            return new File(FileUtil.getSDPath() + "/Animeflv/download");
+            return new File(FileUtil.init(context).getSDPath() + "/Animeflv/download");
         } else {
             return new File(Environment.getExternalStorageDirectory() + "/Animeflv/download");
         }
@@ -88,7 +88,7 @@ public class ModelFactory {
 
     public static DocumentFile getDirectoryFileAccess(Context context) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false)) {
-            return FileUtil.getDownloadDirFromAccess();
+            return FileUtil.init(context).getDownloadDirFromAccess();
         } else {
             return DocumentFile.fromFile(new File(Environment.getExternalStorageDirectory() + "/Animeflv/download"));
         }

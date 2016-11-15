@@ -2,7 +2,6 @@ package knf.animeflv.Recyclers;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -36,9 +35,9 @@ import java.util.concurrent.TimeUnit;
 
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.CookieConstructor;
-import knf.animeflv.DownloadManager.InternalManager;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.JsonFactory.DownloadGetter;
+import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.R;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Utils.FileUtil;
@@ -102,11 +101,11 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     public void onBindViewHolder(final AdapterInfoCapsMaterial.ViewHolder holder, int position) {
         SetUpWeb(holder.web, holder);
         final String item = capitulo.get(position).replace("Capitulo ", "").trim();
-        if (FileUtil.ExistAnime(eids.get(holder.getAdapterPosition()))) {
+        if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
             showDelete(holder.ib_des);
             showPlay(holder.ib_ver);
         } else {
-            if (InternalManager.isDownloading(context, eids.get(holder.getAdapterPosition()))) {
+            if (ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition()))) {
                 showDelete(holder.ib_des);
                 showPlay(holder.ib_ver);
             } else {
@@ -118,8 +117,8 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
         Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
         holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
-            holder.card.setCardBackgroundColor(Color.parseColor("#212121"));
-            holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.blanco));
+            holder.card.setCardBackgroundColor(ColorsRes.Prim(context));
+            holder.tv_capitulo.setTextColor(ColorsRes.Blanco(context));
             holder.ib_ver.setColorFilter(ColorsRes.Holo_Dark(context));
             holder.ib_des.setColorFilter(null);
             holder.ib_des.setColorFilter(ColorsRes.Holo_Dark(context));
@@ -131,14 +130,19 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
         if (vistos) {
             holder.tv_capitulo.setTextColor(getColor());
         }
-        if (MainStates.WaitContains(eids.get(holder.getAdapterPosition()))) {
-            if (!FileUtil.ExistAnime(eids.get(holder.getAdapterPosition()))) {
-                showCloudPlay(holder.ib_ver);
-                holder.ib_des.setImageResource(R.drawable.ic_waiting);
+        if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
+            if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
+                if (CastPlayBackManager.get(context).getCastingEid().equals(eids.get(holder.getAdapterPosition()))) {
+                    showDownload(holder.ib_des);
+                    showCastPlay(holder.ib_ver);
+                } else {
+                    showCloudPlay(holder.ib_ver);
+                    holder.ib_des.setImageResource(R.drawable.ic_waiting);
+                }
             } else {
                 showPlay(holder.ib_ver);
                 showDelete(holder.ib_des);
-                MainStates.delFromWaitList(eids.get(holder.getAdapterPosition()));
+                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition()));
             }
         }
         holder.ib_des.setOnClickListener(new View.OnClickListener() {
@@ -149,8 +153,8 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                         Toaster.toast("Actualizacion descargada, instalar para continuar");
                     } else {
                         if (!MainStates.isProcessing()) {
-                            if (!MainStates.WaitContains(eids.get(holder.getAdapterPosition()))) {
-                                if (!FileUtil.ExistAnime(eids.get(holder.getAdapterPosition())) && !InternalManager.isDownloading(context, eids.get(holder.getAdapterPosition()))) {
+                            if (!MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
+                                if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition())) && !ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition()))) {
                                     showLoading(holder.ib_des);
                                     searchDownload(holder);
                                 } else {
@@ -165,7 +169,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                                 @Override
                                                 public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
-                                                    FileUtil.DeleteAnime(eids.get(holder.getAdapterPosition()));
+                                                    FileUtil.init(context).DeleteAnime(eids.get(holder.getAdapterPosition()));
                                                     showDownload(holder.ib_des);
                                                     showCloudPlay(holder.ib_ver);
                                                     ManageDownload.cancel(context, eids.get(holder.getAdapterPosition()));
@@ -197,7 +201,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                                             @Override
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                MainStates.delFromWaitList(eids.get(holder.getAdapterPosition()));
+                                                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition()));
                                                 showLoading(holder.ib_des);
                                                 searchDownload(holder);
                                             }
@@ -219,8 +223,8 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                         Toaster.toast("Actualizacion descargada, instalar para continuar");
                     } else {
                         if (!MainStates.isProcessing()) {
-                            if (!MainStates.WaitContains(eids.get(holder.getAdapterPosition()))) {
-                                if (FileUtil.ExistAnime(eids.get(holder.getAdapterPosition()))) {
+                            if (!MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
+                                if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition())) && !ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition()))) {
                                     holder.tv_capitulo.setTextColor(getColor());
                                     StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
                                 } else {
@@ -243,8 +247,8 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                                             @Override
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                MainStates.delFromWaitList(eids.get(holder.getAdapterPosition()));
-                                                if (FileUtil.ExistAnime(eids.get(holder.getAdapterPosition()))) {
+                                                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition()));
+                                                if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
                                                     holder.tv_capitulo.setTextColor(getColor());
                                                     StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
                                                 } else {
@@ -264,12 +268,12 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             @Override
             public boolean onLongClick(View view) {
                 if (!MainStates.isListing()) {
-                    if (!FileUtil.ExistAnime(eids.get(holder.getAdapterPosition()))) {
-                        if (MainStates.WaitContains(eids.get(holder.getAdapterPosition()))) {
-                            MainStates.delFromWaitList(eids.get(holder.getAdapterPosition()));
+                    if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
+                        if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
+                            MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition()));
                             showDownload(holder.ib_des);
                         } else {
-                            MainStates.addToWaitList(eids.get(holder.getAdapterPosition()));
+                            MainStates.init(context).addToWaitList(eids.get(holder.getAdapterPosition()));
                             holder.ib_des.setImageResource(R.drawable.ic_waiting);
                         }
                     }
@@ -282,11 +286,11 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             public void onClick(View v) {
                 if (!MainStates.isListing()) {
                     context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("cambio", true).apply();
-                    if (!FileUtil.isInSeen(eids.get(holder.getAdapterPosition()))) {
-                        FileUtil.setSeenState(eids.get(holder.getAdapterPosition()), true);
+                    if (!FileUtil.init(context).isInSeen(eids.get(holder.getAdapterPosition()))) {
+                        FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition()), true);
                         holder.tv_capitulo.setTextColor(getColor());
                     } else {
-                        FileUtil.setSeenState(eids.get(holder.getAdapterPosition()), false);
+                        FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition()), false);
                         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
                             holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.blanco));
                         } else {
@@ -294,12 +298,12 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                         }
                     }
                 } else {
-                    if (!FileUtil.ExistAnime(eids.get(holder.getAdapterPosition()))) {
-                        if (MainStates.WaitContains(eids.get(holder.getAdapterPosition()))) {
-                            MainStates.delFromWaitList(eids.get(holder.getAdapterPosition()));
+                    if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
+                        if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
+                            MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition()));
                             showDownload(holder.ib_des);
                         } else {
-                            MainStates.addToWaitList(eids.get(holder.getAdapterPosition()));
+                            MainStates.init(context).addToWaitList(eids.get(holder.getAdapterPosition()));
                             holder.ib_des.setImageResource(R.drawable.ic_waiting);
                         }
                     }
@@ -342,6 +346,15 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             public void run() {
                 button.setImageResource(R.drawable.ic_borrar_r);
                 button.setEnabled(true);
+            }
+        });
+    }
+
+    private void showCastPlay(final ImageButton button) {
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                button.setImageResource(R.drawable.cast_c);
             }
         });
     }
@@ -399,6 +412,11 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             }
 
             @Override
+            public void onStartCasting() {
+
+            }
+
+            @Override
             public void onLogError(Exception e) {
                 Logger.Error(AdapterInfoCapsMaterial.this.getClass(), e);
             }
@@ -414,6 +432,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
 
             @Override
             public void onStartDownload() {
+                MainStates.setProcessing(false, null);
                 showDownload(holder.ib_des);
             }
 
@@ -430,7 +449,15 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
 
             @Override
             public void onCancelDownload() {
+                MainStates.setProcessing(false, null);
                 showDownload(holder.ib_des);
+            }
+
+            @Override
+            public void onStartCasting() {
+                MainStates.setProcessing(false, null);
+                showDownload(holder.ib_des);
+                holder.ib_ver.setImageResource(es.munix.multidisplaycast.R.drawable.cast_on);
             }
 
             @Override
@@ -520,7 +547,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                             StreamManager.internal(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
                             holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
                         } else {
-                            if (FileUtil.isMXinstalled()) {
+                            if (FileUtil.init(context).isMXinstalled()) {
                                 toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
                                 StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
                                 holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));

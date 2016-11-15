@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/alarm"
+        android:shortcutDisabledMessage="@string/no_open"
+        android:shortcutId="emision"
+        android:shortcutLongLabel="@string/shortcut_em_long"
+        android:shortcutShortLabel="@string/shortcut_em">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="knf.animeflv.Emision.Section.newEmisionTest"
+            android:targetPackage="knf.animeflv"/>
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/dir"
+        android:shortcutDisabledMessage="@string/no_open"
+        android:shortcutId="directorio"
+        android:shortcutLongLabel="@string/shortcut_dir_long"
+        android:shortcutShortLabel="@string/shortcut_dir">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="knf.animeflv.Directorio.Directorio"
+            android:targetPackage="knf.animeflv"/>
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/favs"
+        android:shortcutDisabledMessage="@string/no_open"
+        android:shortcutId="favoritos"
+        android:shortcutLongLabel="@string/shortcut_favs_long"
+        android:shortcutShortLabel="@string/shortcut_favs">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="knf.animeflv.Favoritos"
+            android:targetPackage="knf.animeflv"/>
+    </shortcut>
+
+    <!-- Specify more shortcuts here. -->
+</shortcuts>

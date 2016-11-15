@@ -228,7 +228,7 @@ public class LoginServer {
 
     }
 
-    public static void RefreshData(final Activity activity, final ServerInterface serverInterface) {
+    public static void RefreshData(final Activity activity, final RefreshInterface serverInterface) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -251,13 +251,13 @@ public class LoginServer {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                             super.onSuccess(statusCode, headers, response);
-                            serverInterface.onServerResponse(response);
+                            serverInterface.onFinishRefresh();
                         }
 
                         @Override
                         public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                             super.onFailure(statusCode, headers, responseString, throwable);
-                            serverInterface.onServerError();
+                            serverInterface.onFinishRefresh();
                         }
                     });
                 }
@@ -328,6 +328,10 @@ public class LoginServer {
         return "&fav_code=" + preferences.getString("favoritos", "") + ":;:" + preferences.getString("vistos", "");
     }
 
+    public static String getEmailNormal(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
+    }
+
     public interface ServerInterface {
         void onServerResponse(JSONObject object);
 
@@ -336,5 +340,9 @@ public class LoginServer {
 
     public interface ListResponse {
         void onUserListCreated(@Nullable List<String> list);
+    }
+
+    public interface RefreshInterface {
+        void onFinishRefresh();
     }
 }

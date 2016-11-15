@@ -200,7 +200,7 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
     }
 
     /**
-     * init controller view
+     * initial controller view
      *
      * @return
      */
@@ -264,7 +264,7 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
         mEndTime = (TextView) v.findViewById(R.id.bottom_time);
         mCurrentTime = (TextView) v.findViewById(R.id.bottom_time_current);
 
-        //init formatter
+        //initial formatter
         mFormatBuilder = new StringBuilder();
         mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
     }

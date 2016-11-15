@@ -1,7 +1,12 @@
 package knf.animeflv.DownloadManager;
 
+import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Context;
+import android.preference.PreferenceManager;
 
+import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Files.FileSearchResponse;
 import knf.animeflv.Utils.NetworkUtils;
 import xdroid.toaster.Toaster;
 
@@ -9,7 +14,7 @@ import xdroid.toaster.Toaster;
  * Created by Jordy on 04/03/2016.
  */
 public class ManageDownload {
-    public static ExternalManager external(Context context) {
+    public static ExternalManager external(Activity context) {
         return new ExternalManager(context);
     }
 
@@ -27,9 +32,6 @@ public class ManageDownload {
             case 1:
                 state = DownloadType.EXTERNAL;
                 break;
-            case 2:
-                state = DownloadType.NULL;
-                break;
             default:
                 state = DownloadType.NULL;
                 break;
@@ -37,7 +39,18 @@ public class ManageDownload {
         return state;
     }
 
-    public static void cancel(Context context, String eid) {
+    public static boolean isDownloading(Activity activity, String eid) {
+        switch (getType(activity, eid)) {
+            case INTERNAL:
+                return InternalManager.isDownloading(activity, eid);
+            case EXTERNAL:
+                return ExternalManager.isDownloading(activity, eid);
+            default:
+                return false;
+        }
+    }
+
+    public static void cancel(Activity context, String eid) {
         DownloadType type = getType(context, eid);
         if (type == DownloadType.INTERNAL) {
             new InternalManager(context).cancelDownload(eid);
@@ -47,7 +60,7 @@ public class ManageDownload {
         }
     }
 
-    public static int getProgress(Context context, String eid) {
+    public static int getProgress(Activity context, String eid) {
         DownloadType type = getType(context, eid);
         int prog = 0;
         if (type == DownloadType.INTERNAL) {
@@ -59,7 +72,7 @@ public class ManageDownload {
         return prog;
     }
 
-    private static void DescargarSD(Context context, String eid, String downUrl) {
+    private static void DescargarSD(Activity context, String eid, String downUrl) {
         if (NetworkUtils.isNetworkAvailable()) {
             ManageDownload.external(context).startDownload(eid, downUrl);
         } else {
@@ -67,7 +80,7 @@ public class ManageDownload {
         }
     }
 
-    private static void DescargarSD(Context context, String eid, String downUrl, CookieConstructor constructor) {
+    private static void DescargarSD(Activity context, String eid, String downUrl, CookieConstructor constructor) {
         if (NetworkUtils.isNetworkAvailable()) {
             ManageDownload.external(context).startDownload(eid, downUrl, constructor);
         } else {
@@ -91,19 +104,45 @@ public class ManageDownload {
         }
     }
 
-    public static void chooseDownDir(Context context, String eid, String url) {
-        Boolean inSD = false;//PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
+    public static int getDownloadSate(Activity activity, String eid) {
+        switch (getType(activity, eid)) {
+            case INTERNAL:
+                return InternalManager.getDownloadSate(activity, eid);
+            case EXTERNAL:
+                return ExternalManager.getDownloadState(activity, eid);
+            default:
+                return DownloadManager.STATUS_FAILED;
+        }
+    }
+
+    public static void chooseDownDir(Activity context, String eid, String url) {
+        Boolean inSD = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
         if (inSD) {
-            DescargarSD(context, eid, url);
+            FileSearchResponse response = FileUtil.init(context).searchforSD();
+            if (response.existSD() && FileUtil.haveSDPermission(context)) {
+                DescargarSD(context, eid, url);
+            } else {
+                if (!response.existSD()) {
+                    Toaster.toast("SD no encontrada");
+                } else if (!FileUtil.haveSDPermission(context)) {
+                    Toaster.toast("No se puede escibir en la SD");
+                }
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("sd_down", false).apply();
+                DescargarInbyURL(context, eid, url);
+            }
         } else {
             DescargarInbyURL(context, eid, url);
         }
     }
 
-    public static void chooseDownDir(Context context, String eid, String url, CookieConstructor constructor) {
+    public static void chooseDownDir(Activity context, String eid, String url, CookieConstructor constructor) {
         Boolean inSD = false;//PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
         if (inSD) {
-            DescargarSD(context, eid, url, constructor);
+            if (FileUtil.init(context).searchforSD().existSD() && FileUtil.haveSDPermission(context)) {
+                DescargarSD(context, eid, url, constructor);
+            } else {
+                DescargarInbyURL(context, eid, url, constructor);
+            }
         } else {
             DescargarInbyURL(context, eid, url, constructor);
         }

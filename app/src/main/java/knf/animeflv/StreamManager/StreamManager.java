@@ -36,7 +36,7 @@ public class StreamManager {
         String cap = data[1].replace("E", "");
         HistoryHelper.addToList(context,aid,new Parser().getTitCached(aid),cap);
         File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
-        File sd = new File(FileUtil.getSDPath() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
+        File sd = new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
         int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_video", "0"));
         Log.d("Play type", String.valueOf(type));
         switch (type) {

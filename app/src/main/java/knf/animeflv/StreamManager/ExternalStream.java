@@ -25,7 +25,7 @@ public class ExternalStream {
             String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
             String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).setDataAndType(Uri.parse(url),"video/mp4").putExtra("title", new Parser().getTitCached(aid) + " " + numero));
-            FileUtil.setSeenState(eid, true);
+            FileUtil.init(context).setSeenState(eid, true);
         }catch (Exception e){
             e.printStackTrace();
             Toaster.toast("No hay Aplicaciones dispnibles para reproducir el video!!!");
@@ -42,7 +42,7 @@ public class ExternalStream {
             intent.setDataAndType(Uri.fromFile(file), "video/mp4");
             intent.putExtra("title", new Parser().getTitCached(aid) + " " + numero);
             context.startActivity(intent);
-            FileUtil.setSeenState(eid, true);
+            FileUtil.init(context).setSeenState(eid, true);
         }
     }
 

@@ -2,18 +2,18 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '23.0.2'
+    buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId "knf.animeflv"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 25
-        versionCode 145
-        versionName "3.6"
+        versionCode 146
+        versionName "3.7"
         multiDexEnabled true
     }
     buildTypes {
         release {
-            shrinkResources true
+            shrinkResources false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -26,6 +26,15 @@ android {
     defaultConfig {
         multiDexEnabled true
         renderscriptSupportModeEnabled true
+    }
+    signingConfigs {
+        release {
+            storeFile file("keys.keystore")
+            storePassword "grim042a677"
+            keyAlias "knf"
+            keyPassword "grim042a677"
+            v2SigningEnabled true
+        }
     }
 }
 allprojects {
@@ -42,7 +51,7 @@ dependencies {
     compile('com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:0.9.3@aar') {
         transitive = true
     }
-    compile('com.mikepenz:materialdrawer:5.6.0@aar') {
+    compile('com.mikepenz:materialdrawer:5.7.0@aar') {
         transitive = true
     }
     compile 'com.mikepenz:iconics-core:2.8.1@aar'
@@ -50,38 +59,40 @@ dependencies {
     compile 'com.mikepenz:material-design-iconic-typeface:2.2.0.2@aar'
     compile 'com.mikepenz:fontawesome-typeface:4.6.0.3@aar'
     compile 'com.mikepenz:community-material-typeface:1.5.54.2@aar'
-    compile 'com.afollestad.material-dialogs:core:0.8.6.1'
-    compile 'com.afollestad.material-dialogs:commons:0.8.6.1'
+
+    compile 'com.afollestad.material-dialogs:core:0.9.1.0'
+    compile 'com.afollestad.material-dialogs:commons:0.9.1.0'
     compile files('jsoup-1.9.2.jar')
-    //compile files('jsoup-1.9.2-sources.jar')
+
     compile files('src/SOMAAndroidSDK5.0.9.jar')
     //compile 'com.flurry.android:analytics:6.2.0'
     //compile 'com.flurry.android:ads:6.2.0'
     compile files('src/trace.jar')
     compile 'jp.wasabeef:recyclerview-animators:2.2.3'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
-    compile 'com.cleveroad:audiowidget:0.9.2'
+    compile 'com.cleveroad:audiowidget:1.0.0'
     compile 'com.github.clans:fab:1.6.2'
     compile 'com.nononsenseapps:filepicker:2.5.2'
     compile 'com.github.halysongoncalves:pugnotification:1.8.1'
     compile 'com.google.android.exoplayer:exoplayer:r1.5.9'
     compile 'com.github.ndczz:infinity-loading:0.4'
-    compile 'com.google.firebase:firebase-core:9.6.1'
-    compile 'com.google.android.gms:play-services-analytics:9.6.1'
-    compile 'com.google.android.gms:play-services-ads:9.6.1'
+    /*compile 'com.google.firebase:firebase-core:9.8.0'
+    compile 'com.google.android.gms:play-services-ads:9.8.0'*/
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.daimajia.easing:library:1.0.1@aar'
     compile 'com.daimajia.androidanimations:library:1.1.3@aar'
     compile 'com.github.ViksaaSkool:AwesomeSplash:v1.0.0'
     compile 'com.shamanland:xdroid-toaster:0.0.10'
     compile 'com.karumi:dexter:2.3.1'
-    compile 'com.android.support:design:25.+'
     //<--
+    compile 'com.android.support:design:25.+'
     compile 'com.android.support:palette-v7:25.+'
     compile 'com.android.support:appcompat-v7:25.+'
-    //<---
+    compile 'com.android.support:appcompat-v7:25.+'
     compile 'com.android.support:recyclerview-v7:25.+'
     compile 'com.android.support:cardview-v7:25.+'
+    compile 'com.android.support:mediarouter-v7:25.+'
+    //<---
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
@@ -111,6 +122,10 @@ dependencies {
     compile 'com.wdullaer:materialdatetimepicker:2.5.0'
 
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
+
+    compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
+
+    compile 'com.github.munix:Multi-Display-Cast:+'
 
     compile files('src/SOMAAndroidSDK5.0.9.jar')
 }

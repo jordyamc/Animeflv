@@ -18,11 +18,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -31,13 +26,8 @@ import cz.msebera.android.httpclient.Header;
  */
 public class SoundsLoader {
     public static void start(Context context) {
-        int corePoolSize = 60;
-        int maximumPoolSize = 80;
-        int keepAliveTime = 10;
-        BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(maximumPoolSize);
-        Executor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
         if (NetworkUtils.isNetworkAvailable()) {
-            new Loader(context).executeOnExecutor(threadPoolExecutor);
+            new Loader(context).executeOnExecutor(ExecutorManager.getExecutor());
         }
     }
 

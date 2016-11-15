@@ -1,5 +1,6 @@
 package knf.animeflv.WaitList;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -56,7 +57,7 @@ public class WaitActivity extends AppCompatActivity implements
     private RecyclerViewDragDropManager mRecyclerViewDragDropManager;
     private RecyclerViewSwipeManager mRecyclerViewSwipeManager;
     private RecyclerViewTouchActionGuardManager mRecyclerViewTouchActionGuardManager;
-    private Context context;
+    private Activity context;
     private AdapterWait adapterWait;
     private MaterialDialog processing;
     private Parser parser = new Parser();
@@ -72,7 +73,7 @@ public class WaitActivity extends AppCompatActivity implements
                     String url = urls.get(eids.indexOf(s));
                     if (!url.equals("null")) {
                         ManageDownload.chooseDownDir(context, s, url);
-                        MainStates.delFromWaitList(s);
+                        MainStates.init(context).delFromWaitList(s);
                     }
                 }
                 runOnUiThread(new Runnable() {
@@ -98,7 +99,7 @@ public class WaitActivity extends AppCompatActivity implements
                         ManageDownload.chooseDownDir(context, s, url);
                     }
                 }
-                MainStates.delFromWaitList(eids.get(0));
+                MainStates.init(context).delFromWaitList(eids.get(0));
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -160,7 +161,7 @@ public class WaitActivity extends AppCompatActivity implements
         });
         getSupportActionBar().setTitle("Lista de Espera");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
         WaitManager.Refresh();
         processing = new MaterialDialog.Builder(this)
                 .content("Procesando...")

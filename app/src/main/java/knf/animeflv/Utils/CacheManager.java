@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.github.siyamed.shapeimageview.CircularImageView;
 import com.squareup.picasso.Callback;
 
 import java.io.File;
@@ -27,82 +28,17 @@ import knf.animeflv.TaskType;
 public class CacheManager {
     public static final File miniCache = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/mini");
     public static final File portadaCache = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/portada");
-    public static final File miniCacheNoMedia = new File(miniCache,".nomedia");
-    public static final File portadaCacheNoMedia = new File(portadaCache,".nomedia");
+    public static final File hallImgs = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/hall");
+    public static final File miniCacheNoMedia = new File(miniCache, ".nomedia");
+    public static final File portadaCacheNoMedia = new File(portadaCache, ".nomedia");
     private Parser parser = new Parser();
 
-    public void portada(final Activity context, String aid, final ImageView imageView) {
-        checkCacheDirs();
-        final File localFile = new File(portadaCache, aid + ".jpg");
-        boolean isHD = false;
-        if (localFile.exists()) {
-            PicassoCache.getPicassoInstance(context).load(localFile).into(imageView);
-            isHD = isHD(localFile);
-            if (isHD) Log.d("Local", "is HD!!!");
-        }
-        if (NetworkUtils.isNetworkAvailable() && !isHD) {
-            PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + parser.getCertificateSHA1Fingerprint(context) + "&hd=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").noFade().noPlaceholder().error(R.drawable.ic_block_r).into(imageView, new Callback() {
-                @Override
-                public void onSuccess() {
-                    if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
-                        saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
-                }
-
-                @Override
-                public void onError() {
-
-                }
-            });
-        }
-    }
-
-    public void mini(final Activity context, String aid, final ImageView imageView) {
-        checkCacheDirs();
-        final File localFile = new File(miniCache, aid + ".jpg");
-        imageView.setImageResource(android.R.color.transparent);
-        if (localFile.exists()) {
-            PicassoCache.getPicassoInstance(context).load(localFile).into(imageView);
-        } else {
-            PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + parser.getCertificateSHA1Fingerprint(context) + "&thumb=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").error(R.drawable.ic_block_r).into(imageView, new Callback() {
-                @Override
-                public void onSuccess() {
-                    if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true))
-                        saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
-                }
-
-                @Override
-                public void onError() {
-
-                }
-            });
-        }
-    }
-
-    private void checkCacheDirs() {
-        if (!miniCache.exists()) miniCache.mkdirs();
-        if (!portadaCache.exists()) portadaCache.mkdirs();
-        if (!miniCacheNoMedia.exists())try {miniCacheNoMedia.createNewFile();}catch (Exception e){e.printStackTrace();}
-        if (!portadaCacheNoMedia.exists())try {portadaCacheNoMedia.createNewFile();}catch (Exception e){e.printStackTrace();}
-    }
-
-    private boolean isHD(File file) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-        if (Integer.parseInt(file.getName().replace(".jpg", "")) < 2418) {
-            return true;
-        } else {
-            Log.d("Imagen",""+options.outHeight+" - "+options.outWidth);
-            return options.outWidth > 100;
-        }
-    }
-
-    public static void invalidateCache(final File file, final boolean withDirectory, final boolean exclude,final OnInvalidateCache inter) {
-        new AsyncTask<String,String,String>(){
+    public static void invalidateCache(final File file, final boolean withDirectory, final boolean exclude, final OnInvalidateCache inter) {
+        new AsyncTask<String, String, String>() {
             @Override
             protected String doInBackground(String... strings) {
                 for (File f : file.listFiles()) {
-                    delete(f,withDirectory, exclude);
+                    delete(f, withDirectory, exclude);
                 }
                 inter.onFinish();
                 return null;
@@ -110,8 +46,8 @@ public class CacheManager {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
-    public static List<String> getExceptionList(){
-        List<String> list=new ArrayList<>();
+    public static List<String> getExceptionList() {
+        List<String> list = new ArrayList<>();
         list.add(".sounds");
         list.add("data.save");
         list.add("inicio.txt");
@@ -119,20 +55,20 @@ public class CacheManager {
         return list;
     }
 
-    private static void delete(File file, boolean withDirectory, boolean exclude){
-        if (file.isFile()){
-            if (exclude){
-                if (!getExceptionList().contains(file.getName())){
+    private static void delete(File file, boolean withDirectory, boolean exclude) {
+        if (file.isFile()) {
+            if (exclude) {
+                if (!getExceptionList().contains(file.getName())) {
                     file.delete();
                 }
-            }else {
+            } else {
                 file.delete();
             }
-        }else {
-            if (withDirectory){
-                if (file.isDirectory()){
-                    for (File f:file.listFiles()){
-                        delete(f,true, exclude);
+        } else {
+            if (withDirectory) {
+                if (file.isDirectory()) {
+                    for (File f : file.listFiles()) {
+                        delete(f, true, exclude);
                     }
                 }
             }
@@ -172,7 +108,6 @@ public class CacheManager {
         }
         return size;
     }
-
 
     public static String formatSize(long v) {
         if (v < 1024) return v + " B";
@@ -219,7 +154,7 @@ public class CacheManager {
         new AsyncTask<String, String, String>() {
             @Override
             protected String doInBackground(String... params) {
-                onFinishCount.counted(formatSize(getSize(file,false)));
+                onFinishCount.counted(formatSize(getSize(file, false)));
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
@@ -249,8 +184,125 @@ public class CacheManager {
         return number;
     }
 
+    public void portada(final Activity context, String aid, final ImageView imageView) {
+        checkCacheDirs();
+        final File localFile = new File(portadaCache, aid + ".jpg");
+        boolean isHD = false;
+        if (localFile.exists()) {
+            PicassoCache.getPicassoInstance(context).load(localFile).into(imageView);
+            isHD = isHD(localFile);
+            if (isHD) Log.d("Local", "is HD!!!");
+        }
+        if (NetworkUtils.isNetworkAvailable() && !isHD) {
+            PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + Parser.getCertificateSHA1Fingerprint(context) + "&hd=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").noFade().noPlaceholder().error(R.drawable.ic_block_r).into(imageView, new Callback() {
+                @Override
+                public void onSuccess() {
+                    if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
+                        saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                }
+
+                @Override
+                public void onError() {
+
+                }
+            });
+        }
+    }
+
+    public void mini(final Activity context, String aid, final ImageView imageView) {
+        checkCacheDirs();
+        final File localFile = new File(miniCache, aid + ".jpg");
+        imageView.setImageResource(android.R.color.transparent);
+        if (localFile.exists()) {
+            PicassoCache.getPicassoInstance(context).load(localFile).into(imageView);
+        } else {
+            PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + Parser.getCertificateSHA1Fingerprint(context) + "&thumb=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").error(R.drawable.ic_block_r).into(imageView, new Callback() {
+                @Override
+                public void onSuccess() {
+                    if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true))
+                        saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                }
+
+                @Override
+                public void onError() {
+
+                }
+            });
+        }
+    }
+
+    public void hallMini(final Activity activity, String id, String link, final CircularImageView imageView) {
+        checkCacheDirs();
+        final File localFile = new File(hallImgs, id + "_mini.png");
+        if (localFile.exists()) {
+            PicassoCache.getPicassoInstance(activity).load(localFile).into(imageView);
+        }
+        if (NetworkUtils.isNetworkAvailable()) {
+            PicassoCache.getPicassoInstance(activity).load(link).noPlaceholder().noFade().error(R.drawable.def).into(imageView, new Callback() {
+                @Override
+                public void onSuccess() {
+                    saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                }
+
+                @Override
+                public void onError() {
+
+                }
+            });
+        }
+    }
+
+    public void hallLarge(final Activity activity, String id, String link, final CircularImageView imageView) {
+        checkCacheDirs();
+        final File localFile = new File(hallImgs, id + "_large.png");
+        if (localFile.exists()) {
+            PicassoCache.getPicassoInstance(activity).load(localFile).into(imageView);
+        } else {
+            if (NetworkUtils.isNetworkAvailable())
+                PicassoCache.getPicassoInstance(activity).load(link).error(R.drawable.ic_block_r).into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+        }
+    }
+
+    private void checkCacheDirs() {
+        if (!miniCache.exists()) miniCache.mkdirs();
+        if (!portadaCache.exists()) portadaCache.mkdirs();
+        if (!hallImgs.exists()) hallImgs.mkdirs();
+        if (!miniCacheNoMedia.exists()) try {
+            miniCacheNoMedia.createNewFile();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (!portadaCacheNoMedia.exists()) try {
+            portadaCacheNoMedia.createNewFile();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isHD(File file) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        if (Integer.parseInt(file.getName().replace(".jpg", "")) < 2418) {
+            return true;
+        } else {
+            Log.d("Imagen", "" + options.outHeight + " - " + options.outWidth);
+            return options.outWidth > 100;
+        }
+    }
+
     private void saveBitmap(final Bitmap bitmap, final File file) {
-        new AsyncTask<String,String,String>(){
+        new AsyncTask<String, String, String>() {
             @Override
             protected String doInBackground(String... strings) {
                 if (file.exists()) file.delete();

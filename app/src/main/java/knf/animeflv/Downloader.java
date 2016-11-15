@@ -63,7 +63,7 @@ public class Downloader extends AsyncTask<String, String, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        File Dstorage = new File(FileUtil.getSDPath() + "/Animeflv/download/" + aid);
+        File Dstorage = new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + aid);
         if (!Dstorage.exists()) {
             Dstorage.mkdirs();
         }
@@ -99,7 +99,7 @@ public class Downloader extends AsyncTask<String, String, String> {
                 notificationManager.cancel(idDown);
                 if (status == CANCELADO) {
                     try {
-                        FileUtil.getFileFromAccess(eid).delete();
+                        FileUtil.init(context).getFileFromAccess(eid).delete();
                     } catch (Exception e) {
                     }
                 }
@@ -122,14 +122,14 @@ public class Downloader extends AsyncTask<String, String, String> {
             long progress = 0;
             String semi_prog = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString(eid + "long_prog", null);
             if (semi_prog != null) {
-                DocumentFile cFile = FileUtil.getFileFromAccess(eid);
+                DocumentFile cFile = FileUtil.init(context).getFileFromAccess(eid);
                 if (cFile != null && cFile.exists()) {
                     long c = Long.parseLong(semi_prog);
                     inStream.skip(c);
                     progress = c;
                 }
             }
-            final OutputStream outStream = FileUtil.getOutputStreamFromAccess(eid);
+            final OutputStream outStream = FileUtil.init(context).getOutputStreamFromAccess(eid);
             int current = 0;
             int len;
             while ((len = inStream.read(buff)) != -1) {
@@ -138,7 +138,7 @@ public class Downloader extends AsyncTask<String, String, String> {
                     if (listener != null) listener.onFinish();
                     notificationManager.cancel(idDown);
                     try {
-                        FileUtil.getFileFromAccess(eid).delete();
+                        FileUtil.init(context).getFileFromAccess(eid).delete();
                     } catch (Exception e) {
                     }
                     context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString(eid + "long_prog", "0").apply();

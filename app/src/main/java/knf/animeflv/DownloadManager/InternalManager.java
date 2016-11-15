@@ -9,13 +9,10 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.thin.downloadmanager.ThinDownloadManager;
 
 import java.io.File;
 
-import knf.animeflv.Application;
 import knf.animeflv.DManager;
 import knf.animeflv.Parser;
 
@@ -33,7 +30,7 @@ public class InternalManager {
         sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
     }
 
-    private static int getDownloadSate(Context context, String eid) {
+    public static int getDownloadSate(Context context, String eid) {
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         DownloadManager.Query q = new DownloadManager.Query();
         q.setFilterById(Long.parseLong(context.getSharedPreferences("data", Context.MODE_PRIVATE).getString(eid, "0")));
@@ -51,7 +48,7 @@ public class InternalManager {
             case DownloadManager.STATUS_RUNNING:
                 return true;
             case DownloadManager.STATUS_SUCCESSFUL:
-                return true;
+                return false;
             case DownloadManager.STATUS_PENDING:
                 return true;
             case DownloadManager.STATUS_PAUSED:
@@ -62,10 +59,6 @@ public class InternalManager {
     }
 
     public void startDownload(String eid, String downUrl) {
-        Application application = (Application) context.getApplicationContext();
-        Tracker mTracker = application.getDefaultTracker();
-        mTracker.setScreenName("Download");
-        mTracker.send(new HitBuilders.EventBuilder("Download", "Download Int " + eid).build());
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         String titulo = parser.getTitCached(aid);
@@ -101,10 +94,6 @@ public class InternalManager {
     }
 
     public void startDownload(String eid, String downUrl, CookieConstructor constructor) {
-        Application application = (Application) context.getApplicationContext();
-        Tracker mTracker = application.getDefaultTracker();
-        mTracker.setScreenName("Download");
-        mTracker.send(new HitBuilders.EventBuilder("Download", "Download Int Zippy" + eid).build());
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         String titulo = parser.getTitCached(aid);
@@ -148,10 +137,6 @@ public class InternalManager {
     }
 
     public void cancelDownload(String eid) {
-        Application application = (Application) context.getApplicationContext();
-        Tracker mTracker = application.getDefaultTracker();
-        mTracker.setScreenName("Download");
-        mTracker.send(new HitBuilders.EventBuilder("Download", "Cancel Int " + eid).build());
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         String titulo = parser.getTitCached(aid);

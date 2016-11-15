@@ -22,8 +22,6 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 
 import com.github.ndczz.infinityloading.InfinityLoading;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.SyncHttpClient;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
@@ -50,7 +48,6 @@ import java.util.concurrent.TimeUnit;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
-import knf.animeflv.Application;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Emision.DateCompare;
 import knf.animeflv.Emision.EmisionChecker;
@@ -103,10 +100,6 @@ public class newEmisionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.emision);
         initActivity();
-        Application application = (Application) getApplication();
-        Tracker mTracker = application.getDefaultTracker();
-        mTracker.setScreenName("Emision");
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
         toolbar = (Toolbar) findViewById(R.id.emision_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Cargando...");

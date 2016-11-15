@@ -55,7 +55,7 @@ public class DownloaderCookie extends AsyncTask<String, String, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        File Dstorage = new File(FileUtil.getSDPath() + "/Animeflv/download/" + aid);
+        File Dstorage = new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + aid);
         if (!Dstorage.exists()) {
             Dstorage.mkdirs();
         }

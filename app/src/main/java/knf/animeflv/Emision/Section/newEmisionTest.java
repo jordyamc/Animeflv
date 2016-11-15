@@ -22,8 +22,6 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 
 import com.github.ndczz.infinityloading.InfinityLoading;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
@@ -95,9 +93,6 @@ public class newEmisionTest extends AppCompatActivity {
         setContentView(R.layout.emision);
         initActivity();
         Application application = (Application) getApplication();
-        Tracker mTracker = application.getDefaultTracker();
-        mTracker.setScreenName("Emision");
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
         toolbar = (Toolbar) findViewById(R.id.emision_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Cargando...");
