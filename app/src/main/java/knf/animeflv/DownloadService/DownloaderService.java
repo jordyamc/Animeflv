@@ -20,7 +20,9 @@ import java.net.URLConnection;
 
 import knf.animeflv.Explorer.ExplorerRoot;
 import knf.animeflv.Parser;
+import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.NetworkUtils;
 
 public class DownloaderService extends IntentService {
     public static final int CANCELED = 1554785;
@@ -53,6 +55,8 @@ public class DownloaderService extends IntentService {
                 throw new DownloadCanceledException(String.valueOf(downloadID));
             if (new SQLiteHelperDownloads(this).getState(eid) == DownloadManager.STATUS_RUNNING)
                 FileUtil.init(this).DeleteAnime(eid);
+            if (!NetworkUtils.isNetworkAvailable())
+                throw new IllegalStateException();
             onStartDownload(eid);
             URL url = new URL(bundle.getString("url"));
             URLConnection conection = url.openConnection();
@@ -66,6 +70,8 @@ public class DownloaderService extends IntentService {
             while ((count = input.read(data)) != -1) {
                 if (preferences.getLong(eid + "_downloadID", -1) != downloadID)
                     throw new DownloadCanceledException(String.valueOf(downloadID));
+                if (!NetworkUtils.isNetworkAvailable())
+                    throw new IllegalStateException();
                 total += count;
                 int tprog = (int) ((total * 100) / lenghtOfFile);
                 if (tprog > prog) {
@@ -85,11 +91,12 @@ public class DownloaderService extends IntentService {
             new SQLiteHelperDownloads(this).delete(eid).close();
         } catch (Exception e) {
             Log.e("DownloadService", "error on try", e);
-            onDownloadFailed(eid);
+            onDownloadFailed(eid, intent);
         }
     }
 
     private void onStartDownload(String eid) {
+        getManager().cancel(getDownloadID(eid));
         String title = new Parser().getTitCached(eid.replace("E", "").split("_")[0]);
         NotificationCompat.Builder mBuilder = getDownloadingBuilder()
                 .setContentTitle(title)
@@ -125,6 +132,8 @@ public class DownloaderService extends IntentService {
             } else {
                 if (pending > 1) {
                     mBuilder.setNumber(pending);
+                } else {
+                    mBuilder.setNumber(-1);
                 }
             }
         }
@@ -135,14 +144,18 @@ public class DownloaderService extends IntentService {
         new SQLiteHelperDownloads(this).updateProgress(eid, progress).close();
     }
 
-    private void onDownloadFailed(String eid) {
+    private void onDownloadFailed(String eid, Intent intent) {
         FileUtil.init(this).DeleteAnime(eid);
         DownloadListManager.delete(this, eid + "_" + getSharedPreferences("data", MODE_PRIVATE).getLong(eid + "_downloadID", -1));
         String[] semi = eid.replace("E", "").split("_");
+        Intent n_intent = new Intent(DownloadBroadCaster.ACTION_RETRY);
+        n_intent.putExtras(intent.getExtras());
+        n_intent.putExtra("not_id", getDownloadID(eid));
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(android.R.drawable.stat_notify_error)
                 .setContentTitle(new Parser().getTitCached(semi[0]) + " - " + semi[1])
                 .setContentText("ERROR AL DESCARGAR")
+                .addAction(R.drawable.retry, "REINTENTAR", PendingIntent.getBroadcast(this, -1, n_intent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .setOngoing(false);
         getManager().notify(getDownloadID(eid), builder.build());
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_FAILED).delete(eid);

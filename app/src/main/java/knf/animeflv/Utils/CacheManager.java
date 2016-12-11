@@ -31,6 +31,7 @@ public class CacheManager {
     public static final File hallImgs = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/hall");
     public static final File miniCacheNoMedia = new File(miniCache, ".nomedia");
     public static final File portadaCacheNoMedia = new File(portadaCache, ".nomedia");
+    public static final File hallCacheNoMedia = new File(hallImgs, ".nomedia");
     private Parser parser = new Parser();
 
     public static void invalidateCache(final File file, final boolean withDirectory, final boolean exclude, final OnInvalidateCache inter) {
@@ -44,6 +45,12 @@ public class CacheManager {
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    public static void invalidateCacheSync(final File file, final boolean withDirectory, final boolean exclude) {
+        for (File f : file.listFiles()) {
+            delete(f, withDirectory, exclude);
+        }
     }
 
     public static List<String> getExceptionList() {
@@ -184,7 +191,7 @@ public class CacheManager {
         return number;
     }
 
-    public void portada(final Activity context, String aid, final ImageView imageView) {
+    public void portada(final Activity context, final String aid, final ImageView imageView) {
         checkCacheDirs();
         final File localFile = new File(portadaCache, aid + ".jpg");
         boolean isHD = false;
@@ -194,7 +201,7 @@ public class CacheManager {
             if (isHD) Log.d("Local", "is HD!!!");
         }
         if (NetworkUtils.isNetworkAvailable() && !isHD) {
-            PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + Parser.getCertificateSHA1Fingerprint(context) + "&hd=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").noFade().noPlaceholder().error(R.drawable.ic_block_r).into(imageView, new Callback() {
+            PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + Parser.getCertificateSHA1Fingerprint(context) + "&hd=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").noFade().noPlaceholder().into(imageView, new Callback() {
                 @Override
                 public void onSuccess() {
                     if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
@@ -203,7 +210,18 @@ public class CacheManager {
 
                 @Override
                 public void onError() {
+                    PicassoCache.getPicassoInstance(context).load("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").noFade().noPlaceholder().into(imageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
+                                saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                        }
 
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
                 }
             });
         }
@@ -284,6 +302,12 @@ public class CacheManager {
         }
         if (!portadaCacheNoMedia.exists()) try {
             portadaCacheNoMedia.createNewFile();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (!hallCacheNoMedia.exists()) try {
+            hallCacheNoMedia.createNewFile();
         } catch (Exception e) {
             e.printStackTrace();
         }

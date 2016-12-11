@@ -28,20 +28,24 @@ public class AnimeDetail {
                 tid = object.getString("tid");
                 titulo = FileUtil.corregirTit(object.getString("titulo"));
                 sinopsis = Parser.ValidateSinopsis(object.getString("sinopsis"));
-                String s = object.getString("fecha_fin").trim();
-                if (s.equals("0000-00-00")) {
-                    s = "En emision";
-                } else if (s.equals("prox")) {
-                    s = "Proximamente";
-                } else {
-                    s = "Terminado";
-                }
-                fsalida = object.getString("fecha_inicio").trim().equals("")?"Sin Fecha":object.getString("fecha_inicio").trim();
-                estado = s;
+                String fs = object.getString("fecha_inicio").trim();
+                fsalida = fs.equals("") ? "Sin Fecha" : fs;
+                estado = getState(object.getString("fecha_fin").trim());
                 generos = object.getString("generos");
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private String getState(String state) {
+        switch (state) {
+            case "0000-00-00":
+                return "En emision";
+            case "prox":
+                return "Proximamente";
+            default:
+                return "Terminado";
         }
     }
 

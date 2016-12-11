@@ -24,6 +24,7 @@ import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Parser;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.ExecutorManager;
+import knf.animeflv.Utils.NoLogInterface;
 
 public class LoginServer {
     private static AsyncHttpClient syncHttpClient = new SyncHttpClient();
@@ -266,6 +267,68 @@ public class LoginServer {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
+    public static void RefreshLocalData(final Context context, final RefreshLocalInterface serverInterface) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+                String email_c = preferences.getString("login_email_coded", "null");
+                if (!email_c.equals("null")) {
+                    String pass_c = preferences.getString("login_pass_coded", "null");
+                    AsyncHttpClient client = getClient();
+                    client.setTimeout(10000);
+                    client.setLogInterface(new NoLogInterface());
+                    client.get(context, getServerUrl(context) + "&tipo=get&email_coded=" + email_c + "&pass_coded=" + pass_c, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject object) {
+                            super.onSuccess(statusCode, headers, object);
+                            try {
+                                if (object.getString("response").equals("ok")) {
+                                    String favoritos = Parser.getTrimedList(new Parser().getUserFavs(object.toString()), ":::");
+                                    String visto = new Parser().getUserVistos(object.toString());
+                                    if (visto.equals("")) {
+                                        String favs = Parser.getTrimedList(context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", ""), ":::");
+                                        if (!favs.equals(favoritos)) {
+                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("favoritos", favoritos).apply();
+                                            serverInterface.onUpdate();
+                                        }
+                                    } else {
+                                        String favs = Parser.getTrimedList(context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", ""), ":::");
+                                        if (!favs.equals(favoritos)) {
+                                            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("favoritos", favoritos).apply();
+                                            serverInterface.onUpdate();
+                                        }
+                                        String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
+                                        try {
+                                            if (!vistos.equals(visto)) {
+                                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", visto).apply();
+                                                String[] v = visto.split(";;;");
+                                                for (String s : v) {
+                                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, true).apply();
+                                                }
+                                            }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+                            } catch (Exception e) {
+                                serverInterface.onError();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                            super.onFailure(statusCode, headers, responseString, throwable);
+                            serverInterface.onError();
+                        }
+                    });
+                }
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
     public static void addEmail(Activity activity, String email, String email_coded, final ServerInterface serverInterface) {
         AsyncHttpClient client = getClient();
         client.setTimeout(10000);
@@ -332,6 +395,12 @@ public class LoginServer {
         return PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
     }
 
+    public static boolean isLogedIn(Context context) {
+        String email_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
+        String pass_coded = PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null");
+        return !email_coded.equals("null") && !pass_coded.equals("null");
+    }
+
     public interface ServerInterface {
         void onServerResponse(JSONObject object);
 
@@ -344,5 +413,13 @@ public class LoginServer {
 
     public interface RefreshInterface {
         void onFinishRefresh();
+    }
+
+    public interface RefreshLocalInterface {
+        void onUpdate();
+
+        void onSuccess();
+
+        void onError();
     }
 }

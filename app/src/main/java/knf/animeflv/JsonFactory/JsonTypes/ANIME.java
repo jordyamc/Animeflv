@@ -6,4 +6,8 @@ public class ANIME {
     public ANIME(int aid) {
         this.aid = aid;
     }
+
+    public String getAidString() {
+        return String.valueOf(aid);
+    }
 }

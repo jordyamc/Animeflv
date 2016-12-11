@@ -34,8 +34,8 @@ import knf.animeflv.Configuracion;
 import knf.animeflv.Explorer.Fragments.DirectoryFragment;
 import knf.animeflv.Explorer.Fragments.VideoFilesFragment;
 import knf.animeflv.Explorer.Models.ModelFactory;
+import knf.animeflv.FavSyncro;
 import knf.animeflv.FileMover;
-import knf.animeflv.LoginActivity.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
@@ -416,7 +416,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
     @Override
     protected void onDestroy() {
         new Parser().saveBackup(this);
-        LoginServer.RefreshData(this);
+        FavSyncro.updateServer(this);
         super.onDestroy();
     }
 }

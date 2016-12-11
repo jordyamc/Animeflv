@@ -80,78 +80,10 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/blame" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.afollestad.material-dialogs/commons/0.9.1.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.afollestad.material-dialogs/core/0.9.1.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.amulyakhare/com.amulyakhare.textdrawable/1.0.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support.constraint/constraint-layout/1.0.0-beta3/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/cardview-v7/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/design/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/mediarouter-v7/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/palette-v7/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-compat/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-core-ui/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-core-utils/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-fragment/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-media-compat/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-v13/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-v4/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/transition/25.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.cleveroad/audiowidget/1.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.daimajia.androidanimations/library/1.1.3/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.daimajia.easing/library/1.0.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.devbrackets.android/exomedia/3.0.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.AndroidDeveloperLB/MaterialPreferenceLibrary/9/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.ViksaaSkool/AwesomeSplash/v1.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.clans/fab/1.6.2/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.halysongoncalves/pugnotification/1.8.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.jorgecastilloprz/fillableloaders/1.02/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.munix/Multi-Display-Cast/2.02/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.ndczz/infinity-loading/0.4/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.ozodrukh/CircularReveal/1.1.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.panwrona/DownloadProgressBar/1.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.recruit-lifestyle/WaveSwipeRefreshLayout/1.2/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.siyamed/android-shape-imageview/0.9.3/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.exoplayer/exoplayer/r1.5.9/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/9.8.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/9.8.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-cast/9.8.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-tasks/9.8.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.h6ah4i.android.widget.advrecyclerview/advrecyclerview/0.9.3/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.heinrichreimersoftware/material-intro/1.6/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.joanfuentes/HintCase/1.0.2/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.joanfuentes/HintCaseAssets/1.0.2/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.karumi/dexter/2.3.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mani/ThinDownloadManager/1.2.5/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.melnykov/floatingactionbutton/1.3.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/community-material-typeface/1.5.54.2/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/fastadapter/2.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/fontawesome-typeface/4.6.0.3/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/google-material-typeface/2.2.0.3.original/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/iconics-core/2.8.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/material-design-iconic-typeface/2.2.0.2/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/materialdrawer/5.7.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/materialize/1.0.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.nononsenseapps/filepicker/2.5.2/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.ogaclejapan.smarttablayout/library/1.6.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.ogaclejapan.smarttablayout/utils-v4/1.6.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.rengwuxian.materialedittext/library/2.1.4/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.shamanland/xdroid-core/0.0.10/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.shamanland/xdroid-toaster/0.0.10/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.wdullaer/materialdatetimepicker/2.5.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/jp.wasabeef/recyclerview-animators/2.2.3/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/me.wangyuwei/ParticleView/1.0.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/me.zhanghai.android.materialprogressbar/library/1.3.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/org.adw.library/discrete-seekbar/1.0.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/pl.droidsonroids.gif/android-gif-drawable/1.1.7/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental-safeguard" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/multi-dex" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/shaders" />
@@ -163,10 +95,9 @@
     <orderEntry type="jdk" jdkName="Android API 25 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="butterknife-7.0.1" level="project" />
-    <orderEntry type="library" exported="" name="constraint-layout-1.0.0-beta3" level="project" />
-    <orderEntry type="library" exported="" name="play-services-base-9.8.0" level="project" />
-    <orderEntry type="library" exported="" name="okio-1.6.0" level="project" />
-    <orderEntry type="library" exported="" name="design-25.0.0" level="project" />
+    <orderEntry type="library" exported="" name="play-services-cast-10.0.1" level="project" />
+    <orderEntry type="library" exported="" name="constraint-layout-1.0.0-beta4" level="project" />
+    <orderEntry type="library" exported="" name="design-25.0.1" level="project" />
     <orderEntry type="library" exported="" name="materialdatetimepicker-2.5.0" level="project" />
     <orderEntry type="library" exported="" name="commons-0.9.1.0" level="project" />
     <orderEntry type="library" exported="" name="ParticleView-1.0.1" level="project" />
@@ -176,53 +107,57 @@
     <orderEntry type="library" exported="" name="HintCaseAssets-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="fastadapter-2.0.0" level="project" />
     <orderEntry type="library" exported="" name="material-intro-1.6" level="project" />
+    <orderEntry type="library" exported="" name="dropbox-core-sdk-2.1.2" level="project" />
     <orderEntry type="library" exported="" name="xdroid-core-0.0.10" level="project" />
     <orderEntry type="library" exported="" name="floatingactionbutton-1.3.0" level="project" />
+    <orderEntry type="library" exported="" name="support-fragment-25.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-v13-25.0.0" level="project" />
     <orderEntry type="library" exported="" name="pugnotification-1.8.1" level="project" />
-    <orderEntry type="library" exported="" name="support-fragment-25.0.0" level="project" />
     <orderEntry type="library" exported="" name="infinity-loading-0.4" level="project" />
     <orderEntry type="library" exported="" name="android-gif-drawable-1.1.7" level="project" />
     <orderEntry type="library" exported="" name="materialize-1.0.0" level="project" />
-    <orderEntry type="library" exported="" name="support-core-ui-25.0.0" level="project" />
-    <orderEntry type="library" exported="" name="cardview-v7-25.0.0" level="project" />
+    <orderEntry type="library" exported="" name="cardview-v7-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="support-core-ui-25.0.1" level="project" />
     <orderEntry type="library" exported="" name="google-material-typeface-2.2.0.3.original" level="project" />
     <orderEntry type="library" exported="" name="audiowidget-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="httpclient-4.3.6" level="project" />
-    <orderEntry type="library" exported="" name="support-core-utils-25.0.0" level="project" />
     <orderEntry type="library" exported="" name="filepicker-2.5.2" level="project" />
     <orderEntry type="library" exported="" name="core-0.9.1.0" level="project" />
     <orderEntry type="library" exported="" name="library-1.3.0" level="project" />
     <orderEntry type="library" exported="" name="bolts-android-1.4.0" level="project" />
     <orderEntry type="library" exported="" name="library-1.1.3" level="project" />
     <orderEntry type="library" exported="" name="dexter-2.3.1" level="project" />
+    <orderEntry type="library" exported="" name="palette-v7-25.0.1" level="project" />
     <orderEntry type="library" exported="" name="DownloadProgressBar-1.1" level="project" />
     <orderEntry type="library" exported="" name="discrete-seekbar-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="SOMAAndroidSDK5.0.9" level="project" />
-    <orderEntry type="library" exported="" name="palette-v7-25.0.0" level="project" />
+    <orderEntry type="library" exported="" name="support-core-utils-25.0.1" level="project" />
     <orderEntry type="library" exported="" name="glide-3.6.0" level="project" />
     <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
+    <orderEntry type="library" exported="" name="jackson-core-2.7.4" level="project" />
     <orderEntry type="library" exported="" name="WaveSwipeRefreshLayout-1.2" level="project" />
     <orderEntry type="library" exported="" name="com.amulyakhare.textdrawable-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="HintCase-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="materialdrawer-5.7.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-cast-9.8.0" level="project" />
     <orderEntry type="library" exported="" name="MaterialPreferenceLibrary-9" level="project" />
-    <orderEntry type="library" exported="" name="transition-25.0.0" level="project" />
-    <orderEntry type="library" exported="" name="animated-vector-drawable-25.0.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-tasks-9.8.0" level="project" />
+    <orderEntry type="library" exported="" name="animated-vector-drawable-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="play-services-basement-10.0.1" level="project" />
+    <orderEntry type="library" exported="" name="okhttp-3.5.0" level="project" />
     <orderEntry type="library" exported="" name="bolts-applinks-1.4.0" level="project" />
-    <orderEntry type="library" exported="" name="appcompat-v7-25.0.0" level="project" />
     <orderEntry type="library" exported="" name="Encryption-1.4.0" level="project" />
+    <orderEntry type="library" exported="" name="appcompat-v7-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="recyclerview-v7-25.0.1" level="project" />
     <orderEntry type="library" exported="" name="fab-1.6.2" level="project" />
-    <orderEntry type="library" exported="" name="recyclerview-v7-25.0.0" level="project" />
     <orderEntry type="library" exported="" name="exomedia-3.0.1" level="project" />
     <orderEntry type="library" exported="" name="picasso-2.5.2" level="project" />
     <orderEntry type="library" exported="" name="gson-2.8.0" level="project" />
     <orderEntry type="library" exported="" name="fillableloaders-1.02" level="project" />
     <orderEntry type="library" exported="" name="okhttp-2.4.0" level="project" />
     <orderEntry type="library" exported="" name="ThinDownloadManager-1.2.5" level="project" />
-    <orderEntry type="library" exported="" name="constraint-layout-solver-1.0.0-beta3" level="project" />
+    <orderEntry type="library" exported="" name="play-services-tasks-10.0.1" level="project" />
+    <orderEntry type="library" exported="" name="constraint-layout-solver-1.0.0-beta4" level="project" />
+    <orderEntry type="library" exported="" name="transition-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="play-services-base-10.0.1" level="project" />
     <orderEntry type="library" exported="" name="bolts-tasks-1.4.0" level="project" />
     <orderEntry type="library" exported="" name="community-material-typeface-1.5.54.2" level="project" />
     <orderEntry type="library" exported="" name="trace" level="project" />
@@ -231,19 +166,19 @@
     <orderEntry type="library" exported="" name="library-1.6.0" level="project" />
     <orderEntry type="library" exported="" name="library-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="advrecyclerview-0.9.3" level="project" />
-    <orderEntry type="library" exported="" name="support-annotations-25.0.0" level="project" />
+    <orderEntry type="library" exported="" name="support-annotations-25.0.1" level="project" />
     <orderEntry type="library" exported="" name="guava-19.0" level="project" />
     <orderEntry type="library" exported="" name="exoplayer-r1.5.9" level="project" />
     <orderEntry type="library" exported="" name="library-2.1.4" level="project" />
-    <orderEntry type="library" exported="" name="play-services-basement-9.8.0" level="project" />
-    <orderEntry type="library" exported="" name="mediarouter-v7-25.0.0" level="project" />
-    <orderEntry type="library" exported="" name="support-v4-25.0.0" level="project" />
-    <orderEntry type="library" exported="" name="support-media-compat-25.0.0" level="project" />
-    <orderEntry type="library" exported="" name="support-compat-25.0.0" level="project" />
+    <orderEntry type="library" exported="" name="mediarouter-v7-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="okio-1.11.0" level="project" />
+    <orderEntry type="library" exported="" name="support-compat-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="support-v4-25.0.1" level="project" />
     <orderEntry type="library" exported="" name="Multi-Display-Cast-2.02" level="project" />
     <orderEntry type="library" exported="" name="utils-v4-1.6.0" level="project" />
     <orderEntry type="library" exported="" name="xdroid-toaster-0.0.10" level="project" />
-    <orderEntry type="library" exported="" name="support-vector-drawable-25.0.0" level="project" />
+    <orderEntry type="library" exported="" name="support-media-compat-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="support-vector-drawable-25.0.1" level="project" />
     <orderEntry type="library" exported="" name="material-design-iconic-typeface-2.2.0.2" level="project" />
     <orderEntry type="library" exported="" name="android-shape-imageview-0.9.3" level="project" />
     <orderEntry type="library" exported="" name="android-async-http-1.4.9" level="project" />

@@ -31,4 +31,17 @@
         android:padding="12dp"
         android:text="Cerrar Sesion"
         android:textColor="@color/blanco"/>
+
+    <android.support.v7.widget.AppCompatImageButton
+        android:id="@+id/btn_dropbox"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginBottom="24dp"
+        android:layout_marginTop="12dp"
+        android:animateLayoutChanges="true"
+        android:background="@color/dropbox"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:padding="12dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/dropbox_white"/>
 </LinearLayout>

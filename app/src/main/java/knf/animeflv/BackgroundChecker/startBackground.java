@@ -58,14 +58,21 @@ public class startBackground {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         super.onSuccess(statusCode, headers, response);
-                        startCompare(context, response);
+                        try {
+                            startCompare(context, response);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                         super.onFailure(statusCode, headers, responseString, throwable);
-                        Log.e("Conexion", "Request Failed", throwable);
-                        startCompare(context, null);
+                        try {
+                            startCompare(context, null);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             } catch (Exception e) {
@@ -75,7 +82,7 @@ public class startBackground {
         }
     }
 
-    public static void checkUpdate(final Context context) {
+    public static void checkUpdate(final Context context) throws Exception {
         if (NetworkUtils.isNetworkAvailable()) {
             try {
                 AsyncHttpClient client = new AsyncHttpClient();

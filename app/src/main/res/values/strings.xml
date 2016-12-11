@@ -150,4 +150,7 @@
     <string name="shortcut_em_long">Abrir Emision</string>
 
     <string name="no_open">No se puede abrir</string>
+
+    <string name="app_key">stz1g2qeh9nldga</string>
+    <string name="app_secret">od4i0crlfzmw1hj</string>
 </resources>

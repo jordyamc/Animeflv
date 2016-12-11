@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.objects.MainObject;
 
@@ -139,6 +140,34 @@ public class Parser {
         return url;
     }
 
+    public static String InValidateSinopsis(String sin) {
+        String url = sin;
+        url = url.replace("\u00E1", "&aacute;");
+        url = url.replace("\u00E9", "&eacute;");
+        url = url.replace("\u00ED", "&iacute;");
+        url = url.replace("\u00F3", "&oacute;");
+        url = url.replace("\u00FA", "&uacute;");
+        url = url.replace("\u00C1", "&Aacute;");
+        url = url.replace("\u00C9", "&Eacute;");
+        url = url.replace("\u00CD", "&Iacute;");
+        url = url.replace("\u00D3", "&Oacute;");
+        url = url.replace("\u00DA", "&Uacute;");
+        url = url.replace("\u00F1", "&ntilde;");
+        url = url.replace("\u201C", "&ldquo;");
+        url = url.replace("\u201D", "&rdquo;");
+        url = url.replace("\u2019", "&rsquo;");
+        url = url.replace("\u00BF", "&iquest;");
+        url = url.replace("\u2026", "&hellip;");
+        url = url.replace("\u014D", "&#333;");
+        url = url.replace("\u00FC", "&uuml;");
+        url = url.replace("¡", "&iexcl;");
+        url = url.replace("\"", "&quot;");
+        url = url.replace("\'", "&#039;");
+        url = url.replace("<", "&lt;");
+        url = url.replace(">", "&gt;");
+        return url;
+    }
+
     public static List<String> getEids(JSONObject jsonObj) {
         List<String> eidsArray = new ArrayList<String>();
         try {
@@ -155,41 +184,41 @@ public class Parser {
     }
 
     public static String getCertificateSHA1Fingerprint(Context context) {
-        PackageManager pm = context.getPackageManager();
-        String packageName = context.getPackageName();
-        int flags = PackageManager.GET_SIGNATURES;
-        PackageInfo packageInfo = null;
         try {
-            packageInfo = pm.getPackageInfo(packageName, flags);
-        } catch (PackageManager.NameNotFoundException e) {
+            PackageManager pm = context.getPackageManager();
+            String packageName = context.getPackageName();
+            int flags = PackageManager.GET_SIGNATURES;
+            PackageInfo packageInfo = pm.getPackageInfo(packageName, flags);
+            Signature[] signatures = packageInfo.signatures;
+            byte[] cert = signatures[0].toByteArray();
+            InputStream input = new ByteArrayInputStream(cert);
+            CertificateFactory cf = null;
+            try {
+                cf = CertificateFactory.getInstance("X509");
+            } catch (CertificateException e) {
+                e.printStackTrace();
+            }
+            X509Certificate c = null;
+            try {
+                c = (X509Certificate) cf.generateCertificate(input);
+            } catch (CertificateException e) {
+                e.printStackTrace();
+            }
+            String hexString = null;
+            try {
+                MessageDigest md = MessageDigest.getInstance("SHA1");
+                byte[] publicKey = md.digest(c.getEncoded());
+                hexString = byte2HexFormatted(publicKey);
+            } catch (NoSuchAlgorithmException e1) {
+                e1.printStackTrace();
+            } catch (CertificateEncodingException e) {
+                e.printStackTrace();
+            }
+            return hexString;
+        } catch (Exception e) {
             e.printStackTrace();
+            return "null";
         }
-        Signature[] signatures = packageInfo.signatures;
-        byte[] cert = signatures[0].toByteArray();
-        InputStream input = new ByteArrayInputStream(cert);
-        CertificateFactory cf = null;
-        try {
-            cf = CertificateFactory.getInstance("X509");
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        X509Certificate c = null;
-        try {
-            c = (X509Certificate) cf.generateCertificate(input);
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        String hexString = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA1");
-            byte[] publicKey = md.digest(c.getEncoded());
-            hexString = byte2HexFormatted(publicKey);
-        } catch (NoSuchAlgorithmException e1) {
-            e1.printStackTrace();
-        } catch (CertificateEncodingException e) {
-            e.printStackTrace();
-        }
-        return hexString;
     }
 
     public static String getTitleCached(String aid) {
@@ -263,7 +292,7 @@ public class Parser {
                     builder.append(separator);
                 }
             }
-            return builder.toString();
+            return builder.toString().trim();
         } else {
             return "";
         }
@@ -860,6 +889,7 @@ public class Parser {
             jsonObject.put("email_login", PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null"));
             jsonObject.put("email_coded", PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null"));
             jsonObject.put("pass_coded", PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null"));
+            jsonObject.put("access_token", PreferenceManager.getDefaultSharedPreferences(context).getString(DropboxManager.KEY_DROPBOX, null));
             jsonObject.put("accentColor", PreferenceManager.getDefaultSharedPreferences(context).getInt("accentColor", ColorsRes.Naranja(context)));
             jsonObject.put("favoritos", context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", ""));
             jsonObject.put("vistos", context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", ""));
@@ -930,6 +960,7 @@ public class Parser {
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email", j.getString("email_login")).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", j.getString("email_coded")).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", j.getString("pass_coded")).apply();
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString(DropboxManager.KEY_DROPBOX, j.getString("access_token")).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("accentColor", j.getInt("accentColor")).apply();
             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("favoritos", j.getString("favoritos")).apply();
             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", j.getString("vistos")).apply();

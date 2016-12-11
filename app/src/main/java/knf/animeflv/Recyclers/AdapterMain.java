@@ -19,26 +19,14 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import es.munix.multidisplaycast.CastControlsActivity;
 import knf.animeflv.ColorsRes;
@@ -68,18 +56,10 @@ import xdroid.toaster.Toaster;
 
 public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
 
-    int corePoolSize = 60;
-    int maximumPoolSize = 80;
-    int keepAliveTime = 10;
-    BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(maximumPoolSize);
-    Executor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
     private Activity context;
     private List<MainAnimeModel> Animes = new ArrayList<>();
     private MainRecyclerCallbacks callbacks;
     private Parser parser = new Parser();
-    private MaterialDialog d;
-    private MaterialDialog s;
-    private Spinner sp;
 
     public AdapterMain(Activity context) {
         this.context = context;
@@ -90,43 +70,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         this.context = context;
         this.callbacks = (MainRecyclerCallbacks) context;
         this.Animes = data;
-    }
-
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-
-    public static String getStringFromFile(String filePath) {
-        String ret = "";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        } catch (IOException e) {
-        } catch (Exception e) {
-        }
-        return ret;
-    }
-
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
     }
 
     @Override
@@ -643,7 +586,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 MainStates.setProcessing(false, null);
             }
         });
-        web.loadUrl(parser.getBaseUrl(TaskType.NORMAL, context));
+        web.loadUrl(parser.getBaseUrl(TaskType.NORMAL, context).replace("api2.", ""));
     }
 
     public void setData(List<MainAnimeModel> data) {

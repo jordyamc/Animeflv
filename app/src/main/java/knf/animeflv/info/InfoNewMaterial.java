@@ -60,6 +60,9 @@ import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.CustomViews.TextViewExpandableAnimation;
+import knf.animeflv.FavSyncro;
+import knf.animeflv.JsonFactory.BaseGetter;
+import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
@@ -96,8 +99,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
     @Bind(R.id.nested)
     NestedScrollView nestedScrollView;
     @Bind(R.id.info_descripcion)
-    //TextView txt_sinopsis;
-            TextViewExpandableAnimation txt_sinopsis;
+    TextViewExpandableAnimation txt_sinopsis;
     @Bind(R.id.titulo)
     TextView txt_titulo;
     @Bind(R.id.tipo)
@@ -133,6 +135,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
     LinearLayoutManager layoutManager;
     boolean isInInfo = true;
     boolean blocked = false;
+    boolean infoSeted = false;
 
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
@@ -261,11 +264,6 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                 return false;
             }
         });
-        if (NetworkUtils.isNetworkAvailable()) {
-            getJsonfromApi();
-        } else {
-            getJsonfromFile();
-        }
         imageView.setOnClickListener(getExpandListener());
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -300,6 +298,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
             }
         });
         toolbar.setOnClickListener(getExpandListener());
+        getJsonfromApi();
     }
 
     private void shareAid() {
@@ -350,20 +349,20 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
     }
 
     private void scrollToTop() {
-        barLayout.setExpanded(true, true);
-        /*CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) barLayout.getLayoutParams();
-        AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
-        int[] consumed = new int[2];
-        //behavior.onNestedPreScroll(layout, barLayout, null, 0, -1000, consumed);
-        behavior.onNestedFling(layout, barLayout, null, 0, -10000, true);*/
-        nestedScrollView.scrollTo(0, 1 * -1000);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                barLayout.setExpanded(true, true);
+                nestedScrollView.scrollTo(0, 1 * -1000);
+            }
+        });
     }
 
     private void getJsonfromApi() {
         if (new Parser().getTitCached(aid).equals("null")) {
             AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
             asyncHttpClient.setResponseTimeout(10000);
-            asyncHttpClient.get(parser.getDirectorioUrl(TaskType.NORMAL, context) + "?certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
+            asyncHttpClient.get(parser.getDirectorioUrl(TaskType.NORMAL, context) + "?certificate=" + Parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     super.onSuccess(statusCode, headers, response);
@@ -400,21 +399,15 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                 }
             });
         } else {
-            Log.d("Info", "API");
-            AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-            asyncHttpClient.setResponseTimeout(5000);
-            asyncHttpClient.get(parser.getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(aid) + "&certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
+            BaseGetter.getJson(this, new ANIME(Integer.parseInt(aid)), new BaseGetter.AsyncInterface() {
                 @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    super.onSuccess(statusCode, headers, response);
-                    setInfo(response.toString());
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    super.onFailure(statusCode, headers, responseString, throwable);
-                    Log.d("Info", "Cache");
-                    getJsonfromFile();
+                public void onFinish(String json) {
+                    if (!json.equals("null")) {
+                        setInfo(json);
+                    } else {
+                        Toaster.toast("No hay cache para mostrar");
+                        finish();
+                    }
                 }
             });
         }
@@ -467,25 +460,6 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         }
     }
 
-    public void getJsonfromFile() {
-        String aid = getIntent().getExtras().getString("aid");
-        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-            if (!mediaStorage.exists()) {
-                mediaStorage.mkdirs();
-            }
-        }
-        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + aid + ".txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + aid + ".txt";
-        if (file.exists()) {
-            Log.d("Archivo", "Existe");
-            String infile = FileUtil.getStringFromFile(file_loc);
-            setInfo(infile);
-        } else {
-            Toaster.toast("No hay cache para mostrar");
-            finish();
-        }
-    }
-
     public String getJsonStringfromFile() {
         String aid = getIntent().getExtras().getString("aid");
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
@@ -503,121 +477,81 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
     }
 
     public void setInfo(final String json) {
-        AnimeDetail animeDetail = new AnimeDetail(json);
-        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-            if (!mediaStorage.exists()) {
-                mediaStorage.mkdirs();
-            }
-        }
-        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + aid + ".txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + aid + ".txt";
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            FileUtil.writeToFile(json, file);
-            txt_sinopsis.setText(animeDetail.getSinopsis());
-            txt_titulo.setText(animeDetail.getTitulo());
-            txt_tipo.setText(animeDetail.getTid());
-            txt_fsalida.setText(animeDetail.getFsalida());
-            txt_estado.setText(animeDetail.getEstado());
-            txt_generos.setText(animeDetail.getGeneros());
-            txt_debug.setText(aid);
-            String[] urls = parser.urlsRel(json);
-            if (urls.length == 0) {
-                rv_rel.setVisibility(View.GONE);
-            } else {
-                rv_rel.setHasFixedSize(true);
-                rv_rel.setLayoutManager(new LinearLayoutManager(this));
-                List<String> titulos = parser.parseTitRel(json);
-                List<String> tipos = parser.parseTiposRel(json);
-                String[] aids = parser.parseAidRel(json);
-                AdapterRel adapter = new AdapterRel(this, titulos, tipos, urls, aids);
-                rv_rel.setAdapter(adapter);
-            }
+        if (!infoSeted) {
+            infoSeted = true;
+            final AnimeDetail animeDetail = new AnimeDetail(json);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    txt_sinopsis.setText(animeDetail.getSinopsis());
+                    txt_titulo.setText(animeDetail.getTitulo());
+                    txt_tipo.setText(animeDetail.getTid());
+                    txt_fsalida.setText(animeDetail.getFsalida());
+                    txt_estado.setText(animeDetail.getEstado());
+                    txt_generos.setText(animeDetail.getGeneros());
+                    txt_debug.setText(aid);
+                    final String[] urls = parser.urlsRel(json);
+                    if (urls.length == 0) {
+                        rv_rel.setVisibility(View.GONE);
+                    } else {
+                        final List<String> titulos = parser.parseTitRel(json);
+                        final List<String> tipos = parser.parseTiposRel(json);
+                        final String[] aids = parser.parseAidRel(json);
+                        rv_rel.setHasFixedSize(true);
+                        rv_rel.setLayoutManager(new LinearLayoutManager(InfoNewMaterial.this));
+                        AdapterRel adapter = new AdapterRel(InfoNewMaterial.this, titulos, tipos, urls, aids);
+                        rv_rel.setAdapter(adapter);
+                    }
+                }
+            });
             showInitInfo();
             setRecyclerView(json);
-        } else {
-            Log.d("Archivo", "Existe");
-            String infile = FileUtil.getStringFromFile(file_loc);
-            if (json.equals(infile.trim())) {
-                txt_sinopsis.setText(animeDetail.getSinopsis());
-                txt_titulo.setText(animeDetail.getTitulo());
-                txt_tipo.setText(animeDetail.getTid());
-                txt_fsalida.setText(animeDetail.getFsalida());
-                txt_estado.setText(animeDetail.getEstado());
-                txt_generos.setText(animeDetail.getGeneros());
-                txt_debug.setText(aid);
-                String[] urls = parser.urlsRel(json);
-                if (urls.length == 0) {
-                    rv_rel.setVisibility(View.GONE);
-                } else {
-                    rv_rel.setHasFixedSize(true);
-                    rv_rel.setLayoutManager(new LinearLayoutManager(this));
-                    List<String> titulos = parser.parseTitRel(json);
-                    List<String> tipos = parser.parseTiposRel(json);
-                    String[] aids = parser.parseAidRel(json);
-                    AdapterRel adapter = new AdapterRel(this, titulos, tipos, urls, aids);
-                    rv_rel.setAdapter(adapter);
+            scrollToTop();
+            String pos = getIntent().getStringExtra("position");
+            final int position = pos == null ? -1 : Integer.valueOf(pos);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    button_list.setVisibility(View.VISIBLE);
+                    if (position != -1) {
+                        button.setImageResource(R.drawable.information);
+                        nestedScrollView.setVisibility(View.GONE);
+                        frameLayout.setVisibility(View.VISIBLE);
+                        barLayout.setExpanded(false, true);
+                        button_list.show(true);
+                        isInInfo = false;
+                    }
                 }
-                showInitInfo();
-                setRecyclerView(json);
-            } else {
-                FileUtil.writeToFile(json, file);
-                txt_sinopsis.setText(animeDetail.getSinopsis());
-                txt_titulo.setText(animeDetail.getTitulo());
-                txt_tipo.setText(animeDetail.getTid());
-                txt_fsalida.setText(animeDetail.getFsalida());
-                txt_estado.setText(animeDetail.getEstado());
-                txt_generos.setText(animeDetail.getGeneros());
-                txt_debug.setText(aid);
-                String[] urls = parser.urlsRel(json);
-                if (urls.length == 0) {
-                    rv_rel.setVisibility(View.GONE);
-                } else {
-                    rv_rel.setHasFixedSize(true);
-                    rv_rel.setLayoutManager(new LinearLayoutManager(this));
-                    List<String> titulos = parser.parseTitRel(json);
-                    List<String> tipos = parser.parseTiposRel(json);
-                    String[] aids = parser.parseAidRel(json);
-                    AdapterRel adapter = new AdapterRel(this, titulos, tipos, urls, aids);
-                    rv_rel.setAdapter(adapter);
-                }
-                showInitInfo();
-                setRecyclerView(json);
-            }
-        }
-        scrollToTop();
-        String pos = getIntent().getStringExtra("position");
-        final int position = pos == null ? -1 : Integer.valueOf(pos);
-        button_list.setVisibility(View.VISIBLE);
-        if (position != -1) {
-            button.setImageResource(R.drawable.information);
-            nestedScrollView.setVisibility(View.GONE);
-            frameLayout.setVisibility(View.VISIBLE);
-            barLayout.setExpanded(false, true);
-            button_list.show(true);
-            isInInfo = false;
+            });
         }
     }
 
     private void showInitInfo() {
-        if (getIntent().getStringExtra("position") == null) {
-            Animation bottomUp = AnimationUtils.loadAnimation(context, R.anim.slide_from_bottom);
-            nestedScrollView.startAnimation(bottomUp);
-        }
-        nestedScrollView.setVisibility(View.VISIBLE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (getIntent().getStringExtra("position") == null) {
+                    Animation bottomUp = AnimationUtils.loadAnimation(context, R.anim.slide_from_bottom);
+                    nestedScrollView.startAnimation(bottomUp);
+                }
+                nestedScrollView.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     private void setRecyclerView(final String json) {
+        Log.e("Info", "Set Info");
         adapter_caps = new AdapterInfoCapsMaterial(context, parser.parseNumerobyEID(json), aid, parser.parseEidsbyEID(json));
         layoutManager = new LinearLayoutManager(context);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(adapter_caps);
-        button.show();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                recyclerView.setLayoutManager(layoutManager);
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setAdapter(adapter_caps);
+                button.show();
+            }
+        });
     }
 
 
@@ -661,8 +595,6 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
-        String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
         switch (item.getItemId()) {
             case R.id.favorito_si:
                 SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
@@ -685,11 +617,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                 }
                 Toaster.toast("Favorito Eliminado");
                 getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builder.toString()).apply();
-                String vistos = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
-                if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null, parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + Parser.getCertificateSHA1Fingerprint(this) + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString() + ":;:" + vistos).execute();
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null, parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + Parser.getCertificateSHA1Fingerprint(this) + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builder.toString() + ":;:" + vistos).execute();
-                }
+                FavSyncro.updateServer(InfoNewMaterial.this);
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_no, Amenu);
                 getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", true).apply();
@@ -706,11 +634,7 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
                 }
                 Toaster.toast("Favorito Agregado");
                 getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builderNo.toString()).apply();
-                String vistos1 = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
-                if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null, parser.getBaseUrl(TaskType.NORMAL, context) + "fav-server.php?certificate=" + Parser.getCertificateSHA1Fingerprint(this) + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString() + ":;:" + vistos1).execute();
-                    new LoginServer(this, TaskType.UPDATE, null, null, null, null, parser.getBaseUrl(TaskType.SECUNDARIA, context) + "fav-server.php?certificate=" + Parser.getCertificateSHA1Fingerprint(this) + "&tipo=refresh&email_coded=" + email_coded + "&pass_coded=" + pass_coded + "&new_favs=" + builderNo.toString() + ":;:" + vistos1).execute();
-                }
+                FavSyncro.updateServer(InfoNewMaterial.this);
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_si, Amenu);
                 getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", true).apply();
@@ -816,7 +740,16 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
 
     @Override
     protected void onDestroy() {
-        knf.animeflv.LoginActivity.LoginServer.RefreshData(this);
+        if (NetworkUtils.isNetworkAvailable()) {
+            FavSyncro.updateServer(this);
+        }
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (recyclerView != null && adapter_caps != null)
+            adapter_caps.notifyDataSetChanged();
     }
 }

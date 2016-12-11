@@ -102,9 +102,17 @@ public class VideoFile {
     }
 
     private File saveBitmap(Bitmap bitmap, File file) {
+        File thumbs = new File(tmp, ".nomedia");
         if (!tmp.exists()) {
             tmp.mkdirs();
         }
+        if (!thumbs.exists())
+            try {
+                thumbs.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(new File(tmp, file.getName().replace(".mp4", ".png")));

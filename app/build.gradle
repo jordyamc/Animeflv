@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '25.0.1'
     defaultConfig {
         applicationId "knf.animeflv"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 146
-        versionName "3.7"
+        versionCode 147
+        versionName "3.8"
         multiDexEnabled true
     }
     buildTypes {
@@ -85,18 +85,20 @@ dependencies {
     compile 'com.shamanland:xdroid-toaster:0.0.10'
     compile 'com.karumi:dexter:2.3.1'
     //<--
-    compile 'com.android.support:design:25.+'
-    compile 'com.android.support:palette-v7:25.+'
-    compile 'com.android.support:appcompat-v7:25.+'
-    compile 'com.android.support:appcompat-v7:25.+'
-    compile 'com.android.support:recyclerview-v7:25.+'
-    compile 'com.android.support:cardview-v7:25.+'
-    compile 'com.android.support:mediarouter-v7:25.+'
+    compile 'com.android.support:design:25.0.1'
+    compile 'com.android.support:palette-v7:25.0.1'
+    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.android.support:recyclerview-v7:25.0.1'
+    compile 'com.android.support:cardview-v7:25.0.1'
+    compile 'com.android.support:mediarouter-v7:25.0.1'
+    compile 'com.android.support.constraint:constraint-layout:+'
     //<---
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
-    compile 'com.squareup.okio:okio:1.6.0'
+    compile 'com.squareup.okhttp3:okhttp:3.5.0'
+    compile 'com.squareup.okio:okio:1.11.0'
     compile 'com.ogaclejapan.smarttablayout:library:1.6.0@aar'
     compile 'com.ogaclejapan.smarttablayout:utils-v4:1.6.0@aar'
     compile 'com.github.AndroidDeveloperLB:MaterialPreferenceLibrary:+'
@@ -112,7 +114,6 @@ dependencies {
     //compile 'com.parse:parse-android:1.+'
     compile 'com.melnykov:floatingactionbutton:1.3.0'
     compile 'org.adw.library:discrete-seekbar:1.0.1'
-    compile 'com.android.support.constraint:constraint-layout:+'
     compile 'com.devbrackets.android:exomedia:3.0.1'
     compile 'com.joanfuentes:HintCase:1.0.2'
     compile 'com.joanfuentes:HintCaseAssets:1.0.2'
@@ -126,6 +127,8 @@ dependencies {
     compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
 
     compile 'com.github.munix:Multi-Display-Cast:+'
+
+    compile 'com.dropbox.core:dropbox-core-sdk:2.1.2'
 
     compile files('src/SOMAAndroidSDK5.0.9.jar')
 }

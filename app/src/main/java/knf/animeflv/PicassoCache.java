@@ -29,7 +29,6 @@ public class PicassoCache {
         client.setCookieHandler(cookieManager);
 
         Downloader downloader   = new OkHttpDownloader(context, Integer.MAX_VALUE);
-        //Downloader downloader = new OkHttpDownloader(client);
         Picasso.Builder builder = new Picasso.Builder(context);
         builder.downloader(downloader);
 
@@ -49,8 +48,8 @@ public class PicassoCache {
             new PicassoCache(context);
             return picassoInstance;
         }
-
         return picassoInstance;
     }
+
 
 }

@@ -35,7 +35,18 @@
             android:theme="@style/AppThemeNoAn"/>
         <activity
             android:name=".Utils.CacheControl"
-            android:label="@string/app_name"/>
+            android:label="@string/app_name">
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data
+                    android:host="cache"
+                    android:scheme="animeflv"/>
+            </intent-filter>
+        </activity>
         <activity
             android:name=".Splash"
             android:configChanges="orientation|screenSize|keyboard"
@@ -255,6 +266,19 @@
             android:name=".LoginActivity.LoginUser"
             android:label="@string/app_name"/>
 
+        <activity
+            android:name="com.dropbox.core.android.AuthActivity"
+            android:configChanges="orientation|keyboard"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <data android:scheme="db-stz1g2qeh9nldga"/>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".Tile.QuickSetting"
             android:icon="@drawable/app_icon_intro"
@@ -269,6 +293,14 @@
             android:name=".DownloadService.DownloaderService"
             android:exported="false"
             android:label="@string/app_name"/>
+
+        <receiver
+            android:name=".DownloadService.DownloadBroadCaster"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="download.retry"/>
+            </intent-filter>
+        </receiver>
 
         <provider
             android:name="android.support.v4.content.FileProvider"

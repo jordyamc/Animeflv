@@ -368,7 +368,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
     }
 
     private void showLoading(final ImageButton button) {
-        ((newMain) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.setImageResource(R.drawable.ic_warning);
@@ -378,15 +378,18 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
     }
 
     private void showDownload(final ImageButton button, final int position) {
-        ((newMain) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + Animes.get(position).getEid().replace("E", ""), false)) {
-                    button.setImageResource(R.drawable.listo);
-                    button.setEnabled(true);
-                } else {
-                    button.setImageResource(R.drawable.ic_get_r);
-                    button.setEnabled(true);
+                try {
+                    if (context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + Animes.get(position).getEid().replace("E", ""), false)) {
+                        button.setImageResource(R.drawable.listo);
+                        button.setEnabled(true);
+                    } else {
+                        button.setImageResource(R.drawable.ic_get_r);
+                        button.setEnabled(true);
+                    }
+                } catch (Exception e) {
                 }
             }
         });

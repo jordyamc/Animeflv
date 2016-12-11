@@ -24,7 +24,11 @@ public class Alarm extends BroadcastReceiver {
             //new RequestsBackground(context, TaskType.NOT).executeOnExecutor(ExecutorManager.getExecutor());
             //new RequestsBackground(context,TaskType.VERSION).executeOnExecutor(ExecutorManager.getExecutor());
             startBackground.compareNots(context);
-            startBackground.checkUpdate(context);
+            try {
+                startBackground.checkUpdate(context);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
             Log.d("Service", "Servicio Desactivado");
         }

@@ -11,6 +11,8 @@ import com.loopj.android.http.SyncHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
@@ -26,6 +28,10 @@ public class ServerGetter {
 
     private static String getDirectorio(Context context) {
         return new Parser().getDirectorioUrl(TaskType.NORMAL, context);
+    }
+
+    private static String getAnime(Context context, ANIME anime) {
+        return new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + new Parser().getUrlAnimeCached(anime.getAidString()) + "&certificate=" + Parser.getCertificateSHA1Fingerprint(context);
     }
 
     private static AsyncHttpClient getClient() {
@@ -52,14 +58,12 @@ public class ServerGetter {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                Log.e("Server", "GETTER FAIL", throwable);
                 SelfGetter.getInicio(context, asyncInterface);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
-                Log.e("Server", "GETTER FAIL - TEXT", throwable);
                 SelfGetter.getInicio(context, asyncInterface);
             }
         });
@@ -81,14 +85,36 @@ public class ServerGetter {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
-                Log.e("Server", "GETTER FAIL", throwable);
                 asyncInterface.onFinish(OfflineGetter.getDirectorio());
             }
         });
     }
 
-    public static void getAnime(Context context, ANIME anime, BaseGetter.AsyncInterface asyncInterface) {
+    public static void getAnime(final Context context, final ANIME anime, final BaseGetter.AsyncInterface asyncInterface) {
+        AsyncHttpClient asyncHttpClient = getClient();
+        asyncHttpClient.setLogInterface(new NoLogInterface());
+        asyncHttpClient.setLoggingEnabled(false);
+        asyncHttpClient.setResponseTimeout(5000);
+        asyncHttpClient.get(getAnime(context, anime), null, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                OfflineGetter.backupJson(response, new File(OfflineGetter.animecache, anime.getAidString() + ".txt"));
+                asyncInterface.onFinish(response.toString());
+            }
 
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                SelfGetter.getAnime(context, anime, asyncInterface);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                SelfGetter.getAnime(context, anime, asyncInterface);
+            }
+        });
     }
 
     public static void getDownload(final Context context, final DOWNLOAD download, final BaseGetter.AsyncInterface asyncInterface) {

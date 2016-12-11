@@ -325,7 +325,7 @@ public class newMain extends AppCompatActivity implements
                                 result.closeDrawer();
                                 break;
                             case 7:
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(parser.getBaseUrl(TaskType.NORMAL, context))));
+                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(parser.getBaseUrl(TaskType.NORMAL, context).replace("api2.", ""))));
                                 result.setSelection(0, false);
                                 result.closeDrawer();
                                 break;
@@ -1051,52 +1051,12 @@ public class newMain extends AppCompatActivity implements
 
     public void ActualizarFavoritos() {
         if (isNetworkAvailable()) {
-            String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
-            String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
-            if (!email_coded.equals("null") && !pass_coded.equals("null")) {
-                knf.animeflv.LoginActivity.LoginServer.login(this, email_coded, pass_coded, PreferenceManager.getDefaultSharedPreferences(this).getString("login_email", "null"), new knf.animeflv.LoginActivity.LoginServer.ServerInterface() {
+            if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(this)) {
+                FavSyncro.updateLocal(this, new FavSyncro.UpdateCallback() {
                     @Override
-                    public void onServerResponse(JSONObject object) {
-                        try {
-                            if (object.getString("response").equals("ok")) {
-                                String favoritos = parser.getUserFavs(object.toString());
-                                String visto = parser.getUserVistos(object.toString());
-                                if (visto.equals("")) {
-                                    String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
-                                    if (!favs.equals(favoritos)) {
-                                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).apply();
-                                        loadMainJson();
-                                        Log.d("Reload", "Main");
-                                    }
-                                } else {
-                                    String favs = getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "");
-                                    if (!favs.equals(favoritos)) {
-                                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).apply();
-                                        loadMainJson();
-                                        Log.d("Reload", "Main");
-                                    }
-                                    String vistos = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
-                                    try {
-                                        if (!vistos.equals(visto)) {
-                                            getSharedPreferences("data", MODE_PRIVATE).edit().putString("vistos", visto).apply();
-                                            String[] v = visto.split(";;;");
-                                            for (String s : v) {
-                                                getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, true).apply();
-                                            }
-                                        }
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        } catch (Exception e) {
-                            Log.e("GetFavs", e.getMessage());
-                        }
-                    }
-
-                    @Override
-                    public void onServerError() {
-                        Log.e("FavLoader-Main", "TimeOut!!!!!");
+                    public void onUpdate() {
+                        loadMainJson();
+                        Log.d("Reload by Favs", "Main");
                     }
                 });
             }

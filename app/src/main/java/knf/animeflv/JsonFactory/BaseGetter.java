@@ -28,7 +28,11 @@ public class BaseGetter {
     }
 
     public static void getJson(Context context, ANIME anime, AsyncInterface asyncInterface) {
-
+        if (NetworkUtils.isNetworkAvailable()) {
+            ServerGetter.getAnime(context, anime, asyncInterface);
+        } else {
+            asyncInterface.onFinish(OfflineGetter.getAnime(anime));
+        }
     }
 
     public static void getJson(Context context, EMISION emision, AsyncInterface asyncInterface) {

@@ -6,6 +6,7 @@ import com.karumi.dexter.Dexter;
 
 import es.munix.multidisplaycast.CastManager;
 import knf.animeflv.Emision.EmisionChecker;
+import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.UtilsInit;
 import xdroid.toaster.Toaster;
@@ -34,5 +35,6 @@ public class Application extends android.app.Application {
             }
         });
         CastManager.register(getApplicationContext());
+        DropboxManager.init(this);
     }
 }

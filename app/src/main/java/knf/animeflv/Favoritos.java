@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -46,7 +45,7 @@ import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
 
-public class Favoritos extends AppCompatActivity implements RequestFav.callback, RequestFavSort.callback, LoginServer.ServerInterface {
+public class Favoritos extends AppCompatActivity implements RequestFav.callback, RequestFavSort.callback, FavSyncro.UpdateCallback {
     RecyclerView recyclerView;
     Toolbar toolbar;
     Toolbar ltoolbar;
@@ -151,11 +150,8 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
                 }
             }
         }
-        String email = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email", "null");
-        final String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
-        final String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
-        if (!email_coded.equals("null") && !email_coded.equals("null")) {
-            LoginServer.login(this, email_coded, pass_coded, email, this);
+        if (LoginServer.isLogedIn(this) && NetworkUtils.isNetworkAvailable()) {
+            FavSyncro.updateLocal(this, this);
         }
         getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", false).apply();
         new Handler().postDelayed(new Runnable() {
@@ -168,13 +164,8 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     }
 
     public void ActualizarFavoritos() {
-        if (NetworkUtils.isNetworkAvailable()) {
-            String email = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email", "null");
-            String email_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email_coded", "null");
-            String pass_coded = PreferenceManager.getDefaultSharedPreferences(this).getString("login_pass_coded", "null");
-            if (!email_coded.equals("null") && !email_coded.equals("null")) {
-                LoginServer.login(this, email_coded, pass_coded, email, this);
-            }
+        if (LoginServer.isLogedIn(this) && NetworkUtils.isNetworkAvailable()) {
+            FavSyncro.updateLocal(this, this);
         }
     }
 
@@ -195,8 +186,6 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         if (aids.size() == 0) {
             Toast.makeText(context, "No hay favoritos", Toast.LENGTH_LONG).show();
         } else {
-            recyclerView.setHasFixedSize(true);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
             dialog = new MaterialDialog.Builder(context)
                     .content("Actualizando Favoritos")
                     .progress(true, 0)
@@ -212,9 +201,16 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             favo = new RequestFav(this, TaskType.SORT_NORMAL, dialog, aids);
             favo.executeOnExecutor(threadPoolExecutor);
             dialog.show();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    recyclerView.setHasFixedSize(true);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(Favoritos.this));
+                }
+            });
         }
         if (NetworkUtils.isNetworkAvailable()) {
-            LoginServer.RefreshData(this);
+            FavSyncro.updateServer(this);
         }
     }
 
@@ -383,44 +379,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     }
 
     @Override
-    public void onServerResponse(JSONObject object) {
-        try {
-            if (object.getString("response").equals("ok")) {
-                String favoritos = Parser.getTrimedList(parser.getUserFavs(object.toString()), ":::");
-                String visto = parser.getUserVistos(object.toString());
-                if (visto.equals("")) {
-                    String favs = Parser.getTrimedList(getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", ""), ":::");
-                    if (!favs.equals(favoritos)) {
-                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).commit();
-                        init();
-                    }
-                } else {
-                    String favs = Parser.getTrimedList(getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", ""), ":::");
-                    if (!favs.equals(favoritos)) {
-                        getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", favoritos).commit();
-                        init();
-                    }
-                    String vistos = getSharedPreferences("data", MODE_PRIVATE).getString("vistos", "");
-                    try {
-                        if (!vistos.equals(visto)) {
-                            getSharedPreferences("data", MODE_PRIVATE).edit().putString("vistos", visto).commit();
-                            String[] v = visto.split(";;;");
-                            for (String s : v) {
-                                getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean(s, true).commit();
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Log.e("GetFavs", e.getMessage());
-        }
-    }
-
-    @Override
-    public void onServerError() {
-
+    public void onUpdate() {
+        init();
     }
 }

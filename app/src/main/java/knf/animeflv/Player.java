@@ -19,12 +19,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-import android.widget.VideoView;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-
+import java.io.File;
 import java.util.HashMap;
 
+import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.playerSources.ResizeSurfaceView;
 import knf.animeflv.playerSources.VideoControllerView;
 
@@ -67,24 +66,37 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-        controller = new VideoControllerView(this);
         mVideoSurface = (ResizeSurfaceView) findViewById(R.id.videoSurface);
         mContentView = findViewById(R.id.video_container);
         mLoadingView = findViewById(R.id.loading);
-        SurfaceHolder videoHolder = mVideoSurface.getHolder();
-        videoHolder.addCallback(this);
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        mMediaPlayer = new MediaPlayer();
-        mMediaPlayer.setOnVideoSizeChangedListener(this);
-        controller = new VideoControllerView(this);
         mLoadingView.setVisibility(View.VISIBLE);
         decorView = getWindow().getDecorView();
         hideSystemUI();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+
+        intent = getIntent();
+        setMediaPlayer();
+    }
+
+    private void setMediaPlayer() {
         try {
+            controller = new VideoControllerView(this);
+            SurfaceHolder videoHolder = mVideoSurface.getHolder();
+            videoHolder.addCallback(this);
+            mVideoSurface.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    controller.toggleContollerView();
+                    return false;
+                }
+            });
+            mMediaPlayer = new MediaPlayer();
+            mMediaPlayer.setOnVideoSizeChangedListener(this);
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mMediaPlayer.setOnPreparedListener(this);
-            intent = getIntent();
+            mMediaPlayer.setOnCompletionListener(this);
             ops = intent.getStringExtra("ops");
             if (ops != null) {
                 url = intent.getStringExtra("url");
@@ -113,13 +125,6 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
         } catch (Exception e) {
             e.printStackTrace();
         }
-        mVideoSurface.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                controller.toggleContollerView();
-                return false;
-            }
-        });
     }
 
     private void hideSystemUI() {
@@ -308,8 +313,29 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        mp.reset();
-        mp.release();
-        finish();
+        resetPlayer();
+        String file = intent.getStringExtra("file");
+        String start = file.substring(0, file.lastIndexOf("/"));
+        String eid = file.substring(file.lastIndexOf("/") + 1, file.lastIndexOf(".mp4"));
+        String[] semi = eid.split("_");
+        String aid = semi[0];
+        int num = Integer.parseInt(semi[1]);
+        if (!file.trim().equals("")) {
+            File nextCap = new File(start, aid + "_" + String.valueOf(num + 1) + ".mp4");
+            Log.e("NextCap", nextCap.getAbsolutePath());
+            if (nextCap.exists()) {
+                Intent i = new Intent(this, Player.class);
+                i.putExtra("file", nextCap.getAbsolutePath());
+                i.putExtra("title", new Parser().getTitCached(aid) + " - " + (num + 1));
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                FileUtil.init(this).setSeenState(aid + "_" + (num + 1) + "E", true);
+                finish();
+                startActivity(i);
+            } else {
+                finish();
+            }
+        } else {
+            finish();
+        }
     }
 }

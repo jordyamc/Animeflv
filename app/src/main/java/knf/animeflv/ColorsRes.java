@@ -109,6 +109,11 @@ public class ColorsRes {
     }
 
     @ColorInt
+    public static int DropBox(Context context) {
+        return ContextCompat.getColor(context, R.color.dropbox);
+    }
+
+    @ColorInt
     public static int Transparent(Context context) {
         return ContextCompat.getColor(context, android.R.color.transparent);
     }
