@@ -17,7 +17,6 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
@@ -34,9 +33,10 @@ import java.util.Set;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.BackDownload;
+import knf.animeflv.JsonFactory.BaseGetter;
+import knf.animeflv.JsonFactory.JsonTypes.INICIO;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
-import knf.animeflv.TaskType;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.NoLogInterface;
@@ -49,29 +49,14 @@ public class startBackground {
     public static void compareNots(final Context context) {
         if (NetworkUtils.isNetworkAvailable()) {
             try {
-                AsyncHttpClient client = new AsyncHttpClient();
-                client.setConnectTimeout(15000);
-                client.setLogInterface(new NoLogInterface());
-                client.setLoggingEnabled(false);
-                String url = new Parser().getInicioUrl(TaskType.NORMAL, context) + "?certificate=" + new Parser().getCertificateSHA1Fingerprint(context);
-                client.get(url, null, new JsonHttpResponseHandler() {
+                BaseGetter.getJson(context, new INICIO(), new BaseGetter.AsyncInterface() {
                     @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        super.onSuccess(statusCode, headers, response);
+                    public void onFinish(String json) {
                         try {
-                            startCompare(context, response);
+                            startCompare(context, new JSONObject(json));
                         } catch (Exception e) {
                             e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                        super.onFailure(statusCode, headers, responseString, throwable);
-                        try {
                             startCompare(context, null);
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
                     }
                 });

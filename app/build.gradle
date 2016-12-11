@@ -7,8 +7,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 147
-        versionName "3.8"
+        versionCode 148
+        versionName "3.8.1"
         multiDexEnabled true
     }
     buildTypes {
