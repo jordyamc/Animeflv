@@ -38,6 +38,7 @@ import knf.animeflv.JsonFactory.JsonTypes.INICIO;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.NoLogInterface;
 import knf.animeflv.Utils.UtilNotBlocker;
@@ -74,7 +75,7 @@ public class startBackground {
                 client.setConnectTimeout(15000);
                 client.setLogInterface(new NoLogInterface());
                 client.setLoggingEnabled(false);
-                client.get("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html", null, new TextHttpResponseHandler() {
+                client.get(Keys.Url.VERSION_INT_TEST, null, new TextHttpResponseHandler() {
                     @Override
                     public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                         startUpdate(context, "");
