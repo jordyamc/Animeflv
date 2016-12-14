@@ -577,7 +577,7 @@ public class Parser {
                 }
             }
         } catch (Exception e) {
-            Log.e("DirAnimes", e.getMessage(), e.getCause());
+            Log.e("DirAnimes Get", e.getMessage(), e.getCause());
         }
         return linkArray;
     }

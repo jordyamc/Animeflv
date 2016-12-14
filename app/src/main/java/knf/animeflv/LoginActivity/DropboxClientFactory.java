@@ -24,7 +24,7 @@ public class DropboxClientFactory {
                 sDbxClient = new DbxClientV2(requestConfig, accessToken);
                 Log.e("Dropbox", "Init Success");
             } catch (Exception e) {
-                Log.e("Dropbox", "Init Error", e);
+                Log.e("Dropbox", "Init Error");
             }
         }
     }

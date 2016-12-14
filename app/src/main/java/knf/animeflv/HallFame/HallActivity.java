@@ -21,7 +21,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.ColorsRes;
@@ -34,11 +34,11 @@ import knf.animeflv.TaskType;
 import knf.animeflv.Utils.ThemeUtils;
 
 public class HallActivity extends AppCompatActivity {
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @Bind(R.id.recycler)
+    @BindView(R.id.recycler)
     RecyclerView recyclerView;
-    @Bind(R.id.loader)
+    @BindView(R.id.loader)
     InfinityLoading loading;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

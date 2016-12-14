@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.Utils.Files.FileSearchResponse;
 
 public class FileUtil {
@@ -485,23 +486,11 @@ public class FileUtil {
     }
 
     public boolean isInSeen(String eid) {
-        return context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + eid.replace("E", ""), false);
+        return SeenManager.get(context).isSeen(eid);
     }
 
     public void setSeenState(String eid, boolean seen) {
-        context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("visto" + eid.replace("E", ""), seen).apply();
-        if (seen) {
-            String vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", "");
-            if (!vistos.contains(eid)) {
-                vistos = vistos + eid + ":::";
-                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-            } else {
-                if (vistos.contains(eid + ":::")) {
-                    vistos = vistos.replace(eid + ":::", "");
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", vistos).apply();
-                }
-            }
-        }
+        SeenManager.get(context).setSeenState(eid, seen);
     }
 
     public boolean isMXinstalled() {

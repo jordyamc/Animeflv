@@ -227,14 +227,14 @@ public class CacheManager {
         }
     }
 
-    public void mini(final Activity context, String aid, final ImageView imageView) {
+    public void mini(final Activity context, final String aid, final ImageView imageView) {
         checkCacheDirs();
         final File localFile = new File(miniCache, aid + ".jpg");
         imageView.setImageResource(android.R.color.transparent);
         if (localFile.exists()) {
             PicassoCache.getPicassoInstance(context).load(localFile).into(imageView);
         } else {
-            PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + Parser.getCertificateSHA1Fingerprint(context) + "&thumb=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").error(R.drawable.ic_block_r).into(imageView, new Callback() {
+            PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + Parser.getCertificateSHA1Fingerprint(context) + "&thumb=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").into(imageView, new Callback() {
                 @Override
                 public void onSuccess() {
                     if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true))
@@ -243,7 +243,18 @@ public class CacheManager {
 
                 @Override
                 public void onError() {
+                    PicassoCache.getPicassoInstance(context).load("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").error(R.drawable.ic_block_r).into(imageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true))
+                                saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                        }
 
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
                 }
             });
         }

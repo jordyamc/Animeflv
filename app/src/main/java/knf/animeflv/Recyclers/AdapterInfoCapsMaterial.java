@@ -39,6 +39,7 @@ import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.JsonFactory.DownloadGetter;
 import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.R;
+import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Logger;
@@ -114,7 +115,6 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             }
         }
         holder.tv_capitulo.setText(capitulo.get(position));
-        Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
         holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
             holder.card.setCardBackgroundColor(ColorsRes.Prim(context));
@@ -127,7 +127,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             holder.ib_des.setColorFilter(null);
             holder.ib_des.setColorFilter(ColorsRes.Holo_Light(context));
         }
-        if (vistos) {
+        if (SeenManager.get(context).isSeen(eids.get(holder.getAdapterPosition()))) {
             holder.tv_capitulo.setTextColor(getColor());
         }
         if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
@@ -285,7 +285,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             @Override
             public void onClick(View v) {
                 if (!MainStates.isListing()) {
-                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("cambio", true).apply();
+                    //context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("cambio", true).apply();
                     if (!FileUtil.init(context).isInSeen(eids.get(holder.getAdapterPosition()))) {
                         FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition()), true);
                         holder.tv_capitulo.setTextColor(getColor());

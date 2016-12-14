@@ -51,6 +51,7 @@ import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
+import com.dropbox.core.android.Auth;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.SyncHttpClient;
@@ -66,6 +67,7 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
@@ -94,7 +96,9 @@ import knf.animeflv.Interfaces.MainRecyclerCallbacks;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
 import knf.animeflv.JsonFactory.ServerGetter;
+import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.LoginActivity.LoginBase;
+import knf.animeflv.LoginActivity.LoginUser;
 import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.PlayBack.PlayBackManager;
 import knf.animeflv.Random.RandomActivity;
@@ -102,6 +106,7 @@ import knf.animeflv.Recientes.MainOrganizer;
 import knf.animeflv.Recientes.Status;
 import knf.animeflv.Recyclers.AdapterMain;
 import knf.animeflv.Recyclers.AdapterMainNoGIF;
+import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.Tutorial.TutorialActivity;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
@@ -161,6 +166,7 @@ public class newMain extends AppCompatActivity implements
     private MaterialDialog RapConf;
     private boolean frun = true;
     private boolean tbool = false;
+    private boolean dropboxloging = false;
     private AdapterMain main;
     private AdapterMainNoGIF mainNo;
     private Switch nots;
@@ -190,7 +196,20 @@ public class newMain extends AppCompatActivity implements
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_main);
+        startUp();
         setUpMain();
+    }
+
+    private void startUp() {
+        if (!getSharedPreferences("data", MODE_PRIVATE).getBoolean("seenUpdated", false)) {
+            getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("seenUpdated", true).apply();
+            SeenManager.get(this).updateSeen(getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", ""), new SeenManager.SeenCallback() {
+                @Override
+                public void onSeenUpdated() {
+                    Toaster.toast("Lista de capitulos vistos creada");
+                }
+            });
+        }
     }
 
     private void setUpMain() {
@@ -244,25 +263,142 @@ public class newMain extends AppCompatActivity implements
         } else {
             ic_main = ContextCompat.getDrawable(this, R.mipmap.ic_launcher);
         }
-        headerResult = new AccountHeaderBuilder()
+        AccountHeaderBuilder builder = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(getHDraw(false))
                 .withCompactStyle(true)
                 .withDividerBelowHeader(false)
-                .withSelectionListEnabled(false)
-                .addProfiles(
-                        new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withIcon(ic_main).withIdentifier(9)
-                )
-                .withProfileImagesClickable(true)
-                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
-                    @Override
-                    public boolean onProfileChanged(View view, IProfile profile, boolean current) {
-                        result.closeDrawer();
-                        cambiarColor();
-                        return false;
+                .withCloseDrawerOnProfileListClick(false)
+                .withSelectionListEnabled(true)
+                .withProfileImagesClickable(false);
+        if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(this)) {
+            builder.addProfiles(
+                    new ProfileDrawerItem().withName("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withEmail(headerTit).withIcon(ic_main).withIdentifier(9),
+                    new ProfileSettingDrawerItem().withName("Cambiar colores").withIcon(CommunityMaterial.Icon.cmd_palette).withIdentifier(22),
+                    new ProfileSettingDrawerItem().withName("Sincronizar vistos").withIcon(CommunityMaterial.Icon.cmd_cloud_sync).withIdentifier(88),
+                    new ProfileSettingDrawerItem().withName("Dropbox (" + (DropboxManager.islogedIn() ? "DESCONECTAR" : "CONECTAR") + ")").withIcon(CommunityMaterial.Icon.cmd_dropbox).withIdentifier(120),
+                    new ProfileSettingDrawerItem().withName("Configurar cuenta").withIcon(CommunityMaterial.Icon.cmd_account_settings_variant).withIdentifier(99)
+            ).withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                @Override
+                public boolean onProfileChanged(View view, IProfile profile, boolean current) {
+                    switch (((int) profile.getIdentifier())) {
+                        case 9:
+                            headerResult.toggleSelectionList(newMain.this);
+                            break;
+                        case 22:
+                            cambiarColor();
+                            result.closeDrawer();
+                            break;
+                        case 88:
+                            if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(newMain.this) || DropboxManager.islogedIn()) {
+                                startSeenSync();
+                                result.closeDrawer();
+                            } else {
+                                Toaster.toast("Por favor inicia sesión en la app o en Dropbox");
+                            }
+                            break;
+                        case 120:
+                            if (DropboxManager.islogedIn()) {
+                                new MaterialDialog.Builder(newMain.this)
+                                        .content("¿Cerrar sesión de Dropbox?")
+                                        .positiveText("cerrar")
+                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                            @Override
+                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                DropboxManager.logoff(newMain.this);
+                                                setUpDrawer();
+                                            }
+                                        }).build().show();
+                            } else {
+                                dropboxloging = true;
+                                DropboxManager.login(newMain.this, new DropboxManager.LoginCallback() {
+                                    @Override
+                                    public void onLogin(boolean loged) {
+                                        if (loged)
+                                            setUpDrawer();
+                                    }
+
+                                    @Override
+                                    public void onStartLogin() {
+
+                                    }
+                                });
+                            }
+                            result.closeDrawer();
+                            break;
+                        case 99:
+                            startActivityForResult(new Intent(newMain.this, LoginUser.class), 1147);
+                            result.closeDrawer();
+                            break;
                     }
-                })
-                .build();
+                    return false;
+                }
+            });
+        } else {
+            builder.addProfiles(
+                    new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withIcon(ic_main).withIdentifier(9),
+                    new ProfileSettingDrawerItem().withName("Cambiar colores").withIcon(CommunityMaterial.Icon.cmd_palette).withIdentifier(22),
+                    new ProfileSettingDrawerItem().withName("Sincronizar vistos").withIcon(CommunityMaterial.Icon.cmd_cloud_sync).withIdentifier(88),
+                    new ProfileSettingDrawerItem().withName("Dropbox").withEmail(DropboxManager.islogedIn() ? "DESCONECTAR" : "CONECTAR").withIcon(CommunityMaterial.Icon.cmd_dropbox).withIdentifier(120),
+                    new ProfileSettingDrawerItem().withName("Iniciar sesión").withIcon(CommunityMaterial.Icon.cmd_account_key).withIdentifier(110)
+            ).withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                @Override
+                public boolean onProfileChanged(View view, final IProfile profile, boolean current) {
+                    switch (((int) profile.getIdentifier())) {
+                        case 9:
+                            headerResult.toggleSelectionList(newMain.this);
+                            break;
+                        case 88:
+                            if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(newMain.this) || DropboxManager.islogedIn()) {
+                                startSeenSync();
+                                result.closeDrawer();
+                            } else {
+                                Toaster.toast("Por favor inicia sesión en la app o en Dropbox");
+                            }
+                            break;
+                        case 110:
+                            startActivityForResult(new Intent(newMain.this, LoginBase.class), 1147);
+                            result.closeDrawer();
+                            break;
+                        case 120:
+                            if (DropboxManager.islogedIn()) {
+                                new MaterialDialog.Builder(newMain.this)
+                                        .content("¿Cerrar sesión de Dropbox?")
+                                        .positiveText("cerrar")
+                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                            @Override
+                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                DropboxManager.logoff(newMain.this);
+                                                setUpDrawer();
+                                            }
+                                        }).build().show();
+                            } else {
+                                dropboxloging = true;
+                                DropboxManager.login(newMain.this, new DropboxManager.LoginCallback() {
+                                    @Override
+                                    public void onLogin(boolean loged) {
+                                        if (loged)
+                                            setUpDrawer();
+                                    }
+
+                                    @Override
+                                    public void onStartLogin() {
+
+                                    }
+                                });
+                            }
+                            result.closeDrawer();
+                            break;
+                        case 22:
+                            cambiarColor();
+                            result.closeDrawer();
+                            break;
+                    }
+                    return false;
+                }
+            });
+        }
+        headerResult = builder.build();
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(menu_toolbar)
@@ -368,8 +504,41 @@ public class newMain extends AppCompatActivity implements
                 .addStickyDrawerItems(
                         new SecondaryDrawerItem().withName("Configuracion").withIcon(FontAwesome.Icon.faw_cog).withIdentifier(-1)
                 )
+                .withOnDrawerListener(new Drawer.OnDrawerListener() {
+                    @Override
+                    public void onDrawerOpened(View drawerView) {
+
+                    }
+
+                    @Override
+                    public void onDrawerClosed(View drawerView) {
+                        if (headerResult.isSelectionListShown())
+                            headerResult.toggleSelectionList(newMain.this);
+                    }
+
+                    @Override
+                    public void onDrawerSlide(View drawerView, float slideOffset) {
+
+                    }
+                })
                 .build();
         setUpAdmin(NetworkUtils.isNetworkAvailable());
+    }
+
+    private void startSeenSync() {
+        final MaterialDialog p = new MaterialDialog.Builder(this)
+                .content("Actualizando vistos")
+                .cancelable(false)
+                .progress(true, 0).build();
+        p.show();
+        FavSyncro.updateLocalSeen(this, new FavSyncro.UpdateCallback() {
+            @Override
+            public void onUpdate() {
+                Toaster.toast("Lista de capitulos vistos actualizada");
+                p.dismiss();
+                loadMainJson();
+            }
+        });
     }
 
     private User getUser(JSONObject object) {
@@ -533,22 +702,18 @@ public class newMain extends AppCompatActivity implements
 
     private void cambiarColor() {
         int[] colorl = new int[]{
-                ColorsRes.Naranja(this),
-                ColorsRes.Rojo(this),
                 ColorsRes.Gris(this),
-                ColorsRes.Verde(this),
-                ColorsRes.Rosa(this),
-                ColorsRes.Morado(this)
+                ColorsRes.Prim(this)
         };
-        ColorChooserDialog dialog = new ColorChooserDialog.Builder(this, R.string.color_chooser)
+        ColorChooserDialog dialog = new ColorChooserDialog.Builder(this, R.string.color_chooser_prim)
                 .theme(ThemeUtils.isAmoled(this) ? Theme.DARK : Theme.LIGHT)
                 .customColors(colorl, null)
                 .dynamicButtonColor(true)
                 .allowUserColorInput(false)
                 .allowUserColorInputAlpha(false)
-                .doneButton(android.R.string.ok)
+                .doneButton(R.string.next)
                 .cancelButton(android.R.string.cancel)
-                .preselect(PreferenceManager.getDefaultSharedPreferences(context).getInt("accentColor", ColorsRes.Naranja(context)))
+                .preselect(ThemeUtils.isAmoled(this) ? ColorsRes.Dark(this) : ColorsRes.Gris(this))
                 .accentMode(true)
                 .build();
         dialog.show(this);
@@ -1099,54 +1264,58 @@ public class newMain extends AppCompatActivity implements
             getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isF", false).apply();
             final File saveData = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/data.save");
             if (saveData.exists()) {
-                new MaterialDialog.Builder(context)
-                        .title("Respaldo")
-                        .content("Se ah encontrado un respaldo de la configuracion, ¿Desea restaurarlo?")
-                        .positiveText("SI")
-                        .negativeText("NO")
-                        .autoDismiss(true)
-                        .cancelable(true)
-                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                        .callback(new MaterialDialog.ButtonCallback() {
-                            @Override
-                            public void onPositive(MaterialDialog dialog) {
-                                super.onPositive(dialog);
-                                String save = FileUtil.getStringFromFile(saveData.getPath());
-                                if (parser.restoreBackup(save, context) != Parser.Response.OK) {
-                                    toast("Error al restaurar");
-                                    saveData.delete();
-                                    parser.saveBackup(context);
-                                    showFastConf();
-                                } else {
-                                    if (ThemeUtils.isAmoled(context)) {
-                                        recreate();
-                                    } else {
-                                        if (!knf.animeflv.LoginActivity.LoginServer.getEmailNormal(context).equals("null")) {
-                                            loadMainJson();
-                                            getHDraw(true);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        new MaterialDialog.Builder(context)
+                                .title("Respaldo")
+                                .content("Se ah encontrado un respaldo de la configuracion, ¿Desea restaurarlo?")
+                                .positiveText("SI")
+                                .negativeText("NO")
+                                .autoDismiss(true)
+                                .cancelable(true)
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                        String save = FileUtil.getStringFromFile(saveData.getPath());
+                                        if (parser.restoreBackup(save, context) != Parser.Response.OK) {
+                                            toast("Error al restaurar");
+                                            saveData.delete();
+                                            parser.saveBackup(context);
+                                            showFastConf();
                                         } else {
-                                            openSingInDialog();
+                                            if (ThemeUtils.isAmoled(context)) {
+                                                recreate();
+                                            } else {
+                                                if (!knf.animeflv.LoginActivity.LoginServer.getEmailNormal(context).equals("null")) {
+                                                    loadMainJson();
+                                                    getHDraw(true);
+                                                } else {
+                                                    openSingInDialog();
+                                                }
+                                            }
                                         }
                                     }
-                                }
-                            }
-
-                            @Override
-                            public void onNegative(MaterialDialog dialog) {
-                                super.onNegative(dialog);
-                                saveData.delete();
-                                parser.saveBackup(context);
-                                showFastConf();
-                            }
-                        })
-                        .cancelListener(new DialogInterface.OnCancelListener() {
-                            @Override
-                            public void onCancel(DialogInterface dialog) {
-                                saveData.delete();
-                                parser.saveBackup(context);
-                                showFastConf();
-                            }
-                        }).build().show();
+                                })
+                                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                        saveData.delete();
+                                        parser.saveBackup(context);
+                                        showFastConf();
+                                    }
+                                })
+                                .cancelListener(new DialogInterface.OnCancelListener() {
+                                    @Override
+                                    public void onCancel(DialogInterface dialog) {
+                                        saveData.delete();
+                                        parser.saveBackup(context);
+                                        showFastConf();
+                                    }
+                                }).build().show();
+                    }
+                });
             } else {
                 showFastConf();
             }
@@ -1292,13 +1461,38 @@ public class newMain extends AppCompatActivity implements
         }
     }
 
+
     @Override
     public void onColorSelection(@NonNull ColorChooserDialog dialog, @ColorInt int selectedColor) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("accentColor", selectedColor).apply();
-        if (UtilSound.getAudioWidget().isShown()) UtilSound.getAudioWidget().hide();
-        if (UtilSound.isNotSoundShow)
-            UtilSound.toogleNotSound(UtilSound.getCurrentMediaPlayerInt());
-        recreate();
+        if (selectedColor == ColorsRes.Prim(this) || selectedColor == ColorsRes.Gris(context)) {
+            ThemeHolder.isDark = selectedColor == ColorsRes.Prim(this);
+            int[] colorl = new int[]{
+                    ColorsRes.Naranja(this),
+                    ColorsRes.Rojo(this),
+                    ColorsRes.Gris(this),
+                    ColorsRes.Verde(this),
+                    ColorsRes.Rosa(this),
+                    ColorsRes.Morado(this)
+            };
+            new ColorChooserDialog.Builder(this, R.string.color_chooser)
+                    .theme(ThemeUtils.isAmoled(this) ? Theme.DARK : Theme.LIGHT)
+                    .customColors(colorl, null)
+                    .dynamicButtonColor(true)
+                    .allowUserColorInput(false)
+                    .allowUserColorInputAlpha(false)
+                    .doneButton(android.R.string.ok)
+                    .cancelButton(R.string.back)
+                    .preselect(PreferenceManager.getDefaultSharedPreferences(context).getInt("accentColor", ColorsRes.Naranja(context)))
+                    .accentMode(true)
+                    .build().show(this);
+        } else {
+            ThemeHolder.accentColor = selectedColor;
+            ThemeHolder.applyTheme(this);
+            if (UtilSound.getAudioWidget().isShown()) UtilSound.getAudioWidget().hide();
+            if (UtilSound.isNotSoundShow)
+                UtilSound.toogleNotSound(UtilSound.getCurrentMediaPlayerInt());
+            recreate();
+        }
     }
 
     @Override
@@ -1354,6 +1548,15 @@ public class newMain extends AppCompatActivity implements
             if (!currUser.equals(PreferenceManager.getDefaultSharedPreferences(this).getString("login_email", "null"))) {
                 setUpDrawer();
             }
+            if (dropboxloging) {
+                dropboxloging = false;
+                String token = Auth.getOAuth2Token();
+                if (token != null) {
+                    DropboxManager.UpdateToken(token);
+                    PreferenceManager.getDefaultSharedPreferences(this).edit().putString(DropboxManager.KEY_DROPBOX, token).apply();
+                    setUpDrawer();
+                }
+            }
         } else {
             shouldExecuteOnResume = true;
         }
@@ -1406,6 +1609,8 @@ public class newMain extends AppCompatActivity implements
             }
         }
         new Parser().saveBackup(this);
+        SeenManager.get(this).close();
+        FavSyncro.updateServer(context);
     }
 
     @Override
@@ -1471,6 +1676,14 @@ public class newMain extends AppCompatActivity implements
     protected void onStop() {
         super.onStop();
         PlayBackManager.get(this).removeCallbacks();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1147) {
+            setUpDrawer();
+        }
     }
 
     private class Registrer extends AsyncTask<String, String, String> {

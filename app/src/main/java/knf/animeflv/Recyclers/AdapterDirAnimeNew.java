@@ -55,7 +55,6 @@ public class AdapterDirAnimeNew extends RecyclerView.Adapter<AdapterDirAnimeNew.
             holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
             holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
         }
-        //PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + Animes.get(holder.getAdapterPosition()).getImagen()).error(R.drawable.ic_block_r).into(holder.iv_rel);
         new CacheManager().mini(context,Animes.get(holder.getAdapterPosition()).getAid(),holder.iv_rel);
         holder.tv_tit.setText(Animes.get(holder.getAdapterPosition()).getNombre());
         holder.card.setOnClickListener(new View.OnClickListener() {

@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
@@ -81,9 +81,9 @@ public class SDAdapter extends RecyclerView.Adapter<SDAdapter.ViewHolder> {
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.button)
+        @BindView(R.id.button)
         AppCompatButton button;
-        @Bind(R.id.check)
+        @BindView(R.id.check)
         AppCompatCheckBox check;
 
         public ViewHolder(View itemView) {

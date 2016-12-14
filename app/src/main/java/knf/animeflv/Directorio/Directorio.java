@@ -49,7 +49,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.AnimeSorter;
 import knf.animeflv.ColorsRes;
@@ -66,29 +66,29 @@ import knf.animeflv.Utils.eNums.SearchType;
 import xdroid.toaster.Toaster;
 
 public class Directorio extends AppCompatActivity {
-    @Bind(R.id.toolbar_search)
+    @BindView(R.id.toolbar_search)
     Toolbar toolbarS;
     Menu menuGlobal;
-    @Bind(R.id.et_busqueda)
+    @BindView(R.id.et_busqueda)
     MaterialEditText editText;
-    @Bind(R.id.rv_busqueda)
+    @BindView(R.id.rv_busqueda)
     RecyclerView recyclerView;
-    @Bind(R.id.frame_dir)
+    @BindView(R.id.frame_dir)
     FrameLayout frameLayout;
     RelativeLayout linearLayout;
     Activity context;
     EditText.OnEditorActionListener listener;
     int t_busqueda;
     ViewPager viewPager;
-    @Bind(R.id.viewpagertab2)
+    @BindView(R.id.viewpagertab2)
     SmartTabLayout viewPagerTab;
-    @Bind(R.id.search_menu_text)
+    @BindView(R.id.search_menu_text)
     FloatingActionButton nombre;
-    @Bind(R.id.search_menu_generos)
+    @BindView(R.id.search_menu_generos)
     FloatingActionButton genero;
-    @Bind(R.id.search_menu_id)
+    @BindView(R.id.search_menu_id)
     FloatingActionButton byid;
-    @Bind(R.id.search_menu)
+    @BindView(R.id.search_menu)
     FloatingActionMenu actionMenu;
     List<Integer> lastSearch = Arrays.asList(new Integer[]{0});
     boolean loaded = false;

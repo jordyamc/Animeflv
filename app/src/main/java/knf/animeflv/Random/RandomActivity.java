@@ -13,7 +13,7 @@ import android.view.View;
 
 import java.io.File;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
@@ -22,11 +22,11 @@ import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
 public class RandomActivity extends AppCompatActivity implements RandomInterfaces, SwipeRefreshLayout.OnRefreshListener {
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @Bind(R.id.recyclerView)
+    @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-    @Bind(R.id.swiperefresh)
+    @BindView(R.id.swiperefresh)
     SwipeRefreshLayout swipeRefreshLayout;
     private RandomAdapter adapter;
     private File DirFile = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");

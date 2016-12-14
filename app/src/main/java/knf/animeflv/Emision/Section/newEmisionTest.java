@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.Application;
 import knf.animeflv.Emision.DateCompare;
@@ -59,9 +59,9 @@ public class newEmisionTest extends AppCompatActivity {
     SmartTabLayout viewPagerTab;
     LinearLayout layout;
 
-    @Bind(R.id.emision_loading_screen)
+    @BindView(R.id.emision_loading_screen)
     LinearLayout screen;
-    @Bind(R.id.loader_emision)
+    @BindView(R.id.loader_emision)
     InfinityLoading loading;
 
 

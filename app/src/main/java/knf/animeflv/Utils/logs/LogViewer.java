@@ -30,7 +30,7 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import java.io.File;
 import java.io.FileInputStream;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.ColorsRes;
@@ -43,17 +43,17 @@ import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
 public class LogViewer extends AppCompatActivity {
-    @Bind(R.id.et_correo)
+    @BindView(R.id.et_correo)
     AppCompatEditText correo;
-    @Bind(R.id.text_input)
+    @BindView(R.id.text_input)
     TextInputLayout inputLayout;
-    @Bind(R.id.phone_info)
+    @BindView(R.id.phone_info)
     TextView phone_info;
-    @Bind(R.id.complete_log)
+    @BindView(R.id.complete_log)
     TextView complete_info;
-    @Bind(R.id.action_send_log)
+    @BindView(R.id.action_send_log)
     FloatingActionButton button;
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
 
     String correoS;

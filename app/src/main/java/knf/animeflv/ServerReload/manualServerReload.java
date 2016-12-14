@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.ColorsRes;
@@ -41,34 +41,34 @@ import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.ThemeUtils;
 
 public class manualServerReload extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.ib_admin_recientes_reload)
+    ImageButton rec_reload;
+    @BindView(R.id.tv_admin_recientes_last)
+    TextView last_rec;
+    @BindView(R.id.tv_admin_recientes_state)
+    TextView state_rec;
+    @BindView(R.id.ib_admin_dir_reload)
+    ImageButton dir_reload;
+    @BindView(R.id.tv_admin_dir_state)
+    TextView state_dir;
+    @BindView(R.id.admin_reload)
+    SwipeRefreshLayout refreshLayout;
+    @BindView(R.id.rv_rec_animes)
+    CustomRecycler rec_animes;
+    @BindView(R.id.card_main)
+    CardView card_rec;
+    @BindView(R.id.card_animes)
+    CardView card_animes;
+    @BindView(R.id.card_dir)
+    CardView card_dir;
+    @BindView(R.id.tv_admin_recientes)
+    TextView tit_rec;
+    @BindView(R.id.tv_admin_dir)
+    TextView tit_dir;
     private Parser parser = new Parser();
     private TaskType NORMAL = TaskType.NORMAL;
-    @Bind(R.id.toolbar)
-    Toolbar toolbar;
-    @Bind(R.id.ib_admin_recientes_reload)
-    ImageButton rec_reload;
-    @Bind(R.id.tv_admin_recientes_last)
-    TextView last_rec;
-    @Bind(R.id.tv_admin_recientes_state)
-    TextView state_rec;
-    @Bind(R.id.ib_admin_dir_reload)
-    ImageButton dir_reload;
-    @Bind(R.id.tv_admin_dir_state)
-    TextView state_dir;
-    @Bind(R.id.admin_reload)
-    SwipeRefreshLayout refreshLayout;
-    @Bind(R.id.rv_rec_animes)
-    CustomRecycler rec_animes;
-    @Bind(R.id.card_main)
-    CardView card_rec;
-    @Bind(R.id.card_animes)
-    CardView card_animes;
-    @Bind(R.id.card_dir)
-    CardView card_dir;
-    @Bind(R.id.tv_admin_recientes)
-    TextView tit_rec;
-    @Bind(R.id.tv_admin_dir)
-    TextView tit_dir;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

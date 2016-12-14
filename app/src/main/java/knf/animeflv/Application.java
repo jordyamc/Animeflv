@@ -37,4 +37,6 @@ public class Application extends android.app.Application {
         CastManager.register(getApplicationContext());
         DropboxManager.init(this);
     }
+
+
 }

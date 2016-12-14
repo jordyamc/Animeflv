@@ -16,7 +16,7 @@ import com.github.ndczz.infinityloading.InfinityLoading;
 import java.io.File;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Explorer.Adapters.DirectoryAdapter;
@@ -27,11 +27,11 @@ import knf.animeflv.R;
 import knf.animeflv.Utils.ThemeUtils;
 
 public class VideoFilesFragment extends Fragment {
-    @Bind(R.id.recycler)
+    @BindView(R.id.recycler)
     RecyclerView recyclerView;
-    @Bind(R.id.loading)
+    @BindView(R.id.loading)
     InfinityLoading loading;
-    @Bind(R.id.no_anime)
+    @BindView(R.id.no_anime)
     TextView noAnime;
 
     public VideoFilesFragment() {

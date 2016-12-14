@@ -55,7 +55,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.ColorsRes;
@@ -84,41 +84,41 @@ import static knf.animeflv.Utils.Keys.Login.EMAIL_NORMAL;
 
 @SuppressWarnings("WeakerAccess")
 public class InfoNewMaterial extends AppCompatActivity implements LoginServer.callback {
-    @Bind(R.id.collapsing_toolbar)
+    @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbarLayout;
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @Bind(R.id.image)
+    @BindView(R.id.image)
     ImageView imageView;
-    @Bind(R.id.rv)
+    @BindView(R.id.rv)
     RecyclerView recyclerView;
-    @Bind(R.id.app_bar_layout)
+    @BindView(R.id.app_bar_layout)
     AppBarLayout barLayout;
-    @Bind(R.id.fab)
+    @BindView(R.id.fab)
     FloatingActionButton button;
-    @Bind(R.id.nested)
+    @BindView(R.id.nested)
     NestedScrollView nestedScrollView;
-    @Bind(R.id.info_descripcion)
+    @BindView(R.id.info_descripcion)
     TextViewExpandableAnimation txt_sinopsis;
-    @Bind(R.id.titulo)
+    @BindView(R.id.titulo)
     TextView txt_titulo;
-    @Bind(R.id.tipo)
+    @BindView(R.id.tipo)
     TextView txt_tipo;
-    @Bind(R.id.fsalida)
+    @BindView(R.id.fsalida)
     TextView txt_fsalida;
-    @Bind(R.id.estado)
+    @BindView(R.id.estado)
     TextView txt_estado;
-    @Bind(R.id.generos)
+    @BindView(R.id.generos)
     TextView txt_generos;
-    @Bind(R.id.debug_info)
+    @BindView(R.id.debug_info)
     TextView txt_debug;
-    @Bind(R.id.rv_relacionados)
+    @BindView(R.id.rv_relacionados)
     CustomRecycler rv_rel;
-    @Bind(R.id.coordinator)
+    @BindView(R.id.coordinator)
     CoordinatorLayout layout;
-    @Bind(R.id.frame_rv)
+    @BindView(R.id.frame_rv)
     FrameLayout frameLayout;
-    @Bind(R.id.action_list)
+    @BindView(R.id.action_list)
     com.melnykov.fab.FloatingActionButton button_list;
     String ext_storage_state = Environment.getExternalStorageState();
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");

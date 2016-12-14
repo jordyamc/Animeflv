@@ -29,7 +29,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Parser;
@@ -52,25 +52,25 @@ public class LoginBase extends AppCompatActivity {
     protected String en_email;
     protected String en_password;
     protected List<String> userList = new ArrayList<>();
-    @Bind(R.id.img_login)
+    @BindView(R.id.img_login)
     ImageView image;
-    @Bind(R.id.input_email)
+    @BindView(R.id.input_email)
     EditText email;
-    @Bind(R.id.input_password)
+    @BindView(R.id.input_password)
     EditText password;
-    @Bind(R.id.input_r_password)
+    @BindView(R.id.input_r_password)
     EditText r_password;
-    @Bind(R.id.email)
+    @BindView(R.id.email)
     TextInputLayout input_email;
-    @Bind(R.id.password)
+    @BindView(R.id.password)
     TextInputLayout input_password;
-    @Bind(R.id.r_password)
+    @BindView(R.id.r_password)
     TextInputLayout input_r_password;
-    @Bind(R.id.buttons)
+    @BindView(R.id.buttons)
     LinearLayout buttons;
-    @Bind(R.id.btn_login)
+    @BindView(R.id.btn_login)
     AppCompatButton login;
-    @Bind(R.id.btn_create)
+    @BindView(R.id.btn_create)
     AppCompatButton create;
     private boolean isInSignUp = false;
     private MaterialDialog dialog;

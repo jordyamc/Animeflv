@@ -11,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.AppCompatImageButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Patterns;
@@ -26,14 +25,13 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.dropbox.core.android.Auth;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Parser;
@@ -61,27 +59,25 @@ public class LoginUser extends AppCompatActivity {
     protected String new_en_email = "";
     protected String new_en_password = "";
     protected List<String> userList;
-    @Bind(R.id.img_login)
+    @BindView(R.id.img_login)
     ImageView image;
-    @Bind(R.id.input_email)
+    @BindView(R.id.input_email)
     EditText email;
-    @Bind(R.id.input_password)
+    @BindView(R.id.input_password)
     EditText password;
-    @Bind(R.id.input_r_password)
+    @BindView(R.id.input_r_password)
     EditText r_password;
-    @Bind(R.id.email)
+    @BindView(R.id.email)
     TextInputLayout input_email;
-    @Bind(R.id.password)
+    @BindView(R.id.password)
     TextInputLayout input_password;
-    @Bind(R.id.r_password)
+    @BindView(R.id.r_password)
     TextInputLayout input_r_password;
-    @Bind(R.id.btn_login)
+    @BindView(R.id.btn_login)
     AppCompatButton login;
-    @Bind(R.id.btn_create)
+    @BindView(R.id.btn_create)
     AppCompatButton create;
-    @Bind(R.id.btn_dropbox)
-    AppCompatImageButton dropbox;
-    @Bind(R.id.pass_progress)
+    @BindView(R.id.pass_progress)
     ProgressBar progressBar;
     private MaterialDialog dialog;
     private boolean isEmailOK = false;
@@ -108,43 +104,8 @@ public class LoginUser extends AppCompatActivity {
         ButterKnife.bind(this);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         setUpColors();
-        dropbox.setBackgroundColor((DropboxManager.getToken() == null) ? ColorsRes.DropBox(this) : ColorsRes.Dark(this));
         image.setImageResource(getImageDrawable());
         login.setOnClickListener(getListener());
-        dropbox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (DropboxManager.getToken() == null) {
-                    DropboxManager.login(LoginUser.this, new DropboxManager.LoginCallback() {
-                        @Override
-                        public void onLogin(boolean loged) {
-                            if (loged) {
-                                Toaster.toast("DropBox Loged In");
-                                dropbox.setBackgroundColor(ColorsRes.Dark(LoginUser.this));
-                            } else {
-                                Toaster.toast("Error al conectar Dropbox!!!");
-                            }
-                        }
-
-                        @Override
-                        public void onStartLogin() {
-
-                        }
-                    });
-                } else {
-                    new MaterialDialog.Builder(LoginUser.this)
-                            .content("¿Cerrar sesión de Dropbox?")
-                            .positiveText("cerrar")
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    DropboxManager.logoff(LoginUser.this);
-                                    dropbox.setBackgroundColor(ColorsRes.DropBox(LoginUser.this));
-                                }
-                            }).build().show();
-                }
-            }
-        });
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -750,19 +711,7 @@ public class LoginUser extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        String token = Auth.getOAuth2Token();
-        if (token != null && started) {
-            DropboxManager.UpdateToken(token);
-            PreferenceManager.getDefaultSharedPreferences(this).edit().putString(DropboxManager.KEY_DROPBOX, token).apply();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    dropbox.setBackgroundColor(ColorsRes.Dark(LoginUser.this));
-                }
-            });
-        } else {
-            started = true;
-        }
+
         super.onResume();
     }
 }

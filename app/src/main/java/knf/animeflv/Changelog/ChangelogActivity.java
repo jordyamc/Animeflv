@@ -15,7 +15,7 @@ import android.widget.ProgressBar;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.Changelog.Adapters.VersionAdapter;
 import knf.animeflv.ColorsRes;
@@ -24,9 +24,9 @@ import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
 public class ChangelogActivity extends AppCompatActivity {
-    @Bind(R.id.recycler)
+    @BindView(R.id.recycler)
     RecyclerView recyclerView;
-    @Bind(R.id.progress)
+    @BindView(R.id.progress)
     ProgressBar progressBar;
 
     private static boolean isXLargeScreen(Context context) {

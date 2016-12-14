@@ -27,7 +27,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Emision.EmisionManager;
@@ -39,17 +39,17 @@ import knf.animeflv.Utils.TimeCompare;
 import xdroid.toaster.Toaster;
 
 public class EmisionEditDialog extends DialogFragment {
-    @Bind(R.id.switch_emision)
+    @BindView(R.id.switch_emision)
     SwitchCompat switchCompat;
-    @Bind(R.id.hour_button)
+    @BindView(R.id.hour_button)
     AppCompatButton button;
-    @Bind(R.id.spinner_emision)
+    @BindView(R.id.spinner_emision)
     AppCompatSpinner spinner;
-    @Bind(R.id.more_configs)
+    @BindView(R.id.more_configs)
     LinearLayout configs;
-    @Bind(R.id.hourtext)
+    @BindView(R.id.hourtext)
     TextView hour;
-    @Bind(R.id.daytext)
+    @BindView(R.id.daytext)
     TextView day;
     private View root;
     private MaterialDialog dialog;

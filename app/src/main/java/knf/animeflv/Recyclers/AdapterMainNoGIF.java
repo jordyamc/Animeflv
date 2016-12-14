@@ -48,6 +48,7 @@ import knf.animeflv.Parser;
 import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.R;
 import knf.animeflv.Recientes.MainAnimeModel;
+import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.CacheManager;
@@ -60,7 +61,6 @@ import knf.animeflv.Utils.UpdateUtil;
 import knf.animeflv.Utils.eNums.DownloadTask;
 import knf.animeflv.Utils.eNums.UpdateState;
 import knf.animeflv.info.Helper.InfoHelper;
-import knf.animeflv.newMain;
 import xdroid.toaster.Toaster;
 
 
@@ -382,7 +382,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
             @Override
             public void run() {
                 try {
-                    if (context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + Animes.get(position).getEid().replace("E", ""), false)) {
+                    if (SeenManager.get(context).isSeen(Animes.get(position).getEid())) {
                         button.setImageResource(R.drawable.listo);
                         button.setEnabled(true);
                     } else {
@@ -390,13 +390,14 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                         button.setEnabled(true);
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });
     }
 
     private void showDelete(final ImageButton button) {
-        ((newMain) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.setImageResource(R.drawable.ic_borrar_r);
@@ -415,7 +416,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
     }
 
     private void showCloudPlay(final ImageButton button) {
-        ((newMain) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.setImageResource(R.drawable.ic_cloud_play);
@@ -424,7 +425,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
     }
 
     private void showPlay(final ImageButton button) {
-        ((newMain) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.setImageResource(R.drawable.ic_play);

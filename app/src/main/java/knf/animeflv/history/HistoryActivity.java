@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
@@ -25,11 +25,11 @@ import knf.animeflv.history.adapter.HistoryAdapter;
 import knf.animeflv.history.adapter.HistoryHelper;
 
 public class HistoryActivity extends AppCompatActivity implements HistoryAdapter.HistoryAdapterInterface {
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @Bind(R.id.recycler)
+    @BindView(R.id.recycler)
     RecyclerView recyclerView;
-    @Bind(R.id.noHistory)
+    @BindView(R.id.noHistory)
     TextView noHistory;
 
     @Override

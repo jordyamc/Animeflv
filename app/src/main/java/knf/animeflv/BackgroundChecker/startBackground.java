@@ -93,126 +93,130 @@ public class startBackground {
     }
 
     private static void startCompare(Context context, @Nullable JSONObject s) {
-        if (new Parser().checkStatus(s) == 0) {
-            String ext_storage_state = Environment.getExternalStorageState();
-            File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
-            if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-                if (!mediaStorage.exists()) {
-                    mediaStorage.mkdirs();
-                }
-            }
-            File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt");
-            String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
-            if (NetworkUtils.isNetworkAvailable() && s != null) {
-                if (!file.exists()) {
-                    Log.d("Archivo:", "No existe");
-                    try {
-                        file.createNewFile();
-                    } catch (IOException e) {
-                        Log.d("Archivo:", "Error al crear archivo");
+        try {
+            if (new Parser().checkStatus(s) == 0) {
+                String ext_storage_state = Environment.getExternalStorageState();
+                File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
+                if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                    if (!mediaStorage.exists()) {
+                        mediaStorage.mkdirs();
                     }
-                    FileUtil.writeToFile(s.toString(), file);
-                } else {
-                    String txt = FileUtil.getStringFromFile(file_loc);
-                    List<MainObject> mainobjects = Parser.parseMainList(s);
-                    List<MainObject> oldobjects = Parser.parseMainList(txt);
-                    Boolean desc = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoDesc", false);
-                    if (FileUtil.isJSONValid(txt)) {
-                        if (!mainobjects.get(0).eid.equals(oldobjects.get(0).eid)) {
-                            FileUtil.writeToFile(s.toString(), file);
-                            String act = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("reload", "0");
-                            if (act.trim().equals("0")) {
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "1").apply();
-                            } else {
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "0").apply();
-                            }
-                            int num = 0;
-                            Boolean isnot = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
-                            Set<String> sts = context.getSharedPreferences("data", Context.MODE_PRIVATE).getStringSet("eidsNot", new HashSet<String>());
-                            loop:
-                            {
-                                for (MainObject st : mainobjects) {
-                                    if (!st.eid.equals(oldobjects.get(0).eid)) {
-                                        String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                        Boolean comp = favoritos.startsWith(st.aid + ":::") || favoritos.contains(":::" + st.aid + ":::");
-                                        if (comp && desc && isnot) {
-                                            Descargar(context, st.titulo, st.eid);
-                                        }
-                                        num += 1;
-                                        sts.add(st.eid);
-                                    } else {
-                                        break loop;
-                                    }
-                                }
-                            }
-                            if (isnot && !UtilNotBlocker.isBlocked()) {
-                                int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
-                                context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", sts).apply();
-                                String mess;
-                                String NotTit;
-                                if (nCaps == 1) {
-                                    mess = mainobjects.get(0).titulo + " " + mainobjects.get(0).eid.replace("E", "").split("_")[1];
-                                    NotTit = "Nuevo capitulo disponible!";
+                }
+                File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt");
+                String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
+                if (NetworkUtils.isNetworkAvailable() && s != null) {
+                    if (!file.exists()) {
+                        Log.d("Archivo:", "No existe");
+                        try {
+                            file.createNewFile();
+                        } catch (IOException e) {
+                            Log.d("Archivo:", "Error al crear archivo");
+                        }
+                        FileUtil.writeToFile(s.toString(), file);
+                    } else {
+                        String txt = FileUtil.getStringFromFile(file_loc);
+                        List<MainObject> mainobjects = Parser.parseMainList(s);
+                        List<MainObject> oldobjects = Parser.parseMainList(txt);
+                        Boolean desc = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoDesc", false);
+                        if (FileUtil.isJSONValid(txt)) {
+                            if (!mainobjects.get(0).eid.equals(oldobjects.get(0).eid)) {
+                                FileUtil.writeToFile(s.toString(), file);
+                                String act = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("reload", "0");
+                                if (act.trim().equals("0")) {
+                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "1").apply();
                                 } else {
-                                    mess = "Hay " + Integer.toString(nCaps) + " nuevos capitulos disponibles!!!";
-                                    NotTit = "AnimeFLV";
+                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("reload", "0").apply();
                                 }
-                                String temp = "";
-                                List<String> tlist = new ArrayList<>();
-                                tlist.addAll(sts);
-                                List<String> eids = Parser.getEids(s);
-                                for (String alone : tlist) {
-                                    String[] data = alone.replace("E", "").split("_");
-                                    if (tlist.get(tlist.size() - 1).equals(alone)) {
-                                        temp += mainobjects.get(eids.indexOf(alone)).titulo + " " + data[1];
-                                    } else {
-                                        temp += mainobjects.get(eids.indexOf(alone)).titulo + " " + data[1] + "\n";
+                                int num = 0;
+                                Boolean isnot = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
+                                Set<String> sts = context.getSharedPreferences("data", Context.MODE_PRIVATE).getStringSet("eidsNot", new HashSet<String>());
+                                loop:
+                                {
+                                    for (MainObject st : mainobjects) {
+                                        if (!st.eid.equals(oldobjects.get(0).eid)) {
+                                            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
+                                            Boolean comp = favoritos.startsWith(st.aid + ":::") || favoritos.contains(":::" + st.aid + ":::");
+                                            if (comp && desc && isnot) {
+                                                Descargar(context, st.titulo, st.eid);
+                                            }
+                                            num += 1;
+                                            sts.add(st.eid);
+                                        } else {
+                                            break loop;
+                                        }
                                     }
                                 }
-                                if (temp.endsWith("\n")) {
-                                    temp = temp.substring(0, temp.length() - 2);
+                                if (isnot && !UtilNotBlocker.isBlocked()) {
+                                    int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
+                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
+                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", sts).apply();
+                                    String mess;
+                                    String NotTit;
+                                    if (nCaps == 1) {
+                                        mess = mainobjects.get(0).titulo + " " + mainobjects.get(0).eid.replace("E", "").split("_")[1];
+                                        NotTit = "Nuevo capitulo disponible!";
+                                    } else {
+                                        mess = "Hay " + Integer.toString(nCaps) + " nuevos capitulos disponibles!!!";
+                                        NotTit = "AnimeFLV";
+                                    }
+                                    String temp = "";
+                                    List<String> tlist = new ArrayList<>();
+                                    tlist.addAll(sts);
+                                    List<String> eids = Parser.getEids(s);
+                                    for (String alone : tlist) {
+                                        String[] data = alone.replace("E", "").split("_");
+                                        if (tlist.get(tlist.size() - 1).equals(alone)) {
+                                            temp += mainobjects.get(eids.indexOf(alone)).titulo + " " + data[1];
+                                        } else {
+                                            temp += mainobjects.get(eids.indexOf(alone)).titulo + " " + data[1] + "\n";
+                                        }
+                                    }
+                                    if (temp.endsWith("\n")) {
+                                        temp = temp.substring(0, temp.length() - 2);
+                                    }
+                                    NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
+                                    bigTextStyle.setBigContentTitle("Animes:");
+                                    bigTextStyle.bigText(temp);
+                                    NotificationCompat.Builder mBuilder =
+                                            new NotificationCompat.Builder(context)
+                                                    .setSmallIcon(R.drawable.ic_not_r)
+                                                    .setContentTitle(NotTit)
+                                                    .setContentText(mess);
+                                    mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                                    mBuilder.setStyle(bigTextStyle);
+                                    int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
+                                    mBuilder.setSound(UtilSound.getSoundUri(not));
+                                    mBuilder.setAutoCancel(true);
+                                    mBuilder.setPriority(Notification.PRIORITY_MAX);
+                                    mBuilder.setLights(Color.argb(0, 255, 128, 0), 5000, 2000);
+                                    mBuilder.setGroup("animeflv_group");
+                                    Intent resultIntent = new Intent(context, newMain.class);
+                                    PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                    mBuilder.setContentIntent(resultPendingIntent);
+                                    int mNotificationId = 6991;
+                                    NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                                    mNotifyMgr.cancel(mNotificationId);
+                                    mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                                } else {
+                                    if (UtilNotBlocker.isBlocked()) {
+                                        Log.d("Not Service", "isBlocked");
+                                        UtilNotBlocker.setBlocked(false);
+                                    }
                                 }
-                                NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
-                                bigTextStyle.setBigContentTitle("Animes:");
-                                bigTextStyle.bigText(temp);
-                                NotificationCompat.Builder mBuilder =
-                                        new NotificationCompat.Builder(context)
-                                                .setSmallIcon(R.drawable.ic_not_r)
-                                                .setContentTitle(NotTit)
-                                                .setContentText(mess);
-                                mBuilder.setVibrate(new long[]{100, 200, 100, 500});
-                                mBuilder.setStyle(bigTextStyle);
-                                int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
-                                mBuilder.setSound(UtilSound.getSoundUri(not));
-                                mBuilder.setAutoCancel(true);
-                                mBuilder.setPriority(Notification.PRIORITY_MAX);
-                                mBuilder.setLights(Color.argb(0, 255, 128, 0), 5000, 2000);
-                                mBuilder.setGroup("animeflv_group");
-                                Intent resultIntent = new Intent(context, newMain.class);
-                                PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                                mBuilder.setContentIntent(resultPendingIntent);
-                                int mNotificationId = 6991;
-                                NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                                mNotifyMgr.cancel(mNotificationId);
-                                mNotifyMgr.notify(mNotificationId, mBuilder.build());
                             } else {
-                                if (UtilNotBlocker.isBlocked()) {
-                                    Log.d("Not Service", "isBlocked");
-                                    UtilNotBlocker.setBlocked(false);
-                                }
+                                Log.d("JSON", "Es igual");
                             }
                         } else {
-                            Log.d("JSON", "Es igual");
+                            Log.d("Error", "Borrar archivo");
+                            new File(file_loc).delete();
                         }
-                    } else {
-                        Log.d("Error", "Borrar archivo");
-                        new File(file_loc).delete();
                     }
+                } else {
+                    Log.d("Conexion", "No hay internet isNull " + String.valueOf(s == null));
                 }
-            } else {
-                Log.d("Conexion", "No hay internet isNull " + String.valueOf(s == null));
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

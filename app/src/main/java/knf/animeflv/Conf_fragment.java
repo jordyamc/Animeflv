@@ -199,26 +199,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        String login_email = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null");
-        if (!login_email.equals("null")) {
-            getPreferenceScreen().findPreference("login").setSummary(login_email);
-        }
-        getPreferenceScreen().findPreference("login").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                if (NetworkUtils.isNetworkAvailable()) {
-                    String login_email = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null");
-                    if (login_email.equals("null")) {
-                        startActivityForResult(new Intent(context, LoginBase.class), REQUEST_CODE_LOGIN);
-                    } else {
-                        startActivityForResult(new Intent(context, LoginUser.class), REQUEST_CODE_LOGIN);
-                    }
-                } else {
-                    Toast.makeText(getActivity(), "Necesitas Internet!!!", Toast.LENGTH_SHORT).show();
-                }
-                return false;
-            }
-        });
         getPreferenceScreen().findPreference("b_vistos").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -695,9 +675,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                         sharedPreferences.edit().putBoolean(key, false);
                     }
                 }
-                break;
-            case "is_amoled":
-                getActivity().recreate();
                 break;
             case "betaSounds":
                 SoundsLoader.start(context);

@@ -21,13 +21,10 @@ import java.io.OutputStream;
 
 import knf.animeflv.FavSyncro;
 import knf.animeflv.R;
+import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Keys;
-
-/**
- * Created by Jordy on 07/12/2016.
- */
 
 public class DropboxManager {
     public static final String KEY_DROPBOX = "token_dropbox";
@@ -86,7 +83,7 @@ public class DropboxManager {
                 }
                 SharedPreferences preferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
                 String favoritos = preferences.getString("favoritos", "");
-                String vistos = preferences.getString("vistos", "");
+                String vistos = SeenManager.get(context).getSeenList();
                 try {
                     JSONObject object = new JSONObject();
                     object.put("response", "ok");
@@ -159,7 +156,7 @@ public class DropboxManager {
         return accessToken;
     }
 
-    interface LoginCallback {
+    public interface LoginCallback {
         void onLogin(boolean loged);
 
         void onStartLogin();

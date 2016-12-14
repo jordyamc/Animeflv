@@ -12,7 +12,7 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.HallFame.Objects.ListItem;
@@ -85,7 +85,7 @@ public class HallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public static class ViewHolderTitle extends RecyclerView.ViewHolder {
-        @Bind(R.id.name)
+        @BindView(R.id.name)
         TextView name;
 
         public ViewHolderTitle(View itemView) {
@@ -95,13 +95,13 @@ public class HallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public static class ViewHolderItem extends RecyclerView.ViewHolder {
-        @Bind(R.id.img)
+        @BindView(R.id.img)
         CircularImageView imageView;
-        @Bind(R.id.name)
+        @BindView(R.id.name)
         TextView name;
-        @Bind(R.id.description)
+        @BindView(R.id.description)
         TextView description;
-        @Bind(R.id.card)
+        @BindView(R.id.card)
         CardView card;
 
         public ViewHolderItem(View itemView) {

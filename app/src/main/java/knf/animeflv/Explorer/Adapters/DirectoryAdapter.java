@@ -16,7 +16,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.ManageDownload;
@@ -182,19 +182,19 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.root)
+        @BindView(R.id.root)
         public RelativeLayout root;
-        @Bind(R.id.img)
+        @BindView(R.id.img)
         public ImageView img;
-        @Bind(R.id.titulo)
+        @BindView(R.id.titulo)
         public TextView titulo;
-        @Bind(R.id.cap)
+        @BindView(R.id.cap)
         public TextView cap;
-        @Bind(R.id.ib_ver)
+        @BindView(R.id.ib_ver)
         public ImageButton ver;
-        @Bind(R.id.ib_del)
+        @BindView(R.id.ib_del)
         public ImageButton del;
-        @Bind(R.id.seen)
+        @BindView(R.id.seen)
         public ImageView iV_visto;
 
         public ViewHolder(View itemView) {

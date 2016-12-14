@@ -82,6 +82,10 @@
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
     </style>
 
+    <style name="Widget.MediaRouter.ChooserTextPrimary" parent="">
+        <item name="android:textColor">@color/negro</item>
+    </style>
+
     <style name="toolbar" parent="AppTheme">
         <item name="android:textColorPrimary">@android:color/white</item>
         <item name="colorControlNormal">@color/blanco</item>

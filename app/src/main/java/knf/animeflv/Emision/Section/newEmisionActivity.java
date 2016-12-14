@@ -45,7 +45,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.ColorsRes;
@@ -67,9 +67,9 @@ public class newEmisionActivity extends AppCompatActivity {
     SmartTabLayout viewPagerTab;
     LinearLayout layout;
 
-    @Bind(R.id.emision_loading_screen)
+    @BindView(R.id.emision_loading_screen)
     LinearLayout screen;
-    @Bind(R.id.loader_emision)
+    @BindView(R.id.loader_emision)
     InfinityLoading loading;
 
 

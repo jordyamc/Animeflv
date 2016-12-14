@@ -38,6 +38,7 @@ import knf.animeflv.Parser;
 import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.R;
 import knf.animeflv.Recientes.MainAnimeModel;
+import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.CacheManager;
@@ -434,7 +435,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
             @Override
             public void run() {
                 try {
-                    if (context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + Animes.get(position).getEid().replace("E", ""), false)) {
+                    if (SeenManager.get(context).isSeen(Animes.get(position).getEid())) {
                         button.setScaleType(ImageView.ScaleType.FIT_END);
                         button.setImageResource(R.drawable.listo);
                         button.setEnabled(true);

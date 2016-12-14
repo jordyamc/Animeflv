@@ -29,7 +29,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.io.File;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
@@ -40,45 +40,45 @@ public class CacheControl extends AppCompatActivity {
     MaterialDialog loading;
     MaterialDialog executing;
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @Bind(R.id.linearLayout)
+    @BindView(R.id.linearLayout)
     LinearLayout layout;
-    @Bind(R.id.lay_apk)
+    @BindView(R.id.lay_apk)
     View apk_view;
-    @Bind(R.id.total)
+    @BindView(R.id.total)
     TextView total;
 
-    @Bind(R.id.switch_mini)
+    @BindView(R.id.switch_mini)
     SwitchCompat switch_mini;
-    @Bind(R.id.clear_mini)
+    @BindView(R.id.clear_mini)
     Button clear_mini;
 
-    @Bind(R.id.switch_portada)
+    @BindView(R.id.switch_portada)
     SwitchCompat switch_portada;
-    @Bind(R.id.clear_portada)
+    @BindView(R.id.clear_portada)
     Button clear_portada;
 
-    @Bind(R.id.clear_thumb)
+    @BindView(R.id.clear_thumb)
     Button clear_thumb;
 
-    @Bind(R.id.clear_logs)
+    @BindView(R.id.clear_logs)
     Button clear_logs;
 
-    @Bind(R.id.clear_anime)
+    @BindView(R.id.clear_anime)
     Button clear_anime;
 
-    @Bind(R.id.desc_apk)
+    @BindView(R.id.desc_apk)
     TextView desc_apk;
-    @Bind(R.id.clear_apk)
+    @BindView(R.id.clear_apk)
     Button clear_apk;
-    @Bind(R.id.install_apk)
+    @BindView(R.id.install_apk)
     Button apply_apk;
 
-    @Bind(R.id.clear_android)
+    @BindView(R.id.clear_android)
     Button clear_android;
 
-    @Bind(R.id.clear_all)
+    @BindView(R.id.clear_all)
     Button clear_all;
 
     @Override

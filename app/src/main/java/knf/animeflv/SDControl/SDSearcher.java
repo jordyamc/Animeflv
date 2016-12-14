@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
@@ -23,9 +23,9 @@ public class SDSearcher extends Fragment implements SDAdapter.OnOptionsClicklist
     public static final int GRANT_WRITE_PERMISSION_CODE = 558;
     public static final int SD_SELECTED = 887;
     public static final int SD_NO_SELECTED = 884;
-    @Bind(R.id.recycler)
+    @BindView(R.id.recycler)
     RecyclerView recyclerView;
-    @Bind(R.id.titulo)
+    @BindView(R.id.titulo)
     TextView textView;
     private FileSearchResponse response;
 

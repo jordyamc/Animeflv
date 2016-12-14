@@ -4,6 +4,9 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.TextHttpResponseHandler;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -16,10 +19,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
 
+import cz.msebera.android.httpclient.Header;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.Parser;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.NoLogInterface;
 
 public class SelfGetter {
     private static final int TIMEOUT = 10000;
@@ -77,6 +82,7 @@ public class SelfGetter {
                 String aid = "null";
                 String eid = "null";
                 String izanagi = "null";
+                String mina = "null";
                 String zippy = "null";
                 String sync = "null";
                 String mega = "null";
@@ -85,7 +91,7 @@ public class SelfGetter {
                 String Yotta = "null";
                 String Yotta480 = "null";
                 String Yotta360 = "null";
-                String[] names = new String[]{"Izanagi", "Yotta", "Yotta 480p", "Yotta 360p", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
+                String[] names = new String[]{"Izanagi", "Mina", "Yotta", "Yotta 480p", "Yotta 360p", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
                 try {
                     Log.e("Url", url);
                     Document main = Jsoup.connect(url).userAgent(ua).cookie("dev", "1").timeout(TIMEOUT).get();
@@ -152,12 +158,24 @@ public class SelfGetter {
                                     }
                                 }
                             }
+                        } else if (el.contains("embed_mina.php")) {
+                            String[] p = el.split("\",\"");
+                            for (String r : p) {
+                                if (r.contains("embed_mina.php")) {
+                                    try {
+                                        JSONObject ja = new JSONObject(Jsoup.connect("https://s1.animeflv.com/minhateca.php?id=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" "))).userAgent(ua).get().body().text());
+                                        mina = ja.getString("file");
+                                    } catch (Exception e) {
+
+                                    }
+                                }
+                            }
                         }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                String[] links = new String[]{izanagi, Yotta, Yotta480, Yotta360, zippy, sync, mega, aflv, maru};
+                String[] links = new String[]{izanagi, mina, Yotta, Yotta480, Yotta360, zippy, sync, mega, aflv, maru};
                 try {
                     JSONObject object = new JSONObject();
                     object.put("version", context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName + "-Internal_Api");
@@ -244,6 +262,34 @@ public class SelfGetter {
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    public static void getDir(Context context, final BaseGetter.AsyncInterface asyncInterface) {
+        AsyncHttpClient asyncHttpClient = ServerGetter.getClient();
+        asyncHttpClient.setLogInterface(new NoLogInterface());
+        asyncHttpClient.setLoggingEnabled(false);
+        asyncHttpClient.setResponseTimeout(5000);
+        asyncHttpClient.get("http://animeflv.net/ajax/animes/lista_completa", null, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                asyncInterface.onFinish(OfflineGetter.getDirectorio());
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                String dirJson = responseString.replace("var lanime=[", "[").replace("];", "]").trim();
+                try {
+                    JSONArray array = new JSONArray(dirJson);
+                    JSONObject object = new JSONObject();
+                    object.put("lista", array);
+                    OfflineGetter.backupJson(object, OfflineGetter.directorio);
+                    asyncInterface.onFinish(object.toString());
+                } catch (Exception e) {
+                    Log.e("Dir Self Getter", "JSON Error", e);
+                    asyncInterface.onFinish(OfflineGetter.getDirectorio());
+                }
+            }
+        });
     }
 
     private static String getState(String className) {

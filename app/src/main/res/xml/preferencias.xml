@@ -37,12 +37,6 @@
             android:summary="%s"
             android:title="Usar Conexion" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="Colores">
-        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
-            android:defaultValue="false"
-            android:key="is_amoled"
-            android:title="Modo AMOLED" />
-    </PreferenceCategory>
     <PreferenceCategory android:title="Busqueda">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
@@ -80,10 +74,6 @@
             android:defaultValue="null"
             android:key="open_tutorial"
             android:title="Tutorial" />
-        <com.lb.material_preferences_library.custom_preferences.Preference
-            android:key="login"
-            android:summary="Iniciar Sesion"
-            android:title="Sincronizar Favoritos" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="resaltar"

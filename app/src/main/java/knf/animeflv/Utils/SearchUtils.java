@@ -57,7 +57,36 @@ public class SearchUtils {
                 }
             }
             if (type == SearchType.GENEROS) {
-                if (SearchConstructor.getGeneros().contains(Genero.TODOS)) {
+                try {
+                    if (SearchConstructor.getGeneros().contains(Genero.TODOS)) {
+                        JSONObject jsonObj = new JSONObject(json);
+                        JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject object = jsonArray.getJSONObject(i);
+                            String tipo = object.getString("c");
+                            String nombre = FileUtil.corregirTit(object.getString("b"));
+                            String aid = object.getString("a");
+                            String url = "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
+                            linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
+                        }
+                    } else {
+                        JSONObject jsonObj = new JSONObject(json);
+                        JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject object = jsonArray.getJSONObject(i);
+                            String generos = object.getString("e");
+                            String nombre = FileUtil.corregirTit(object.getString("b"));
+                            if (containsGenero(generos) && nombre.toLowerCase().contains(search)) {
+                                String tipo = object.getString("c");
+                                String aid = object.getString("a");
+                                String url = "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
+                                linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
+                            }
+
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                     JSONObject jsonObj = new JSONObject(json);
                     JSONArray jsonArray = jsonObj.getJSONArray("lista");
                     for (int i = 0; i < jsonArray.length(); i++) {
@@ -67,21 +96,6 @@ public class SearchUtils {
                         String aid = object.getString("a");
                         String url = "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
                         linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
-                    }
-                } else {
-                    JSONObject jsonObj = new JSONObject(json);
-                    JSONArray jsonArray = jsonObj.getJSONArray("lista");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject object = jsonArray.getJSONObject(i);
-                        String generos = object.getString("e");
-                        String nombre = FileUtil.corregirTit(object.getString("b"));
-                        if (containsGenero(generos) && nombre.toLowerCase().contains(search)) {
-                            String tipo = object.getString("c");
-                            String aid = object.getString("a");
-                            String url = "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
-                            linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
-                        }
-
                     }
                 }
             }

@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.Changelog.ChangeLogObjects;
 import knf.animeflv.ColorsRes;
@@ -132,9 +132,9 @@ public class LogAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public static class ViewHolderNormal extends RecyclerView.ViewHolder {
-        @Bind(R.id.log_desc)
+        @BindView(R.id.log_desc)
         TextView name;
-        @Bind(R.id.cardMain)
+        @BindView(R.id.cardMain)
         CardView card;
 
         public ViewHolderNormal(View itemView) {
@@ -144,11 +144,11 @@ public class LogAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public static class ViewHolderExtras extends RecyclerView.ViewHolder {
-        @Bind(R.id.log_desc)
+        @BindView(R.id.log_desc)
         TextView name;
-        @Bind(R.id.cardMain)
+        @BindView(R.id.cardMain)
         CardView card;
-        @Bind(R.id.recycler_extras)
+        @BindView(R.id.recycler_extras)
         RecyclerView extras;
 
         public ViewHolderExtras(View itemView) {

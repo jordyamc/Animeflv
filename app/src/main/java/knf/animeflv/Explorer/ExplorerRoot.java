@@ -27,7 +27,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.io.File;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Configuracion;
@@ -47,9 +47,9 @@ import xdroid.toaster.Toaster;
 
 public class ExplorerRoot extends AppCompatActivity implements ExplorerInterfaces {
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @Bind(R.id.fileDir)
+    @BindView(R.id.fileDir)
     TextView textView;
     DirectoryFragment directoryFragment;
     VideoFilesFragment videoFilesFragment;

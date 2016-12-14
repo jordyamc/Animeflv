@@ -1,19 +1,11 @@
 package knf.animeflv.history.adapter;
 
-import android.animation.Animator;
 import android.app.Activity;
-
-import android.preference.PreferenceManager;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewPropertyAnimator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,27 +18,19 @@ import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemView
 
 import org.json.JSONArray;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
-import knf.animeflv.newMain;
-import xdroid.toaster.Toaster;
 
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> implements SwipeableItemAdapter<HistoryAdapter.ViewHolder> {
-    interface Swipeable extends SwipeableItemConstants {
-    }
-    public interface HistoryAdapterInterface{
-        void onDelete();
-    }
+    HistoryAdapterInterface historyInterface;
     private Activity activity;
     private JSONArray jsonArray;
-    HistoryAdapterInterface historyInterface;
-
     public HistoryAdapter(Activity activity) {
         this.activity = activity;
         jsonArray = HistoryHelper.getHistoryArray(activity);
@@ -118,14 +102,21 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     }
 
+    interface Swipeable extends SwipeableItemConstants {
+    }
+
+    public interface HistoryAdapterInterface {
+        void onDelete();
+    }
+
     public static class ViewHolder extends AbstractSwipeableItemViewHolder {
-        @Bind(R.id.card)
+        @BindView(R.id.card)
         public CardView card;
-        @Bind(R.id.img)
+        @BindView(R.id.img)
         public ImageView img;
-        @Bind(R.id.tv_tit)
+        @BindView(R.id.tv_tit)
         public TextView tv_tit;
-        @Bind(R.id.tv_current)
+        @BindView(R.id.tv_current)
         public TextView tv_current;
 
         public ViewHolder(View itemView) {

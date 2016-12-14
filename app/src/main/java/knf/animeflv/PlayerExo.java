@@ -3,7 +3,6 @@ package knf.animeflv;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,11 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.Toast;
 
@@ -25,28 +22,17 @@ import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecSelector;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
-import com.google.android.exoplayer.MediaFormat;
-import com.google.android.exoplayer.chunk.Chunk;
-import com.google.android.exoplayer.chunk.ChunkOperationHolder;
-import com.google.android.exoplayer.chunk.ChunkSource;
-import com.google.android.exoplayer.chunk.MediaChunk;
-import com.google.android.exoplayer.dash.DashChunkSource;
 import com.google.android.exoplayer.extractor.ExtractorSampleSource;
 import com.google.android.exoplayer.extractor.mp4.Mp4Extractor;
 import com.google.android.exoplayer.upstream.Allocator;
 import com.google.android.exoplayer.upstream.DataSource;
-import com.google.android.exoplayer.upstream.DataSpec;
 import com.google.android.exoplayer.upstream.DefaultAllocator;
 import com.google.android.exoplayer.upstream.DefaultHttpDataSource;
-import com.google.android.exoplayer.upstream.DefaultUriDataSource;
-import com.google.android.exoplayer.upstream.UriDataSource;
 import com.google.android.exoplayer.util.PlayerControl;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -54,8 +40,10 @@ import butterknife.ButterKnife;
  */
 
 public class PlayerExo extends AppCompatActivity implements ExoPlayer.Listener,SurfaceHolder.Callback {
-    @Bind(R.id.surface_view)SurfaceView surfaceView;
-    @Bind(R.id.root)View root;
+    @BindView(R.id.surface_view)
+    SurfaceView surfaceView;
+    @BindView(R.id.root)
+    View root;
     private ExoPlayer player;
     private Intent intent;
     private String ops;

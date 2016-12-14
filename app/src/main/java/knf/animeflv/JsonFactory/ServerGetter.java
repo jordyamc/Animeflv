@@ -34,7 +34,7 @@ public class ServerGetter {
         return new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + new Parser().getUrlAnimeCached(anime.getAidString()) + "&certificate=" + Parser.getCertificateSHA1Fingerprint(context);
     }
 
-    private static AsyncHttpClient getClient() {
+    public static AsyncHttpClient getClient() {
         if (Looper.myLooper() == null) {
             return new SyncHttpClient();
         } else {
@@ -85,7 +85,7 @@ public class ServerGetter {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
-                asyncInterface.onFinish(OfflineGetter.getDirectorio());
+                SelfGetter.getDir(context, asyncInterface);
             }
         });
     }

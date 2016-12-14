@@ -3,6 +3,8 @@ package knf.animeflv.PlayBack;
 import android.app.Activity;
 import android.view.Menu;
 
+import com.connectsdk.device.DevicePicker;
+
 import es.munix.multidisplaycast.CastControlsActivity;
 import es.munix.multidisplaycast.CastManager;
 import es.munix.multidisplaycast.interfaces.CastListener;
@@ -23,6 +25,7 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
 
     public CastPlayBackManager(Activity activity) {
         this.activity = activity;
+        CastManager.getInstance().setTheme(ThemeUtils.isAmoled(activity) ? DevicePicker.Theme.DARK : DevicePicker.Theme.LIGTH);
         CastManager.getInstance().setDiscoveryManager();
         CastManager.getInstance().setCastListener(TAG, this);
         CastManager.getInstance().setPlayStatusListener(TAG, this);

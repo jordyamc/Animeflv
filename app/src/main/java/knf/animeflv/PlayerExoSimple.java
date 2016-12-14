@@ -16,7 +16,7 @@ import com.devbrackets.android.exomedia.ui.widget.EMVideoView;
 
 import java.util.HashMap;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.playerSources.VideoControlsEsp;
@@ -27,7 +27,8 @@ import xdroid.toaster.Toaster;
  */
 
 public class PlayerExoSimple extends AppCompatActivity implements OnPreparedListener,OnErrorListener,OnCompletionListener{
-    @Bind(R.id.video_view)EMVideoView videoView;
+    @BindView(R.id.video_view)
+    EMVideoView videoView;
     Intent intent;
     String ops;
     String url;

@@ -145,4 +145,8 @@ public class ThemeUtils {
     public static boolean isAmoled(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false);
     }
+
+    public static void setAmoled(Context context, boolean dark) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("is_amoled", dark).apply();
+    }
 }
