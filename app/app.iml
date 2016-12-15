@@ -146,6 +146,7 @@
     <orderEntry type="library" exported="" name="play-services-basement-10.0.0" level="project" />
     <orderEntry type="library" exported="" name="Encryption-1.4.0" level="project" />
     <orderEntry type="library" exported="" name="support-vector-drawable-25.1.0" level="project" />
+    <orderEntry type="library" exported="" name="nanohttpd-2.2.0" level="project" />
     <orderEntry type="library" exported="" name="butterknife-annotations-8.4.0" level="project" />
     <orderEntry type="library" exported="" name="butterknife-8.4.0" level="project" />
     <orderEntry type="library" exported="" name="fab-1.6.2" level="project" />

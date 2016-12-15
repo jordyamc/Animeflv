@@ -144,5 +144,9 @@
             android:defaultValue="false"
             android:key="betaSounds"
             android:title="Sonidos Beta" />
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="non"
+            android:key="web_server"
+            android:title="Web Server"/>
     </PreferenceCategory>
 </PreferenceScreen>

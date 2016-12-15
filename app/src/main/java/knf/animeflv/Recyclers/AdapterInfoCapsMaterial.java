@@ -226,6 +226,12 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                             if (!MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
                                 if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition())) && !ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition()))) {
                                     holder.tv_capitulo.setTextColor(getColor());
+                                    /*if (CastPlayBackManager.get(context).isDeviceConnected()){
+                                        String e=eids.get(holder.getAdapterPosition());
+                                        CastPlayBackManager.get(context).play(ServerManager.get().startStream(context,FileUtil.init(context).getFile(e)),e);
+                                    }else {
+                                        StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
+                                    }*/
                                     StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
                                 } else {
                                     showLoading(holder.ib_des);

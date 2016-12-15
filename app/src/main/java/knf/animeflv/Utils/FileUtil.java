@@ -124,6 +124,21 @@ public class FileUtil {
         }
     }
 
+    @Nullable
+    public static InputStream getInputStreamFromAccess(Context activity, File file) {
+        DocumentFile sdFile = FileUtil.init(activity).getDownloadFromAccess(file);
+        if (sdFile != null) {
+            try {
+                return activity.getContentResolver().openInputStream(sdFile.getUri());
+            } catch (FileNotFoundException e) {
+                return null;
+            }
+
+        } else {
+            return null;
+        }
+    }
+
     public static DocumentFile findFileFromAccess(@NonNull DocumentFile parent, String name) {
         DocumentFile file = parent.findFile(name);
         if (file == null) {
@@ -398,6 +413,14 @@ public class FileUtil {
 
     public File getFileNormal(String eid) {
         return new File(getSDPath() + "/Animeflv/download/" + eid.split("_")[0], eid.replace("E", "") + ".mp4");
+    }
+
+    public File getFile(String eid) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false)) {
+            return new File(getSDPath() + "/Animeflv/download/" + eid.split("_")[0], eid.replace("E", "") + ".mp4");
+        } else {
+            return new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + eid.split("_")[0], eid.replace("E", "") + ".mp4");
+        }
     }
 
     @Nullable

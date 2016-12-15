@@ -7,8 +7,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 150
-        versionName "3.8.5"
+        versionCode 151
+        versionName "3.8.6"
         multiDexEnabled true
     }
     buildTypes {
@@ -126,6 +126,8 @@ dependencies {
     compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
     //compile 'com.github.munix:Multi-Display-Cast:2.02'
     compile 'com.dropbox.core:dropbox-core-sdk:2.1.2'
+
+    compile 'org.nanohttpd:nanohttpd:2.2.0'
     compile files('src/SOMAAndroidSDK5.0.9.jar')
     compile project(':multidisplaycast')
 }

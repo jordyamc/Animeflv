@@ -212,7 +212,11 @@ public class SelfGetter {
                     String tid = infos.get(0).ownText();
                     String state = getState(infos.get(1).select("span").first().attr("class"));
                     String generos = infos.get(2).text().replace("Generos:", "");
-                    String start = infos.get(3).ownText();
+                    String start = "Sin Fecha";
+                    try {
+                        start = infos.get(3).ownText();
+                    } catch (Exception e) {
+                    }
                     String title = document.select("h1").first().text();
                     String sinopsis = Parser.InValidateSinopsis(document.select("div.sinopsis").text().trim());
                     Elements epis = document.select("ul.anime_episodios").first().select("li");

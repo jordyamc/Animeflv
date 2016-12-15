@@ -236,6 +236,9 @@
                     android:scheme="http"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".WebServer.ServerActivity"
+            android:label="@string/app_name"/>
 
         <receiver
             android:name=".Alarm"
