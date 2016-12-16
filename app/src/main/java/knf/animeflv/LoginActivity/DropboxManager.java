@@ -11,6 +11,7 @@ import com.dropbox.core.android.Auth;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.WriteMode;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -133,9 +134,17 @@ public class DropboxManager {
                     }
                     client.files().downloadBuilder("/favs.save")
                             .download(outputStream);
-                    JSONObject object = new JSONObject(FileUtil.getStringFromFile(tmpFile));
-                    if (callback != null)
-                        callback.onDownload(object, true);
+                    try {
+                        JSONObject object = new JSONObject(FileUtil.getStringFromFile(tmpFile));
+                        if (callback != null)
+                            callback.onDownload(object, true);
+                    } catch (JSONException e) {
+                        client.files().delete("/favs.save");
+                        updateFavs(context, null);
+                        if (callback != null)
+                            callback.onDownload(null, false);
+                    }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     if (callback != null)
