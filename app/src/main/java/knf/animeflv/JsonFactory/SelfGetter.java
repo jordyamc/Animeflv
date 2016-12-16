@@ -14,6 +14,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -63,6 +64,7 @@ public class SelfGetter {
                         }
                     }
                     object.put("lista", array);
+                    OfflineGetter.backupJson(object, OfflineGetter.inicio);
                     asyncInterface.onFinish(object.toString());
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -262,6 +264,7 @@ public class SelfGetter {
                     fobject.put("generos", generos);
                     fobject.put("episodios", array);
                     fobject.put("relacionados", j_rels);
+                    OfflineGetter.backupJson(fobject, new File(OfflineGetter.animecache, anime.getAidString() + ".txt"));
                     asyncInterface.onFinish(fobject.toString());
                 } catch (Exception e) {
                     asyncInterface.onFinish(OfflineGetter.getAnime(anime));

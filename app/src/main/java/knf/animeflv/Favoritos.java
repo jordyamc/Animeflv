@@ -64,6 +64,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     int keepAliveTime = 10;
     BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(maximumPoolSize);
     Executor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
+    private boolean isStarting = true;
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -164,7 +165,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     }
 
     public void ActualizarFavoritos() {
-        if (LoginServer.isLogedIn(this) && NetworkUtils.isNetworkAvailable()) {
+        if (LoginServer.isLogedIn(this) && NetworkUtils.isNetworkAvailable() && !isStarting) {
             FavSyncro.updateLocal(this, this);
         }
     }
@@ -244,6 +245,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         } else {
             Toast.makeText(context, "Error de red", Toast.LENGTH_SHORT).show();
         }
+        isStarting = false;
     }
 
     @Override

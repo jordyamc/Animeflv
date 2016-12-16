@@ -2,25 +2,20 @@ package knf.animeflv;
 
 import android.app.Activity;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.SyncHttpClient;
 
-import org.json.JSONObject;
-
-import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.msebera.android.httpclient.Header;
+import knf.animeflv.JsonFactory.BaseGetter;
+import knf.animeflv.JsonFactory.JsonTypes.ANIME;
+import knf.animeflv.JsonFactory.OfflineGetter;
 import knf.animeflv.Utils.FileUtil;
-import knf.animeflv.Utils.NoLogInterface;
 
 public class RequestFav extends AsyncTask<String,String,String> {
     InputStream is;
@@ -60,46 +55,19 @@ public class RequestFav extends AsyncTask<String,String,String> {
         final List<String> list = new ArrayList<String>();
         Log.e("Loading Favs", "Start");
         for (final String i : aids) {
-            final File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
-            if (!file.exists() || !FileUtil.isJSONValid(FileUtil.getStringFromFile(file.getPath()))) {
-                SyncHttpClient client = new SyncHttpClient();
-                client.setTimeout(5000);
-                client.setLogInterface(new NoLogInterface());
-                client.get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(i) + "&certificate=" + Parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
+            String off_json = OfflineGetter.getAnime(new ANIME(Integer.parseInt(i)));
+            if (!FileUtil.isJSONValid(off_json)) {
+                BaseGetter.getJson(context, new ANIME(Integer.parseInt(i)), new BaseGetter.AsyncInterface() {
                     @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        super.onSuccess(statusCode, headers, response);
-                        FileUtil.writeToFile(response.toString(), file);
-                        list.add(parser.getTit(response.toString()));
-                        updateDialog();
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                        super.onFailure(statusCode, headers, responseString, throwable);
-                        File file1 = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
-                        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt";
-                        if (file1.exists()) {
-                            String json = FileUtil.getStringFromFile(file_loc);
-                            if (FileUtil.isJSONValid(json)) {
-                                list.add(parser.getTit(json));
-                            } else {
-                                file1.delete();
-                            }
+                    public void onFinish(String json) {
+                        if (!json.equals("null")) {
+                            list.add(parser.getTit(json));
                         }
                         updateDialog();
                     }
                 });
             }else {
-                String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt";
-                if (file.exists()) {
-                    String json = FileUtil.getStringFromFile(file_loc);
-                    if (FileUtil.isJSONValid(json)) {
-                        list.add(parser.getTit(json));
-                    } else {
-                        file.delete();
-                    }
-                }
+                list.add(parser.getTit(off_json));
                 updateDialog();
             }
         }

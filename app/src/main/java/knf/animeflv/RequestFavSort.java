@@ -5,11 +5,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.AsyncTask;
-import android.os.Environment;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.SyncHttpClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,8 +30,10 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.JsonFactory.BaseGetter;
+import knf.animeflv.JsonFactory.JsonTypes.ANIME;
+import knf.animeflv.JsonFactory.OfflineGetter;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.ThemeUtils;
 
@@ -51,11 +50,11 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
     String[] favs;
     int prog = 0;
 
-    public RequestFavSort(Activity con, TaskType taskType,String[] favs) {
+    public RequestFavSort(Activity con, TaskType taskType, String[] favs) {
         call = (callback) con;
         this.context = con;
         this.taskType = taskType;
-        this.favs=favs;
+        this.favs = favs;
     }
 
     public static String byte2HexFormatted(byte[] arr) {
@@ -136,10 +135,10 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        dialog=new MaterialDialog.Builder(context)
-                .content("Reacomodando...\n"+"("+prog+"/"+favs.length+")")
+        dialog = new MaterialDialog.Builder(context)
+                .content("Reacomodando...\n" + "(" + prog + "/" + favs.length + ")")
                 .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                .progress(true,0)
+                .progress(true, 0)
                 .build();
         context.runOnUiThread(new Runnable() {
             @Override
@@ -153,55 +152,31 @@ public class RequestFavSort extends AsyncTask<String, List<AnimeClass>, List<Ani
     protected List<AnimeClass> doInBackground(String... params) {
         final List<AnimeClass> list = new ArrayList<AnimeClass>();
         for (final String i : favs) {
-            final File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
-            if (!file.exists() || !isJSONValid(getStringFromFile(file.getPath()))) {
-                new SyncHttpClient().get(new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + parser.getUrlAnimeCached(i) + "&certificate=" + getCertificateSHA1Fingerprint(), null, new JsonHttpResponseHandler() {
+            String off_json = OfflineGetter.getAnime(new ANIME(Integer.parseInt(i)));
+            if (!FileUtil.isJSONValid(off_json)) {
+                BaseGetter.getJson(context, new ANIME(Integer.parseInt(i)), new BaseGetter.AsyncInterface() {
                     @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        super.onSuccess(statusCode, headers, response);
-                        writeToFile(response.toString(), file);
-                        list.add(new AnimeClass(response.toString()));
-                        updateDialog();
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                        super.onFailure(statusCode, headers, responseString, throwable);
-                        File file1 = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt");
-                        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt";
-                        if (file1.exists()) {
-                            String json = getStringFromFile(file_loc);
-                            if (FileUtil.isJSONValid(json)) {
-                                list.add(new AnimeClass(json));
-                            } else {
-                                file1.delete();
-                            }
+                    public void onFinish(String json) {
+                        if (!json.equals("null")) {
+                            list.add(new AnimeClass(json));
                         }
                         updateDialog();
                     }
                 });
             } else {
-                String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + i + ".txt";
-                if (file.exists()) {
-                    String json = getStringFromFile(file_loc);
-                    if (FileUtil.isJSONValid(json)) {
-                        list.add(new AnimeClass(json));
-                    } else {
-                        file.delete();
-                    }
-                }
+                list.add(new AnimeClass(off_json));
                 updateDialog();
             }
         }
         return list;
     }
 
-    private void updateDialog(){
+    private void updateDialog() {
         context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 prog++;
-                dialog.setContent("Reacomodando...\n"+"("+prog+"/"+favs.length+")");
+                dialog.setContent("Reacomodando...\n" + "(" + prog + "/" + favs.length + ")");
             }
         });
     }
