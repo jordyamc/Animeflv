@@ -34,28 +34,22 @@ public class StreamManager {
         String aid = data[0];
         String semi = eid.replace("E", "");
         String cap = data[1].replace("E", "");
-        HistoryHelper.addToList(context,aid,new Parser().getTitCached(aid),cap);
+        HistoryHelper.addToList(context, aid, new Parser().getTitCached(aid), cap);
         File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
         File sd = new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
-        int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_video", "0"));
-        Log.d("Play type", String.valueOf(type));
-        switch (type) {
+        switch (Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_video", "0"))) {
             case 0:
                 if (file.exists()) {
                     StreamManager.internal(context).Play(eid, file);
-                } else {
-                    if (sd.exists()) {
-                        StreamManager.internal(context).Play(eid, sd);
-                    }
+                } else if (sd.exists()) {
+                    StreamManager.internal(context).Play(eid, sd);
                 }
                 break;
             case 1:
                 if (file.exists()) {
                     StreamManager.external(context).Play(eid, file);
-                } else {
-                    if (sd.exists()) {
-                        StreamManager.external(context).Play(eid, sd);
-                    }
+                } else if (sd.exists()) {
+                    StreamManager.external(context).Play(eid, sd);
                 }
                 break;
 
@@ -66,7 +60,7 @@ public class StreamManager {
         String[] data = eid.replace("E", "").split("_");
         String aid = data[0];
         String cap = data[1].replace("E", "");
-        HistoryHelper.addToList(context,aid,new Parser().getTitCached(aid),cap);
+        HistoryHelper.addToList(context, aid, new Parser().getTitCached(aid), cap);
         int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
         Log.d("Streaming", PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
         switch (type) {
@@ -80,8 +74,8 @@ public class StreamManager {
     }
 
     private static void StreamingExtbyURL(Activity context, String eid, String url) {
-        Intent i = (new Intent(Intent.ACTION_VIEW, Uri.parse(url)).setDataAndType(Uri.parse(url),"video/mp4"));
-        if (getDefaultId(context,i).startsWith("com.mxtech.videoplayer")) {
+        Intent i = (new Intent(Intent.ACTION_VIEW, Uri.parse(url)).setDataAndType(Uri.parse(url), "video/mp4"));
+        if (getDefaultId(context, i).startsWith("com.mxtech.videoplayer")) {
             StreamManager.mx(context).Stream(eid, url);
         } else {
             StreamManager.external(context).Stream(eid, url);
@@ -89,12 +83,12 @@ public class StreamManager {
         }
     }
 
-    private static String getDefaultId(Activity context,Intent i){
+    private static String getDefaultId(Activity context, Intent i) {
         try {
             PackageManager pm = context.getPackageManager();
             final ResolveInfo mInfo = pm.resolveActivity(i, 0);
             return mInfo.activityInfo.applicationInfo.processName;
-        }catch (Exception e){
+        } catch (Exception e) {
             return "null";
         }
     }

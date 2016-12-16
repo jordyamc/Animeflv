@@ -266,6 +266,10 @@
             android:label="@string/app_name"/>
 
         <activity
+            android:name=".info.InfoFragments"
+            android:label="@string/app_name"/>
+
+        <activity
             android:name="com.dropbox.core.android.AuthActivity"
             android:configChanges="orientation|keyboard"
             android:launchMode="singleTask">

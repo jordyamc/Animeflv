@@ -176,20 +176,25 @@ public class InfoNewMaterial extends AppCompatActivity implements LoginServer.ca
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isInInfo) {
-                    button.setImageResource(R.drawable.information);
-                    nestedScrollView.setVisibility(View.GONE);
-                    frameLayout.setVisibility(View.VISIBLE);
-                    button_list.show(true);
-                    barLayout.setExpanded(false, true);
-                    isInInfo = false;
-                } else {
-                    button.setImageResource(R.drawable.playlist);
-                    nestedScrollView.setVisibility(View.VISIBLE);
-                    frameLayout.setVisibility(View.GONE);
-                    scrollToTop();
-                    isInInfo = true;
-                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isInInfo) {
+                            button.setImageResource(R.drawable.information);
+                            nestedScrollView.setVisibility(View.GONE);
+                            frameLayout.setVisibility(View.VISIBLE);
+                            button_list.show(true);
+                            barLayout.setExpanded(false, true);
+                            isInInfo = false;
+                        } else {
+                            button.setImageResource(R.drawable.playlist);
+                            nestedScrollView.setVisibility(View.VISIBLE);
+                            frameLayout.setVisibility(View.GONE);
+                            scrollToTop();
+                            isInInfo = true;
+                        }
+                    }
+                });
             }
         });
         getSupportActionBar().setDisplayShowHomeEnabled(true);

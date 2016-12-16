@@ -216,6 +216,7 @@ public class SelfGetter {
                     try {
                         start = infos.get(3).ownText();
                     } catch (Exception e) {
+                        Log.e("Anime Self Getter", "No End Date");
                     }
                     String title = document.select("h1").first().text();
                     String sinopsis = Parser.InValidateSinopsis(document.select("div.sinopsis").text().trim());
@@ -224,7 +225,10 @@ public class SelfGetter {
                     for (Element ep : epis) {
                         JSONObject object = new JSONObject();
                         String name = ep.select("a").first().ownText().trim();
-                        String num = name.substring(name.lastIndexOf(" ") + 1);
+                        String num = name.replace(title, "").trim();
+                        if (num.contains(":")) {
+                            num = num.replace(" ", "").split(":")[0];
+                        }
                         object.put("num", num);
                         object.put("eid", aid + "_" + num + "E");
                         array.put(object);

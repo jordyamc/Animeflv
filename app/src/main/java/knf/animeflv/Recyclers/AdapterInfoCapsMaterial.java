@@ -49,7 +49,6 @@ import knf.animeflv.Utils.UpdateUtil;
 import knf.animeflv.Utils.UrlUtils;
 import knf.animeflv.Utils.eNums.DownloadTask;
 import knf.animeflv.Utils.eNums.UpdateState;
-import knf.animeflv.info.InfoNewMaterial;
 import xdroid.toaster.Toaster;
 
 /**
@@ -101,14 +100,23 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     @Override
     public void onBindViewHolder(final AdapterInfoCapsMaterial.ViewHolder holder, int position) {
         SetUpWeb(holder.web, holder);
-        final String item = capitulo.get(position).replace("Capitulo ", "").trim();
         if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
             showDelete(holder.ib_des);
             showPlay(holder.ib_ver);
+            if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition())))
+                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition()));
         } else {
             if (ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition()))) {
                 showDelete(holder.ib_des);
                 showPlay(holder.ib_ver);
+            } else if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
+                if (CastPlayBackManager.get(context).getCastingEid().equals(eids.get(holder.getAdapterPosition()))) {
+                    showDownload(holder.ib_des);
+                    showCastPlay(holder.ib_ver);
+                } else {
+                    showCloudPlay(holder.ib_ver);
+                    holder.ib_des.setImageResource(R.drawable.ic_waiting);
+                }
             } else {
                 showCloudPlay(holder.ib_ver);
                 showDownload(holder.ib_des);
@@ -130,21 +138,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
         if (SeenManager.get(context).isSeen(eids.get(holder.getAdapterPosition()))) {
             holder.tv_capitulo.setTextColor(getColor());
         }
-        if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
-            if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
-                if (CastPlayBackManager.get(context).getCastingEid().equals(eids.get(holder.getAdapterPosition()))) {
-                    showDownload(holder.ib_des);
-                    showCastPlay(holder.ib_ver);
-                } else {
-                    showCloudPlay(holder.ib_ver);
-                    holder.ib_des.setImageResource(R.drawable.ic_waiting);
-                }
-            } else {
-                showPlay(holder.ib_ver);
-                showDelete(holder.ib_des);
-                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition()));
-            }
-        }
+
         holder.ib_des.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -325,7 +319,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
 
     private void showLoading(final ImageButton button) {
         MainStates.setProcessing(true, null);
-        ((InfoNewMaterial) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.setImageResource(R.drawable.ic_warning);
@@ -336,7 +330,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
 
     private void showDownload(final ImageButton button) {
         MainStates.setProcessing(false, null);
-        ((InfoNewMaterial) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.setImageResource(R.drawable.ic_get_r);
@@ -347,7 +341,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
 
     private void showDelete(final ImageButton button) {
         MainStates.setProcessing(false, null);
-        ((InfoNewMaterial) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.setImageResource(R.drawable.ic_borrar_r);
@@ -366,7 +360,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     }
 
     private void showCloudPlay(final ImageButton button) {
-        ((InfoNewMaterial) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.setImageResource(R.drawable.ic_cloud_play);
@@ -375,7 +369,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     }
 
     private void showPlay(final ImageButton button) {
-        ((InfoNewMaterial) context).runOnUiThread(new Runnable() {
+        context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.setImageResource(R.drawable.ic_play);

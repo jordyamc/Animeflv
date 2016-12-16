@@ -10,8 +10,8 @@ import es.munix.multidisplaycast.CastManager;
 import es.munix.multidisplaycast.interfaces.CastListener;
 import es.munix.multidisplaycast.interfaces.PlayStatusListener;
 import knf.animeflv.Parser;
+import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.TaskType;
-import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
@@ -58,7 +58,7 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
     public void play(String url, String eid) {
         if (isDeviceConnected()) {
             castingEid = eid;
-            FileUtil.init(activity).setSeenState(eid, true);
+            SeenManager.get(activity).setSeenStateUpload(eid, true);
             String[] semi = eid.replace("E", "").split("_");
             String aid = semi[0];
             String num = semi[1];

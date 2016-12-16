@@ -252,7 +252,12 @@ public class newMain extends AppCompatActivity implements
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(listener);
-        if (!DirFile.exists()) ServerGetter.backupDir(this);
+        if (!DirFile.exists()) {
+            ServerGetter.backupDir(this);
+        } else if (!FileUtil.isJSONValid(FileUtil.getStringFromFile(DirFile))) {
+            DirFile.delete();
+            ServerGetter.backupDir(this);
+        }
     }
 
     private void setUpDrawer() {

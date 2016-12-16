@@ -18,10 +18,12 @@ import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
 import knf.animeflv.Parser;
 import knf.animeflv.TaskType;
+import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.NoLogInterface;
 
 
 public class ServerGetter {
+    private static int TIMEOUT = 3000;
     private static String getInicio(Context context) {
         return new Parser().getInicioUrl(TaskType.NORMAL, context);
     }
@@ -46,7 +48,7 @@ public class ServerGetter {
         AsyncHttpClient asyncHttpClient = getClient();
         asyncHttpClient.setLogInterface(new NoLogInterface());
         asyncHttpClient.setLoggingEnabled(false);
-        asyncHttpClient.setResponseTimeout(5000);
+        asyncHttpClient.setResponseTimeout(TIMEOUT);
         asyncHttpClient.get(getInicio(context) + "?certificate=" + Parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -73,7 +75,7 @@ public class ServerGetter {
         AsyncHttpClient asyncHttpClient = getClient();
         asyncHttpClient.setLogInterface(new NoLogInterface());
         asyncHttpClient.setLoggingEnabled(false);
-        asyncHttpClient.setResponseTimeout(5000);
+        asyncHttpClient.setResponseTimeout(TIMEOUT);
         asyncHttpClient.get(getDirectorio(context) + "?certificate=" + Parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -94,7 +96,7 @@ public class ServerGetter {
         AsyncHttpClient asyncHttpClient = getClient();
         asyncHttpClient.setLogInterface(new NoLogInterface());
         asyncHttpClient.setLoggingEnabled(false);
-        asyncHttpClient.setResponseTimeout(5000);
+        asyncHttpClient.setResponseTimeout(TIMEOUT);
         asyncHttpClient.get(getAnime(context, anime), null, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -121,7 +123,7 @@ public class ServerGetter {
         AsyncHttpClient asyncHttpClient = getClient();
         asyncHttpClient.setLogInterface(new NoLogInterface());
         asyncHttpClient.setLoggingEnabled(false);
-        asyncHttpClient.setResponseTimeout(5000);
+        asyncHttpClient.setResponseTimeout(TIMEOUT);
         asyncHttpClient.get(getInicio(context) + "?certificate=" + Parser.getCertificateSHA1Fingerprint(context) + "&url=" + download.url, null, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -153,7 +155,7 @@ public class ServerGetter {
         AsyncHttpClient asyncHttpClient = getClient();
         asyncHttpClient.setLogInterface(new NoLogInterface());
         asyncHttpClient.setLoggingEnabled(false);
-        asyncHttpClient.setResponseTimeout(5000);
+        asyncHttpClient.setResponseTimeout(TIMEOUT);
         asyncHttpClient.get(new Parser().getBaseUrl(TaskType.NORMAL, context) + "emisionlist.php", null, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -172,21 +174,34 @@ public class ServerGetter {
     }
 
     public static void backupDir(final Context context) {
-        AsyncHttpClient asyncHttpClient = getClient();
-        asyncHttpClient.setLogInterface(new NoLogInterface());
-        asyncHttpClient.setLoggingEnabled(false);
-        asyncHttpClient.setResponseTimeout(5000);
-        asyncHttpClient.get(getDirectorio(context) + "?certificate=" + Parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                OfflineGetter.backupJson(response, OfflineGetter.directorio);
-            }
+        if (NetworkUtils.isNetworkAvailable()) {
+            AsyncHttpClient asyncHttpClient = getClient();
+            asyncHttpClient.setLogInterface(new NoLogInterface());
+            asyncHttpClient.setLoggingEnabled(false);
+            asyncHttpClient.setResponseTimeout(TIMEOUT);
+            asyncHttpClient.get(getDirectorio(context) + "?certificate=" + Parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    super.onSuccess(statusCode, headers, response);
+                    OfflineGetter.backupJson(response, OfflineGetter.directorio);
+                }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
-            }
-        });
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    super.onFailure(statusCode, headers, responseString, throwable);
+                    SelfGetter.getDir(context, new BaseGetter.AsyncInterface() {
+                        @Override
+                        public void onFinish(String json) {
+                            try {
+                                if (!json.equals("null"))
+                                    OfflineGetter.backupJson(new JSONObject(json), OfflineGetter.directorio);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            });
+        }
     }
 }

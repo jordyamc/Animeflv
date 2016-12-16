@@ -8,7 +8,7 @@ import java.io.File;
 
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.Parser;
-import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Seen.SeenManager;
 
 /**
  * Created by Jordy on 04/03/2016.
@@ -29,7 +29,7 @@ public class InternalStream {
         interno.putExtra("title", parser.getTitCached(aid) + " " + numero);
         interno.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(interno);
-        FileUtil.init(context).setSeenState(eid, true);
+        SeenManager.get(context).setSeenStateUpload(eid, true);
     }
 
     public void Stream(String eid, String url, CookieConstructor constructor) {
@@ -43,7 +43,7 @@ public class InternalStream {
         intent.putExtras(bundle);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
-        FileUtil.init(context).setSeenState(eid, true);
+        SeenManager.get(context).setSeenStateUpload(eid, true);
     }
 
     public void Play(String eid, File file) {
@@ -54,6 +54,6 @@ public class InternalStream {
         interno.putExtra("title", parser.getTitCached(aid) + " " + numero);
         interno.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(interno);
-        FileUtil.init(context).setSeenState(eid, true);
+        SeenManager.get(context).setSeenStateUpload(eid, true);
     }
 }

@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import knf.animeflv.FavSyncro;
 import knf.animeflv.Utils.ExecutorManager;
 
 
@@ -72,6 +73,27 @@ public class SeenManager {
                         db.delete(TABLE_NAME, KEY_EID + "='" + eid + "'", null);
                     }
                 }
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    public void setSeenStateUpload(final String eid, final boolean seen) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                if (seen) {
+                    if (!isSeenNoClose(eid)) {
+                        ContentValues values = new ContentValues();
+                        values.put(KEY_EID, eid);
+                        db.insert(TABLE_NAME, null, values);
+                    }
+                } else {
+                    if (isSeenNoClose(eid)) {
+                        db.delete(TABLE_NAME, KEY_EID + "='" + eid + "'", null);
+                    }
+                }
+                FavSyncro.updateServer(context);
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());

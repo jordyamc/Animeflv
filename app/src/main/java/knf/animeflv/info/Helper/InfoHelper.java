@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.view.View;
 
-import knf.animeflv.info.InfoNewMaterial;
+import knf.animeflv.info.InfoFragments;
 
 /**
  * Created by Jordy on 09/06/2016.
@@ -23,7 +23,7 @@ public class InfoHelper {
             for (BundleItem item : items) {
                 bundleInfo.putString(item.key, item.value);
             }
-            Intent intent = new Intent(activity, InfoNewMaterial.class);
+            Intent intent = new Intent(activity, InfoFragments.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtras(bundleInfo);
             activity.startActivity(intent, compat.toBundle());
@@ -32,7 +32,7 @@ public class InfoHelper {
             for (BundleItem item : items) {
                 bundleInfo.putString(item.key, item.value);
             }
-            Intent intent = new Intent(activity, InfoNewMaterial.class);
+            Intent intent = new Intent(activity, InfoFragments.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtras(bundleInfo);
             activity.startActivity(intent);
@@ -47,7 +47,7 @@ public class InfoHelper {
             for (BundleItem item : items) {
                 bundleInfo.putString(item.key, item.value);
             }
-            Intent intent = new Intent(activity, InfoNewMaterial.class);
+            Intent intent = new Intent(activity, InfoFragments.class);
             intent.addFlags(flag);
             intent.putExtras(bundleInfo);
             activity.startActivity(intent, compat.toBundle());
@@ -56,7 +56,7 @@ public class InfoHelper {
             for (BundleItem item : items) {
                 bundleInfo.putString(item.key, item.value);
             }
-            Intent intent = new Intent(activity, InfoNewMaterial.class);
+            Intent intent = new Intent(activity, InfoFragments.class);
             intent.addFlags(flag);
             intent.putExtras(bundleInfo);
             activity.startActivity(intent);
@@ -64,10 +64,10 @@ public class InfoHelper {
     }
 
     public static class BundleItem {
-        public String key;
-        public String value;
         public static final String KEY_AID="aid";
         public static final String KEY_TITLE="title";
+        public String key;
+        public String value;
 
         public BundleItem(String key, String value) {
             this.key = key;
