@@ -13,10 +13,15 @@ import knf.animeflv.Utils.NetworkUtils;
 public class BaseGetter {
     public static void getJson(Context context, INICIO inicio, AsyncInterface asyncInterface) {
         if (NetworkUtils.isNetworkAvailable()) {
-            ServerGetter.getInicio(context, asyncInterface);
+            ServerGetter.getInicio(context, inicio, asyncInterface);
         } else {
-            asyncInterface.onFinish(OfflineGetter.getInicio());
+            if (inicio.type == 0) {
+                asyncInterface.onFinish(OfflineGetter.getInicio());
+            } else {
+                asyncInterface.onFinish("null");
+            }
         }
+
     }
 
     public static void getJson(Context context, DIRECTORIO directorio, AsyncInterface asyncInterface) {

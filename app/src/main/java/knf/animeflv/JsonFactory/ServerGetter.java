@@ -16,6 +16,7 @@ import java.io.File;
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
+import knf.animeflv.JsonFactory.JsonTypes.INICIO;
 import knf.animeflv.Parser;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.NetworkUtils;
@@ -24,6 +25,7 @@ import knf.animeflv.Utils.NoLogInterface;
 
 public class ServerGetter {
     private static int TIMEOUT = 3000;
+
     private static String getInicio(Context context) {
         return new Parser().getInicioUrl(TaskType.NORMAL, context);
     }
@@ -44,7 +46,7 @@ public class ServerGetter {
         }
     }
 
-    public static void getInicio(final Context context, final BaseGetter.AsyncInterface asyncInterface) {
+    public static void getInicio(final Context context, final INICIO inicio, final BaseGetter.AsyncInterface asyncInterface) {
         AsyncHttpClient asyncHttpClient = getClient();
         asyncHttpClient.setLogInterface(new NoLogInterface());
         asyncHttpClient.setLoggingEnabled(false);
@@ -53,20 +55,21 @@ public class ServerGetter {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
-                OfflineGetter.backupJson(response, OfflineGetter.inicio);
+                if (inicio.type == 0)
+                    OfflineGetter.backupJson(response, OfflineGetter.inicio);
                 asyncInterface.onFinish(response.toString());
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                SelfGetter.getInicio(context, asyncInterface);
+                SelfGetter.getInicio(context, inicio, asyncInterface);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
-                SelfGetter.getInicio(context, asyncInterface);
+                SelfGetter.getInicio(context, inicio, asyncInterface);
             }
         });
     }

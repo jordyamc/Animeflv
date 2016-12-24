@@ -22,6 +22,7 @@ import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
+import knf.animeflv.JsonFactory.JsonTypes.INICIO;
 import knf.animeflv.Parser;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
@@ -31,13 +32,12 @@ public class SelfGetter {
     private static final int TIMEOUT = 10000;
     private static final String ua = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/5.7.15533.1010 Safari/537.36";
 
-    public static void getInicio(final Context context, final BaseGetter.AsyncInterface asyncInterface) {
+    public static void getInicio(final Context context, final INICIO inicio, final BaseGetter.AsyncInterface asyncInterface) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
                     Document main = Jsoup.connect("http://animeflv.net").userAgent(ua).cookie("dev", "1").timeout(TIMEOUT).get();
-                    Element lista = main.getElementsByClass("ultimos_epis").first();
                     Elements caps = main.select("div.not");
                     JSONObject object = new JSONObject();
                     object.put("version", context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName + "-Internal_Api");
@@ -64,11 +64,16 @@ public class SelfGetter {
                         }
                     }
                     object.put("lista", array);
-                    OfflineGetter.backupJson(object, OfflineGetter.inicio);
+                    if (inicio.type == 0)
+                        OfflineGetter.backupJson(object, OfflineGetter.inicio);
                     asyncInterface.onFinish(object.toString());
                 } catch (Exception e) {
                     e.printStackTrace();
-                    asyncInterface.onFinish(OfflineGetter.getInicio());
+                    if (inicio.type != 0) {
+                        asyncInterface.onFinish("null");
+                    } else {
+                        asyncInterface.onFinish(OfflineGetter.getInicio());
+                    }
                 }
                 return null;
             }

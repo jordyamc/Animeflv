@@ -50,7 +50,7 @@ public class DropboxManager {
                         } else {
                             preferences.edit().putString(KEY_DROPBOX, accessToken).apply();
                             DropboxClientFactory.init(accessToken);
-                            FavSyncro.updateServer(((LoginUser) context));
+                            FavSyncro.updateServer(context);
                             callback.onLogin(true);
                         }
                 }

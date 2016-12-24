@@ -50,7 +50,7 @@ public class startBackground {
     public static void compareNots(final Context context) {
         if (NetworkUtils.isNetworkAvailable()) {
             try {
-                BaseGetter.getJson(context, new INICIO(), new BaseGetter.AsyncInterface() {
+                BaseGetter.getJson(context, new INICIO(1), new BaseGetter.AsyncInterface() {
                     @Override
                     public void onFinish(String json) {
                         try {

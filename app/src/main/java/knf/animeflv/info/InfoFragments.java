@@ -36,8 +36,6 @@ import android.widget.Spinner;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,11 +50,11 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cz.msebera.android.httpclient.Header;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.FavSyncro;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
+import knf.animeflv.JsonFactory.JsonTypes.DIRECTORIO;
 import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
@@ -276,42 +274,15 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
 
     private void getJsonfromApi() {
         if (new Parser().getTitCached(aid).equals("null")) {
-            AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-            asyncHttpClient.setResponseTimeout(10000);
-            asyncHttpClient.get(parser.getDirectorioUrl(TaskType.NORMAL, context) + "?certificate=" + Parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
+            BaseGetter.getJson(this, new DIRECTORIO(), new BaseGetter.AsyncInterface() {
                 @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    super.onSuccess(statusCode, headers, response);
-                    loadDir(response.toString());
-                }
-
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                    super.onSuccess(statusCode, headers, response);
-                    loadDir(response.toString());
-                    Toaster.toast("No hay cache para mostrar");
-                    finish();
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                    Toaster.toast("No hay cache para mostrar");
-                    finish();
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                    Toaster.toast("No hay cache para mostrar");
-                    finish();
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    super.onFailure(statusCode, headers, responseString, throwable);
-                    Toaster.toast("No hay cache para mostrar");
-                    finish();
+                public void onFinish(String json) {
+                    if (new Parser().getTitCached(aid).equals("null")) {
+                        Toaster.toast("Error al actualizar directorio");
+                        finish();
+                    } else {
+                        getJsonfromApi();
+                    }
                 }
             });
         } else {
@@ -437,8 +408,10 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     private void addFragments(int position) {
         FragmentTransaction transaction = getManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        transaction.add(R.id.root, fragmentCaps, "caps");
-        transaction.add(R.id.root, fragmentInfo, "info");
+        if (!fragmentCaps.isAdded())
+            transaction.add(R.id.root, fragmentCaps, "caps");
+        if (!fragmentInfo.isAdded())
+            transaction.add(R.id.root, fragmentInfo, "info");
         transaction.commit();
         transaction = getManager().beginTransaction();
         if (position == -1) {
