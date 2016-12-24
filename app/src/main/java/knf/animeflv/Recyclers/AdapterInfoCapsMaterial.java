@@ -218,7 +218,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                     } else {
                         if (!MainStates.isProcessing()) {
                             if (!MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
-                                if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition())) && !ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition()))) {
+                                if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
                                     holder.tv_capitulo.setTextColor(getColor());
                                     /*if (CastPlayBackManager.get(context).isDeviceConnected()){
                                         String e=eids.get(holder.getAdapterPosition());
@@ -227,6 +227,8 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                         StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
                                     }*/
                                     StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
+                                } else if (ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition()))) {
+                                    Toaster.toast("Descarga en proceso");
                                 } else {
                                     showLoading(holder.ib_des);
                                     searchStream(holder);
