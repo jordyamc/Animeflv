@@ -141,11 +141,15 @@ public class FragmentInfo extends Fragment {
             activity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (position == -1) {
-                        Animation bottomUp = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_from_bottom);
-                        nestedScrollView.startAnimation(bottomUp);
+                    try {
+                        if (position == -1) {
+                            Animation bottomUp = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_from_bottom);
+                            nestedScrollView.startAnimation(bottomUp);
+                        }
+                        nestedScrollView.setVisibility(View.VISIBLE);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    nestedScrollView.setVisibility(View.VISIBLE);
                 }
             });
         } catch (Exception e) {

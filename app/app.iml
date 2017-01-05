@@ -84,6 +84,8 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental-safeguard" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/multi-dex" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/pre-dexed" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/shaders" />
@@ -115,6 +117,7 @@
     <orderEntry type="library" exported="" name="infinity-loading-0.4" level="project" />
     <orderEntry type="library" exported="" name="android-gif-drawable-1.1.7" level="project" />
     <orderEntry type="library" exported="" name="materialize-1.0.0" level="project" />
+    <orderEntry type="library" exported="" name="advrecyclerview-0.10.2" level="project" />
     <orderEntry type="library" exported="" name="google-material-typeface-2.2.0.3.original" level="project" />
     <orderEntry type="library" exported="" name="audiowidget-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="httpclient-4.3.6" level="project" />
@@ -127,6 +130,7 @@
     <orderEntry type="library" exported="" name="DownloadProgressBar-1.1" level="project" />
     <orderEntry type="library" exported="" name="discrete-seekbar-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="SOMAAndroidSDK5.0.9" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="multidex-instrumentation-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
     <orderEntry type="library" exported="" name="jackson-core-2.7.4" level="project" />
@@ -168,7 +172,6 @@
     <orderEntry type="library" exported="" name="library-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="AndroidUtilities-1.6.0" level="project" />
     <orderEntry type="library" exported="" name="palette-v7-25.1.0" level="project" />
-    <orderEntry type="library" exported="" name="advrecyclerview-0.9.3" level="project" />
     <orderEntry type="library" exported="" name="support-core-utils-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="guava-19.0" level="project" />
     <orderEntry type="library" exported="" name="exoplayer-r1.5.9" level="project" />
@@ -177,6 +180,7 @@
     <orderEntry type="library" exported="" name="community-material-typeface-1.7.22.1" level="project" />
     <orderEntry type="library" exported="" name="animated-vector-drawable-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="utils-v4-1.6.0" level="project" />
+    <orderEntry type="library" exported="" name="multidex-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="xdroid-toaster-0.0.10" level="project" />
     <orderEntry type="library" exported="" name="material-design-iconic-typeface-2.2.0.2" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-25.1.0" level="project" />

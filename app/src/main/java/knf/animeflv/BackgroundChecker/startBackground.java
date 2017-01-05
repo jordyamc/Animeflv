@@ -75,7 +75,7 @@ public class startBackground {
                 client.setConnectTimeout(15000);
                 client.setLogInterface(new NoLogInterface());
                 client.setLoggingEnabled(false);
-                client.get(Keys.Url.VERSION_INT_TEST, null, new TextHttpResponseHandler() {
+                client.get(Keys.Url.VERSION_INT, null, new TextHttpResponseHandler() {
                     @Override
                     public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                         startUpdate(context, "");

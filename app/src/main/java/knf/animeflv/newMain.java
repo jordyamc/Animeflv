@@ -29,6 +29,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
@@ -42,7 +43,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -121,7 +121,7 @@ import knf.animeflv.Utils.UtilNotBlocker;
 import knf.animeflv.Utils.UtilSound;
 import knf.animeflv.Utils.admin.adminListeners;
 import knf.animeflv.Utils.objects.User;
-import knf.animeflv.WaitList.WaitActivity;
+import knf.animeflv.WaitList.WaitList;
 import knf.animeflv.history.HistoryActivity;
 import xdroid.toaster.Toaster;
 
@@ -170,10 +170,10 @@ public class newMain extends AppCompatActivity implements
     private AdapterMain main;
     private AdapterMainNoGIF mainNo;
     private Switch nots;
-    private Spinner sonidos;
-    private Spinner conexion;
-    private Spinner repVid;
-    private Spinner repStream;
+    private AppCompatSpinner sonidos;
+    private AppCompatSpinner conexion;
+    private AppCompatSpinner repVid;
+    private AppCompatSpinner repStream;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
     private Handler EmisionHandler = new Handler();
     Runnable EmisionWaiting = new Runnable() {
@@ -448,7 +448,7 @@ public class newMain extends AppCompatActivity implements
                                 result.closeDrawer();
                                 break;
                             case 4:
-                                startActivity(new Intent(context, WaitActivity.class));
+                                startActivity(new Intent(context, WaitList.class));
                                 result.setSelection(0, false);
                                 result.closeDrawer();
                                 break;
@@ -531,6 +531,7 @@ public class newMain extends AppCompatActivity implements
     }
 
     private void startSeenSync() {
+        Log.e("Seen Sync", "Start");
         final MaterialDialog p = new MaterialDialog.Builder(this)
                 .content("Actualizando vistos")
                 .cancelable(false)
@@ -927,7 +928,7 @@ public class newMain extends AppCompatActivity implements
             if (versionCode > ant_ver) {
                 PreferenceManager.getDefaultSharedPreferences(this).edit().putInt(Keys.Conf.CURRENT_VERSION, versionCode).apply();
                 new MaterialDialog.Builder(this)
-                        .title(versionName)
+                        .title("Versión " + versionName)
                         .titleGravity(GravityEnum.CENTER)
                         .content("Nueva version detectada!!!")
                         .positiveText("changelog")
@@ -1125,10 +1126,6 @@ public class newMain extends AppCompatActivity implements
 
     public String getInicio() {
         return parser.getInicioUrl(normal, context);
-    }
-
-    public String getInicioSec() {
-        return parser.getInicioUrl(secundario, context);
     }
 
     public String getDirectorio() {
@@ -1329,110 +1326,116 @@ public class newMain extends AppCompatActivity implements
     }
 
     private void showFastConf() {
-        RapConf = new MaterialDialog.Builder(context)
-                .title("Configuracion rapida")
-                .titleGravity(GravityEnum.CENTER)
-                .customView(R.layout.rap_conf, false)
-                .positiveText("CONTINUAR")
-                .autoDismiss(false)
-                .cancelable(false)
-                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                .callback(new MaterialDialog.ButtonCallback() {
-                    @Override
-                    public void onPositive(MaterialDialog dialog) {
-                        super.onPositive(dialog);
-                        if (sonidos.getSelectedItemPosition() > 0 && conexion.getSelectedItemPosition() > 0 && repVid.getSelectedItemPosition() > 0 && repStream.getSelectedItemPosition() > 0) {
-                            toast("Se pueden volver a modificar desde configuracion");
-                            RapConf.dismiss();
-                            parser.saveBackup(context);
-                            openSingInDialog();
-                        } else {
-                            toast("Falta cambiar configuraciones!!!");
+        try {
+            RapConf = new MaterialDialog.Builder(context)
+                    .title("Configuracion rapida")
+                    .titleGravity(GravityEnum.CENTER)
+                    .customView(R.layout.rap_conf, false)
+                    .positiveText("CONTINUAR")
+                    .autoDismiss(false)
+                    .cancelable(false)
+                    .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                    .callback(new MaterialDialog.ButtonCallback() {
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            super.onPositive(dialog);
+                            if (sonidos.getSelectedItemPosition() > 0 && conexion.getSelectedItemPosition() > 0 && repVid.getSelectedItemPosition() > 0 && repStream.getSelectedItemPosition() > 0) {
+                                toast("Se pueden volver a modificar desde configuracion");
+                                RapConf.dismiss();
+                                parser.saveBackup(context);
+                                openSingInDialog();
+                            } else {
+                                toast("Falta cambiar configuraciones!!!");
+                            }
                         }
+                    }).build();
+            nots = (Switch) RapConf.getCustomView().findViewById(R.id.switch_not_conf);
+            sonidos = (AppCompatSpinner) RapConf.getCustomView().findViewById(R.id.spinner_sonido_conf);
+            conexion = (AppCompatSpinner) RapConf.getCustomView().findViewById(R.id.spinner_conexion_conf);
+            repVid = (AppCompatSpinner) RapConf.getCustomView().findViewById(R.id.spinner_rep_vid);
+            repStream = (AppCompatSpinner) RapConf.getCustomView().findViewById(R.id.spinner_rep_stream);
+            nots.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", true).apply();
+                    } else {
+                        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", false).apply();
                     }
-                }).build();
-        nots = (Switch) RapConf.getCustomView().findViewById(R.id.switch_not_conf);
-        sonidos = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_sonido_conf);
-        conexion = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_conexion_conf);
-        repVid = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_rep_vid);
-        repStream = (Spinner) RapConf.getCustomView().findViewById(R.id.spinner_rep_stream);
-        nots.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", true).apply();
-                } else {
-                    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", false).apply();
                 }
-            }
-        });
-        List<String> sonido = new ArrayList<>();
-        sonido.add("Selecciona...");
-        sonido.addAll(Arrays.asList(UtilSound.getSoundsNameList()));
-        ArrayAdapter<String> adapterSonidos = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, sonido);
-        sonidos.setAdapter(adapterSonidos);
-        sonidos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0)
-                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sonido", Integer.toString(position - 1)).apply();
-            }
+            });
+            List<String> sonido = new ArrayList<>();
+            sonido.add("Selecciona...");
+            sonido.addAll(Arrays.asList(UtilSound.getSoundsNameList()));
+            ArrayAdapter<String> adapterSonidos = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, sonido);
+            sonidos.setAdapter(adapterSonidos);
+            sonidos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (position > 0)
+                        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sonido", Integer.toString(position - 1)).apply();
+                }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
+            List<String> tipos = new ArrayList<>();
+            tipos.add("Selecciona...");
+            for (String dat : getResources().getStringArray(R.array.tipos)) {
+                tipos.add(dat);
             }
-        });
-        List<String> tipos = new ArrayList<>();
-        tipos.add("Selecciona...");
-        for (String dat : getResources().getStringArray(R.array.tipos)) {
-            tipos.add(dat);
+            ArrayAdapter<String> adapterConx = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, tipos);
+            conexion.setAdapter(adapterConx);
+            conexion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (position > 0)
+                        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_conexion", Integer.toString(position - 1)).apply();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
+            List<String> repVids = new ArrayList<>();
+            repVids.add("Selecciona...");
+            for (String dat : getResources().getStringArray(R.array.players)) {
+                repVids.add(dat);
+            }
+            ArrayAdapter<String> adapterreps = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, repVids);
+            repVid.setAdapter(adapterreps);
+            repStream.setAdapter(adapterreps);
+            repVid.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (position > 0)
+                        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_video", Integer.toString(position - 1)).apply();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            repStream.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (position > 0)
+                        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_streaming", Integer.toString(position - 1)).apply();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            RapConf.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toaster.toast("Error al abrir configuracion rapida, porfavor pasa por configuracion");
+            openSingInDialog();
         }
-        ArrayAdapter<String> adapterConx = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, tipos);
-        conexion.setAdapter(adapterConx);
-        conexion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0)
-                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_conexion", Integer.toString(position - 1)).apply();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-        List<String> repVids = new ArrayList<>();
-        repVids.add("Selecciona...");
-        for (String dat : getResources().getStringArray(R.array.players)) {
-            repVids.add(dat);
-        }
-        ArrayAdapter<String> adapterreps = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, repVids);
-        repVid.setAdapter(adapterreps);
-        repStream.setAdapter(adapterreps);
-        repVid.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0)
-                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_video", Integer.toString(position - 1)).apply();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        repStream.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0)
-                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_streaming", Integer.toString(position - 1)).apply();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-        RapConf.show();
     }
 
     public void loadMainJson() {

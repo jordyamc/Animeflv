@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Random;
 
 import knf.animeflv.Explorer.ExplorerRoot;
 import knf.animeflv.Parser;
@@ -155,7 +156,7 @@ public class DownloaderService extends IntentService {
                 .setSmallIcon(android.R.drawable.stat_notify_error)
                 .setContentTitle(new Parser().getTitCached(semi[0]) + " - " + semi[1])
                 .setContentText("ERROR AL DESCARGAR")
-                .addAction(R.drawable.retry, "REINTENTAR", PendingIntent.getBroadcast(this, -1, n_intent, PendingIntent.FLAG_UPDATE_CURRENT))
+                .addAction(R.drawable.redo, "REINTENTAR", PendingIntent.getBroadcast(this, new Random().nextInt(), n_intent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .setOngoing(false);
         getManager().notify(getDownloadID(eid), builder.build());
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_FAILED).delete(eid);

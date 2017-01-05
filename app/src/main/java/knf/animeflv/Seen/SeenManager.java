@@ -8,8 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.util.List;
+
 import knf.animeflv.FavSyncro;
 import knf.animeflv.Utils.ExecutorManager;
+import knf.animeflv.info.fragments.FragmentCaps;
 
 
 public class SeenManager {
@@ -73,6 +76,42 @@ public class SeenManager {
                         db.delete(TABLE_NAME, KEY_EID + "='" + eid + "'", null);
                     }
                 }
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    public void setListSeenState(final List<String> eid, final boolean seen, final FragmentCaps.SeenProgress progress) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                if (seen) {
+                    for (String e : eid) {
+                        Log.e("Seen State", "setting " + e + "   Seen: true");
+                        if (!isSeenNoClose(e)) {
+                            ContentValues values = new ContentValues();
+                            values.put(KEY_EID, e);
+                            db.insert(TABLE_NAME, null, values);
+                            Log.e("Seen " + e, "Set as Seen");
+                        } else {
+                            Log.e("Seen " + e, "Alredy Seen");
+                        }
+                        progress.onStep();
+                    }
+                } else {
+                    StringBuilder builder = new StringBuilder();
+                    for (String e : eid) {
+                        builder.append("'");
+                        builder.append(e);
+                        builder.append("', ");
+                    }
+                    String f_s = builder.toString();
+                    if (f_s.endsWith(", "))
+                        f_s = f_s.substring(0, f_s.length() - 2);
+                    db.execSQL("delete from " + TABLE_NAME + " where " + KEY_EID + " in (" + f_s + ");");
+                }
+                close();
+                progress.onFinish();
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
@@ -176,10 +215,10 @@ public class SeenManager {
                         if (!eid.trim().equals(""))
                             setSeenStateNoClose(eid.trim(), true);
                     }
-                    SeenManager.isUpdating = false;
                 } catch (Exception e) {
-                    SeenManager.isUpdating = false;
+                    e.printStackTrace();
                 }
+                SeenManager.isUpdating = false;
                 callback.onSeenUpdated();
                 return null;
             }

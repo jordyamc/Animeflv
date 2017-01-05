@@ -665,7 +665,7 @@ public class Parser {
     public String getUrlFavs(String json, String aid) {
         String ret = "null";
         try {
-            JSONArray jsonArray = new JSONArray(json);
+            JSONArray jsonArray = new JSONObject(json).getJSONArray("lista");
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject nombreJ = jsonArray.getJSONObject(i);
                 String n = nombreJ.getString("a");

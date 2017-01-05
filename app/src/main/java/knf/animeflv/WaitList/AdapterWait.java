@@ -43,7 +43,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
         implements ExpandableDraggableItemAdapter<GroupHolder, ChildHolder>,
         ExpandableSwipeableItemAdapter<GroupHolder, ChildHolder> {
     List<String> animes;
-    List<List<Float>> animesCapList;
+    List<List<Integer>> animesCapList;
     RecyclerViewExpandableItemManager manager;
     RecyclerViewSwipeManager swipeManager;
     Activity context;
@@ -109,7 +109,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
             @Override
             public void onClick(View v) {
                 InfoHelper.open(
-                        ((WaitActivity) context),
+                        context,
                         new InfoHelper.SharedItem(holder.image, "img"),
                         Intent.FLAG_ACTIVITY_NEW_TASK,
                         new InfoHelper.BundleItem("aid", animes.get(groupPosition)),

@@ -86,16 +86,6 @@
         <activity
             android:name=".Tutorial.TutorialActivity"
             android:label="@string/app_name"/>
-        <activity
-            android:name=".WebDescarga"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Transparent">
-            <intent-filter>
-                <action android:name="android.intent.action.WEB_SEARCH"/>
-
-                <category android:name="android.intent.category.APP_BROWSER"/>
-            </intent-filter>
-        </activity>
         <activity android:name="com.smaato.soma.ExpandedBannerActivity"/>
         <activity android:name="com.smaato.soma.interstitial.InterstitialActivity"/>
         <activity android:name="com.smaato.soma.video.VASTAdActivity"/>
@@ -103,23 +93,16 @@
             android:name=".Favoritos"
             android:label="@string/app_name"/>
         <activity
+            android:name=".WaitList.WaitList"
+            android:label="@string/app_name"/>
+        <activity
             android:name=".Directorio.Directorio"
-            android:label="@string/app_name"/>
-        <activity
-            android:name=".Descargas"
-            android:label="@string/app_name"/>
-        <activity
-            android:name=".WaitList.WaitActivity"
             android:label="@string/app_name"/>
         <activity
             android:name=".Intronew"
             android:label="@string/app_name"/>
         <activity
             android:name=".BackDownload"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Transparent"/>
-        <activity
-            android:name=".Retry"
             android:label="@string/app_name"
             android:theme="@style/Theme.Transparent"/>
         <activity

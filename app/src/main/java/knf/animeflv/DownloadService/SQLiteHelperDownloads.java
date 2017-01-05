@@ -60,7 +60,7 @@ public class SQLiteHelperDownloads {
     }
 
     public SQLiteHelperDownloads delete(String eid) {
-        db.delete(DOWNLOAD_TABLE_NAME, KEY_DOWNLOAD_ID + "=" + context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + KEY_DOWNLOAD_PREFS, -1), null);
+        db.delete(DOWNLOAD_TABLE_NAME, KEY_DOWNLOAD_ID + "='" + context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + KEY_DOWNLOAD_PREFS, -1) + "'", null);
         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putLong(eid + KEY_DOWNLOAD_PREFS, -1).apply();
         return this;
     }

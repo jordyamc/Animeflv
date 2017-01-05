@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import knf.animeflv.Utils.eNums.DownloadTask;
+import knf.animeflv.WaitList.WaitDBHelper;
 import pl.droidsonroids.gif.GifImageButton;
 
 /**
@@ -29,9 +30,11 @@ public class MainStates {
     private static String processingEid = "";
     private static boolean loadingEmision = true;
     private static int position = -1;
+    private static Context context;
 
     public MainStates(Context context) {
         preferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+        MainStates.context = context;
     }
 
     public static MainStates init(Context con) {
@@ -131,40 +134,50 @@ public class MainStates {
     }
 
     public void addToWaitList(String eid) {
-        String[] data = eid.replace("E", "").split("_");
-        String key = data[0] + "waiting";
-        Set<String> set = preferences.getStringSet(key, new HashSet<String>());
-        List<String> list = new ArrayList<>();
-        list.addAll(set);
-        if (!list.contains(data[1])) {
-            list.add(data[1]);
-            UpdateWaitList(key, list);
-        }
-        set = preferences.getStringSet("GlobalWaiting", new HashSet<String>());
-        list.clear();
-        list.addAll(set);
-        if (!list.contains(data[0])) {
-            list.add(data[0]);
-            UpdateWaitList("GlobalWaiting", list);
+        try {
+            String[] data = eid.replace("E", "").split("_");
+            String key = data[0] + "waiting";
+            Set<String> set = preferences.getStringSet(key, new HashSet<String>());
+            List<String> list = new ArrayList<>();
+            list.addAll(set);
+            if (!list.contains(data[1])) {
+                list.add(data[1]);
+                UpdateWaitList(key, list);
+            }
+            set = preferences.getStringSet("GlobalWaiting", new HashSet<String>());
+            list.clear();
+            list.addAll(set);
+            if (!list.contains(data[0])) {
+                list.add(data[0]);
+                UpdateWaitList("GlobalWaiting", list);
+            }
+            new WaitDBHelper(context).addToList(eid);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     public void delFromWaitList(String eid) {
-        String[] data = eid.replace("E", "").split("_");
-        String key = data[0] + "waiting";
-        Set<String> set = preferences.getStringSet(key, new HashSet<String>());
-        List<String> list = new ArrayList<>();
-        list.addAll(set);
-        if (list.contains(data[1])) {
-            list.remove(list.indexOf(data[1]));
-            UpdateWaitList(key, list);
-        }
-        if (list.isEmpty()) {
-            set = preferences.getStringSet("GlobalWaiting", new HashSet<String>());
-            list.clear();
+        try {
+            String[] data = eid.replace("E", "").split("_");
+            String key = data[0] + "waiting";
+            Set<String> set = preferences.getStringSet(key, new HashSet<String>());
+            List<String> list = new ArrayList<>();
             list.addAll(set);
-            list.remove(list.indexOf(data[0]));
-            UpdateWaitList("GlobalWaiting", list);
+            if (list.contains(data[1])) {
+                list.remove(list.indexOf(data[1]));
+                UpdateWaitList(key, list);
+            }
+            if (list.isEmpty()) {
+                set = preferences.getStringSet("GlobalWaiting", new HashSet<String>());
+                list.clear();
+                list.addAll(set);
+                list.remove(list.indexOf(data[0]));
+                UpdateWaitList("GlobalWaiting", list);
+            }
+            new WaitDBHelper(context).delFromList(eid);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

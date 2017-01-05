@@ -14,7 +14,6 @@ import knf.animeflv.DownloadService.DownloadListManager;
 import knf.animeflv.DownloadService.DownloadObject;
 import knf.animeflv.DownloadService.DownloaderService;
 import knf.animeflv.DownloadService.SQLiteHelperDownloads;
-import knf.animeflv.DownloaderCookie;
 import knf.animeflv.Parser;
 import knf.animeflv.Utils.FileUtil;
 

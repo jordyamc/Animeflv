@@ -5,7 +5,7 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 
-import knf.animeflv.Utils.MainStates;
+import knf.animeflv.WaitList.WaitDBHelper;
 
 /**
  * Created by Jordy on 31/03/2016.
@@ -13,17 +13,17 @@ import knf.animeflv.Utils.MainStates;
 public class WaitManager {
     private static Context context;
     private static List<String> animesList = new ArrayList<>();
-    private static List<List<Float>> numerosList = new ArrayList<>();
+    private static List<List<Integer>> numerosList = new ArrayList<>();
 
     public static void initial(Context c) {
         context = c;
     }
 
     public static void Refresh() {
-        animesList = MainStates.init(context).getGlobalWaitList();
+        animesList = new WaitDBHelper(context).getAidsList();
         numerosList.clear();
         for (String s : animesList) {
-            numerosList.add(ChildListCreator.getList(context, s));
+            numerosList.add(ChildListCreator.create(context, s));
         }
     }
 
@@ -31,7 +31,7 @@ public class WaitManager {
         return animesList;
     }
 
-    public static List<List<Float>> getNumerosList() {
+    public static List<List<Integer>> getNumerosList() {
         return numerosList;
     }
 }

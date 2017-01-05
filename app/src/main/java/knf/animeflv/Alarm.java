@@ -10,7 +10,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import knf.animeflv.BackgroundChecker.startBackground;
-import knf.animeflv.Utils.ExecutorManager;
 
 public class Alarm extends BroadcastReceiver {
     @Override
@@ -42,9 +41,17 @@ public class Alarm extends BroadcastReceiver {
         Boolean not = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
         if (not) {
             Log.d("Service", "Servicio Iniciado");
-            new RequestsBackground(context, TaskType.NOT).executeOnExecutor(ExecutorManager.getExecutor());
-            new RequestsBackground(context, TaskType.VERSION).executeOnExecutor(ExecutorManager.getExecutor());
-        }else {Log.d("Service", "Servicio Desactivado");}
+            //new RequestsBackground(context, TaskType.NOT).executeOnExecutor(ExecutorManager.getExecutor());
+            //new RequestsBackground(context,TaskType.VERSION).executeOnExecutor(ExecutorManager.getExecutor());
+            startBackground.compareNots(context);
+            try {
+                startBackground.checkUpdate(context);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.d("Service", "Servicio Desactivado");
+        }
         wl.release();
     }
 

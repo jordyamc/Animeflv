@@ -1,6 +1,7 @@
 package knf.animeflv;
 
 import android.content.Context;
+import android.support.multidex.MultiDexApplication;
 
 import com.karumi.dexter.Dexter;
 
@@ -12,7 +13,7 @@ import knf.animeflv.Utils.UtilsInit;
 import xdroid.toaster.Toaster;
 
 
-public class Application extends android.app.Application {
+public class Application extends MultiDexApplication {
     Context context;
 
     @Override

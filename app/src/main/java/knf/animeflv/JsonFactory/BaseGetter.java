@@ -13,7 +13,7 @@ import knf.animeflv.Utils.NetworkUtils;
 public class BaseGetter {
     public static void getJson(Context context, INICIO inicio, AsyncInterface asyncInterface) {
         if (NetworkUtils.isNetworkAvailable()) {
-            ServerGetter.getInicio(context, inicio, asyncInterface);
+            SelfGetter.getInicio(context, inicio, asyncInterface);
         } else {
             if (inicio.type == 0) {
                 asyncInterface.onFinish(OfflineGetter.getInicio());
@@ -26,7 +26,7 @@ public class BaseGetter {
 
     public static void getJson(Context context, DIRECTORIO directorio, AsyncInterface asyncInterface) {
         if (NetworkUtils.isNetworkAvailable()) {
-            ServerGetter.getDir(context, asyncInterface);
+            SelfGetter.getDir(context, asyncInterface);
         } else {
             asyncInterface.onFinish(OfflineGetter.getDirectorio());
         }
@@ -34,7 +34,7 @@ public class BaseGetter {
 
     public static void getJson(Context context, ANIME anime, AsyncInterface asyncInterface) {
         if (NetworkUtils.isNetworkAvailable()) {
-            ServerGetter.getAnime(context, anime, asyncInterface);
+            SelfGetter.getAnime(context, anime, asyncInterface);
         } else {
             asyncInterface.onFinish(OfflineGetter.getAnime(anime));
         }
@@ -50,7 +50,7 @@ public class BaseGetter {
 
     public static void getJson(Context context, DOWNLOAD download, AsyncInterface asyncInterface) {
         if (NetworkUtils.isNetworkAvailable()) {
-            ServerGetter.getDownload(context, download, asyncInterface);
+            SelfGetter.getDownload(context, download.url, asyncInterface);
         } else {
             asyncInterface.onFinish("null");
         }

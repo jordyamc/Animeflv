@@ -42,7 +42,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -300,53 +299,6 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         }
     }
 
-    public void loadDir(String data) {
-        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-            if (!mediaStorage.exists()) {
-                mediaStorage.mkdirs();
-            }
-        }
-        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-        if (NetworkUtils.isNetworkAvailable() && !data.trim().equals("error")) {
-            String trimed = data.trim();
-            if (!file.exists()) {
-                Log.d("Archivo:", "No existe");
-                try {
-                    file.createNewFile();
-                } catch (IOException e) {
-                    Log.d("Archivo:", "Error al crear archivo");
-                }
-
-                if (FileUtil.isJSONValid(trimed)) {
-                    FileUtil.writeToFile(trimed, file);
-                    getJsonfromApi();
-                } else {
-                    Toaster.toast("No hay cache para mostrar");
-                    finish();
-                }
-            } else {
-                Log.d("Archivo", "Existe");
-                String infile = FileUtil.getStringFromFile(file_loc);
-                if (!infile.trim().equals(trimed)) {
-                    if (FileUtil.isJSONValid(infile)) {
-                        if (FileUtil.isJSONValid(trimed)) {
-                            Log.d("Cargar", "Json nuevo");
-                            FileUtil.writeToFile(trimed, file);
-                            getJsonfromApi();
-                        }
-                    }
-                } else {
-                    Toaster.toast("No hay cache para mostrar");
-                    finish();
-                }
-            }
-        } else {
-            Toaster.toast("No hay cache para mostrar");
-            finish();
-        }
-    }
-
     public String getJsonStringfromFile() {
         String aid = getIntent().getExtras().getString("aid");
         if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
@@ -373,8 +325,9 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             String pos = getIntent().getStringExtra("position");
             final int position = pos == null ? -1 : Integer.valueOf(pos);
             addFragments(position);
-            fragmentInfo.startAnimation(position);
-            scrollToTop();
+            if (position == -1) {
+                scrollToTop();
+            }
         }
     }
 
@@ -382,7 +335,12 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         FragmentTransaction transaction = getManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         if (isInInfo) {
-            barLayout.setExpanded(false, true);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    barLayout.setExpanded(false, true);
+                }
+            });
             button.setImageResource(R.drawable.information);
             transaction.hide(fragmentInfo);
             transaction.show(fragmentCaps);
@@ -396,6 +354,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             isInInfo = true;
         }
         transaction.commit();
+        supportInvalidateOptionsMenu();
     }
 
     private FragmentManager getManager() {
@@ -408,37 +367,39 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     private void addFragments(int position) {
         FragmentTransaction transaction = getManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        if (!fragmentCaps.isAdded())
-            transaction.add(R.id.root, fragmentCaps, "caps");
-        if (!fragmentInfo.isAdded())
-            transaction.add(R.id.root, fragmentInfo, "info");
-        transaction.commit();
-        transaction = getManager().beginTransaction();
         if (position == -1) {
-            scrollToTop();
             isInInfo = true;
-            button.setImageResource(R.drawable.playlist);
+            if (!fragmentCaps.isAdded())
+                transaction.add(R.id.root, fragmentCaps, "caps");
+            if (!fragmentInfo.isAdded())
+                transaction.add(R.id.root, fragmentInfo, "info");
             transaction.hide(fragmentCaps);
-            transaction.show(fragmentInfo);
+            button.setImageResource(R.drawable.playlist);
         } else {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    barLayout.setExpanded(false, true);
-                }
-            });
             isInInfo = false;
-            button.setImageResource(R.drawable.information);
+            if (!fragmentInfo.isAdded())
+                transaction.add(R.id.root, fragmentInfo, "info");
+            if (!fragmentCaps.isAdded())
+                transaction.add(R.id.root, fragmentCaps, "caps");
             transaction.hide(fragmentInfo);
-            transaction.show(fragmentCaps);
+            button.setImageResource(R.drawable.information);
+            supportInvalidateOptionsMenu();
         }
+        //transaction.show(fragmentInfo);
+        transaction.commitAllowingStateLoss();
+        fragmentInfo.startAnimation(position);
+        transaction = getManager().beginTransaction();
+        transaction.hide(position == -1 ? fragmentCaps : fragmentInfo);
+        transaction.commitAllowingStateLoss();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 button.show();
             }
         });
-        transaction.commit();
+        /*if (position != -1) {
+            toogleFragments();
+        }*/
     }
 
 
@@ -450,27 +411,32 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Amenu = menu;
-        SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-        String fav = sharedPreferences.getString("favoritos", "");
-        String[] favoritos = {};
-        favoritos = fav.split(":::");
-        Boolean isfav = false;
-        for (String favo : favoritos) {
-            if (!favo.equals("")) {
-                if (Integer.parseInt(favo) == Integer.parseInt(aid)) {
-                    getMenuInflater().inflate(R.menu.menu_fav_si, menu);
-                    isfav = true;
-                    break;
+        if (isInInfo) {
+            Amenu = menu;
+            SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+            String fav = sharedPreferences.getString("favoritos", "");
+            String[] favoritos = {};
+            favoritos = fav.split(":::");
+            Boolean isfav = false;
+            for (String favo : favoritos) {
+                if (!favo.equals("") && !favo.equals("null")) {
+                    if (favo.trim().equals(aid.trim())) {
+                        getMenuInflater().inflate(R.menu.menu_fav_si, menu);
+                        isfav = true;
+                        break;
+                    }
                 }
             }
-        }
-        if (isfav) {
-            Amenu.clear();
-            getMenuInflater().inflate(R.menu.menu_fav_si, menu);
+            if (isfav) {
+                Amenu.clear();
+                getMenuInflater().inflate(R.menu.menu_fav_si, menu);
+            } else {
+                Amenu.clear();
+                getMenuInflater().inflate(R.menu.menu_fav_no, menu);
+            }
         } else {
             Amenu.clear();
-            getMenuInflater().inflate(R.menu.menu_fav_no, menu);
+            getMenuInflater().inflate(R.menu.menu_fast_seen, menu);
         }
         return true;
     }
@@ -578,6 +544,12 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                     }
                 });
                 dialog.show();
+                break;
+            case R.id.sel_all:
+                fragmentCaps.setallAsSeen();
+                break;
+            case R.id.sel_none:
+                fragmentCaps.setallAsNotSeen();
                 break;
         }
         return true;

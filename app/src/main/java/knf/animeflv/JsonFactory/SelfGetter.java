@@ -16,8 +16,10 @@ import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
@@ -27,6 +29,8 @@ import knf.animeflv.Parser;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.NoLogInterface;
+import knf.animeflv.WaitList.WaitDownloadElement;
+import knf.animeflv.WaitList.WaitList;
 
 public class SelfGetter {
     private static final int TIMEOUT = 10000;
@@ -84,127 +88,154 @@ public class SelfGetter {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                String tit = "null";
-                String num = "null";
-                String aid = "null";
-                String eid = "null";
-                String izanagi = "null";
-                String mina = "null";
-                String zippy = "null";
-                String sync = "null";
-                String mega = "null";
-                String aflv = "null";
-                String maru = "null";
-                String Yotta = "null";
-                String Yotta480 = "null";
-                String Yotta360 = "null";
-                String[] names = new String[]{"Izanagi", "Mina", "Yotta", "Yotta 480p", "Yotta 360p", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
+                asyncInterface.onFinish(getDownloadInfo(context, url));
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    public static void getDownloadList(final Context context, final List<String> eids, final WaitList.ListListener listListener) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                List<WaitDownloadElement> list = new ArrayList<>();
                 try {
-                    Log.e("Url", url);
-                    Document main = Jsoup.connect(url).userAgent(ua).cookie("dev", "1").timeout(TIMEOUT).get();
-                    String titinfo = main.select("div.episodio_titulo").first().getElementsByTag("h1").text();
-                    tit = titinfo.substring(0, titinfo.lastIndexOf(" "));
-                    num = titinfo.substring(titinfo.lastIndexOf(" ") + 1);
-                    String link = main.select("meta[property='og:image']").attr("content");
-                    aid = link.substring(link.lastIndexOf("/") + 1, link.lastIndexOf("."));
-                    eid = aid + "_" + num + "E";
-                    Elements descargas = main.select("a.op_download");
-                    if (descargas.outerHtml().contains("zippyshare")) {
-                        for (Element e : descargas) {
-                            String z = e.attr("href");
-                            if (z.contains("zippyshare")) {
-                                zippy = z;
-                                break;
-                            }
-                        }
+                    for (String eid : eids) {
+                        String url = new Parser().getUrlCached(eid);
+                        JSONObject object = new JSONObject(getDownloadInfo(context, url));
+                        String ur = object.getJSONArray("downloads").getJSONObject(0).getString("url");
+                        if (!url.contains("mega") || !url.contains("zippy"))
+                            list.add(new WaitDownloadElement(eid, ur));
                     }
-                    Element script = main.select("div#contenido").first().getElementsByTag("script").last();
-                    String j = script.outerHtml();
-                    String json = j.substring(j.indexOf("{"), j.indexOf("}") + 1);
-                    JSONObject js = new JSONObject(json);
-                    Iterator<String> iterator = js.keys();
-                    while (iterator.hasNext()) {
-                        String el = js.get(iterator.next()).toString();
-                        if (el.contains("izanagi")) {
-                            String[] p = el.split("\",\"");
-                            for (String r : p) {
-                                if (r.contains("embed_izanagi.php")) {
-                                    try {
-                                        String body = Jsoup.connect("https://animeflv.net/embed_izanagi.php?key=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" "))).userAgent(ua).get().outerHtml();
-                                        izanagi = new JSONObject(Jsoup.connect(body.substring(body.indexOf("get('") + 5, body.indexOf("',"))).userAgent(ua).get().body().text()).getString("file");
-                                    } catch (Exception e) {
-
-                                    }
-                                }
-                            }
-                        } else if (el.contains("embed_yotta.php")) {
-                            String[] p = el.split("\",\"");
-                            for (String r : p) {
-                                if (r.contains("embed_yotta.php")) {
-                                    try {
-                                        JSONArray ja = new JSONObject(Jsoup.connect("http://s1.animeflv.net/yotta.php?id=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" "))).userAgent(ua).get().body().text()).getJSONArray("sources");
-                                        if (ja.length() > 1) {
-                                            Yotta480 = ja.getJSONObject(0).getString("file");
-                                            Yotta360 = ja.getJSONObject(1).getString("file");
-                                        } else {
-                                            Yotta = ja.getJSONObject(0).getString("file");
-                                        }
-                                    } catch (Exception e) {
-
-                                    }
-                                }
-                            }
-                        } else if (el.contains("https://mega.nz")) {
-                            String[] p = el.split("\",\"");
-                            for (String r : p) {
-                                if (r.contains("https://mega.nz")) {
-                                    try {
-                                        mega = r.substring(r.indexOf("https://mega.nz"), r.indexOf("\\\" "));
-                                    } catch (Exception e) {
-
-                                    }
-                                }
-                            }
-                        } else if (el.contains("embed_mina.php")) {
-                            String[] p = el.split("\",\"");
-                            for (String r : p) {
-                                if (r.contains("embed_mina.php")) {
-                                    try {
-                                        JSONObject ja = new JSONObject(Jsoup.connect("https://s1.animeflv.com/minhateca.php?id=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" "))).userAgent(ua).get().body().text());
-                                        mina = ja.getString("file");
-                                    } catch (Exception e) {
-
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    listListener.onListCreated(list);
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
-                String[] links = new String[]{izanagi, mina, Yotta, Yotta480, Yotta360, zippy, sync, mega, aflv, maru};
-                try {
-                    JSONObject object = new JSONObject();
-                    object.put("version", context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName + "-Internal_Api");
-                    object.put("cache", "0");
-                    object.put("titulo", tit);
-                    object.put("eid", eid);
-                    JSONArray array = new JSONArray();
-                    for (int i = 0; i < names.length; i++) {
-                        JSONObject o = new JSONObject();
-                        o.put("name", names[i]);
-                        o.put("url", links[i]);
-                        array.put(o);
-                    }
-                    object.put("downloads", array);
-                    asyncInterface.onFinish(object.toString());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    asyncInterface.onFinish("null");
+                    listListener.onListCreated(list);
                 }
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    private static String getDownloadInfo(final Context context, final String url) {
+        String tit = "null";
+        String num = "null";
+        String aid = "null";
+        String eid = "null";
+        String izanagi = "null";
+        String mina = "null";
+        String zippy = "null";
+        String sync = "null";
+        String mega = "null";
+        String aflv = "null";
+        String maru = "null";
+        String Yotta = "null";
+        String Yotta480 = "null";
+        String Yotta360 = "null";
+        String[] names = new String[]{"Izanagi", "Mina", "Yotta", "Yotta 480p", "Yotta 360p", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
+        try {
+            Log.e("Url", url);
+            Document main = Jsoup.connect(url).userAgent(ua).cookie("dev", "1").timeout(TIMEOUT).get();
+            String titinfo = main.select("div.episodio_titulo").first().getElementsByTag("h1").text();
+            tit = titinfo.substring(0, titinfo.lastIndexOf(" "));
+            num = titinfo.substring(titinfo.lastIndexOf(" ") + 1);
+            String link = main.select("meta[property='og:image']").attr("content");
+            aid = link.substring(link.lastIndexOf("/") + 1, link.lastIndexOf("."));
+            eid = aid + "_" + num + "E";
+            Elements descargas = main.select("a.op_download");
+            if (descargas.outerHtml().contains("zippyshare")) {
+                for (Element e : descargas) {
+                    String z = e.attr("href");
+                    if (z.contains("zippyshare")) {
+                        zippy = z;
+                        break;
+                    }
+                }
+            }
+            Element script = main.select("div#contenido").first().getElementsByTag("script").last();
+            String j = script.outerHtml();
+            String json = j.substring(j.indexOf("{"), j.indexOf("}") + 1);
+            JSONObject js = new JSONObject(json);
+            Iterator<String> iterator = js.keys();
+            while (iterator.hasNext()) {
+                String el = js.get(iterator.next()).toString();
+                if (el.contains("izanagi")) {
+                    String[] p = el.split("\",\"");
+                    for (String r : p) {
+                        if (r.contains("embed_izanagi.php")) {
+                            try {
+                                String body = Jsoup.connect("https://animeflv.net/embed_izanagi.php?key=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" "))).userAgent(ua).get().outerHtml();
+                                izanagi = new JSONObject(Jsoup.connect(body.substring(body.indexOf("get('") + 5, body.indexOf("',"))).userAgent(ua).get().body().text()).getString("file");
+                            } catch (Exception e) {
+
+                            }
+                        }
+                    }
+                } else if (el.contains("embed_yotta.php")) {
+                    String[] p = el.split("\",\"");
+                    for (String r : p) {
+                        if (r.contains("embed_yotta.php")) {
+                            try {
+                                JSONArray ja = new JSONObject(Jsoup.connect("http://s1.animeflv.net/yotta.php?id=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" "))).userAgent(ua).get().body().text()).getJSONArray("sources");
+                                if (ja.length() > 1) {
+                                    Yotta480 = ja.getJSONObject(0).getString("file");
+                                    Yotta360 = ja.getJSONObject(1).getString("file");
+                                } else {
+                                    Yotta = ja.getJSONObject(0).getString("file");
+                                }
+                            } catch (Exception e) {
+
+                            }
+                        }
+                    }
+                } else if (el.contains("https://mega.nz")) {
+                    String[] p = el.split("\",\"");
+                    for (String r : p) {
+                        if (r.contains("https://mega.nz")) {
+                            try {
+                                mega = r.substring(r.indexOf("https://mega.nz"), r.indexOf("\\\" "));
+                            } catch (Exception e) {
+
+                            }
+                        }
+                    }
+                } else if (el.contains("embed_mina.php")) {
+                    String[] p = el.split("\",\"");
+                    for (String r : p) {
+                        if (r.contains("embed_mina.php")) {
+                            try {
+                                JSONObject ja = new JSONObject(Jsoup.connect("https://s1.animeflv.com/minhateca.php?id=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" "))).userAgent(ua).get().body().text());
+                                mina = ja.getString("file");
+                            } catch (Exception e) {
+
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String[] links = new String[]{izanagi, mina, Yotta, Yotta480, Yotta360, zippy, sync, mega, aflv, maru};
+        try {
+            JSONObject object = new JSONObject();
+            object.put("version", context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName + "-Internal_Api");
+            object.put("cache", "0");
+            object.put("titulo", tit);
+            object.put("eid", eid);
+            JSONArray array = new JSONArray();
+            for (int i = 0; i < names.length; i++) {
+                JSONObject o = new JSONObject();
+                o.put("name", names[i]);
+                o.put("url", links[i]);
+                array.put(o);
+            }
+            object.put("downloads", array);
+            return object.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "null";
+        }
     }
 
     public static void getAnime(final Context context, final ANIME anime, final BaseGetter.AsyncInterface asyncInterface) {

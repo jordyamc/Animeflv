@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/fast"
+        android:icon="@drawable/ic_fast_seen"
+        android:orderInCategory="100"
+        android:title="Buscar"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/sel_all"
+                android:title="Marcar todos como visto"/>
+            <item
+                android:id="@+id/sel_none"
+                android:title="Marcar todos como no visto"/>
+        </menu>
+
+    </item>
+</menu>

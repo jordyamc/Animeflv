@@ -173,6 +173,13 @@ public class FileUtil {
             fos.close();
         } catch (IOException e) {
             e.printStackTrace();
+            try {
+                file.createNewFile();
+                writeToFile(body, file);
+            } catch (Exception ex) {
+
+            }
+
         }
     }
 

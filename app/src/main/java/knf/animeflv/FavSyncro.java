@@ -1,6 +1,7 @@
 package knf.animeflv;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -69,6 +70,7 @@ public class FavSyncro {
 
             @Override
             public void onError() {
+                Log.e("Seen Sync", "Error getting from server, trying Dropbox");
                 DropboxManager.downloadFavs(context, new DropboxManager.DownloadCallback() {
                     @Override
                     public void onDownload(JSONObject object, boolean success) {
@@ -82,19 +84,27 @@ public class FavSyncro {
                                             SeenManager.get(context).updateSeen(visto, new SeenManager.SeenCallback() {
                                                 @Override
                                                 public void onSeenUpdated() {
+                                                    Log.e("Seen Sync", "Dropbox Updated");
                                                     callback.onUpdate();
                                                 }
                                             });
+                                        } else {
+                                            Log.e("Seen Sync", "Dropbox same info");
+                                            callback.onUpdate();
                                         }
                                     } catch (Exception e) {
                                         e.printStackTrace();
+                                        callback.onUpdate();
                                     }
+                                } else {
+                                    callback.onUpdate();
                                 }
                             } catch (Exception e) {
                                 callback.onUpdate();
                             }
                         } else {
                             callback.onUpdate();
+                            Log.e("Seen Sync", "Dropbox Error");
                         }
                     }
                 });

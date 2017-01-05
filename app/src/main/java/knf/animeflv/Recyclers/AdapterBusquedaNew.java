@@ -34,7 +34,6 @@ import java.util.List;
 
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Directorio.AnimeClass;
-import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
@@ -120,7 +119,7 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
                     SharedPreferences.Editor sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
                     sharedPreferences.putString("aid", Animes.get(holder.getAdapterPosition()).getAid()).apply();
                     InfoHelper.open(
-                            ((Directorio) context),
+                            context,
                             new InfoHelper.SharedItem(holder.iv_rel, "img"),
                             Intent.FLAG_ACTIVITY_NEW_TASK,
                             new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
