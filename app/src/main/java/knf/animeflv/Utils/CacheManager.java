@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import knf.animeflv.JsonFactory.MALGetter;
 import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
@@ -201,7 +202,42 @@ public class CacheManager {
             if (isHD) Log.d("Local", "is HD!!!");
         }
         if (NetworkUtils.isNetworkAvailable() && !isHD) {
-            PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + Parser.getCertificateSHA1Fingerprint(context) + "&hd=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").noFade().noPlaceholder().into(imageView, new Callback() {
+            MALGetter.getAnimeSearch(new Parser().getTitCached(aid).trim(), new MALGetter.SearchInterface() {
+                @Override
+                public void onFinishSearch(String result) {
+                    Log.e("Image Getter", result);
+                    if (!result.contains("_error")) {
+                        if (localFile.exists())
+                            PicassoCache.getPicassoInstance(context).invalidate(localFile);
+                        PicassoCache.getPicassoInstance(context).load(result).noFade().noPlaceholder().into(imageView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
+                                    saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                            }
+
+                            @Override
+                            public void onError() {
+
+                            }
+                        });
+                    } else {
+                        PicassoCache.getPicassoInstance(context).load("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").noFade().noPlaceholder().into(imageView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
+                                    saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                            }
+
+                            @Override
+                            public void onError() {
+
+                            }
+                        });
+                    }
+                }
+            });
+            /*PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + Parser.getCertificateSHA1Fingerprint(context) + "&hd=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").noFade().noPlaceholder().into(imageView, new Callback() {
                 @Override
                 public void onSuccess() {
                     if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
@@ -223,7 +259,7 @@ public class CacheManager {
                         }
                     });
                 }
-            });
+            });*/
         }
     }
 
@@ -328,12 +364,8 @@ public class CacheManager {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-        if (Integer.parseInt(file.getName().replace(".jpg", "")) < 2418) {
-            return true;
-        } else {
-            Log.d("Imagen", "" + options.outHeight + " - " + options.outWidth);
-            return options.outWidth > 100;
-        }
+        Log.d("Cache Image", "" + options.outHeight + " - " + options.outWidth);
+        return options.outWidth > 100;
     }
 
     private void saveBitmap(final Bitmap bitmap, final File file) {

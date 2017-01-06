@@ -243,6 +243,7 @@ public class SelfGetter {
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
+                    Log.e("Get Anime Info", new Parser().getUrlAnimeCached(anime.getAidString()));
                     Document document = Jsoup.connect(new Parser().getUrlAnimeCached(anime.getAidString())).userAgent(ua).cookie("dev", "1").timeout(TIMEOUT).get();
                     String imgUrl = document.select("img.portada").first().attr("src");
                     String aid = imgUrl.substring(imgUrl.lastIndexOf("/") + 1, imgUrl.lastIndexOf("."));
@@ -258,36 +259,44 @@ public class SelfGetter {
                     }
                     String title = document.select("h1").first().text();
                     String sinopsis = Parser.InValidateSinopsis(document.select("div.sinopsis").text().trim());
-                    Elements epis = document.select("ul.anime_episodios").first().select("li");
                     JSONArray array = new JSONArray();
-                    for (Element ep : epis) {
-                        JSONObject object = new JSONObject();
-                        String name = ep.select("a").first().ownText().trim();
-                        String num = name.replace(title, "").trim();
-                        if (num.contains(":")) {
-                            num = num.replace(" ", "").split(":")[0];
+                    try {
+                        Elements epis = document.select("ul.anime_episodios").first().select("li");
+                        for (Element ep : epis) {
+                            JSONObject object = new JSONObject();
+                            String name = ep.select("a").first().ownText().trim();
+                            String num = name.replace(title, "").trim();
+                            if (num.contains(":")) {
+                                num = num.replace(" ", "").split(":")[0];
+                            }
+                            object.put("num", num);
+                            object.put("eid", aid + "_" + num + "E");
+                            array.put(object);
                         }
-                        object.put("num", num);
-                        object.put("eid", aid + "_" + num + "E");
-                        array.put(object);
+                    } catch (Exception e) {
+                        Log.e("Get Anime Info", "No Ep List");
                     }
-                    Elements rels = document.select("div.relacionados").first().select("li");
                     JSONArray j_rels = new JSONArray();
-                    for (Element rel : rels) {
-                        String t_tid = rel.select("b").first().ownText();
-                        Element link = rel.select("a").first();
-                        String full_link = "http://animeflv.net" + link.attr("href");
-                        String name = link.ownText();
-                        String type = rel.ownText().trim().replace("(", "").replace(")", "").replace(":", "");
-                        Document t_document = Jsoup.connect(full_link).userAgent(ua).cookie("dev", "1").get();
-                        String t_imgUrl = t_document.select("img.portada").first().attr("src");
-                        String t_aid = t_imgUrl.substring(t_imgUrl.lastIndexOf("/") + 1, t_imgUrl.lastIndexOf("."));
-                        JSONObject object = new JSONObject();
-                        object.put("aid", t_aid);
-                        object.put("tid", type);
-                        object.put("titulo", name);
-                        object.put("rel_tipo", t_tid);
-                        j_rels.put(object);
+                    try {
+                        Elements rels = document.select("div.relacionados").first().select("li");
+                        for (Element rel : rels) {
+                            String t_tid = rel.select("b").first().ownText();
+                            Element link = rel.select("a").first();
+                            String full_link = "http://animeflv.net" + link.attr("href");
+                            String name = link.ownText();
+                            String type = rel.ownText().trim().replace("(", "").replace(")", "").replace(":", "");
+                            Document t_document = Jsoup.connect(full_link).userAgent(ua).cookie("dev", "1").get();
+                            String t_imgUrl = t_document.select("img.portada").first().attr("src");
+                            String t_aid = t_imgUrl.substring(t_imgUrl.lastIndexOf("/") + 1, t_imgUrl.lastIndexOf("."));
+                            JSONObject object = new JSONObject();
+                            object.put("aid", t_aid);
+                            object.put("tid", type);
+                            object.put("titulo", name);
+                            object.put("rel_tipo", t_tid);
+                            j_rels.put(object);
+                        }
+                    } catch (Exception e) {
+                        Log.e("Get Anime Info", "No Rel List");
                     }
                     JSONObject fobject = new JSONObject();
                     fobject.put("cache", "0");

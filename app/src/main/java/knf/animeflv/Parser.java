@@ -739,7 +739,7 @@ public class Parser {
                     JSONObject nombreJ = jsonArray.getJSONObject(i);
                     String n = nombreJ.getString("a");
                     if (n.trim().equals(aid)) {
-                        return "http://animeflv.net/" + nombreJ.getString("c").toLowerCase() + "/" + nombreJ.getString("d") + ".html";
+                        return "http://animeflv.net/" + nombreJ.getString("c").toLowerCase() + "/" + nombreJ.getString("e") + "/" + nombreJ.getString("d");
                     }
                 }
             } catch (Exception e) {
