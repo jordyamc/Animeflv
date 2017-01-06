@@ -94,7 +94,7 @@ public class NetworkUtils {
         @Override
         protected String doInBackground(String... params) {
             Looper.prepare();
-            new SyncHttpClient().get(Keys.Url.VERSION_INT_TEST, null, new TextHttpResponseHandler() {
+            new SyncHttpClient().get(Keys.Url.VERSION_INT, null, new TextHttpResponseHandler() {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                     UpdateUtil.setState(UpdateState.NO_UPDATE);
