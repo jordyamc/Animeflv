@@ -91,6 +91,10 @@
     {
       "name": "Pika Girl",
       "file": "pika_girl.mp3"
+    },
+    {
+      "name": "Pomf Pomf Pomf",
+      "file": "pomfpomfpomf.mp3"
     }
   ]
 }
