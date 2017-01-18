@@ -39,6 +39,30 @@ public class InfoHelper {
         }
     }
 
+    public static void openResult(Activity activity, SharedItem sharedItem, BundleItem... items) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            sharedItem.view.setTransitionName("img");
+            ActivityOptionsCompat compat = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, sharedItem.view, sharedItem.tag);
+            Bundle bundleInfo = new Bundle();
+            for (BundleItem item : items) {
+                bundleInfo.putString(item.key, item.value);
+            }
+            Intent intent = new Intent(activity, InfoFragments.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtras(bundleInfo);
+            activity.startActivityForResult(intent, 55774);
+        } else {
+            Bundle bundleInfo = new Bundle();
+            for (BundleItem item : items) {
+                bundleInfo.putString(item.key, item.value);
+            }
+            Intent intent = new Intent(activity, InfoFragments.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtras(bundleInfo);
+            activity.startActivityForResult(intent, 55774);
+        }
+    }
+
     public static void open(Activity activity, SharedItem sharedItem, int flag, BundleItem... items) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             sharedItem.view.setTransitionName("img");

@@ -125,6 +125,34 @@ public class FileUtil {
     }
 
     @Nullable
+    public static OutputStream getOutputStreamFromAccess(Activity activity, DocumentFile sdFile) {
+        if (sdFile != null) {
+            try {
+                return activity.getContentResolver().openOutputStream(sdFile.getUri(), "rw");
+            } catch (FileNotFoundException e) {
+                return null;
+            }
+
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    public static InputStream getInputStreamFromAccess(Activity activity, DocumentFile sdFile) {
+        if (sdFile != null) {
+            try {
+                return activity.getContentResolver().openInputStream(sdFile.getUri());
+            } catch (FileNotFoundException e) {
+                return null;
+            }
+
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
     public static InputStream getInputStreamFromAccess(Context activity, File file) {
         DocumentFile sdFile = FileUtil.init(activity).getDownloadFromAccess(file);
         if (sdFile != null) {

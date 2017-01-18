@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
+import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
 import java.io.File;
@@ -140,7 +142,7 @@ public class MXStream {
         switch (pack) {
             case "com.mxtech.videoplayer.pro":
                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                Uri videoUri = Uri.fromFile(file);
+                Uri videoUri = getUrifromFile(file);
                 intent.setDataAndType(videoUri, "application/mp4");
                 intent.setPackage("com.mxtech.videoplayer.pro");
                 intent.putExtra("title", parser.getTitCached(aid) + " " + numero);
@@ -150,7 +152,7 @@ public class MXStream {
                 break;
             case "com.mxtech.videoplayer.ad":
                 Intent intentad = new Intent(Intent.ACTION_VIEW);
-                Uri videoUriad = Uri.fromFile(file);
+                Uri videoUriad = getUrifromFile(file);
                 intentad.setDataAndType(videoUriad, "application/mp4");
                 intentad.setPackage("com.mxtech.videoplayer.ad");
                 intentad.putExtra("title", parser.getTitCached(aid) + " " + numero);
@@ -161,6 +163,14 @@ public class MXStream {
             default:
                 Toast.makeText(context, "MX player no instalado", Toast.LENGTH_SHORT).show();
                 break;
+        }
+    }
+
+    private Uri getUrifromFile(File file) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return FileProvider.getUriForFile(context, context.getPackageName() + ".RequestsBackground", file);
+        } else {
+            return Uri.fromFile(file);
         }
     }
 }

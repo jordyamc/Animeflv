@@ -9,6 +9,8 @@ import android.os.Looper;
 import android.support.v4.provider.DocumentFile;
 import android.util.Log;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -18,10 +20,97 @@ import java.util.ArrayList;
 import java.util.List;
 
 import knf.animeflv.DownloadManager.ManageDownload;
+import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
+import xdroid.toaster.Toaster;
 
 public class FileMover {
+    public static void PrepareToPlay(final Activity activity, final String eid) {
+        final MaterialDialog dialog = new MaterialDialog.Builder(activity)
+                .progress(true, 0)
+                .content("Preparando archivo...")
+                .build();
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected void onPreExecute() {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.show();
+                    }
+                });
+                super.onPreExecute();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                checktmp();
+                File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/tmp", eid.replace("E", "") + ".mp4");
+                if (!file.exists()) {
+                    DocumentFile documentFile = FileUtil.init(activity).getFileFromAccess(eid);
+                    try {
+                        file.createNewFile();
+                        InputStream in = FileUtil.getInputStreamFromAccess(activity, documentFile);
+                        OutputStream out = new FileOutputStream(file);
+                        int r;
+                        byte[] b = new byte[1024 * 4];
+                        while ((r = in.read(b, 0, b.length)) != -1) {
+                            out.write(b, 0, r);
+                            out.flush();
+                        }
+                        out.close();
+                        in.close();
+                        StreamManager.Play(activity, eid, file);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toaster.toast("Error preparando archivo");
+                    }
+                } else {
+                    StreamManager.Play(activity, eid, file);
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                    }
+                });
+                super.onPostExecute(aVoid);
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    private static void checktmp() {
+        try {
+            File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/tmp");
+            if (!file.exists())
+                file.mkdirs();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void cleantmp() {
+        try {
+            File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/tmp");
+            if (!file.exists()) {
+                file.mkdirs();
+            } else {
+                for (File f : file.listFiles()) {
+                    if (f.isFile())
+                        f.delete();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void PrepareMove(final Activity activity, final OnProgressListener listener) {
         new AsyncTask<String, String, String>() {
             @Override

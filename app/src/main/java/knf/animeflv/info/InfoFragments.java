@@ -9,7 +9,6 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -38,7 +37,6 @@ import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -60,27 +58,22 @@ import knf.animeflv.R;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.FileUtil;
-import knf.animeflv.Utils.Keys;
-import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
-import knf.animeflv.Utils.objects.User;
 import knf.animeflv.info.fragments.FragmentCaps;
 import knf.animeflv.info.fragments.FragmentInfo;
 import xdroid.toaster.Toaster;
 
-import static knf.animeflv.Utils.Keys.Login.EMAIL_NORMAL;
-
 @SuppressWarnings("WeakerAccess")
 public class InfoFragments extends AppCompatActivity implements LoginServer.callback {
+    public static String ACTION_EDITED = "knf.animeflv.emision.EMISION_EDITED";
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbarLayout;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.image)
     ImageView imageView;
-
     @BindView(R.id.app_bar_layout)
     AppBarLayout barLayout;
     @BindView(R.id.fab)
@@ -97,14 +90,13 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     String aid;
     String u;
     Menu Amenu;
-    String json = "{}";
+    String global_json;
     boolean isInInfo = true;
     boolean infoSeted = false;
-
     private FragmentInfo fragmentInfo;
     private FragmentCaps fragmentCaps;
-
     private FragmentManager fragmentManager;
+    private JSONArray eps;
 
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
@@ -179,9 +171,9 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if (isUserAdmin()) {
+                if (isEmision()) {
                     new MaterialDialog.Builder(InfoFragments.this)
-                            .title("Administrador")
+                            .title("Opciones")
                             .titleGravity(GravityEnum.CENTER)
                             .content("Seleccione accion")
                             .positiveText("editar")
@@ -212,6 +204,26 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         getJsonfromApi();
     }
 
+    private boolean isEmision() {
+        if (global_json != null) {
+            try {
+                JSONObject object = new JSONObject(global_json);
+                switch (object.getString("fecha_fin").trim()) {
+                    case "0000-00-00":
+                    case "prox":
+                        return true;
+                    default:
+                        return false;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
     private void shareAid() {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
@@ -227,37 +239,6 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 barLayout.setExpanded(true, true);
             }
         };
-    }
-
-    private boolean isUserAdmin() {
-        String json_admin = PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.JSON_ADMINS, "null");
-        if (FileUtil.isJSONValid(json_admin)) {
-            try {
-                return getUser(new JSONObject(json_admin)).isAdmin();
-            } catch (JSONException e) {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    private User getUser(JSONObject object) {
-        String email = PreferenceManager.getDefaultSharedPreferences(context).getString(EMAIL_NORMAL, "null");
-        if (email.equals("null")) {
-            return new User(false);
-        }
-        try {
-            JSONArray array = object.getJSONArray("admins");
-            for (int o = 0; o < array.length(); o++) {
-                if (array.getJSONObject(o).getString("email").equals(email)) {
-                    return new User(true, array.getJSONObject(o).getString("name"));
-                }
-            }
-        } catch (JSONException e) {
-            Logger.Error(getClass(), e);
-            return new User(false);
-        }
-        return new User(false);
     }
 
     private void scrollToTop() {
@@ -289,7 +270,14 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 @Override
                 public void onFinish(String json) {
                     if (!json.equals("null")) {
+                        global_json = json;
                         setInfo(json);
+                        try {
+                            eps = new JSONObject(json).getJSONArray("episodios");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            eps = null;
+                        }
                     } else {
                         Toaster.toast("No hay cache para mostrar");
                         finish();
@@ -310,9 +298,9 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/" + aid + ".txt";
         if (file.exists()) {
             Log.d("Archivo", "Existe");
-            json = FileUtil.getStringFromFile(file_loc);
+            return FileUtil.getStringFromFile(file_loc);
         }
-        return json;
+        return "{}";
     }
 
     public void setInfo(final String json) {
@@ -493,57 +481,62 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", true).apply();
                 break;
             case R.id.comentarios:
-                dialog = new MaterialDialog.Builder(this)
-                        .title("COMENTARIOS")
-                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                        .titleGravity(GravityEnum.CENTER)
-                        .customView(R.layout.comentarios, false)
-                        .positiveText("SALIR")
-                        .build();
-                spinner = (Spinner) dialog.getCustomView().findViewById(R.id.comentarios_box_cap);
-                final List<String> caps = parser.parseNumerobyEID(getJsonStringfromFile());
-                String[] array = new String[caps.size()];
-                caps.toArray(array);
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, array);
-                spinner.setAdapter(arrayAdapter);
-                webView = (WebView) dialog.getCustomView().findViewById(R.id.comentarios_box);
-                webView.getSettings().setJavaScriptEnabled(true);
-                String newUA = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
-                webView.getSettings().setUserAgentString(newUA);
-                webView.setWebViewClient(new WebViewClient() {
-                    @Override
-                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                        view.loadUrl(url);
-                        return true;
-                    }
-                });
-                String url = "";
-                try {
-                    url = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, caps.get(0).substring(caps.get(0).lastIndexOf(" ") + 1)), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                Log.d("Comentarios", url);
-                webView.loadUrl(url);
-                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        String urlch = "";
-                        try {
-                            urlch = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1)), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                if (eps != null && eps.length() > 0) {
+                    dialog = new MaterialDialog.Builder(this)
+                            .title("COMENTARIOS")
+                            .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                            .titleGravity(GravityEnum.CENTER)
+                            .customView(R.layout.comentarios, false)
+                            .positiveText("SALIR")
+                            .build();
+                    spinner = (Spinner) dialog.getCustomView().findViewById(R.id.comentarios_box_cap);
+                    final List<String> caps = parser.parseNumerobyEID(getJsonStringfromFile());
+                    String[] array = new String[caps.size()];
+                    caps.toArray(array);
+                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, array);
+                    spinner.setAdapter(arrayAdapter);
+                    webView = (WebView) dialog.getCustomView().findViewById(R.id.comentarios_box);
+                    webView.getSettings().setJavaScriptEnabled(true);
+                    String newUA = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
+                    webView.getSettings().setUserAgentString(newUA);
+                    webView.setWebViewClient(new WebViewClient() {
+                        @Override
+                        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                            view.loadUrl(url);
+                            return true;
                         }
-                        Log.d("Comentarios", urlch);
-                        webView.loadUrl(urlch);
+                    });
+                    String url = "";
+                    try {
+                        String num = caps.get(0).substring(caps.get(0).lastIndexOf(" ") + 1);
+                        url = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, num, eps.getJSONObject(0).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+                    Log.d("Comentarios", url);
+                    webView.loadUrl(url);
+                    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                            String urlch = "";
+                            try {
+                                urlch = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1), eps.getJSONObject(position).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            Log.d("Comentarios", urlch);
+                            webView.loadUrl(urlch);
+                        }
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
 
-                    }
-                });
-                dialog.show();
+                        }
+                    });
+                    dialog.show();
+                } else {
+                    Toaster.toast("No se pueden mostrar los comentarios");
+                }
                 break;
             case R.id.sel_all:
                 fragmentCaps.setallAsSeen();

@@ -19,11 +19,24 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class VideoFile {
+    private final File tmp = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/thumbs");
     private File src;
-    private File tmp = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/thumbs");
+    private String eid;
+    private String id;
+    private File thumb;
+    private String f_num;
 
     public VideoFile(File src) {
         this.src = src;
+        this.eid = src.getName().replace(".mp4", "E");
+        this.id = getEID().replace("E", "").split("_")[0];
+        File file = new File(tmp, src.getName().replace(".mp4", ".png"));
+        if (file.exists()) {
+            this.thumb = file;
+        } else {
+            this.thumb = saveBitmap(ThumbnailUtils.createVideoThumbnail(src.getAbsolutePath(), MediaStore.Images.Thumbnails.MINI_KIND), src);
+        }
+        this.f_num = getEID().replace("E", "").split("_")[1];
     }
 
     public String getPath() {
@@ -35,20 +48,15 @@ public class VideoFile {
     }
 
     public String getEID() {
-        return src.getName().replace(".mp4", "E");
+        return eid;
     }
 
     public String getID() {
-        return getEID().replace("E", "").split("_")[0];
+        return id;
     }
 
     public File getThumbImage() {
-        File file = new File(tmp, src.getName().replace(".mp4", ".png"));
-        if (file.exists()) {
-            return file;
-        } else {
-            return saveBitmap(ThumbnailUtils.createVideoThumbnail(src.getAbsolutePath(), MediaStore.Images.Thumbnails.MINI_KIND), src);
-        }
+        return thumb;
     }
 
     public File recreateThumbImage() {
@@ -98,7 +106,7 @@ public class VideoFile {
     }
 
     public String getCapNumber() {
-        return getEID().replace("E", "").split("_")[1];
+        return f_num;
     }
 
     private File saveBitmap(Bitmap bitmap, File file) {

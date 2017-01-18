@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.File;
 
+import knf.animeflv.FileMover;
 import knf.animeflv.Parser;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.history.adapter.HistoryHelper;
@@ -34,23 +36,43 @@ public class StreamManager {
         String aid = data[0];
         String semi = eid.replace("E", "");
         String cap = data[1].replace("E", "");
-        HistoryHelper.addToList(context, aid, new Parser().getTitCached(aid), cap);
-        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
         File sd = new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
-        switch (Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_video", "0"))) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sd.exists() && getStreamType(context) == 1) {
+            FileMover.PrepareToPlay(context, eid);
+        } else {
+            HistoryHelper.addToList(context, aid, new Parser().getTitCached(aid), cap);
+            File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
+            switch (getStreamType(context)) {
+                case 0:
+                    if (file.exists()) {
+                        StreamManager.internal(context).Play(eid, file);
+                    } else if (sd.exists()) {
+                        StreamManager.internal(context).Play(eid, sd);
+                    }
+                    break;
+                case 1:
+                    if (file.exists()) {
+                        StreamManager.external(context).Play(eid, file);
+                    } else if (sd.exists()) {
+                        StreamManager.external(context).Play(eid, sd);
+                    }
+                    break;
+
+            }
+        }
+    }
+
+    public static int getStreamType(Context context) {
+        return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_video", "0"));
+    }
+
+    public static void Play(Activity context, String eid, File file) {
+        switch (getStreamType(context)) {
             case 0:
-                if (file.exists()) {
-                    StreamManager.internal(context).Play(eid, file);
-                } else if (sd.exists()) {
-                    StreamManager.internal(context).Play(eid, sd);
-                }
+                StreamManager.internal(context).Play(eid, file);
                 break;
             case 1:
-                if (file.exists()) {
-                    StreamManager.external(context).Play(eid, file);
-                } else if (sd.exists()) {
-                    StreamManager.external(context).Play(eid, sd);
-                }
+                StreamManager.external(context).Play(eid, file);
                 break;
 
         }

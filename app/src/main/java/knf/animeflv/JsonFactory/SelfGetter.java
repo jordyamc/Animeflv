@@ -266,11 +266,13 @@ public class SelfGetter {
                             JSONObject object = new JSONObject();
                             String name = ep.select("a").first().ownText().trim();
                             String num = name.replace(title, "").trim();
+                            String s_id = ep.select("a").first().attr("href").split("/")[2];
                             if (num.contains(":")) {
                                 num = num.replace(" ", "").split(":")[0];
                             }
                             object.put("num", num);
                             object.put("eid", aid + "_" + num + "E");
+                            object.put("sid", s_id);
                             array.put(object);
                         }
                     } catch (Exception e) {

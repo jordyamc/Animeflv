@@ -16,16 +16,32 @@ public class Directory {
     private String title;
     private DocumentFile srcAccess;
     private boolean inSD;
+    private String filenumber;
+    private String id;
 
     public Directory(File src) {
         this.src = src;
+        if (src != null) {
+            this.filenumber = String.valueOf(src.list().length) + " archivos";
+            this.id = src.getName();
+        } else {
+            this.filenumber = String.valueOf(srcAccess.listFiles().length) + " archivos";
+            this.id = srcAccess.getName();
+        }
         this.title = new Parser().getTitCached(getID());
     }
 
-    public Directory(DocumentFile src, boolean inSD) {
-        this.srcAccess = src;
-        this.title = new Parser().getTitCached(getID());
+    public Directory(DocumentFile srce, boolean inSD) {
+        this.srcAccess = srce;
         this.inSD = inSD;
+        if (src != null) {
+            this.filenumber = String.valueOf(src.list().length) + " archivos";
+            this.id = src.getName();
+        } else {
+            this.filenumber = String.valueOf(srcAccess.listFiles().length) + " archivos";
+            this.id = srcAccess.getName();
+        }
+        this.title = new Parser().getTitCached(getID());
     }
 
     public String getPath() {
@@ -45,11 +61,7 @@ public class Directory {
     }
 
     public String getID() {
-        if (src != null) {
-            return src.getName();
-        } else {
-            return srcAccess.getName();
-        }
+        return id;
     }
 
     public String getImageUrl(Context context) {
@@ -61,10 +73,6 @@ public class Directory {
     }
 
     public String getFilesNumber() {
-        if (src != null) {
-            return String.valueOf(src.list().length) + " archivos";
-        } else {
-            return String.valueOf(srcAccess.listFiles().length) + " archivos";
-        }
+        return filenumber;
     }
 }

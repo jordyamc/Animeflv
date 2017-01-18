@@ -85,10 +85,10 @@ import java.util.HashSet;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import knf.animeflv.AutoEmision.AutoEmisionActivity;
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.Emision.Section.newEmisionActivity;
-import knf.animeflv.Emision.Section.newEmisionTest;
 import knf.animeflv.Explorer.ExplorerRoot;
 import knf.animeflv.HallFame.HallActivity;
 import knf.animeflv.Interfaces.EncryptionListener;
@@ -201,6 +201,7 @@ public class newMain extends AppCompatActivity implements
     }
 
     private void startUp() {
+        FileMover.cleantmp();
         if (!getSharedPreferences("data", MODE_PRIVATE).getBoolean("seenUpdated", false)) {
             getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("seenUpdated", true).apply();
             SeenManager.get(this).updateSeen(getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", ""), new SeenManager.SeenCallback() {
@@ -443,7 +444,8 @@ public class newMain extends AppCompatActivity implements
                                 result.setSelection(0, false);
                                 break;
                             case 3:
-                                startActivity(new Intent(context, newEmisionTest.class));
+                                //startActivity(new Intent(context, newEmisionTest.class));
+                                startActivity(new Intent(context, AutoEmisionActivity.class));
                                 result.setSelection(0, false);
                                 result.closeDrawer();
                                 break;

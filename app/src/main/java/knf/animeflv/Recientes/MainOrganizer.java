@@ -17,22 +17,32 @@ public class MainOrganizer {
     private static MainOrganizer organizer = new MainOrganizer();
 
     public static MainOrganizer init(String json) {
-        restartLists();
-        try {
-            JSONArray array = new JSONObject(json).getJSONArray("lista");
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject object = array.getJSONObject(i);
-                eids.add(object.getString("eid"));
-                tipos.add(object.getString("tid"));
-                tits.add(object.getString("titulo"));
+        if (!json.equals("null")) {
+            restartLists();
+            try {
+                JSONArray array = new JSONObject(json).getJSONArray("lista");
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject object = array.getJSONObject(i);
+                    eids.add(object.getString("eid"));
+                    tipos.add(object.getString("tid"));
+                    tits.add(object.getString("titulo"));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (organizer != null) {
-            return organizer;
+            if (organizer != null) {
+                return organizer;
+            } else {
+                organizer = new MainOrganizer();
+                return organizer;
+            }
         } else {
-            return new MainOrganizer();
+            if (organizer != null) {
+                return organizer;
+            } else {
+                organizer = new MainOrganizer();
+                return organizer;
+            }
         }
     }
 

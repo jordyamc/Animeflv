@@ -121,7 +121,7 @@ public class FragmentCaps extends Fragment {
     }
 
     private Activity activity() {
-        return activityWeakReference.get();
+        return getActivity();
     }
 
     public void resetListButton() {

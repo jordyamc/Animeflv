@@ -5,10 +5,10 @@ android {
     buildToolsVersion '25.0.2'
     defaultConfig {
         applicationId "knf.animeflv"
-        minSdkVersion 19
+        minSdkVersion 16
         targetSdkVersion 25
-        versionCode 158
-        versionName "4.1.1"
+        versionCode 159
+        versionName "4.2"
         multiDexEnabled = true
     }
     buildTypes {
@@ -100,8 +100,8 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.4.0'
     compile 'com.squareup.okhttp3:okhttp:3.5.0'
     compile 'com.squareup.okio:okio:1.11.0'
-    compile 'com.ogaclejapan.smarttablayout:library:1.6.0@aar'
-    compile 'com.ogaclejapan.smarttablayout:utils-v4:1.6.0@aar'
+    compile 'com.ogaclejapan.smarttablayout:library:1.6.1@aar'
+    compile 'com.ogaclejapan.smarttablayout:utils-v4:1.6.1@aar'
     compile 'com.github.AndroidDeveloperLB:MaterialPreferenceLibrary:+'
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'com.github.panwrona:DownloadProgressBar:1.1'

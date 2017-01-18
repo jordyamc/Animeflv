@@ -116,6 +116,9 @@
             android:name=".Emision.Section.newEmisionTest"
             android:label="@string/app_name"/>
         <activity
+            android:name=".AutoEmision.AutoEmisionActivity"
+            android:label="@string/app_name"/>
+        <activity
             android:name=".Player"
             android:label="@string/app_name"/>
         <activity

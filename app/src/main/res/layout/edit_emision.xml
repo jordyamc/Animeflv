@@ -25,32 +25,6 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/hourtext"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:text="Hora:"
-                android:textSize="24sp"/>
-
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/hour_button"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:text="~00:00AM"/>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
                 android:id="@+id/daytext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -69,8 +43,8 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
-                android:layout_toEndOf="@+id/text"
-                android:layout_toRightOf="@+id/text"/>
+                android:layout_toEndOf="@+id/daytext"
+                android:layout_toRightOf="@+id/daytext"/>
         </RelativeLayout>
     </LinearLayout>
 

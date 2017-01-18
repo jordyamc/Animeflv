@@ -101,7 +101,11 @@ public class FragmentInfo extends Fragment {
     }
 
     private Activity activity() {
-        return activityWeakReference.get();
+        try {
+            return activityWeakReference.get();
+        } catch (NullPointerException e) {
+            return getActivity();
+        }
     }
 
     private void setInfo() {
@@ -161,7 +165,8 @@ public class FragmentInfo extends Fragment {
         activity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                nestedScrollView.scrollTo(0, 1 * -1000);
+                if (nestedScrollView != null)
+                    nestedScrollView.scrollTo(0, 1 * -1000);
             }
         });
     }

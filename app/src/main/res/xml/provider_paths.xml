@@ -3,4 +3,10 @@
     <external-path
         name="_.sounds"
         path="Animeflv/cache/.sounds/"/>
+    <external-path
+        name="download"
+        path="Animeflv/download/"/>
+    <external-path
+        name="download-tmp"
+        path="Animeflv/download/tmp/"/>
 </paths>

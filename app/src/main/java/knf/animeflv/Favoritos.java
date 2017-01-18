@@ -330,12 +330,13 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
             fin = fin + ":::" + aid;
         }
         getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", fin).commit();
-        LoginServer.RefreshData(this, new LoginServer.RefreshInterface() {
+        FavSyncro.updateServer(this);
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onFinishRefresh() {
+            public void run() {
                 sorted = false;
             }
-        });
+        }, 5000);
     }
 
     @Override
