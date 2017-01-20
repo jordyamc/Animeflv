@@ -121,7 +121,7 @@ public class BackDownload extends AppCompatActivity {
         titulo = bundle.getString("titulo", "");
         eid = bundle.getString("eid", "");
         Parser parser = new Parser();
-        new Check(this).execute(parser.getInicioUrl(TaskType.NORMAL, this) + "?url=" + parser.getUrlCached(aid, num));
+        new Check(this).execute(parser.getInicioUrl(TaskType.NORMAL, this) + "?url=" + Parser.getUrlCached(aid + "_" + num + "E", "000"));
     }
 
     public void setupWeb() {

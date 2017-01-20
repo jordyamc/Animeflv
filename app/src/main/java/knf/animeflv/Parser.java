@@ -298,6 +298,31 @@ public class Parser {
         }
     }
 
+    public static String getUrlCached(String eid, String sid) {
+        String[] data = eid.replace("E", "").split("_");
+        String aid = data[0];
+        String numero = data[1];
+        String ret = "null";
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject nombreJ = jsonArray.getJSONObject(i);
+                    String n = nombreJ.getString("a");
+                    if (n.trim().equals(aid)) {
+                        return "http://animeflv.net/ver/" + sid + "/" + nombreJ.getString("d") + "-" + numero;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
     public String[] parseTitulos(String json) {
         List<String> titulosArray = new ArrayList<String>();
         String[] titulos;
@@ -680,28 +705,6 @@ public class Parser {
         return ret;
     }
 
-    public String getUrlCached(String aid, String numero) {
-        String ret = "null";
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-        File file = new File(file_loc);
-        if (file.exists()) {
-            try {
-                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
-                JSONArray jsonArray = jsonObj.getJSONArray("lista");
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject nombreJ = jsonArray.getJSONObject(i);
-                    String n = nombreJ.getString("a");
-                    if (n.trim().equals(aid)) {
-                        return "http://animeflv.net/ver/" + nombreJ.getString("d") + "-" + numero + ".html";
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return ret;
-    }
-
     public String getUrlCached(String aid, String numero, String sid) {
         String ret = "null";
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
@@ -715,31 +718,6 @@ public class Parser {
                     String n = nombreJ.getString("a");
                     if (n.trim().equals(aid)) {
                         return "http://animeflv.net/ver/" + sid + "/" + nombreJ.getString("d") + "-" + numero;
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return ret;
-    }
-
-    public String getUrlCached(String eid) {
-        String[] data = eid.replace("E", "").split("_");
-        String aid = data[0];
-        String numero = data[1];
-        String ret = "null";
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-        File file = new File(file_loc);
-        if (file.exists()) {
-            try {
-                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
-                JSONArray jsonArray = jsonObj.getJSONArray("lista");
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject nombreJ = jsonArray.getJSONObject(i);
-                    String n = nombreJ.getString("a");
-                    if (n.trim().equals(aid)) {
-                        return "http://animeflv.net/ver/" + nombreJ.getString("d") + "-" + numero + ".html";
                     }
                 }
             } catch (Exception e) {

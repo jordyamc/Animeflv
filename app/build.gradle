@@ -7,8 +7,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 159
-        versionName "4.2"
+        versionCode 160
+        versionName "4.2.1"
         multiDexEnabled = true
     }
     buildTypes {
@@ -19,7 +19,7 @@ android {
         }
     }
     dexOptions {
-        javaMaxHeapSize "20g"
+        javaMaxHeapSize "50g"
     }
     productFlavors {
     }
@@ -72,7 +72,7 @@ dependencies {
     compile 'jp.wasabeef:recyclerview-animators:2.2.3'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'com.cleveroad:audiowidget:1.0.0'
-    compile 'com.github.clans:fab:1.6.2'
+    compile 'com.github.clans:fab:1.6.4'
     compile 'com.nononsenseapps:filepicker:2.5.2'
     compile 'com.github.halysongoncalves:pugnotification:1.8.1'
     compile 'com.google.android.exoplayer:exoplayer:r1.5.9'
@@ -86,7 +86,6 @@ dependencies {
     compile 'com.shamanland:xdroid-toaster:0.0.10'
     compile 'com.karumi:dexter:2.3.1'
     //<--
-    compile 'com.android.support:design:25.1.0'
     compile 'com.android.support:palette-v7:25.1.0'
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.android.support:recyclerview-v7:25.1.0'
@@ -131,4 +130,7 @@ dependencies {
     compile project(':multidisplaycast')
 
     compile 'com.android.support:multidex:1.0.1'
+
+    //compile 'com.google.android.gms:play-services-analytics:10.0.1'
 }
+//apply plugin: 'com.google.gms.google-services'

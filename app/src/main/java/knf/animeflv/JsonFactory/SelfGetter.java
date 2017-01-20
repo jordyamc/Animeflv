@@ -24,6 +24,7 @@ import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
+import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
 import knf.animeflv.Parser;
 import knf.animeflv.Utils.ExecutorManager;
@@ -94,24 +95,60 @@ public class SelfGetter {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
-    public static void getDownloadList(final Context context, final List<String> eids, final WaitList.ListListener listListener) {
+    public static void getDownload(final Context context, final DOWNLOAD download, final BaseGetter.AsyncInterface asyncInterface) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                List<WaitDownloadElement> list = new ArrayList<>();
-                try {
-                    for (String eid : eids) {
-                        String url = new Parser().getUrlCached(eid);
-                        JSONObject object = new JSONObject(getDownloadInfo(context, url));
-                        String ur = object.getJSONArray("downloads").getJSONObject(0).getString("url");
-                        if (!url.contains("mega") || !url.contains("zippy"))
-                            list.add(new WaitDownloadElement(eid, ur));
+                getAnime(context, new ANIME(download.eid.split("_")[0]), new BaseGetter.AsyncInterface() {
+                    @Override
+                    public void onFinish(String json) {
+                        try {
+                            JSONArray array = new JSONObject(json).getJSONArray("episodios");
+                            for (int i = 0; i < array.length(); i++) {
+                                JSONObject object = array.getJSONObject(i);
+                                if (object.getString("eid").equals(download.eid)) {
+                                    asyncInterface.onFinish(getDownloadInfo(context, Parser.getUrlCached(download.eid, object.getString("sid"))));
+                                    return;
+                                }
+                            }
+                            asyncInterface.onFinish("null");
+                        } catch (Exception e) {
+                            asyncInterface.onFinish("null");
+                        }
                     }
-                    listListener.onListCreated(list);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    listListener.onListCreated(list);
-                }
+                });
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    public static void getDownloadList(final Context context, final String aid, final List<String> eids, final WaitList.ListListener listListener) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                getAnime(context, new ANIME(aid), new BaseGetter.AsyncInterface() {
+                    @Override
+                    public void onFinish(String json) {
+                        List<WaitDownloadElement> list = new ArrayList<>();
+                        try {
+                            JSONArray array = new JSONObject(json).getJSONArray("episodios");
+                            for (int i = 0; i < array.length(); i++) {
+                                JSONObject object = array.getJSONObject(i);
+                                if (eids.contains(object.getString("eid"))) {
+                                    String url = Parser.getUrlCached(object.getString("eid"), object.getString("sid"));
+                                    JSONObject obj = new JSONObject(getDownloadInfo(context, url));
+                                    String ur = obj.getJSONArray("downloads").getJSONObject(0).getString("url");
+                                    if (!url.contains("mega") || !url.contains("zippy"))
+                                        list.add(new WaitDownloadElement(object.getString("eid"), ur));
+                                }
+                            }
+                            listListener.onListCreated(list);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            listListener.onListCreated(list);
+                        }
+                    }
+                });
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());

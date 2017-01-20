@@ -62,6 +62,7 @@ import knf.animeflv.Recyclers.AdapterBusquedaNew;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.SearchUtils;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.Utils.TrackingHelper;
 import knf.animeflv.Utils.eNums.SearchType;
 import xdroid.toaster.Toaster;
 
@@ -901,5 +902,11 @@ public class Directorio extends AppCompatActivity {
             viewPager.setVisibility(View.VISIBLE);
             viewPagerTab.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        TrackingHelper.track(this, TrackingHelper.DIRECTORIO);
     }
 }

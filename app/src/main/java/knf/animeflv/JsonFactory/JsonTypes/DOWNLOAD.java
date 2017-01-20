@@ -12,4 +12,8 @@ public class DOWNLOAD {
         this.url = url;
         this.eid = eid;
     }
+
+    public DOWNLOAD(String eid) {
+        this.eid = eid;
+    }
 }

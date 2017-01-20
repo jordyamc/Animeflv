@@ -50,7 +50,7 @@ public class BaseGetter {
 
     public static void getJson(Context context, DOWNLOAD download, AsyncInterface asyncInterface) {
         if (NetworkUtils.isNetworkAvailable()) {
-            SelfGetter.getDownload(context, download.url, asyncInterface);
+            SelfGetter.getDownload(context, download, asyncInterface);
         } else {
             asyncInterface.onFinish("null");
         }

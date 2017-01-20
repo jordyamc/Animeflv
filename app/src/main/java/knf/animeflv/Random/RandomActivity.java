@@ -19,6 +19,7 @@ import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.Utils.TrackingHelper;
 import xdroid.toaster.Toaster;
 
 public class RandomActivity extends AppCompatActivity implements RandomInterfaces, SwipeRefreshLayout.OnRefreshListener {
@@ -100,5 +101,11 @@ public class RandomActivity extends AppCompatActivity implements RandomInterface
     @Override
     public void onRefresh() {
         adapter.onStartRefreshing();
+    }
+
+    @Override
+    protected void onResume() {
+        TrackingHelper.track(this, TrackingHelper.RANDOM);
+        super.onResume();
     }
 }

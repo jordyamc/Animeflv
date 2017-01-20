@@ -1,39 +1,64 @@
 {
   "project_info": {
-    "project_number": "226609368920",
-    "firebase_url": "https://animeflvapp-4070a.firebaseio.com",
-    "project_id": "animeflvapp-4070a",
-    "storage_bucket": "animeflvapp-4070a.appspot.com"
+    "project_number": "545685263928",
+    "project_id": "animeflvapp"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:226609368920:android:6cecf802da69fe21",
+        "mobilesdk_app_id": "1:545685263928:android:a8774144a5b04ee0",
         "android_client_info": {
-          "package_name": "knf.animeflv"
+          "package_name": "knf.animeflv2"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "226609368920-3rhsnnimlo9hnooa8pthtlt9nqv4kep5.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyD9v_gVOosGMXSRSeVta2dofYXhpx1dTGs"
+          "current_key": "AIzaSyBzCpxKXaQnY6fAx76JA6EFCCWl6N-6PQA"
         }
       ],
       "services": {
         "analytics_service": {
-          "status": 1
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-40289745-2"
+          }
         },
         "appinvite_service": {
           "status": 1,
           "other_platform_oauth_client": []
         },
         "ads_service": {
-          "status": 2
+          "status": 1
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545685263928:android:6cecf802da69fe21",
+        "android_client_info": {
+          "package_name": "knf.animeflv"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzCpxKXaQnY6fAx76JA6EFCCWl6N-6PQA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-40289745-2"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
         }
       }
     }

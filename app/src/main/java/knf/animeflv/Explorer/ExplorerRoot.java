@@ -42,6 +42,7 @@ import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.FragmentExtras;
 import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.Utils.TrackingHelper;
 import xdroid.toaster.Toaster;
 
 
@@ -411,6 +412,12 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
             videoFilesFragment = new VideoFilesFragment();
             showDirectory();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        TrackingHelper.track(this, TrackingHelper.EXPLORADOR);
+        super.onResume();
     }
 
     @Override

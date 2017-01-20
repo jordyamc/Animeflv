@@ -31,7 +31,6 @@ import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.Interfaces.WaitDownloadCallback;
 import knf.animeflv.JsonFactory.SelfGetter;
-import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.MainStates;
@@ -53,7 +52,6 @@ public class WaitList extends AppCompatActivity implements
     private Activity context;
     private AdapterWait adapterWait;
     private MaterialDialog processing;
-    private Parser parser = new Parser();
     private List<String> urls = new ArrayList<>();
     private List<String> eids = new ArrayList<>();
 
@@ -220,7 +218,7 @@ public class WaitList extends AppCompatActivity implements
                 final String eid = aid + "_" + curr + "E";
                 eids.add(eid);
             }
-            SelfGetter.getDownloadList(WaitList.this, eids, new ListListener() {
+            SelfGetter.getDownloadList(WaitList.this, aid, eids, new ListListener() {
                 @Override
                 public void onListCreated(List<WaitDownloadElement> list) {
                     startDownloads(list);
@@ -246,7 +244,7 @@ public class WaitList extends AppCompatActivity implements
                 final String eid = aid + "_" + curr + "E";
                 eids.add(eid);
             }
-            SelfGetter.getDownloadList(WaitList.this, eids, new ListListener() {
+            SelfGetter.getDownloadList(WaitList.this, aid, eids, new ListListener() {
                 @Override
                 public void onListCreated(List<WaitDownloadElement> list) {
                     startDownloads(list);

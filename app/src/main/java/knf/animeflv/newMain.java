@@ -1,9 +1,11 @@
 package knf.animeflv;
 
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -88,6 +90,7 @@ import cz.msebera.android.httpclient.Header;
 import knf.animeflv.AutoEmision.AutoEmisionActivity;
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.Directorio.Directorio;
+import knf.animeflv.DownloadService.DownloaderService;
 import knf.animeflv.Emision.Section.newEmisionActivity;
 import knf.animeflv.Explorer.ExplorerRoot;
 import knf.animeflv.HallFame.HallActivity;
@@ -116,6 +119,7 @@ import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.NoLogInterface;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.Utils.TrackingHelper;
 import knf.animeflv.Utils.UtilDialogPref;
 import knf.animeflv.Utils.UtilNotBlocker;
 import knf.animeflv.Utils.UtilSound;
@@ -191,6 +195,8 @@ public class newMain extends AppCompatActivity implements
     };
     private String currUser = "null";
 
+    private BroadcastReceiver receiver;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         ThemeUtils.setThemeOn(this);
@@ -259,6 +265,21 @@ public class newMain extends AppCompatActivity implements
             DirFile.delete();
             ServerGetter.backupDir(this);
         }
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(DownloaderService.RECEIVER_ACTION_ERROR);
+        registerReceiver(getReceiver(), filter);
+    }
+
+    private BroadcastReceiver getReceiver() {
+        if (receiver == null)
+            receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (intent.getAction().equals(DownloaderService.RECEIVER_ACTION_ERROR))
+                        loadMainJson();
+                }
+            };
+        return receiver;
     }
 
     private void setUpDrawer() {
@@ -1535,6 +1556,7 @@ public class newMain extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        TrackingHelper.track(this, TrackingHelper.MAIN);
         getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", new HashSet<String>()).apply();
         parser.refreshUrls(context);
@@ -1621,6 +1643,8 @@ public class newMain extends AppCompatActivity implements
         new Parser().saveBackup(this);
         SeenManager.get(this).close();
         FavSyncro.updateServer(context);
+        if (receiver != null)
+            unregisterReceiver(getReceiver());
     }
 
     @Override
@@ -1648,6 +1672,7 @@ public class newMain extends AppCompatActivity implements
                         mediaRouteMenuItem);
         mediaRouteActionProvider.setRouteSelector(PlayBackManager.get(this).getSelector());*/
         CastPlayBackManager.get(this).registrerMenu(menu, R.id.media_route);
+
         return true;
     }
 

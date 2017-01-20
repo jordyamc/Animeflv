@@ -44,6 +44,7 @@ import knf.animeflv.Recyclers.AdapterFavs;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.Utils.TrackingHelper;
 
 public class Favoritos extends AppCompatActivity implements RequestFav.callback, RequestFavSort.callback, FavSyncro.UpdateCallback {
     RecyclerView recyclerView;
@@ -273,6 +274,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
     @Override
     protected void onResume() {
         super.onResume();
+        TrackingHelper.track(this, TrackingHelper.FAVORITOS);
         if (shouldExecuteOnResume) {
             handler.postDelayed(runnable, 1);
             Boolean cambiado = getSharedPreferences("data", MODE_PRIVATE).getBoolean("cambio_fav", false);

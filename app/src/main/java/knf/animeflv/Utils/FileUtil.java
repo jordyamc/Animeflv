@@ -266,6 +266,7 @@ public class FileUtil {
                 .replace("&oacute;", "ó")
                 .replace("&quot;", "\"")
                 .replace("&uuml;", "\u00FC")
+                .replace("&auml;", "\u00E4")
                 .replace("&szlig;", "\u00DF")
                 .replace("&radic;", "\u221A")
                 .replace("&dagger;", "\u2020")

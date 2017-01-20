@@ -39,7 +39,7 @@ public class DownloadGetter {
     private static Spinner sp;
 
     public static void search(final Activity context, final String eid, final ActionsInterface actionsInterface) {
-        BaseGetter.getJson(context, new DOWNLOAD(new Parser().getUrlCached(eid), eid), new BaseGetter.AsyncInterface() {
+        BaseGetter.getJson(context, new DOWNLOAD(eid), new BaseGetter.AsyncInterface() {
             @Override
             public void onFinish(String json) {
                 try {
@@ -155,9 +155,8 @@ public class DownloadGetter {
                     actionsInterface.onCancelDownload();
                     actionsInterface.onLogError(e);
                     if (NetworkUtils.isNetworkAvailable()) {
-                        Parser parser = new Parser();
-                        FileUtil.writeToFile(e.getMessage() + "   " + parser.getUrlCached(eid) + "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
-                        if (!parser.getUrlCached(eid).equals("null")) {
+                        FileUtil.writeToFile(e.getMessage() + "   " + Parser.getUrlCached(eid, "000") + "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
+                        if (!Parser.getUrlCached(eid, "000").equals("null")) {
                             Toaster.toast("Error en JSON");
                         } else {
                             Toaster.toast("Anime no encontrado en directorio!");

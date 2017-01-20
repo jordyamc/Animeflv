@@ -61,6 +61,7 @@ import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.Utils.TrackingHelper;
 import knf.animeflv.info.fragments.FragmentCaps;
 import knf.animeflv.info.fragments.FragmentInfo;
 import xdroid.toaster.Toaster;
@@ -133,6 +134,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             setCollapsingToolbarLayoutTitle(getIntent().getExtras().getString("title"));
             u = parser.getUrlAnimeCached(aid);
         }
+        TrackingHelper.track(this, TrackingHelper.INFO + aid);
         new CacheManager().portada(this, aid, imageView);
         button.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -6,9 +6,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
 
@@ -204,6 +206,7 @@ public class NetworkUtils {
                                             public void run() {
                                                 button.setShowProgressBackground(true);
                                                 button.show(true);
+                                                button.setIndeterminate(true);
                                             }
                                         });
                                         final ThinDownloadManager downloadManager = new ThinDownloadManager();
@@ -222,12 +225,7 @@ public class NetworkUtils {
                                                                 button.setOnClickListener(new View.OnClickListener() {
                                                                     @Override
                                                                     public void onClick(View v) {
-                                                                        Intent promptInstall = new Intent(Intent.ACTION_VIEW)
-                                                                                .setDataAndType(Uri.fromFile(descarga),
-                                                                                        "application/vnd.android.package-archive");
-                                                                        dialog.dismiss();
-                                                                        ((newMain) Tcontext).finish();
-                                                                        Tcontext.startActivity(promptInstall);
+                                                                        startInstall();
                                                                     }
                                                                 });
                                                             }
@@ -246,6 +244,7 @@ public class NetworkUtils {
                                                         ((newMain) Tcontext).runOnUiThread(new Runnable() {
                                                             @Override
                                                             public void run() {
+                                                                button.setIndeterminate(false);
                                                                 button.setProgress(progress, true);
                                                             }
                                                         });
@@ -267,6 +266,26 @@ public class NetworkUtils {
             });
             Looper.loop();
             return null;
+        }
+
+        private void startInstall() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                Uri uri = FileProvider.getUriForFile(context, "knf.animeflv.RequestsBackground", descarga);
+                Tcontext.grantUriPermission("com.android.packageinstaller", uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                Intent promptInstall = new Intent(Intent.ACTION_VIEW)
+                        .setDataAndType(uri,
+                                "application/vnd.android.package-archive");
+                dialog.dismiss();
+                ((newMain) Tcontext).finish();
+                Tcontext.startActivity(promptInstall);
+            } else {
+                Intent promptInstall = new Intent(Intent.ACTION_VIEW)
+                        .setDataAndType(Uri.fromFile(descarga),
+                                "application/vnd.android.package-archive");
+                dialog.dismiss();
+                ((newMain) Tcontext).finish();
+                Tcontext.startActivity(promptInstall);
+            }
         }
     }
 }

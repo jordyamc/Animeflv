@@ -4,6 +4,9 @@
         name="_.sounds"
         path="Animeflv/cache/.sounds/"/>
     <external-path
+        name="cache"
+        path="Animeflv/cache/"/>
+    <external-path
         name="download"
         path="Animeflv/download/"/>
     <external-path

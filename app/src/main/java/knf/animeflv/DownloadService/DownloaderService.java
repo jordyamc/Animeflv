@@ -29,6 +29,7 @@ public class DownloaderService extends IntentService {
     public static final int CANCELED = 1554785;
     private static final int DOWNLOAD_NOTIFICATION_ID = 4458758;
     private static final int NULL = 388744;
+    public static String RECEIVER_ACTION_ERROR = "knf.animeflv.DownloadService.DownloadService.RECIEVER_ERROR";
     private NotificationManager manager;
     private NotificationCompat.Builder downloading;
 
@@ -160,6 +161,7 @@ public class DownloaderService extends IntentService {
                 .setOngoing(false);
         getManager().notify(getDownloadID(eid), builder.build());
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_FAILED).delete(eid);
+        sendBroadcast(new Intent(RECEIVER_ACTION_ERROR));
     }
 
     private int getDownloadID(String eid) {
