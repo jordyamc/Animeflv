@@ -206,7 +206,6 @@ public class NetworkUtils {
                                             public void run() {
                                                 button.setShowProgressBackground(true);
                                                 button.show(true);
-                                                button.setIndeterminate(true);
                                             }
                                         });
                                         final ThinDownloadManager downloadManager = new ThinDownloadManager();
@@ -244,7 +243,6 @@ public class NetworkUtils {
                                                         ((newMain) Tcontext).runOnUiThread(new Runnable() {
                                                             @Override
                                                             public void run() {
-                                                                button.setIndeterminate(false);
                                                                 button.setProgress(progress, true);
                                                             }
                                                         });
