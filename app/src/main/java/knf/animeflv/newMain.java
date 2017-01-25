@@ -445,7 +445,7 @@ public class newMain extends AppCompatActivity implements
                         new PrimaryDrawerItem().withName("Lista").withIcon(MaterialDesignIconic.Icon.gmi_assignment_returned).withIdentifier(4),
                         new PrimaryDrawerItem().withName("VIP").withIcon(CommunityMaterial.Icon.cmd_crown).withIdentifier(15),
                         new PrimaryDrawerItem().withName("Pagina Oficial").withIcon(FontAwesome.Icon.faw_facebook).withIdentifier(6),
-                        new PrimaryDrawerItem().withName("Web Oficial").withIcon(MaterialDesignIconic.Icon.gmi_view_web).withIdentifier(7),
+                        new PrimaryDrawerItem().withName("Discord Oficial").withIcon(CommunityMaterial.Icon.cmd_discord).withIdentifier(7),
                         new PrimaryDrawerItem().withName("Publicidad").withIcon(MaterialDesignIconic.Icon.gmi_cloud).withIdentifier(8)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -489,7 +489,7 @@ public class newMain extends AppCompatActivity implements
                                 result.closeDrawer();
                                 break;
                             case 7:
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(parser.getBaseUrl(TaskType.NORMAL, context).replace("api2.", ""))));
+                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://discord.gg/6hzpua6")));
                                 result.setSelection(0, false);
                                 result.closeDrawer();
                                 break;

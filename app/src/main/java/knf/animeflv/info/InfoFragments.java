@@ -121,13 +121,13 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         aid = getIntent().getExtras().getString("aid");
         if (aid == null) {
             u = getIntent().getDataString();
-            String url = u.replace("http://animeflv.net/", "").replace(".html", "");
+            String url = u.replace("http://animeflv.net/", "");
             String[] data = url.split("/");
-            aid = parser.getAidCached(data[1]);
+            aid = parser.getAidCached(data[2]);
             if (aid != null) {
                 setCollapsingToolbarLayoutTitle(parser.getTitCached(aid));
             } else {
-                Toaster.toast("Error al abrir informacion!!!");
+                Toaster.toast("Error al abrir informacion desde link!!!");
                 finish();
             }
         } else {

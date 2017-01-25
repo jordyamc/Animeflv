@@ -78,6 +78,10 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
         return castingEid;
     }
 
+    public boolean isCasting(String eid) {
+        return getCastingEid().equals(eid);
+    }
+
     private String getPreviewUrl() {
         String base = new Parser().getBaseUrl(TaskType.NORMAL, activity).replace("api2.", "") + "/images/";
         return base + (ThemeUtils.isAmoled(activity) ? "preview_dark.png" : "preview_light.png");

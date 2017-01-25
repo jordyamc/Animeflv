@@ -116,7 +116,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 showDelete(holder.ib_des);
             } else {
                 showDownload(holder.ib_des, holder.getAdapterPosition());
-                if (CastPlayBackManager.get(context).getCastingEid().equals(Animes.get(holder.getAdapterPosition()).getEid())) {
+                if (CastPlayBackManager.get(context).isCasting(Animes.get(holder.getAdapterPosition()).getEid())) {
                     showCastPlay(holder.ib_ver);
                 } else {
                     showCloudPlay(holder.ib_ver);

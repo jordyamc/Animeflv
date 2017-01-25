@@ -8,6 +8,7 @@ import android.content.pm.Signature;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -793,8 +794,8 @@ public class Parser {
         return ret;
     }
 
+    @Nullable
     public String getAidCached(String url) {
-        String ret = "0";
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
         File file = new File(file_loc);
         if (file.exists()) {
@@ -812,7 +813,7 @@ public class Parser {
                 e.printStackTrace();
             }
         }
-        return ret;
+        return null;
     }
 
     public boolean isJSONValid(String test) {
