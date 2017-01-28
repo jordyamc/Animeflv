@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Animeflv App | No Oficial</title>
+    <link href="css/bootstrap.css" rel='stylesheet' type='text/css'/>
+    <!-- jQuery (Bootstrap's JavaScript plugins) -->
+    <script src="js/jquery.min.js"></script>
+    <!-- Custom Theme files -->
+    <link href="css/style.css" rel="stylesheet" type="text/css" media="all"/>
+    <!-- Custom Theme files -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="keywords" content="Anime, Animeflv, Animeflvapp, android, 
+app, free anime, Samsung, LG, SonyErricsson, Motorola"/>
+    <script type="application/x-javascript">
+        addEventListener("load", function () {
+            setTimeout(hideURLbar, 0);
+        }, false);
+        act();
+
+        function hideURLbar() {
+            window.scrollTo(0, 1);
+        }
+
+        function act() {
+            $.ajax({
+                type: "GET",
+                url: "contador.php?version=total",
+                data: "",
+                success: function (data) {
+                    var texto = document.getElementById("cuenta");
+                    texto.innerHTML = data;
+                    texto.style.color = "#ff0f0f";
+                }
+            });
+            setTimeout(act, 10000);
+        }
+
+    </script>
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-5390653757953587",
+            enable_page_level_ads: true
+        });
+
+    </script>
+</head>
+
+<body>
+<!---->
+<div class="header">
+    <div class="container">
+        <div class="header-top">
+            <div class="logo">
+                <a href="index.html"><h1>AnimeFlv App<span>No Oficial</span></h1></a>
+            </div>
+            <div class="hdr-address">
+                <div class="address1">
+                    <h5></h5>
+                    <p></p>
+                </div>
+                <div class="call">
+                    <a href="mailto:animeflvapp@hotmail.com"><h5>animeflvapp@hotmail.com</h5></a>
+                    <p>Contacto</p>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <!--<div class="search">
+                <div class="search-box">
+                    <div id="sb-search" class="sb-search">
+                        <form>
+                            <input class="sb-search-input" placeholder="search term..." type="search" name="search" id="search">
+                            <input class="sb-search-submit" type="submit" value="">
+                            <span class="sb-icon-search"> </span>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"> </div>
+            <script src="js/classie.js"></script>
+            <script src="js/uisearch.js"></script>
+            <script>
+                new UISearch(document.getElementById('sb-search'));
+            </script>
+            <!-- //search-scripts -->
+            <div class="clearfix"></div>
+        </div>
+        <div class="top-menu">
+            <span class="menu">MENU</span>
+            <ul>
+                <li class="active"><a href="index.html"><span class="glyphicon glyphicon-home"
+                                                              aria-hidden="true"></span>Home</a>
+                </li>
+                <li><a href="about.html"><span class="glyphicon glyphicon-user"
+                                               aria-hidden="true"></span>Sobre mi</a></li>
+                <li>
+                    <a href="https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true"
+                       target="_blank"><span class="glyphicon glyphicon-save"
+                                             aria-hidden="true">                              </span>Descargar</a>
+                </li>
+                <li><a href="servers.html"><span class="glyphicon glyphicon-cloud"
+                                                 aria-hidden="true"></span>Servidores</a></li>
+                <li><a href="ads.html"><span class="glyphicon glyphicon-euro"
+                                             aria-hidden="true"></span>Apoyo</a></li>
+            </ul>
+        </div>
+        <!-- script-for-menu -->
+        <script>
+                $("span.menu").click(function () {
+                    $(".top-menu ul").slideToggle("slow", function () {});
+                });
+
+        </script>
+        <!-- script-for-menu -->
+        <div class="clearfix"></div>
+    </div>
+</div>
+<!---->
+<div class="banner">
+    <div class="container">
+        <script src="js/responsiveslides.min.js"></script>
+        <script>
+                $(function () {
+                    $("#slider").responsiveSlides({
+                        auto: true,
+                        nav: false,
+                        speed: 500,
+                        namespace: "callbacks",
+                        pager: true,
+                    });
+                });
+
+        </script>
+        <div class="slider">
+            <div class="callbacks_container">
+                <ul class="rslides" id="slider">
+                    <li>
+                        <h2>material design</h2>
+                        <h3>facil manejo, mejor diseño</h3>
+                    </li>
+                    <li>
+                        <h2>gran catalogo de animes</h2>
+                        <h3>descarga y streaming disponible</h3>
+                    </li>
+                    <li>
+                        <h2>notificaciones</h2>
+                        <h3>sistema de notificaciones para animes recientes</h3>
+                    </li>
+                    <li>
+                        <h2>favoritos</h2>
+                        <h3>sincronizacion en la nube</h3>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!----->
+
+    </div>
+</div>
+<!---->
+<div class="welcome">
+    <div class="container">
+        <div class="welcome-top">
+            <h3>Bienvenido!!!!</h3>
+            <h4 id="cuenta"></h4>
+            <h4> Instalaciones y en aumento!!!</h4>
+            <p>Esta es la pagina de la app No Oficial de AnimeFlv, espero que sea de su agrado.</p>
+        </div>
+        <div class="charitys">
+            <div class="col-md-4 chrt_grid"
+                 style="visibility: visible; -webkit-animation-delay: 0.4s;">
+                <div class="chrty">
+                    <figure class="icon">
+                        <span class="glyphicon-icon glyphicon-heart" aria-hidden="true"></span>
+                    </figure>
+                    <h3>Favoritos</h3>
+                    <p>Seccion de descargas, con guardado en la nube, multi dispositivos.</p>
+                </div>
+            </div>
+            <div class="col-md-4 chrt_grid"
+                 style="visibility: visible; -webkit-animation-delay: 0.4s;">
+                <div class="chrty">
+                    <figure class="icon">
+                        <span class="glyphicon-icon glyphicon-download-alt"
+                              aria-hidden="true"></span>
+                    </figure>
+                    <h3>Descarga y Streaming</h3>
+                    <p>Descarga y streaming disponibles para todos los animes en directorio.</p>
+                </div>
+            </div>
+            <div class="col-md-4 chrt_grid"
+                 style="visibility: visible; -webkit-animation-delay: 0.4s;">
+                <div class="chrty">
+                    <figure class="icon">
+                        <span class="glyphicon-icon glyphicon-remove" aria-hidden="true"></span>
+                    </figure>
+                    <h3>Sin publicidad</h3>
+                    <p>Una app de fans para fans, sin publicidad, totalmente gratis.</p>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+<!---->
+<div class="mission">
+    <div class="container">
+        <h3>Características</h3>
+        <div class="mission-sec">
+            <div class="blog-grids">
+                <div class="col-md-6 blog1 text_grid">
+                    <h4>Diseño simple y amigable</h4>
+                    <p>Diseño Material Desing, compatible desde Android 4.1</p>
+                </div>
+                <div class="col-md-6 blog-pic">
+                    <img src="images/screen1.png" class="img-responsive" alt="">
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <br>
+            <div class="blog-grids">
+                <div class="col-md-6 blog-pic">
+                    <img src="images/screen2.png" class="img-responsive" alt="">
+                </div>
+                <div class="col-md-6 blog1">
+                    <h4>Varias secciones</h4>
+                    <p>La aplicacion cuenta con muchas secciones, como el directorio, las descargas,
+                        enviar sugerencias, etc.</p>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <br>
+            <div class="blog-grids">
+                <div class="col-md-6 blog1 text_grid">
+                    <h4>Descarga y Streaming</h4>
+                    <p>La aplicacion cuenta con descarga y streaming de todos los nuevos capitulos,
+                        y animes del directorio.</p>
+                </div>
+                <div class="col-md-6 blog-pic">
+                    <img src="images/screen3.png" class="img-responsive" alt="">
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <br>
+            <div class="blog-grids">
+                <div class="col-md-6 blog-pic">
+                    <img src="images/screen4.png" class="img-responsive" alt="">
+                </div>
+                <div class="col-md-6 blog1">
+                    <h4>Directorio</h4>
+                    <p>Directorio amplio de animes, dividido en Animes, OVAs y Peliculas.</p>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <br>
+            <div class="blog-grids">
+                <div class="col-md-6 blog1 text_grid">
+                    <h4>Configurable</h4>
+                    <p>La aplicacion cuenta con muchos aspectos configurables, como
+                        activar/desactivar las notificaciones, resaltar las tarjetas, el sonido de
+                        notificacion, etc.</p>
+                </div>
+                <div class="col-md-6 blog-pic">
+                    <img src="images/screen5.png" class="img-responsive" alt="">
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <br>
+            <div class="blog-grids">
+                <div class="col-md-6 blog1 text_grid">
+                    <h4>Vista de tablet</h4>
+                    <p>La interfaz es autoadaptable a tablets, y cambia para mejorar el manejo de la
+                        misma.</p>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <br>
+            <div class="blog-grids">
+                <div class="col-md-6 blog-pic">
+                    <img src="images/screen6.png" class="img-responsive" alt="">
+                </div>
+                <div class="col-md-6 blog-pic">
+                    <img src="images/screen7.png" class="img-responsive" alt="">
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!---->
+<div class="join">
+    <div class="container">
+        <div class="col-md-9 join-info">
+            <h3>Una de las mejores aplicaciones para descargar y ver anime!!</h3>
+            <p>Totalmente gratis, sin publicidad, ni pagos, actualizacion automatica.</p>
+        </div>
+        <div class="col-md-3 join-link">
+            <a href="https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true"
+               target="_blank">Descargar</a>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+</div>
+<!---->
+<div class="copywrite">
+    <div class="container">
+        <p> © 2015 AnimeFlvApp. Todos los derechos reservados | Programado por Jordy Mendoza</p>
+    </div>
+</div>
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Anime -->
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5390653757953587"
+     data-ad-slot="3458874357" data-ad-format="auto"></ins>
+<script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+
+</script>
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Anime2 -->
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5390653757953587"
+     data-ad-slot="7191069950" data-ad-format="auto"></ins>
+<script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+
+</script>
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Anime3 -->
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5390653757953587"
+     data-ad-slot="2621269557" data-ad-format="auto"></ins>
+<script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+
+</script>
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Anime11 -->
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5390653757953587"
+     data-ad-slot="2652048351" data-ad-format="auto"></ins>
+<script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+
+</script>
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Anime12 -->
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5390653757953587"
+     data-ad-slot="4128781550" data-ad-format="auto"></ins>
+<script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+
+</script>
+<!-- Anime6 -->
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5390653757953587"
+     data-ad-slot="9465794750" data-ad-format="auto"></ins>
+<script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+
+</script>
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Anime7 -->
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5390653757953587"
+     data-ad-slot="1942527957" data-ad-format="auto"></ins>
+<script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+
+</script>
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Anime8 -->
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5390653757953587"
+     data-ad-slot="3419261153" data-ad-format="auto"></ins>
+<script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+
+</script>
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Anime9 -->
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5390653757953587"
+     data-ad-slot="4895994356" data-ad-format="auto"></ins>
+<script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+
+</script>
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Anime10 -->
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5390653757953587"
+     data-ad-slot="6372727552" data-ad-format="auto"></ins>
+<script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+
+</script>
+<div class="fb-ad" data-placementid="723830621050686_795112560589158" data-format="300x250"
+     data-testmode="false"></div>
+</body>
+<script>
+    window.onload = function () {
+            window.fbAsyncInit = function () {
+                FB.Event.subscribe(
+                    'ad.loaded',
+                    function (placementId) {
+                        console.log('Audience Network ad loaded');
+                    }
+                );
+                FB.Event.subscribe(
+                    'ad.error',
+                    function (errorCode, errorMessage, placementId) {
+                        console.log('Audience Network error (' + errorCode + ') ' + errorMessage);
+                    }
+                );
+            };
+        }
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk/xfbml.ad.js#xfbml=1&version=v2.5&appId=723830621050686";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+</script>
+
+</html>

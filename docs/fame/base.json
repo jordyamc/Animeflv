@@ -1,0 +1,94 @@
+{
+  "list": [
+    {
+      "name": "Desarrollo de la app",
+      "list": [
+        {
+          "name": "Animeflvapp",
+          "description": "Programador principal (y unico)",
+          "id": "admin"
+        },
+        {
+          "name": "Bowen_gfla",
+          "description": "Buscador de Imagenes",
+          "id": "pezzini"
+        }
+      ]
+    },
+    {
+      "name": "Soporte Moral",
+      "list": [
+        {
+          "name": "Edel (El primer desaparecido)",
+          "description": "Apoyo desde los inicios de la app",
+          "id": "edel"
+        },
+        {
+          "name": "Oaxaca",
+          "description": "Apoyo desde los inicios de la app",
+          "id": "oaxaca"
+        },
+        {
+          "name": "Sam",
+          "description": "Apoyo desde los inicios de la app",
+          "id": "sam"
+        }
+      ]
+    },
+    {
+      "name": "Beta Testers",
+      "list": [
+        {
+          "name": "Guerra1337",
+          "description": "Miembro super activo del grupo",
+          "id": "guerra"
+        },
+        {
+          "name": "Oaxaca",
+          "description": "Miembro super activo del grupo",
+          "id": "oaxaca"
+        },
+        {
+          "name": "Richi Kurono (azu-nya)",
+          "description": "Miembro super activo del grupo",
+          "id": "richi"
+        },
+        {
+          "name": "Tatsuya Shiba",
+          "description": "Miembro activo del grupo",
+          "id": "tatsuya"
+        },
+        {
+          "name": "Sam",
+          "description": "Miembro regular del grupo",
+          "id": "sam"
+        },
+        {
+          "name": "Ryuk",
+          "description": "Miembro regular del grupo",
+          "id": "ryuk"
+        },
+        {
+          "name": "Heiden",
+          "description": "Miembro del grupo",
+          "id": "heiden"
+        },
+        {
+          "name": "Macd",
+          "description": "Miembro del grupo",
+          "id": "julio"
+        },
+        {
+          "name": "Chico",
+          "description": "Raramente miembro del grupo",
+          "id": "luis"
+        },
+        {
+          "name": "INF3R",
+          "description": "Nuevo miembro del grupo",
+          "id": "inf3r"
+        }
+      ]
+    }
+  ]
+}
