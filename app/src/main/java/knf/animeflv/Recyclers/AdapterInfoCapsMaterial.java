@@ -27,11 +27,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.CookieConstructor;
@@ -56,18 +51,12 @@ import xdroid.toaster.Toaster;
  */
 public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCapsMaterial.ViewHolder> {
 
-    List<String> capitulo;
-    String id;
-    List<String> eids;
-    String ext_storage_state = Environment.getExternalStorageState();
-    MaterialDialog d;
-    Boolean streaming = false;
-    int posT;
-    int corePoolSize = 60;
-    int maximumPoolSize = 80;
-    int keepAliveTime = 10;
-    BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(maximumPoolSize);
-    Executor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
+    private List<String> capitulo;
+    private String id;
+    private List<String> eids;
+    private String ext_storage_state = Environment.getExternalStorageState();
+    private MaterialDialog d;
+    private Boolean streaming = false;
     private Activity context;
 
     public AdapterInfoCapsMaterial(Activity context, List<String> capitulos, String aid, List<String> eid) {

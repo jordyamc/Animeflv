@@ -42,15 +42,15 @@ import knf.animeflv.info.Helper.InfoHelper;
 public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, ChildHolder>
         implements ExpandableDraggableItemAdapter<GroupHolder, ChildHolder>,
         ExpandableSwipeableItemAdapter<GroupHolder, ChildHolder> {
-    List<String> animes;
-    List<List<Integer>> animesCapList;
-    RecyclerViewExpandableItemManager manager;
-    RecyclerViewSwipeManager swipeManager;
-    Activity context;
-    Parser parser = new Parser();
-    WaitDownloadCallback callback;
+    private List<WaitDBHelper.WaitObject> animes;
+    private List<List<Integer>> animesCapList;
+    private RecyclerViewExpandableItemManager manager;
+    private RecyclerViewSwipeManager swipeManager;
+    private Activity context;
+    private Parser parser = new Parser();
+    private WaitDownloadCallback callback;
 
-    public AdapterWait(Activity context, RecyclerViewExpandableItemManager manager, RecyclerViewSwipeManager swipeManager) {
+    AdapterWait(Activity context, RecyclerViewExpandableItemManager manager, RecyclerViewSwipeManager swipeManager) {
         setHasStableIds(true);
         this.manager = manager;
         this.swipeManager = swipeManager;
@@ -73,13 +73,13 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
     @Override
     public long getGroupId(int groupPosition) {
         // This method need to return unique value within all group items.
-        return animes.get(groupPosition).hashCode();
+        return Integer.parseInt(animes.get(groupPosition).aid);
     }
 
     @Override
     public long getChildId(int groupPosition, int childPosition) {
         // This method need to return unique value within the group.
-        return Math.round(animesCapList.get(groupPosition).get(childPosition) * Float.parseFloat(animes.get(groupPosition)));
+        return ((Integer.parseInt(animes.get(groupPosition).aid) * animesCapList.get(groupPosition).get(childPosition)) / 2) + 11;
     }
 
     @Override
@@ -103,8 +103,8 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
             holder.start.setColorFilter(ColorsRes.Holo_Dark(context));
         }
         //PicassoCache.getPicassoInstance(context).load(Uri.parse(getUrlImg(animes.get(groupPosition)))).error(R.drawable.ic_block_r).into(holder.image);
-        new CacheManager().mini(context,animes.get(groupPosition),holder.image);
-        holder.titulo.setText(parser.getTitCached(animes.get(groupPosition)));
+        new CacheManager().mini(context, animes.get(groupPosition).aid, holder.image);
+        holder.titulo.setText(parser.getTitCached(animes.get(groupPosition).aid));
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,8 +112,8 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
                         context,
                         new InfoHelper.SharedItem(holder.image, "img"),
                         Intent.FLAG_ACTIVITY_NEW_TASK,
-                        new InfoHelper.BundleItem("aid", animes.get(groupPosition)),
-                        new InfoHelper.BundleItem("title", parser.getTitCached(animes.get(groupPosition)))
+                        new InfoHelper.BundleItem("aid", animes.get(groupPosition).aid),
+                        new InfoHelper.BundleItem("title", parser.getTitCached(animes.get(groupPosition).aid))
                 );
             }
         });
@@ -136,7 +136,8 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
                     manager.collapseGroup(groupPosition);
                 }
                 holder.card.setVisibility(View.GONE);
-                MainStates.init(context).delFromGlobalWaitList(animes.get(groupPosition));
+                new WaitDBHelper(context).removeList(animes.get(groupPosition).aid);
+                MainStates.init(context).delFromGlobalWaitList(animes.get(groupPosition).aid);
                 WaitManager.Refresh();
                 animes = WaitManager.getAnimesList();
                 animesCapList = WaitManager.getNumerosList();
@@ -154,7 +155,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                callback.onAllCapsDownload(animes.get(groupPosition), animesCapList.get(groupPosition));
+                                callback.onAllCapsDownload(animes.get(groupPosition).aid, animesCapList.get(groupPosition));
                             }
                         }).build().show();
             }
@@ -183,8 +184,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
             holder.delete.setColorFilter(ColorsRes.Holo_Dark(context));
             holder.download.setColorFilter(ColorsRes.Holo_Dark(context));
         }
-        String text = "Capitulo " + animesCapList.get(groupPosition).get(childPosition);
-        holder.cap.setText(text.replace(".0", ""));
+        holder.cap.setText(Parser.getCap(animes.get(groupPosition).type, String.valueOf(animesCapList.get(groupPosition).get(childPosition)), animesCapList.get(groupPosition).size() > 1));
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -198,7 +198,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
         holder.download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback.onSingleCapDownload(animes.get(groupPosition), animesCapList.get(groupPosition).get(childPosition));
+                callback.onSingleCapDownload(animes.get(groupPosition).aid, animesCapList.get(groupPosition).get(childPosition));
             }
         });
     }
@@ -227,9 +227,8 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
 
     @Override
     public void onMoveGroupItem(int fromGroupPosition, int toGroupPosition) {
-        String tmp = animes.get(fromGroupPosition);
         animes.remove(fromGroupPosition);
-        animes.add(toGroupPosition, tmp);
+        animes.add(toGroupPosition, animes.get(fromGroupPosition));
         MainStates.init(context).UpdateWaitList("GlobalWaiting", animes);
         WaitManager.Refresh();
         animesCapList = WaitManager.getNumerosList();

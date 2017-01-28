@@ -127,7 +127,15 @@ public class MainStates {
         return list;
     }
 
-    public void UpdateWaitList(String key, List<String> list) {
+    public void UpdateWaitList(String key, List<WaitDBHelper.WaitObject> list) {
+        Set<String> set = new HashSet<>();
+        for (WaitDBHelper.WaitObject object : list) {
+            set.add(object.aid);
+        }
+        preferences.edit().putStringSet(key, set).apply();
+    }
+
+    public void UpdateWaitList(String key, List<String> list, @Nullable String i) {
         Set<String> set = new HashSet<>();
         set.addAll(list);
         preferences.edit().putStringSet(key, set).apply();
@@ -142,14 +150,14 @@ public class MainStates {
             list.addAll(set);
             if (!list.contains(data[1])) {
                 list.add(data[1]);
-                UpdateWaitList(key, list);
+                UpdateWaitList(key, list, null);
             }
             set = preferences.getStringSet("GlobalWaiting", new HashSet<String>());
             list.clear();
             list.addAll(set);
             if (!list.contains(data[0])) {
                 list.add(data[0]);
-                UpdateWaitList("GlobalWaiting", list);
+                UpdateWaitList("GlobalWaiting", list, null);
             }
             new WaitDBHelper(context).addToList(eid);
         } catch (Exception e) {
@@ -166,14 +174,14 @@ public class MainStates {
             list.addAll(set);
             if (list.contains(data[1])) {
                 list.remove(list.indexOf(data[1]));
-                UpdateWaitList(key, list);
+                UpdateWaitList(key, list, null);
             }
             if (list.isEmpty()) {
                 set = preferences.getStringSet("GlobalWaiting", new HashSet<String>());
                 list.clear();
                 list.addAll(set);
                 list.remove(list.indexOf(data[0]));
-                UpdateWaitList("GlobalWaiting", list);
+                UpdateWaitList("GlobalWaiting", list, null);
             }
             new WaitDBHelper(context).delFromList(eid);
         } catch (Exception e) {
@@ -187,9 +195,9 @@ public class MainStates {
         list.addAll(set);
         if (list.contains(aid)) {
             list.remove(list.indexOf(aid));
-            UpdateWaitList("GlobalWaiting", list);
+            UpdateWaitList("GlobalWaiting", list, null);
             list.clear();
-            UpdateWaitList(aid + "waiting", list);
+            UpdateWaitList(aid + "waiting", list, null);
         }
     }
 

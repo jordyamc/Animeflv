@@ -77,7 +77,7 @@ public class WaitList extends AppCompatActivity implements
     }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(@Nullable final Bundle savedInstanceState) {
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wait_list_lay);
@@ -119,33 +119,46 @@ public class WaitList extends AppCompatActivity implements
         getSupportActionBar().setTitle("Lista de Espera");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
-        WaitManager.Refresh();
         processing = new MaterialDialog.Builder(this)
                 .content("Procesando...")
                 .progress(true, 0)
                 .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                 .cancelable(false)
                 .build();
-        final Parcelable eimSavedState = (savedInstanceState != null) ? savedInstanceState.getParcelable("RecyclerViewExpandableItemManager") : null;
-        mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(eimSavedState);
-        // touch guard manager  (this class is required to suppress scrolling while swipe-dismiss animation is running)
-        mRecyclerViewTouchActionGuardManager = new RecyclerViewTouchActionGuardManager();
-        mRecyclerViewTouchActionGuardManager.setInterceptVerticalScrollingWhileAnimationRunning(true);
-        mRecyclerViewTouchActionGuardManager.setEnabled(true);
+        processing.show();
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                WaitManager.Refresh();
 
-        // drag & drop manager
-        mRecyclerViewDragDropManager = new RecyclerViewDragDropManager();
+                final Parcelable eimSavedState = (savedInstanceState != null) ? savedInstanceState.getParcelable("RecyclerViewExpandableItemManager") : null;
+                mRecyclerViewExpandableItemManager = new RecyclerViewExpandableItemManager(eimSavedState);
+                // touch guard manager  (this class is required to suppress scrolling while swipe-dismiss animation is running)
+                mRecyclerViewTouchActionGuardManager = new RecyclerViewTouchActionGuardManager();
+                mRecyclerViewTouchActionGuardManager.setInterceptVerticalScrollingWhileAnimationRunning(true);
+                mRecyclerViewTouchActionGuardManager.setEnabled(true);
 
-        // swipe manager
-        mRecyclerViewSwipeManager = new RecyclerViewSwipeManager();
-        adapterWait = new AdapterWait(this, mRecyclerViewExpandableItemManager, mRecyclerViewSwipeManager);
-        mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(adapterWait);       // wrap for expanding
-        mWrappedAdapter = mRecyclerViewDragDropManager.createWrappedAdapter(mWrappedAdapter);           // wrap for dragging
-        mWrappedAdapter = mRecyclerViewSwipeManager.createWrappedAdapter(mWrappedAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setHasFixedSize(true);
-        //recyclerView.setItemAnimator(animator);
-        recyclerView.setAdapter(mWrappedAdapter);
+                // drag & drop manager
+                mRecyclerViewDragDropManager = new RecyclerViewDragDropManager();
+
+                // swipe manager
+                mRecyclerViewSwipeManager = new RecyclerViewSwipeManager();
+                adapterWait = new AdapterWait(WaitList.this, mRecyclerViewExpandableItemManager, mRecyclerViewSwipeManager);
+                mWrappedAdapter = mRecyclerViewExpandableItemManager.createWrappedAdapter(adapterWait);       // wrap for expanding
+                mWrappedAdapter = mRecyclerViewDragDropManager.createWrappedAdapter(mWrappedAdapter);           // wrap for dragging
+                mWrappedAdapter = mRecyclerViewSwipeManager.createWrappedAdapter(mWrappedAdapter);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        recyclerView.setLayoutManager(new LinearLayoutManager(WaitList.this));
+                        recyclerView.setHasFixedSize(true);
+                        recyclerView.setAdapter(mWrappedAdapter);
+                        processing.dismiss();
+                    }
+                });
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
     @Override

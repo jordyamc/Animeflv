@@ -16,6 +16,7 @@ import java.util.List;
 
 import knf.animeflv.Explorer.DirectoryComparator;
 import knf.animeflv.Explorer.VideoComparator;
+import knf.animeflv.Parser;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
 
@@ -65,10 +66,11 @@ public class ModelFactory {
         new AsyncTask<String, String, String>() {
             @Override
             protected String doInBackground(String... strings) {
+                String type = Parser.getTypeCached(file.getName());
                 List<VideoFile> files = new ArrayList<>();
                 for (File video : file.listFiles()) {
                     if (!video.isDirectory()) {
-                        files.add(new VideoFile(video));
+                        files.add(new VideoFile(video, type));
                     }
                 }
                 Collections.sort(files, new VideoComparator());

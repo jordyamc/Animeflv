@@ -244,28 +244,6 @@ public class Parser {
         return FileUtil.corregirTit(ret);
     }
 
-    public static String getTypeCached(String aid) {
-        String ret = "null";
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-        File file = new File(file_loc);
-        if (file.exists()) {
-            try {
-                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
-                JSONArray jsonArray = jsonObj.getJSONArray("lista");
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject nombreJ = jsonArray.getJSONObject(i);
-                    String n = nombreJ.getString("a");
-                    if (n.trim().equals(aid)) {
-                        return FileUtil.corregirTit(nombreJ.getString("c"));
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return ret;
-    }
-
     public static int getLastAidCached() {
         int aid = 2500;
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
@@ -322,6 +300,56 @@ public class Parser {
             }
         }
         return ret;
+    }
+
+    public static String getTypeCached(String aid) {
+        String ret = "null";
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject nombreJ = jsonArray.getJSONObject(i);
+                    String n = nombreJ.getString("a");
+                    if (n.trim().equals(aid)) {
+                        return nombreJ.getString("c").trim();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return ret;
+    }
+
+    public static String getCap(String tid, String num) {
+        Log.e("Caps", "Tid: " + tid + "    Eid: " + num);
+        switch (tid) {
+            case "Anime":
+                return "Capitulo " + num;
+            case "OVA":
+                return tid + " " + num;
+            default:
+                return tid;
+        }
+    }
+
+    public static String getCap(String tid, String num, boolean more) {
+        Log.e("Caps", "Tid: " + tid + "    Eid: " + num);
+        switch (tid) {
+            case "Anime":
+                return "Capitulo " + num;
+            case "OVA":
+                return tid + " " + num;
+            default:
+                if (more) {
+                    return tid + " " + num;
+                } else {
+                    return tid;
+                }
+        }
     }
 
     public String[] parseTitulos(String json) {
@@ -431,14 +459,14 @@ public class Parser {
 
     public List<String> parseNumerobyEID(String json) {
         List<String> eidsArray = new ArrayList<String>();
-        String[] eids;
         try {
             JSONObject jsonObj = new JSONObject(json);
+            String tipo = jsonObj.getString("tid");
             JSONArray jsonArray = jsonObj.getJSONArray("episodios");
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject childJSONObject = jsonArray.getJSONObject(i);
                 String eid = childJSONObject.getString("num");
-                eidsArray.add("Capitulo " + eid);
+                eidsArray.add(getCap(tipo, eid));
             }
         } catch (Exception e) {
             e.printStackTrace();

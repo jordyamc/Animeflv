@@ -12,7 +12,7 @@ import knf.animeflv.WaitList.WaitDBHelper;
  */
 public class WaitManager {
     private static Context context;
-    private static List<String> animesList = new ArrayList<>();
+    private static List<WaitDBHelper.WaitObject> animesList = new ArrayList<>();
     private static List<List<Integer>> numerosList = new ArrayList<>();
 
     public static void initial(Context c) {
@@ -22,12 +22,12 @@ public class WaitManager {
     public static void Refresh() {
         animesList = new WaitDBHelper(context).getAidsList();
         numerosList.clear();
-        for (String s : animesList) {
-            numerosList.add(ChildListCreator.create(context, s));
+        for (WaitDBHelper.WaitObject s : animesList) {
+            numerosList.add(ChildListCreator.create(context, s.aid));
         }
     }
 
-    public static List<String> getAnimesList() {
+    public static List<WaitDBHelper.WaitObject> getAnimesList() {
         return animesList;
     }
 

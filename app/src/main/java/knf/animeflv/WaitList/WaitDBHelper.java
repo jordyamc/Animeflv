@@ -9,6 +9,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import knf.animeflv.Parser;
+
 /**
  * Created by Jordy on 02/01/2017.
  */
@@ -78,21 +80,21 @@ public class WaitDBHelper {
         close();
     }
 
-    public List<String> getAidsList() {
-        List<String> list = new ArrayList<>();
+    public List<WaitObject> getAidsList() {
+        List<WaitObject> list = new ArrayList<>();
         Cursor c = db.query(DOWNLOAD_TABLE_NAME, new String[]{
                 KEY_AID
         }, null, null, null, null, null);
         if (c.getCount() > 0) {
             while (c.moveToNext()) {
-                list.add(c.getString(0));
+                list.add(new WaitObject(c.getString(0).trim()));
             }
         }
         c.close();
         return list;
     }
 
-    private void removeList(String aid) {
+    public void removeList(String aid) {
         db.delete(DOWNLOAD_TABLE_NAME, KEY_AID + "='" + aid + "'", null);
     }
 
@@ -122,5 +124,15 @@ public class WaitDBHelper {
         args.put(KEY_AID, aid);
         args.put(KEY_LIST, list);
         db.insert(DOWNLOAD_TABLE_NAME, null, args);
+    }
+
+    public class WaitObject {
+        public String aid;
+        public String type;
+
+        public WaitObject(String aid) {
+            this.aid = aid;
+            this.type = Parser.getTypeCached(aid);
+        }
     }
 }

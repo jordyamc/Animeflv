@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import knf.animeflv.Parser;
+
 /**
  * Created by Jordy on 01/06/2016.
  */
@@ -25,6 +27,7 @@ public class VideoFile {
     private String id;
     private File thumb;
     private String f_num;
+    private String type;
 
     public VideoFile(File src) {
         this.src = src;
@@ -37,6 +40,20 @@ public class VideoFile {
             this.thumb = saveBitmap(ThumbnailUtils.createVideoThumbnail(src.getAbsolutePath(), MediaStore.Images.Thumbnails.MINI_KIND), src);
         }
         this.f_num = getEID().replace("E", "").split("_")[1];
+    }
+
+    public VideoFile(File src, String type) {
+        this.src = src;
+        this.eid = src.getName().replace(".mp4", "E");
+        this.id = getEID().replace("E", "").split("_")[0];
+        File file = new File(tmp, src.getName().replace(".mp4", ".png"));
+        if (file.exists()) {
+            this.thumb = file;
+        } else {
+            this.thumb = saveBitmap(ThumbnailUtils.createVideoThumbnail(src.getAbsolutePath(), MediaStore.Images.Thumbnails.MINI_KIND), src);
+        }
+        this.f_num = getEID().replace("E", "").split("_")[1];
+        this.type = type;
     }
 
     public String getPath() {
@@ -68,7 +85,11 @@ public class VideoFile {
     }
 
     public String getTitle() {
-        return "Capitulo " + getCapNumber();
+        if (type == null) {
+            return "Capitulo " + getCapNumber();
+        } else {
+            return Parser.getCap(type, getCapNumber());
+        }
     }
 
     public String getDuration(Context context) {
