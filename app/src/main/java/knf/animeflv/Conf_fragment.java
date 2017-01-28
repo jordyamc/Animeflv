@@ -352,8 +352,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         getPreferenceScreen().findPreference("Rpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", "null").commit();
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null).commit();
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", null).commit();
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, "null").commit();
                 getActivity().recreate();
                 return false;
             }
@@ -824,13 +824,18 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             }
         }
         if (requestCode == SDManager.REQUEST_CODE && SDResultContainer.getResult() == SDSearcher.SD_SELECTED) {
-            getPreferenceScreen().findPreference("sd_down").setEnabled(true);
-            getPreferenceScreen().findPreference("b_move").setEnabled(true);
-            getPreferenceScreen().findPreference("SDpath").setTitle("Cambiar SD");
-            getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.init(context).getSDPath());
-            getPreferenceScreen().findPreference("SDpath").setEnabled(true);
-            PreferenceCategory sd = (PreferenceCategory) getPreferenceScreen().findPreference("catSD");
-            sd.setEnabled(true);
+            try {
+                getPreferenceScreen().findPreference("sd_down").setEnabled(true);
+                getPreferenceScreen().findPreference("b_move").setEnabled(true);
+                getPreferenceScreen().findPreference("SDpath").setTitle("Cambiar SD");
+                getPreferenceScreen().findPreference("SDpath").setSummary(FileUtil.init(context).getSDPath());
+                getPreferenceScreen().findPreference("SDpath").setEnabled(true);
+                PreferenceCategory sd = (PreferenceCategory) getPreferenceScreen().findPreference("catSD");
+                sd.setEnabled(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             if (requestCode == 5260 & Settings.canDrawOverlays(context)) {

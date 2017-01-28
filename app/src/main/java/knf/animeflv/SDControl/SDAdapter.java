@@ -2,6 +2,7 @@ package knf.animeflv.SDControl;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatCheckBox;
@@ -65,6 +66,16 @@ public class SDAdapter extends RecyclerView.Adapter<SDAdapter.ViewHolder> {
                     holder.check.setChecked(true);
                     notifyDataSetChanged();
                 }
+            }
+        });
+        holder.button.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                    activity.startActivityForResult(intent, SDSearcher.GRANT_WRITE_PERMISSION_CODE);
+                }
+                return false;
             }
         });
     }

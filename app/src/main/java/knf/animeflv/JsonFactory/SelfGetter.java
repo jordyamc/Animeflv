@@ -213,7 +213,7 @@ public class SelfGetter {
                     for (String r : p) {
                         if (r.contains("embed_yotta.php")) {
                             try {
-                                JSONArray ja = new JSONObject(Jsoup.connect("http://s1.animeflv.net/yotta.php?id=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" "))).userAgent(ua).get().body().text()).getJSONArray("sources");
+                                JSONArray ja = new JSONObject(Jsoup.connect("http://s1.animeflv.net/gdrive.php?id=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" "))).userAgent(ua).get().body().text()).getJSONArray("sources");
                                 if (ja.length() > 1) {
                                     Yotta480 = ja.getJSONObject(0).getString("file");
                                     Yotta360 = ja.getJSONObject(1).getString("file");
@@ -221,7 +221,7 @@ public class SelfGetter {
                                     Yotta = ja.getJSONObject(0).getString("file");
                                 }
                             } catch (Exception e) {
-
+                                Log.e("Yotta", "Error getting Yotta: " + "http://s1.animeflv.net/gdrive.php?id=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" ")));
                             }
                         }
                     }
