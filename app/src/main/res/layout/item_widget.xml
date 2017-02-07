@@ -47,7 +47,7 @@
                     android:lines="1"
                     android:maxLines="1"
                     android:scrollHorizontally="true"
-                    android:text="Titulo"
+                    android:text="Título"
                     android:textColor="#4d4d4d"/>
 
                 <TextView
@@ -58,7 +58,7 @@
                     android:background="@android:color/transparent"
                     android:lines="1"
                     android:maxLines="1"
-                    android:text="N Capitulo"
+                    android:text="N Capítulo"
                     android:textColor="#7d7d7d"/>
 
             </LinearLayout>

@@ -1,72 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_gravity="center">
+              xmlns:card_view="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_gravity="center"
+              android:orientation="vertical">
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/card_descargas"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        card_view:cardCornerRadius="3dp"
-        card_view:cardElevation="4dp"
-        card_view:cardBackgroundColor="@android:color/white"
+        android:layout_marginBottom="3dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="3dp"
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground"
-        android:layout_marginTop="3dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="3dp"
-        android:layout_marginLeft="10dp">
+        card_view:cardBackgroundColor="@android:color/white"
+        card_view:cardCornerRadius="3dp"
+        card_view:cardElevation="4dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="750dp"
                 android:layout_height="match_parent"
-                android:weightSum="2"
+                android:background="@android:color/transparent"
                 android:gravity="center_vertical"
+                android:orientation="vertical"
                 android:padding="15dp"
-                android:background="@android:color/transparent">
+                android:weightSum="2">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
                 <TextView
+                    android:id="@+id/tv_cardDownload_titulo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Titulo"
-                    android:id="@+id/tv_cardDownload_titulo"
                     android:background="@android:color/transparent"
-                    android:lines="1"
-                    android:scrollHorizontally="true"
                     android:ellipsize="end"
-                    android:maxLines="1" />
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:scrollHorizontally="true"
+                    android:text="Título"/>
                     <TextView
+                        android:id="@+id/tv_numero"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/tv_numero"
-                        android:text="Cap 0"
-                        android:layout_marginLeft="1dp" />
+                        android:layout_marginLeft="1dp"
+                        android:text="Cap 0"/>
                 </LinearLayout>
                 <TextView
+                    android:id="@+id/tv_cardDownload_capitulo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="N Capitulo"
-                    android:id="@+id/tv_cardDownload_capitulo"
+                    android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:lines="1"
                     android:maxLines="1"
-                    android:layout_weight="1" />
+                    android:text="N Capítulo"/>
 
             </LinearLayout>
             <View
@@ -75,30 +76,30 @@
                 android:layout_weight="1"
                 />
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical|end">
+                android:gravity="center_vertical|end"
+                android:orientation="horizontal">
                 <ImageButton
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
                     android:id="@+id/ib_ver_download"
-                    android:src="@drawable/ic_rep_r"
-                    android:foreground="?android:attr/selectableItemBackground"
                     style="?android:attr/borderlessButtonStyle"
-                    android:scaleType="fitCenter"
-                    android:clickable="false"
-                    android:longClickable="true" />
-                <ImageButton
                     android:layout_width="70dp"
                     android:layout_height="70dp"
-                    android:id="@+id/ib_descargar_download"
-                    android:src="@drawable/ic_get_r"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    style="?android:attr/borderlessButtonStyle"
-                    android:scaleType="fitEnd"
                     android:clickable="false"
-                    android:longClickable="true" />
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:longClickable="true"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_rep_r"/>
+                <ImageButton
+                    android:id="@+id/ib_descargar_download"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:clickable="false"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:longClickable="true"
+                    android:scaleType="fitEnd"
+                    android:src="@drawable/ic_get_r"/>
 
             </LinearLayout>
 
@@ -108,9 +109,9 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:max="100"
                 android:layout_alignParentTop="true"
-                android:layout_marginTop="-6dp" />
+                android:layout_marginTop="-6dp"
+                android:max="100"/>
         </LinearLayout>
 
     </android.support.v7.widget.CardView>

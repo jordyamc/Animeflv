@@ -62,7 +62,7 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
             String[] semi = eid.replace("E", "").split("_");
             String aid = semi[0];
             String num = semi[1];
-            CastManager.getInstance().playMedia(url, "video/mp4", new Parser().getTitCached(aid), "Capitulo " + num, getPreviewUrl());
+            CastManager.getInstance().playMedia(url, "video/mp4", new Parser().getTitCached(aid), "Capítulo " + num, getPreviewUrl());
         } else {
             isConnected = false;
             Toaster.toast("No hay dispositivos conectados");

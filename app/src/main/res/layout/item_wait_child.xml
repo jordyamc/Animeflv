@@ -54,7 +54,7 @@
                     android:lines="1"
                     android:maxLines="1"
                     android:scrollHorizontally="true"
-                    android:text="Titulo" />
+                    android:text="Título"/>
 
             </LinearLayout>
 

@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -145,7 +146,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
             holder.ib_des.setColorFilter(ColorsRes.Holo_Light(context));
         }
         Boolean resaltar = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar", true);
-        if (getCap(holder.getAdapterPosition()).equals("Capitulo 1") || getCap(holder.getAdapterPosition()).equals("Preestreno") || getCap(holder.getAdapterPosition()).contains("OVA") || getCap(holder.getAdapterPosition()).contains("Pelicula")) {
+        if (getCap(holder.getAdapterPosition()).equals("Capítulo 1") || getCap(holder.getAdapterPosition()).equals("Preestreno") || getCap(holder.getAdapterPosition()).contains("OVA") || getCap(holder.getAdapterPosition()).contains("Pelicula")) {
             if (resaltar)
                 holder.card.setCardBackgroundColor(Color.argb(100, 253, 250, 93));
         }
@@ -369,7 +370,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         if (numero.equals("0")) {
             return "Preestreno";
         } else {
-            return "Capitulo " + numero;
+            return "Capítulo " + numero;
         }
     }
 
@@ -444,7 +445,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         String res = "";
         switch (model.getTipo()) {
             case "Anime":
-                res = "Capitulo " + model.getNumero();
+                res = "Capítulo " + model.getNumero();
                 break;
             case "OVA":
                 res = "OVA " + model.getNumero();
@@ -462,6 +463,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         web.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
+                Log.e("loaded URL", url);
                 if (url.contains("zippyshare.com") || url.contains("blank")) {
                     web.loadUrl("javascript:("
                             + "function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);}"
@@ -523,7 +525,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 MainStates.setProcessing(false, null);
             }
         });
-        web.loadUrl(parser.getBaseUrl(TaskType.NORMAL, context));
+        web.loadUrl(parser.getBaseUrl(TaskType.NORMAL, context).replace("api2.", ""));
     }
 
     public void setData(List<MainAnimeModel> data) {

@@ -63,7 +63,7 @@ public class DownloaderCookie extends AsyncTask<String, String, String> {
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         builder = new NotificationCompat.Builder(context);
         builder.setContentTitle(titulo)
-                .setContentText("Capitulo " + numero)
+                .setContentText("Capítulo " + numero)
                 .setOngoing(true)
                 .setSmallIcon(android.R.drawable.stat_sys_download);
         String descargados = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("eids_descarga", "");

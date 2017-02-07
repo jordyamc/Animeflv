@@ -201,7 +201,7 @@ public class WaitList extends AppCompatActivity implements
     @Override
     public void onSingleCapDownload(String aid, int cap) {
         processing.show();
-        processing.setContent("Capitulo " + cap);
+        processing.setContent("Capítulo " + cap);
         urls.clear();
         eids.clear();
         Log.d("DownloadSingle", "Start " + UrlUtils.getUrlAnimeCached(aid));

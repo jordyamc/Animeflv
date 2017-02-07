@@ -206,7 +206,7 @@ public class TutorialActivity extends AppCompatActivity implements SwipeRefreshL
                     final int position = random.indexOf(aid);
                     final String id = String.valueOf(aid).trim();
                     String type = Parser.getTypeCached(id);
-                    if (type.equals("Anime")) type = "Capitulo";
+                    if (type.equals("Anime")) type = "Capítulo";
                     final String number = !type.equals("Pelicula") ? " 1" : "";
                     final String result = type + number;
                     final String title = parser.getTitCached(id);

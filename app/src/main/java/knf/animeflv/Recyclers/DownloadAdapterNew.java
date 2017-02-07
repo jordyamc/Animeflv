@@ -99,7 +99,7 @@ public class DownloadAdapterNew extends RecyclerView.Adapter<DownloadAdapterNew.
                             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                             //request.setTitle(fileName.substring(0, fileName.indexOf(".")));
                             request.setTitle(titulo.get(position));
-                            request.setDescription("Capitulo " + capitulo.get(position));
+                            request.setDescription("Capítulo " + capitulo.get(position));
                             request.setMimeType("video/mp4");
                             request.setDestinationInExternalPublicDir("Animeflv/download/" + fileT.substring(0, fileT.indexOf("_")), fileT + ".mp4");
                             DownloadManager managerR = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);

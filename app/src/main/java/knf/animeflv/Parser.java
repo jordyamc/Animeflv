@@ -328,7 +328,7 @@ public class Parser {
         Log.e("Caps", "Tid: " + tid + "    Eid: " + num);
         switch (tid) {
             case "Anime":
-                return "Capitulo " + num;
+                return "Capítulo " + num;
             case "OVA":
                 return tid + " " + num;
             default:
@@ -340,7 +340,7 @@ public class Parser {
         Log.e("Caps", "Tid: " + tid + "    Eid: " + num);
         switch (tid) {
             case "Anime":
-                return "Capitulo " + num;
+                return "Capítulo " + num;
             case "OVA":
                 return tid + " " + num;
             default:

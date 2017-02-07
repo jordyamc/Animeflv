@@ -102,7 +102,7 @@ public class DownloaderService extends IntentService {
         String title = new Parser().getTitCached(eid.replace("E", "").split("_")[0]);
         NotificationCompat.Builder mBuilder = getDownloadingBuilder()
                 .setContentTitle(title)
-                .setContentText("Capitulo " + eid.replace("E", "").split("_")[1])
+                .setContentText("Capítulo " + eid.replace("E", "").split("_")[1])
                 .setContentIntent(PendingIntent.getActivity(this, 0, getDownloadingIntent(eid.split("_")[0]), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setProgress(100, 0, true);
         getManager().notify(DOWNLOAD_NOTIFICATION_ID, mBuilder.build());

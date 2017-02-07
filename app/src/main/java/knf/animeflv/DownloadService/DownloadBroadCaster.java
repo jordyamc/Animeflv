@@ -9,6 +9,8 @@ import android.os.Bundle;
 
 import xdroid.toaster.Toaster;
 
+import static knf.animeflv.DownloadService.DownloaderService.RECEIVER_ACTION_ERROR;
+
 /**
  * Created by Jordy on 05/12/2016.
  */
@@ -29,6 +31,7 @@ public class DownloadBroadCaster extends BroadcastReceiver {
                     .close();
             n_intent.putExtras(bundle);
             context.startService(n_intent);
+            context.sendBroadcast(new Intent(RECEIVER_ACTION_ERROR));
         }
     }
 }

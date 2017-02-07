@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:id="@+id/layout_principal"
-    android:tag="generic">
+              xmlns:card_view="http://schemas.android.com/apk/res-auto"
+              android:id="@+id/layout_principal"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_gravity="center"
+              android:orientation="vertical"
+              android:tag="generic">
 
     <include
-        layout="@layout/toolbar"
-        android:id="@+id/main_toolbar" />
+        android:id="@+id/main_toolbar"
+        layout="@layout/toolbar"/>
 
     <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/swiperefresh"
@@ -18,10 +18,10 @@
         android:layout_height="match_parent">
 
         <ScrollView
+            android:id="@+id/sv_inicio"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="invisible"
-            android:id="@+id/sv_inicio">
+            android:visibility="invisible">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -29,227 +29,227 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/textOffline"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="MODO OFFLINE"
-                    android:id="@+id/textOffline"
                     android:gravity="center_vertical|center_horizontal"
-                    android:textColor="@color/dark"
-                    android:visibility="gone"
-                    android:textSize="20dp"
+                    android:paddingBottom="5dp"
                     android:paddingTop="5dp"
-                    android:paddingBottom="5dp" />
+                    android:text="MODO OFFLINE"
+                    android:textColor="@color/dark"
+                    android:textSize="20dp"
+                    android:visibility="gone"/>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card1"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
+                            android:id="@+id/imgCardD1"
                             android:layout_width="70dp"
                             android:layout_height="70dp"
-                            android:id="@+id/imgCardD1"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:gravity="center_vertical"
-                            android:layout_alignParentStart="true"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="10dp"
-                            android:background="@android:color/transparent"
                             android:layout_centerVertical="true"
                             android:layout_toLeftOf="@+id/botones1"
+                            android:layout_toRightOf="@+id/imgCardD1"
                             android:layout_toStartOf="@+id/botones1"
-                            android:layout_toRightOf="@+id/imgCardD1">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="10dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo1"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
+                            android:id="@+id/botones1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
                             android:layout_alignParentEnd="true"
-                            android:id="@+id/botones1"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
+                                android:id="@+id/ib_ver_cardD1"
+                                style="?android:attr/borderlessButtonStyle"
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
-                                android:id="@+id/ib_ver_cardD1"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
-                                style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
                                 android:clickable="true"
-                                android:onClick="onVerclicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
 
                             <pl.droidsonroids.gif.GifImageButton
+                                android:id="@+id/ib_descargar_cardD1"
+                                style="?android:attr/borderlessButtonStyle"
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
-                                android:id="@+id/ib_descargar_cardD1"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
-                                style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
                         </LinearLayout>
 
                     </RelativeLayout>
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card2"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD2"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:gravity="center_vertical"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones2"
+                            android:layout_toRightOf="@+id/imgCardD2"
                             android:layout_toStartOf="@+id/botones2"
-                            android:layout_toRightOf="@+id/imgCardD2">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo2"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD2"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD2"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -258,105 +258,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card3"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD3"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones3"
+                            android:layout_toRightOf="@+id/imgCardD3"
                             android:layout_toStartOf="@+id/botones3"
-                            android:layout_toRightOf="@+id/imgCardD3">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo3"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD3"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD3"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -365,105 +365,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card4"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card4"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD4"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones4"
+                            android:layout_toRightOf="@+id/imgCardD4"
                             android:layout_toStartOf="@+id/botones4"
-                            android:layout_toRightOf="@+id/imgCardD4">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo4"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD4"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD4"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -472,105 +472,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card5"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card5"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD5"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones5"
+                            android:layout_toRightOf="@+id/imgCardD5"
                             android:layout_toStartOf="@+id/botones5"
-                            android:layout_toRightOf="@+id/imgCardD5">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo5"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo5"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD5"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD5"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -579,105 +579,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card6"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card6"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD6"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones6"
+                            android:layout_toRightOf="@+id/imgCardD6"
                             android:layout_toStartOf="@+id/botones6"
-                            android:layout_toRightOf="@+id/imgCardD6">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo6"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo6"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones6"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD6"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD6"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -686,105 +686,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card7"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card7"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD7"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones7"
+                            android:layout_toRightOf="@+id/imgCardD7"
                             android:layout_toStartOf="@+id/botones7"
-                            android:layout_toRightOf="@+id/imgCardD7">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo7"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo7"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones7"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD7"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD7"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -793,105 +793,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card8"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card8"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD8"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones8"
+                            android:layout_toRightOf="@+id/imgCardD8"
                             android:layout_toStartOf="@+id/botones8"
-                            android:layout_toRightOf="@+id/imgCardD8">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo8"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo8"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones8"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD8"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD8"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -900,105 +900,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card9"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card9"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD9"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones9"
+                            android:layout_toRightOf="@+id/imgCardD9"
                             android:layout_toStartOf="@+id/botones9"
-                            android:layout_toRightOf="@+id/imgCardD9">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo9"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo9"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones9"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD9"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD9"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -1007,105 +1007,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card10"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card10"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD10"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones10"
+                            android:layout_toRightOf="@+id/imgCardD10"
                             android:layout_toStartOf="@+id/botones10"
-                            android:layout_toRightOf="@+id/imgCardD10">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo10"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo10"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones10"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD10"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD10"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -1114,105 +1114,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card11"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card11"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD11"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones11"
+                            android:layout_toRightOf="@+id/imgCardD11"
                             android:layout_toStartOf="@+id/botones11"
-                            android:layout_toRightOf="@+id/imgCardD11">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo11"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo11"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones11"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD11"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD11"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -1221,105 +1221,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card12"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card12"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD12"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones12"
+                            android:layout_toRightOf="@+id/imgCardD12"
                             android:layout_toStartOf="@+id/botones12"
-                            android:layout_toRightOf="@+id/imgCardD12">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo12"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo12"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones12"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD12"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD12"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -1328,105 +1328,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card13"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card13"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD13"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones13"
+                            android:layout_toRightOf="@+id/imgCardD13"
                             android:layout_toStartOf="@+id/botones13"
-                            android:layout_toRightOf="@+id/imgCardD13">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo13"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo13"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones13"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD13"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD13"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -1435,105 +1435,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card14"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card14"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD14"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones14"
+                            android:layout_toRightOf="@+id/imgCardD14"
                             android:layout_toStartOf="@+id/botones14"
-                            android:layout_toRightOf="@+id/imgCardD14">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo14"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo14"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones14"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD14"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD14"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -1542,105 +1542,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card15"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card15"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD15"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones15"
+                            android:layout_toRightOf="@+id/imgCardD15"
                             android:layout_toStartOf="@+id/botones15"
-                            android:layout_toRightOf="@+id/imgCardD15">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo15"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo15"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones15"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD15"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD15"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -1649,105 +1649,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card16"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card16"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD16"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones16"
+                            android:layout_toRightOf="@+id/imgCardD16"
                             android:layout_toStartOf="@+id/botones16"
-                            android:layout_toRightOf="@+id/imgCardD16">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo16"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo16"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones16"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD16"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD16"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -1756,105 +1756,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card17"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card17"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD17"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones17"
+                            android:layout_toRightOf="@+id/imgCardD17"
                             android:layout_toStartOf="@+id/botones17"
-                            android:layout_toRightOf="@+id/imgCardD17">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo17"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo17"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones17"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD17"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD17"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -1863,105 +1863,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card18"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card18"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD18"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones18"
+                            android:layout_toRightOf="@+id/imgCardD18"
                             android:layout_toStartOf="@+id/botones18"
-                            android:layout_toRightOf="@+id/imgCardD18">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo18"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo18"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
-                            android:layout_alignParentEnd="true"
                             android:id="@+id/botones18"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
-                                android:layout_width="60dp"
-                                android:layout_height="60dp"
                                 android:id="@+id/ib_ver_cardD18"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
-                                android:clickable="true"
-                                android:onClick="onVerclicked" />
-
-                            <pl.droidsonroids.gif.GifImageButton
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
+                                android:clickable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
+
+                            <pl.droidsonroids.gif.GifImageButton
                                 android:id="@+id/ib_descargar_cardD18"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
                                 style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -1970,105 +1970,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card19"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card19"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
                             android:id="@+id/imgCardD19"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones19"
+                            android:layout_toRightOf="@+id/imgCardD19"
                             android:layout_toStartOf="@+id/botones19"
-                            android:layout_toRightOf="@+id/imgCardD19">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo19"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo19"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
+                            android:id="@+id/botones19"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
                             android:layout_alignParentEnd="true"
-                            android:id="@+id/botones19"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
+                                android:id="@+id/ib_ver_cardD19"
+                                style="?android:attr/borderlessButtonStyle"
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
-                                android:id="@+id/ib_ver_cardD19"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
-                                style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
                                 android:clickable="true"
-                                android:onClick="onVerclicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
 
                             <pl.droidsonroids.gif.GifImageButton
+                                android:id="@+id/ib_descargar_cardD19"
+                                style="?android:attr/borderlessButtonStyle"
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
-                                android:id="@+id/ib_descargar_cardD19"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
-                                style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -2077,105 +2077,105 @@
                 </android.support.v7.widget.CardView>
 
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/card20"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    card_view:cardCornerRadius="3dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardBackgroundColor="@android:color/white"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginLeft="10dp"
-                    android:onClick="onCardClicked">
+                                                    android:id="@+id/card20"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content"
+                                                    android:layout_gravity="center_horizontal"
+                                                    android:layout_marginBottom="3dp"
+                                                    android:layout_marginLeft="10dp"
+                                                    android:layout_marginRight="10dp"
+                                                    android:layout_marginTop="3dp"
+                                                    android:clickable="true"
+                                                    android:foreground="?android:attr/selectableItemBackground"
+                                                    android:onClick="onCardClicked"
+                                                    card_view:cardBackgroundColor="@android:color/white"
+                                                    card_view:cardCornerRadius="3dp"
+                                                    card_view:cardElevation="4dp">
 
                     <RelativeLayout
-                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:orientation="horizontal"
                         android:paddingEnd="10dp"
                         android:paddingRight="10dp">
 
                         <ImageView
+                            android:id="@+id/imgCardD20"
                             android:layout_width="70dp"
                             android:layout_height="70dp"
-                            android:id="@+id/imgCardD20"
-                            android:padding="5dp"
-                            android:src="@drawable/ic_block_r"
-                            android:layout_alignParentStart="true"
                             android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true" />
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_block_r"/>
 
                         <LinearLayout
-                            android:orientation="vertical"
                             android:layout_width="120dp"
                             android:layout_height="match_parent"
-                            android:weightSum="2"
-                            android:gravity="center_vertical"
-                            android:padding="15dp"
-                            android:background="@android:color/transparent"
                             android:layout_toLeftOf="@+id/botones20"
+                            android:layout_toRightOf="@+id/imgCardD20"
                             android:layout_toStartOf="@+id/botones20"
-                            android:layout_toRightOf="@+id/imgCardD20">
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:padding="15dp"
+                            android:weightSum="2">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Titulo"
                                 android:id="@+id/tv_cardD_titulo20"
-                                android:background="@android:color/transparent"
-                                android:lines="1"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:layout_weight="1" />
-
-                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="N Capitulo"
+                                android:layout_weight="1"
+                                android:background="@android:color/transparent"
+                                android:ellipsize="end"
+                                android:lines="1"
+                                android:maxLines="1"
+                                android:scrollHorizontally="true"
+                                android:text="Título"/>
+
+                            <TextView
                                 android:id="@+id/tv_cardD_capitulo20"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:background="@android:color/transparent"
                                 android:lines="1"
                                 android:maxLines="1"
-                                android:layout_weight="1" />
+                                android:text="N Capítulo"/>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:orientation="horizontal"
+                            android:id="@+id/botones20"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center_vertical|end"
                             android:layout_alignParentEnd="true"
-                            android:id="@+id/botones20"
                             android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true">
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical|end"
+                            android:orientation="horizontal">
 
                             <ImageButton
+                                android:id="@+id/ib_ver_cardD20"
+                                style="?android:attr/borderlessButtonStyle"
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
-                                android:id="@+id/ib_ver_cardD20"
-                                android:src="@drawable/ic_rep_r"
-                                android:foreground="?android:attr/selectableItemBackground"
-                                style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitCenter"
                                 android:clickable="true"
-                                android:onClick="onVerclicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onVerclicked"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_rep_r"/>
 
                             <pl.droidsonroids.gif.GifImageButton
+                                android:id="@+id/ib_descargar_cardD20"
+                                style="?android:attr/borderlessButtonStyle"
                                 android:layout_width="60dp"
                                 android:layout_height="60dp"
-                                android:id="@+id/ib_descargar_cardD20"
-                                android:src="@drawable/ic_get_r"
-                                android:foreground="?android:attr/selectableItemBackground"
-                                style="?android:attr/borderlessButtonStyle"
-                                android:scaleType="fitEnd"
                                 android:clickable="true"
-                                android:onClick="onDesClicked" />
+                                android:foreground="?android:attr/selectableItemBackground"
+                                android:onClick="onDesClicked"
+                                android:scaleType="fitEnd"
+                                android:src="@drawable/ic_get_r"/>
 
                         </LinearLayout>
 
@@ -2184,21 +2184,21 @@
                 </android.support.v7.widget.CardView>
 
                 <WebView
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
                     android:id="@+id/wv_inicio"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
                     android:visibility="gone" />
 
                 <WebView
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
                     android:id="@+id/wv_inicio2"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
                     android:visibility="gone" />
 
                 <WebView
+                    android:id="@+id/gets"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:id="@+id/gets"
                     android:visibility="gone" />
 
             </LinearLayout>

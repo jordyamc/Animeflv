@@ -73,7 +73,7 @@ public class InternalManager {
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downUrl));
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.setTitle(titulo);
-        request.setDescription("Capitulo " + numero);
+        request.setDescription("Capítulo " + numero);
         request.setMimeType("video/mp4");
         request.setDestinationInExternalPublicDir("Animeflv/download/" + aid, aid + "_" + numero + ".mp4");
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
@@ -108,7 +108,7 @@ public class InternalManager {
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downUrl));
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.setTitle(titulo);
-        request.setDescription("Capitulo " + numero);
+        request.setDescription("Capítulo " + numero);
         request.setMimeType("video/mp4");
         request.addRequestHeader("cookie", constructor.getCookie());
         Log.e("Cookie", constructor.getCookie());

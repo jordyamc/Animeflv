@@ -31,7 +31,7 @@ public class HistoryHelper {
 
     public static String getLastFrom(JSONArray array,int position){
         try {
-            return "Capitulo "+array.getJSONObject(position).getString("last");
+            return "Capítulo " + array.getJSONObject(position).getString("last");
         }catch (Exception e){
             return "NF";
         }

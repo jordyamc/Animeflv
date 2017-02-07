@@ -50,7 +50,7 @@
                     android:lines="1"
                     android:maxLines="1"
                     android:scrollHorizontally="true"
-                    android:text="Titulo"
+                    android:text="Título"
                     android:textStyle="normal|bold"/>
                 <TextView
                     android:id="@+id/tv_current"
@@ -60,7 +60,7 @@
                     android:background="@android:color/transparent"
                     android:lines="1"
                     android:maxLines="1"
-                    android:text="N Capitulo"/>
+                    android:text="N Capítulo"/>
 
             </LinearLayout>
 

@@ -141,7 +141,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                     showLoading(holder.ib_des);
                                     searchDownload(holder);
                                 } else {
-                                    final String item = capitulo.get(holder.getAdapterPosition()).replace("Capitulo ", "").trim();
+                                    final String item = capitulo.get(holder.getAdapterPosition()).replace("Capítulo ", "").trim();
                                     MaterialDialog borrar = new MaterialDialog.Builder(context)
                                             .title("Eliminar")
                                             .titleGravity(GravityEnum.CENTER)
@@ -503,7 +503,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                     }
                     File archivo = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")) + "/" + fileName);
                     if (!archivo.exists()) {
-                        String item = capitulo.get(holder.getAdapterPosition()).replace("Capitulo ", "").trim();
+                        String item = capitulo.get(holder.getAdapterPosition()).replace("Capítulo ", "").trim();
                         String urlD = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("urlD", null);
                         CookieManager cookieManager = CookieManager.getInstance();
                         String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));

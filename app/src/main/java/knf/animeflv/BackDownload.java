@@ -206,7 +206,7 @@ public class BackDownload extends AppCompatActivity {
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                     //request.setTitle(fileName.substring(0, fileName.indexOf(".")));
                     request.setTitle(titulo);
-                    request.setDescription("Capitulo " + num);
+                    request.setDescription("Capítulo " + num);
                     request.addRequestHeader("cookie", cookie);
                     request.addRequestHeader("User-Agent", web.getSettings().getUserAgentString());
                     request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
@@ -268,7 +268,7 @@ public class BackDownload extends AppCompatActivity {
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             //request.setTitle(fileName.substring(0, fileName.indexOf(".")));
             request.setTitle(titulo);
-            request.setDescription("Capitulo " + num);
+            request.setDescription("Capítulo " + num);
             request.setMimeType("video/mp4");
             request.setDestinationInExternalPublicDir("Animeflv/download/" + aid, aid + "_" + num + ".mp4");
             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);

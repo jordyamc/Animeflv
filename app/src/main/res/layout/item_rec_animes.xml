@@ -21,7 +21,7 @@
         android:maxLines="1"
         android:padding="10dp"
         android:singleLine="true"
-        android:text="Titulo"
+        android:text="Título"
         android:textSize="15sp"/>
 
     <TextView
