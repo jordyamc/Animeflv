@@ -9,7 +9,7 @@
         android:shortcutShortLabel="@string/shortcut_em">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="knf.animeflv.Emision.Section.newEmisionTest"
+            android:targetClass="knf.animeflv.AutoEmision.AutoEmisionActivity"
             android:targetPackage="knf.animeflv"/>
     </shortcut>
     <shortcut

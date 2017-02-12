@@ -305,6 +305,8 @@ public class LoginServer {
                             serverInterface.onError();
                         }
                     });
+                } else {
+                    serverInterface.onError();
                 }
                 return null;
             }
@@ -427,6 +429,10 @@ public class LoginServer {
 
     public static String getEmailNormal(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null");
+    }
+
+    public static String getEmail(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", null);
     }
 
     public static boolean isLogedIn(Context context) {

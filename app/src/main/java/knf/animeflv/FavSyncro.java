@@ -8,17 +8,51 @@ import org.json.JSONObject;
 import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.LoginActivity.LoginServer;
 import knf.animeflv.Seen.SeenManager;
-
-/**
- * Created by Jordy on 08/12/2016.
- */
+import knf.animeflv.Utils.NetworkUtils;
 
 public class FavSyncro {
     public static void updateServer(Context activity) {
         if (LoginServer.isLogedIn(activity))
             LoginServer.RefreshData(activity);
+        if (DropboxManager.islogedIn()) {
+            DropboxManager.updateFavs(activity, null);
+            DropboxManager.updateSeen(activity, null);
+        }
+    }
+
+    public static void updateFavs(Context activity) {
+        if (LoginServer.isLogedIn(activity))
+            LoginServer.RefreshData(activity);
         if (DropboxManager.islogedIn())
             DropboxManager.updateFavs(activity, null);
+    }
+
+    public static void updateSeen(Context activity, DropboxManager.UploadCallback callback) {
+        if (LoginServer.isLogedIn(activity))
+            LoginServer.RefreshData(activity);
+        if (DropboxManager.islogedIn())
+            DropboxManager.updateSeen(activity, callback);
+    }
+
+    public static String getEmail(Context context) {
+        if (LoginServer.isLogedIn(context) || DropboxManager.islogedIn()) {
+            if (LoginServer.isLogedIn(context)) {
+                String email = LoginServer.getEmail(context);
+                if (email != null)
+                    return email;
+            }
+            if (DropboxManager.islogedIn()) {
+                String email = DropboxManager.getEmail(context);
+                if (email != null) {
+                    return email;
+                } else if (NetworkUtils.isNetworkAvailable()) {
+                    DropboxManager.setEmail(context);
+                }
+            }
+            return "Animeflv";
+        } else {
+            return "Animeflv";
+        }
     }
 
     public static void updateLocal(final Context context, final UpdateCallback callback) {
@@ -35,10 +69,12 @@ public class FavSyncro {
 
             @Override
             public void onError() {
+                Log.e("Fav Sync", "Error getting from server, trying Dropbox");
                 DropboxManager.downloadFavs(context, new DropboxManager.DownloadCallback() {
                     @Override
                     public void onDownload(JSONObject object, boolean success) {
                         if (success) {
+                            Log.e("Fav Sync", "Dropbox Success, saving local");
                             try {
                                 String favoritos = Parser.getTrimedList(new Parser().getUserFavs(object.toString()), ":::");
                                 String favs = Parser.getTrimedList(context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", ""), ":::");
@@ -49,6 +85,8 @@ public class FavSyncro {
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
+                        } else {
+                            Log.e("Fav Sync", "Error getting from Dropbox");
                         }
                     }
                 });
@@ -70,8 +108,9 @@ public class FavSyncro {
 
             @Override
             public void onError() {
+                //TODO: CHANGE NUMBER TO DINAMIC
                 Log.e("Seen Sync", "Error getting from server, trying Dropbox");
-                DropboxManager.downloadFavs(context, new DropboxManager.DownloadCallback() {
+                DropboxManager.downloadSeen(context, new DropboxManager.DownloadCallback() {
                     @Override
                     public void onDownload(JSONObject object, boolean success) {
                         if (success) {

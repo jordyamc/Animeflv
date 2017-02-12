@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -533,7 +532,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         web.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
-                Log.e("loaded URL", url);
                 if (url.contains("zippyshare.com") || url.contains("blank")) {
                     web.loadUrl("javascript:("
                             + "function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);}"

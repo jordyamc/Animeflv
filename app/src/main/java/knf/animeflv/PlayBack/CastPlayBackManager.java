@@ -58,7 +58,7 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
     public void play(String url, String eid) {
         if (isDeviceConnected()) {
             castingEid = eid;
-            SeenManager.get(activity).setSeenStateUpload(eid, true);
+            SeenManager.get(activity).setSeenState(eid, true);
             String[] semi = eid.replace("E", "").split("_");
             String aid = semi[0];
             String num = semi[1];

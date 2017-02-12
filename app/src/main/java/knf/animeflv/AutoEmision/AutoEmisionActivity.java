@@ -12,8 +12,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
@@ -25,11 +28,14 @@ import java.util.Calendar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
+import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.R;
 import knf.animeflv.Utils.ExecutorManager;
+import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.TrackingHelper;
 import knf.animeflv.info.InfoFragments;
+import xdroid.toaster.Toaster;
 
 /**
  * Created by Jordy on 09/01/2017.
@@ -155,13 +161,75 @@ public class AutoEmisionActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (DropboxManager.islogedIn() && NetworkUtils.isNetworkAvailable()) {
+            getMenuInflater().inflate(R.menu.menu_emision, menu);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (DropboxManager.islogedIn()) {
+            switch (item.getItemId()) {
+                case R.id.download:
+                    final MaterialDialog dialog = getLoadingDialog(0);
+                    dialog.show();
+                    DropboxManager.downloadEmision(this, new DropboxManager.DownloadCallback() {
+                        @Override
+                        public void onDownload(JSONObject result, boolean success) {
+                            dialog.dismiss();
+                            if (success) {
+                                AutoEmisionHelper.updateSavedList(AutoEmisionActivity.this, result);
+                                Toaster.toast("Descarga exitosa");
+                                invalidateCurrentList();
+                            } else {
+                                Toaster.toast("Error al descargar");
+                            }
+                        }
+                    });
+                    break;
+                case R.id.upload:
+                    final MaterialDialog dialog_up = getLoadingDialog(1);
+                    dialog_up.show();
+                    DropboxManager.updateEmision(this, new DropboxManager.UploadCallback() {
+                        @Override
+                        public void onUpload(boolean success) {
+                            dialog_up.dismiss();
+                            if (success) {
+                                Toaster.toast("Subida exitosamente");
+                            } else {
+                                Toaster.toast("Error al subir lista");
+                            }
+                        }
+                    });
+                    break;
+            }
+        } else {
+            Toaster.toast("Se necesita tener vinculada una cuenta de Dropbox");
+        }
+        return true;
+    }
+
+    private MaterialDialog getLoadingDialog(int type) {
+        return new MaterialDialog.Builder(this)
+                .content((type == 0 ? "Descargando " : "Subiendo ") + "lista...")
+                .progress(true, 0)
+                .build();
+    }
+
+    private void invalidateCurrentList() {
+        listJson = null;
+        AutoEmisionListHolder.invalidateLists();
+        finish();
+        startActivity(new Intent(this, AutoEmisionActivity.class));
+    }
+
+    @Override
     protected void onResume() {
         TrackingHelper.track(this, TrackingHelper.EMISION);
         if (reset) {
-            listJson = null;
-            AutoEmisionListHolder.invalidateLists();
-            finish();
-            startActivity(new Intent(this, AutoEmisionActivity.class));
+            invalidateCurrentList();
         }
         super.onResume();
     }

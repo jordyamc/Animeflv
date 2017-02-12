@@ -183,6 +183,8 @@ public class startBackground {
                                                     .setContentTitle(NotTit)
                                                     .setContentText(mess);
                                     mBuilder.setVibrate(new long[]{100, 200, 100, 500});
+                                    if (nCaps > 1)
+                                        mBuilder.setNumber(nCaps);
                                     mBuilder.setStyle(bigTextStyle);
                                     int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
                                     mBuilder.setSound(UtilSound.getSoundUri(not));

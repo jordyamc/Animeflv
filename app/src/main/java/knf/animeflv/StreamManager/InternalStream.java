@@ -29,7 +29,7 @@ public class InternalStream {
         interno.putExtra("title", parser.getTitCached(aid) + " " + numero);
         interno.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(interno);
-        SeenManager.get(context).setSeenStateUpload(eid, true);
+        SeenManager.get(context).setSeenState(eid, true);
     }
 
     public void Stream(String eid, String url, CookieConstructor constructor) {
@@ -43,7 +43,7 @@ public class InternalStream {
         intent.putExtras(bundle);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
-        SeenManager.get(context).setSeenStateUpload(eid, true);
+        SeenManager.get(context).setSeenState(eid, true);
     }
 
     public void Play(String eid, File file) {
@@ -54,6 +54,6 @@ public class InternalStream {
         interno.putExtra("title", parser.getTitCached(aid) + " " + numero);
         interno.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(interno);
-        SeenManager.get(context).setSeenStateUpload(eid, true);
+        SeenManager.get(context).setSeenState(eid, true);
     }
 }

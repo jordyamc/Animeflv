@@ -2,10 +2,11 @@
 <resources>
     <color name="prim">#212121</color>
     <color name="dark">#454545</color>
-    <color name="blanco">#ffffff</color>
+    <color name="blanco">#FFF</color>
     <color name="rojo">#F20000</color>
 
-    <color name="newCap">#FDFA5D</color>
+    <color name="newCap">#fdfa5d</color>
+    <color name="in_favs">#641acef6</color>
 
     <color name="log_new">#FFD700</color>
     <color name="log_importante">#800080</color>
@@ -37,7 +38,7 @@
     <color name="theme_rojo">@android:color/holo_red_dark</color>
 
     <color name="intro_1">#FAC720</color>
-    <color name="intro_1_dark">#FBC02D</color>
+    <color name="intro_1_dark">#fbc02d</color>
 
     <color name="intro_2">#283593</color>
     <color name="intro_2_dark">#1A237E</color>

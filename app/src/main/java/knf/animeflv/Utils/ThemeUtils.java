@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorRes;
+import android.support.annotation.DrawableRes;
 import android.view.View;
 
 import knf.animeflv.ColorsRes;
@@ -26,6 +27,30 @@ public class ThemeUtils {
 
     public static int getAcentColor(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getInt("accentColor", ColorsRes.Naranja(context));
+    }
+
+    @DrawableRes
+    public static int getAccentColorDrawable(Context context) {
+        int accent = getAcentColor(context);
+        if (accent == ColorsRes.Rojo(context)) {
+            return R.drawable.rojo;
+        }
+        if (accent == ColorsRes.Naranja(context)) {
+            return R.drawable.naranja;
+        }
+        if (accent == ColorsRes.Gris(context)) {
+            return R.drawable.gris;
+        }
+        if (accent == ColorsRes.Verde(context)) {
+            return R.drawable.verde;
+        }
+        if (accent == ColorsRes.Rosa(context)) {
+            return R.drawable.rosa;
+        }
+        if (accent == ColorsRes.Morado(context)) {
+            return R.drawable.morado;
+        }
+        return R.drawable.cargando;
     }
 
     public static void setStatusBarPadding(Activity activity, View toolbar) {

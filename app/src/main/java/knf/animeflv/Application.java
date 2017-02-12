@@ -7,7 +7,6 @@ import android.support.multidex.MultiDexApplication;
 import com.karumi.dexter.Dexter;
 
 import es.munix.multidisplaycast.CastManager;
-import knf.animeflv.Emision.EmisionChecker;
 import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.UtilsInit;
@@ -30,7 +29,6 @@ public class Application extends MultiDexApplication {
         super.onCreate();
         context = this;
         UtilsInit.init(this);
-        EmisionChecker.Ginit(this);
         Dexter.initialize(getApplicationContext());
         android.webkit.CookieSyncManager.createInstance(this);
         android.webkit.CookieManager.getInstance().setAcceptCookie(true);

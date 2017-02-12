@@ -32,10 +32,12 @@ import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.JsonFactory.DownloadGetter;
+import knf.animeflv.Parser;
 import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.R;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.StreamManager.StreamManager;
+import knf.animeflv.TaskType;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
@@ -64,19 +66,6 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
         this.context = context;
         this.id = aid;
         this.eids = eid;
-    }
-
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
     }
 
     @Override
@@ -550,6 +539,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                 }
             }
         });
+        web.loadUrl(new Parser().getBaseUrl(TaskType.NORMAL, context).replace("api2.", ""));
     }
 
     public void toast(String text) {

@@ -39,6 +39,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
+import knf.animeflv.CustomSettingsIntro.CustomIntro;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
@@ -275,6 +276,16 @@ public class Splash extends AwesomeSplash {
         }
     }
 
+    private void proceed() {
+        if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("intro", false)) {
+            finish();
+            startActivity(new Intent(context, newMain.class));
+        } else {
+            finish();
+            startActivity(new Intent(context, CustomIntro.class));
+        }
+    }
+
     @TargetApi(23)
     public void checkPermission() {
         final String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -282,8 +293,7 @@ public class Splash extends AwesomeSplash {
             Dexter.checkPermission(new PermissionListener() {
                 @Override
                 public void onPermissionGranted(PermissionGrantedResponse response) {
-                    finish();
-                    startActivity(new Intent(context, newMain.class));
+                    proceed();
                 }
 
                 @Override
@@ -343,8 +353,7 @@ public class Splash extends AwesomeSplash {
 
             }, permission);
         } else {
-            finish();
-            startActivity(new Intent(context, newMain.class));
+            proceed();
         }
     }
 }

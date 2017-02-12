@@ -1,6 +1,5 @@
 package knf.animeflv.Recientes;
 
-import android.content.Context;
 import android.os.Environment;
 
 import org.json.JSONObject;
@@ -14,14 +13,12 @@ import java.util.TimeZone;
 import knf.animeflv.Utils.FileUtil;
 
 public class Status {
-    private static Context context;
     private static String server_version = "0.0";
     private static String cache = "0";
     private static String late = "00:00";
     private static Status status = new Status();
 
-    public static Status reload(Context cont) {
-        context = cont;
+    public static Status reload() {
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
         File file = new File(file_loc);
         if (file.exists()) {

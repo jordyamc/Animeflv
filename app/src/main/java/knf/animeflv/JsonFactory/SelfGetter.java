@@ -204,7 +204,6 @@ public class SelfGetter {
                                 String body = Jsoup.connect("https://animeflv.net/embed_izanagi.php?key=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" "))).userAgent(ua).get().outerHtml();
                                 izanagi = new JSONObject(Jsoup.connect(body.substring(body.indexOf("get('") + 5, body.indexOf("',"))).userAgent(ua).get().body().text()).getString("file");
                             } catch (Exception e) {
-
                             }
                         }
                     }
@@ -242,9 +241,9 @@ public class SelfGetter {
                         if (r.contains("embed_mina.php")) {
                             try {
                                 JSONObject ja = new JSONObject(Jsoup.connect("https://s1.animeflv.com/minhateca.php?id=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" "))).userAgent(ua).get().body().text());
+                                Log.e("Mina DEBUG", ja.toString());
                                 mina = ja.getString("file");
                             } catch (Exception e) {
-
                             }
                         }
                     }

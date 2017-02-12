@@ -16,6 +16,7 @@ public class Keys {
         public static final File DOWNLOADS = new File(Environment.getExternalStorageDirectory() + "/Animeflv/downloads");
         public static final File UPDATE = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "Animeflv_Nver.apk");
         public static final File SOUNDS_NOMEDIA = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/.sounds/.nomedia");
+        public static final File BACKUP_DATA = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/data.save");
     }
 
     public static class Url {

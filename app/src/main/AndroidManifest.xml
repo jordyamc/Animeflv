@@ -68,6 +68,11 @@
                     android:host="github.com"
                     android:pathPrefix="/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true"
                     android:scheme="http"/>
+                <data
+                    android:host="raw.githubusercontent.com"
+                    android:pathPrefix="/jordyamc/Animeflv/master/app/app-release.apk"
+                    android:scheme="https"
+                    />
             </intent-filter>
 
             <meta-data
@@ -103,6 +108,9 @@
             android:name=".Intronew"
             android:label="@string/app_name"/>
         <activity
+            android:name=".CustomSettingsIntro.CustomIntro"
+            android:label="@string/app_name"/>
+        <activity
             android:name=".BackDownload"
             android:label="@string/app_name"
             android:theme="@style/Theme.Transparent"/>
@@ -110,12 +118,6 @@
             android:name=".Configuracion"
             android:label="@string/app_name"
             android:theme="@style/AppTheme"/>
-        <activity
-            android:name=".Emision.Section.newEmisionActivity"
-            android:label="@string/app_name"/>
-        <activity
-            android:name=".Emision.Section.newEmisionTest"
-            android:label="@string/app_name"/>
         <activity
             android:name=".AutoEmision.AutoEmisionActivity"
             android:label="@string/app_name"/>
@@ -266,6 +268,9 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.github.zawadz88.activitychooser.MaterialActivityChooserActivity"
+            android:theme="@style/MACTheme"/>
         <service
             android:name=".Tile.QuickSetting"
             android:icon="@drawable/app_icon_intro"

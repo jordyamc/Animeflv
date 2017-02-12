@@ -211,6 +211,7 @@ public class SeenManager {
                     db.delete(TABLE_NAME, null, null);
                     setDB();
                     String[] exploded = list.split(":::");
+                    Log.e("Seen Sync", "To sync: " + exploded.length);
                     for (String eid : exploded) {
                         if (!eid.trim().equals(""))
                             setSeenStateNoClose(eid.trim(), true);

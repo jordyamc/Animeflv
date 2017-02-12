@@ -111,6 +111,9 @@
     <string name="intro_title_1">Bienvenido!!</string>
     <string name="intro_desc_1">Esta es la app No Oficial de AnimeFLV</string>
 
+    <string name="intro_title_1_1">Bienvenido de nuevo!!</string>
+    <string name="intro_desc_1_1">Tus configuraciones han sido restauradas</string>
+
     <string name="intro_title_2">Recientes</string>
     <string name="intro_desc_2">Lista con los ultimos capitulos agregados</string>
 

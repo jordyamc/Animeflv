@@ -3,7 +3,6 @@ package knf.animeflv;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -41,8 +40,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
@@ -82,16 +79,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.AutoEmision.AutoEmisionActivity;
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.DownloadService.DownloaderService;
-import knf.animeflv.Emision.Section.newEmisionActivity;
 import knf.animeflv.Explorer.ExplorerRoot;
 import knf.animeflv.HallFame.HallActivity;
 import knf.animeflv.Interfaces.EncryptionListener;
@@ -145,7 +139,6 @@ public class newMain extends AppCompatActivity implements
     TextInputLayout inputLayout;
     private boolean isAmoled;
     private boolean doubleBackToExitPressedOnce = false;
-    private boolean verOk;
     private String ext_storage_state = Environment.getExternalStorageState();
     private File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
     private File DirFile = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
@@ -179,20 +172,6 @@ public class newMain extends AppCompatActivity implements
     private AppCompatSpinner repVid;
     private AppCompatSpinner repStream;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
-    private Handler EmisionHandler = new Handler();
-    Runnable EmisionWaiting = new Runnable() {
-        @Override
-        public void run() {
-            if (!MainStates.isLoadingEmision()) {
-                getWaitingSnackBar().dismiss();
-                EmisionHandler.removeCallbacks(EmisionWaiting);
-                getWaitingSnackBar().dismiss();
-                startActivity(new Intent(context, newEmisionActivity.class));
-            } else {
-                EmisionHandler.postDelayed(EmisionWaiting, 500);
-            }
-        }
-    };
     private String currUser = "null";
 
     private BroadcastReceiver receiver;
@@ -220,9 +199,6 @@ public class newMain extends AppCompatActivity implements
     }
 
     private void setUpMain() {
-        if (!getSharedPreferences("data", MODE_PRIVATE).getBoolean("intro", false)) {
-            startActivity(new Intent(this, Intronew.class));
-        }
         MainRegistrer.init();
         setUpVersion();
         setUpViews();
@@ -282,6 +258,7 @@ public class newMain extends AppCompatActivity implements
         return receiver;
     }
 
+    //FIXME: FIX SERVER LOGIN
     private void setUpDrawer() {
         Drawable ic_main;
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -302,9 +279,10 @@ public class newMain extends AppCompatActivity implements
             builder.addProfiles(
                     new ProfileDrawerItem().withName("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withEmail(headerTit).withIcon(ic_main).withIdentifier(9),
                     new ProfileSettingDrawerItem().withName("Cambiar colores").withIcon(CommunityMaterial.Icon.cmd_palette).withIdentifier(22),
+                    new ProfileSettingDrawerItem().withName("Actualizar vistos").withIcon(MaterialDesignIconic.Icon.gmi_cloud_upload).withIdentifier(87),
                     new ProfileSettingDrawerItem().withName("Sincronizar vistos").withIcon(CommunityMaterial.Icon.cmd_cloud_sync).withIdentifier(88),
-                    new ProfileSettingDrawerItem().withName("Dropbox (" + (DropboxManager.islogedIn() ? "DESCONECTAR" : "CONECTAR") + ")").withIcon(CommunityMaterial.Icon.cmd_dropbox).withIdentifier(120),
-                    new ProfileSettingDrawerItem().withName("Configurar cuenta").withIcon(CommunityMaterial.Icon.cmd_account_settings_variant).withIdentifier(99)
+                    new ProfileSettingDrawerItem().withName("Dropbox (" + (DropboxManager.islogedIn() ? "DESCONECTAR" : "CONECTAR") + ")").withIcon(CommunityMaterial.Icon.cmd_dropbox).withIdentifier(120)
+                    //new ProfileSettingDrawerItem().withName("Configurar cuenta").withIcon(CommunityMaterial.Icon.cmd_account_settings_variant).withIdentifier(99)
             ).withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                 @Override
                 public boolean onProfileChanged(View view, IProfile profile, boolean current) {
@@ -315,6 +293,14 @@ public class newMain extends AppCompatActivity implements
                         case 22:
                             cambiarColor();
                             result.closeDrawer();
+                            break;
+                        case 87:
+                            if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(newMain.this) || DropboxManager.islogedIn()) {
+                                startSeenUpdate();
+                                result.closeDrawer();
+                            } else {
+                                Toaster.toast("Por favor inicia sesión en la app o en Dropbox");
+                            }
                             break;
                         case 88:
                             if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(newMain.this) || DropboxManager.islogedIn()) {
@@ -365,15 +351,24 @@ public class newMain extends AppCompatActivity implements
             builder.addProfiles(
                     new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withIcon(ic_main).withIdentifier(9),
                     new ProfileSettingDrawerItem().withName("Cambiar colores").withIcon(CommunityMaterial.Icon.cmd_palette).withIdentifier(22),
+                    new ProfileSettingDrawerItem().withName("Actualizar vistos").withIcon(MaterialDesignIconic.Icon.gmi_cloud_upload).withIdentifier(87),
                     new ProfileSettingDrawerItem().withName("Sincronizar vistos").withIcon(CommunityMaterial.Icon.cmd_cloud_sync).withIdentifier(88),
-                    new ProfileSettingDrawerItem().withName("Dropbox").withEmail(DropboxManager.islogedIn() ? "DESCONECTAR" : "CONECTAR").withIcon(CommunityMaterial.Icon.cmd_dropbox).withIdentifier(120),
-                    new ProfileSettingDrawerItem().withName("Iniciar sesión").withIcon(CommunityMaterial.Icon.cmd_account_key).withIdentifier(110)
+                    new ProfileSettingDrawerItem().withName("Dropbox").withEmail(DropboxManager.islogedIn() ? "DESCONECTAR" : "CONECTAR").withIcon(CommunityMaterial.Icon.cmd_dropbox).withIdentifier(120)
+                    //new ProfileSettingDrawerItem().withName("Iniciar sesión").withIcon(CommunityMaterial.Icon.cmd_account_key).withIdentifier(110)
             ).withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                 @Override
                 public boolean onProfileChanged(View view, final IProfile profile, boolean current) {
                     switch (((int) profile.getIdentifier())) {
                         case 9:
                             headerResult.toggleSelectionList(newMain.this);
+                            break;
+                        case 87:
+                            if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(newMain.this) || DropboxManager.islogedIn()) {
+                                startSeenUpdate();
+                                result.closeDrawer();
+                            } else {
+                                Toaster.toast("Por favor inicia sesión en la app o en Dropbox");
+                            }
                             break;
                         case 88:
                             if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(newMain.this) || DropboxManager.islogedIn()) {
@@ -554,20 +549,43 @@ public class newMain extends AppCompatActivity implements
     }
 
     private void startSeenSync() {
-        Log.e("Seen Sync", "Start");
-        final MaterialDialog p = new MaterialDialog.Builder(this)
-                .content("Actualizando vistos")
-                .cancelable(false)
-                .progress(true, 0).build();
-        p.show();
-        FavSyncro.updateLocalSeen(this, new FavSyncro.UpdateCallback() {
-            @Override
-            public void onUpdate() {
-                Toaster.toast("Lista de capitulos vistos actualizada");
-                p.dismiss();
-                loadMainJson();
-            }
-        });
+        if (NetworkUtils.isNetworkAvailable()) {
+            Log.e("Seen Sync", "Start");
+            final MaterialDialog p = new MaterialDialog.Builder(this)
+                    .content("Actualizando vistos")
+                    .cancelable(false)
+                    .progress(true, 0).build();
+            p.show();
+            FavSyncro.updateLocalSeen(this, new FavSyncro.UpdateCallback() {
+                @Override
+                public void onUpdate() {
+                    Toaster.toast("Lista de capitulos vistos actualizada");
+                    p.dismiss();
+                    loadMainJson();
+                }
+            });
+        } else {
+            Toaster.toast("Sin internet");
+        }
+    }
+
+    private void startSeenUpdate() {
+        if (NetworkUtils.isNetworkAvailable()) {
+            Log.e("Seen Update", "Start");
+            Toaster.toast("Actualizando...");
+            FavSyncro.updateSeen(this, new DropboxManager.UploadCallback() {
+                @Override
+                public void onUpload(boolean success) {
+                    if (success) {
+                        Toaster.toast("Actualizado correctamente");
+                    } else {
+                        Toaster.toast("Error al actualizar");
+                    }
+                }
+            });
+        } else {
+            Toaster.toast("Sin internet");
+        }
     }
 
     private User getUser(JSONObject object) {
@@ -755,30 +773,8 @@ public class newMain extends AppCompatActivity implements
     }
 
     private int getHDraw(final Boolean set) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int drawable = R.drawable.cargando;
-        headerTit = "Animeflv";
-        String e = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email", "null");
-        int accent = ThemeUtils.getAcentColor(this);
-        if (!e.equals("null")) headerTit = e;
-        if (accent == ColorsRes.Rojo(this)) {
-            drawable = R.drawable.rojo;
-        }
-        if (accent == ColorsRes.Naranja(this)) {
-            drawable = R.drawable.naranja;
-        }
-        if (accent == ColorsRes.Gris(this)) {
-            drawable = R.drawable.gris;
-        }
-        if (accent == ColorsRes.Verde(this)) {
-            drawable = R.drawable.verde;
-        }
-        if (accent == ColorsRes.Rosa(this)) {
-            drawable = R.drawable.rosa;
-        }
-        if (accent == ColorsRes.Morado(this)) {
-            drawable = R.drawable.morado;
-        }
+        int drawable = ThemeUtils.getAccentColorDrawable(this);
+        headerTit = FavSyncro.getEmail(this);
 
         if (set) {
             ArrayList<IProfile> profile = new ArrayList<>();
@@ -1170,7 +1166,6 @@ public class newMain extends AppCompatActivity implements
         if (isNetworkAvailable()) {
             loadMainJson();
         } else {
-            verOk = false;
             if (file.exists()) {
                 String infile = FileUtil.getStringFromFile(file_loc);
                 getData(infile);
@@ -1188,7 +1183,7 @@ public class newMain extends AppCompatActivity implements
                 //tipos = parser.parseTipos(json);
                 //EmisionChecker.Refresh();
                 NetworkUtils.checkVersion(newMain.this, updateButton);
-                Status.reload(newMain.this);
+                Status.reload();
                 if (Status.getCacheStatusInt() == 1) {
                     getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();
                     if (!PreferenceManager.getDefaultSharedPreferences(newMain.this).getBoolean("statusShown", false)) {
@@ -1241,7 +1236,7 @@ public class newMain extends AppCompatActivity implements
 
     public void ActualizarFavoritos() {
         if (isNetworkAvailable()) {
-            if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(this)) {
+            if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(this) || DropboxManager.islogedIn()) {
                 FavSyncro.updateLocal(this, new FavSyncro.UpdateCallback() {
                     @Override
                     public void onUpdate() {
@@ -1270,194 +1265,15 @@ public class newMain extends AppCompatActivity implements
     }
 
     public void load(String s) {
-        Boolean isF = getSharedPreferences("data", MODE_PRIVATE).getBoolean("isF", true);
-        if (!isF) {
-            frun = false;
-            if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-                if (!mediaStorage.exists()) {
-                    mediaStorage.mkdirs();
-                }
+        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+            if (!mediaStorage.exists()) {
+                mediaStorage.mkdirs();
             }
-            if (s.equals("null")) {
-                toast("Sin cache para mostrar");
-            } else {
-                getData(s);
-            }
-        } else {
-            frun = true;
-            new DirGetter(context, TaskType.ACT_DIR_MAIN).execute(getDirectorio());
-            getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isF", false).apply();
-            final File saveData = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/data.save");
-            if (saveData.exists()) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        new MaterialDialog.Builder(context)
-                                .title("Respaldo")
-                                .content("Se ah encontrado un respaldo de la configuracion, ¿Desea restaurarlo?")
-                                .positiveText("SI")
-                                .negativeText("NO")
-                                .autoDismiss(true)
-                                .cancelable(true)
-                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        String save = FileUtil.getStringFromFile(saveData.getPath());
-                                        if (parser.restoreBackup(save, context) != Parser.Response.OK) {
-                                            toast("Error al restaurar");
-                                            saveData.delete();
-                                            parser.saveBackup(context);
-                                            showFastConf();
-                                        } else {
-                                            if (ThemeUtils.isAmoled(context)) {
-                                                recreate();
-                                            } else {
-                                                if (!knf.animeflv.LoginActivity.LoginServer.getEmailNormal(context).equals("null")) {
-                                                    loadMainJson();
-                                                    getHDraw(true);
-                                                } else {
-                                                    openSingInDialog();
-                                                }
-                                            }
-                                        }
-                                    }
-                                })
-                                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        saveData.delete();
-                                        parser.saveBackup(context);
-                                        showFastConf();
-                                    }
-                                })
-                                .cancelListener(new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialog) {
-                                        saveData.delete();
-                                        parser.saveBackup(context);
-                                        showFastConf();
-                                    }
-                                }).build().show();
-                    }
-                });
-            } else {
-                showFastConf();
-            }
-            loadMainJson();
         }
-    }
-
-    private void showFastConf() {
-        try {
-            RapConf = new MaterialDialog.Builder(context)
-                    .title("Configuracion rapida")
-                    .titleGravity(GravityEnum.CENTER)
-                    .customView(R.layout.rap_conf, false)
-                    .positiveText("CONTINUAR")
-                    .autoDismiss(false)
-                    .cancelable(false)
-                    .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                    .callback(new MaterialDialog.ButtonCallback() {
-                        @Override
-                        public void onPositive(MaterialDialog dialog) {
-                            super.onPositive(dialog);
-                            if (sonidos.getSelectedItemPosition() > 0 && conexion.getSelectedItemPosition() > 0 && repVid.getSelectedItemPosition() > 0 && repStream.getSelectedItemPosition() > 0) {
-                                toast("Se pueden volver a modificar desde configuracion");
-                                RapConf.dismiss();
-                                parser.saveBackup(context);
-                                openSingInDialog();
-                            } else {
-                                toast("Falta cambiar configuraciones!!!");
-                            }
-                        }
-                    }).build();
-            nots = (Switch) RapConf.getCustomView().findViewById(R.id.switch_not_conf);
-            sonidos = (AppCompatSpinner) RapConf.getCustomView().findViewById(R.id.spinner_sonido_conf);
-            conexion = (AppCompatSpinner) RapConf.getCustomView().findViewById(R.id.spinner_conexion_conf);
-            repVid = (AppCompatSpinner) RapConf.getCustomView().findViewById(R.id.spinner_rep_vid);
-            repStream = (AppCompatSpinner) RapConf.getCustomView().findViewById(R.id.spinner_rep_stream);
-            nots.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked) {
-                        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", true).apply();
-                    } else {
-                        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("notificaciones", false).apply();
-                    }
-                }
-            });
-            List<String> sonido = new ArrayList<>();
-            sonido.add("Selecciona...");
-            sonido.addAll(Arrays.asList(UtilSound.getSoundsNameList()));
-            ArrayAdapter<String> adapterSonidos = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, sonido);
-            sonidos.setAdapter(adapterSonidos);
-            sonidos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (position > 0)
-                        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sonido", Integer.toString(position - 1)).apply();
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                }
-            });
-            List<String> tipos = new ArrayList<>();
-            tipos.add("Selecciona...");
-            for (String dat : getResources().getStringArray(R.array.tipos)) {
-                tipos.add(dat);
-            }
-            ArrayAdapter<String> adapterConx = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, tipos);
-            conexion.setAdapter(adapterConx);
-            conexion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (position > 0)
-                        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_conexion", Integer.toString(position - 1)).apply();
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                }
-            });
-            List<String> repVids = new ArrayList<>();
-            repVids.add("Selecciona...");
-            for (String dat : getResources().getStringArray(R.array.players)) {
-                repVids.add(dat);
-            }
-            ArrayAdapter<String> adapterreps = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, repVids);
-            repVid.setAdapter(adapterreps);
-            repStream.setAdapter(adapterreps);
-            repVid.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (position > 0)
-                        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_video", Integer.toString(position - 1)).apply();
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-            repStream.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (position > 0)
-                        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("t_streaming", Integer.toString(position - 1)).apply();
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-            RapConf.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toaster.toast("Error al abrir configuracion rapida, porfavor pasa por configuracion");
-            openSingInDialog();
+        if (s.equals("null")) {
+            toast("Sin cache para mostrar");
+        } else {
+            getData(s);
         }
     }
 
@@ -1468,28 +1284,6 @@ public class newMain extends AppCompatActivity implements
                 load(json);
             }
         });
-    }
-
-    private void openSingInDialog() {
-        new MaterialDialog.Builder(this)
-                .content("Desea crear una cuenta en el servidor para guardar los favoritos en la nube?")
-                .positiveText("Si")
-                .negativeText("No")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        startActivity(new Intent(newMain.this, LoginBase.class));
-                    }
-                }).build().show();
-    }
-
-    private Snackbar getWaitingSnackBar() {
-        if (waiting == null) {
-            waiting = Snackbar.make(root, "Cargando Lista", Snackbar.LENGTH_INDEFINITE);
-            return waiting;
-        } else {
-            return waiting;
-        }
     }
 
 

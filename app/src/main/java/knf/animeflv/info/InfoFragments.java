@@ -1,8 +1,10 @@
 package knf.animeflv.info;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -35,6 +37,7 @@ import android.widget.Spinner;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.zawadz88.activitychooser.MaterialActivityChooserBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -48,6 +51,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
+import knf.animeflv.DownloadService.DownloaderService;
 import knf.animeflv.FavSyncro;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
@@ -98,6 +102,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     private FragmentCaps fragmentCaps;
     private FragmentManager fragmentManager;
     private JSONArray eps;
+    private BroadcastReceiver receiver;
 
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
@@ -203,7 +208,28 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             }
         });
         toolbar.setOnClickListener(getExpandListener());
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(DownloaderService.RECEIVER_ACTION_ERROR);
+        registerReceiver(getReceiver(), filter);
         getJsonfromApi();
+    }
+
+    private BroadcastReceiver getReceiver() {
+        if (receiver == null)
+            receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (intent.getAction().equals(DownloaderService.RECEIVER_ACTION_ERROR))
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (fragmentCaps != null)
+                                    fragmentCaps.resetList();
+                            }
+                        });
+                }
+            };
+        return receiver;
     }
 
     private boolean isEmision() {
@@ -231,7 +257,11 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         intent.setAction(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_TEXT, u);
         intent.setType("text/plain");
-        startActivity(Intent.createChooser(intent, "Compartir Link"));
+        //startActivity(Intent.createChooser(intent, "Compartir Link"));
+        new MaterialActivityChooserBuilder(context)
+                .withIntent(intent)
+                .withTitle("Compartir Link")
+                .show();
     }
 
     private View.OnClickListener getExpandListener() {
@@ -460,7 +490,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 }
                 Toaster.toast("Favorito Eliminado");
                 getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builder.toString()).apply();
-                FavSyncro.updateServer(InfoFragments.this);
+                FavSyncro.updateFavs(InfoFragments.this);
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_no, Amenu);
                 getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", true).apply();
@@ -477,7 +507,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 }
                 Toaster.toast("Favorito Agregado");
                 getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builderNo.toString()).apply();
-                FavSyncro.updateServer(InfoFragments.this);
+                FavSyncro.updateFavs(InfoFragments.this);
                 Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fav_si, Amenu);
                 getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", true).apply();
@@ -570,8 +600,10 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     @Override
     public boolean onKeyLongPress(int keyCode, KeyEvent event) {
         super.onKeyLongPress(keyCode, event);
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && fragmentInfo != null && fragmentCaps != null) {
             toogleFragments();
+        } else if (keyCode == KeyEvent.KEYCODE_BACK && fragmentInfo == null && fragmentCaps == null) {
+            Toaster.toast("Espera a que cargue la informaciom");
         }
         return true;
     }
@@ -581,6 +613,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         if (NetworkUtils.isNetworkAvailable()) {
             FavSyncro.updateServer(this);
         }
+        unregisterReceiver(getReceiver());
         super.onDestroy();
     }
 

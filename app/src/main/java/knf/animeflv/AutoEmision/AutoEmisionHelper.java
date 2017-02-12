@@ -65,6 +65,11 @@ public class AutoEmisionHelper {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_PREFS_JSON, "not found");
     }
 
+    @SuppressLint("ApplySharedPref")
+    public static void updateSavedList(Context context, JSONObject object) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(KEY_PREFS_JSON, object.toString()).commit();
+    }
+
     public static void asyncAddAnimetoList(final Context context, final String aid, final int daycode, final EmisionEditDialog.SearchListener listener) {
         new AsyncTask<Void, Void, Void>() {
             @Override
