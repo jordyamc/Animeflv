@@ -463,9 +463,18 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
             @Override
             public void onPageFinished(WebView view, String url) {
                 if (url.contains("zippyshare.com") || url.contains("blank")) {
-                    web.loadUrl("javascript:("
-                            + "function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);}"
+                    /*web.loadUrl("javascript:("
+                            + "function(){var l=document.getElementById('dlbutton');"
+                            + "var f=document.createEvent('HTMLEvents');"
+                            + "f.initEvent('click',true,true);"
+                            + "l.dispatchEvent(f);}"
                             + ")()");
+                            */
+                    web.loadUrl("javascript:(" +
+                            "function(){" +
+                            "var down=document.getElementById('dlbutton').href;" +
+                            "location.replace(down);" +
+                            "})()");
                 }
             }
 

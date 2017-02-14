@@ -82,6 +82,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import cz.msebera.android.httpclient.Header;
+import knf.animeflv.About.AboutActivity;
 import knf.animeflv.AutoEmision.AutoEmisionActivity;
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.Directorio.Directorio;
@@ -438,9 +439,7 @@ public class newMain extends AppCompatActivity implements
                         new PrimaryDrawerItem().withName("Explorador").withIcon(MaterialDesignIconic.Icon.gmi_folder).withIdentifier(9),
                         new PrimaryDrawerItem().withName("Historial").withIcon(MaterialDesignIconic.Icon.gmi_eye).withIdentifier(10),
                         new PrimaryDrawerItem().withName("Lista").withIcon(MaterialDesignIconic.Icon.gmi_assignment_returned).withIdentifier(4),
-                        new PrimaryDrawerItem().withName("VIP").withIcon(CommunityMaterial.Icon.cmd_crown).withIdentifier(15),
-                        new PrimaryDrawerItem().withName("Pagina Oficial").withIcon(FontAwesome.Icon.faw_facebook).withIdentifier(6),
-                        new PrimaryDrawerItem().withName("Discord Oficial").withIcon(CommunityMaterial.Icon.cmd_discord).withIdentifier(7),
+                        new PrimaryDrawerItem().withName("Sobre la app").withIcon(CommunityMaterial.Icon.cmd_information_outline).withIdentifier(20),
                         new PrimaryDrawerItem().withName("Publicidad").withIcon(MaterialDesignIconic.Icon.gmi_cloud).withIdentifier(8)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -509,6 +508,10 @@ public class newMain extends AppCompatActivity implements
                             case 15:
                                 result.setSelection(0, false);
                                 startActivity(new Intent(context, HallActivity.class));
+                                break;
+                            case 20:
+                                result.setSelection(0, false);
+                                startActivity(new Intent(context, AboutActivity.class));
                                 break;
                             case -1:
                                 Intent intent = new Intent(context, Configuracion.class);

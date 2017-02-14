@@ -932,4 +932,17 @@
         <item name="colorPrimaryDark">@color/negro</item>
     </style>
 
+    <style name="AboutLight" parent="Theme.Mal.Light.DarkActionBar">
+        <item name="colorPrimary">@color/prim</item>
+        <item name="colorPrimaryDark">@color/dark</item>
+        <item name="colorAccent">@color/rojo</item>
+    </style>
+
+    <style name="AboutDark" parent="Theme.Mal.Dark.DarkActionBar">
+        <item name="colorPrimary">@color/negro</item>
+        <item name="colorPrimaryDark">@color/negro</item>
+        <item name="colorAccent">@color/rojo</item>
+        <item name="android:windowAnimationStyle">@style/Animations</item>
+    </style>
+
 </resources>

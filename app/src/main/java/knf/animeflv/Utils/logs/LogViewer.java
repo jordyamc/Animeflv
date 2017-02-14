@@ -7,7 +7,6 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +33,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.ColorsRes;
+import knf.animeflv.FavSyncro;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
@@ -74,9 +74,7 @@ public class LogViewer extends AppCompatActivity {
         ButterKnife.bind(this);
         button.setColorNormal(ThemeUtils.getAcentColor(this));
         Intent intent = getIntent();
-        if (intent.getExtras() != null) {
-            setContent(intent.getExtras());
-        } else if (intent.getData() != null) {
+        if (intent.getData() != null) {
             setContent(intent.getData());
         } else {
             ToastError(new Exception("No Extras"));
@@ -106,8 +104,8 @@ public class LogViewer extends AppCompatActivity {
         }
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Informe de Error");
-        correoS = PreferenceManager.getDefaultSharedPreferences(this).getString("login_email", "");
-        if (correoS.equals("")) {
+        correoS = FavSyncro.getEmail(this);
+        if (correoS.equals("Animeflv")) {
             correo.requestFocus();
         } else {
             correo.setText(correoS);
@@ -159,6 +157,7 @@ public class LogViewer extends AppCompatActivity {
             complete_info.setText(FileUtil.getStringFromFile(current));
             phone_info.setText(getPhoneInfo(bundle.getString("path", null)));
         } catch (Exception e) {
+            e.printStackTrace();
             ToastError(e);
             finish();
         }
@@ -170,6 +169,7 @@ public class LogViewer extends AppCompatActivity {
             complete_info.setText(FileUtil.getStringFromFile(current));
             phone_info.setText(getPhoneInfo(uri.getPath()));
         } catch (Exception e) {
+            e.printStackTrace();
             ToastError(e);
             finish();
         }

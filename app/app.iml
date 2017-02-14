@@ -102,6 +102,7 @@
     <orderEntry type="library" exported="" name="commons-0.9.1.0" level="project" />
     <orderEntry type="library" exported="" name="jsoup-1.9.2" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-animators-2.2.3" level="project" />
+    <orderEntry type="library" exported="" name="material-about-library-1.7.1" level="project" />
     <orderEntry type="library" exported="" name="AwesomeSplash-v1.0.0" level="project" />
     <orderEntry type="library" exported="" name="HintCaseAssets-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="fastadapter-2.0.0" level="project" />

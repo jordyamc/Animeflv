@@ -57,7 +57,6 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     private String id;
     private List<String> eids;
     private String ext_storage_state = Environment.getExternalStorageState();
-    private MaterialDialog d;
     private Boolean streaming = false;
     private Activity context;
 
@@ -465,9 +464,18 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             public void onPageFinished(WebView view, String url) {
                 if (url.contains("zippyshare.com") || url.contains("blank")) {
                     context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("urlD", url).apply();
-                    web.loadUrl("javascript:("
-                            + "function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);}"
+                    /*web.loadUrl("javascript:("
+                            + "function(){var l=document.getElementById('dlbutton');"
+                            + "var f=document.createEvent('HTMLEvents');"
+                            + "f.initEvent('click',true,true);"
+                            + "l.dispatchEvent(f);}"
                             + ")()");
+                            */
+                    web.loadUrl("javascript:(" +
+                            "function(){" +
+                            "var down=document.getElementById('dlbutton').href;" +
+                            "location.replace(down);" +
+                            "})()");
                 }
             }
 
@@ -507,7 +515,6 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                     } else {
                         Toast.makeText(context, "El archivo ya existe", Toast.LENGTH_SHORT).show();
                     }
-                    d.dismiss();
 
                 } else {
                     int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));

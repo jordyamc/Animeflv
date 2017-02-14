@@ -431,8 +431,8 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Amenu = menu;
         if (isInInfo) {
-            Amenu = menu;
             SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
             String fav = sharedPreferences.getString("favoritos", "");
             String[] favoritos = {};

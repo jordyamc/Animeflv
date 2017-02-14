@@ -183,6 +183,7 @@ public class SelfGetter {
             if (descargas.outerHtml().contains("zippyshare")) {
                 for (Element e : descargas) {
                     String z = e.attr("href");
+                    z = z.substring(z.lastIndexOf("http"));
                     if (z.contains("zippyshare")) {
                         zippy = z;
                         break;

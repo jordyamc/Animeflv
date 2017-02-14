@@ -136,7 +136,7 @@ public class ManageDownload {
     }
 
     public static void chooseDownDir(Activity context, String eid, String url, CookieConstructor constructor) {
-        Boolean inSD = false;//PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
+        Boolean inSD = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false);
         if (inSD) {
             if (FileUtil.init(context).searchforSD().existSD() && FileUtil.haveSDPermission(context)) {
                 DescargarSD(context, eid, url, constructor);

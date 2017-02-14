@@ -62,6 +62,11 @@ public class DownloaderService extends IntentService {
             onStartDownload(eid);
             URL url = new URL(bundle.getString("url"));
             URLConnection conection = url.openConnection();
+            if (bundle.getBoolean("constructor")) {
+                conection.setRequestProperty("Cookie", bundle.getString("cookie"));
+                conection.setRequestProperty("Referer", bundle.getString("referer"));
+                conection.setRequestProperty("User-Agent", bundle.getString("useragent"));
+            }
             conection.connect();
             int lenghtOfFile = conection.getContentLength();
             InputStream input = conection.getInputStream();

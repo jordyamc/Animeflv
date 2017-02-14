@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -532,10 +533,21 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         web.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
+                if (!url.contains("jordyamc"))
+                    Log.e("URL Loaded", url);
                 if (url.contains("zippyshare.com") || url.contains("blank")) {
-                    web.loadUrl("javascript:("
-                            + "function(){var l=document.getElementById('dlbutton');" + "var f=document.createEvent('HTMLEvents');" + "f.initEvent('click',true,true);" + "l.dispatchEvent(f);}"
+                    /*web.loadUrl("javascript:("
+                            + "function(){var l=document.getElementById('dlbutton');"
+                            + "var f=document.createEvent('HTMLEvents');"
+                            + "f.initEvent('click',true,true);"
+                            + "l.dispatchEvent(f);}"
                             + ")()");
+                            */
+                    web.loadUrl("javascript:(" +
+                            "function(){" +
+                            "var down=document.getElementById('dlbutton').href;" +
+                            "location.replace(down);" +
+                            "})()");
                 }
             }
 
@@ -549,6 +561,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
             public void onDownloadStart(String url, String userAgent,
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
+                Log.e("Start Download", url);
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
                 String eid = fileName.replace(".mp4", "") + "E";
                 if (MainStates.getDowloadTask() == DownloadTask.DESCARGA) {
