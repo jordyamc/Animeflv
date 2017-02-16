@@ -1,0 +1,92 @@
+{
+  "links": {
+    "normal": "http://jordyamc.github.io/Animeflv/",
+    "base": "http://api2.jordyamc.github.io/Animeflv/",
+    "base_back": "http://api2.jordyamc.github.io/Animeflv/",
+    "inicio": "http://api2.animeflvapp.xyz/getHtml.php",
+    "inicio_back": "http://animeflvapp.xyz/getHtml.php",
+    "directorio": "http://api2.animeflvapp.xyz/directorio.php",
+    "directorio_back": "http://animeflvapp.xyz/directorio.php"
+  },
+  "contributors": [
+    {
+      "name": "Bowen_gfla",
+      "description": "Buscador de imagenes",
+      "onclick_message": 0,
+      "message": "",
+      "alias": ""
+    }
+  ],
+  "beta": [
+    {
+      "name": "Guerra1337",
+      "description": "Miembro super activo",
+      "onclick_message": 0,
+      "message": "",
+      "alias": "guerra1337"
+    },
+    {
+      "name": "Oaxaca",
+      "description": "Miembro super activo",
+      "onclick_message": 1,
+      "message": "Un Doujishin de nicoXmaki NTR podria invocarlo",
+      "alias": "Oaxaca_samaXD"
+    },
+    {
+      "name": "Richi Kurono (azu-nya)",
+      "description": "Miembro super activo",
+      "onclick_message": 1,
+      "message": "Ntr is love, Ntr is life",
+      "alias": "Richikurono"
+    },
+    {
+      "name": "Tatsuya Shiba",
+      "description": "Miembro activo",
+      "onclick_message": 0,
+      "message": "",
+      "alias": "Onii_sama"
+    },
+    {
+      "name": "Sam",
+      "description": "Miembro activo",
+      "onclick_message": 1,
+      "message": "El NTR lo mato",
+      "alias": "Sam_7u7"
+    },
+    {
+      "name": "Ryuk",
+      "description": "Miembro regular",
+      "onclick_message": 0,
+      "message": "",
+      "alias": "Naturedead"
+    },
+    {
+      "name": "Heiden",
+      "description": "Miembro poco regular",
+      "onclick_message": 1,
+      "message": "The dick only makes it better",
+      "alias": "CarajoEstoEsDificil"
+    },
+    {
+      "name": "Macd",
+      "description": "Miembro poco regular",
+      "onclick_message": 0,
+      "message": "",
+      "alias": "Macd89"
+    },
+    {
+      "name": "Chico",
+      "description": "Miembro muy poco regular",
+      "onclick_message": 1,
+      "message": "Las lolis son vida las lolis son amor",
+      "alias": "Chico_loli"
+    },
+    {
+      "name": "INF3R",
+      "description": "Miembro muy poco regular",
+      "onclick_message": 0,
+      "message": "",
+      "alias": "INF3R"
+    }
+  ]
+}
