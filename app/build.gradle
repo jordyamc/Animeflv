@@ -7,8 +7,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 166
-        versionName "4.4.1"
+        versionCode 167
+        versionName "4.4.2"
         multiDexEnabled = true
     }
     buildTypes {
@@ -135,6 +135,6 @@ dependencies {
 
     compile 'com.github.daniel-stoneuk:material-about-library:1.7.1'
 
-    //compile 'com.google.android.gms:play-services-analytics:10.0.1'
+    compile 'com.google.android.gms:play-services-analytics:10.0.1'
 }
-//apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.gms.google-services'

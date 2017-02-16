@@ -24,9 +24,13 @@ import com.mikepenz.community_material_typeface_library.CommunityMaterial;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import java.util.List;
+
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.ColorsRes;
+import knf.animeflv.Parser;
 import knf.animeflv.R;
+import knf.animeflv.Utils.OnlineDataHelper;
 import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
@@ -154,14 +158,7 @@ public class AboutActivity extends MaterialAboutActivity {
         MaterialAboutCard.Builder builder = new MaterialAboutCard.Builder();
         builder.title("Contribuidores");
 
-        builder.addItem(new MaterialAboutActionItem.Builder()
-                .text("Bowen_gfla")
-                .subText("Buscador de imagenes")
-                .icon(new IconicsDrawable(context)
-                        .icon(GoogleMaterial.Icon.gmd_person)
-                        .color(iconColor(context))
-                        .sizeDp(18))
-                .build());
+        addContributors(builder);
 
         return builder;
     }
@@ -170,135 +167,7 @@ public class AboutActivity extends MaterialAboutActivity {
         MaterialAboutCard.Builder builder = new MaterialAboutCard.Builder();
         builder.title("Beta Testers");
 
-        builder.addItem(new MaterialAboutActionItem.Builder()
-                .text("Guerra1337")
-                .subText("Miembro super activo")
-                .icon(new IconicsDrawable(context)
-                        .icon(GoogleMaterial.Icon.gmd_person)
-                        .color(iconColor(context))
-                        .sizeDp(18))
-                .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://t.me/guerra1337")))
-                .build());
-
-        builder.addItem(new MaterialAboutActionItem.Builder()
-                .text("Oaxaca")
-                .subText("Miembro super activo")
-                .icon(new IconicsDrawable(context)
-                        .icon(GoogleMaterial.Icon.gmd_person)
-                        .color(iconColor(context))
-                        .sizeDp(18))
-                .setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
-                    @Override
-                    public void onClick() {
-                        if (!antispam) {
-                            antispam = true;
-                            handler.postDelayed(runnable, 10000);
-                            Toaster.toastLong("Un Doujishin de nicoxmaki ntr podria invocarlo");
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/Oaxacasempai")));
-                        } else {
-                            Log.e("AntiSpam", "Enabled");
-                        }
-                    }
-                })
-                .build());
-
-        builder.addItem(new MaterialAboutActionItem.Builder()
-                .text("Richi Kurono (azu-nya)")
-                .subText("Miembro super activo")
-                .icon(new IconicsDrawable(context)
-                        .icon(GoogleMaterial.Icon.gmd_person)
-                        .color(iconColor(context))
-                        .sizeDp(18))
-                .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://t.me/Richikurono")))
-                .build());
-
-        builder.addItem(new MaterialAboutActionItem.Builder()
-                .text("Tatsuya Shiba")
-                .subText("Miembro activo")
-                .icon(new IconicsDrawable(context)
-                        .icon(GoogleMaterial.Icon.gmd_person)
-                        .color(iconColor(context))
-                        .sizeDp(18))
-                .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://t.me/Onii_sama")))
-                .build());
-
-        builder.addItem(new MaterialAboutActionItem.Builder()
-                .text("Sam")
-                .subText("Miembro activo")
-                .icon(new IconicsDrawable(context)
-                        .icon(GoogleMaterial.Icon.gmd_person)
-                        .color(iconColor(context))
-                        .sizeDp(18))
-                .setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
-                    @Override
-                    public void onClick() {
-                        Toaster.toastLong("El ntr lo mato");
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/Sam_7u7")));
-                    }
-                })
-                .build());
-
-        builder.addItem(new MaterialAboutActionItem.Builder()
-                .text("Ryuk")
-                .subText("Miembro regular")
-                .icon(new IconicsDrawable(context)
-                        .icon(GoogleMaterial.Icon.gmd_person)
-                        .color(iconColor(context))
-                        .sizeDp(18))
-                .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://t.me/Naturedead")))
-                .build());
-
-        builder.addItem(new MaterialAboutActionItem.Builder()
-                .text("Heiden")
-                .subText("Miembro poco regular")
-                .icon(new IconicsDrawable(context)
-                        .icon(GoogleMaterial.Icon.gmd_person)
-                        .color(iconColor(context))
-                        .sizeDp(18))
-                .setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
-                    @Override
-                    public void onClick() {
-                        Toaster.toastLong("The dick only makes it better");
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/CarajoEstoEsDificil")));
-                    }
-                })
-                .build());
-
-        builder.addItem(new MaterialAboutActionItem.Builder()
-                .text("Macd")
-                .subText("Miembro poco regular")
-                .icon(new IconicsDrawable(context)
-                        .icon(GoogleMaterial.Icon.gmd_person)
-                        .color(iconColor(context))
-                        .sizeDp(18))
-                .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://t.me/Macd89")))
-                .build());
-
-        builder.addItem(new MaterialAboutActionItem.Builder()
-                .text("Chico")
-                .subText("Miembro muy poco regular")
-                .icon(new IconicsDrawable(context)
-                        .icon(GoogleMaterial.Icon.gmd_person)
-                        .color(iconColor(context))
-                        .sizeDp(18))
-                .setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
-                    @Override
-                    public void onClick() {
-                        Toaster.toastLong("Las lolis son vida las lolis son amor");
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/Chico_loli")));
-                    }
-                })
-                .build());
-
-        builder.addItem(new MaterialAboutActionItem.Builder()
-                .text("INF3R")
-                .subText("Miembro muy poco regular")
-                .icon(new IconicsDrawable(context)
-                        .icon(GoogleMaterial.Icon.gmd_person)
-                        .color(iconColor(context))
-                        .sizeDp(18))
-                .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://t.me/INF3R")))
-                .build());
+        addBetas(builder);
 
         return builder;
     }
@@ -310,6 +179,7 @@ public class AboutActivity extends MaterialAboutActivity {
         builder.addItem(
                 new MaterialAboutActionItem.Builder()
                         .text("Facebook")
+                        .subText("/animeflv.app.jordy")
                         .icon(
                                 new IconicsDrawable(context)
                                         .icon(CommunityMaterial.Icon.cmd_facebook_box)
@@ -323,6 +193,7 @@ public class AboutActivity extends MaterialAboutActivity {
         builder.addItem(
                 new MaterialAboutActionItem.Builder()
                         .text("Discord")
+                        .subText("@UnbarredStream")
                         .icon(
                                 new IconicsDrawable(context)
                                         .icon(CommunityMaterial.Icon.cmd_discord)
@@ -336,13 +207,14 @@ public class AboutActivity extends MaterialAboutActivity {
         builder.addItem(
                 new MaterialAboutActionItem.Builder()
                         .text("Página Web")
+                        .subText(Parser.getNormalUrl(context))
                         .icon(
                                 new IconicsDrawable(context)
                                         .icon(CommunityMaterial.Icon.cmd_web)
                                         .color(iconColor(context))
                                         .sizeDp(18)
                         )
-                        .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://jordyamc.github.io/Animeflv/")))
+                        .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse(Parser.getNormalUrl(context))))
                         .build()
         );
 
@@ -368,6 +240,64 @@ public class AboutActivity extends MaterialAboutActivity {
         );
 
         return builder;
+    }
+
+    private void addContributors(MaterialAboutCard.Builder builder) {
+        List<OnlineDataHelper.PersonItem> items = OnlineDataHelper.get(this).getPersons(OnlineDataHelper.TYPE_CONTRIBUTOR);
+        for (OnlineDataHelper.PersonItem item : items) {
+            if (item.haveMessage > 0) {
+                addMessage(item, builder);
+            } else {
+                addNoMessage(item, builder);
+            }
+        }
+    }
+
+    private void addBetas(MaterialAboutCard.Builder builder) {
+        List<OnlineDataHelper.PersonItem> items = OnlineDataHelper.get(this).getPersons(OnlineDataHelper.TYPE_BETA);
+        for (OnlineDataHelper.PersonItem item : items) {
+            if (item.haveMessage > 0) {
+                addMessage(item, builder);
+            } else {
+                addNoMessage(item, builder);
+            }
+        }
+    }
+
+    private void addMessage(final OnlineDataHelper.PersonItem item, MaterialAboutCard.Builder builder) {
+        MaterialAboutActionItem.Builder action =
+                new MaterialAboutActionItem.Builder()
+                        .text(item.name)
+                        .subText(item.description)
+                        .icon(new IconicsDrawable(this)
+                                .icon(GoogleMaterial.Icon.gmd_person)
+                                .color(iconColor(this))
+                                .sizeDp(18)
+                        );
+        if (!item.alias.trim().equals(""))
+            action.setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+                @Override
+                public void onClick() {
+                    Toaster.toastLong(item.message);
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/" + item.alias)));
+                }
+            });
+        builder.addItem(action.build());
+    }
+
+    private void addNoMessage(final OnlineDataHelper.PersonItem item, MaterialAboutCard.Builder builder) {
+        MaterialAboutActionItem.Builder action =
+                new MaterialAboutActionItem.Builder()
+                        .text(item.name)
+                        .subText(item.description)
+                        .icon(new IconicsDrawable(this)
+                                .icon(GoogleMaterial.Icon.gmd_person)
+                                .color(iconColor(this))
+                                .sizeDp(18)
+                        );
+        if (!item.alias.trim().equals(""))
+            action.setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(this, Uri.parse("https://t.me/" + item.alias)));
+        builder.addItem(action.build());
     }
 
     private Uri facebookUri() {

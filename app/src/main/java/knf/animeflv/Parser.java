@@ -352,6 +352,10 @@ public class Parser {
         }
     }
 
+    public static String getNormalUrl(Context context) {
+        return context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("dir_normal", "https://jordyamc.github.io/Animeflv/");
+    }
+
     public String[] parseTitulos(String json) {
         List<String> titulosArray = new ArrayList<String>();
         String[] titulos;

@@ -41,6 +41,7 @@ import java.util.Locale;
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.CustomSettingsIntro.CustomIntro;
 import knf.animeflv.Utils.NetworkUtils;
+import knf.animeflv.Utils.OnlineDataHelper;
 import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
@@ -203,7 +204,7 @@ public class Splash extends AwesomeSplash {
             asyncHttpClient.setTimeout(2000);
             asyncHttpClient.setResponseTimeout(2000);
             asyncHttpClient.setConnectTimeout(2000);
-            asyncHttpClient.get("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/links.html", null, new JsonHttpResponseHandler() {
+            asyncHttpClient.get("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/online_data.json", null, new JsonHttpResponseHandler() {
 
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -258,8 +259,11 @@ public class Splash extends AwesomeSplash {
     public void actlinks(String s) {
         if (!s.equals("error")) {
             try {
-                JSONObject jsonObject = new JSONObject(s.trim());
+                JSONObject json = new JSONObject(s.trim());
+                OnlineDataHelper.update(this, json);
+                JSONObject jsonObject = json.getJSONObject("links");
                 SharedPreferences.Editor preferences = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
+                preferences.putString("dir_normal", jsonObject.getString("normal")).apply();
                 preferences.putString("dir_base", jsonObject.getString("base")).apply();
                 preferences.putString("dir_base_back", jsonObject.getString("base_back")).apply();
                 preferences.putString("dir_inicio", jsonObject.getString("inicio")).apply();

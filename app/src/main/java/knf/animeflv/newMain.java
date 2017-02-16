@@ -182,6 +182,7 @@ public class newMain extends AppCompatActivity implements
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.anime_main);
+        TrackingHelper.track(this, TrackingHelper.MAIN);
         startUp();
         setUpMain();
     }
@@ -1353,7 +1354,6 @@ public class newMain extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        TrackingHelper.track(this, TrackingHelper.MAIN);
         getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", new HashSet<String>()).apply();
         parser.refreshUrls(context);

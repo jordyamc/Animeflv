@@ -41,7 +41,6 @@ import knf.animeflv.R;
 import knf.animeflv.Recientes.MainAnimeModel;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.StreamManager.StreamManager;
-import knf.animeflv.TaskType;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Logger;
@@ -536,13 +535,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 if (!url.contains("jordyamc"))
                     Log.e("URL Loaded", url);
                 if (url.contains("zippyshare.com") || url.contains("blank")) {
-                    /*web.loadUrl("javascript:("
-                            + "function(){var l=document.getElementById('dlbutton');"
-                            + "var f=document.createEvent('HTMLEvents');"
-                            + "f.initEvent('click',true,true);"
-                            + "l.dispatchEvent(f);}"
-                            + ")()");
-                            */
                     web.loadUrl("javascript:(" +
                             "function(){" +
                             "var down=document.getElementById('dlbutton').href;" +
@@ -606,7 +598,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 MainStates.setProcessing(false, null);
             }
         });
-        web.loadUrl(parser.getBaseUrl(TaskType.NORMAL, context).replace("api2.", ""));
+        web.loadUrl(Parser.getNormalUrl(context));
     }
 
     public void setData(List<MainAnimeModel> data) {

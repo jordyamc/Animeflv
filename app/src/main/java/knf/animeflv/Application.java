@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.multidex.MultiDexApplication;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
 import com.karumi.dexter.Dexter;
 
 import es.munix.multidisplaycast.CastManager;
@@ -12,13 +14,10 @@ import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.UtilsInit;
 import xdroid.toaster.Toaster;
 
-//import com.google.android.gms.analytics.GoogleAnalytics;
-//import com.google.android.gms.analytics.Tracker;
-
 
 public class Application extends MultiDexApplication {
     Context context;
-    //private Tracker mTracker;
+    private Tracker mTracker;
 
     public static Application get(Activity activity) {
         return (Application) activity.getApplication();
@@ -46,13 +45,13 @@ public class Application extends MultiDexApplication {
         DropboxManager.init(this);
     }
 
-    /*synchronized public Tracker getDefaultTracker() {
+    synchronized public Tracker getDefaultTracker() {
         if (mTracker == null) {
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
             // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
             mTracker = analytics.newTracker(R.xml.global_tracker);
         }
         return mTracker;
-    }*/
+    }
 
 }

@@ -37,7 +37,6 @@ import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.R;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.StreamManager.StreamManager;
-import knf.animeflv.TaskType;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
@@ -464,13 +463,6 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             public void onPageFinished(WebView view, String url) {
                 if (url.contains("zippyshare.com") || url.contains("blank")) {
                     context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("urlD", url).apply();
-                    /*web.loadUrl("javascript:("
-                            + "function(){var l=document.getElementById('dlbutton');"
-                            + "var f=document.createEvent('HTMLEvents');"
-                            + "f.initEvent('click',true,true);"
-                            + "l.dispatchEvent(f);}"
-                            + ")()");
-                            */
                     web.loadUrl("javascript:(" +
                             "function(){" +
                             "var down=document.getElementById('dlbutton').href;" +
@@ -546,7 +538,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                 }
             }
         });
-        web.loadUrl(new Parser().getBaseUrl(TaskType.NORMAL, context).replace("api2.", ""));
+        web.loadUrl(Parser.getNormalUrl(context));
     }
 
     public void toast(String text) {

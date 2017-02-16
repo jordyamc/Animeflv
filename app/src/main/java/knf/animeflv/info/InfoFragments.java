@@ -253,11 +253,11 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     }
 
     private void shareAid() {
+        TrackingHelper.action(this, aid);
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_TEXT, u);
         intent.setType("text/plain");
-        //startActivity(Intent.createChooser(intent, "Compartir Link"));
         new MaterialActivityChooserBuilder(context)
                 .withIntent(intent)
                 .withTitle("Compartir Link")
