@@ -114,6 +114,12 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferencias);
         context = getActivity();
+
+        //FIXME:TEST AREA
+        //Test Area
+
+        //<----------
+
         Boolean activado = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("notificaciones", true);
         if (!activado) {
             getPreferenceScreen().findPreference("tiempo").setEnabled(false);

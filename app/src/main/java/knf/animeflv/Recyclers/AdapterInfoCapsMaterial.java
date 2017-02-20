@@ -45,6 +45,7 @@ import knf.animeflv.Utils.UpdateUtil;
 import knf.animeflv.Utils.UrlUtils;
 import knf.animeflv.Utils.eNums.DownloadTask;
 import knf.animeflv.Utils.eNums.UpdateState;
+import knf.animeflv.zippy.zippyHelper;
 import xdroid.toaster.Toaster;
 
 /**
@@ -375,11 +376,25 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
 
             @Override
             public void onStartZippy(final String url) {
-                MainStates.setZippyState(DownloadTask.DESCARGA, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
-                holder.web.post(new Runnable() {
+                zippyHelper.calculate(url, new zippyHelper.OnZippyResult() {
                     @Override
-                    public void run() {
-                        holder.web.loadUrl(url);
+                    public void onSuccess(zippyHelper.zippyObject object) {
+                        MainStates.setProcessing(false, null);
+                        showDelete(holder.ib_des);
+                        showPlay(holder.ib_ver);
+                        ManageDownload.chooseDownDir(context, eids.get(holder.getAdapterPosition()), object.download_url, object.cookieConstructor);
+                    }
+
+                    @Override
+                    public void onError() {
+                        Toaster.toast("Error al obtener link, reintentando en modo nativo");
+                        MainStates.setZippyState(DownloadTask.DESCARGA, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
+                        holder.web.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                holder.web.loadUrl(url);
+                            }
+                        });
                     }
                 });
             }
@@ -416,11 +431,38 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
 
             @Override
             public void onStartZippy(final String url) {
-                MainStates.setZippyState(DownloadTask.STREAMING, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
-                holder.web.post(new Runnable() {
+                zippyHelper.calculate(url, new zippyHelper.OnZippyResult() {
                     @Override
-                    public void run() {
-                        holder.web.loadUrl(url);
+                    public void onSuccess(zippyHelper.zippyObject object) {
+                        MainStates.setProcessing(false, null);
+                        showDownload(holder.ib_des);
+                        int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
+                        if (type == 1) {
+                            StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), object.download_url, object.cookieConstructor);
+                        } else {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                StreamManager.internal(context).Stream(eids.get(holder.getAdapterPosition()), object.download_url, object.cookieConstructor);
+                            } else {
+                                if (FileUtil.init(context).isMXinstalled()) {
+                                    Toaster.toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
+                                    StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), object.download_url, object.cookieConstructor);
+                                } else {
+                                    Toaster.toast("No hay reproductor adecuado disponible");
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError() {
+                        Toaster.toast("Error al obtener link, reintentando en modo nativo");
+                        MainStates.setZippyState(DownloadTask.STREAMING, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
+                        holder.web.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                holder.web.loadUrl(url);
+                            }
+                        });
                     }
                 });
             }
