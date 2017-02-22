@@ -18,7 +18,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,23 +36,24 @@ public class SelfGetter {
     private static final int TIMEOUT = 10000;
     private static final String ua = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/5.7.15533.1010 Safari/537.36";
 
+    //FIXME:OVA PELICULA
     public static void getInicio(final Context context, final INICIO inicio, final BaseGetter.AsyncInterface asyncInterface) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    Document main = Jsoup.connect("http://animeflv.net").userAgent(ua).cookie("dev", "1").timeout(TIMEOUT).get();
-                    Elements caps = main.select("div.not");
+                    Document main = Jsoup.connect("http://animeflv.net").userAgent(ua).cookie("mobile_detect", "computer").timeout(TIMEOUT).get();
+                    Element list = main.select("ul.ListEpisodios.AX.Rows.A06.C04.D03").first();
+                    Elements caps = list.select("li");
                     JSONObject object = new JSONObject();
                     object.put("version", context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName + "-Internal_Api");
                     object.put("cache", "0");
                     object.put("last", getCurrentHour());
                     JSONArray array = new JSONArray();
                     for (Element element : caps) {
-                        Element link = element.select("a").first();
-                        String title_semi = link.attr("title").trim();
-                        String title = title_semi.substring(0, title_semi.lastIndexOf(" "));
-                        String numero = title_semi.substring(title_semi.lastIndexOf(" ") + 1);
+                        String title = element.select("strong.Title").first().ownText();
+                        String numero_semi = element.select("span.Capi").first().ownText();
+                        String numero = numero_semi.substring(numero_semi.lastIndexOf(" ") + 1);
                         Element img = element.select("img").first();
                         String img_url = img.attr("src");
                         String aid = img_url.substring(img_url.lastIndexOf("/") + 1, img_url.lastIndexOf("."));
@@ -169,17 +169,17 @@ public class SelfGetter {
         String Yotta = "null";
         String Yotta480 = "null";
         String Yotta360 = "null";
-        String[] names = new String[]{"Izanagi", "Mina", "Yotta", "Yotta 480p", "Yotta 360p", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
+        String[] names = new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 480p", "Yotta 360p", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
         try {
             Log.e("Url", url);
-            Document main = Jsoup.connect(url).userAgent(ua).cookie("dev", "1").timeout(TIMEOUT).get();
-            String titinfo = main.select("div.episodio_titulo").first().getElementsByTag("h1").text();
+            Document main = Jsoup.connect(url).userAgent(ua).cookie("mobile_detect", "computer").timeout(TIMEOUT).get();
+            String titinfo = main.select("h1").first().text();
             tit = titinfo.substring(0, titinfo.lastIndexOf(" "));
             num = titinfo.substring(titinfo.lastIndexOf(" ") + 1);
             String link = main.select("meta[property='og:image']").attr("content");
             aid = link.substring(link.lastIndexOf("/") + 1, link.lastIndexOf("."));
             eid = aid + "_" + num + "E";
-            Elements descargas = main.select("a.op_download");
+            Elements descargas = main.select("a.Button.Sm.fa-download");
             if (descargas.outerHtml().contains("zippyshare")) {
                 for (Element e : descargas) {
                     String z = e.attr("href");
@@ -190,40 +190,39 @@ public class SelfGetter {
                     }
                 }
             }
-            Element script = main.select("div#contenido").first().getElementsByTag("script").last();
+            Element script = main.select("script").last();
             String j = script.outerHtml();
-            String json = j.substring(j.indexOf("{"), j.indexOf("}") + 1);
-            JSONObject js = new JSONObject(json);
-            Iterator<String> iterator = js.keys();
-            while (iterator.hasNext()) {
-                String el = js.get(iterator.next()).toString();
-                if (el.contains("izanagi")) {
-                    String[] p = el.split("\",\"");
-                    for (String r : p) {
-                        if (r.contains("embed_izanagi.php")) {
-                            try {
-                                String body = Jsoup.connect("https://animeflv.net/embed_izanagi.php?key=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" "))).userAgent(ua).get().outerHtml();
-                                izanagi = new JSONObject(Jsoup.connect(body.substring(body.indexOf("get('") + 5, body.indexOf("',"))).userAgent(ua).get().body().text()).getString("file");
-                            } catch (Exception e) {
-                            }
-                        }
+            String json = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()"));
+            String[] parts = json.split("video");
+            for (String el : parts) {
+                if (el.contains("server=izanagi")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
+                        izanagi = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(ua).get().body().text()).getString("file");
+                    } catch (Exception e) {
                     }
-                } else if (el.contains("embed_yotta.php")) {
-                    String[] p = el.split("\",\"");
-                    for (String r : p) {
-                        if (r.contains("embed_yotta.php")) {
-                            try {
-                                JSONArray ja = new JSONObject(Jsoup.connect("http://s1.animeflv.net/gdrive.php?id=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" "))).userAgent(ua).get().body().text()).getJSONArray("sources");
-                                if (ja.length() > 1) {
-                                    Yotta480 = ja.getJSONObject(0).getString("file");
-                                    Yotta360 = ja.getJSONObject(1).getString("file");
-                                } else {
-                                    Yotta = ja.getJSONObject(0).getString("file");
-                                }
-                            } catch (Exception e) {
-                                Log.e("Yotta", "Error getting Yotta: " + "http://s1.animeflv.net/gdrive.php?id=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" ")));
+                } else if (el.contains("server=gdrive")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
+                        JSONArray ja = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(ua).get().body().text()).getJSONArray("sources");
+                        if (ja.length() > 1) {
+                            if (ja.getJSONObject(0).getString("label").equals("360")) {
+                                Yotta360 = ja.getJSONObject(0).getString("file");
+                            } else {
+                                Yotta480 = ja.getJSONObject(0).getString("file");
                             }
+                            if (ja.getJSONObject(1).getString("label").equals("360")) {
+                                Yotta360 = ja.getJSONObject(1).getString("file");
+                            } else {
+                                Yotta480 = ja.getJSONObject(1).getString("file");
+                            }
+                        } else {
+                            Yotta = ja.getJSONObject(0).getString("file");
                         }
+                    } catch (Exception e) {
+                        Log.e("Yotta", "Error getting Yotta: " + down_link.replace("embed", "check"));
                     }
                 } else if (el.contains("https://mega.nz")) {
                     String[] p = el.split("\",\"");
@@ -236,17 +235,13 @@ public class SelfGetter {
                             }
                         }
                     }
-                } else if (el.contains("embed_mina.php")) {
-                    String[] p = el.split("\",\"");
-                    for (String r : p) {
-                        if (r.contains("embed_mina.php")) {
-                            try {
-                                JSONObject ja = new JSONObject(Jsoup.connect("https://s1.animeflv.com/minhateca.php?id=" + r.substring(r.indexOf("key=") + 4, r.indexOf("\\\" "))).userAgent(ua).get().body().text());
-                                Log.e("Mina DEBUG", ja.toString());
-                                mina = ja.getString("file");
-                            } catch (Exception e) {
-                            }
-                        }
+                } else if (el.contains("server=minhateca")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
+                        mina = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(ua).get().body().text()).getString("file");
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -281,24 +276,25 @@ public class SelfGetter {
             protected Void doInBackground(Void... voids) {
                 try {
                     Log.e("Get Anime Info", new Parser().getUrlAnimeCached(anime.getAidString()));
-                    Document document = Jsoup.connect(new Parser().getUrlAnimeCached(anime.getAidString())).userAgent(ua).cookie("dev", "1").timeout(TIMEOUT).get();
-                    String imgUrl = document.select("img.portada").first().attr("src");
+                    Document document = Jsoup.connect(new Parser().getUrlAnimeCached(anime.getAidString())).userAgent(ua).cookie("mobile_detect", "computer").timeout(TIMEOUT).get();
+                    String imgUrl = document.select("div.Image").first().select("img").first().attr("src");
                     String aid = imgUrl.substring(imgUrl.lastIndexOf("/") + 1, imgUrl.lastIndexOf("."));
-                    Elements infos = document.select("ul.ainfo").first().select("li");
-                    String tid = infos.get(0).ownText();
-                    String state = getState(infos.get(1).select("span").first().attr("class"));
-                    String generos = infos.get(2).text().replace("Generos:", "");
-                    String start = "Sin Fecha";
-                    try {
-                        start = infos.get(3).ownText();
-                    } catch (Exception e) {
-                        Log.e("Anime Self Getter", "No End Date");
+                    String tid = document.select("div.Ficha").first().select("div.Container").first().select("span").first().attr("class");
+                    String state = getState(document.select("aside.SidebarA.BFixed").first().select("div").last().attr("class"));
+                    Elements categories = document.select("div.Categories").first().select("a");
+                    String gens = "";
+                    for (Element gen : categories) {
+                        gens += gen.ownText();
+                        gens += ", ";
                     }
+                    String generos = gens.substring(0, gens.lastIndexOf(","));
+                    String start = "Sin Fecha";
+
                     String title = document.select("h1").first().text();
-                    String sinopsis = Parser.InValidateSinopsis(document.select("div.sinopsis").text().trim());
+                    String sinopsis = Parser.InValidateSinopsis(document.select("div.Sect.Descrtn").first().select("p").first().text().trim());
                     JSONArray array = new JSONArray();
                     try {
-                        Elements epis = document.select("ul.anime_episodios").first().select("li");
+                        Elements epis = document.select("ul.ListEpisodes").first().select("li");
                         for (Element ep : epis) {
                             JSONObject object = new JSONObject();
                             String name = ep.select("a").first().ownText().trim();
@@ -317,24 +313,26 @@ public class SelfGetter {
                     }
                     JSONArray j_rels = new JSONArray();
                     try {
-                        Elements rels = document.select("div.relacionados").first().select("li");
+                        Elements rels = document.select("ul.ListAnimRela").first().select("li");
                         for (Element rel : rels) {
-                            String t_tid = rel.select("b").first().ownText();
-                            Element link = rel.select("a").first();
+                            //FIXME: Buscar diferencia de Precuela/Secuela
+                            //String t_tid = rel.select("b").first().ownText();
+                            Element link = rel.select("a").get(1);
                             String full_link = "http://animeflv.net" + link.attr("href");
                             String name = link.ownText();
-                            String type = rel.ownText().trim().replace("(", "").replace(")", "").replace(":", "");
-                            Document t_document = Jsoup.connect(full_link).userAgent(ua).cookie("dev", "1").get();
-                            String t_imgUrl = t_document.select("img.portada").first().attr("src");
+                            String type = rel.select("span").first().attr("class");
+                            Document t_document = Jsoup.connect(full_link).userAgent(ua).cookie("mobile_detect", "computer").get();
+                            String t_imgUrl = t_document.select("div.Image").first().select("img").first().attr("src");
                             String t_aid = t_imgUrl.substring(t_imgUrl.lastIndexOf("/") + 1, t_imgUrl.lastIndexOf("."));
                             JSONObject object = new JSONObject();
                             object.put("aid", t_aid);
                             object.put("tid", type);
                             object.put("titulo", name);
-                            object.put("rel_tipo", t_tid);
+                            object.put("rel_tipo", "");
                             j_rels.put(object);
                         }
                     } catch (Exception e) {
+                        //e.printStackTrace();
                         Log.e("Get Anime Info", "No Rel List");
                     }
                     JSONObject fobject = new JSONObject();
@@ -388,12 +386,12 @@ public class SelfGetter {
     }
 
     private static String getState(String className) {
-        if (className.contains("1")) {
+        if (className.contains("On")) {
             return "0000-00-00";
-        } else if (className.contains("3")) {
-            return "prox";
-        } else {
+        } else if (className.contains("Off")) {
             return "1";
+        } else {
+            return "prox";
         }
     }
 

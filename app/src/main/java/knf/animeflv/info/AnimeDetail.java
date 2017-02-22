@@ -38,6 +38,19 @@ public class AnimeDetail {
         }
     }
 
+    private String getTid(String t) {
+        switch (t) {
+            default:
+            case "Type tv":
+                return "Anime";
+            case "Type ova":
+                return "OVA";
+            case "Type movie":
+                return "Pelicula";
+
+        }
+    }
+
     private String getState(String state) {
         switch (state) {
             case "0000-00-00":
@@ -58,7 +71,7 @@ public class AnimeDetail {
     }
 
     public String getTid() {
-        return tid;
+        return getTid(tid);
     }
 
     public String getTitulo() {

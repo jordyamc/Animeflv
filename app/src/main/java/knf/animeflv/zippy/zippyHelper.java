@@ -14,10 +14,6 @@ import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.JsonFactory.ServerGetter;
 import knf.animeflv.Utils.NoLogInterface;
 
-/**
- * Created by Jordy on 18/02/2017.
- */
-
 public class zippyHelper {
     public static void calculate(final String url, final OnZippyResult callback) {
         AsyncHttpClient client = ServerGetter.getClient();

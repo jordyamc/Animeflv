@@ -222,7 +222,7 @@ public class CacheManager {
                             }
                         });
                     } else {
-                        PicassoCache.getPicassoInstance(context).load("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").noFade().noPlaceholder().into(imageView, new Callback() {
+                        PicassoCache.getPicassoInstance(context).load("http://animeflv.net/uploads/animes/covers/" + aid + ".jpg").noFade().noPlaceholder().into(imageView, new Callback() {
                             @Override
                             public void onSuccess() {
                                 if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
@@ -237,29 +237,6 @@ public class CacheManager {
                     }
                 }
             });
-            /*PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + Parser.getCertificateSHA1Fingerprint(context) + "&hd=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").noFade().noPlaceholder().into(imageView, new Callback() {
-                @Override
-                public void onSuccess() {
-                    if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
-                        saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
-                }
-
-                @Override
-                public void onError() {
-                    PicassoCache.getPicassoInstance(context).load("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").noFade().noPlaceholder().into(imageView, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
-                                saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
-                }
-            });*/
         }
     }
 
@@ -279,7 +256,7 @@ public class CacheManager {
 
                 @Override
                 public void onError() {
-                    PicassoCache.getPicassoInstance(context).load("http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").error(R.drawable.ic_block_r).into(imageView, new Callback() {
+                    PicassoCache.getPicassoInstance(context).load("http://animeflv.net/uploads/animes/covers/80x80/" + aid + ".jpg").error(R.drawable.ic_block_r).into(imageView, new Callback() {
                         @Override
                         public void onSuccess() {
                             if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true))

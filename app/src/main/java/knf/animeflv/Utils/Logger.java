@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -66,6 +67,7 @@ public class Logger {
         mBuilder.setPriority(Notification.PRIORITY_MAX);
         mBuilder.setLights(Color.argb(0, 255, 128, 0), 5000, 2000);
         Intent resultIntent = new Intent(context, LogViewer.class);
+        resultIntent.setData(Uri.parse(file.getAbsolutePath()));
         resultIntent.putExtra("path", file.getAbsolutePath());
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);

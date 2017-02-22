@@ -325,7 +325,6 @@ public class Parser {
     }
 
     public static String getCap(String tid, String num) {
-        Log.e("Caps", "Tid: " + tid + "    Eid: " + num);
         switch (tid) {
             case "Anime":
                 return "Capítulo " + num;
@@ -337,7 +336,6 @@ public class Parser {
     }
 
     public static String getCap(String tid, String num, boolean more) {
-        Log.e("Caps", "Tid: " + tid + "    Eid: " + num);
         switch (tid) {
             case "Anime":
                 return "Capítulo " + num;
@@ -354,6 +352,19 @@ public class Parser {
 
     public static String getNormalUrl(Context context) {
         return context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("dir_normal", "https://jordyamc.github.io/Animeflv/");
+    }
+
+    private static String getTid(String t) {
+        switch (t) {
+            default:
+            case "Type Ani":
+                return "Anime";
+            case "Type Ova":
+                return "OVA";
+            case "Type Pel":
+                return "Pelicula";
+
+        }
     }
 
     public String[] parseTitulos(String json) {
@@ -530,9 +541,9 @@ public class Parser {
         return eidsArray;
     }
 
+    //FIXME: Precuela/Secuela
     public List<String> parseTiposRel(String json) {
         List<String> eidsArray = new ArrayList<String>();
-        String[] eids;
         try {
             JSONObject jsonObj = new JSONObject(json);
             JSONArray jsonArray = jsonObj.getJSONArray("relacionados");
@@ -540,7 +551,8 @@ public class Parser {
                 JSONObject childJSONObject = jsonArray.getJSONObject(i);
                 String rel_tipo = childJSONObject.getString("rel_tipo");
                 String tid = childJSONObject.getString("tid");
-                eidsArray.add(rel_tipo + " - " + tid);
+                //eidsArray.add(rel_tipo + " - " + tid);
+                eidsArray.add(getTid(tid));
             }
         } catch (Exception e) {
             e.printStackTrace();
