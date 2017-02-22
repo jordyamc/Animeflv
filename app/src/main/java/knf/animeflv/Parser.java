@@ -324,7 +324,7 @@ public class Parser {
         return ret;
     }
 
-    public static String getCap(String tid, String num) {
+    /*public static String getCap(String tid, String num) {
         switch (tid) {
             case "Anime":
                 return "Capítulo " + num;
@@ -333,9 +333,19 @@ public class Parser {
             default:
                 return tid;
         }
+    }*/
+    public static String getCap(String tid, String num) {
+        switch (tid) {
+            case "Type tv":
+                return "Capítulo " + num;
+            case "Type ova":
+                return "OVA " + num;
+            default:
+                return "Pelicula";
+        }
     }
 
-    public static String getCap(String tid, String num, boolean more) {
+    /*public static String getCap(String tid, String num, boolean more) {
         switch (tid) {
             case "Anime":
                 return "Capítulo " + num;
@@ -346,6 +356,21 @@ public class Parser {
                     return tid + " " + num;
                 } else {
                     return tid;
+                }
+        }
+    }*/
+
+    public static String getCap(String tid, String num, boolean more) {
+        switch (tid) {
+            case "Type tv":
+                return "Capítulo " + num;
+            case "Type ova":
+                return "OVA " + num;
+            default:
+                if (more) {
+                    return "Pelicula " + num;
+                } else {
+                    return "Pelicula";
                 }
         }
     }
