@@ -362,15 +362,15 @@ public class Parser {
 
     public static String getCap(String tid, String num, boolean more) {
         switch (tid) {
-            case "Type tv":
+            case "Anime":
                 return "Capítulo " + num;
-            case "Type ova":
-                return "OVA " + num;
+            case "OVA":
+                return tid + " " + num;
             default:
                 if (more) {
-                    return "Pelicula " + num;
+                    return tid + " " + num;
                 } else {
-                    return "Pelicula";
+                    return tid;
                 }
         }
     }

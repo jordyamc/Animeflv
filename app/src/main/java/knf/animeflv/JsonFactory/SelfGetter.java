@@ -362,7 +362,7 @@ public class SelfGetter {
         asyncHttpClient.setLogInterface(new NoLogInterface());
         asyncHttpClient.setLoggingEnabled(false);
         asyncHttpClient.setResponseTimeout(5000);
-        asyncHttpClient.get("http://animeflv.net/ajax/animes/lista_completa", null, new TextHttpResponseHandler() {
+        asyncHttpClient.get("https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/directorio.json", null, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 asyncInterface.onFinish(OfflineGetter.getDirectorio());
@@ -370,11 +370,8 @@ public class SelfGetter {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                String dirJson = responseString.replace("var lanime=[", "[").replace("];", "]").trim();
                 try {
-                    JSONArray array = new JSONArray(dirJson);
-                    JSONObject object = new JSONObject();
-                    object.put("lista", array);
+                    JSONObject object = new JSONObject(responseString);
                     OfflineGetter.backupJson(object, OfflineGetter.directorio);
                     asyncInterface.onFinish(object.toString());
                 } catch (Exception e) {
