@@ -26,6 +26,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,6 +77,8 @@ public class Directorio extends AppCompatActivity {
     RecyclerView recyclerView;
     @BindView(R.id.frame_dir)
     FrameLayout frameLayout;
+    @BindView(R.id.load)
+    ProgressBar loading;
     RelativeLayout linearLayout;
     Activity context;
     EditText.OnEditorActionListener listener;
@@ -93,6 +96,7 @@ public class Directorio extends AppCompatActivity {
     FloatingActionMenu actionMenu;
     List<Integer> lastSearch = Arrays.asList(new Integer[]{0});
     boolean loaded = false;
+    private boolean prestarted = false;
 
     public static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -187,17 +191,36 @@ public class Directorio extends AppCompatActivity {
         }
         final String j = OfflineGetter.getDirectorio();
         if (!j.equals("null")) {
+            prestarted = true;
             toolbarS.setVisibility(View.VISIBLE);
             viewPagerTab.setVisibility(View.VISIBLE);
             init(j);
+        } else {
+            Toaster.toast("Creando directorio");
+            loading.setVisibility(View.VISIBLE);
         }
         BaseGetter.getJson(this, new DIRECTORIO(), new BaseGetter.AsyncInterface() {
             @Override
             public void onFinish(String json) {
                 if (!json.equals("null")) {
                     if (!json.equals(j)) {
-                        if (new Parser().checkStatus(json) == new Parser().checkStatus(j))
-                            initAsync(json);
+                        if (new Parser().checkStatus(json) == new Parser().checkStatus(j)) {
+                            if (prestarted) {
+                                initAsync(json);
+                            } else {
+                                prestarted = true;
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        toolbarS.setVisibility(View.VISIBLE);
+                                        viewPagerTab.setVisibility(View.VISIBLE);
+                                        loading.setVisibility(View.GONE);
+                                        Toaster.toast("Directorio creado!");
+                                    }
+                                });
+                                init(json);
+                            }
+                        }
                     }
                     loaded = true;
                     supportInvalidateOptionsMenu();
@@ -418,268 +441,315 @@ public class Directorio extends AppCompatActivity {
             viewPagerTab.setViewPager(viewPager);
         }
         List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, editText.getText().toString()));
-        AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
-        recyclerView.setAdapter(adapterBusqueda);
-        Toaster.toast("Directorio Actualizado");
+        final AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                recyclerView.setAdapter(adapterBusqueda);
+                Toaster.toast("Directorio Actualizado");
+            }
+        });
     }
 
     private void init(final String json) {
-        final Bundle bundle = getIntent().getExtras();
-        t_busqueda = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_busqueda", "0").trim());
-        actionMenu.getMenuIconView().setImageResource(R.drawable.ic_search_text);
-        actionMenu.setClosedOnTouchOutside(true);
-        actionMenu.setMenuButtonColorNormal(getColor());
-        actionMenu.setMenuButtonColorPressed(getColor());
-        nombre.setColorNormal(getColor());
-        nombre.setColorPressed(getColor());
-        genero.setColorNormal(getColor());
-        genero.setColorPressed(getColor());
-        byid.setColorNormal(getColor());
-        byid.setColorPressed(getColor());
-        SearchConstructor.SetSearch(SearchType.NOMBRE, null);
-        actionMenu.setOnMenuToggleListener(new FloatingActionMenu.OnMenuToggleListener() {
+        runOnUiThread(new Runnable() {
             @Override
-            public void onMenuToggle(boolean opened) {
-                if (opened) {
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-                } else {
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.showSoftInput(editText, 0);
-                }
-            }
-        });
-        nombre.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Toaster.toast("Buscar por Nombre");
-                return false;
-            }
-        });
-        genero.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Toaster.toast("Buscar por Generos");
-                return false;
-            }
-        });
-        byid.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Toaster.toast("Buscar por ID");
-                return false;
-            }
-        });
-        nombre.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (t_busqueda == 1) {
-                    editText.setHint("Presiona Enter...");
-                } else {
-                    editText.setHint("Buscar...");
-                }
-                actionMenu.close(true);
-                editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-                SearchConstructor.SetSearch(SearchType.NOMBRE, null);
+            public void run() {
+                final Bundle bundle = getIntent().getExtras();
+                t_busqueda = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_busqueda", "0").trim());
                 actionMenu.getMenuIconView().setImageResource(R.drawable.ic_search_text);
-                editText.setText(editText.getEditableText().toString());
-            }
-        });
-        genero.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                actionMenu.close(false);
-                actionMenu.getMenuIconView().setImageResource(R.drawable.ic_search_generos);
-                editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-                SearchConstructor.SetSearch(SearchType.GENEROS, SearchConstructor.getGenerosInt());
-                editText.setText(editText.getEditableText().toString());
-                editText.setHint("Generos: TODOS");
-                new MaterialDialog.Builder(context)
-                        .items(getGeneros())
-                        .autoDismiss(false)
-                        .cancelable(false)
-                        .positiveText("OK")
-                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                        .alwaysCallMultiChoiceCallback()
-                        .itemsCallbackMultiChoice(SearchConstructor.getGenerosInt(), new MaterialDialog.ListCallbackMultiChoice() {
-                            @Override
-                            public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
-                                List<Integer> current = Arrays.asList(which);
-                                if (!lastSearch.contains(0) && current.contains(0)) {
-                                    lastSearch = Arrays.asList(new Integer[]{0});
-                                    SearchConstructor.SetSearch(SearchType.GENEROS, which);
-                                    dialog.setSelectedIndices(new Integer[]{0});
-                                    editText.setHint("Generos: TODOS");
-                                } else {
-                                    List<Integer> l = new LinkedList<Integer>(Arrays.asList(which));
-                                    if (l.contains(0)) {
-                                        l.remove(0);
-                                    }
-                                    lastSearch = l;
-                                    Integer[] nArray = new Integer[l.size()];
-                                    l.toArray(nArray);
-                                    dialog.setSelectedIndices(nArray);
-                                    SearchConstructor.SetSearch(SearchType.GENEROS, nArray);
-                                    editText.setHint("Generos: " + which.length);
-                                }
-                                List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, editText.getEditableText().toString()));
-                                AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
-                                recyclerView.setAdapter(adapterBusqueda);
-                                return true;
-                            }
-                        })
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                editText.setText(editText.getEditableText().toString());
-                                dialog.dismiss();
-                                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                imm.showSoftInput(editText, 0);
-                                editText.requestFocus();
-                            }
-                        }).build().show();
-            }
-        });
-        byid.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (t_busqueda == 1) {
-                    editText.setHint("Presiona Enter...");
-                } else {
-                    editText.setHint("Buscar...");
-                }
-                actionMenu.close(true);
-                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-                SearchConstructor.SetSearch(SearchType.ID, null);
-                actionMenu.getMenuIconView().setImageResource(R.drawable.ic_search_id);
-                if (FileUtil.isNumber(editText.getEditableText().toString().trim())) {
-                    editText.setText(editText.getEditableText().toString());
-                } else {
-                    editText.setText("");
-                }
-            }
-        });
-        if (!isXLargeScreen(context)) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
-            toolbarS.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (bundle == null) {
-                        if (editText.getVisibility() == View.GONE) {
-                            finish();
-                        } else {
-                            cancelar();
-                        }
-                    } else {
-                        finish();
-                    }
-                }
-            });
-        } else {
-            Toolbar ltoolbar = (Toolbar) findViewById(R.id.toolbar_l);
-            ThemeUtils.setStatusBarPadding(this, ltoolbar);
-            ltoolbar.setNavigationIcon(R.drawable.ic_back_r);
-            ltoolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (bundle == null) {
-                        if (editText.getVisibility() == View.GONE) {
-                            finish();
-                        } else {
-                            cancelar();
-                        }
-                    } else {
-                        finish();
-                    }
-                }
-            });
-        }
-        toolbarS.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.buscar_borrar:
-                        if (editText.getText().length() > 0) {
-                            editText.setText("");
-                            menuGlobal.clear();
-                            if (!isXLargeScreen(context)) {
-                                getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                            } else {
-                                getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
-                            }
-                            List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, null));
-                            AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
-                            recyclerView.setAdapter(adapterBusqueda);
-                        }
-                        break;
-                    case R.id.buscar_cancelar:
-                        if (bundle == null) {
-                            cancelar();
-                        } else {
-                            finish();
-                        }
-                        break;
-                    case R.id.search:
-                        getSupportActionBar().setTitle("");
-                        editText.setVisibility(View.VISIBLE);
-                        editText.setText("");
-                        editText.requestFocus();
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.showSoftInput(editText, 0);
-                        menuGlobal.clear();
-                        if (!isXLargeScreen(context)) {
-                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                        } else {
-                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
-                        }
-                        if (!isXLargeScreen(context)) {
-                            linearLayout.setVisibility(View.GONE);
-                            recyclerView.setVisibility(View.VISIBLE);
-                            frameLayout.setVisibility(View.VISIBLE);
-                        } else {
-                            viewPager.setVisibility(View.GONE);
-                            viewPagerTab.setVisibility(View.GONE);
-                            recyclerView.setVisibility(View.VISIBLE);
-                            frameLayout.setVisibility(View.VISIBLE);
-                        }
-                        break;
-                }
-                return true;
-            }
-        });
-        editText.setEnabled(true);
-        editText.setClickable(true);
-        editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(final Editable s) {
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
+                actionMenu.setClosedOnTouchOutside(true);
+                actionMenu.setMenuButtonColorNormal(getColor());
+                actionMenu.setMenuButtonColorPressed(getColor());
+                nombre.setColorNormal(getColor());
+                nombre.setColorPressed(getColor());
+                genero.setColorNormal(getColor());
+                genero.setColorPressed(getColor());
+                byid.setColorNormal(getColor());
+                byid.setColorPressed(getColor());
+                SearchConstructor.SetSearch(SearchType.NOMBRE, null);
+                actionMenu.setOnMenuToggleListener(new FloatingActionMenu.OnMenuToggleListener() {
                     @Override
-                    public void run() {
-                        if (t_busqueda == 0) {
-                            if (s.length() > 0) {
-                                menuGlobal.clear();
-                                if (!isXLargeScreen(context)) {
-                                    getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
+                    public void onMenuToggle(boolean opened) {
+                        if (opened) {
+                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+                        } else {
+                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.showSoftInput(editText, 0);
+                        }
+                    }
+                });
+                nombre.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        Toaster.toast("Buscar por Nombre");
+                        return false;
+                    }
+                });
+                genero.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        Toaster.toast("Buscar por Generos");
+                        return false;
+                    }
+                });
+                byid.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        Toaster.toast("Buscar por ID");
+                        return false;
+                    }
+                });
+                nombre.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (t_busqueda == 1) {
+                            editText.setHint("Presiona Enter...");
+                        } else {
+                            editText.setHint("Buscar...");
+                        }
+                        actionMenu.close(true);
+                        editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                        SearchConstructor.SetSearch(SearchType.NOMBRE, null);
+                        actionMenu.getMenuIconView().setImageResource(R.drawable.ic_search_text);
+                        editText.setText(editText.getEditableText().toString());
+                    }
+                });
+                genero.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        actionMenu.close(false);
+                        actionMenu.getMenuIconView().setImageResource(R.drawable.ic_search_generos);
+                        editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                        SearchConstructor.SetSearch(SearchType.GENEROS, SearchConstructor.getGenerosInt());
+                        editText.setText(editText.getEditableText().toString());
+                        editText.setHint("Generos: TODOS");
+                        new MaterialDialog.Builder(context)
+                                .items(getGeneros())
+                                .autoDismiss(false)
+                                .cancelable(false)
+                                .positiveText("OK")
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                .alwaysCallMultiChoiceCallback()
+                                .itemsCallbackMultiChoice(SearchConstructor.getGenerosInt(), new MaterialDialog.ListCallbackMultiChoice() {
+                                    @Override
+                                    public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
+                                        List<Integer> current = Arrays.asList(which);
+                                        if (!lastSearch.contains(0) && current.contains(0)) {
+                                            lastSearch = Arrays.asList(new Integer[]{0});
+                                            SearchConstructor.SetSearch(SearchType.GENEROS, which);
+                                            dialog.setSelectedIndices(new Integer[]{0});
+                                            editText.setHint("Generos: TODOS");
+                                        } else {
+                                            List<Integer> l = new LinkedList<Integer>(Arrays.asList(which));
+                                            if (l.contains(0)) {
+                                                l.remove(0);
+                                            }
+                                            lastSearch = l;
+                                            Integer[] nArray = new Integer[l.size()];
+                                            l.toArray(nArray);
+                                            dialog.setSelectedIndices(nArray);
+                                            SearchConstructor.SetSearch(SearchType.GENEROS, nArray);
+                                            editText.setHint("Generos: " + which.length);
+                                        }
+                                        List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, editText.getEditableText().toString()));
+                                        AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
+                                        recyclerView.setAdapter(adapterBusqueda);
+                                        return true;
+                                    }
+                                })
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                        editText.setText(editText.getEditableText().toString());
+                                        dialog.dismiss();
+                                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                        imm.showSoftInput(editText, 0);
+                                        editText.requestFocus();
+                                    }
+                                }).build().show();
+                    }
+                });
+                byid.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (t_busqueda == 1) {
+                            editText.setHint("Presiona Enter...");
+                        } else {
+                            editText.setHint("Buscar...");
+                        }
+                        actionMenu.close(true);
+                        editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                        SearchConstructor.SetSearch(SearchType.ID, null);
+                        actionMenu.getMenuIconView().setImageResource(R.drawable.ic_search_id);
+                        if (FileUtil.isNumber(editText.getEditableText().toString().trim())) {
+                            editText.setText(editText.getEditableText().toString());
+                        } else {
+                            editText.setText("");
+                        }
+                    }
+                });
+                if (!isXLargeScreen(context)) {
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
+                    toolbarS.setNavigationOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (bundle == null) {
+                                if (editText.getVisibility() == View.GONE) {
+                                    finish();
                                 } else {
-                                    getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
+                                    cancelar();
                                 }
                             } else {
-                                if (editText.getVisibility() == View.VISIBLE) {
+                                finish();
+                            }
+                        }
+                    });
+                } else {
+                    Toolbar ltoolbar = (Toolbar) findViewById(R.id.toolbar_l);
+                    ThemeUtils.setStatusBarPadding(Directorio.this, ltoolbar);
+                    ltoolbar.setNavigationIcon(R.drawable.ic_back_r);
+                    ltoolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (bundle == null) {
+                                if (editText.getVisibility() == View.GONE) {
+                                    finish();
+                                } else {
+                                    cancelar();
+                                }
+                            } else {
+                                finish();
+                            }
+                        }
+                    });
+                }
+                toolbarS.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.buscar_borrar:
+                                if (editText.getText().length() > 0) {
+                                    editText.setText("");
                                     menuGlobal.clear();
                                     if (!isXLargeScreen(context)) {
                                         getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
                                     } else {
                                         getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                                     }
+                                    List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, null));
+                                    AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
+                                    recyclerView.setAdapter(adapterBusqueda);
+                                }
+                                break;
+                            case R.id.buscar_cancelar:
+                                if (bundle == null) {
+                                    cancelar();
+                                } else {
+                                    finish();
+                                }
+                                break;
+                            case R.id.search:
+                                getSupportActionBar().setTitle("");
+                                editText.setVisibility(View.VISIBLE);
+                                editText.setText("");
+                                editText.requestFocus();
+                                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                imm.showSoftInput(editText, 0);
+                                menuGlobal.clear();
+                                if (!isXLargeScreen(context)) {
+                                    getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
+                                } else {
+                                    getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                                }
+                                if (!isXLargeScreen(context)) {
+                                    linearLayout.setVisibility(View.GONE);
+                                    recyclerView.setVisibility(View.VISIBLE);
+                                    frameLayout.setVisibility(View.VISIBLE);
+                                } else {
+                                    viewPager.setVisibility(View.GONE);
+                                    viewPagerTab.setVisibility(View.GONE);
+                                    recyclerView.setVisibility(View.VISIBLE);
+                                    frameLayout.setVisibility(View.VISIBLE);
+                                }
+                                break;
+                        }
+                        return true;
+                    }
+                });
+                editText.setEnabled(true);
+                editText.setClickable(true);
+                editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void afterTextChanged(final Editable s) {
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (t_busqueda == 0) {
+                                    if (s.length() > 0) {
+                                        menuGlobal.clear();
+                                        if (!isXLargeScreen(context)) {
+                                            getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
+                                        } else {
+                                            getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
+                                        }
+                                    } else {
+                                        if (editText.getVisibility() == View.VISIBLE) {
+                                            menuGlobal.clear();
+                                            if (!isXLargeScreen(context)) {
+                                                getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
+                                            } else {
+                                                getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                                            }
+                                        }
+                                    }
+                                    List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, s.toString()));
+                                    AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
+                                    recyclerView.setAdapter(adapterBusqueda);
+                                } else {
+                                    if (s.length() > 0) {
+                                        menuGlobal.clear();
+                                        if (!isXLargeScreen(context)) {
+                                            getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
+                                        } else {
+                                            getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
+                                        }
+                                    } else {
+                                        menuGlobal.clear();
+                                        if (!isXLargeScreen(context)) {
+                                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
+                                        } else {
+                                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                                        }
+                                    }
                                 }
                             }
-                            List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, s.toString()));
-                            AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
-                            recyclerView.setAdapter(adapterBusqueda);
-                        } else {
+                        }, 150);
+                    }
+
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    }
+                });
+                editText.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        editText.requestFocus();
+                    }
+                });
+                listener = new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
+                        if (t_busqueda == 1) {
+                            Editable s = editText.getEditableText();
                             if (s.length() > 0) {
                                 menuGlobal.clear();
                                 if (!isXLargeScreen(context)) {
@@ -695,91 +765,54 @@ public class Directorio extends AppCompatActivity {
                                     getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                                 }
                             }
+                            List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, s.toString()));
+                            AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
+                            recyclerView.setAdapter(adapterBusqueda);
                         }
+                        return true;
                     }
-                }, 150);
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-        });
-        editText.post(new Runnable() {
-            @Override
-            public void run() {
-                editText.requestFocus();
-            }
-        });
-        listener = new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
+                };
+                editText.setOnEditorActionListener(listener);
                 if (t_busqueda == 1) {
-                    Editable s = editText.getEditableText();
-                    if (s.length() > 0) {
-                        menuGlobal.clear();
-                        if (!isXLargeScreen(context)) {
-                            getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
-                        } else {
-                            getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
+                    editText.setHint("Presiona Enter...");
+                }
+                getSharedPreferences("data", MODE_PRIVATE).edit().putInt("genero", 0).apply();
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setLayoutManager(new LinearLayoutManager(Directorio.this));
+                Bundle b = new Bundle();
+                b.putString("json", json);
+                FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
+                        getSupportFragmentManager(), FragmentPagerItems.with(Directorio.this)
+                        .add("ANIMES", Animes.class, b)
+                        .add("OVAS", Ovas.class, b)
+                        .add("PELICULAS", Peliculas.class, b)
+                        .create());
+                viewPager = (ViewPager) findViewById(R.id.viewpager2);
+                viewPager.setOffscreenPageLimit(3);
+                viewPager.setAdapter(adapter);
+                viewPagerTab.setViewPager(viewPager);
+                if (bundle != null) {
+                    if (!isXLargeScreen(context)) {
+                        try {
+                            linearLayout.setVisibility(View.GONE);
+                        } catch (NullPointerException e) {
+                            Toast.makeText(context, "Esta vista se hizo para tablets, por favor desactiva el modo landscape", Toast.LENGTH_SHORT).show();
+                            finish();
                         }
+                        recyclerView.setVisibility(View.VISIBLE);
+                        frameLayout.setVisibility(View.VISIBLE);
                     } else {
-                        menuGlobal.clear();
-                        if (!isXLargeScreen(context)) {
-                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                        } else {
-                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
-                        }
+                        viewPager.setVisibility(View.GONE);
+                        viewPagerTab.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        frameLayout.setVisibility(View.VISIBLE);
                     }
-                    List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, s.toString()));
-                    AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
-                    recyclerView.setAdapter(adapterBusqueda);
                 }
-                return true;
+                List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, null));
+                final AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
+                recyclerView.setAdapter(adapterBusqueda);
             }
-        };
-        editText.setOnEditorActionListener(listener);
-        if (t_busqueda == 1) {
-            editText.setHint("Presiona Enter...");
-        }
-        getSharedPreferences("data", MODE_PRIVATE).edit().putInt("genero", 0).apply();
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        Bundle b = new Bundle();
-        b.putString("json", json);
-        FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
-                getSupportFragmentManager(), FragmentPagerItems.with(this)
-                .add("ANIMES", Animes.class, b)
-                .add("OVAS", Ovas.class, b)
-                .add("PELICULAS", Peliculas.class, b)
-                .create());
-        viewPager = (ViewPager) findViewById(R.id.viewpager2);
-        viewPager.setOffscreenPageLimit(3);
-        viewPager.setAdapter(adapter);
-        viewPagerTab.setViewPager(viewPager);
-        if (bundle != null) {
-            if (!isXLargeScreen(context)) {
-                try {
-                    linearLayout.setVisibility(View.GONE);
-                } catch (NullPointerException e) {
-                    Toast.makeText(context, "Esta vista se hizo para tablets, por favor desactiva el modo landscape", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-                recyclerView.setVisibility(View.VISIBLE);
-                frameLayout.setVisibility(View.VISIBLE);
-            } else {
-                viewPager.setVisibility(View.GONE);
-                viewPagerTab.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                frameLayout.setVisibility(View.VISIBLE);
-            }
-        }
-        List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, null));
-        AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
-        recyclerView.setAdapter(adapterBusqueda);
+        });
     }
 
     private String[] getGeneros() {

@@ -91,6 +91,8 @@ public class AnimeDetail {
     }
 
     public String getGeneros() {
+        if (generos.trim().equals(""))
+            return "Sin Generos";
         return generos;
     }
 }

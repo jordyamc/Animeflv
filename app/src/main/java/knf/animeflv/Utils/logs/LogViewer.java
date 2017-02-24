@@ -131,7 +131,7 @@ public class LogViewer extends AppCompatActivity {
     }
 
     private void ToastError(Throwable e) {
-        Toaster.toast("Error en operacion " + e.getMessage());
+        Toaster.toast("Error en operacion " + e.getCause());
     }
 
     private String getPhoneInfo(String path) {

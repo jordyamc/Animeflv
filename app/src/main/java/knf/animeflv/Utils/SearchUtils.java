@@ -37,7 +37,7 @@ public class SearchUtils {
                         String tipo = object.getString("c");
                         String nombre = FileUtil.corregirTit(object.getString("b"));
                         String aid = object.getString("a");
-                        String url = "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
+                        String url = "http://animeflv.net/uploads/animes/covers/80x80/" + aid + ".jpg";
                         linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
 
                     }
@@ -50,7 +50,7 @@ public class SearchUtils {
                         String aid = object.getString("a");
                         if (nombre.toLowerCase().contains(search.toLowerCase())) {
                             String tipo = object.getString("c");
-                            String url = "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
+                            String url = "http://animeflv.net/uploads/animes/covers/80x80/" + aid + ".jpg";
                             linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
                         }
                     }
@@ -66,7 +66,7 @@ public class SearchUtils {
                             String tipo = object.getString("c");
                             String nombre = FileUtil.corregirTit(object.getString("b"));
                             String aid = object.getString("a");
-                            String url = "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
+                            String url = "http://animeflv.net/uploads/animes/covers/80x80/" + aid + ".jpg";
                             linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
                         }
                     } else {
@@ -74,12 +74,12 @@ public class SearchUtils {
                         JSONArray jsonArray = jsonObj.getJSONArray("lista");
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject object = jsonArray.getJSONObject(i);
-                            String generos = object.getString("e");
+                            String generos = object.getString("f");
                             String nombre = FileUtil.corregirTit(object.getString("b"));
                             if (containsGenero(generos) && nombre.toLowerCase().contains(search)) {
                                 String tipo = object.getString("c");
                                 String aid = object.getString("a");
-                                String url = "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
+                                String url = "http://animeflv.net/uploads/animes/covers/80x80/" + aid + ".jpg";
                                 linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
                             }
 
@@ -94,7 +94,7 @@ public class SearchUtils {
                         String tipo = object.getString("c");
                         String nombre = FileUtil.corregirTit(object.getString("b"));
                         String aid = object.getString("a");
-                        String url = "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
+                        String url = "http://animeflv.net/uploads/animes/covers/80x80/" + aid + ".jpg";
                         linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
                     }
                 }
@@ -113,7 +113,7 @@ public class SearchUtils {
                                 String aid = object.getString("a");
                                 if (aid.equals(search.trim())) {
                                     String tipo = object.getString("c");
-                                    String url = "http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg";
+                                    String url = "http://animeflv.net/uploads/animes/covers/80x80/" + aid + ".jpg";
                                     linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
                                 }
                             } else {
@@ -138,7 +138,7 @@ public class SearchUtils {
     private static String[] getGeneros() {
         String[] generos = {
                 "Todos",
-                "Accion",
+                "Acción",
                 "Aventura",
                 "Carreras",
                 "Comedia",
@@ -180,13 +180,11 @@ public class SearchUtils {
         for (String g : gen) {
             lower.add(g.toLowerCase().trim());
         }
-        List<Boolean> responses = new ArrayList<>();
         for (Genero genero : SearchConstructor.getGeneros()) {
             if (!lower.contains(getGeneros()[genero.getValue()].toLowerCase())) {
-                responses.add(false);
-                break;
+                return false;
             }
         }
-        return responses.isEmpty();
+        return true;
     }
 }

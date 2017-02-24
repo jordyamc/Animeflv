@@ -479,10 +479,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     @TargetApi(21)
     private void openAccessFramework() {
         startActivityForResult(new Intent(context, SDManager.class), SDManager.REQUEST_CODE);
-        /*
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        startActivityForResult(intent, 15889);
-        */
     }
 
     private void openIfExtra() {
