@@ -2,6 +2,7 @@ package knf.animeflv.JsonFactory;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -357,7 +358,7 @@ public class SelfGetter {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
-    public static void getDir(Context context, final BaseGetter.AsyncInterface asyncInterface) {
+    public static void getDir(Context context, @Nullable final BaseGetter.AsyncInterface asyncInterface) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -436,7 +437,8 @@ public class SelfGetter {
                     return null;
                 } catch (Exception e) {
                     //Log.e("Dir DEBUG", "Error loading dir", e);
-                    asyncInterface.onFinish(OfflineGetter.getDirectorio());
+                    if (asyncInterface != null)
+                        asyncInterface.onFinish(OfflineGetter.getDirectorio());
                 }
                 return null;
             }
@@ -450,13 +452,12 @@ public class SelfGetter {
                 new_list.put(old_list.getJSONObject(i));
             }
             object.put("lista", new_list);
-            OfflineGetter.backupJson(object, OfflineGetter.directorio);
-            asyncInterface.onFinish(object.toString());
         } else {
             object.put("lista", old_list);
-            OfflineGetter.backupJson(object, OfflineGetter.directorio);
-            asyncInterface.onFinish(object.toString());
         }
+        OfflineGetter.backupJson(object, OfflineGetter.directorio);
+        if (asyncInterface != null)
+            asyncInterface.onFinish(object.toString());
     }
 
     private static String getState(String className) {

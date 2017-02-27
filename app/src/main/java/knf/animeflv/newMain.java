@@ -30,7 +30,6 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
@@ -42,7 +41,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -76,8 +74,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -93,7 +89,7 @@ import knf.animeflv.Interfaces.EncryptionListener;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
-import knf.animeflv.JsonFactory.ServerGetter;
+import knf.animeflv.JsonFactory.SelfGetter;
 import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.LoginActivity.LoginBase;
 import knf.animeflv.LoginActivity.LoginUser;
@@ -154,24 +150,17 @@ public class newMain extends AppCompatActivity implements
     private AccountHeader headerResult;
     private String headerTit;
     private Context context;
-    private Snackbar waiting;
     private FloatingActionButton actionButton;
     private com.github.clans.fab.FloatingActionButton updateButton;
     private Parser parser = new Parser();
     private boolean shouldExecuteOnResume;
     private TaskType normal = TaskType.NORMAL;
     private TaskType secundario = TaskType.SECUNDARIA;
-    private MaterialDialog RapConf;
     private boolean frun = true;
     private boolean tbool = false;
     private boolean dropboxloging = false;
     private AdapterMain main;
     private AdapterMainNoGIF mainNo;
-    private Switch nots;
-    private AppCompatSpinner sonidos;
-    private AppCompatSpinner conexion;
-    private AppCompatSpinner repVid;
-    private AppCompatSpinner repStream;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
     private String currUser = "null";
 
@@ -238,10 +227,10 @@ public class newMain extends AppCompatActivity implements
         };
         prefs.registerOnSharedPreferenceChangeListener(listener);
         if (!DirFile.exists()) {
-            ServerGetter.backupDir(this);
+            SelfGetter.getDir(this, null);
         } else if (!FileUtil.isJSONValid(FileUtil.getStringFromFile(DirFile))) {
             DirFile.delete();
-            ServerGetter.backupDir(this);
+            SelfGetter.getDir(this, null);
         }
         IntentFilter filter = new IntentFilter();
         filter.addAction(DownloaderService.RECEIVER_ACTION_ERROR);
@@ -801,31 +790,6 @@ public class newMain extends AppCompatActivity implements
         Toaster.toast(text);
     }
 
-    public void writeToFile(String body, File file) {
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file);
-            fos.write(body.getBytes());
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private boolean isJSONValid(String test) {
-        try {
-            new JSONObject(test);
-        } catch (JSONException ex) {
-            try {
-                new JSONArray(test);
-            } catch (JSONException ex1) {
-                ex1.printStackTrace();
-                return false;
-            }
-        }
-        return true;
-    }
-
     private void setUpAmoled() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -979,184 +943,8 @@ public class newMain extends AppCompatActivity implements
         startActivity(intent);
     }
 
-    public void loadDir(String data, boolean search) {
-        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-            if (!mediaStorage.exists()) {
-                mediaStorage.mkdirs();
-            }
-        }
-        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-        if (isNetworkAvailable() && !data.trim().equals("error")) {
-            String trimed = data.trim();
-            if (!file.exists()) {
-                Log.d("Archivo:", "No existe");
-                try {
-                    file.createNewFile();
-                } catch (IOException e) {
-                    Log.d("Archivo:", "Error al crear archivo");
-                }
-                writeToFile(trimed, file);
-                Intent intent = new Intent(context, Directorio.class);
-                Bundle bundle = new Bundle();
-                bundle.putString("tipo", "Busqueda");
-                intent.putExtras(bundle);
-                startActivity(intent);
-            } else {
-                Log.d("Archivo", "Existe");
-                String infile = FileUtil.getStringFromFile(file_loc);
-                if (!infile.trim().equals(data.trim())) {
-                    Log.d("Cargar", "Json nuevo");
-                    writeToFile(trimed, file);
-                    Intent intent = new Intent(context, Directorio.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("tipo", "Busqueda");
-                    intent.putExtras(bundle);
-                    startActivity(intent);
-                } else {
-                    Log.d("Cargar", "Json existente");
-                    Intent intent = new Intent(context, Directorio.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("tipo", "Busqueda");
-                    intent.putExtras(bundle);
-                    startActivity(intent);
-                }
-            }
-        } else {
-            loadSecDir(true);
-        }
-    }
-
-    public void loadDir(String data) {
-        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-            if (!mediaStorage.exists()) {
-                mediaStorage.mkdirs();
-            }
-        }
-        File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-        if (isNetworkAvailable() && !data.trim().equals("error")) {
-            String trimed = data.trim();
-            if (!file.exists()) {
-                Log.d("Archivo:", "No existe");
-                try {
-                    file.createNewFile();
-                } catch (IOException e) {
-                    Log.d("Archivo:", "Error al crear archivo");
-                }
-
-                if (isJSONValid(trimed)) {
-                    writeToFile(trimed, file);
-                    Intent intent = new Intent(context, Directorio.class);
-                    startActivity(intent);
-                } else {
-                    Toaster.toast("Error en Servidor");
-                }
-            } else {
-                Log.d("Archivo", "Existe");
-                String infile = FileUtil.getStringFromFile(file_loc);
-                if (!infile.trim().equals(trimed)) {
-                    if (isJSONValid(infile)) {
-                        if (isJSONValid(trimed)) {
-                            Log.d("Cargar", "Json nuevo");
-                            writeToFile(trimed, file);
-                            Intent intent = new Intent(context, Directorio.class);
-                            startActivity(intent);
-                        } else {
-                            setDir(tbool);
-                        }
-                    } else {
-                        file.delete();
-                        setDir(tbool);
-                        Toaster.toast("Error en cache, recargando");
-                    }
-                } else {
-                    if (isJSONValid(infile)) {
-                        Log.d("Cargar", "Json existente");
-                        Intent intent = new Intent(context, Directorio.class);
-                        startActivity(intent);
-                    } else {
-                        file.delete();
-                        setDir(tbool);
-                        Toaster.toast("Error en cache, recargando");
-                    }
-                }
-            }
-        } else {
-            if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-                if (!mediaStorage.exists()) {
-                    mediaStorage.mkdirs();
-                }
-            }
-            File fileoff = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
-            String file_loc_off = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-            if (fileoff.exists() && isJSONValid(FileUtil.getStringFromFile(file_loc_off))) {
-                Intent intent = new Intent(context, Directorio.class);
-                startActivity(intent);
-            } else {
-                //Toaster.toast("Servidor fallando y no hay datos en cache");
-                //new DirGetter(context, TaskType.DIRECTORIO).execute(getDirectorioSec());
-                loadSecDir(false);
-            }
-        }
-    }
-
-    public void loadSecDir(final boolean search) {
-        AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-        asyncHttpClient.setResponseTimeout(10000);
-        asyncHttpClient.get(getDirectorioSec() + "?certificate=" + parser.getCertificateSHA1Fingerprint(context), null, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                super.onSuccess(statusCode, headers, response);
-                if (search) {
-                    loadDir(response.toString(), true);
-                } else {
-                    loadDir(response.toString());
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                if (search) {
-                    loadDir("error", true);
-                } else {
-                    loadDir("error");
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                if (search) {
-                    loadDir("error", true);
-                } else {
-                    loadDir("error");
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
-                if (search) {
-                    loadDir("error", true);
-                } else {
-                    loadDir("error");
-                }
-            }
-        });
-    }
-
     public String getInicio() {
         return parser.getInicioUrl(normal, context);
-    }
-
-    public String getDirectorio() {
-        return parser.getDirectorioUrl(normal, context);
-    }
-
-    public String getDirectorioSec() {
-        return parser.getDirectorioUrl(secundario, context);
     }
 
     public void getJson() {
@@ -1289,7 +1077,6 @@ public class newMain extends AppCompatActivity implements
             }
         });
     }
-
 
     @Override
     public void onColorSelection(@NonNull ColorChooserDialog dialog, @ColorInt int selectedColor) {

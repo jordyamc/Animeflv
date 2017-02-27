@@ -2,6 +2,7 @@ package knf.animeflv;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.UiModeManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -63,9 +64,14 @@ public class Splash extends AwesomeSplash {
     @Override
     public void initSplash(ConfigSplash configSplash) {
         context = this;
+        /*Toaster.toastLong(
+                "isXLarge = "+String.valueOf(isXLargeScreen(this))+"\n"+
+                "isUITelevision = "+String.valueOf((((UiModeManager)getSystemService(UI_MODE_SERVICE)).getCurrentModeType()==Configuration.UI_MODE_TYPE_TELEVISION))+"\n"+
+                "isTabletBool = "+String.valueOf(getResources().getBoolean(R.bool.isTelevision))
+        );*/
         new Alarm().SetAlarm(this);
         //EmisionChecker.Refresh();
-        if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
+        if (!isXLargeScreen(getApplicationContext()) && !(((UiModeManager) getSystemService(UI_MODE_SERVICE)).getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION)) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);

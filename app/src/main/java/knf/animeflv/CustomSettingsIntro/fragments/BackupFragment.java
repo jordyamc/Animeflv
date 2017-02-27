@@ -50,7 +50,7 @@ public class BackupFragment extends SlideFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_slide, container, false);
+        View view = inflater.inflate(R.layout.fragment_slide_backup, container, false);
         ButterKnife.bind(this, view);
         image_slide.setImageResource(R.drawable.app_icon_intro);
         BackupFragment.backupLoaded = PreferenceManager.getDefaultSharedPreferences(getA()).getBoolean("f_backup_set", false);

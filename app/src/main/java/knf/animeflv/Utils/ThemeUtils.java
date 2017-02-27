@@ -1,6 +1,7 @@
 package knf.animeflv.Utils;
 
 import android.app.Activity;
+import android.app.UiModeManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -14,6 +15,8 @@ import android.view.View;
 
 import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
+
+import static android.content.Context.UI_MODE_SERVICE;
 
 /**
  * Created by Jordy on 30/03/2016.
@@ -154,13 +157,13 @@ public class ThemeUtils {
     }
 
     public static boolean isTablet(Activity activity) {
-        return (activity.getResources().getConfiguration().screenLayout
+        return ((activity.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+                >= Configuration.SCREENLAYOUT_SIZE_XLARGE);
     }
 
     public static void setOrientation(Activity activity) {
-        if (!isTablet(activity)) { //Portrait
+        if (!isTablet(activity) && !(((UiModeManager) activity.getSystemService(UI_MODE_SERVICE)).getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION)) { //Portrait
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);

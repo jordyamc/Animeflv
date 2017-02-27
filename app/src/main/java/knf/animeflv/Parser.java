@@ -245,14 +245,14 @@ public class Parser {
     }
 
     public static int getLastAidCached() {
-        int aid = 2500;
+        int aid = 2600;
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
         File file = new File(file_loc);
         if (file.exists()) {
             try {
                 JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
                 JSONArray jsonArray = jsonObj.getJSONArray("lista");
-                JSONObject nombreJ = jsonArray.getJSONObject(jsonArray.length() - 1);
+                JSONObject nombreJ = jsonArray.getJSONObject(0);
                 return Integer.parseInt(nombreJ.getString("a"));
             } catch (Exception e) {
                 e.printStackTrace();
