@@ -1,82 +1,53 @@
 package knf.animeflv;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Fade;
-import android.transition.Slide;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.FrameLayout;
 
-import com.smaato.soma.AdDimension;
-import com.smaato.soma.BannerView;
-import com.smaato.soma.debug.Debugger;
-import com.smaato.soma.interstitial.Interstitial;
-import com.smaato.soma.interstitial.InterstitialAdListener;
-import com.smaato.soma.video.VASTAdListener;
-import com.smaato.soma.video.Video;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.NativeExpressAdView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
-public class ADS extends AppCompatActivity implements InterstitialAdListener, VASTAdListener {
+public class ADS extends AppCompatActivity {
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    int ad1_id;
-    int ad2_id;
-    int ad3_id;
-    int ad4_id;
-    int inter1_id;
-    int inter2_id;
-    int inter3_id;
-    int publisher_id;
-    // Remove the below line after defining your own ad unit ID.
-    private Button inter_ad1;
-    private Button inter_ad2;
-    private Button inter_ad3;
-    private Video mInterstitialAd1;
-    private Interstitial mInterstitialAd2;
-    private Interstitial mInterstitialAd3;
-    private FrameLayout ad_arriba_1;
-    private FrameLayout ad_arriba_2;
-    private FrameLayout ad_abajo_1;
-    private FrameLayout ad_abajo_2;
-    private BannerView ad1;
-    private BannerView ad2;
-    private BannerView ad3;
-    private BannerView ad4;
 
-    public static boolean isXLargeScreen(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
+    @BindView(R.id.ad_button_1)
+    Button inter_ad1;
+    @BindView(R.id.ad_button_2)
+    Button inter_ad2;
+    @BindView(R.id.ad_button_3)
+    Button inter_ad3;
+    @BindView(R.id.ad_top_1)
+    NativeExpressAdView top_1;
+    @BindView(R.id.ad_top_2)
+    NativeExpressAdView top_2;
+    @BindView(R.id.ad_bottom_1)
+    NativeExpressAdView bottom_1;
+    @BindView(R.id.ad_bottom_2)
+    NativeExpressAdView bottom_2;
+    private InterstitialAd interstitialAd_1;
+    private InterstitialAd interstitialAd_2;
+    private InterstitialAd interstitialAd_3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
-            setTheme(R.style.AppThemeDark);
-        }
+        ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
-        setUpAnimations();
         setContentView(R.layout.activity_ads);
+        ButterKnife.bind(this);
         Toaster.toast("Si aprecias esta app, considera hacerle click a algunos anuncios y/o botones :D");
-        if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -84,305 +55,207 @@ public class ADS extends AppCompatActivity implements InterstitialAdListener, VA
             window.setStatusBarColor(getResources().getColor(R.color.dark));
             getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
         }
-        toolbar = (Toolbar) findViewById(R.id.toolbar_ads);
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
-            toolbar.setBackgroundColor(getResources().getColor(android.R.color.black));
-            toolbar.getRootView().setBackgroundColor(getResources().getColor(android.R.color.black));
+
+        if (ThemeUtils.isAmoled(this)) {
+            toolbar.setBackgroundColor(ColorsRes.Negro(this));
+            toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(getResources().getColor(R.color.negro));
-                getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
+                window.setStatusBarColor(ColorsRes.Negro(this));
+                getWindow().setNavigationBarColor(ColorsRes.Negro(this));
             }
         }
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Publicidad");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        final Drawable upArrow = getResources().getDrawable(R.drawable.ic_back_r);
-        upArrow.setColorFilter(getResources().getColor(R.color.blanco), PorterDuff.Mode.SRC_ATOP);
-        getSupportActionBar().setHomeAsUpIndicator(upArrow);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
-        inter_ad1 = ((Button) findViewById(R.id.pop_ad_1));
-        inter_ad2 = ((Button) findViewById(R.id.pop_ad_2));
-        inter_ad3 = ((Button) findViewById(R.id.pop_ad_3));
-        inter_ad1.setEnabled(false);
-        inter_ad2.setEnabled(false);
-        inter_ad3.setEnabled(false);
+        startAds();
+    }
+
+    private void startAds() {
+        top_1.loadAd(new AdRequest.Builder()/*.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)*/.build());
+        top_2.loadAd(new AdRequest.Builder()/*.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)*/.build());
+
+        bottom_1.loadAd(new AdRequest.Builder()/*.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)*/.build());
+        bottom_2.loadAd(new AdRequest.Builder()/*.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)*/.build());
+
+        interstitialAd_1 = new InterstitialAd(this);
+        interstitialAd_2 = new InterstitialAd(this);
+        interstitialAd_3 = new InterstitialAd(this);
+
+        interstitialAd_1.setAdUnitId(getString(R.string.interstitial_ad_1));
+        interstitialAd_2.setAdUnitId(getString(R.string.interstitial_ad_2));
+        interstitialAd_3.setAdUnitId(getString(R.string.interstitial_ad_3));
+
+        requestInter1();
+        requestInter2();
+        requestInter3();
+
         inter_ad1.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                showInterstitial1();
+            public void onClick(View v) {
+                if (interstitialAd_1.isLoaded()) {
+                    interstitialAd_1.show();
+                } else if (interstitialAd_1.isLoading()) {
+                    Toaster.toast("El anuncio esta cargando, intenta en unos segundos");
+                } else {
+                    requestInter1();
+                }
             }
         });
+
+        interstitialAd_1.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestInter1();
+            }
+
+            @Override
+            public void onAdFailedToLoad(int i) {
+                requestInter1();
+            }
+
+            @Override
+            public void onAdOpened() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        inter_ad1.setEnabled(false);
+                    }
+                });
+            }
+
+            @Override
+            public void onAdLoaded() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        inter_ad1.setEnabled(true);
+                    }
+                });
+            }
+        });
+
         inter_ad2.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                showInterstitial2();
+            public void onClick(View v) {
+                if (interstitialAd_2.isLoaded()) {
+                    interstitialAd_2.show();
+                } else if (interstitialAd_2.isLoading()) {
+                    Toaster.toast("El anuncio esta cargando, intenta en unos segundos");
+                } else {
+                    requestInter2();
+                }
             }
         });
+
+        interstitialAd_2.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestInter2();
+            }
+
+            @Override
+            public void onAdFailedToLoad(int i) {
+                requestInter2();
+            }
+
+            @Override
+            public void onAdOpened() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        inter_ad2.setEnabled(false);
+                    }
+                });
+            }
+
+            @Override
+            public void onAdLoaded() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        inter_ad2.setEnabled(true);
+                    }
+                });
+            }
+        });
+
         inter_ad3.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                showInterstitial3();
-            }
-        });
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
-            inter_ad1.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            inter_ad2.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-            inter_ad3.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-        }
-
-        ad1_id = 130070017;
-        ad2_id = 130070020;
-        ad3_id = 130070022;
-        ad4_id = 130070023;
-
-        inter1_id = 130070018;
-        inter2_id = 130070019;
-        inter3_id = 130070021;
-
-        publisher_id = 1100015447;
-
-        Debugger.setDebugMode(Debugger.Level_0);
-
-        mInterstitialAd1 = new Video(this);
-        mInterstitialAd2 = new Interstitial(this);
-        mInterstitialAd3 = new Interstitial(this);
-
-        mInterstitialAd1.setVastAdListener(new VASTAdListener() {
-            @Override
-            public void onReadyToShow() {
-                inter_ad1.setEnabled(true);
-            }
-
-            @Override
-            public void onWillShow() {
-
-            }
-
-            @Override
-            public void onWillOpenLandingPage() {
-
-            }
-
-            @Override
-            public void onWillClose() {
-
-            }
-
-            @Override
-            public void onFailedToLoadAd() {
-
-            }
-        });
-        mInterstitialAd2.setInterstitialAdListener(new InterstitialAdListener() {
-            @Override
-            public void onReadyToShow() {
-                inter_ad2.setEnabled(true);
-            }
-
-            @Override
-            public void onWillShow() {
-
-            }
-
-            @Override
-            public void onWillOpenLandingPage() {
-
-            }
-
-            @Override
-            public void onWillClose() {
-
-            }
-
-            @Override
-            public void onFailedToLoadAd() {
-
-            }
-        });
-        mInterstitialAd3.setInterstitialAdListener(new InterstitialAdListener() {
-            @Override
-            public void onReadyToShow() {
-                inter_ad3.setEnabled(true);
-            }
-
-            @Override
-            public void onWillShow() {
-
-            }
-
-            @Override
-            public void onWillOpenLandingPage() {
-
-            }
-
-            @Override
-            public void onWillClose() {
-
-            }
-
-            @Override
-            public void onFailedToLoadAd() {
-
+            public void onClick(View v) {
+                if (interstitialAd_3.isLoaded()) {
+                    interstitialAd_3.show();
+                } else if (interstitialAd_3.isLoading()) {
+                    Toaster.toast("El anuncio esta cargando, intenta en unos segundos");
+                } else {
+                    requestInter3();
+                }
             }
         });
 
-        loadInterstitial1();
-        loadInterstitial2();
-        loadInterstitial3();
+        interstitialAd_3.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestInter3();
+            }
 
-        ad_arriba_1 = (FrameLayout) findViewById(R.id.ad_arriba_1);
-        ad_arriba_2 = (FrameLayout) findViewById(R.id.ad_arriba_2);
-        ad_abajo_1 = (FrameLayout) findViewById(R.id.ad_abajo_1);
-        ad_abajo_2 = (FrameLayout) findViewById(R.id.ad_abajo_2);
+            @Override
+            public void onAdFailedToLoad(int i) {
+                requestInter3();
+            }
 
-        ad1 = new BannerView(this);
-        ad2 = new BannerView(this);
-        ad3 = new BannerView(this);
-        ad4 = new BannerView(this);
+            @Override
+            public void onAdOpened() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        inter_ad3.setEnabled(false);
+                    }
+                });
+            }
 
-        ad1.getAdSettings().setPublisherId(publisher_id);
-        ad2.getAdSettings().setPublisherId(publisher_id);
-        ad3.getAdSettings().setPublisherId(publisher_id);
-        ad4.getAdSettings().setPublisherId(publisher_id);
+            @Override
+            public void onAdLoaded() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        inter_ad3.setEnabled(true);
+                    }
+                });
+            }
+        });
 
-        ad1.getAdSettings().setAdspaceId(ad1_id);
-        ad2.getAdSettings().setAdspaceId(ad2_id);
-        ad3.getAdSettings().setAdspaceId(ad3_id);
-        ad4.getAdSettings().setAdspaceId(ad4_id);
-
-        ad1.getAdSettings().setAdDimension(AdDimension.DEFAULT);
-        ad2.getAdSettings().setAdDimension(AdDimension.DEFAULT);
-        ad3.getAdSettings().setAdDimension(AdDimension.DEFAULT);
-        ad4.getAdSettings().setAdDimension(AdDimension.DEFAULT);
-
-        ad_arriba_1.addView(ad1, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 150));
-        ad_arriba_2.addView(ad2, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 150));
-        ad_abajo_1.addView(ad3, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 150));
-        ad_abajo_2.addView(ad4, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 150));
-
-        ad1.asyncLoadNewBanner();
-        ad2.asyncLoadNewBanner();
-        ad3.asyncLoadNewBanner();
-        ad4.asyncLoadNewBanner();
     }
 
-    @TargetApi(21)
-    public void setUpAnimations() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+    private void requestInter1() {
+        AdRequest adRequest = new AdRequest.Builder()/*.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)*/.build();
+        interstitialAd_1.loadAd(adRequest);
+    }
 
-            Fade fade = new Fade();
-            fade.setDuration(1000);
-            getWindow().setEnterTransition(fade);
+    private void requestInter2() {
+        AdRequest adRequest = new AdRequest.Builder()/*.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)*/.build();
+        interstitialAd_2.loadAd(adRequest);
+    }
 
-            Slide slide = new Slide();
-            slide.setDuration(1000);
-            getWindow().setReturnTransition(slide);
-        }
+    private void requestInter3() {
+        AdRequest adRequest = new AdRequest.Builder()/*.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)*/.build();
+        interstitialAd_3.loadAd(adRequest);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onReadyToShow() {
-
-    }
-
-    @Override
-    public void onWillShow() {
-
-    }
-
-    @Override
-    public void onWillOpenLandingPage() {
-
-    }
-
-    @Override
-    public void onWillClose() {
-        goToNextLevel1();
-        goToNextLevel2();
-        goToNextLevel3();
-    }
-
-    @Override
-    public void onFailedToLoadAd() {
-
-    }
-
-    private void showInterstitial1() {
-        mInterstitialAd1.show();
-    }
-
-    private void showInterstitial2() {
-        mInterstitialAd2.show();
-    }
-
-    private void showInterstitial3() {
-        mInterstitialAd3.show();
-    }
-
-    private void loadInterstitial1() {
-        mInterstitialAd1.getAdSettings().setPublisherId(publisher_id);
-        mInterstitialAd1.getAdSettings().setAdspaceId(inter1_id);
-        mInterstitialAd1.asyncLoadNewBanner();
-    }
-
-    private void loadInterstitial2() {
-        mInterstitialAd2.getAdSettings().setPublisherId(publisher_id);
-        mInterstitialAd2.getAdSettings().setAdspaceId(inter2_id);
-        mInterstitialAd2.asyncLoadNewBanner();
-    }
-
-    private void loadInterstitial3() {
-        mInterstitialAd3.getAdSettings().setPublisherId(publisher_id);
-        mInterstitialAd3.getAdSettings().setAdspaceId(inter3_id);
-        mInterstitialAd3.asyncLoadNewBanner();
-    }
-
-    private void goToNextLevel1() {
-        //mInterstitialAd1 = new Interstitial(this);
-        loadInterstitial1();
-    }
-
-    private void goToNextLevel2() {
-        mInterstitialAd2 = new Interstitial(this);
-        loadInterstitial2();
-    }
-
-    private void goToNextLevel3() {
-        mInterstitialAd3 = new Interstitial(this);
-        loadInterstitial3();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        if (!isXLargeScreen(getApplicationContext())) {
-            return;
-        }
+    protected void onDestroy() {
+        interstitialAd_1.setAdListener(null);
+        interstitialAd_2.setAdListener(null);
+        interstitialAd_3.setAdListener(null);
+        super.onDestroy();
     }
 }

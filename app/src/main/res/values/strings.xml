@@ -61,14 +61,16 @@
         This is an ad unit ID for an interstitial test ad. Replace with your own interstitial ad unit id.
         For more information, see https://support.google.com/admob/answer/3052638
     <!- -->
-    <string name="interstitial_ad_unit_id1">ca-app-pub-5390653757953587/5574735954</string>
-    <string name="interstitial_ad_unit_id2">ca-app-pub-5390653757953587/6632666754</string>
-    <string name="interstitial_ad_unit_id3">ca-app-pub-5390653757953587/8109399951</string>
+    <string name="interstitial_ad_1">ca-app-pub-5390653757953587/4544823957</string>
+    <string name="interstitial_ad_2">ca-app-pub-5390653757953587/8835422755</string>
+    <string name="interstitial_ad_3">ca-app-pub-5390653757953587/4265622352</string>
 
-    <string name="banner_ad_unit_id1">ca-app-pub-5390653757953587/3679200353</string>
-    <string name="banner_ad_unit_id2">ca-app-pub-5390653757953587/8469326751</string>
-    <string name="banner_ad_unit_id3">ca-app-pub-5390653757953587/5155933554</string>
-    <string name="banner_ad_unit_id4">ca-app-pub-5390653757953587/5515860353</string>
+    <string name="ad_top_1">ca-app-pub-5390653757953587/5103227158</string>
+    <string name="ad_top_2">ca-app-pub-5390653757953587/9114624355</string>
+    <string name="ad_bottom_1">ca-app-pub-5390653757953587/1591357550</string>
+    <string name="ad_bottom_2">ca-app-pub-5390653757953587/3068090750</string>
+
+    <string name="banner_ad_test">ca-app-pub-3940256099942544/6300978111</string>
 
     <string-array name="bannersizes_largesizes">
         <item>Banner</item>

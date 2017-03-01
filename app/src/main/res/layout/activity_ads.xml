@@ -1,4 +1,6 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,53 +8,97 @@
     tools:context="knf.animeflv.ADS">
 
     <include
-        layout="@layout/toolbar"
-        android:id="@+id/toolbar_ads" />
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"/>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:layout_height="match_parent">
 
-        <FrameLayout
-            android:id="@+id/ad_arriba_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <FrameLayout
-            android:id="@+id/ad_arriba_2"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="50dp" />
+            android:layout_alignParentTop="true"
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/pop_ad_1"
-            android:layout_width="wrap_content"
+            <com.google.android.gms.ads.NativeExpressAdView
+                android:id="@+id/ad_top_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                ads:adSize="FULL_WIDTHxAUTO_HEIGHT"
+                ads:adUnitId="@string/ad_top_1"/>
+
+            <com.google.android.gms.ads.NativeExpressAdView
+                android:id="@+id/ad_top_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                ads:adSize="FULL_WIDTHxAUTO_HEIGHT"
+                ads:adUnitId="@string/ad_top_2"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/next_level" />
+            android:layout_centerHorizontal="false"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal"
+            android:weightSum="3">
 
-        <Button
-            android:id="@+id/pop_ad_2"
-            android:layout_width="wrap_content"
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/ad_button_1"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/colorAccent"
+                android:enabled="false"
+                android:padding="10dp"
+                android:text="Abrir Anuncio"/>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/ad_button_2"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/colorAccent"
+                android:enabled="false"
+                android:padding="10dp"
+                android:text="Abrir Anuncio"/>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/ad_button_3"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/colorAccent"
+                android:enabled="false"
+                android:padding="10dp"
+                android:text="Abrir Anuncio"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/next_level" />
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/pop_ad_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/next_level" />
+            <com.google.android.gms.ads.NativeExpressAdView
+                android:id="@+id/ad_bottom_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                ads:adSize="FULL_WIDTHxAUTO_HEIGHT"
+                ads:adUnitId="@string/ad_bottom_1"/>
 
-        <FrameLayout
-            android:id="@+id/ad_abajo_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp" />
-
-        <FrameLayout
-            android:id="@+id/ad_abajo_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            <com.google.android.gms.ads.NativeExpressAdView
+                android:id="@+id/ad_bottom_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                ads:adSize="FULL_WIDTHxAUTO_HEIGHT"
+                ads:adUnitId="@string/ad_bottom_2"/>
+        </LinearLayout>
+    </RelativeLayout>
 </LinearLayout>

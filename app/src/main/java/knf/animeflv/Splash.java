@@ -2,7 +2,6 @@ package knf.animeflv;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.UiModeManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -71,8 +70,10 @@ public class Splash extends AwesomeSplash {
         );*/
         new Alarm().SetAlarm(this);
         //EmisionChecker.Refresh();
-        if (!isXLargeScreen(getApplicationContext()) && !(((UiModeManager) getSystemService(UI_MODE_SERVICE)).getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION)) { //set phones to portrait;
+        if (!isXLargeScreen(getApplicationContext()) && !ThemeUtils.isTV(this)) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else if (ThemeUtils.isTV(this)) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }

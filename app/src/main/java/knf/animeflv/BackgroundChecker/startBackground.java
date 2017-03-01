@@ -117,7 +117,8 @@ public class startBackground {
                         String txt = FileUtil.getStringFromFile(file_loc);
                         List<MainObject> mainobjects = Parser.parseMainList(s);
                         List<MainObject> oldobjects = Parser.parseMainList(txt);
-                        Boolean desc = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoDesc", false);
+                        boolean desc = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoDesc", false);
+                        boolean onlyNotFavs = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notFavs", false);
                         if (FileUtil.isJSONValid(txt)) {
                             if (!mainobjects.get(0).eid.equals(oldobjects.get(0).eid)) {
                                 FileUtil.writeToFile(s.toString(), file);
@@ -132,15 +133,20 @@ public class startBackground {
                                 Set<String> sts = context.getSharedPreferences("data", Context.MODE_PRIVATE).getStringSet("eidsNot", new HashSet<String>());
                                 loop:
                                 {
+                                    String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
                                     for (MainObject st : mainobjects) {
                                         if (!st.eid.equals(oldobjects.get(0).eid)) {
-                                            String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-                                            Boolean comp = favoritos.startsWith(st.aid + ":::") || favoritos.contains(":::" + st.aid + ":::");
-                                            if (comp && desc && isnot) {
-                                                Descargar(context, st.titulo, st.eid);
+                                            Boolean isInFavs = favoritos.startsWith(st.aid + ":::") || favoritos.contains(":::" + st.aid + ":::");
+                                            if (isInFavs && desc && isnot) {
+                                                Descargar(context, st.titulo, st.eid, st.sid);
                                             }
-                                            num += 1;
-                                            sts.add(st.eid);
+                                            if (onlyNotFavs && isInFavs) {
+                                                num += 1;
+                                                sts.add(st.eid);
+                                            } else {
+                                                num += 1;
+                                                sts.add(st.eid);
+                                            }
                                         } else {
                                             break loop;
                                         }
@@ -351,7 +357,7 @@ public class startBackground {
         downloadManager.add(downloadRequest);
     }
 
-    private static void Descargar(Context context, String titulo, String eid) {
+    private static void Descargar(Context context, String titulo, String eid, String sid) {
         String[] semi = eid.replace("E", "").split("_");
         String aid = semi[0];
         String num = semi[1];
@@ -374,6 +380,7 @@ public class startBackground {
         bundle.putString("num", num);
         bundle.putString("titulo", titulo);
         bundle.putString("eid", eid);
+        bundle.putString("sid", sid);
         resultIntent.putExtras(bundle);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);

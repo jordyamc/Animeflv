@@ -5,6 +5,16 @@
             android:defaultValue="true"
             android:key="notificaciones"
             android:title="Activar Notificaciones" />
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="notFavs"
+            android:summary="Solo notificara capitulos nuevos de animes en favoritos"
+            android:title="Solo notificar capitulos nuevos en favoritos"/>
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="autoDesc"
+            android:summary="Genera una notificacion para descargar capitulos nuevos de animes en favoritos"
+            android:title="Notificar descarga de capitulos en favoritos"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="60000"
             android:enabled="true"
@@ -79,11 +89,6 @@
             android:key="resaltar"
             android:summary="Animes, OVAS, Peliculas nuevas, y Animes en favoritos"
             android:title="Resaltar" />
-        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
-            android:defaultValue="false"
-            android:key="autoDesc"
-            android:summary="Generar una notificacion para descargar capitulos nuevos de animes en favoritos"
-            android:title="Notificar capitulos nuevos" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="autoUpdate"

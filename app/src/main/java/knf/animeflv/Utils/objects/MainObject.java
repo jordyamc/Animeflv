@@ -9,11 +9,13 @@ public class MainObject {
     public String num;
     public String titulo;
     public String eid;
+    public String sid;
 
-    public MainObject(String aid, String num, String titulo, String eid) {
+    public MainObject(String aid, String num, String titulo, String eid, String sid) {
         this.aid = aid;
         this.num = num;
         this.titulo = titulo;
         this.eid = eid;
+        this.sid = sid;
     }
 }

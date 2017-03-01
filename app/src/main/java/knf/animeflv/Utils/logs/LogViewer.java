@@ -76,6 +76,8 @@ public class LogViewer extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent.getData() != null) {
             setContent(intent.getData());
+        } else if (intent.getExtras() != null) {
+            setContent(intent.getExtras());
         } else {
             ToastError(new Exception("No Extras"));
             finish();

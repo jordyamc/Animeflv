@@ -1,0 +1,53 @@
+{
+  "project_info": {
+    "project_number": "173077795541",
+    "firebase_url": "https://animeflv-app.firebaseio.com",
+    "project_id": "animeflv-app",
+    "storage_bucket": "animeflv-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:173077795541:android:6cecf802da69fe21",
+        "android_client_info": {
+          "package_name": "knf.animeflv"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "173077795541-pku98fls3kko7b2tjbnoknggpq78jtrr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "knf.animeflv",
+            "certificate_hash": "7f430d840ee16a696bd6f52ecba80a8e4e119df5"
+          }
+        },
+        {
+          "client_id": "173077795541-h6dmajcj5vlib6nr38uii471g0fseei2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvILRVMxsiqJbC6REHClE1zayq0BzUfR0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-40289745-2"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

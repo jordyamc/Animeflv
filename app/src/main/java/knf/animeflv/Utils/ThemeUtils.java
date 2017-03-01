@@ -162,9 +162,15 @@ public class ThemeUtils {
                 >= Configuration.SCREENLAYOUT_SIZE_XLARGE);
     }
 
+    public static boolean isTV(Context context) {
+        return (((UiModeManager) context.getSystemService(UI_MODE_SERVICE)).getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION);
+    }
+
     public static void setOrientation(Activity activity) {
         if (!isTablet(activity) && !(((UiModeManager) activity.getSystemService(UI_MODE_SERVICE)).getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION)) { //Portrait
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else if (isTV(activity)) {
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         } else {
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }

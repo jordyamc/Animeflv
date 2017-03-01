@@ -74,7 +74,7 @@ public class Parser {
             JSONArray array = object.getJSONArray("lista");
             for (int i = 0; i < array.length(); i++) {
                 JSONObject jsonObject = array.getJSONObject(i);
-                objects.add(new MainObject(jsonObject.getString("aid"), jsonObject.getString("numero"), FileUtil.corregirTit(jsonObject.getString("titulo")), jsonObject.getString("eid")));
+                objects.add(new MainObject(jsonObject.getString("aid"), jsonObject.getString("numero"), FileUtil.corregirTit(jsonObject.getString("titulo")), jsonObject.getString("eid"), jsonObject.getString("sid")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,7 +89,7 @@ public class Parser {
             JSONArray array = object.getJSONArray("lista");
             for (int i = 0; i < array.length(); i++) {
                 JSONObject jsonObject = array.getJSONObject(i);
-                objects.add(new MainObject(jsonObject.getString("aid"), jsonObject.getString("numero"), FileUtil.corregirTit(jsonObject.getString("titulo")), jsonObject.getString("eid")));
+                objects.add(new MainObject(jsonObject.getString("aid"), jsonObject.getString("numero"), FileUtil.corregirTit(jsonObject.getString("titulo")), jsonObject.getString("eid"), jsonObject.getString("sid")));
             }
         } catch (Exception e) {
             e.printStackTrace();

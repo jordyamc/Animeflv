@@ -55,6 +55,7 @@ public class SelfGetter {
                         String img_url = img.attr("src");
                         String aid = img_url.substring(img_url.lastIndexOf("/") + 1, img_url.lastIndexOf("."));
                         String eid = aid + "_" + numero + "E";
+                        String sid = element.select("a").first().attr("href").split("/")[2];
                         if (FileUtil.isNumber(numero.trim())) {
                             JSONObject anime = new JSONObject();
                             anime.put("aid", aid);
@@ -62,6 +63,7 @@ public class SelfGetter {
                             anime.put("numero", numero);
                             anime.put("tid", getTid(element));
                             anime.put("eid", eid);
+                            anime.put("sid", sid);
                             array.put(anime);
                         }
                     }

@@ -44,17 +44,17 @@ public class RandomActivity extends AppCompatActivity implements RandomInterface
         setContentView(R.layout.random_layout);
         ButterKnife.bind(this);
         setTheme();
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
         swipeRefreshLayout.setOnRefreshListener(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Random");
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         swipeRefreshLayout.post(new Runnable() {
             @Override
