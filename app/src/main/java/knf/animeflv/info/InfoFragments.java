@@ -56,6 +56,7 @@ import knf.animeflv.FavSyncro;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DIRECTORIO;
+import knf.animeflv.JsonFactory.OfflineGetter;
 import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
@@ -301,6 +302,9 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             BaseGetter.getJson(this, new ANIME(Integer.parseInt(aid)), new BaseGetter.AsyncInterface() {
                 @Override
                 public void onFinish(String json) {
+                    if (json.startsWith("error")) {
+                        json = OfflineGetter.getAnime(new ANIME(Integer.parseInt(aid)));
+                    }
                     if (!json.equals("null")) {
                         global_json = json;
                         setInfo(json);

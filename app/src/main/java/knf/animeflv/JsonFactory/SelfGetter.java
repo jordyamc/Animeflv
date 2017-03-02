@@ -8,6 +8,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -112,7 +113,11 @@ public class SelfGetter {
                             }
                             asyncInterface.onFinish("null");
                         } catch (Exception e) {
-                            asyncInterface.onFinish("null");
+                            if (json.startsWith("error") && json.contains("503")) {
+                                asyncInterface.onFinish(json);
+                            } else {
+                                asyncInterface.onFinish("null");
+                            }
                         }
                     }
                 });
@@ -351,6 +356,10 @@ public class SelfGetter {
                     fobject.put("relacionados", j_rels);
                     OfflineGetter.backupJson(fobject, new File(OfflineGetter.animecache, anime.getAidString() + ".txt"));
                     asyncInterface.onFinish(fobject.toString());
+                } catch (HttpStatusException he) {
+                    if (he.getStatusCode() == 503) {
+                        asyncInterface.onFinish("error:503");
+                    }
                 } catch (Exception e) {
                     asyncInterface.onFinish(OfflineGetter.getAnime(anime));
                     e.printStackTrace();

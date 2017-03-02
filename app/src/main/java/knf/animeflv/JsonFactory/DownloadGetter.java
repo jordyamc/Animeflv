@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.widget.ArrayAdapter;
@@ -17,7 +16,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +27,6 @@ import knf.animeflv.Parser;
 import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.R;
 import knf.animeflv.StreamManager.StreamManager;
-import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
@@ -151,15 +148,17 @@ public class DownloadGetter {
                         actionsInterface.onCancelDownload();
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     MainStates.setProcessing(false, null);
                     actionsInterface.onCancelDownload();
                     actionsInterface.onLogError(e);
                     if (NetworkUtils.isNetworkAvailable()) {
-                        FileUtil.writeToFile(e.getMessage() + "   " + Parser.getUrlCached(eid, "000") + "\n" + e.getCause(), new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "log.txt"));
-                        if (!Parser.getUrlCached(eid, "000").equals("null")) {
-                            Toaster.toast("Error en JSON");
-                        } else {
+                        if (Parser.getUrlCached(eid, "000").equals("null")) {
                             Toaster.toast("Anime no encontrado en directorio!");
+                        } else if (json.startsWith("error") && json.contains("503")) {
+                            Toaster.toast("No se pudo acceder a la pagina de Animeflv");
+                        } else {
+                            Toaster.toast("Error en json");
                         }
                     } else {
                         Toaster.toast("No hay internet!!!");
