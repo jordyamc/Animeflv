@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat;
  * Created by Jordy on 16/03/2016.
  */
 public class ColorsRes {
+
     @ColorInt
     public static int SecondaryTextDark(Context context) {
         return ContextCompat.getColor(context, android.R.color.secondary_text_dark);

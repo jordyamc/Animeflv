@@ -31,8 +31,8 @@ import knf.animeflv.WaitList.WaitDownloadElement;
 import knf.animeflv.WaitList.WaitList;
 
 public class SelfGetter {
-    private static final int TIMEOUT = 10000;
-    private static final String ua = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/5.7.15533.1010 Safari/537.36";
+    public static final int TIMEOUT = 10000;
+    public static final String ua = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/5.7.15533.1010 Safari/537.36";
 
     //FIXME:OVA PELICULA
     public static void getInicio(final Context context, final INICIO inicio, final BaseGetter.AsyncInterface asyncInterface) {

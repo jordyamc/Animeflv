@@ -2,7 +2,7 @@
 <resources>
     <color name="prim">#212121</color>
     <color name="dark">#454545</color>
-    <color name="blanco">#FFF</color>
+    <color name="blanco">#ffffff</color>
     <color name="rojo">#F20000</color>
 
     <color name="newCap">#fdfa5d</color>

@@ -101,6 +101,7 @@ import knf.animeflv.Recientes.Status;
 import knf.animeflv.Recyclers.AdapterMain;
 import knf.animeflv.Recyclers.AdapterMainNoGIF;
 import knf.animeflv.Seen.SeenManager;
+import knf.animeflv.State.StateActivity;
 import knf.animeflv.Tutorial.TutorialActivity;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
@@ -253,7 +254,7 @@ public class newMain extends AppCompatActivity implements
     private void setUpDrawer() {
         Drawable ic_main;
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (preferences.getBoolean("is_amoled", false)) {
+        if (ThemeUtils.isAmoled(this)) {
             ic_main = ContextCompat.getDrawable(this, R.mipmap.ic_launcher_dark);
         } else {
             ic_main = ContextCompat.getDrawable(this, R.mipmap.ic_launcher);
@@ -265,7 +266,20 @@ public class newMain extends AppCompatActivity implements
                 .withDividerBelowHeader(false)
                 .withCloseDrawerOnProfileListClick(false)
                 .withSelectionListEnabled(true)
-                .withProfileImagesClickable(false);
+                .withProfileImagesClickable(true);
+        builder.withOnAccountHeaderProfileImageListener(new AccountHeader.OnAccountHeaderProfileImageListener() {
+            @Override
+            public boolean onProfileImageClick(View view, IProfile profile, boolean current) {
+                return false;
+            }
+
+            @Override
+            public boolean onProfileImageLongClick(View view, IProfile profile, boolean current) {
+                result.closeDrawer();
+                startActivity(new Intent(newMain.this, StateActivity.class));
+                return false;
+            }
+        });
         if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(this)) {
             builder.addProfiles(
                     new ProfileDrawerItem().withName("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withEmail(headerTit).withIcon(ic_main).withIdentifier(9),

@@ -30,6 +30,7 @@ import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
+import knf.animeflv.State.StateActivity;
 import knf.animeflv.Utils.OnlineDataHelper;
 import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
@@ -109,6 +110,20 @@ public class AboutActivity extends MaterialAboutActivity {
                             @Override
                             public void onClick() {
                                 startActivity(new Intent(context, ChangelogActivity.class));
+                            }
+                        })
+                        .build());
+        info.addItem(
+                new MaterialAboutActionItem.Builder()
+                        .text("Estado")
+                        .icon(new IconicsDrawable(context)
+                                .icon(CommunityMaterial.Icon.cmd_alert)
+                                .color(iconColor(context))
+                                .sizeDp(18))
+                        .setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+                            @Override
+                            public void onClick() {
+                                startActivity(new Intent(context, StateActivity.class));
                             }
                         })
                         .build());
