@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
@@ -39,6 +40,8 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
+import knf.animeflv.Cloudflare.Bypass;
+import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.CustomSettingsIntro.CustomIntro;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.OnlineDataHelper;
@@ -46,7 +49,14 @@ import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
 public class Splash extends AwesomeSplash {
+    final Handler handler = new Handler();
     Context context;
+    final Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            proceed();
+        }
+    };
 
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
@@ -297,6 +307,32 @@ public class Splash extends AwesomeSplash {
         }
     }
 
+    private void checkCloudflare() {
+        if (NetworkUtils.isNetworkAvailable()) {
+            Toaster.toast("Activando bypass de Cloudflare");
+            Bypass.runJsoupTest(new Bypass.onTestResult() {
+                @Override
+                public void onResult(boolean needBypass) {
+                    if (needBypass) {
+                        handler.postDelayed(runnable, 20000);
+                        Bypass.check(Splash.this, new Bypass.onBypassCheck() {
+                            @Override
+                            public void onFinish() {
+                                handler.removeCallbacks(runnable);
+                                proceed();
+                            }
+                        });
+                    } else {
+                        BypassHolder.clear(Splash.this);
+                        proceed();
+                    }
+                }
+            });
+        } else {
+            proceed();
+        }
+    }
+
     @TargetApi(23)
     public void checkPermission() {
         final String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -304,7 +340,7 @@ public class Splash extends AwesomeSplash {
             Dexter.checkPermission(new PermissionListener() {
                 @Override
                 public void onPermissionGranted(PermissionGrantedResponse response) {
-                    proceed();
+                    checkCloudflare();
                 }
 
                 @Override
@@ -364,7 +400,7 @@ public class Splash extends AwesomeSplash {
 
             }, permission);
         } else {
-            proceed();
+            checkCloudflare();
         }
     }
 }
