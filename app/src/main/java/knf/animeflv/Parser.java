@@ -324,16 +324,19 @@ public class Parser {
         return ret;
     }
 
-    /*public static String getCap(String tid, String num) {
+    public static String getCapExplorer(String tid, String num) {
         switch (tid) {
+            case "Type tv":
             case "Anime":
                 return "Capítulo " + num;
             case "OVA":
+            case "Type ova":
                 return tid + " " + num;
+            case "Type movie":
             default:
-                return tid;
+                return "Pelicula";
         }
-    }*/
+    }
     public static String getCap(String tid, String num) {
         switch (tid) {
             case "Type tv":

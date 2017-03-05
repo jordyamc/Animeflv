@@ -88,7 +88,7 @@ public class VideoFile {
         if (type == null) {
             return "Capítulo " + getCapNumber();
         } else {
-            return Parser.getCap(type, getCapNumber());
+            return Parser.getCapExplorer(type, getCapNumber());
         }
     }
 

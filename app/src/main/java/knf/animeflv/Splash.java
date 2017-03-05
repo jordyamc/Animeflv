@@ -54,6 +54,7 @@ public class Splash extends AwesomeSplash {
     final Runnable runnable = new Runnable() {
         @Override
         public void run() {
+            Toaster.toast("Error al activar Bypass");
             proceed();
         }
     };
@@ -309,11 +310,11 @@ public class Splash extends AwesomeSplash {
 
     private void checkCloudflare() {
         if (NetworkUtils.isNetworkAvailable()) {
-            Toaster.toast("Activando bypass de Cloudflare");
             Bypass.runJsoupTest(new Bypass.onTestResult() {
                 @Override
                 public void onResult(boolean needBypass) {
                     if (needBypass) {
+                        Toaster.toast("Activando bypass de Cloudflare");
                         handler.postDelayed(runnable, 20000);
                         Bypass.check(Splash.this, new Bypass.onBypassCheck() {
                             @Override

@@ -4,15 +4,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.multidex.MultiDexApplication;
 
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.karumi.dexter.Dexter;
 
 import es.munix.multidisplaycast.CastManager;
+import io.fabric.sdk.android.Fabric;
 import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.UtilsInit;
-import xdroid.toaster.Toaster;
 
 
 public class Application extends MultiDexApplication {
@@ -36,11 +38,18 @@ public class Application extends MultiDexApplication {
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread thread, Throwable e) {
-                Toaster.toast(e.getMessage());
-                Logger.UncaughtError(e);
-                System.exit(0);
+                if (!(e instanceof InternalError)) {
+                    Logger.UncaughtError(e);
+                    System.exit(0);
+                }
             }
         });
+        final Fabric fabric = new Fabric.Builder(this)
+                .kits(new Crashlytics(), new Answers())
+                .debuggable(true)
+                .build();
+        Fabric.with(fabric);
+        Crashlytics.setUserEmail(FavSyncro.getEmail(this));
         CastManager.register(getApplicationContext());
         DropboxManager.init(this);
     }

@@ -253,7 +253,6 @@ public class newMain extends AppCompatActivity implements
     //FIXME: FIX SERVER LOGIN
     private void setUpDrawer() {
         Drawable ic_main;
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (ThemeUtils.isAmoled(this)) {
             ic_main = ContextCompat.getDrawable(this, R.mipmap.ic_launcher_dark);
         } else {

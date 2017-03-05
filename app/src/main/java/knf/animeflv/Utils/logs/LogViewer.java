@@ -167,6 +167,7 @@ public class LogViewer extends AppCompatActivity {
 
     private void setContent(Uri uri) {
         try {
+            Log.e("Log Uri", uri.toString());
             current = new File(uri.getPath());
             complete_info.setText(FileUtil.getStringFromFile(current));
             phone_info.setText(getPhoneInfo(uri.getPath()));

@@ -67,7 +67,7 @@ public class Logger {
         mBuilder.setPriority(Notification.PRIORITY_MAX);
         mBuilder.setLights(Color.argb(0, 255, 128, 0), 5000, 2000);
         Intent resultIntent = new Intent(context, LogViewer.class);
-        resultIntent.setData(Uri.parse(file.getAbsolutePath()));
+        resultIntent.setData(Uri.fromFile(file));
         resultIntent.putExtra("path", file.getAbsolutePath());
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);

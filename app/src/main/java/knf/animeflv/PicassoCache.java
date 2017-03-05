@@ -10,6 +10,9 @@ import com.squareup.picasso.Picasso;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 
+import knf.animeflv.Cloudflare.BypassHolder;
+import knf.animeflv.Utils.PicassoDownloader;
+
 public class PicassoCache {
 
     /**
@@ -28,7 +31,13 @@ public class PicassoCache {
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
         client.setCookieHandler(cookieManager);
 
-        Downloader downloader   = new OkHttpDownloader(context, Integer.MAX_VALUE);
+        Downloader downloader;
+        if (BypassHolder.isActive) {
+            downloader = new PicassoDownloader(context);
+        } else {
+            downloader = new OkHttpDownloader(context, Integer.MAX_VALUE);
+        }
+
         Picasso.Builder builder = new Picasso.Builder(context);
         builder.downloader(downloader);
 
