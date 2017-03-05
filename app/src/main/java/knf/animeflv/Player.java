@@ -197,8 +197,12 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        mMediaPlayer.setDisplay(holder);
-        mMediaPlayer.prepareAsync();
+        if (mMediaPlayer != null) {
+            mMediaPlayer.setDisplay(holder);
+            mMediaPlayer.prepareAsync();
+        } else {
+            setMediaPlayer();
+        }
     }
 
     @Override
@@ -314,27 +318,31 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
     @Override
     public void onCompletion(MediaPlayer mp) {
         resetPlayer();
-        String file = intent.getStringExtra("file");
-        String start = file.substring(0, file.lastIndexOf("/"));
-        String eid = file.substring(file.lastIndexOf("/") + 1, file.lastIndexOf(".mp4"));
-        String[] semi = eid.split("_");
-        String aid = semi[0];
-        int num = Integer.parseInt(semi[1]);
-        if (!file.trim().equals("")) {
-            File nextCap = new File(start, aid + "_" + String.valueOf(num + 1) + ".mp4");
-            Log.e("NextCap", nextCap.getAbsolutePath());
-            if (nextCap.exists()) {
-                Intent i = new Intent(this, Player.class);
-                i.putExtra("file", nextCap.getAbsolutePath());
-                i.putExtra("title", new Parser().getTitCached(aid) + " - " + (num + 1));
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                FileUtil.init(this).setSeenState(aid + "_" + (num + 1) + "E", true);
-                finish();
-                startActivity(i);
+        try {
+            String file = intent.getStringExtra("file");
+            if (!file.trim().equals("")) {
+                String start = file.substring(0, file.lastIndexOf("/"));
+                String eid = file.substring(file.lastIndexOf("/") + 1, file.lastIndexOf(".mp4"));
+                String[] semi = eid.split("_");
+                String aid = semi[0];
+                int num = Integer.parseInt(semi[1]);
+                File nextCap = new File(start, aid + "_" + String.valueOf(num + 1) + ".mp4");
+                Log.e("NextCap", nextCap.getAbsolutePath());
+                if (nextCap.exists()) {
+                    Intent i = new Intent(this, Player.class);
+                    i.putExtra("file", nextCap.getAbsolutePath());
+                    i.putExtra("title", new Parser().getTitCached(aid) + " - " + (num + 1));
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    FileUtil.init(this).setSeenState(aid + "_" + (num + 1) + "E", true);
+                    finish();
+                    startActivity(i);
+                } else {
+                    finish();
+                }
             } else {
                 finish();
             }
-        } else {
+        } catch (Exception e) {
             finish();
         }
     }

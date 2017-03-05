@@ -8,7 +8,11 @@ public class ANIME {
     }
 
     public ANIME(String aid) {
-        this.aid = Integer.parseInt(aid);
+        try {
+            this.aid = Integer.parseInt(aid);
+        } catch (Exception e) {
+            this.aid = -1;
+        }
     }
 
 

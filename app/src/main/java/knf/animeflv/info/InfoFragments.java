@@ -50,6 +50,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadService.DownloaderService;
 import knf.animeflv.FavSyncro;
@@ -409,21 +410,21 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             button.setImageResource(R.drawable.information);
             supportInvalidateOptionsMenu();
         }
-        //transaction.show(fragmentInfo);
-        transaction.commitAllowingStateLoss();
-        fragmentInfo.startAnimation(position);
-        transaction = getManager().beginTransaction();
-        transaction.hide(position == -1 ? fragmentCaps : fragmentInfo);
-        transaction.commitAllowingStateLoss();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                button.show();
-            }
-        });
-        /*if (position != -1) {
-            toogleFragments();
-        }*/
+        try {
+            transaction.commitAllowingStateLoss();
+            fragmentInfo.startAnimation(position);
+            transaction = getManager().beginTransaction();
+            transaction.hide(position == -1 ? fragmentCaps : fragmentInfo);
+            transaction.commitAllowingStateLoss();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    button.show();
+                }
+            });
+        } catch (Exception e) {
+
+        }
     }
 
 
@@ -624,7 +625,9 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     @Override
     protected void onResume() {
         super.onResume();
-        if (fragmentCaps != null)
+        if (fragmentCaps != null) {
+            Bypass.check(this, null);
             fragmentCaps.resetList();
+        }
     }
 }

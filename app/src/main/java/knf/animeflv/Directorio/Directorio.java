@@ -427,24 +427,24 @@ public class Directorio extends AppCompatActivity {
             }
         };
         editText.setOnEditorActionListener(listener);
-        if (bundle == null) {
-            Bundle b = new Bundle();
-            b.putString("json", json);
-            FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
-                    getSupportFragmentManager(), FragmentPagerItems.with(this)
-                    .add("ANIMES", Animes.class, b)
-                    .add("OVAS", Ovas.class, b)
-                    .add("PELICULAS", Peliculas.class, b)
-                    .create());
-            viewPager.setOffscreenPageLimit(3);
-            viewPager.setAdapter(adapter);
-            viewPagerTab.setViewPager(viewPager);
-        }
         List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, editText.getText().toString()));
         final AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                if (bundle == null) {
+                    Bundle b = new Bundle();
+                    b.putString("json", json);
+                    FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
+                            getSupportFragmentManager(), FragmentPagerItems.with(Directorio.this)
+                            .add("ANIMES", Animes.class, b)
+                            .add("OVAS", Ovas.class, b)
+                            .add("PELICULAS", Peliculas.class, b)
+                            .create());
+                    viewPager.setOffscreenPageLimit(3);
+                    viewPager.setAdapter(adapter);
+                    viewPagerTab.setViewPager(viewPager);
+                }
                 recyclerView.setAdapter(adapterBusqueda);
                 Toaster.toast("Directorio Actualizado");
             }
@@ -691,19 +691,23 @@ public class Directorio extends AppCompatActivity {
                             public void run() {
                                 if (t_busqueda == 0) {
                                     if (s.length() > 0) {
-                                        menuGlobal.clear();
-                                        if (!isXLargeScreen(context)) {
-                                            getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
-                                        } else {
-                                            getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
+                                        if (menuGlobal != null) {
+                                            menuGlobal.clear();
+                                            if (!isXLargeScreen(context)) {
+                                                getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
+                                            } else {
+                                                getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
+                                            }
                                         }
                                     } else {
                                         if (editText.getVisibility() == View.VISIBLE) {
-                                            menuGlobal.clear();
-                                            if (!isXLargeScreen(context)) {
-                                                getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                                            } else {
-                                                getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                                            if (menuGlobal != null) {
+                                                menuGlobal.clear();
+                                                if (!isXLargeScreen(context)) {
+                                                    getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
+                                                } else {
+                                                    getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                                                }
                                             }
                                         }
                                     }
@@ -712,18 +716,22 @@ public class Directorio extends AppCompatActivity {
                                     recyclerView.setAdapter(adapterBusqueda);
                                 } else {
                                     if (s.length() > 0) {
-                                        menuGlobal.clear();
-                                        if (!isXLargeScreen(context)) {
-                                            getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
-                                        } else {
-                                            getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
+                                        if (menuGlobal != null) {
+                                            menuGlobal.clear();
+                                            if (!isXLargeScreen(context)) {
+                                                getMenuInflater().inflate(R.menu.menu_buscar_borrar, menuGlobal);
+                                            } else {
+                                                getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
+                                            }
                                         }
                                     } else {
-                                        menuGlobal.clear();
-                                        if (!isXLargeScreen(context)) {
-                                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                                        } else {
-                                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                                        if (menuGlobal != null) {
+                                            menuGlobal.clear();
+                                            if (!isXLargeScreen(context)) {
+                                                getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
+                                            } else {
+                                                getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                                            }
                                         }
                                     }
                                 }

@@ -167,17 +167,22 @@ public class FileUtil {
         }
     }
 
+    @Nullable
     public static DocumentFile findFileFromAccess(@NonNull DocumentFile parent, String name) {
-        DocumentFile file = parent.findFile(name);
-        if (file == null) {
-            if (!name.endsWith(".mp4")) file = parent.createDirectory(name);
-        }
         try {
-            if (!file.exists() && !name.endsWith(".mp4")) parent.createDirectory(name);
-        } catch (NullPointerException e) {
-            Log.d("File Not Exist", name);
+            DocumentFile file = parent.findFile(name);
+            if (file == null) {
+                if (!name.endsWith(".mp4")) file = parent.createDirectory(name);
+            }
+            try {
+                if (!file.exists() && !name.endsWith(".mp4")) parent.createDirectory(name);
+            } catch (NullPointerException e) {
+                Log.d("File Not Exist", name);
+            }
+            return file;
+        } catch (Exception e) {
+            return null;
         }
-        return file;
     }
 
     public static boolean isJSONValid(String test) {
@@ -424,10 +429,14 @@ public class FileUtil {
         } catch (Exception e) {
             return DocumentFile.fromFile(new File(Environment.getExternalStorageDirectory(), "adahsjkdhuaiohaudusws.txt"));
         }
-        if (treeUri != null) {
-            DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
-            return findFileFromAccess(findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), data[0]), eid.replace("E", "") + ".mp4");
-        } else {
+        try {
+            if (treeUri != null) {
+                DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
+                return findFileFromAccess(findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), data[0]), eid.replace("E", "") + ".mp4");
+            } else {
+                return DocumentFile.fromFile(new File(Environment.getExternalStorageDirectory(), "adahsjkdhuaiohaudusws.txt"));
+            }
+        } catch (Exception e) {
             return DocumentFile.fromFile(new File(Environment.getExternalStorageDirectory(), "adahsjkdhuaiohaudusws.txt"));
         }
     }

@@ -2,6 +2,7 @@ package knf.animeflv.Cloudflare;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.CookieManager;
@@ -29,7 +30,7 @@ import xdroid.toaster.Toaster;
 //TODO: Find a solution
 public class Bypass {
 
-    public static void check(final Context context, final onBypassCheck check) {
+    public static void check(final Context context, @Nullable final onBypassCheck check) {
         BypassHolder.savedToLocal(context);
         AsyncHttpClient client = ServerGetter.getClient();
         if (BypassHolder.isActive) {
@@ -86,21 +87,23 @@ public class Bypass {
                     @Override
                     public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                         Log.e("CloudflareBypass", "ENABLED Keep bypass");
-                        check.onFinish();
+                        if (check != null)
+                            check.onFinish();
                     }
 
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String responseString) {
                         Log.e("CloudflareBypass", "DISABLED clear bypass");
                         BypassHolder.clear(context);
-                        check.onFinish();
+                        if (check != null)
+                            check.onFinish();
                     }
                 });
             }
         });
     }
 
-    private static void saveCookie(Context context, String cookies, onBypassCheck check) {
+    private static void saveCookie(Context context, String cookies, @Nullable onBypassCheck check) {
         if (cookies.contains("__cfduid") || cookies.contains("cf_clearance")) {
             String[] parts = cookies.split(";");
             for (String cookie : parts) {
@@ -114,7 +117,8 @@ public class Bypass {
                 }
             }
             Toaster.toast("Bypass de Cloudflare Activado");
-            check.onFinish();
+            if (check != null)
+                check.onFinish();
         }
     }
 

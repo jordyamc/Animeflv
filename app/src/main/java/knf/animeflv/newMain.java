@@ -81,6 +81,7 @@ import cz.msebera.android.httpclient.Header;
 import knf.animeflv.About.AboutActivity;
 import knf.animeflv.AutoEmision.AutoEmisionActivity;
 import knf.animeflv.Changelog.ChangelogActivity;
+import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.DownloadService.DownloaderService;
 import knf.animeflv.Explorer.ExplorerRoot;
@@ -814,9 +815,13 @@ public class newMain extends AppCompatActivity implements
             if (!isXLargeScreen()) {
                 toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
             } else {
-                findViewById(R.id.frame).setBackgroundColor(ColorsRes.Negro(this));
-                toolbar.getRootView().setBackgroundColor(ColorsRes.Prim(this));
-                findViewById(R.id.cardMain).setBackgroundColor(ColorsRes.Negro(this));
+                try {
+                    findViewById(R.id.frame).setBackgroundColor(ColorsRes.Negro(this));
+                    toolbar.getRootView().setBackgroundColor(ColorsRes.Prim(this));
+                    findViewById(R.id.cardMain).setBackgroundColor(ColorsRes.Negro(this));
+                } catch (Exception e) {
+
+                }
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 if (!isXLargeScreen()) {
@@ -1160,6 +1165,7 @@ public class newMain extends AppCompatActivity implements
         ActualizarFavoritos();
         UtilNotBlocker.setPaused(false);
         if (shouldExecuteOnResume) {
+            Bypass.check(this, null);
             if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false) != isAmoled) {
                 recreate();
             }
@@ -1217,7 +1223,11 @@ public class newMain extends AppCompatActivity implements
                 }, 2000);
             } else {
                 MainStates.setListing(false);
-                main.setData(MainOrganizer.getList());
+                if (main != null) {
+                    main.setData(MainOrganizer.getList());
+                } else if (mainNo != null) {
+                    mainNo.setData(MainOrganizer.getList());
+                }
             }
         } else {
             result.closeDrawer();

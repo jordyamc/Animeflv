@@ -105,13 +105,17 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Favoritos");
         if (isXLargeScreen(context)) {
-            ltoolbar.setNavigationIcon(R.drawable.ic_back_r);
-            ltoolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
-                }
-            });
+            try {
+                ltoolbar.setNavigationIcon(R.drawable.ic_back_r);
+                ltoolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                    }
+                });
+            } catch (Exception e) {
+
+            }
         } else {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);

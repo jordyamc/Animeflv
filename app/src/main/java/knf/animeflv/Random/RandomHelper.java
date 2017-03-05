@@ -12,7 +12,11 @@ import knf.animeflv.Parser;
 
 public class RandomHelper {
     public static int getRandomNumber() {
-        return new Random().nextInt(Parser.getLastAidCached() - 1) + 1;
+        try {
+            return new Random().nextInt(Parser.getLastAidCached() - 1) + 1;
+        } catch (Exception e) {
+            return new Random().nextInt(2800) + 1;
+        }
     }
 
     public static List<AnimeObject> getList(int number) {
