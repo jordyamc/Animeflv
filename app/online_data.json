@@ -17,7 +17,7 @@
       "alias": ""
     }
   ],
-  "beta": [
+  "alpha": [
     {
       "name": "Guerra1337",
       "description": "Miembro super activo",
@@ -88,5 +88,8 @@
       "message": "",
       "alias": "INF3R"
     }
+  ],
+  "beta": [
+
   ]
 }
