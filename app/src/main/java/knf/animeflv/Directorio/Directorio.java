@@ -432,21 +432,26 @@ public class Directorio extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (bundle == null) {
-                    Bundle b = new Bundle();
-                    b.putString("json", json);
-                    FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
-                            getSupportFragmentManager(), FragmentPagerItems.with(Directorio.this)
-                            .add("ANIMES", Animes.class, b)
-                            .add("OVAS", Ovas.class, b)
-                            .add("PELICULAS", Peliculas.class, b)
-                            .create());
-                    viewPager.setOffscreenPageLimit(3);
-                    viewPager.setAdapter(adapter);
-                    viewPagerTab.setViewPager(viewPager);
+                try {
+                    if (bundle == null) {
+                        Bundle b = new Bundle();
+                        b.putString("json", json);
+                        FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
+                                getSupportFragmentManager(), FragmentPagerItems.with(Directorio.this)
+                                .add("ANIMES", Animes.class, b)
+                                .add("OVAS", Ovas.class, b)
+                                .add("PELICULAS", Peliculas.class, b)
+                                .create());
+                        viewPager.setOffscreenPageLimit(3);
+                        viewPager.setAdapter(adapter);
+                        viewPagerTab.setViewPager(viewPager);
+                    }
+                    recyclerView.setAdapter(adapterBusqueda);
+                    Toaster.toast("Directorio Actualizado");
+                } catch (Exception e) {
+                    Toaster.toast("Error en directorio, recargando...");
+                    recreate();
                 }
-                recyclerView.setAdapter(adapterBusqueda);
-                Toaster.toast("Directorio Actualizado");
             }
         });
     }

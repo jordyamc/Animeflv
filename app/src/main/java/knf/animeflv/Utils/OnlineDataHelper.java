@@ -35,7 +35,8 @@ public class OnlineDataHelper {
                     + ");";
     private static final String DATABASE_NAME = "ONLINE_CHANGE_DATA";
     public static int TYPE_CONTRIBUTOR = 0;
-    public static int TYPE_BETA = 1;
+    public static int TYPE_ALPHA = 1;
+    public static int TYPE_BETA = 2;
     protected Context context;
     private SQLiteDatabase db;
 
@@ -64,6 +65,11 @@ public class OnlineDataHelper {
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject sub = array.getJSONObject(i);
                         dataHelper.addElement(new PersonItem(TYPE_CONTRIBUTOR, sub));
+                    }
+                    array = object.getJSONArray("alpha");
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject sub = array.getJSONObject(i);
+                        dataHelper.addElement(new PersonItem(TYPE_ALPHA, sub));
                     }
                     array = object.getJSONArray("beta");
                     for (int i = 0; i < array.length(); i++) {

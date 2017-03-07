@@ -59,7 +59,7 @@ public class SDAdapter extends RecyclerView.Adapter<SDAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 PreferenceManager.getDefaultSharedPreferences(activity).edit().putString("SDPath", items.list().get(holder.getAdapterPosition()).replace("_noWrite_", "")).commit();
-                if (items.list().get(holder.getAdapterPosition()).contains("_noWrite_")) {
+                if (items.list().get(holder.getAdapterPosition()).contains("_noWrite_") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
                     activity.startActivityForResult(intent, SDSearcher.GRANT_WRITE_PERMISSION_CODE);
                 } else {

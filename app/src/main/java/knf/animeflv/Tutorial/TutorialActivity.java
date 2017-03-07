@@ -36,13 +36,13 @@ import com.melnykov.fab.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
+import knf.animeflv.Random.RandomHelper;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.MainStates;
@@ -431,14 +431,10 @@ public class TutorialActivity extends AppCompatActivity implements SwipeRefreshL
 
     private List<Integer> getRandomaids() {
         List<Integer> integers = new ArrayList<>();
-        integers.add(getRandomNumber());
-        integers.add(getRandomNumber());
-        integers.add(getRandomNumber());
+        integers.add(RandomHelper.getRandomNumber());
+        integers.add(RandomHelper.getRandomNumber());
+        integers.add(RandomHelper.getRandomNumber());
         return integers;
-    }
-
-    private int getRandomNumber() {
-        return new Random().nextInt(Parser.getLastAidCached() - 1) + 1;
     }
 
     private void changeTextsColor() {

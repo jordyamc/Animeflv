@@ -64,10 +64,16 @@ public class Bypass {
                                     Log.e("CloudflareBypass", "Redirect to: " + url);
                                     if (url.equals("http://animeflv.net/")) {
                                         String cookies = CookieManager.getInstance().getCookie("http://animeflv.net");
-                                        String ua = webView.getSettings().getUserAgentString();
-                                        Log.e("Detected Cookies", cookies);
-                                        BypassHolder.setUserAgent(context, ua);
-                                        saveCookie(context, cookies, check);
+                                        if (cookies != null && cookies.contains(BypassHolder.cookieKeyClearance) && cookies.contains(BypassHolder.cookieKeyDuid)) {
+                                            String ua = webView.getSettings().getUserAgentString();
+                                            Log.e("Detected Cookies", cookies);
+                                            BypassHolder.setUserAgent(context, ua);
+                                            saveCookie(context, cookies, check);
+                                        } else {
+                                            Toaster.toast("Error al activar Bypass");
+                                            if (check != null)
+                                                check.onFinish();
+                                        }
                                         return true;
                                     } else {
                                         return false;

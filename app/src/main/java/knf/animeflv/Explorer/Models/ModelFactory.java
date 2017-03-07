@@ -39,12 +39,16 @@ public class ModelFactory {
             protected String doInBackground(String... strings) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     List<Directory> files = new ArrayList<>();
-                    for (DocumentFile file : getDirectoryFileAccess(context).listFiles()) {
-                        if (file.isDirectory() && file.listFiles().length > 0) {
-                            files.add(new Directory(file, PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false)));
+                    try {
+                        for (DocumentFile file : getDirectoryFileAccess(context).listFiles()) {
+                            if (file.isDirectory() && file.listFiles().length > 0) {
+                                files.add(new Directory(file, PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false)));
+                            }
                         }
+                        Collections.sort(files, new DirectoryComparator());
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    Collections.sort(files, new DirectoryComparator());
                     listener.onCreated(files);
                 } else {
                     List<Directory> files = new ArrayList<>();
@@ -68,12 +72,16 @@ public class ModelFactory {
             protected String doInBackground(String... strings) {
                 String type = Parser.getTypeCached(file.getName());
                 List<VideoFile> files = new ArrayList<>();
-                for (File video : file.listFiles()) {
-                    if (!video.isDirectory()) {
-                        files.add(new VideoFile(video, type));
+                try {
+                    for (File video : file.listFiles()) {
+                        if (!video.isDirectory()) {
+                            files.add(new VideoFile(video, type));
+                        }
                     }
+                    Collections.sort(files, new VideoComparator());
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                Collections.sort(files, new VideoComparator());
                 listener.onCreated(files);
                 return null;
             }

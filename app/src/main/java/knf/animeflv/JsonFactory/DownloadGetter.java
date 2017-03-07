@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import knf.animeflv.Cloudflare.Bypass;
+import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
@@ -39,6 +40,7 @@ public class DownloadGetter {
 
     public static void search(final Activity context, final String eid, final ActionsInterface actionsInterface) {
         if (eid.contains("_") && eid.endsWith("E")) {
+            BypassHolder.savedToLocal(context);
             BaseGetter.getJson(context, new DOWNLOAD(eid), new BaseGetter.AsyncInterface() {
                 @Override
                 public void onFinish(String json) {

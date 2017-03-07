@@ -113,6 +113,7 @@ import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.NoLogInterface;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.TrackingHelper;
+import knf.animeflv.Utils.UpdateUtil;
 import knf.animeflv.Utils.UtilDialogPref;
 import knf.animeflv.Utils.UtilNotBlocker;
 import knf.animeflv.Utils.UtilSound;
@@ -282,7 +283,7 @@ public class newMain extends AppCompatActivity implements
         });
         if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(this)) {
             builder.addProfiles(
-                    new ProfileDrawerItem().withName("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withEmail(headerTit).withIcon(ic_main).withIdentifier(9),
+                    new ProfileDrawerItem().withName("Versión " + versionName + " (" + Integer.toString(versionCode) + ")" + (UpdateUtil.isBeta ? " - BETA" : "")).withEmail(headerTit).withIcon(ic_main).withIdentifier(9),
                     new ProfileSettingDrawerItem().withName("Cambiar colores").withIcon(CommunityMaterial.Icon.cmd_palette).withIdentifier(22),
                     new ProfileSettingDrawerItem().withName("Actualizar vistos").withIcon(MaterialDesignIconic.Icon.gmi_cloud_upload).withIdentifier(87),
                     new ProfileSettingDrawerItem().withName("Sincronizar vistos").withIcon(CommunityMaterial.Icon.cmd_cloud_sync).withIdentifier(88),
@@ -354,7 +355,7 @@ public class newMain extends AppCompatActivity implements
             });
         } else {
             builder.addProfiles(
-                    new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withIcon(ic_main).withIdentifier(9),
+                    new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")" + (UpdateUtil.isBeta ? " - BETA" : "")).withIcon(ic_main).withIdentifier(9),
                     new ProfileSettingDrawerItem().withName("Cambiar colores").withIcon(CommunityMaterial.Icon.cmd_palette).withIdentifier(22),
                     new ProfileSettingDrawerItem().withName("Actualizar vistos").withIcon(MaterialDesignIconic.Icon.gmi_cloud_upload).withIdentifier(87),
                     new ProfileSettingDrawerItem().withName("Sincronizar vistos").withIcon(CommunityMaterial.Icon.cmd_cloud_sync).withIdentifier(88),
@@ -1311,7 +1312,7 @@ public class newMain extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        PlayBackManager.get(this).addCallbacks();
+        //PlayBackManager.get(this).addCallbacks();
     }
 
     @Override

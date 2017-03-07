@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
+import android.webkit.URLUtil;
 import android.widget.Toast;
 
 import com.thin.downloadmanager.ThinDownloadManager;
@@ -15,6 +16,7 @@ import java.io.File;
 
 import knf.animeflv.DManager;
 import knf.animeflv.Parser;
+import xdroid.toaster.Toaster;
 
 /**
  * Created by Jordy on 04/03/2016.
@@ -59,81 +61,89 @@ public class InternalManager {
     }
 
     public void startDownload(String eid, String downUrl) {
-        String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
-        String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
-        String titulo = parser.getTitCached(aid);
-        File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid);
-        if (Environment.getExternalStorageState().equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-            if (!Dstorage.exists()) {
-                if (!Dstorage.mkdirs())
-                    Toast.makeText(context, "Error al crear carpeta", Toast.LENGTH_SHORT).show();
+        if (URLUtil.isValidUrl(downUrl)) {
+            String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
+            String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
+            String titulo = parser.getTitCached(aid);
+            File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid);
+            if (Environment.getExternalStorageState().equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                if (!Dstorage.exists()) {
+                    if (!Dstorage.mkdirs())
+                        Toast.makeText(context, "Error al crear carpeta", Toast.LENGTH_SHORT).show();
+                }
             }
+            sharedPreferences.edit().putString(eid + "dtype", INTERNA).apply();
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downUrl));
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setTitle(titulo);
+            request.setDescription("Capítulo " + numero);
+            request.setMimeType("video/mp4");
+            request.setDestinationInExternalPublicDir("Animeflv/download/" + aid, aid + "_" + numero + ".mp4");
+            DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+            long l = manager.enqueue(request);
+            sharedPreferences.edit().putString(eid, Long.toString(l)).apply();
+            String descargados = sharedPreferences.getString("eids_descarga", "");
+            String epID = sharedPreferences.getString("epIDS_descarga", "");
+            if (descargados.contains(eid)) {
+                sharedPreferences.edit().putString("eids_descarga", descargados.replace(eid + ":::", "")).apply();
+                sharedPreferences.edit().putString("epIDS_descarga", epID.replace(aid + "_" + numero + ":::", "")).apply();
+            }
+            descargados = sharedPreferences.getString("eids_descarga", "");
+            sharedPreferences.edit().putString("eids_descarga", descargados + eid + ":::").apply();
+            String tits = sharedPreferences.getString("titulos_descarga", "");
+            epID = sharedPreferences.getString("epIDS_descarga", "");
+            sharedPreferences.edit().putString("titulos_descarga", tits + aid + ":::").apply();
+            sharedPreferences.edit().putString("epIDS_descarga", epID + aid + "_" + numero + ":::").apply();
+        } else {
+            Toaster.toast("Url no valida, Eid: " + eid);
         }
-        sharedPreferences.edit().putString(eid + "dtype", INTERNA).apply();
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downUrl));
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setTitle(titulo);
-        request.setDescription("Capítulo " + numero);
-        request.setMimeType("video/mp4");
-        request.setDestinationInExternalPublicDir("Animeflv/download/" + aid, aid + "_" + numero + ".mp4");
-        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        long l = manager.enqueue(request);
-        sharedPreferences.edit().putString(eid, Long.toString(l)).apply();
-        String descargados = sharedPreferences.getString("eids_descarga", "");
-        String epID = sharedPreferences.getString("epIDS_descarga", "");
-        if (descargados.contains(eid)) {
-            sharedPreferences.edit().putString("eids_descarga", descargados.replace(eid + ":::", "")).apply();
-            sharedPreferences.edit().putString("epIDS_descarga", epID.replace(aid + "_" + numero + ":::", "")).apply();
-        }
-        descargados = sharedPreferences.getString("eids_descarga", "");
-        sharedPreferences.edit().putString("eids_descarga", descargados + eid + ":::").apply();
-        String tits = sharedPreferences.getString("titulos_descarga", "");
-        epID = sharedPreferences.getString("epIDS_descarga", "");
-        sharedPreferences.edit().putString("titulos_descarga", tits + aid + ":::").apply();
-        sharedPreferences.edit().putString("epIDS_descarga", epID + aid + "_" + numero + ":::").apply();
     }
 
     public void startDownload(String eid, String downUrl, CookieConstructor constructor) {
-        String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
-        String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
-        String titulo = parser.getTitCached(aid);
-        File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid);
-        if (Environment.getExternalStorageState().equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-            if (!Dstorage.exists()) {
-                if (!Dstorage.mkdirs())
-                    Toast.makeText(context, "Error al crear carpeta", Toast.LENGTH_SHORT).show();
+        if (URLUtil.isValidUrl(downUrl)) {
+            String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
+            String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
+            String titulo = parser.getTitCached(aid);
+            File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid);
+            if (Environment.getExternalStorageState().equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                if (!Dstorage.exists()) {
+                    if (!Dstorage.mkdirs())
+                        Toast.makeText(context, "Error al crear carpeta", Toast.LENGTH_SHORT).show();
+                }
             }
+            sharedPreferences.edit().putString(eid + "dtype", INTERNA).apply();
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downUrl));
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setTitle(titulo);
+            request.setDescription("Capítulo " + numero);
+            request.setMimeType("video/mp4");
+            request.addRequestHeader("cookie", constructor.getCookie());
+            Log.e("Cookie", constructor.getCookie());
+            if (constructor.getReferer() != null)
+                request.addRequestHeader("Referer", constructor.getReferer());
+            if (constructor.getReferer() != null)
+                request.addRequestHeader("User-Agent", constructor.getUseAgent());
+            request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
+            request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
+            request.setDestinationInExternalPublicDir("Animeflv/download/" + aid, aid + "_" + numero + ".mp4");
+            DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+            long l = manager.enqueue(request);
+            sharedPreferences.edit().putString(eid, Long.toString(l)).apply();
+            String descargados = sharedPreferences.getString("eids_descarga", "");
+            String epID = sharedPreferences.getString("epIDS_descarga", "");
+            if (descargados.contains(eid)) {
+                sharedPreferences.edit().putString("eids_descarga", descargados.replace(eid + ":::", "")).apply();
+                sharedPreferences.edit().putString("epIDS_descarga", epID.replace(aid + "_" + numero + ":::", "")).apply();
+            }
+            descargados = sharedPreferences.getString("eids_descarga", "");
+            sharedPreferences.edit().putString("eids_descarga", descargados + eid + ":::").apply();
+            String tits = sharedPreferences.getString("titulos_descarga", "");
+            epID = sharedPreferences.getString("epIDS_descarga", "");
+            sharedPreferences.edit().putString("titulos_descarga", tits + aid + ":::").apply();
+            sharedPreferences.edit().putString("epIDS_descarga", epID + aid + "_" + numero + ":::").apply();
+        } else {
+            Toaster.toast("Url no valida, Eid: " + eid);
         }
-        sharedPreferences.edit().putString(eid + "dtype", INTERNA).apply();
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(downUrl));
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setTitle(titulo);
-        request.setDescription("Capítulo " + numero);
-        request.setMimeType("video/mp4");
-        request.addRequestHeader("cookie", constructor.getCookie());
-        Log.e("Cookie", constructor.getCookie());
-        if (constructor.getReferer() != null)
-            request.addRequestHeader("Referer", constructor.getReferer());
-        if (constructor.getReferer() != null)
-            request.addRequestHeader("User-Agent", constructor.getUseAgent());
-        request.addRequestHeader("Accept", "text/html, application/xhtml+xml, *" + "/" + "*");
-        request.addRequestHeader("Accept-Language", "en-US,en;q=0.7,he;q=0.3");
-        request.setDestinationInExternalPublicDir("Animeflv/download/" + aid, aid + "_" + numero + ".mp4");
-        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        long l = manager.enqueue(request);
-        sharedPreferences.edit().putString(eid, Long.toString(l)).apply();
-        String descargados = sharedPreferences.getString("eids_descarga", "");
-        String epID = sharedPreferences.getString("epIDS_descarga", "");
-        if (descargados.contains(eid)) {
-            sharedPreferences.edit().putString("eids_descarga", descargados.replace(eid + ":::", "")).apply();
-            sharedPreferences.edit().putString("epIDS_descarga", epID.replace(aid + "_" + numero + ":::", "")).apply();
-        }
-        descargados = sharedPreferences.getString("eids_descarga", "");
-        sharedPreferences.edit().putString("eids_descarga", descargados + eid + ":::").apply();
-        String tits = sharedPreferences.getString("titulos_descarga", "");
-        epID = sharedPreferences.getString("epIDS_descarga", "");
-        sharedPreferences.edit().putString("titulos_descarga", tits + aid + ":::").apply();
-        sharedPreferences.edit().putString("epIDS_descarga", epID + aid + "_" + numero + ":::").apply();
     }
 
     public void cancelDownload(String eid) {

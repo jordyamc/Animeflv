@@ -46,13 +46,17 @@ public class SDSearcher extends Fragment implements SDAdapter.OnOptionsClicklist
     }
 
     public void resetResponse() {
-        response = FileUtil.init(getActivity()).searchforSD();
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                recyclerView.setAdapter(new SDAdapter(getActivity(), response, SDSearcher.this));
-            }
-        });
+        try {
+            response = FileUtil.init(getActivity()).searchforSD();
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    recyclerView.setAdapter(new SDAdapter(getActivity(), response, SDSearcher.this));
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

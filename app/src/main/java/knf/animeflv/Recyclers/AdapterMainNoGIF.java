@@ -284,22 +284,27 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        if (FileUtil.init(context).DeleteAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
-                                            ManageDownload.cancel(context, Animes.get(holder.getAdapterPosition()).getEid());
-                                            showDownload(holder.ib_des, holder.getAdapterPosition());
-                                            showCloudPlay(holder.ib_ver);
-                                            Toaster.toast("Archivo Eliminado");
-                                        } else {
-                                            if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
-                                                if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
-                                                    ManageDownload.cancel(context, Animes.get(holder.getAdapterPosition()).getEid());
-                                                }
+                                        try {
+                                            if (FileUtil.init(context).DeleteAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+                                                ManageDownload.cancel(context, Animes.get(holder.getAdapterPosition()).getEid());
                                                 showDownload(holder.ib_des, holder.getAdapterPosition());
                                                 showCloudPlay(holder.ib_ver);
                                                 Toaster.toast("Archivo Eliminado");
                                             } else {
-                                                Toaster.toast("Error al Eliminar");
+                                                if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+                                                    if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+                                                        ManageDownload.cancel(context, Animes.get(holder.getAdapterPosition()).getEid());
+                                                    }
+                                                    showDownload(holder.ib_des, holder.getAdapterPosition());
+                                                    showCloudPlay(holder.ib_ver);
+                                                    Toaster.toast("Archivo Eliminado");
+                                                } else {
+                                                    Toaster.toast("Error al Eliminar");
+                                                }
                                             }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                            Toaster.toast("Error al Eliminar");
                                         }
                                     }
                                 })

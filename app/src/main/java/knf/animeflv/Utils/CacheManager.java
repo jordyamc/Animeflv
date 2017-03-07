@@ -25,6 +25,7 @@ import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
+import xdroid.toaster.Toaster;
 
 public class CacheManager {
     public static final File miniCache = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/mini");
@@ -36,16 +37,21 @@ public class CacheManager {
     private Parser parser = new Parser();
 
     public static void invalidateCache(final File file, final boolean withDirectory, final boolean exclude, final OnInvalidateCache inter) {
-        new AsyncTask<String, String, String>() {
-            @Override
-            protected String doInBackground(String... strings) {
-                for (File f : file.listFiles()) {
-                    delete(f, withDirectory, exclude);
+        try {
+            new AsyncTask<String, String, String>() {
+                @Override
+                protected String doInBackground(String... strings) {
+                    for (File f : file.listFiles()) {
+                        delete(f, withDirectory, exclude);
+                    }
+                    inter.onFinish();
+                    return null;
                 }
-                inter.onFinish();
-                return null;
-            }
-        }.executeOnExecutor(ExecutorManager.getExecutor());
+            }.executeOnExecutor(ExecutorManager.getExecutor());
+        } catch (Exception e) {
+            Toaster.toast("Error al vaciar cache");
+            inter.onFinish();
+        }
     }
 
     public static void invalidateCacheSync(final File file, final boolean withDirectory, final boolean exclude) {
@@ -346,28 +352,32 @@ public class CacheManager {
     }
 
     private void saveBitmap(final Bitmap bitmap, final File file) {
-        new AsyncTask<String, String, String>() {
-            @Override
-            protected String doInBackground(String... strings) {
-                if (file.exists()) file.delete();
-                FileOutputStream out = null;
-                try {
-                    out = new FileOutputStream(file);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
+        try {
+            new AsyncTask<String, String, String>() {
+                @Override
+                protected String doInBackground(String... strings) {
+                    if (file.exists()) file.delete();
+                    FileOutputStream out = null;
                     try {
-                        if (out != null) {
-                            out.close();
-                        }
-                    } catch (IOException e) {
+                        out = new FileOutputStream(file);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                    } catch (Exception e) {
                         e.printStackTrace();
+                    } finally {
+                        try {
+                            if (out != null) {
+                                out.close();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
+                    return null;
                 }
-                return null;
-            }
-        }.executeOnExecutor(ExecutorManager.getExecutor());
+            }.executeOnExecutor(ExecutorManager.getExecutor());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public interface OnInvalidateCache {

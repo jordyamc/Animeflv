@@ -92,17 +92,23 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                for (String file : list.get(holder.getAdapterPosition()).getFile(context).list()) {
-                                    ManageDownload.cancel(context, file.replace(".mp4", "E"));
-                                    FileUtil.init(context).DeleteAnime(file.replace(".mp4", "E"));
-                                }
-                                if (list.get(holder.getAdapterPosition()).getFile(context).list().length == 0) {
-                                    FileUtil.init(context).DeleteAnimeDir(list.get(holder.getAdapterPosition()).getID());
-                                    list.remove(holder.getAdapterPosition());
-                                    notifyItemRemoved(holder.getAdapterPosition());
-                                    Toaster.toast("Archivos eliminados");
-                                    recreateList();
-                                } else {
+                                try {
+                                    for (String file : list.get(holder.getAdapterPosition()).getFile(context).list()) {
+                                        ManageDownload.cancel(context, file.replace(".mp4", "E"));
+                                        FileUtil.init(context).DeleteAnime(file.replace(".mp4", "E"));
+                                    }
+                                    if (list.get(holder.getAdapterPosition()).getFile(context).list().length == 0) {
+                                        FileUtil.init(context).DeleteAnimeDir(list.get(holder.getAdapterPosition()).getID());
+                                        list.remove(holder.getAdapterPosition());
+                                        notifyItemRemoved(holder.getAdapterPosition());
+                                        Toaster.toast("Archivos eliminados");
+                                        recreateList();
+                                    } else {
+                                        Toaster.toast("Error al eliminar");
+                                        recreateList();
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                     Toaster.toast("Error al eliminar");
                                     recreateList();
                                 }

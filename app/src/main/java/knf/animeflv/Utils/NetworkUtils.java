@@ -122,6 +122,7 @@ public class NetworkUtils {
                     }
                     Log.d("Version", Integer.toString(versionCode) + " >> " + vers.trim());
                     if (versionCode >= Integer.parseInt(vers.trim())) {
+                        UpdateUtil.isBeta = versionCode > Integer.parseInt(vers.trim());
                         if (Integer.parseInt(vers.trim()) == 0) {
                             if (!disM) {
                                 /** Formato: dividido por ":::"

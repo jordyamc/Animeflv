@@ -74,6 +74,7 @@ public class AboutActivity extends MaterialAboutActivity {
                 .addCard(getInfoBuilder(context).build())
                 .addCard(getAuthorBuilder(context).build())
                 .addCard(getContributorsBuilder(context).build())
+                .addCard(getAlphaBuilder(context).build())
                 .addCard(getBetaBuilder(context).build())
                 .addCard(getAppBuilder(context).build())
                 .addCard(getContactBuilder(context).build())
@@ -178,6 +179,15 @@ public class AboutActivity extends MaterialAboutActivity {
         return builder;
     }
 
+    private MaterialAboutCard.Builder getAlphaBuilder(final Context context) {
+        MaterialAboutCard.Builder builder = new MaterialAboutCard.Builder();
+        builder.title("Alpha Testers");
+
+        addAlphas(builder);
+
+        return builder;
+    }
+
     private MaterialAboutCard.Builder getBetaBuilder(final Context context) {
         MaterialAboutCard.Builder builder = new MaterialAboutCard.Builder();
         builder.title("Beta Testers");
@@ -261,9 +271,20 @@ public class AboutActivity extends MaterialAboutActivity {
         List<OnlineDataHelper.PersonItem> items = OnlineDataHelper.get(this).getPersons(OnlineDataHelper.TYPE_CONTRIBUTOR);
         for (OnlineDataHelper.PersonItem item : items) {
             if (item.haveMessage > 0) {
-                addMessage(item, builder);
+                addMessage(item, builder, OnlineDataHelper.TYPE_CONTRIBUTOR);
             } else {
-                addNoMessage(item, builder);
+                addNoMessage(item, builder, OnlineDataHelper.TYPE_CONTRIBUTOR);
+            }
+        }
+    }
+
+    private void addAlphas(MaterialAboutCard.Builder builder) {
+        List<OnlineDataHelper.PersonItem> items = OnlineDataHelper.get(this).getPersons(OnlineDataHelper.TYPE_ALPHA);
+        for (OnlineDataHelper.PersonItem item : items) {
+            if (item.haveMessage > 0) {
+                addMessage(item, builder, OnlineDataHelper.TYPE_ALPHA);
+            } else {
+                addNoMessage(item, builder, OnlineDataHelper.TYPE_ALPHA);
             }
         }
     }
@@ -272,20 +293,20 @@ public class AboutActivity extends MaterialAboutActivity {
         List<OnlineDataHelper.PersonItem> items = OnlineDataHelper.get(this).getPersons(OnlineDataHelper.TYPE_BETA);
         for (OnlineDataHelper.PersonItem item : items) {
             if (item.haveMessage > 0) {
-                addMessage(item, builder);
+                addMessage(item, builder, OnlineDataHelper.TYPE_BETA);
             } else {
-                addNoMessage(item, builder);
+                addNoMessage(item, builder, OnlineDataHelper.TYPE_BETA);
             }
         }
     }
 
-    private void addMessage(final OnlineDataHelper.PersonItem item, MaterialAboutCard.Builder builder) {
+    private void addMessage(final OnlineDataHelper.PersonItem item, MaterialAboutCard.Builder builder, int type) {
         MaterialAboutActionItem.Builder action =
                 new MaterialAboutActionItem.Builder()
                         .text(item.name)
                         .subText(item.description)
                         .icon(new IconicsDrawable(this)
-                                .icon(GoogleMaterial.Icon.gmd_person)
+                                .icon(type == 1 ? CommunityMaterial.Icon.cmd_account_star : GoogleMaterial.Icon.gmd_person)
                                 .color(iconColor(this))
                                 .sizeDp(18)
                         );
@@ -300,13 +321,13 @@ public class AboutActivity extends MaterialAboutActivity {
         builder.addItem(action.build());
     }
 
-    private void addNoMessage(final OnlineDataHelper.PersonItem item, MaterialAboutCard.Builder builder) {
+    private void addNoMessage(final OnlineDataHelper.PersonItem item, MaterialAboutCard.Builder builder, int type) {
         MaterialAboutActionItem.Builder action =
                 new MaterialAboutActionItem.Builder()
                         .text(item.name)
                         .subText(item.description)
                         .icon(new IconicsDrawable(this)
-                                .icon(GoogleMaterial.Icon.gmd_person)
+                                .icon(type == 1 ? CommunityMaterial.Icon.cmd_account_star : GoogleMaterial.Icon.gmd_person)
                                 .color(iconColor(this))
                                 .sizeDp(18)
                         );

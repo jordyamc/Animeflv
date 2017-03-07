@@ -82,7 +82,7 @@ public class VideoFilesFragment extends Fragment {
                             }
                         }
                     });
-                } catch (NullPointerException e) {
+                } catch (Exception e) {
                     Log.e("VideoFragment", "Context is already NULL!!!!");
                 }
             }
@@ -104,7 +104,11 @@ public class VideoFilesFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        ((VideoFileAdapter) recyclerView.getAdapter()).performDestroy();
+        try {
+            ((VideoFileAdapter) recyclerView.getAdapter()).performDestroy();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         super.onDestroy();
     }
 }

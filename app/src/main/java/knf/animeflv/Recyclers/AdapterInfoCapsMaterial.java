@@ -523,60 +523,72 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             public void onDownloadStart(String url, String userAgent,
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
-                String fileName = url.substring(url.lastIndexOf("/") + 1);
-                web.loadUrl("about:blank");
-                if (!streaming) {
-                    File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")));
-                    if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
-                        if (!Dstorage.exists()) {
-                            Dstorage.mkdirs();
+                try {
+                    String fileName = url.substring(url.lastIndexOf("/") + 1);
+                    web.loadUrl("about:blank");
+                    if (!streaming) {
+                        File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")));
+                        if (ext_storage_state.equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
+                            if (!Dstorage.exists()) {
+                                Dstorage.mkdirs();
+                            }
                         }
-                    }
-                    File archivo = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")) + "/" + fileName);
-                    if (!archivo.exists()) {
-                        String item = capitulo.get(holder.getAdapterPosition()).replace("Capítulo ", "").trim();
+                        File archivo = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("_")) + "/" + fileName);
+                        if (!archivo.exists()) {
+                            try {
+                                String item = capitulo.get(holder.getAdapterPosition()).replace("Capítulo ", "").trim();
+                                String urlD = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("urlD", null);
+                                CookieManager cookieManager = CookieManager.getInstance();
+                                String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
+                                CookieConstructor constructor = new CookieConstructor(cookie, web.getSettings().getUserAgentString(), urlD);
+                                ManageDownload.chooseDownDir(context, eids.get(holder.getAdapterPosition()), url, constructor);
+                                showPlay(holder.ib_ver);
+                                showDelete(holder.ib_des);
+                                Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
+                                if (!vistos) {
+                                    holder.tv_capitulo.setTextColor(getColor());
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                Toaster.toast("Error al comenzar descarga");
+                            }
+                        } else {
+                            Toast.makeText(context, "El archivo ya existe", Toast.LENGTH_SHORT).show();
+                        }
+
+                    } else {
+                        int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
                         String urlD = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("urlD", null);
                         CookieManager cookieManager = CookieManager.getInstance();
                         String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
+                        streaming = false;
+                        web.loadUrl("about:blank");
+                        showCloudPlay(holder.ib_ver);
+                        showDownload(holder.ib_des);
                         CookieConstructor constructor = new CookieConstructor(cookie, web.getSettings().getUserAgentString(), urlD);
-                        ManageDownload.chooseDownDir(context, eids.get(holder.getAdapterPosition()), url, constructor);
-                        showPlay(holder.ib_ver);
-                        showDelete(holder.ib_des);
-                        Boolean vistos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("visto" + id + "_" + item, false);
-                        if (!vistos) {
-                            holder.tv_capitulo.setTextColor(getColor());
-                        }
-                    } else {
-                        Toast.makeText(context, "El archivo ya existe", Toast.LENGTH_SHORT).show();
-                    }
-
-                } else {
-                    int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
-                    String urlD = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("urlD", null);
-                    CookieManager cookieManager = CookieManager.getInstance();
-                    String cookie = cookieManager.getCookie(url.substring(0, url.indexOf("/", 8)));
-                    streaming = false;
-                    web.loadUrl("about:blank");
-                    showCloudPlay(holder.ib_ver);
-                    showDownload(holder.ib_des);
-                    CookieConstructor constructor = new CookieConstructor(cookie, web.getSettings().getUserAgentString(), urlD);
-                    if (type == 1) {
-                        StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
-                        holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
-                    } else {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            StreamManager.internal(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
+                        if (type == 1) {
+                            StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
                             holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
                         } else {
-                            if (FileUtil.init(context).isMXinstalled()) {
-                                toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
-                                StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                StreamManager.internal(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
                                 holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
                             } else {
-                                toast("No hay reproductor adecuado disponible");
+                                if (FileUtil.init(context).isMXinstalled()) {
+                                    toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
+                                    StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), url, constructor);
+                                    holder.tv_capitulo.setTextColor(ThemeUtils.getAcentColor(context));
+                                } else {
+                                    toast("No hay reproductor adecuado disponible");
+                                }
                             }
                         }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toaster.toast("Error al reproducir link");
+                    showCloudPlay(holder.ib_ver);
+                    showDownload(holder.ib_des);
                 }
             }
         });

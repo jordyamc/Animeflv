@@ -78,8 +78,12 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
                                 PicassoCache.getPicassoInstance(context).load(list.get(holder.getAdapterPosition()).getThumbImage()).error(R.drawable.ic_block_r).resize(90, 100).centerInside().into(holder.img, new Callback() {
                                     @Override
                                     public void onSuccess() {
-                                        if (FileUtil.init(context).isInSeen(list.get(holder.getAdapterPosition()).getEID())) {
-                                            showAsSeen(holder);
+                                        try {
+                                            if (FileUtil.init(context).isInSeen(list.get(holder.getAdapterPosition()).getEID())) {
+                                                showAsSeen(holder);
+                                            }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
                                         }
                                     }
 
