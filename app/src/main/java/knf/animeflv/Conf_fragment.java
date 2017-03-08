@@ -722,10 +722,12 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
 
     private void cleanSounds() {
         File dir = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/.sounds");
-        for (File file : dir.listFiles()) {
-            file.delete();
+        if (dir.exists()) {
+            for (File file : dir.listFiles()) {
+                file.delete();
+            }
+            SoundsLoader.start(context);
         }
-        SoundsLoader.start(context);
     }
 
     @Override

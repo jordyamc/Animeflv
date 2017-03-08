@@ -22,8 +22,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 181
-        versionName "4.6.9.2"
+        versionCode 182
+        versionName "4.7"
         multiDexEnabled = true
     }
     buildTypes {
@@ -136,7 +136,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:10.2.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.6@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.7@aar') {
         transitive = true;
     }
 }

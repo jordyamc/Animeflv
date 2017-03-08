@@ -37,21 +37,21 @@ public class CacheManager {
     private Parser parser = new Parser();
 
     public static void invalidateCache(final File file, final boolean withDirectory, final boolean exclude, final OnInvalidateCache inter) {
-        try {
-            new AsyncTask<String, String, String>() {
-                @Override
-                protected String doInBackground(String... strings) {
+        new AsyncTask<String, String, String>() {
+            @Override
+            protected String doInBackground(String... strings) {
+                try {
                     for (File f : file.listFiles()) {
                         delete(f, withDirectory, exclude);
                     }
                     inter.onFinish();
-                    return null;
+                } catch (Exception e) {
+                    Toaster.toast("Error al vaciar cache");
+                    inter.onFinish();
                 }
-            }.executeOnExecutor(ExecutorManager.getExecutor());
-        } catch (Exception e) {
-            Toaster.toast("Error al vaciar cache");
-            inter.onFinish();
-        }
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
     public static void invalidateCacheSync(final File file, final boolean withDirectory, final boolean exclude) {

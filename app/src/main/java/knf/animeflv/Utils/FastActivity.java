@@ -14,22 +14,26 @@ public class FastActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            switch (bundle.getInt("key")) {
-                case STOP_SOUND:
-                    UtilSound.getCurrentMediaPlayer().stop();
-                    if (UtilSound.isNotSoundShow) {
-                        UtilSound.toogleNotSound(-1);
-                    }
-                    break;
-                case OPEN_CONF_SOUNDS:
-                    FragmentExtras.KEY = Configuracion.OPEN_SOUNDS;
-                    startActivity(new Intent(this, Configuracion.class));
-                    break;
+        try {
+            Bundle bundle = getIntent().getExtras();
+            if (bundle != null) {
+                switch (bundle.getInt("key")) {
+                    case STOP_SOUND:
+                        UtilSound.getCurrentMediaPlayer().stop();
+                        if (UtilSound.isNotSoundShow) {
+                            UtilSound.toogleNotSound(-1);
+                        }
+                        break;
+                    case OPEN_CONF_SOUNDS:
+                        FragmentExtras.KEY = Configuracion.OPEN_SOUNDS;
+                        startActivity(new Intent(this, Configuracion.class));
+                        break;
+                }
+                finish();
+            } else {
+                finish();
             }
-            finish();
-        } else {
+        } catch (Exception e) {
             finish();
         }
     }

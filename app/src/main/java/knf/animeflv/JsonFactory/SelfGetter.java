@@ -171,6 +171,8 @@ public class SelfGetter {
         String eid = "null";
         String izanagi = "null";
         String mina = "null";
+        String mp4upload = "null";
+        String yourupload = "null";
         String zippy = "null";
         String sync = "null";
         String mega = "null";
@@ -179,7 +181,7 @@ public class SelfGetter {
         String Yotta = "null";
         String Yotta480 = "null";
         String Yotta360 = "null";
-        String[] names = new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 480p", "Yotta 360p", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
+        String[] names = new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 480p", "Yotta 360p", "Mp4Upload", "YourUpload", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
         try {
             Log.e("Url", url);
             Document main = Jsoup.connect(url).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(TIMEOUT).get();
@@ -253,12 +255,28 @@ public class SelfGetter {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else if (el.contains("server=mp4upload")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
+                        mp4upload = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (el.contains("server=yourupload")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
+                        yourupload = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String[] links = new String[]{izanagi, mina, Yotta, Yotta480, Yotta360, zippy, sync, mega, aflv, maru};
+        String[] links = new String[]{izanagi, mina, Yotta, Yotta480, Yotta360, mp4upload, yourupload, zippy, sync, mega, aflv, maru};
         try {
             JSONObject object = new JSONObject();
             object.put("version", context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName + "-Internal_Api");

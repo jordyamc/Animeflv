@@ -134,13 +134,17 @@ public class FragmentCaps extends Fragment {
     }
 
     public void resetList() {
-        activity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (recyclerView != null && adapter_caps != null)
-                    adapter_caps.notifyDataSetChanged();
-            }
-        });
+        try {
+            activity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (recyclerView != null && adapter_caps != null)
+                        adapter_caps.notifyDataSetChanged();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void setallAsSeen() {

@@ -14,6 +14,7 @@ import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.history.adapter.HistoryHelper;
 import xdroid.toaster.Toaster;
 
 public class CastPlayBackManager implements CastListener, PlayStatusListener {
@@ -71,6 +72,7 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
             String[] semi = eid.replace("E", "").split("_");
             String aid = semi[0];
             String num = semi[1];
+            HistoryHelper.addToList(activity, aid, new Parser().getTitCached(aid), num);
             CastManager.getInstance().playMedia(url, "video/mp4", new Parser().getTitCached(aid), "Capítulo " + num, getPreviewUrl());
         } else {
             isConnected = false;

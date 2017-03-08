@@ -2,7 +2,9 @@ package knf.animeflv;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.multidex.MultiDexApplication;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
@@ -39,8 +41,13 @@ public class Application extends MultiDexApplication {
             @Override
             public void uncaughtException(Thread thread, Throwable e) {
                 if (!(e instanceof InternalError)) {
-                    Logger.UncaughtError(e);
-                    System.exit(0);
+                    if (!(e instanceof OutOfMemoryError)) {
+                        Logger.UncaughtError(e);
+                        System.exit(0);
+                    } else {
+                        Toast.makeText(context, "Error en memoria!!!", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(context, Splash.class));
+                    }
                 }
             }
         });

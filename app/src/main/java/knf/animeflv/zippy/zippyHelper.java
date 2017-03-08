@@ -9,16 +9,18 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.net.URLDecoder;
+
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.JsonFactory.ServerGetter;
 import knf.animeflv.Utils.NoLogInterface;
 
 public class zippyHelper {
-    public static void calculate(final String url, final OnZippyResult callback) {
+    public static void calculate(final String u, final OnZippyResult callback) {
         AsyncHttpClient client = ServerGetter.getClient();
         client.setLogInterface(new NoLogInterface());
-        client.get(url, null, new TextHttpResponseHandler() {
+        client.get(u, null, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Log.e("Zippy Calculate", "Error - Status: " + statusCode + " Response: " + responseString);
@@ -35,6 +37,7 @@ public class zippyHelper {
                 }
                 if (cookies != null) {
                     try {
+                        String url = URLDecoder.decode(u, "utf-8");
                         Document document = Jsoup.parse(responseString);
                         Element center = document.select("div.center").first();
                         Element script = center.select("script").get(1);

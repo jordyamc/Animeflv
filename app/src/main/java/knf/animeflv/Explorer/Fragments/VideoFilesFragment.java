@@ -63,16 +63,20 @@ public class VideoFilesFragment extends Fragment {
                             recyclerView.setAdapter(new VideoFileAdapter(getActivity(), file, list, new DirectoryAdapter.OnFinishListListener() {
                                 @Override
                                 public void onFinish(final int count) {
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (count == 0) {
-                                                noAnime.setVisibility(View.VISIBLE);
-                                            } else {
-                                                noAnime.setVisibility(View.GONE);
+                                    try {
+                                        getActivity().runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (count == 0) {
+                                                    noAnime.setVisibility(View.VISIBLE);
+                                                } else {
+                                                    noAnime.setVisibility(View.GONE);
+                                                }
                                             }
-                                        }
-                                    });
+                                        });
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             }));
                             if (list.size() == 0) {

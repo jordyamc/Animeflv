@@ -141,13 +141,11 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
                 @Override
                 public void onClick(View v) {
                     showAsSeen(holder);
-                    /*if (CastPlayBackManager.get(context).isDeviceConnected()){
-                        String e=list.get(holder.getAdapterPosition()).getEID();
-                        CastPlayBackManager.get(context).play(ServerManager.get().startStream(context,FileUtil.init(context).getFile(e)),e);
-                    }else {
+                    try {
                         StreamManager.Play(context, list.get(holder.getAdapterPosition()).getEID());
-                    }*/
-                    StreamManager.Play(context, list.get(holder.getAdapterPosition()).getEID());
+                    } catch (Exception e) {
+                        Toaster.toast("Error al reproducir");
+                    }
                 }
             });
             holder.del.setOnClickListener(new View.OnClickListener() {

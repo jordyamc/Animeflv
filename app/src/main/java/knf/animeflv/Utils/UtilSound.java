@@ -180,9 +180,13 @@ public class UtilSound {
 
                 @Override
                 public boolean onPlayPauseClicked() {
-                    if (getCurrentMediaPlayer().isPlaying()) {
-                        getCurrentMediaPlayer().stop();
-                        getAudioWidget().hide();
+                    try {
+                        if (getCurrentMediaPlayer().isPlaying()) {
+                            getCurrentMediaPlayer().stop();
+                            getAudioWidget().hide();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                     return false;
                 }

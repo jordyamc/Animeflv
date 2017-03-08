@@ -45,10 +45,20 @@ public class DialogSounds extends DialogFragment {
         }
         context = getActivity();
         mp = UtilDialogPref.getPlayer();
-        if (!UtilDialogPref.getPlayer().isPlaying()) {
-            int selected = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(UtilDialogPref.getKey(), UtilDialogPref.getDef()));
-            setMediaPlayer(selected);
-            UtilSound.setCurrentMediaPlayerInt(selected);
+        try {
+            if (!UtilDialogPref.getPlayer().isPlaying()) {
+                try {
+                    int selected = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(UtilDialogPref.getKey(), UtilDialogPref.getDef()));
+                    setMediaPlayer(selected);
+                    UtilSound.setCurrentMediaPlayerInt(selected);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    setMediaPlayer(0);
+                    UtilSound.setCurrentMediaPlayerInt(0);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         UtilDialogPref.setSelected(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(UtilDialogPref.getKey(), UtilDialogPref.getDef())));
         String[] array = new String[]{};

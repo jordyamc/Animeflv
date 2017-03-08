@@ -321,12 +321,6 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                     Toaster.toast("Actualizacion descargada, instalar para continuar");
                 } else {
                     if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
-                        /*if (CastPlayBackManager.get(context).isDeviceConnected()){
-                            String e=Animes.get(holder.getAdapterPosition()).getEid();
-                            CastPlayBackManager.get(context).play(ServerManager.get().startStream(context,FileUtil.init(context).getFile(e)),e);
-                        }else {
-                            StreamManager.Play(context, Animes.get(holder.getAdapterPosition()).getEid());
-                        }*/
                         StreamManager.Play(context, Animes.get(holder.getAdapterPosition()).getEid());
                     } else {
                         if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
