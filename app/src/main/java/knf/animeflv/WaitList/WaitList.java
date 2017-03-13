@@ -153,7 +153,11 @@ public class WaitList extends AppCompatActivity implements
                         recyclerView.setLayoutManager(new LinearLayoutManager(WaitList.this));
                         recyclerView.setHasFixedSize(true);
                         recyclerView.setAdapter(mWrappedAdapter);
-                        processing.dismiss();
+                        try {
+                            processing.dismiss();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
                 return null;

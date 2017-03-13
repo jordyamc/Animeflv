@@ -61,32 +61,36 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                dragDropManager = new RecyclerViewDragDropManager();
-                dragDropManager.setInitiateOnLongPress(true);
-                dragDropManager.setInitiateOnMove(false);
-                dragDropManager.setDraggingItemShadowDrawable(
-                        (NinePatchDrawable) ContextCompat.getDrawable(getContext(), R.drawable.material_shadow_z3));
-                int day = getArguments().getInt("day");
-                List<EmObj> list = AutoEmisionHelper.getDayList(getArguments().getString("array"), day);
-                startVerification(list, day);
-                AutoEmisionListHolder.setList(day, list);
-                adapter = new AutoEmisionAdapter(getActivity(), list, day, AutoEmisionFragment.this);
-                wraped = dragDropManager.createWrappedAdapter(adapter);
-                final GeneralItemAnimator animator = new DraggableItemAnimator();
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressBar.setVisibility(View.GONE);
-                        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                        recyclerView.setAdapter(wraped);
-                        recyclerView.setItemAnimator(animator);
+                try {
+                    dragDropManager = new RecyclerViewDragDropManager();
+                    dragDropManager.setInitiateOnLongPress(true);
+                    dragDropManager.setInitiateOnMove(false);
+                    dragDropManager.setDraggingItemShadowDrawable(
+                            (NinePatchDrawable) ContextCompat.getDrawable(getContext(), R.drawable.material_shadow_z3));
+                    int day = getArguments().getInt("day");
+                    List<EmObj> list = AutoEmisionHelper.getDayList(getArguments().getString("array"), day);
+                    startVerification(list, day);
+                    AutoEmisionListHolder.setList(day, list);
+                    adapter = new AutoEmisionAdapter(getActivity(), list, day, AutoEmisionFragment.this);
+                    wraped = dragDropManager.createWrappedAdapter(adapter);
+                    final GeneralItemAnimator animator = new DraggableItemAnimator();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBar.setVisibility(View.GONE);
+                            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                            recyclerView.setAdapter(wraped);
+                            recyclerView.setItemAnimator(animator);
 
-                        if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
-                            recyclerView.addItemDecoration(new ItemShadowDecorator((NinePatchDrawable) ContextCompat.getDrawable(getContext(), R.drawable.material_shadow_z1)));
+                            if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
+                                recyclerView.addItemDecoration(new ItemShadowDecorator((NinePatchDrawable) ContextCompat.getDrawable(getContext(), R.drawable.material_shadow_z1)));
+                            }
+                            dragDropManager.attachRecyclerView(recyclerView);
                         }
-                        dragDropManager.attachRecyclerView(recyclerView);
-                    }
-                });
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());

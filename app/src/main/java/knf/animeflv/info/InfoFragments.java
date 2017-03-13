@@ -436,32 +436,38 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Amenu = menu;
-        if (isInInfo) {
-            SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-            String fav = sharedPreferences.getString("favoritos", "");
-            String[] favoritos = {};
-            favoritos = fav.split(":::");
-            Boolean isfav = false;
-            for (String favo : favoritos) {
-                if (!favo.equals("") && !favo.equals("null")) {
-                    if (favo.trim().equals(aid.trim())) {
-                        getMenuInflater().inflate(R.menu.menu_fav_si, menu);
-                        isfav = true;
-                        break;
+        try {
+            Amenu = menu;
+            if (isInInfo) {
+                SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+                String fav = sharedPreferences.getString("favoritos", "");
+                String[] favoritos = {};
+                favoritos = fav.split(":::");
+                Boolean isfav = false;
+                for (String favo : favoritos) {
+                    if (!favo.equals("") && !favo.equals("null")) {
+                        if (favo.trim().equals(aid.trim())) {
+                            getMenuInflater().inflate(R.menu.menu_fav_si, menu);
+                            isfav = true;
+                            break;
+                        }
                     }
                 }
-            }
-            if (isfav) {
-                Amenu.clear();
-                getMenuInflater().inflate(R.menu.menu_fav_si, menu);
+                if (isfav) {
+                    Amenu.clear();
+                    getMenuInflater().inflate(R.menu.menu_fav_si, menu);
+                } else {
+                    Amenu.clear();
+                    getMenuInflater().inflate(R.menu.menu_fav_no, menu);
+                }
             } else {
                 Amenu.clear();
-                getMenuInflater().inflate(R.menu.menu_fav_no, menu);
+                getMenuInflater().inflate(R.menu.menu_fast_seen, menu);
             }
-        } else {
-            Amenu.clear();
-            getMenuInflater().inflate(R.menu.menu_fast_seen, menu);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toaster.toast("Error al abrir informacion");
+            finish();
         }
         return true;
     }
@@ -473,114 +479,118 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.favorito_si:
-                SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-                String fav = sharedPreferences.getString("favoritos", "");
-                String[] favoritos = {};
-                favoritos = fav.split(":::");
-                List<String> list = new ArrayList<String>();
-                for (String i : favoritos) {
-                    if (!i.equals("")) {
-                        if (Integer.parseInt(i) != Integer.parseInt(aid)) {
-                            list.add(i);
-                        }
-                    }
-                }
-                favoritos = new String[list.size()];
-                list.toArray(favoritos);
-                StringBuilder builder = new StringBuilder();
-                for (String i : favoritos) {
-                    builder.append(":::" + i);
-                }
-                Toaster.toast("Favorito Eliminado");
-                getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builder.toString()).apply();
-                FavSyncro.updateFavs(InfoFragments.this);
-                Amenu.clear();
-                getMenuInflater().inflate(R.menu.menu_fav_no, Amenu);
-                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", true).apply();
-                break;
-            case R.id.favorito_no:
-                String[] favoritosNo = {getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "")};
-                List<String> Listno = new ArrayList<String>(Arrays.asList(favoritosNo));
-                Listno.add(aid);
-                favoritos = new String[Listno.size()];
-                Listno.toArray(favoritos);
-                StringBuilder builderNo = new StringBuilder();
-                for (String i : favoritos) {
-                    builderNo.append(":::" + i);
-                }
-                Toaster.toast("Favorito Agregado");
-                getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builderNo.toString()).apply();
-                FavSyncro.updateFavs(InfoFragments.this);
-                Amenu.clear();
-                getMenuInflater().inflate(R.menu.menu_fav_si, Amenu);
-                getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", true).apply();
-                break;
-            case R.id.comentarios:
-                if (eps != null && eps.length() > 0) {
-                    dialog = new MaterialDialog.Builder(this)
-                            .title("COMENTARIOS")
-                            .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                            .titleGravity(GravityEnum.CENTER)
-                            .customView(R.layout.comentarios, false)
-                            .positiveText("SALIR")
-                            .build();
-                    spinner = (Spinner) dialog.getCustomView().findViewById(R.id.comentarios_box_cap);
-                    final List<String> caps = parser.parseNumerobyEID(getJsonStringfromFile());
-                    String[] array = new String[caps.size()];
-                    caps.toArray(array);
-                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, array);
-                    spinner.setAdapter(arrayAdapter);
-                    webView = (WebView) dialog.getCustomView().findViewById(R.id.comentarios_box);
-                    webView.getSettings().setJavaScriptEnabled(true);
-                    String newUA = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
-                    webView.getSettings().setUserAgentString(newUA);
-                    webView.setWebViewClient(new WebViewClient() {
-                        @Override
-                        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                            view.loadUrl(url);
-                            return true;
-                        }
-                    });
-                    String url = "";
-                    try {
-                        String num = caps.get(0).substring(caps.get(0).lastIndexOf(" ") + 1);
-                        url = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, num, eps.getJSONObject(0).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    Log.d("Comentarios", url);
-                    webView.loadUrl(url);
-                    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                            String urlch = "";
-                            try {
-                                urlch = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1), eps.getJSONObject(position).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
-                            } catch (Exception e) {
-                                e.printStackTrace();
+        try {
+            switch (item.getItemId()) {
+                case R.id.favorito_si:
+                    SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+                    String fav = sharedPreferences.getString("favoritos", "");
+                    String[] favoritos = {};
+                    favoritos = fav.split(":::");
+                    List<String> list = new ArrayList<String>();
+                    for (String i : favoritos) {
+                        if (!i.equals("")) {
+                            if (Integer.parseInt(i) != Integer.parseInt(aid)) {
+                                list.add(i);
                             }
-                            Log.d("Comentarios", urlch);
-                            webView.loadUrl(urlch);
                         }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> parent) {
-
+                    }
+                    favoritos = new String[list.size()];
+                    list.toArray(favoritos);
+                    StringBuilder builder = new StringBuilder();
+                    for (String i : favoritos) {
+                        builder.append(":::" + i);
+                    }
+                    Toaster.toast("Favorito Eliminado");
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builder.toString()).apply();
+                    FavSyncro.updateFavs(InfoFragments.this);
+                    Amenu.clear();
+                    getMenuInflater().inflate(R.menu.menu_fav_no, Amenu);
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", true).apply();
+                    break;
+                case R.id.favorito_no:
+                    String[] favoritosNo = {getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "")};
+                    List<String> Listno = new ArrayList<String>(Arrays.asList(favoritosNo));
+                    Listno.add(aid);
+                    favoritos = new String[Listno.size()];
+                    Listno.toArray(favoritos);
+                    StringBuilder builderNo = new StringBuilder();
+                    for (String i : favoritos) {
+                        builderNo.append(":::" + i);
+                    }
+                    Toaster.toast("Favorito Agregado");
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builderNo.toString()).apply();
+                    FavSyncro.updateFavs(InfoFragments.this);
+                    Amenu.clear();
+                    getMenuInflater().inflate(R.menu.menu_fav_si, Amenu);
+                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", true).apply();
+                    break;
+                case R.id.comentarios:
+                    if (eps != null && eps.length() > 0) {
+                        dialog = new MaterialDialog.Builder(this)
+                                .title("COMENTARIOS")
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                .titleGravity(GravityEnum.CENTER)
+                                .customView(R.layout.comentarios, false)
+                                .positiveText("SALIR")
+                                .build();
+                        spinner = (Spinner) dialog.getCustomView().findViewById(R.id.comentarios_box_cap);
+                        final List<String> caps = parser.parseNumerobyEID(getJsonStringfromFile());
+                        String[] array = new String[caps.size()];
+                        caps.toArray(array);
+                        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, array);
+                        spinner.setAdapter(arrayAdapter);
+                        webView = (WebView) dialog.getCustomView().findViewById(R.id.comentarios_box);
+                        webView.getSettings().setJavaScriptEnabled(true);
+                        String newUA = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
+                        webView.getSettings().setUserAgentString(newUA);
+                        webView.setWebViewClient(new WebViewClient() {
+                            @Override
+                            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                                view.loadUrl(url);
+                                return true;
+                            }
+                        });
+                        String url = "";
+                        try {
+                            String num = caps.get(0).substring(caps.get(0).lastIndexOf(" ") + 1);
+                            url = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, num, eps.getJSONObject(0).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    });
-                    dialog.show();
-                } else {
-                    Toaster.toast("No se pueden mostrar los comentarios");
-                }
-                break;
-            case R.id.sel_all:
-                fragmentCaps.setallAsSeen();
-                break;
-            case R.id.sel_none:
-                fragmentCaps.setallAsNotSeen();
-                break;
+                        Log.d("Comentarios", url);
+                        webView.loadUrl(url);
+                        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                String urlch = "";
+                                try {
+                                    urlch = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1), eps.getJSONObject(position).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                Log.d("Comentarios", urlch);
+                                webView.loadUrl(urlch);
+                            }
+
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) {
+
+                            }
+                        });
+                        dialog.show();
+                    } else {
+                        Toaster.toast("No se pueden mostrar los comentarios");
+                    }
+                    break;
+                case R.id.sel_all:
+                    fragmentCaps.setallAsSeen();
+                    break;
+                case R.id.sel_none:
+                    fragmentCaps.setallAsNotSeen();
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return true;
     }

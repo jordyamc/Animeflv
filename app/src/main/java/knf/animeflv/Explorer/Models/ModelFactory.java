@@ -37,28 +37,34 @@ public class ModelFactory {
         new AsyncTask<String, String, String>() {
             @Override
             protected String doInBackground(String... strings) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    List<Directory> files = new ArrayList<>();
-                    try {
-                        for (DocumentFile file : getDirectoryFileAccess(context).listFiles()) {
-                            if (file.isDirectory() && file.listFiles().length > 0) {
-                                files.add(new Directory(file, PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false)));
+                try {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        List<Directory> files = new ArrayList<>();
+                        try {
+                            for (DocumentFile file : getDirectoryFileAccess(context).listFiles()) {
+                                if (file.isDirectory() && file.listFiles().length > 0) {
+                                    files.add(new Directory(file, PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false)));
+                                }
                             }
+                            Collections.sort(files, new DirectoryComparator());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        listener.onCreated(files);
+                    } else {
+                        List<Directory> files = new ArrayList<>();
+                        if (!getDirectoryFile(context).exists()) {
+                            getDirectoryFile(context).mkdirs();
+                        }
+                        for (File file : getDirectoryFile(context).listFiles(dirFilter)) {
+                            files.add(new Directory(file));
                         }
                         Collections.sort(files, new DirectoryComparator());
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        listener.onCreated(files);
                     }
-                    listener.onCreated(files);
-                } else {
+                } catch (Exception e) {
+                    e.printStackTrace();
                     List<Directory> files = new ArrayList<>();
-                    if (!getDirectoryFile(context).exists()) {
-                        getDirectoryFile(context).mkdirs();
-                    }
-                    for (File file : getDirectoryFile(context).listFiles(dirFilter)) {
-                        files.add(new Directory(file));
-                    }
-                    Collections.sort(files, new DirectoryComparator());
                     listener.onCreated(files);
                 }
                 return null;

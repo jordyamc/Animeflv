@@ -151,41 +151,45 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
             holder.del.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new MaterialDialog.Builder(context)
-                            .content("Esta seguro que desea eliminar el " + list.get(holder.getAdapterPosition()).getTitle().toLowerCase() + "?")
-                            .positiveText("Eliminar")
-                            .negativeText("cancelar")
-                            .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    ManageDownload.cancel(context, list.get(holder.getAdapterPosition()).getEID());
-                                    if (FileUtil.init(context).DeleteAnime(list.get(holder.getAdapterPosition()).getEID())) {
-                                        context.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                holder.progress.setVisibility(View.GONE);
-                                            }
-                                        });
-                                        if (list.size() - 1 < 1) {
-                                            FileUtil.init(context).DeleteAnimeDir(list.get(holder.getAdapterPosition()).getID());
-                                            list.remove(holder.getAdapterPosition());
-                                            notifyItemRemoved(holder.getAdapterPosition());
-                                            try {
-                                                interfaces.OnDirectoryEmpty(list.get(0).getID());
-                                            } catch (Exception e) {
+                    try {
+                        new MaterialDialog.Builder(context)
+                                .content("Esta seguro que desea eliminar el " + list.get(holder.getAdapterPosition()).getTitle().toLowerCase() + "?")
+                                .positiveText("Eliminar")
+                                .negativeText("cancelar")
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                        ManageDownload.cancel(context, list.get(holder.getAdapterPosition()).getEID());
+                                        if (FileUtil.init(context).DeleteAnime(list.get(holder.getAdapterPosition()).getEID())) {
+                                            context.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    holder.progress.setVisibility(View.GONE);
+                                                }
+                                            });
+                                            if (list.size() - 1 < 1) {
+                                                FileUtil.init(context).DeleteAnimeDir(list.get(holder.getAdapterPosition()).getID());
+                                                list.remove(holder.getAdapterPosition());
+                                                notifyItemRemoved(holder.getAdapterPosition());
+                                                try {
+                                                    interfaces.OnDirectoryEmpty(list.get(0).getID());
+                                                } catch (Exception e) {
+                                                }
+                                            } else {
+                                                Toaster.toast("Archivo eliminado");
+                                                notifyItemRemoved(holder.getAdapterPosition());
+                                                recreateList();
                                             }
                                         } else {
-                                            Toaster.toast("Archivo eliminado");
-                                            notifyItemRemoved(holder.getAdapterPosition());
+                                            Toaster.toast("Error al eliminar");
                                             recreateList();
                                         }
-                                    } else {
-                                        Toaster.toast("Error al eliminar");
-                                        recreateList();
                                     }
-                                }
-                            }).build().show();
+                                }).build().show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             });
             if (ManageDownload.isDownloading(context, list.get(holder.getAdapterPosition()).getEID())) {

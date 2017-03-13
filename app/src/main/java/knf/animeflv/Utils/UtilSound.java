@@ -145,10 +145,14 @@ public class UtilSound {
             widget.controller().onWidgetStateChangedListener(new AudioWidget.OnWidgetStateChangedListener() {
                 @Override
                 public void onWidgetStateChanged(@NonNull AudioWidget.State state) {
-                    if (state == AudioWidget.State.REMOVED) {
-                        if (getCurrentMediaPlayer().isPlaying()) {
-                            getCurrentMediaPlayer().stop();
+                    try {
+                        if (state == AudioWidget.State.REMOVED) {
+                            if (getCurrentMediaPlayer().isPlaying()) {
+                                getCurrentMediaPlayer().stop();
+                            }
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
 

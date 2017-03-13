@@ -11,8 +11,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -213,7 +211,7 @@ public class newMain extends AppCompatActivity implements
                             }
                         }
                     });
-                    if (isNetworkAvailable()) {
+                    if (NetworkUtils.isNetworkAvailable()) {
                         Log.d("NewMain", "Block Nots");
                         UtilNotBlocker.setBlocked(true);
                         NetworkUtils.checkVersion(context, updateButton);
@@ -732,29 +730,6 @@ public class newMain extends AppCompatActivity implements
         encrypt.show();
     }
 
-    private boolean isNetworkAvailable() {
-        Boolean net = false;
-        int Tcon = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "2"));
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        switch (Tcon) {
-            case 0:
-                NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                net = Wifi.isConnected();
-                break;
-            case 1:
-                NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                net = mobile.isConnected();
-                break;
-            case 2:
-                NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                net = WifiA.isConnected() || mobileA.isConnected();
-                break;
-        }
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && net;
-    }
-
     private void cambiarColor() {
         int[] colorl = new int[]{
                 ColorsRes.Gris(this),
@@ -974,7 +949,7 @@ public class newMain extends AppCompatActivity implements
         }
         File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt");
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/inicio.txt";
-        if (isNetworkAvailable()) {
+        if (NetworkUtils.isNetworkAvailable()) {
             loadMainJson();
         } else {
             if (file.exists()) {
@@ -1046,7 +1021,7 @@ public class newMain extends AppCompatActivity implements
     }
 
     public void ActualizarFavoritos() {
-        if (isNetworkAvailable()) {
+        if (NetworkUtils.isNetworkAvailable()) {
             if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(this) || DropboxManager.islogedIn()) {
                 FavSyncro.updateLocal(this, new FavSyncro.UpdateCallback() {
                     @Override
@@ -1132,7 +1107,7 @@ public class newMain extends AppCompatActivity implements
 
     @Override
     public void onRefresh() {
-        if (isNetworkAvailable()) {
+        if (NetworkUtils.isNetworkAvailable()) {
             getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", new HashSet<String>()).apply();
             parser.refreshUrls(context);
@@ -1170,7 +1145,7 @@ public class newMain extends AppCompatActivity implements
             if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false) != isAmoled) {
                 recreate();
             }
-            if (isNetworkAvailable()) {
+            if (NetworkUtils.isNetworkAvailable()) {
                 //checkBan(APP);
                 loadMainJson();
             } else {
@@ -1257,12 +1232,20 @@ public class newMain extends AppCompatActivity implements
 
     @Override
     public void onPutInList() {
-        Snackbar.make(root, "Añadido a la lista", Snackbar.LENGTH_SHORT).show();
+        try {
+            Snackbar.make(root, "Añadido a la lista", Snackbar.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onDelFromList() {
-        Snackbar.make(root, "Eliminado de la lista", Snackbar.LENGTH_SHORT).show();
+        try {
+            Snackbar.make(root, "Eliminado de la lista", Snackbar.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

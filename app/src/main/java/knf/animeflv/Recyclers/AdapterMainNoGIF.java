@@ -317,47 +317,51 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         holder.ib_ver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (UpdateUtil.getState() == UpdateState.WAITING_TO_UPDATE) {
-                    Toaster.toast("Actualizacion descargada, instalar para continuar");
-                } else {
-                    if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
-                        StreamManager.Play(context, Animes.get(holder.getAdapterPosition()).getEid());
+                try {
+                    if (UpdateUtil.getState() == UpdateState.WAITING_TO_UPDATE) {
+                        Toaster.toast("Actualizacion descargada, instalar para continuar");
                     } else {
-                        if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
-                            Toaster.toast("Descarga en proceso");
+                        if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+                            StreamManager.Play(context, Animes.get(holder.getAdapterPosition()).getEid());
                         } else {
-                            if (NetworkUtils.isNetworkAvailable()) {
-                                if (!MainStates.isProcessing()) {
-                                    if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
-                                        final int pos = holder.getAdapterPosition();
-                                        new MaterialDialog.Builder(context)
-                                                .content(
-                                                        "El " + getCap(Animes.get(pos).getNumero()).toLowerCase() +
-                                                                " de " + Animes.get(pos).getTitulo() +
-                                                                " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
-                                                .autoDismiss(true)
-                                                .positiveText("Continuar")
-                                                .negativeText("Cancelar")
-                                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                                    @Override
-                                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                        MainStates.init(context).delFromWaitList(Animes.get(pos).getEid());
-                                                        MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
-                                                        showLoading(holder.ib_des);
-                                                        searchStream(holder);
-                                                    }
-                                                })
-                                                .build().show();
-                                    } else {
-                                        MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
-                                        showLoading(holder.ib_des);
-                                        searchStream(holder);
+                            if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+                                Toaster.toast("Descarga en proceso");
+                            } else {
+                                if (NetworkUtils.isNetworkAvailable()) {
+                                    if (!MainStates.isProcessing()) {
+                                        if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
+                                            final int pos = holder.getAdapterPosition();
+                                            new MaterialDialog.Builder(context)
+                                                    .content(
+                                                            "El " + getCap(Animes.get(pos).getNumero()).toLowerCase() +
+                                                                    " de " + Animes.get(pos).getTitulo() +
+                                                                    " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
+                                                    .autoDismiss(true)
+                                                    .positiveText("Continuar")
+                                                    .negativeText("Cancelar")
+                                                    .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                                        @Override
+                                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                            MainStates.init(context).delFromWaitList(Animes.get(pos).getEid());
+                                                            MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
+                                                            showLoading(holder.ib_des);
+                                                            searchStream(holder);
+                                                        }
+                                                    })
+                                                    .build().show();
+                                        } else {
+                                            MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
+                                            showLoading(holder.ib_des);
+                                            searchStream(holder);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });

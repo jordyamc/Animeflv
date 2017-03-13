@@ -60,7 +60,11 @@ public class DialogSounds extends DialogFragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        UtilDialogPref.setSelected(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(UtilDialogPref.getKey(), UtilDialogPref.getDef())));
+        try {
+            UtilDialogPref.setSelected(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString(UtilDialogPref.getKey(), UtilDialogPref.getDef())));
+        } catch (Exception e) {
+            UtilDialogPref.setSelected(-1);
+        }
         String[] array = new String[]{};
         MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
                 .title(UtilDialogPref.getTitulo())

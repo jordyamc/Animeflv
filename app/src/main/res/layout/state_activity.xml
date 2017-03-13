@@ -13,117 +13,46 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.CardView
-            xmlns:card_view="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/card"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="3dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="3dp"
-            android:clickable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            card_view:cardBackgroundColor="@color/blanco"
-            card_view:cardCornerRadius="3dp"
-            card_view:cardElevation="4dp"
-            card_view:cardUseCompatPadding="true">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <android.support.v7.widget.CardView
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="5dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="Animeflv.net"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textSize="22sp"/>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="5dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="10dp"
-                        android:paddingRight="10dp"
-                        android:text="CONEXION:"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:id="@+id/conexion"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="conectando..."
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
-                </LinearLayout>
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="3dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="3dp"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                card_view:cardBackgroundColor="@color/blanco"
+                card_view:cardCornerRadius="3dp"
+                card_view:cardElevation="4dp"
+                card_view:cardUseCompatPadding="true">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="5dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="10dp"
-                        android:paddingRight="10dp"
-                        android:text="CODIGO:"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:id="@+id/codigo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="\u221E"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="5dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingEnd="10dp"
-                        android:paddingRight="10dp"
-                        android:text="ESTADO:"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:id="@+id/estado"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="esperando..."
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/extras"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="gone">
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="Animeflv.net"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                        android:textSize="22sp"/>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:orientation="horizontal"
                         android:padding="5dp">
 
                         <TextView
@@ -131,22 +60,22 @@
                             android:layout_height="wrap_content"
                             android:paddingEnd="10dp"
                             android:paddingRight="10dp"
-                            android:text="MOTIVO:"
+                            android:text="CONEXION:"
                             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                             android:textStyle="bold"/>
 
                         <TextView
-                            android:id="@+id/motivo"
+                            android:id="@+id/conexion"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="ninguno"
+                            android:text="conectando..."
                             android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:orientation="horizontal"
                         android:padding="5dp">
 
                         <TextView
@@ -154,20 +83,253 @@
                             android:layout_height="wrap_content"
                             android:paddingEnd="10dp"
                             android:paddingRight="10dp"
-                            android:text="SOLUCION:"
+                            android:text="CODIGO:"
                             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                             android:textStyle="bold"/>
 
                         <TextView
-                            android:id="@+id/solucion"
+                            android:id="@+id/codigo"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="ninguna"
+                            android:text="\u221E"
                             android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="5dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="10dp"
+                            android:paddingRight="10dp"
+                            android:text="ESTADO:"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:id="@+id/estado"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="esperando..."
+                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/extras"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="5dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingEnd="10dp"
+                                android:paddingRight="10dp"
+                                android:text="MOTIVO:"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:id="@+id/motivo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="ninguno"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="5dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingEnd="10dp"
+                                android:paddingRight="10dp"
+                                android:text="SOLUCION:"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:id="@+id/solucion"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="ninguna"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_bypass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="3dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="3dp"
+                android:clickable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                card_view:cardBackgroundColor="@color/blanco"
+                card_view:cardCornerRadius="3dp"
+                card_view:cardElevation="4dp"
+                card_view:cardUseCompatPadding="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="Bypass"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                        android:textSize="22sp"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="5dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="10dp"
+                            android:paddingRight="10dp"
+                            android:text="ESTADO:"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:id="@+id/estado_bypass"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="esperando..."
+                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/extras_bypass"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="5dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingEnd="10dp"
+                                android:paddingRight="10dp"
+                                android:text="VALIDO:"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:id="@+id/valid"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="esperando..."
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="5dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingEnd="10dp"
+                                android:paddingRight="10dp"
+                                android:text="DUID:"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:id="@+id/uid"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="ninguno"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="5dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingEnd="10dp"
+                                android:paddingRight="10dp"
+                                android:text="CLREARANCE:"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:id="@+id/clearance"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="ninguna"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="5dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingEnd="10dp"
+                                android:paddingRight="10dp"
+                                android:text="USER-AGENT:"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:id="@+id/useragent"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="ninguna"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
     </ScrollView>
 
 </LinearLayout>

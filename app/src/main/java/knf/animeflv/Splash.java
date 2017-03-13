@@ -315,7 +315,7 @@ public class Splash extends AwesomeSplash {
                 public void onResult(boolean needBypass) {
                     if (needBypass) {
                         Toaster.toast("Activando bypass de Cloudflare");
-                        handler.postDelayed(runnable, 20000);
+                        handler.postDelayed(runnable, 30000);
                         Bypass.check(Splash.this, new Bypass.onBypassCheck() {
                             @Override
                             public void onFinish() {

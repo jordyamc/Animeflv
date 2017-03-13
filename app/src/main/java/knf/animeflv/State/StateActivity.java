@@ -16,6 +16,8 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
+import knf.animeflv.Cloudflare.Bypass;
+import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.JsonFactory.ServerGetter;
 import knf.animeflv.R;
@@ -52,6 +54,21 @@ public class StateActivity extends AppCompatActivity {
     @BindView(R.id.solucion)
     TextView solucion;
 
+    @BindView(R.id.card_bypass)
+    CardView cardView_bypass;
+    @BindView(R.id.extras_bypass)
+    LinearLayout layout_extras_bypass;
+    @BindView(R.id.estado_bypass)
+    TextView estado_bypass;
+    @BindView(R.id.valid)
+    TextView valid;
+    @BindView(R.id.uid)
+    TextView uid;
+    @BindView(R.id.clearance)
+    TextView clearance;
+    @BindView(R.id.useragent)
+    TextView useragent;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         ThemeUtils.setThemeOn(this);
@@ -76,10 +93,23 @@ public class StateActivity extends AppCompatActivity {
                 return true;
             }
         });
+        cardView_bypass.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Bypass.check(StateActivity.this, new Bypass.onBypassCheck() {
+                    @Override
+                    public void onFinish() {
+                        checkBypass();
+                    }
+                });
+                return false;
+            }
+        });
         if (ThemeUtils.isAmoled(this)) {
             toolbar.setBackgroundColor(ColorsRes.Negro(this));
             toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
             cardView.setCardBackgroundColor(ColorsRes.Prim(this));
+            cardView_bypass.setCardBackgroundColor(ColorsRes.Prim(this));
         }
         startCheck();
     }
@@ -106,6 +136,40 @@ public class StateActivity extends AppCompatActivity {
         } else {
             setInfo(-2);
         }
+        checkBypass();
+    }
+
+    private void checkBypass() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                BypassHolder.savedToLocal(StateActivity.this);
+                if (BypassHolder.isActive) {
+                    estado_bypass.setText("ACTIVADO");
+                    estado_bypass.setTextColor(getTextColor(200));
+                    layout_extras_bypass.setVisibility(View.VISIBLE);
+                    uid.setText(BypassHolder.valueDuid);
+                    clearance.setText(BypassHolder.valueClearance);
+                    useragent.setText(BypassHolder.userAgent);
+                    Bypass.runJsoupTest(new Bypass.onTestResult() {
+                        @Override
+                        public void onResult(final boolean needBypass) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    valid.setText(needBypass ? "ERROR" : "OK");
+                                    valid.setTextColor(needBypass ? getTextColor(100) : getTextColor(200));
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    estado_bypass.setText("DESACTIVADO");
+                    estado_bypass.setTextColor(getTextColor(100));
+                    layout_extras_bypass.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     private void reset() {

@@ -47,71 +47,75 @@ public class AdapterDialogPref extends RecyclerView.Adapter<AdapterDialogPref.Vi
 
     @Override
     public void onBindViewHolder(final AdapterDialogPref.ViewHolder holder, final int position) {
-        holder.playing.setColorFilter(ThemeUtils.getAcentColor(context));
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            ColorStateList colorStateList = new ColorStateList(
-                    new int[][]{
-                            new int[]{-android.R.attr.state_checked},
-                            new int[]{android.R.attr.state_checked}
-                    },
-                    new int[]{
+        try {
+            holder.playing.setColorFilter(ThemeUtils.getAcentColor(context));
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                ColorStateList colorStateList = new ColorStateList(
+                        new int[][]{
+                                new int[]{-android.R.attr.state_checked},
+                                new int[]{android.R.attr.state_checked}
+                        },
+                        new int[]{
 
-                            ThemeUtils.getAcentColor(context)
-                            , ThemeUtils.getAcentColor(context),
-                    }
-            );
-            holder.button.setSupportButtonTintList(colorStateList);
-        }
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
-            holder.text.setTextColor(ColorsRes.Holo_Dark(context));
-        } else {
-            holder.text.setTextColor(ColorsRes.Holo_Light(context));
-        }
-        if (holder.getAdapterPosition() == UtilDialogPref.getSelected()) {
-            holder.button.setChecked(true);
-            holder.playing.setVisibility(View.VISIBLE);
-            if (UtilDialogPref.getPlayer().isPlaying()) {
-                holder.playing.setImageResource(R.drawable.ic_stop);
-                UtilDialogPref.getPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        holder.playing.setImageResource(R.drawable.ic_play);
-                    }
-                });
-            } else {
-                holder.playing.setImageResource(R.drawable.ic_play);
+                                ThemeUtils.getAcentColor(context)
+                                , ThemeUtils.getAcentColor(context),
+                        }
+                );
+                holder.button.setSupportButtonTintList(colorStateList);
             }
-        } else {
-            holder.button.setChecked(false);
-            holder.playing.setVisibility(View.GONE);
-        }
-        holder.text.setText(lista[holder.getAdapterPosition()]);
-        holder.back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (holder.getAdapterPosition() == UtilDialogPref.getSelected()) {
-                    if (UtilDialogPref.getPlayer().isPlaying()) {
-                        UtilDialogPref.getPlayer().stop();
-                        tooglebyPref(holder.getAdapterPosition());
-                        holder.playing.setImageResource(R.drawable.ic_play);
+            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
+                holder.text.setTextColor(ColorsRes.Holo_Dark(context));
+            } else {
+                holder.text.setTextColor(ColorsRes.Holo_Light(context));
+            }
+            if (holder.getAdapterPosition() == UtilDialogPref.getSelected()) {
+                holder.button.setChecked(true);
+                holder.playing.setVisibility(View.VISIBLE);
+                if (UtilDialogPref.getPlayer().isPlaying()) {
+                    holder.playing.setImageResource(R.drawable.ic_stop);
+                    UtilDialogPref.getPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            holder.playing.setImageResource(R.drawable.ic_play);
+                        }
+                    });
+                } else {
+                    holder.playing.setImageResource(R.drawable.ic_play);
+                }
+            } else {
+                holder.button.setChecked(false);
+                holder.playing.setVisibility(View.GONE);
+            }
+            holder.text.setText(lista[holder.getAdapterPosition()]);
+            holder.back.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (holder.getAdapterPosition() == UtilDialogPref.getSelected()) {
+                        if (UtilDialogPref.getPlayer().isPlaying()) {
+                            UtilDialogPref.getPlayer().stop();
+                            tooglebyPref(holder.getAdapterPosition());
+                            holder.playing.setImageResource(R.drawable.ic_play);
+                        } else {
+                            setMediaPlayer(holder.getAdapterPosition());
+                            UtilDialogPref.getPlayer().start();
+                            tooglebyPref(holder.getAdapterPosition());
+                            holder.playing.setImageResource(R.drawable.ic_stop);
+                        }
                     } else {
+                        if (UtilDialogPref.getPlayer().isPlaying()) {
+                            UtilDialogPref.getPlayer().stop();
+                        }
                         setMediaPlayer(holder.getAdapterPosition());
                         UtilDialogPref.getPlayer().start();
-                        tooglebyPref(holder.getAdapterPosition());
-                        holder.playing.setImageResource(R.drawable.ic_stop);
+                        updatebyPref(holder.getAdapterPosition());
+                        checkRadios(holder.getAdapterPosition());
                     }
-                } else {
-                    if (UtilDialogPref.getPlayer().isPlaying()) {
-                        UtilDialogPref.getPlayer().stop();
-                    }
-                    setMediaPlayer(holder.getAdapterPosition());
-                    UtilDialogPref.getPlayer().start();
-                    updatebyPref(holder.getAdapterPosition());
-                    checkRadios(holder.getAdapterPosition());
+                    UtilSound.setCurrentMediaPlayerInt(holder.getAdapterPosition());
                 }
-                UtilSound.setCurrentMediaPlayerInt(holder.getAdapterPosition());
-            }
-        });
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void tooglebyPref(int pos) {

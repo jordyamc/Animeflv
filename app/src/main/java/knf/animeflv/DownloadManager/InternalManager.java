@@ -36,9 +36,9 @@ public class InternalManager {
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         DownloadManager.Query q = new DownloadManager.Query();
         q.setFilterById(Long.parseLong(context.getSharedPreferences("data", Context.MODE_PRIVATE).getString(eid, "0")));
-        Cursor cursor = manager.query(q);
-        cursor.moveToFirst();
         try {
+            Cursor cursor = manager.query(q);
+            cursor.moveToFirst();
             return cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
         } catch (Exception e) {
             return -1;

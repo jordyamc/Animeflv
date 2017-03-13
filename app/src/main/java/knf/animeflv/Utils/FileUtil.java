@@ -210,9 +210,11 @@ public class FileUtil {
                 file.createNewFile();
                 writeToFile(body, file);
             } catch (Exception ex) {
-
+                ex.printStackTrace();
             }
 
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

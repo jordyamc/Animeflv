@@ -21,17 +21,22 @@ public class DownloadBroadCaster extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(ACTION_RETRY)) {
-            Toaster.toast("Reintentando...");
-            ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(intent.getIntExtra("not_id", 123));
-            Intent n_intent = new Intent(context, DownloaderService.class);
-            Bundle bundle = intent.getExtras();
-            new SQLiteHelperDownloads(context)
-                    .addElement(new DownloadObject(bundle.getLong("downloadID"), bundle.getString("url"), bundle.getString("eid")))
-                    .updateState(bundle.getString("eid"), DownloadManager.STATUS_PENDING)
-                    .close();
-            n_intent.putExtras(bundle);
-            context.startService(n_intent);
-            context.sendBroadcast(new Intent(RECEIVER_ACTION_ERROR));
+            try {
+                Toaster.toast("Reintentando...");
+                ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(intent.getIntExtra("not_id", 123));
+                Intent n_intent = new Intent(context, DownloaderService.class);
+                Bundle bundle = intent.getExtras();
+                new SQLiteHelperDownloads(context)
+                        .addElement(new DownloadObject(bundle.getLong("downloadID"), bundle.getString("url"), bundle.getString("eid")))
+                        .updateState(bundle.getString("eid"), DownloadManager.STATUS_PENDING)
+                        .close();
+                n_intent.putExtras(bundle);
+                context.startService(n_intent);
+                context.sendBroadcast(new Intent(RECEIVER_ACTION_ERROR));
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toaster.toast("Error al reintentar...");
+            }
         }
     }
 }

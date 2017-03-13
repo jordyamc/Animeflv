@@ -91,34 +91,42 @@ public class CacheManager {
 
     public static long getSize(File file) {
         long size = 0;
-        if (file.isDirectory()) {
-            if (!getExceptionList().contains(file.getName())) {
-                for (File f : file.listFiles()) {
-                    size = size + getSize(f);
+        try {
+            if (file.isDirectory()) {
+                if (!getExceptionList().contains(file.getName())) {
+                    for (File f : file.listFiles()) {
+                        size = size + getSize(f);
+                    }
+                }
+            } else {
+                if (!getExceptionList().contains(file.getName())) {
+                    size = size + file.length();
                 }
             }
-        } else {
-            if (!getExceptionList().contains(file.getName())) {
-                size = size + file.length();
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return size;
     }
 
     public static long getSize(File file, boolean directory) {
         long size = 0;
-        if (file.isDirectory()) {
-            if (!getExceptionList().contains(file.getName())) {
-                for (File f : file.listFiles()) {
-                    if (!f.isDirectory()) {
-                        size = size + getSize(f);
+        try {
+            if (file.isDirectory()) {
+                if (!getExceptionList().contains(file.getName())) {
+                    for (File f : file.listFiles()) {
+                        if (!f.isDirectory()) {
+                            size = size + getSize(f);
+                        }
                     }
                 }
+            } else {
+                if (!getExceptionList().contains(file.getName())) {
+                    size = size + file.length();
+                }
             }
-        } else {
-            if (!getExceptionList().contains(file.getName())) {
-                size = size + file.length();
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return size;
     }
