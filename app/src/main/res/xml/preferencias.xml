@@ -46,6 +46,12 @@
             android:key="t_conexion"
             android:summary="%s"
             android:title="Usar Conexion" />
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="30000"
+            android:enabled="true"
+            android:key="bypass_time"
+            android:summary="Esperar %s para cancelar bypass"
+            android:title="Bypass"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Busqueda">
         <com.lb.material_preferences_library.custom_preferences.Preference

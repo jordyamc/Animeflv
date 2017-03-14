@@ -333,7 +333,7 @@ public class startBackground {
                         mBuilder.setLights(Color.BLUE, 5000, 2000);
                         mBuilder.setGroup("animeflv_group");
                         Intent resultIntent = new Intent(Intent.ACTION_VIEW) //FIXME: Uri Exposed
-                                .setDataAndType(Uri.fromFile(descarga),
+                                .setDataAndType(FileUtil.init(context).getUriForFile(descarga),
                                         "application/vnd.android.package-archive");
                         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         mBuilder.setContentIntent(resultPendingIntent);

@@ -302,6 +302,15 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
+        getPreferenceScreen().findPreference("bypass_time").setSummary("Esperar " + getStringfromResourse(R.array.time_bypass, "bypass_time", "30000") + " para cancelar bypass");
+        getPreferenceScreen().findPreference("bypass_time").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                UtilDialogPref.init(getResources().getStringArray(R.array.time_bypass), getResources().getStringArray(R.array.time_val_bypass), "Esperar %s para cancelar bypass", "bypass_time", "30000", "Tiempo para cancelar", getPreferenceScreen().findPreference("bypass_time"));
+                PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
+                return false;
+            }
+        });
         getPreferenceScreen().findPreference("t_busqueda").setSummary(getStringfromResourse(R.array.busqueda, "t_busqueda", "0"));
         getPreferenceScreen().findPreference("t_busqueda").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -509,6 +518,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         } catch (IndexOutOfBoundsException e) {
             if (key.equals("tiempo")) {
                 return getResources().getStringArray(array)[Arrays.asList(getResources().getStringArray(R.array.min_val)).indexOf(PreferenceManager.getDefaultSharedPreferences(myContext).getString(key, def))];
+            } else if (key.equals("bypass_time")) {
+                return getResources().getStringArray(array)[Arrays.asList(getResources().getStringArray(R.array.time_val_bypass)).indexOf(PreferenceManager.getDefaultSharedPreferences(myContext).getString(key, def))];
             } else {
                 Logger.Error(getClass(), e);
                 PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString(key, def).apply();

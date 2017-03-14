@@ -10,6 +10,17 @@
     <string name="next">Siguiente</string>
     <string name="back">Atras</string>
 
+    <string-array name="time_bypass">
+        <item>30 segundos</item>
+        <item>1 minuto</item>
+        <item>2 minutos</item>
+    </string-array>
+    <string-array name="time_val_bypass">
+        <item>30000</item>
+        <item>60000</item>
+        <item>120000</item>
+    </string-array>
+
     <string-array name="minutos">
         <item>1 minuto</item>
         <item>5 minutos</item>

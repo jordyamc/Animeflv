@@ -1,5 +1,6 @@
 package knf.animeflv.State;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
@@ -18,6 +19,7 @@ import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.Cloudflare.BypassHolder;
+import knf.animeflv.Cloudflare.DebugBypass;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.JsonFactory.ServerGetter;
 import knf.animeflv.R;
@@ -93,6 +95,12 @@ public class StateActivity extends AppCompatActivity {
                 return true;
             }
         });
+        cardView_bypass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(StateActivity.this, DebugBypass.class));
+            }
+        });
         cardView_bypass.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -102,7 +110,7 @@ public class StateActivity extends AppCompatActivity {
                         checkBypass();
                     }
                 });
-                return false;
+                return true;
             }
         });
         if (ThemeUtils.isAmoled(this)) {

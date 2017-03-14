@@ -62,9 +62,12 @@ public class Bypass {
                                 @Override
                                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
                                     Log.e("CloudflareBypass", "Redirect to: " + url);
-                                    if (url.equals("http://animeflv.net/")) {
+                                    if (url.startsWith("http://animeflv.net") && !url.contains("cdn-cgi")) {
+                                        Log.e("CloudflareBypass", "Getting Cookies");
                                         String cookies = CookieManager.getInstance().getCookie("http://animeflv.net");
-                                        if (cookies != null && cookies.contains(BypassHolder.cookieKeyClearance) && cookies.contains(BypassHolder.cookieKeyDuid)) {
+                                        if (cookies != null)
+                                            Log.e("CloudflareBypass", "Getting Cookies: " + cookies);
+                                        if (cookies != null && (cookies.contains(BypassHolder.cookieKeyClearance) || cookies.contains(BypassHolder.cookieKeyDuid))) {
                                             String ua = webView.getSettings().getUserAgentString();
                                             Log.e("Detected Cookies", cookies);
                                             BypassHolder.setUserAgent(context, ua);

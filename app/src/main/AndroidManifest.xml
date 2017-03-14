@@ -169,6 +169,9 @@
             android:name=".State.StateActivity"
             android:label="@string/app_name"/>
         <activity
+            android:name=".Cloudflare.DebugBypass"
+            android:label="@string/app_name"/>
+        <activity
             android:name=".Utils.logs.LogViewer"
             android:excludeFromRecents="true"
             android:label="@string/app_name">

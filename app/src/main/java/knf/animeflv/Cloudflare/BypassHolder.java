@@ -23,8 +23,10 @@ public class BypassHolder {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("mobile_detect", "computer");
         if (isActive) {
-            map.put(cookieKeyDuid, valueDuid);
-            map.put(cookieKeyClearance, valueClearance);
+            if (!valueDuid.equals(""))
+                map.put(cookieKeyDuid, valueDuid);
+            if (!valueClearance.equals(""))
+                map.put(cookieKeyClearance, valueClearance);
         }
         return map;
     }
@@ -33,8 +35,12 @@ public class BypassHolder {
         Map<String, String> map = new LinkedHashMap<>();
         map.put("mobile_detect", "computer");
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isBypassActive", false)) {
-            map.put(cookieKeyDuid, PreferenceManager.getDefaultSharedPreferences(context).getString("bypassDuid", ""));
-            map.put(cookieKeyClearance, PreferenceManager.getDefaultSharedPreferences(context).getString("bypassClearance", ""));
+            String duid = PreferenceManager.getDefaultSharedPreferences(context).getString("bypassDuid", "");
+            if (!duid.equals(""))
+                map.put(cookieKeyDuid, duid);
+            String clearance = PreferenceManager.getDefaultSharedPreferences(context).getString("bypassClearance", "");
+            if (!clearance.equals(""))
+                map.put(cookieKeyClearance, clearance);
         }
         return map;
     }

@@ -11,6 +11,7 @@ import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v4.provider.DocumentFile;
 import android.util.Log;
 
@@ -580,5 +581,13 @@ public class FileUtil {
             }
         }
         return !pack.equals("null");
+    }
+
+    public Uri getUriForFile(File file) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return FileProvider.getUriForFile(context, context.getPackageName() + ".RequestBackground", file);
+        } else {
+            return Uri.fromFile(file);
+        }
     }
 }
