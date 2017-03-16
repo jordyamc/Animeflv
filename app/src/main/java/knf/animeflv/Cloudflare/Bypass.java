@@ -2,6 +2,7 @@ package knf.animeflv.Cloudflare;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -60,7 +61,7 @@ public class Bypass {
                             webView.getSettings().setJavaScriptEnabled(true);
                             webView.setWebViewClient(new WebViewClient() {
                                 @Override
-                                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                                public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
                                     Log.e("CloudflareBypass", "Redirect to: " + url);
                                     if (url.startsWith("http://animeflv.net") && !url.contains("cdn-cgi")) {
                                         Log.e("CloudflareBypass", "Getting Cookies");
@@ -80,6 +81,25 @@ public class Bypass {
                                         return true;
                                     } else {
                                         return false;
+                                    }
+                                }
+
+                                @Override
+                                public void onPageFinished(WebView view, String url) {
+                                    super.onPageFinished(view, url);
+                                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                                        if (url.startsWith("http://animeflv.net") && !url.contains("cdn-cgi")) {
+                                            Log.e("CloudflareBypass", "Getting Cookies");
+                                            String cookies = CookieManager.getInstance().getCookie("http://animeflv.net");
+                                            if (cookies != null)
+                                                Log.e("CloudflareBypass", "Getting Cookies: " + cookies);
+                                            if (cookies != null && (cookies.contains(BypassHolder.cookieKeyClearance) && cookies.contains(BypassHolder.cookieKeyDuid))) {
+                                                String ua = webView.getSettings().getUserAgentString();
+                                                Log.e("Detected Cookies", cookies);
+                                                BypassHolder.setUserAgent(context, ua);
+                                                saveCookie(context, cookies, check);
+                                            }
+                                        }
                                     }
                                 }
                             });

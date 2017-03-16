@@ -179,9 +179,10 @@ public class SelfGetter {
         String aflv = "null";
         String maru = "null";
         String Yotta = "null";
+        String Yotta720 = "null";
         String Yotta480 = "null";
         String Yotta360 = "null";
-        String[] names = new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 480p", "Yotta 360p", "Mp4Upload", "YourUpload", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
+        String[] names = new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 720p", "Yotta 480p", "Yotta 360p", "Mp4Upload", "YourUpload", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
         try {
             Log.e("Url", url);
             Document main = Jsoup.connect(url).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(TIMEOUT).get();
@@ -220,18 +221,37 @@ public class SelfGetter {
                     try {
                         JSONArray ja = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getJSONArray("sources");
                         if (ja.length() > 1) {
-                            if (ja.getJSONObject(0).getString("label").equals("360")) {
-                                Yotta360 = ja.getJSONObject(0).getString("file");
-                            } else {
-                                Yotta480 = ja.getJSONObject(0).getString("file");
-                            }
-                            if (ja.getJSONObject(1).getString("label").equals("360")) {
-                                Yotta360 = ja.getJSONObject(1).getString("file");
-                            } else {
-                                Yotta480 = ja.getJSONObject(1).getString("file");
+                            for (int i = 0; i <= ja.length(); i++) {
+                                String label = ja.getJSONObject(i).getString("label");
+                                String link_self = ja.getJSONObject(i).getString("file");
+                                switch (label) {
+                                    case "360":
+                                        Yotta360 = link_self;
+                                        break;
+                                    case "480":
+                                        Yotta480 = link_self;
+                                        break;
+                                    case "720":
+                                        Yotta720 = link_self;
+                                        break;
+                                }
                             }
                         } else {
-                            Yotta = ja.getJSONObject(0).getString("file");
+                            String label = ja.getJSONObject(0).getString("label");
+                            String link_self = ja.getJSONObject(0).getString("file");
+                            switch (label) {
+                                case "360":
+                                    Yotta360 = link_self;
+                                    break;
+                                case "480":
+                                    Yotta480 = link_self;
+                                    break;
+                                case "720":
+                                    Yotta720 = link_self;
+                                    break;
+                                default:
+                                    Yotta = link_self;
+                            }
                         }
                     } catch (Exception e) {
                         Log.e("Yotta", "Error getting Yotta: " + down_link.replace("embed", "check"));
@@ -276,7 +296,7 @@ public class SelfGetter {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String[] links = new String[]{izanagi, mina, Yotta, Yotta480, Yotta360, mp4upload, yourupload, zippy, sync, mega, aflv, maru};
+        String[] links = new String[]{izanagi, mina, Yotta, Yotta720, Yotta480, Yotta360, mp4upload, yourupload, zippy, sync, mega, aflv, maru};
         try {
             JSONObject object = new JSONObject();
             object.put("version", context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName + "-Internal_Api");

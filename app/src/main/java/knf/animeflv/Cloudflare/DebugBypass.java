@@ -1,6 +1,7 @@
 package knf.animeflv.Cloudflare;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -87,6 +88,25 @@ public class DebugBypass extends AppCompatActivity {
                     return true;
                 } else {
                     return false;
+                }
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                    if (url.startsWith("http://animeflv.net") && !url.contains("cdn-cgi")) {
+                        addLog("-Page Finished JellyBeam: " + url);
+                        String cookies = CookieManager.getInstance().getCookie("http://animeflv.net");
+                        if (cookies != null && (cookies.contains(BypassHolder.cookieKeyClearance) && cookies.contains(BypassHolder.cookieKeyDuid))) {
+                            addLog("-Cookies detectadas: " + cookies);
+                            String ua = webView.getSettings().getUserAgentString();
+                            addLog("-User-Agent: " + ua);
+                            Log.e("Detected Cookies", cookies);
+                            BypassHolder.setUserAgent(DebugBypass.this, ua);
+                            saveCookie(DebugBypass.this, cookies);
+                        }
+                    }
                 }
             }
         });
