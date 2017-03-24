@@ -54,10 +54,19 @@ public class WaitDBHelper {
         String aid = semi[0];
         String num = semi[1];
         String list = getList(aid);
-        if (list != null && !list.contains(num + "-")) {
-            list += num + "-";
-            setList(aid, list);
-        } else if (list == null) {
+        if (list != null) {
+            boolean contains = false;
+            for (String l : list.split("-")) {
+                if (l.equals(num)) {
+                    contains = true;
+                    break;
+                }
+            }
+            if (!contains) {
+                list += num + "-";
+                setList(aid, list);
+            }
+        } else {
             list = num + "-";
             addList(aid, list);
         }

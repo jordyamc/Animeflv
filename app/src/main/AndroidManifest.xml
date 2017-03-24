@@ -99,6 +99,9 @@
             android:name=".Favoritos"
             android:label="@string/app_name"/>
         <activity
+            android:name=".Favorites.FavoriteMain"
+            android:label="@string/app_name" />
+        <activity
             android:name=".WaitList.WaitList"
             android:label="@string/app_name"/>
         <activity

@@ -162,18 +162,22 @@ public class DirectoryFragment extends Fragment {
                             activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    int pos = manager.findFirstVisibleItemPosition();
-                                    recyclerView.setAdapter(new DirectoryAdapter(activity, list));
-                                    int count = manager.getChildCount();
-                                    if (pos != RecyclerView.NO_POSITION && pos < count) {
-                                        manager.scrollToPosition(pos);
-                                    }
-                                    if (list.size() == 0) {
-                                        noAnime.setVisibility(View.VISIBLE);
-                                        recyclerView.setVisibility(View.GONE);
-                                    } else {
-                                        noAnime.setVisibility(View.GONE);
-                                        recyclerView.setVisibility(View.VISIBLE);
+                                    try {
+                                        int pos = manager.findFirstVisibleItemPosition();
+                                        recyclerView.setAdapter(new DirectoryAdapter(activity, list));
+                                        int count = manager.getChildCount();
+                                        if (pos != RecyclerView.NO_POSITION && pos < count) {
+                                            manager.scrollToPositionWithOffset(pos, 5);
+                                        }
+                                        if (list.size() == 0) {
+                                            noAnime.setVisibility(View.VISIBLE);
+                                            recyclerView.setVisibility(View.GONE);
+                                        } else {
+                                            noAnime.setVisibility(View.GONE);
+                                            recyclerView.setVisibility(View.VISIBLE);
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
                                     }
                                 }
                             });

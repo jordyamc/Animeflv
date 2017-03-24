@@ -75,7 +75,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     }
 
     @Override
-    public void onBindViewHolder(final AdapterInfoCapsMaterial.ViewHolder holder, int position) {
+    public void onBindViewHolder(final AdapterInfoCapsMaterial.ViewHolder holder, final int position) {
         SetUpWeb(holder.web, holder);
         if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
             showDelete(holder.ib_des);
@@ -140,10 +140,10 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                                 @Override
                                                 public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
-                                                    FileUtil.init(context).DeleteAnime(eids.get(holder.getAdapterPosition()));
+                                                    FileUtil.init(context).DeleteAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
                                                     showDownload(holder.ib_des);
                                                     showCloudPlay(holder.ib_ver);
-                                                    ManageDownload.cancel(context, eids.get(holder.getAdapterPosition()));
+                                                    ManageDownload.cancel(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
                                                     Toast.makeText(context, "Archivo Eliminado", Toast.LENGTH_SHORT).show();
                                                 }
                                             })
@@ -263,29 +263,32 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!MainStates.isListing()) {
-                    //context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putBoolean("cambio", true).apply();
-                    if (!FileUtil.init(context).isInSeen(eids.get(holder.getAdapterPosition()))) {
-                        FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition()), true);
-                        holder.tv_capitulo.setTextColor(getColor());
+                try {
+                    if (!MainStates.isListing()) {
+                        if (!FileUtil.init(context).isInSeen(eids.get(holder.getAdapterPosition()))) {
+                            FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition()), true);
+                            holder.tv_capitulo.setTextColor(getColor());
+                        } else {
+                            FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition()), false);
+                            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
+                                holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.blanco));
+                            } else {
+                                holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
+                            }
+                        }
                     } else {
-                        FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition()), false);
-                        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
-                            holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.blanco));
-                        } else {
-                            holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
+                        if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
+                            if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
+                                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition()));
+                                showDownload(holder.ib_des);
+                            } else {
+                                MainStates.init(context).addToWaitList(eids.get(holder.getAdapterPosition()));
+                                holder.ib_des.setImageResource(R.drawable.ic_waiting);
+                            }
                         }
                     }
-                } else {
-                    if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
-                        if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
-                            MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition()));
-                            showDownload(holder.ib_des);
-                        } else {
-                            MainStates.init(context).addToWaitList(eids.get(holder.getAdapterPosition()));
-                            holder.ib_des.setImageResource(R.drawable.ic_waiting);
-                        }
-                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });

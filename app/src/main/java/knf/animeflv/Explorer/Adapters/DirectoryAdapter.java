@@ -78,7 +78,7 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
         holder.root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                interfaces.OnDirectoryClicked(list.get(holder.getAdapterPosition()).getFile(context), list.get(holder.getAdapterPosition()).getTitle());
+                interfaces.OnDirectoryClicked(list.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getFile(context), list.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getTitle());
             }
         });
         holder.del.setOnClickListener(new View.OnClickListener() {

@@ -42,6 +42,7 @@ import java.util.concurrent.TimeUnit;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
+import knf.animeflv.Favorites.FavoriteHelper;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
 import knf.animeflv.JsonFactory.DownloadGetter;
 import knf.animeflv.Parser;
@@ -149,9 +150,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
             if (resaltar)
                 holder.card.setCardBackgroundColor(Color.argb(100, 253, 250, 93));
         }
-        final String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-        final Boolean comp = favoritos.startsWith(Animes.get(position).getAid() + ":::") || favoritos.contains(":::" + Animes.get(position).getAid() + ":::") || favoritos.endsWith(":::" + Animes.get(position).getAid());
-        if (comp) {
+        if (FavoriteHelper.isFav(context, Animes.get(position).getAid())) {
             if (resaltar)
                 holder.card.setCardBackgroundColor(Color.argb(100, 26, 206, 246));
         }

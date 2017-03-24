@@ -310,14 +310,15 @@ public class AboutActivity extends MaterialAboutActivity {
                                 .color(iconColor(this))
                                 .sizeDp(18)
                         );
-        if (!item.alias.trim().equals(""))
-            action.setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
-                @Override
-                public void onClick() {
-                    Toaster.toastLong(item.message);
+        action.setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+            @Override
+            public void onClick() {
+                Log.e("Beta", "Onclick");
+                Toaster.toastLong(item.message);
+                if (!item.alias.trim().equals(""))
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/" + item.alias)));
-                }
-            });
+            }
+        });
         builder.addItem(action.build());
     }
 

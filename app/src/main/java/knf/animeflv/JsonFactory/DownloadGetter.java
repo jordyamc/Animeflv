@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -70,83 +71,109 @@ public class DownloadGetter {
                             e.printStackTrace();
                         }
                         if (nombres.size() != 0) {
-                            final MaterialDialog.Builder d = new MaterialDialog.Builder(context)
-                                    .title(actionsInterface.isStream() ? "Streaming" : "Descarga")
-                                    .titleGravity(GravityEnum.CENTER)
-                                    .customView(R.layout.dialog_down, false)
-                                    .cancelable(true)
-                                    .autoDismiss(false)
-                                    .positiveText(actionsInterface.isStream() ? "Reproducir" : "Descargar")
-                                    .negativeText("Cancelar")
-                                    .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                            String des = nombres.get(sp.getSelectedItemPosition());
-                                            final String ur = urls.get(sp.getSelectedItemPosition());
-                                            switch (des.toLowerCase()) {
-                                                case "zippyshare":
-                                                    actionsInterface.onStartZippy(ur);
-                                                    dialog.dismiss();
-                                                    break;
-                                                case "zippyshare fast":
-                                                    dialog.dismiss();
-                                                    startDownload(actionsInterface.isStream(), context, eid, ur, new CookieConstructor(datas.get(0)));
-                                                    actionsInterface.onStartDownload();
-                                                    break;
-                                                case "mega":
-                                                    dialog.dismiss();
-                                                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
-                                                    MainStates.setProcessing(false, null);
-                                                    actionsInterface.onStartDownload();
-                                                    break;
-                                                default:
-                                                    startDownload(actionsInterface.isStream(), context, eid, ur);
-                                                    MainStates.setProcessing(false, null);
-                                                    actionsInterface.onStartDownload();
-                                                    dialog.dismiss();
-                                                    break;
+                            int pref = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("def_download", "0"));
+                            if (pref > 0 && !jsonArray.getJSONObject(pref - 1).getString("url").equals("null") && !(CastPlayBackManager.get(context).isDeviceConnected() && actionsInterface.isStream())) {
+                                JSONObject current = jsonArray.getJSONObject(pref - 1);
+                                String des = current.getString("name");
+                                final String ur = current.getString("url");
+                                switch (des.toLowerCase()) {
+                                    case "zippyshare":
+                                        actionsInterface.onStartZippy(ur);
+                                        break;
+                                    case "zippyshare fast":
+                                        startDownload(actionsInterface.isStream(), context, eid, ur, new CookieConstructor(datas.get(0)));
+                                        actionsInterface.onStartDownload();
+                                        break;
+                                    case "mega":
+                                        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
+                                        MainStates.setProcessing(false, null);
+                                        actionsInterface.onStartDownload();
+                                        break;
+                                    default:
+                                        startDownload(actionsInterface.isStream(), context, eid, ur);
+                                        MainStates.setProcessing(false, null);
+                                        actionsInterface.onStartDownload();
+                                        break;
+                                }
+                            } else {
+                                final MaterialDialog.Builder d = new MaterialDialog.Builder(context)
+                                        .title(actionsInterface.isStream() ? "Streaming" : "Descarga")
+                                        .titleGravity(GravityEnum.CENTER)
+                                        .customView(R.layout.dialog_down, false)
+                                        .cancelable(true)
+                                        .autoDismiss(false)
+                                        .positiveText(actionsInterface.isStream() ? "Reproducir" : "Descargar")
+                                        .negativeText("Cancelar")
+                                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                            @Override
+                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                String des = nombres.get(sp.getSelectedItemPosition());
+                                                final String ur = urls.get(sp.getSelectedItemPosition());
+                                                switch (des.toLowerCase()) {
+                                                    case "zippyshare":
+                                                        actionsInterface.onStartZippy(ur);
+                                                        dialog.dismiss();
+                                                        break;
+                                                    case "zippyshare fast":
+                                                        dialog.dismiss();
+                                                        startDownload(actionsInterface.isStream(), context, eid, ur, new CookieConstructor(datas.get(0)));
+                                                        actionsInterface.onStartDownload();
+                                                        break;
+                                                    case "mega":
+                                                        dialog.dismiss();
+                                                        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
+                                                        MainStates.setProcessing(false, null);
+                                                        actionsInterface.onStartDownload();
+                                                        break;
+                                                    default:
+                                                        startDownload(actionsInterface.isStream(), context, eid, ur);
+                                                        MainStates.setProcessing(false, null);
+                                                        actionsInterface.onStartDownload();
+                                                        dialog.dismiss();
+                                                        break;
+                                                }
                                             }
-                                        }
-                                    })
-                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                        })
+                                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                            @Override
+                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                MainStates.setProcessing(false, null);
+                                                actionsInterface.onCancelDownload();
+                                                dialog.dismiss();
+                                            }
+                                        })
+                                        .cancelListener(new DialogInterface.OnCancelListener() {
+                                            @Override
+                                            public void onCancel(DialogInterface dialog) {
+                                                dialog.dismiss();
+                                                MainStates.setProcessing(false, null);
+                                                actionsInterface.onCancelDownload();
+                                            }
+                                        });
+                                if (CastPlayBackManager.get(context).isDeviceConnected() && actionsInterface.isStream()) {
+                                    d.neutralText("CAST");
+                                    d.onNeutral(new MaterialDialog.SingleButtonCallback() {
                                         @Override
                                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                            MainStates.setProcessing(false, null);
-                                            actionsInterface.onCancelDownload();
-                                            dialog.dismiss();
-                                        }
-                                    })
-                                    .cancelListener(new DialogInterface.OnCancelListener() {
-                                        @Override
-                                        public void onCancel(DialogInterface dialog) {
-                                            dialog.dismiss();
-                                            MainStates.setProcessing(false, null);
-                                            actionsInterface.onCancelDownload();
+                                            String url = urls.get(sp.getSelectedItemPosition());
+                                            if (!url.toLowerCase().contains("zippyshare")) {
+                                                CastPlayBackManager.get(context).play(url, eid);
+                                                dialog.dismiss();
+                                            } else {
+                                                Toaster.toast("No se puede reproducir desde Zippyshare!!!");
+                                                dialog.dismiss();
+                                            }
+                                            actionsInterface.onStartCasting();
                                         }
                                     });
-                            if (CastPlayBackManager.get(context).isDeviceConnected() && actionsInterface.isStream()) {
-                                d.neutralText("CAST");
-                                d.onNeutral(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        String url = urls.get(sp.getSelectedItemPosition());
-                                        if (!url.toLowerCase().contains("zippyshare")) {
-                                            CastPlayBackManager.get(context).play(url, eid);
-                                            dialog.dismiss();
-                                        } else {
-                                            Toaster.toast("No se puede reproducir desde Zippyshare!!!");
-                                            dialog.dismiss();
-                                        }
-                                        actionsInterface.onStartCasting();
-                                    }
-                                });
+                                }
+                                MaterialDialog builded = d.build();
+                                sp = (Spinner) builded.getCustomView().findViewById(R.id.spinner_down);
+                                sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
+                                sp.setBackgroundColor((ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context)));
+                                builded.show();
                             }
-                            MaterialDialog builded = d.build();
-                            sp = (Spinner) builded.getCustomView().findViewById(R.id.spinner_down);
-                            sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
-                            sp.setBackgroundColor((ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context)));
-                            builded.show();
                         } else {
                             Toaster.toast("No hay links!!! Intenta mas tarde!!!");
                             MainStates.setProcessing(false, null);

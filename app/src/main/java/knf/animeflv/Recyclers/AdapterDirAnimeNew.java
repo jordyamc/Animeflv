@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
@@ -76,15 +78,16 @@ public class AdapterDirAnimeNew extends RecyclerView.Adapter<AdapterDirAnimeNew.
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.img)
         public ImageView iv_rel;
+        @BindView(R.id.title)
         public TextView tv_tit;
+        @BindView(R.id.card)
         public CardView card;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            this.iv_rel = (ImageView) itemView.findViewById(R.id.imgCardInfoRel);
-            this.tv_tit = (TextView) itemView.findViewById(R.id.tv_info_rel_tit);
-            this.card = (CardView) itemView.findViewById(R.id.cardRel);
+            ButterKnife.bind(this, itemView);
         }
     }
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -176,7 +177,7 @@ public class AutoEmisionHelper {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
-    public static void removeAnimeFromList(final Context context, final String aid, final int daycode, EmisionEditDialog.SearchListener listener) {
+    public static void removeAnimeFromList(final Context context, final String aid, final int daycode, @Nullable EmisionEditDialog.SearchListener listener) {
         try {
             JSONObject object = getJson(context);
             JSONArray array = object.getJSONArray(KEY_JSON_LIST).getJSONObject(daycode - 1).getJSONArray(KEY_JSON_AIDS);
@@ -187,11 +188,13 @@ public class AutoEmisionHelper {
             }
             object.getJSONArray(KEY_JSON_LIST).getJSONObject(daycode - 1).put(KEY_JSON_AIDS, n_list);
             saveListCommit(context, object);
-            listener.OnResponse(null);
+            if (listener != null)
+                listener.OnResponse(null);
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("ADD Emision", "Error Removing " + aid);
-            listener.OnError();
+            if (listener != null)
+                listener.OnError();
         }
     }
 

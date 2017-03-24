@@ -30,7 +30,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import knf.animeflv.Favoritos;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
@@ -118,7 +117,7 @@ public class AdapterFavs extends RecyclerView.Adapter<AdapterFavs.ViewHolder> {
                     item = new InfoHelper.BundleItem("link", getUrlInfo(titulosCard.get(position), new Parser().getTipoAnime(json)));
                 }
                 InfoHelper.open(
-                        ((Favoritos) context),
+                        context,
                         new InfoHelper.SharedItem(holder.iv_rel, "img"),
                         Intent.FLAG_ACTIVITY_NEW_TASK,
                         new InfoHelper.BundleItem("aid", aids.get(holder.getAdapterPosition())),

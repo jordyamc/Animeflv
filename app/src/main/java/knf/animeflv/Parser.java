@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Favorites.FavotiteDB;
 import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.objects.MainObject;
@@ -393,6 +394,28 @@ public class Parser {
                 return "Pelicula";
 
         }
+    }
+
+    public static String getUrlAnimeCached(String aid) {
+        String ret = "null";
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject nombreJ = jsonArray.getJSONObject(i);
+                    String n = nombreJ.getString("a");
+                    if (n.trim().equals(aid)) {
+                        return "http://animeflv.net/" + nombreJ.getString("c").toLowerCase() + "/" + nombreJ.getString("e") + "/" + nombreJ.getString("d");
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return ret;
     }
 
     public String[] parseTitulos(String json) {
@@ -800,28 +823,6 @@ public class Parser {
         return ret;
     }
 
-    public String getUrlAnimeCached(String aid) {
-        String ret = "null";
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-        File file = new File(file_loc);
-        if (file.exists()) {
-            try {
-                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
-                JSONArray jsonArray = jsonObj.getJSONArray("lista");
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject nombreJ = jsonArray.getJSONObject(i);
-                    String n = nombreJ.getString("a");
-                    if (n.trim().equals(aid)) {
-                        return "http://animeflv.net/" + nombreJ.getString("c").toLowerCase() + "/" + nombreJ.getString("e") + "/" + nombreJ.getString("d");
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return ret;
-    }
-
     public String getTitCached(String aid) {
         String ret = "null";
         String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
@@ -964,7 +965,7 @@ public class Parser {
             jsonObject.put("pass_coded", PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null"));
             jsonObject.put("access_token", PreferenceManager.getDefaultSharedPreferences(context).getString(DropboxManager.KEY_DROPBOX, null));
             jsonObject.put("accentColor", PreferenceManager.getDefaultSharedPreferences(context).getInt("accentColor", ColorsRes.Naranja(context)));
-            jsonObject.put("favoritos", context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", ""));
+            jsonObject.put("favoritos", new FavotiteDB(context).getDBJSON(true).toString());
             jsonObject.put("vistos", context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", ""));
             JSONArray jsonArray = new JSONArray();
             JSONObject not = new JSONObject();
@@ -1035,7 +1036,7 @@ public class Parser {
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", j.getString("pass_coded")).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString(DropboxManager.KEY_DROPBOX, j.getString("access_token")).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("accentColor", j.getInt("accentColor")).apply();
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("favoritos", j.getString("favoritos")).apply();
+            new FavotiteDB(context).updatebyJSON(new JSONObject(j.getString("favoritos")), null);
             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", j.getString("vistos")).apply();
             JSONArray jsonArray = j.getJSONArray("preferencias");
             for (int i = 0; i < jsonArray.length(); i++) {

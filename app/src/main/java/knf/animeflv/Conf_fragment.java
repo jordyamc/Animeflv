@@ -356,6 +356,24 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
+        getPreferenceScreen().findPreference("sort_fav").setSummary(getStringfromResourse(R.array.sort_type, "sort_fav", "0"));
+        getPreferenceScreen().findPreference("sort_fav").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                UtilDialogPref.init(getResources().getStringArray(R.array.sort_type), "%s", "sort_fav", "0", "Selecciona", getPreferenceScreen().findPreference("sort_fav"));
+                PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("def_download").setSummary(getStringfromResourse(R.array.download_name, "def_download", "0"));
+        getPreferenceScreen().findPreference("def_download").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                UtilDialogPref.init(getResources().getStringArray(R.array.download_name), "%s", "def_download", "0", "Selecciona", getPreferenceScreen().findPreference("def_download"));
+                PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
+                return false;
+            }
+        });
         getPreferenceScreen().findPreference("Rpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {

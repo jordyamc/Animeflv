@@ -57,7 +57,11 @@ public class ThemeUtils {
     }
 
     public static void setStatusBarPadding(Activity activity, View toolbar) {
-        toolbar.setPadding(0, getStatusBarHeight(activity), 0, 0);
+        try {
+            toolbar.setPadding(0, getStatusBarHeight(activity), 0, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void setNavigationBarPadding(Activity activity, View view) {

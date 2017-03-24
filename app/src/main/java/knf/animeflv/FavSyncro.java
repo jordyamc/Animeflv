@@ -5,12 +5,17 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import knf.animeflv.Favorites.FavotiteDB;
 import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.LoginActivity.LoginServer;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.Utils.NetworkUtils;
 
 public class FavSyncro {
+    public static boolean isLogedIn(Context context) {
+        return LoginServer.isLogedIn(context) || DropboxManager.islogedIn();
+    }
+
     public static void updateServer(Context activity) {
         if (LoginServer.isLogedIn(activity))
             LoginServer.RefreshData(activity);
@@ -56,42 +61,46 @@ public class FavSyncro {
     }
 
     public static void updateLocal(final Context context, final UpdateCallback callback) {
-        LoginServer.RefreshLocalData(context, new LoginServer.RefreshLocalInterface() {
-            @Override
-            public void onUpdate() {
-                callback.onUpdate();
-            }
+        if (isLogedIn(context)) {
+            LoginServer.RefreshLocalData(context, new LoginServer.RefreshLocalInterface() {
+                @Override
+                public void onUpdate() {
+                    callback.onUpdate();
+                }
 
-            @Override
-            public void onSuccess() {
+                @Override
+                public void onSuccess() {
 
-            }
+                }
 
-            @Override
-            public void onError() {
-                Log.e("Fav Sync", "Error getting from server, trying Dropbox");
-                DropboxManager.downloadFavs(context, new DropboxManager.DownloadCallback() {
-                    @Override
-                    public void onDownload(JSONObject object, boolean success) {
-                        if (success) {
-                            Log.e("Fav Sync", "Dropbox Success, saving local");
-                            try {
-                                String favoritos = Parser.getTrimedList(new Parser().getUserFavs(object.toString()), ":::");
-                                String favs = Parser.getTrimedList(context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", ""), ":::");
-                                if (!favs.equals(favoritos)) {
-                                    context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("favoritos", favoritos).apply();
-                                    callback.onUpdate();
+                @Override
+                public void onError() {
+                    Log.e("Fav Sync", "Error getting from server, trying Dropbox");
+                    DropboxManager.downloadFavs(context, new DropboxManager.DownloadCallback() {
+                        @Override
+                        public void onDownload(JSONObject object, boolean success) {
+                            if (success) {
+                                try {
+                                    Log.e("Fav Sync", "Dropbox Success, saving local");
+                                    new FavotiteDB(context).updatebyJSON(object, new FavotiteDB.updateDataInterface() {
+                                        @Override
+                                        public void onFinish() {
+                                            callback.onUpdate();
+                                        }
+                                    });
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                            } else {
+                                Log.e("Fav Sync", "Error getting from Dropbox");
                             }
-                        } else {
-                            Log.e("Fav Sync", "Error getting from Dropbox");
                         }
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+        } else {
+            callback.onUpdate();
+        }
     }
 
     public static void updateLocalSeen(final Context context, final UpdateCallback callback) {
@@ -152,7 +161,7 @@ public class FavSyncro {
     }
 
 
-    interface UpdateCallback {
+    public interface UpdateCallback {
         void onUpdate();
     }
 }

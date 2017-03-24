@@ -33,6 +33,7 @@ import java.util.Set;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.BackDownload;
+import knf.animeflv.Favorites.FavoriteHelper;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
 import knf.animeflv.Parser;
@@ -41,6 +42,7 @@ import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.NoLogInterface;
+import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UtilNotBlocker;
 import knf.animeflv.Utils.UtilSound;
 import knf.animeflv.Utils.objects.MainObject;
@@ -133,10 +135,9 @@ public class startBackground {
                                 Set<String> sts = context.getSharedPreferences("data", Context.MODE_PRIVATE).getStringSet("eidsNot", new HashSet<String>());
                                 loop:
                                 {
-                                    String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
                                     for (MainObject st : mainobjects) {
                                         if (!st.eid.equals(oldobjects.get(0).eid)) {
-                                            Boolean isInFavs = favoritos.startsWith(st.aid + ":::") || favoritos.contains(":::" + st.aid + ":::");
+                                            Boolean isInFavs = FavoriteHelper.isFav(context, st.aid);
                                             if (isInFavs && desc && isnot) {
                                                 Descargar(context, st.titulo, st.eid, st.sid);
                                             }
@@ -194,6 +195,7 @@ public class startBackground {
                                     mBuilder.setStyle(bigTextStyle);
                                     int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
                                     mBuilder.setSound(UtilSound.getSoundUri(not));
+                                    mBuilder.setColor(ThemeUtils.getAcentColor(context));
                                     mBuilder.setAutoCancel(true);
                                     mBuilder.setPriority(Notification.PRIORITY_MAX);
                                     mBuilder.setLights(Color.argb(0, 255, 128, 0), 5000, 2000);

@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
@@ -91,6 +92,7 @@ public class NetworkUtils {
     private static class checkAct extends AsyncTask<String, String, String> {
         Context Tcontext;
         FloatingActionButton button;
+        String update_ver;
 
         public checkAct(Context tcontext, FloatingActionButton button) {
             Tcontext = tcontext;
@@ -120,6 +122,7 @@ public class NetworkUtils {
                             mensaje = data.split(":::");
                         }
                     }
+                    update_ver = vers;
                     Log.d("Version", Integer.toString(versionCode) + " >> " + vers.trim());
                     if (versionCode >= Integer.parseInt(vers.trim())) {
                         UpdateUtil.isBeta = versionCode > Integer.parseInt(vers.trim());
@@ -201,6 +204,7 @@ public class NetworkUtils {
                                 .callback(new MaterialDialog.ButtonCallback() {
                                     @Override
                                     public void onPositive(final MaterialDialog dialog) {
+                                        TrackingHelper.track((AppCompatActivity) Tcontext, TrackingHelper.UPDATING + update_ver.trim());
                                         dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
                                         if (descarga.exists()) {
                                             descarga.delete();

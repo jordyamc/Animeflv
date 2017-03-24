@@ -129,7 +129,8 @@ public class ThemeFragment extends SlideFragment {
                 getA().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        toolbar.setBackgroundColor((Integer) animation.getAnimatedValue());
+                        if (toolbar != null)
+                            toolbar.setBackgroundColor((Integer) animation.getAnimatedValue());
                     }
                 });
             }
@@ -145,6 +146,7 @@ public class ThemeFragment extends SlideFragment {
                 getA().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        if (linearLayout != null)
                         linearLayout.setBackgroundColor((Integer) animation.getAnimatedValue());
                     }
                 });
@@ -161,6 +163,7 @@ public class ThemeFragment extends SlideFragment {
                 getA().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        if (color != null)
                         color.setColorFilter((Integer) animation.getAnimatedValue());
                     }
                 });
@@ -177,6 +180,7 @@ public class ThemeFragment extends SlideFragment {
                 getA().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        if (card1 != null)
                         card1.setCardBackgroundColor((Integer) animation.getAnimatedValue());
                     }
                 });
@@ -193,9 +197,11 @@ public class ThemeFragment extends SlideFragment {
                 getA().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        title1.setTextColor((Integer) animation.getAnimatedValue());
-                        title2.setTextColor((Integer) animation.getAnimatedValue());
-                        title3.setTextColor((Integer) animation.getAnimatedValue());
+                        if (title1 != null && title2 != null && title3 != null) {
+                            title1.setTextColor((Integer) animation.getAnimatedValue());
+                            title2.setTextColor((Integer) animation.getAnimatedValue());
+                            title3.setTextColor((Integer) animation.getAnimatedValue());
+                        }
                     }
                 });
             }
@@ -211,10 +217,12 @@ public class ThemeFragment extends SlideFragment {
                 getA().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        cap1.setTextColor((Integer) animation.getAnimatedValue());
-                        cap2.setTextColor((Integer) animation.getAnimatedValue());
-                        cap3.setTextColor((Integer) animation.getAnimatedValue());
-                        accent.setColorFilter((Integer) animation.getAnimatedValue());
+                        if (cap1 != null && cap2 != null && cap3 != null && accent != null) {
+                            cap1.setTextColor((Integer) animation.getAnimatedValue());
+                            cap2.setTextColor((Integer) animation.getAnimatedValue());
+                            cap3.setTextColor((Integer) animation.getAnimatedValue());
+                            accent.setColorFilter((Integer) animation.getAnimatedValue());
+                        }
                     }
                 });
             }

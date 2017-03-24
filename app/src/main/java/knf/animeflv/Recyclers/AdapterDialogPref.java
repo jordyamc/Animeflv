@@ -102,13 +102,17 @@ public class AdapterDialogPref extends RecyclerView.Adapter<AdapterDialogPref.Vi
                             holder.playing.setImageResource(R.drawable.ic_stop);
                         }
                     } else {
-                        if (UtilDialogPref.getPlayer().isPlaying()) {
-                            UtilDialogPref.getPlayer().stop();
+                        try {
+                            if (UtilDialogPref.getPlayer().isPlaying()) {
+                                UtilDialogPref.getPlayer().stop();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                         setMediaPlayer(holder.getAdapterPosition());
                         UtilDialogPref.getPlayer().start();
                         updatebyPref(holder.getAdapterPosition());
-                        checkRadios(holder.getAdapterPosition());
+                        checkRadios(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition());
                     }
                     UtilSound.setCurrentMediaPlayerInt(holder.getAdapterPosition());
                 }

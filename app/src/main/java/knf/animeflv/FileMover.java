@@ -188,7 +188,8 @@ public class FileMover {
                     }
                 }
         } catch (Exception e) {
-            fileout.delete();
+            if (fileout != null)
+                fileout.delete();
             Log.e("Move Error", file.getName() + " Error:" + e.getMessage());
             e.printStackTrace();
             listener.onError(file.getName());

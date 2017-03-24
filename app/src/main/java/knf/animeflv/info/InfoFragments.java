@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -44,8 +43,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -54,6 +51,8 @@ import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadService.DownloaderService;
 import knf.animeflv.FavSyncro;
+import knf.animeflv.Favorites.FavoriteHelper;
+import knf.animeflv.Favorites.FavotiteDB;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DIRECTORIO;
@@ -439,21 +438,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         try {
             Amenu = menu;
             if (isInInfo) {
-                SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-                String fav = sharedPreferences.getString("favoritos", "");
-                String[] favoritos = {};
-                favoritos = fav.split(":::");
-                Boolean isfav = false;
-                for (String favo : favoritos) {
-                    if (!favo.equals("") && !favo.equals("null")) {
-                        if (favo.trim().equals(aid.trim())) {
-                            getMenuInflater().inflate(R.menu.menu_fav_si, menu);
-                            isfav = true;
-                            break;
-                        }
-                    }
-                }
-                if (isfav) {
+                if (FavoriteHelper.isFav(this, aid)) {
                     Amenu.clear();
                     getMenuInflater().inflate(R.menu.menu_fav_si, menu);
                 } else {
@@ -482,47 +467,34 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         try {
             switch (item.getItemId()) {
                 case R.id.favorito_si:
-                    SharedPreferences sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-                    String fav = sharedPreferences.getString("favoritos", "");
-                    String[] favoritos = {};
-                    favoritos = fav.split(":::");
-                    List<String> list = new ArrayList<String>();
-                    for (String i : favoritos) {
-                        if (!i.equals("")) {
-                            if (Integer.parseInt(i) != Integer.parseInt(aid)) {
-                                list.add(i);
-                            }
+                    FavoriteHelper.setFav(this, aid, false, new FavotiteDB.updateDataInterface() {
+                        @Override
+                        public void onFinish() {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toaster.toast("Favorito Eliminado");
+                                    supportInvalidateOptionsMenu();
+                                }
+                            });
+                            FavSyncro.updateFavs(InfoFragments.this);
                         }
-                    }
-                    favoritos = new String[list.size()];
-                    list.toArray(favoritos);
-                    StringBuilder builder = new StringBuilder();
-                    for (String i : favoritos) {
-                        builder.append(":::" + i);
-                    }
-                    Toaster.toast("Favorito Eliminado");
-                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builder.toString()).apply();
-                    FavSyncro.updateFavs(InfoFragments.this);
-                    Amenu.clear();
-                    getMenuInflater().inflate(R.menu.menu_fav_no, Amenu);
-                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", true).apply();
+                    });
                     break;
                 case R.id.favorito_no:
-                    String[] favoritosNo = {getSharedPreferences("data", MODE_PRIVATE).getString("favoritos", "")};
-                    List<String> Listno = new ArrayList<String>(Arrays.asList(favoritosNo));
-                    Listno.add(aid);
-                    favoritos = new String[Listno.size()];
-                    Listno.toArray(favoritos);
-                    StringBuilder builderNo = new StringBuilder();
-                    for (String i : favoritos) {
-                        builderNo.append(":::" + i);
-                    }
-                    Toaster.toast("Favorito Agregado");
-                    getSharedPreferences("data", MODE_PRIVATE).edit().putString("favoritos", builderNo.toString()).apply();
-                    FavSyncro.updateFavs(InfoFragments.this);
-                    Amenu.clear();
-                    getMenuInflater().inflate(R.menu.menu_fav_si, Amenu);
-                    getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("cambio_fav", true).apply();
+                    FavoriteHelper.setFav(this, aid, true, new FavotiteDB.updateDataInterface() {
+                        @Override
+                        public void onFinish() {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toaster.toast("Favorito Agregado");
+                                    supportInvalidateOptionsMenu();
+                                }
+                            });
+                            FavSyncro.updateFavs(InfoFragments.this);
+                        }
+                    });
                     break;
                 case R.id.comentarios:
                     if (eps != null && eps.length() > 0) {

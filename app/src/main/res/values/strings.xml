@@ -59,10 +59,32 @@
         <item>Avanzado</item>
         <!--<item>Exo</item>     Desactivado-->
     </string-array>
+    <string-array name="sort_type">
+        <item>Sin Ordenar</item>
+        <item>Por Nombre</item>
+        <item>Por ID</item>
+        <item>Por ID - Invertido</item>
+    </string-array>
     <string-array name="sound_ind">
         <item>Ninguno</item>
         <item>Notificacion</item>
         <item>Flotante</item>
+    </string-array>
+    <string-array name="download_name">
+        <item>Ninguno</item>
+        <item>Izanagi</item>
+        <item>Minhateca</item>
+        <item>Yotta</item>
+        <item>Yotta 720p</item>
+        <item>Yotta 480p</item>
+        <item>Yotta 360p</item>
+        <item>Mp4Upload</item>
+        <item>YourUpload</item>
+        <item>Zippyshare</item>
+        <item>4Sync</item>
+        <item>Mega</item>
+        <item>Animeflv</item>
+        <item>Maru</item>
     </string-array>
     <string name="title_activity_ads">ADS</string>
     <string name="description">Player</string>

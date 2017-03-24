@@ -83,6 +83,8 @@ import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.DownloadService.DownloaderService;
 import knf.animeflv.Explorer.ExplorerRoot;
+import knf.animeflv.Favorites.FavoriteMain;
+import knf.animeflv.Favorites.FavotiteDB;
 import knf.animeflv.HallFame.HallActivity;
 import knf.animeflv.Interfaces.EncryptionListener;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
@@ -158,7 +160,7 @@ public class newMain extends AppCompatActivity implements
     private TaskType normal = TaskType.NORMAL;
     private TaskType secundario = TaskType.SECUNDARIA;
     private boolean frun = true;
-    private boolean tbool = false;
+    private boolean favs_data_ok = false;
     private boolean dropboxloging = false;
     private AdapterMain main;
     private AdapterMainNoGIF mainNo;
@@ -198,6 +200,7 @@ public class newMain extends AppCompatActivity implements
         setUpDrawer();
         getJson();
         NetworkUtils.checkVersion(this, updateButton);
+        ActualizarFavoritos();
         SharedPreferences prefs = this.getSharedPreferences("data", MODE_PRIVATE);
         frun = true;
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -453,8 +456,9 @@ public class newMain extends AppCompatActivity implements
                                 result.setSelection(0, false);
                                 break;
                             case 1:
-                                Intent in = new Intent(context, Favoritos.class);
-                                startActivity(in);
+                                //startActivity(new Intent(context, Favoritos.class));
+                                if (favs_data_ok)
+                                    startActivity(new Intent(context, FavoriteMain.class));
                                 result.setSelection(0, false);
                                 break;
                             case 2:
@@ -987,7 +991,6 @@ public class newMain extends AppCompatActivity implements
                         actionButton.setVisibility(View.GONE);
                     }
                 }
-                ActualizarFavoritos();
                 if (PreferenceManager.getDefaultSharedPreferences(newMain.this).getBoolean("noGif", true)) {
                     if (mainNo == null) {
                         recreate();
@@ -1021,17 +1024,12 @@ public class newMain extends AppCompatActivity implements
     }
 
     public void ActualizarFavoritos() {
-        if (NetworkUtils.isNetworkAvailable()) {
-            if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(this) || DropboxManager.islogedIn()) {
-                FavSyncro.updateLocal(this, new FavSyncro.UpdateCallback() {
-                    @Override
-                    public void onUpdate() {
-                        loadMainJson();
-                        Log.d("Reload by Favs", "Main");
-                    }
-                });
+        new FavotiteDB(this).updateOldData(new FavotiteDB.updateDataInterface() {
+            @Override
+            public void onFinish() {
+                favs_data_ok = true;
             }
-        }
+        });
     }
 
     public void isFirst() {
@@ -1108,6 +1106,7 @@ public class newMain extends AppCompatActivity implements
     @Override
     public void onRefresh() {
         if (NetworkUtils.isNetworkAvailable()) {
+//            ActualizarFavoritos();
             getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", new HashSet<String>()).apply();
             parser.refreshUrls(context);
@@ -1138,7 +1137,7 @@ public class newMain extends AppCompatActivity implements
         getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", new HashSet<String>()).apply();
         parser.refreshUrls(context);
-        ActualizarFavoritos();
+//        ActualizarFavoritos();
         UtilNotBlocker.setPaused(false);
         if (shouldExecuteOnResume) {
             Bypass.check(this, null);

@@ -165,6 +165,7 @@ public class Directorio extends AppCompatActivity {
                 viewPagerTab.setSelectedIndicatorColors(getResources().getColor(R.color.prim));
             } else {
                 toolbarS.getRootView().setBackgroundColor(ColorsRes.Prim(this));
+                if (ThemeUtils.isTablet(this))
                 findViewById(R.id.cardMain).setBackgroundColor(ColorsRes.Negro(this));
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

@@ -22,6 +22,7 @@ import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropM
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -70,24 +71,7 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
                     int day = getArguments().getInt("day");
                     List<EmObj> list = AutoEmisionHelper.getDayList(getArguments().getString("array"), day);
                     startVerification(list, day);
-                    AutoEmisionListHolder.setList(day, list);
-                    adapter = new AutoEmisionAdapter(getActivity(), list, day, AutoEmisionFragment.this);
-                    wraped = dragDropManager.createWrappedAdapter(adapter);
-                    final GeneralItemAnimator animator = new DraggableItemAnimator();
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressBar.setVisibility(View.GONE);
-                            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                            recyclerView.setAdapter(wraped);
-                            recyclerView.setItemAnimator(animator);
-
-                            if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
-                                recyclerView.addItemDecoration(new ItemShadowDecorator((NinePatchDrawable) ContextCompat.getDrawable(getContext(), R.drawable.material_shadow_z1)));
-                            }
-                            dragDropManager.attachRecyclerView(recyclerView);
-                        }
-                    });
+                    setRecycler(list, day);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -96,43 +80,78 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
+    private void setRecycler(List<EmObj> list, int day) {
+        AutoEmisionListHolder.setList(day, list);
+        adapter = new AutoEmisionAdapter(getActivity(), list, day, AutoEmisionFragment.this);
+        wraped = dragDropManager.createWrappedAdapter(adapter);
+        final GeneralItemAnimator animator = new DraggableItemAnimator();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setVisibility(View.GONE);
+                recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                recyclerView.setAdapter(wraped);
+                recyclerView.setItemAnimator(animator);
+
+                if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
+                    recyclerView.addItemDecoration(new ItemShadowDecorator((NinePatchDrawable) ContextCompat.getDrawable(getContext(), R.drawable.material_shadow_z1)));
+                }
+                dragDropManager.attachRecyclerView(recyclerView);
+            }
+        });
+    }
+
     private void startVerification(final List<EmObj> list, final int day) {
         new AsyncTask<Void, Void, Void>() {
+            private boolean edited = false;
             @Override
             protected Void doInBackground(Void... params) {
-                for (final EmObj obj : list) {
-                    Log.e("Emision Check", "Day: " + day + "  Title: " + obj.getTitle());
-                    String off_json = OfflineGetter.getAnime(new ANIME(Integer.parseInt(obj.getAid())));
-                    if (!off_json.equals("null")) {
-                        try {
-                            JSONObject object = new JSONObject(off_json);
-                            if (!isEmision(object)) {
-                                Log.e("AutoEmision", "Deleting from list: " + obj.getTitle());
-                                AutoEmisionListHolder.deleteFromList(obj.getAid(), day);
-                                adapter.updatelist();
+                try {
+                    final List<EmObj> new_list = new ArrayList<EmObj>();
+                    new_list.addAll(list);
+                    for (final EmObj obj : list) {
+                        Log.e("Emision Check", "Day: " + day + "  Title: " + obj.getTitle());
+                        String off_json = OfflineGetter.getAnime(new ANIME(Integer.parseInt(obj.getAid())));
+                        if (!off_json.equals("null")) {
+                            try {
+                                JSONObject object = new JSONObject(off_json);
+                                if (!isEmision(object)) {
+                                    Log.e("AutoEmision", "Deleting from list: " + obj.getTitle());
+                                    AutoEmisionListHolder.deleteFromList(new_list, obj.getAid(), day);
+                                    AutoEmisionHelper.removeAnimeFromList(getActivity(), obj.getAid(), day, null);
+                                    edited = true;
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        BaseGetter.getJson(getActivity(), new ANIME(Integer.parseInt(obj.getAid())), new BaseGetter.AsyncInterface() {
-                            @Override
-                            public void onFinish(String json) {
-                                if (!json.equals("null")) {
-                                    try {
-                                        JSONObject object = new JSONObject(json);
-                                        if (!isEmision(object)) {
-                                            Log.e("AutoEmision", "Deleting from list: " + obj.getTitle());
-                                            AutoEmisionListHolder.deleteFromList(obj.getAid(), day);
-                                            adapter.updatelist();
+                        } else {
+                            BaseGetter.getJson(getActivity(), new ANIME(Integer.parseInt(obj.getAid())), new BaseGetter.AsyncInterface() {
+                                @Override
+                                public void onFinish(String json) {
+                                    if (!json.equals("null")) {
+                                        try {
+                                            JSONObject object = new JSONObject(json);
+                                            if (!isEmision(object)) {
+                                                Log.e("AutoEmision", "Deleting from list: " + obj.getTitle());
+                                                AutoEmisionListHolder.deleteFromList(new_list, obj.getAid(), day);
+                                                AutoEmisionHelper.removeAnimeFromList(getActivity(), obj.getAid(), day, null);
+                                                edited = true;
+                                            }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
                                         }
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
                                     }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
+                    if (edited) {
+                        setRecycler(new_list, day);
+                        /*AutoEmisionListHolder.setList(day,new_list);
+                        adapter.updatelist();*/
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
                 return null;
             }

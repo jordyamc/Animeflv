@@ -213,7 +213,6 @@ public class FileUtil {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -584,9 +583,13 @@ public class FileUtil {
     }
 
     public Uri getUriForFile(File file) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return FileProvider.getUriForFile(context, context.getPackageName() + ".RequestBackground", file);
-        } else {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                return FileProvider.getUriForFile(context, context.getPackageName() + ".RequestBackground", file);
+            } else {
+                return Uri.fromFile(file);
+            }
+        } catch (Exception e) {
             return Uri.fromFile(file);
         }
     }

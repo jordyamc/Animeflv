@@ -205,8 +205,10 @@ public class UtilSound {
                     Toaster.toast(getSoundName(current));
                     PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sonido", String.valueOf(current)).apply();
                     setCurrentMediaPlayerInt(current);
+                    if (getCurrentMediaPlayer() != null)
                     getCurrentMediaPlayer().stop();
                     setCurrentMediaPlayer(getMediaPlayer(context, current));
+                    if (getCurrentMediaPlayer() != null)
                     getCurrentMediaPlayer().start();
                 }
 

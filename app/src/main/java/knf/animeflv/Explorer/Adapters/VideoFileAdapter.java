@@ -160,7 +160,7 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
                                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        ManageDownload.cancel(context, list.get(holder.getAdapterPosition()).getEID());
+                                        ManageDownload.cancel(context, list.get(position).getEID());
                                         if (FileUtil.init(context).DeleteAnime(list.get(holder.getAdapterPosition()).getEID())) {
                                             context.runOnUiThread(new Runnable() {
                                                 @Override

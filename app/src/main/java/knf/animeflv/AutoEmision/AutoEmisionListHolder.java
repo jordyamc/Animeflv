@@ -105,8 +105,26 @@ public class AutoEmisionListHolder {
                 }
                 count++;
             }
+            if (exist) {
+                list.remove(count);
+                setList(day, list);
+            }
+        }
+    }
+
+    public static void deleteFromList(List<EmObj> list, String aid, int day) {
+        if (list != null) {
+            int count = 0;
+            boolean exist = false;
+            for (EmObj obj : list) {
+                if (obj.getAid().equals(aid)) {
+                    exist = true;
+                    break;
+                }
+                count++;
+            }
             if (exist)
-                getList(day).remove(count);
+                list.remove(count);
         }
     }
 

@@ -96,11 +96,16 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
 
     @Override
     public void onBindGroupViewHolder(final GroupHolder holder, final int groupPosition, int viewType) {
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
-            holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
-            holder.titulo.setTextColor(context.getResources().getColor(R.color.blanco));
+        if (ThemeUtils.isAmoled(context)) {
+            holder.card.setCardBackgroundColor(ColorsRes.Prim(context));
+            holder.titulo.setTextColor(ColorsRes.Blanco(context));
             holder.delete.setColorFilter(ColorsRes.Holo_Dark(context));
             holder.start.setColorFilter(ColorsRes.Holo_Dark(context));
+        } else {
+            holder.card.setCardBackgroundColor(ColorsRes.Blanco(context));
+            holder.titulo.setTextColor(ColorsRes.SecondaryTextLight(context));
+            holder.delete.setColorFilter(ColorsRes.Holo_Light(context));
+            holder.start.setColorFilter(ColorsRes.Holo_Light(context));
         }
         //PicassoCache.getPicassoInstance(context).load(Uri.parse(getUrlImg(animes.get(groupPosition)))).error(R.drawable.ic_block_r).into(holder.image);
         new CacheManager().mini(context, animes.get(groupPosition).aid, holder.image);
@@ -179,10 +184,15 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
     @Override
     public void onBindChildViewHolder(final ChildHolder holder, final int groupPosition, final int childPosition, int viewType) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
-            holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
-            holder.cap.setTextColor(context.getResources().getColor(R.color.blanco));
+            holder.card.setCardBackgroundColor(ColorsRes.Prim(context));
+            holder.cap.setTextColor(ColorsRes.Blanco(context));
             holder.delete.setColorFilter(ColorsRes.Holo_Dark(context));
             holder.download.setColorFilter(ColorsRes.Holo_Dark(context));
+        } else {
+            holder.card.setCardBackgroundColor(ColorsRes.Blanco(context));
+            holder.cap.setTextColor(ColorsRes.SecondaryTextLight(context));
+            holder.delete.setColorFilter(ColorsRes.Holo_Light(context));
+            holder.download.setColorFilter(ColorsRes.Holo_Light(context));
         }
         holder.cap.setText(Parser.getCap(animes.get(groupPosition).type, String.valueOf(animesCapList.get(groupPosition).get(childPosition)), animesCapList.get(groupPosition).size() > 1));
         holder.delete.setOnClickListener(new View.OnClickListener() {

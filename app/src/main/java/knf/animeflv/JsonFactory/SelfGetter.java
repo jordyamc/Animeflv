@@ -2,6 +2,7 @@ package knf.animeflv.JsonFactory;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -147,9 +148,20 @@ public class SelfGetter {
                                 if (eids.contains(object.getString("eid"))) {
                                     String url = Parser.getUrlCached(object.getString("eid"), object.getString("sid"));
                                     JSONObject obj = new JSONObject(getDownloadInfo(context, url));
-                                    String ur = obj.getJSONArray("downloads").getJSONObject(0).getString("url");
-                                    if (!url.contains("mega") || !url.contains("zippy"))
-                                        list.add(new WaitDownloadElement(object.getString("eid"), ur));
+                                    JSONArray links = obj.getJSONArray("downloads");
+                                    int pref = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("def_download", "0"));
+                                    if (pref > 0 && !links.getJSONObject(pref - 1).getString("url").equals("null")) {
+                                        list.add(new WaitDownloadElement(object.getString("eid"), links.getJSONObject(pref - 1).getString("url")));
+                                    } else {
+                                        for (int a = 0; a <= links.length(); a++) {
+                                            JSONObject link = links.getJSONObject(a);
+                                            String ur = link.getString("url");
+                                            if (!ur.trim().equals("null") && (!ur.contains("mega") || !ur.contains("zippy"))) {
+                                                list.add(new WaitDownloadElement(object.getString("eid"), ur));
+                                                break;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                             listListener.onListCreated(list);

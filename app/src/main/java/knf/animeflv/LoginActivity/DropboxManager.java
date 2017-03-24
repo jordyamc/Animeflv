@@ -22,11 +22,13 @@ import java.io.OutputStream;
 
 import knf.animeflv.AutoEmision.AutoEmisionHelper;
 import knf.animeflv.FavSyncro;
+import knf.animeflv.Favorites.FavotiteDB;
 import knf.animeflv.R;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Keys;
+import knf.animeflv.Utils.NetworkUtils;
 
 public class DropboxManager {
     public static final String KEY_DROPBOX = "token_dropbox";
@@ -108,34 +110,38 @@ public class DropboxManager {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                if (getToken() == null) {
-                    if (callback != null)
-                        callback.onUpload(false);
-                    return null;
-                }
-                SharedPreferences preferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
-                String favoritos = preferences.getString("favoritos", "");
-                try {
-                    JSONObject object = new JSONObject();
-                    object.put("response", "ok");
-                    object.put("favs", favoritos);
-                    File tmpFile = new File(Keys.Dirs.CACHE, "favs.save");
-                    FileUtil.writeToFile(object.toString(), tmpFile);
-                    InputStream inputStream = new FileInputStream(tmpFile);
-                    DbxClientV2 client = DropboxClientFactory.getClient();
-                    if (client == null) {
-                        DropboxClientFactory.init(accessToken);
-                        client = DropboxClientFactory.getClient();
+                if (islogedIn() && NetworkUtils.isNetworkAvailable()) {
+                    Log.e("DropBoxUpload", "Start Upload");
+                    if (getToken() == null) {
+                        if (callback != null)
+                            callback.onUpload(false);
+                        return null;
                     }
-                    client.files().uploadBuilder("/favs.save")
-                            .withMode(WriteMode.OVERWRITE)
-                            .withMute(true)
-                            .uploadAndFinish(inputStream);
-                    tmpFile.delete();
-                    if (callback != null)
-                        callback.onUpload(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    try {
+                        JSONObject object = new FavotiteDB(context).getDBJSON(true);
+                        File tmpFile = new File(Keys.Dirs.CACHE, "favs.save");
+                        FileUtil.writeToFile(object.toString(), tmpFile);
+                        InputStream inputStream = new FileInputStream(tmpFile);
+                        DbxClientV2 client = DropboxClientFactory.getClient();
+                        if (client == null) {
+                            DropboxClientFactory.init(accessToken);
+                            client = DropboxClientFactory.getClient();
+                        }
+                        client.files().uploadBuilder("/favs.save")
+                                .withMode(WriteMode.OVERWRITE)
+                                .withMute(true)
+                                .uploadAndFinish(inputStream);
+                        tmpFile.delete();
+                        if (callback != null)
+                            callback.onUpload(true);
+                        Log.e("DropBoxUpload", "Upload Success");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        if (callback != null)
+                            callback.onUpload(false);
+                        Log.e("DropBoxUpload", "Upload Error");
+                    }
+                } else {
                     if (callback != null)
                         callback.onUpload(false);
                 }

@@ -33,6 +33,7 @@ import es.munix.multidisplaycast.CastControlsActivity;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
+import knf.animeflv.Favorites.FavoriteHelper;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
 import knf.animeflv.JsonFactory.DownloadGetter;
 import knf.animeflv.Parser;
@@ -97,9 +98,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
             if (resaltar)
                 holder.card.setCardBackgroundColor(Color.argb(100, 253, 250, 93));
         }
-        final String favoritos = context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("favoritos", "");
-        final Boolean comp = favoritos.startsWith(Animes.get(position).getAid() + ":::") || favoritos.contains(":::" + Animes.get(position).getAid() + ":::") || favoritos.endsWith(":::" + Animes.get(position).getAid());
-        if (comp) {
+        if (FavoriteHelper.isFav(context, Animes.get(position).getAid())) {
             if (resaltar)
                 holder.card.setCardBackgroundColor(Color.argb(100, 26, 206, 246));
         }
@@ -195,7 +194,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 if (UpdateUtil.getState() == UpdateState.WAITING_TO_UPDATE) {
                     Toaster.toast("Actualizacion descargada, instalar para continuar");
                 } else {
-                    if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid()) && !ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+                    if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid()) && !ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                         if (!MainStates.isProcessing()) {
                             if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
                                 final int pos = holder.getAdapterPosition();
