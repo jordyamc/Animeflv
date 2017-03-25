@@ -95,7 +95,7 @@ public class InternalManager {
             sharedPreferences.edit().putString("titulos_descarga", tits + aid + ":::").apply();
             sharedPreferences.edit().putString("epIDS_descarga", epID + aid + "_" + numero + ":::").apply();
         } else {
-            Toaster.toast("Url no valida, Eid: " + eid);
+            Toaster.toast("Url no valida, Eid: " + eid + " Url: " + downUrl);
         }
     }
 
@@ -142,7 +142,7 @@ public class InternalManager {
             sharedPreferences.edit().putString("titulos_descarga", tits + aid + ":::").apply();
             sharedPreferences.edit().putString("epIDS_descarga", epID + aid + "_" + numero + ":::").apply();
         } else {
-            Toaster.toast("Url no valida, Eid: " + eid);
+            Toaster.toast("Url no valida, Eid: " + eid + " Url: " + downUrl);
         }
     }
 

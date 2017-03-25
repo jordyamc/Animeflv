@@ -150,7 +150,8 @@ public class SelfGetter {
                                     JSONObject obj = new JSONObject(getDownloadInfo(context, url));
                                     JSONArray links = obj.getJSONArray("downloads");
                                     int pref = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("def_download", "0"));
-                                    if (pref > 0 && !links.getJSONObject(pref - 1).getString("url").equals("null")) {
+                                    String prefLink = links.getJSONObject(pref - 1).getString("url");
+                                    if (pref > 0 && !prefLink.equals("null") && !(prefLink.contains("mega") && prefLink.contains("zippy"))) {
                                         list.add(new WaitDownloadElement(object.getString("eid"), links.getJSONObject(pref - 1).getString("url")));
                                     } else {
                                         for (int a = 0; a <= links.length(); a++) {
