@@ -31,6 +31,7 @@ import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.WaitList.WaitDownloadElement;
 import knf.animeflv.WaitList.WaitList;
+import xdroid.toaster.Toaster;
 
 public class SelfGetter {
     public static final int TIMEOUT = 10000;
@@ -150,18 +151,24 @@ public class SelfGetter {
                                     JSONObject obj = new JSONObject(getDownloadInfo(context, url));
                                     JSONArray links = obj.getJSONArray("downloads");
                                     int pref = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("def_download", "0"));
-                                    String prefLink = links.getJSONObject(pref - 1).getString("url");
-                                    if (pref > 0 && !prefLink.equals("null") && !(prefLink.contains("mega") && prefLink.contains("zippy"))) {
+                                    String prefLink = "null";
+                                    if (pref > 0)
+                                        prefLink = links.getJSONObject(pref - 1).getString("url");
+                                    if (pref > 0 && !prefLink.equals("null") && !(prefLink.contains("mega") || prefLink.contains("zippy"))) {
                                         list.add(new WaitDownloadElement(object.getString("eid"), links.getJSONObject(pref - 1).getString("url")));
                                     } else {
+                                        boolean found = false;
                                         for (int a = 0; a <= links.length(); a++) {
                                             JSONObject link = links.getJSONObject(a);
                                             String ur = link.getString("url");
                                             if (!ur.trim().equals("null") && (!ur.contains("mega") || !ur.contains("zippy"))) {
                                                 list.add(new WaitDownloadElement(object.getString("eid"), ur));
+                                                found = true;
                                                 break;
                                             }
                                         }
+                                        if (!found)
+                                            Toaster.toast("Error al encontrar link: " + object.getString("eid"));
                                     }
                                 }
                             }

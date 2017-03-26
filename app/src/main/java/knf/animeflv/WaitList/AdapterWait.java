@@ -140,7 +140,9 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
                 if (manager.isGroupExpanded(groupPosition)) {
                     manager.collapseGroup(groupPosition);
                 }
-                holder.card.setVisibility(View.GONE);
+                animesCapList.remove(groupPosition);
+                notifyItemRemoved(groupPosition);
+                //holder.card.setVisibility(View.GONE);
                 new WaitDBHelper(context).removeList(animes.get(groupPosition).aid);
                 MainStates.init(context).delFromGlobalWaitList(animes.get(groupPosition).aid);
                 WaitManager.Refresh();
