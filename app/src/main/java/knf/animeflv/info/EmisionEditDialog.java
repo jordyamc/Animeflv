@@ -2,21 +2,20 @@ package knf.animeflv.info;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.AppCompatSpinner;
-import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.Calendar;
@@ -31,8 +30,7 @@ import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
 public class EmisionEditDialog extends DialogFragment {
-    @BindView(R.id.switch_emision)
-    SwitchCompat switchCompat;
+    private static onEditListener listener;
     @BindView(R.id.spinner_emision)
     AppCompatSpinner spinner;
     @BindView(R.id.more_configs)
@@ -43,14 +41,14 @@ public class EmisionEditDialog extends DialogFragment {
     private MaterialDialog dialog;
     private EmObj object;
     private int daycode = -1;
-    private boolean exist = false;
-    private boolean existStart = false;
 
-    public static EmisionEditDialog create(String aid) {
+    public static EmisionEditDialog create(String aid, boolean count, onEditListener l) {
         Bundle bundle = new Bundle();
         bundle.putString("aid", aid);
+        bundle.putBoolean("count", count);
         EmisionEditDialog d = new EmisionEditDialog();
         d.setArguments(bundle);
+        listener = l;
         return d;
     }
 
@@ -60,73 +58,60 @@ public class EmisionEditDialog extends DialogFragment {
         super.onCreateDialog(savedInstanceState);
         root = LayoutInflater.from(getActivity()).inflate(R.layout.edit_emision, null);
         dialog = new MaterialDialog.Builder(getActivity())
-                .title("Editor")
-                .titleGravity(GravityEnum.CENTER)
                 .customView(root, true)
                 .positiveText("Aceptar")
                 .autoDismiss(false)
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull final MaterialDialog d, @NonNull DialogAction which) {
-                        if (daycode != object.getDaycode() || exist != existStart) {
-                            d.getActionButton(DialogAction.POSITIVE).setEnabled(false);
-                            if (!exist) {
-                                AutoEmisionHelper.removeAnimeFromList(getActivity(), object.getAid(), object.getDaycode(), new SearchListener() {
-                                    @Override
-                                    public void OnResponse(EmObj obj) {
-                                        getActivity().runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
-                                            }
-                                        });
-                                        getActivity().sendBroadcast(new Intent(InfoFragments.ACTION_EDITED));
-                                        Toaster.toast("Editado!!!");
-                                        d.dismiss();
-                                    }
+                        d.getActionButton(DialogAction.POSITIVE).setEnabled(false);
+                        AutoEmisionHelper.editAnimetoList(getActivity(), object, new EmObj(object.getAid(), daycode), new SearchListener() {
+                            @Override
+                            public void OnResponse(EmObj obj) {
+                                if (getArguments().getBoolean("count")) {
+                                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                                    int count = preferences.getInt("add_count", 0);
+                                    count++;
+                                    switch (count) {
+                                        case 4:
+                                            Toaster.toast("Que vicioso...");
+                                            break;
+                                        case 10:
+                                            Toaster.toast("Estas loco?");
+                                            break;
+                                        case 15:
+                                            Toaster.toast("Bueno, es tu vida, ya no te dire nada....");
+                                            break;
 
+                                    }
+                                    preferences.edit().putInt("add_count", count).apply();
+                                }
+                                object = obj;
+                                getActivity().runOnUiThread(new Runnable() {
                                     @Override
-                                    public void OnError() {
-                                        getActivity().runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
-                                            }
-                                        });
-                                        Toaster.toast("Error al editar");
+                                    public void run() {
+                                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
                                     }
                                 });
-                            } else {
-                                AutoEmisionHelper.editAnimetoList(getActivity(), object, new EmObj(object.getAid(), daycode), new SearchListener() {
-                                    @Override
-                                    public void OnResponse(EmObj obj) {
-                                        object = obj;
-                                        getActivity().runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
-                                            }
-                                        });
-                                        getActivity().sendBroadcast(new Intent(InfoFragments.ACTION_EDITED));
-                                        Toaster.toast("Editado!!!");
-                                        d.dismiss();
-                                    }
-
-                                    @Override
-                                    public void OnError() {
-                                        getActivity().runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
-                                            }
-                                        });
-                                        Toaster.toast("Error al editar");
-                                    }
-                                });
+                                getActivity().sendBroadcast(new Intent(InfoFragments.ACTION_EDITED));
+                                if (listener != null)
+                                    listener.onEdit();
+                                d.dismiss();
                             }
-                        } else {
-                            d.dismiss();
-                        }
+
+                            @Override
+                            public void OnError() {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                                    }
+                                });
+                                Toaster.toast("Error al editar");
+                                if (listener != null)
+                                    listener.onEdit();
+                            }
+                        });
                     }
                 }).build();
         dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
@@ -145,22 +130,6 @@ public class EmisionEditDialog extends DialogFragment {
 
             }
         });
-        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        exist = isChecked;
-                        if (isChecked) {
-                            configs.setVisibility(View.VISIBLE);
-                        } else {
-                            configs.setVisibility(View.GONE);
-                        }
-                    }
-                });
-            }
-        });
         AutoEmisionHelper.getAnimeInfo(getActivity(), getArguments().getString("aid"), new SearchListener() {
             @Override
             public void OnResponse(final EmObj obj) {
@@ -170,21 +139,13 @@ public class EmisionEditDialog extends DialogFragment {
                     public void run() {
                         dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
                         if (obj != null) {
-                            exist = true;
-                            existStart = true;
-                            switchCompat.setChecked(true);
                             daycode = obj.getDaycode();
                             spinner.setSelection(daycode, true);
-                            configs.setVisibility(View.VISIBLE);
                         } else {
                             object = new EmObj(getArguments().getString("aid"), getActualDayCode());
-                            exist = false;
-                            existStart = false;
-                            switchCompat.setChecked(false);
                             daycode = getActualDayCode();
                             spinner.setSelection(getActualDayCode(), true);
                         }
-                        switchCompat.setEnabled(true);
                     }
                 });
             }
@@ -200,7 +161,6 @@ public class EmisionEditDialog extends DialogFragment {
 
     private void setUpTheme() {
         boolean amoled = ThemeUtils.isAmoled(getActivity());
-        switchCompat.setTextColor(amoled ? ColorsRes.SecondaryTextDark(getActivity()) : ColorsRes.SecondaryTextLight(getActivity()));
         day.setTextColor(amoled ? ColorsRes.SecondaryTextDark(getActivity()) : ColorsRes.SecondaryTextLight(getActivity()));
     }
 
@@ -231,5 +191,9 @@ public class EmisionEditDialog extends DialogFragment {
         void OnResponse(EmObj obj);
 
         void OnError();
+    }
+
+    interface onEditListener {
+        void onEdit();
     }
 }

@@ -143,8 +143,12 @@ public class BackDownload extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        d.dismiss();
-        finish();
+        try {
+            d.dismiss();
+            finish();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void toast(String texto) {

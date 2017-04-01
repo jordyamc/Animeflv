@@ -5,20 +5,13 @@
               android:orientation="vertical"
               android:padding="15dp">
 
-    <android.support.v7.widget.SwitchCompat
-        android:id="@+id/switch_emision"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:enabled="false"
-        android:text="En Emision"/>
-
     <LinearLayout
         android:id="@+id/more_configs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -32,7 +25,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:text="Dia:"
-                android:textSize="24sp"/>
+                android:textSize="24sp" />
 
             <android.support.v7.widget.AppCompatSpinner
                 android:id="@+id/spinner_emision"
@@ -44,7 +37,7 @@
                 android:layout_marginLeft="30dp"
                 android:layout_marginStart="30dp"
                 android:layout_toEndOf="@+id/daytext"
-                android:layout_toRightOf="@+id/daytext"/>
+                android:layout_toRightOf="@+id/daytext" />
         </RelativeLayout>
     </LinearLayout>
 

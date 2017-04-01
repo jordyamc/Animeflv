@@ -47,6 +47,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import knf.animeflv.AutoEmision.AutoEmisionHelper;
+import knf.animeflv.AutoEmision.EmObj;
 import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadService.DownloaderService;
@@ -124,21 +126,29 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         }
         setSupportActionBar(toolbar);
         context = this;
-        aid = getIntent().getExtras().getString("aid");
-        if (aid == null) {
-            u = getIntent().getDataString();
-            String url = u.replace("http://animeflv.net/", "");
-            String[] data = url.split("/");
-            aid = parser.getAidCached(data[2]);
-            if (aid != null) {
-                setCollapsingToolbarLayoutTitle(parser.getTitCached(aid));
+        try {
+            aid = getIntent().getExtras().getString("aid");
+            if (aid == null) {
+                u = getIntent().getDataString();
+                String url = u.replace("http://animeflv.net/", "");
+                String[] data = url.split("/");
+                Log.e("Debug", data[2]);
+                aid = parser.getAidCached(data[2]);
+                Log.e("Debug", aid);
+                if (aid != null) {
+                    setCollapsingToolbarLayoutTitle(parser.getTitCached(aid));
+                } else {
+                    Toaster.toast("Error al abrir informacion desde link!!!");
+                    finish();
+                }
             } else {
-                Toaster.toast("Error al abrir informacion desde link!!!");
-                finish();
+                setCollapsingToolbarLayoutTitle(getIntent().getExtras().getString("title"));
+                u = Parser.getUrlAnimeCached(aid);
             }
-        } else {
-            setCollapsingToolbarLayoutTitle(getIntent().getExtras().getString("title"));
-            u = parser.getUrlAnimeCached(aid);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toaster.toast("Error al abrir informacion desde link!!!");
+            finish();
         }
         TrackingHelper.track(this, TrackingHelper.INFO + aid);
         new CacheManager().portada(this, aid, imageView);
@@ -179,32 +189,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if (isEmision()) {
-                    new MaterialDialog.Builder(InfoFragments.this)
-                            .title("Opciones")
-                            .titleGravity(GravityEnum.CENTER)
-                            .content("Seleccione accion")
-                            .positiveText("editar")
-                            .neutralText("compartir")
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    if (NetworkUtils.isNetworkAvailable()) {
-                                        EmisionEditDialog.create(aid).show(getSupportFragmentManager(), "dialog");
-                                    } else {
-                                        Toaster.toast("Se necesita internet!!!");
-                                    }
-                                }
-                            })
-                            .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    shareAid();
-                                }
-                            }).build().show();
-                } else {
-                    shareAid();
-                }
+                shareAid();
                 return true;
             }
         });
@@ -352,33 +337,38 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             if (position == -1) {
                 scrollToTop();
             }
+            supportInvalidateOptionsMenu();
         }
     }
 
     private void toogleFragments() {
-        FragmentTransaction transaction = getManager().beginTransaction();
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        if (isInInfo) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    barLayout.setExpanded(false, true);
-                }
-            });
-            button.setImageResource(R.drawable.information);
-            transaction.hide(fragmentInfo);
-            transaction.show(fragmentCaps);
-            fragmentCaps.resetListButton();
-            isInInfo = false;
-        } else {
-            scrollToTop();
-            button.setImageResource(R.drawable.playlist);
-            transaction.hide(fragmentCaps);
-            transaction.show(fragmentInfo);
-            isInInfo = true;
+        try {
+            FragmentTransaction transaction = getManager().beginTransaction();
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            if (isInInfo) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        barLayout.setExpanded(false, true);
+                    }
+                });
+                button.setImageResource(R.drawable.information);
+                transaction.hide(fragmentInfo);
+                transaction.show(fragmentCaps);
+                fragmentCaps.resetListButton();
+                isInInfo = false;
+            } else {
+                scrollToTop();
+                button.setImageResource(R.drawable.playlist);
+                transaction.hide(fragmentCaps);
+                transaction.show(fragmentInfo);
+                isInInfo = true;
+            }
+            transaction.commit();
+            supportInvalidateOptionsMenu();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        transaction.commit();
-        supportInvalidateOptionsMenu();
     }
 
     private FragmentManager getManager() {
@@ -433,25 +423,90 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
     }
 
+    private void showComments() {
+        if (eps != null && eps.length() > 0) {
+            dialog = new MaterialDialog.Builder(this)
+                    .title("COMENTARIOS")
+                    .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                    .titleGravity(GravityEnum.CENTER)
+                    .customView(R.layout.comentarios, false)
+                    .positiveText("SALIR")
+                    .build();
+            spinner = (Spinner) dialog.getCustomView().findViewById(R.id.comentarios_box_cap);
+            final List<String> caps = parser.parseNumerobyEID(getJsonStringfromFile());
+            String[] array = new String[caps.size()];
+            caps.toArray(array);
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, array);
+            spinner.setAdapter(arrayAdapter);
+            webView = (WebView) dialog.getCustomView().findViewById(R.id.comentarios_box);
+            webView.getSettings().setJavaScriptEnabled(true);
+            String newUA = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
+            webView.getSettings().setUserAgentString(newUA);
+            webView.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    view.loadUrl(url);
+                    return true;
+                }
+            });
+            String url = "";
+            try {
+                String num = caps.get(0).substring(caps.get(0).lastIndexOf(" ") + 1);
+                url = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, num, eps.getJSONObject(0).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Log.d("Comentarios", url);
+            webView.loadUrl(url);
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String urlch = "";
+                    try {
+                        urlch = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1), eps.getJSONObject(position).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Log.d("Comentarios", urlch);
+                    webView.loadUrl(urlch);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            dialog.show();
+        } else {
+            Toaster.toast("No se pueden mostrar los comentarios");
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         try {
-            Amenu = menu;
             if (isInInfo) {
-                if (FavoriteHelper.isFav(this, aid)) {
-                    Amenu.clear();
-                    getMenuInflater().inflate(R.menu.menu_fav_si, menu);
+                if (infoSeted) {
+                    getMenuInflater().inflate(R.menu.menu_fav_em, menu);
                 } else {
-                    Amenu.clear();
-                    getMenuInflater().inflate(R.menu.menu_fav_no, menu);
+                    getMenuInflater().inflate(R.menu.menu_fav_no_em, menu);
+                }
+                if (FavoriteHelper.isFav(this, aid))
+                    menu.findItem(R.id.favorito).setIcon(R.drawable.ic_fav_lleno);
+                if (infoSeted) {
+                    if (isEmision()) {
+                        if (AutoEmisionHelper.isAnimeAdded(this, aid))
+                            menu.findItem(R.id.emision).setIcon(R.drawable.alarm_added);
+                    } else {
+                        menu.removeItem(R.id.emision);
+                    }
                 }
             } else {
-                Amenu.clear();
                 getMenuInflater().inflate(R.menu.menu_fast_seen, menu);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Toaster.toast("Error al abrir informacion");
+            Toaster.toast("Error al crear Menu");
             finish();
         }
         return true;
@@ -466,14 +521,15 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
             switch (item.getItemId()) {
-                case R.id.favorito_si:
-                    FavoriteHelper.setFav(this, aid, false, new FavotiteDB.updateDataInterface() {
+                case R.id.favorito:
+                    final boolean isFav = FavoriteHelper.isFav(this, aid);
+                    FavoriteHelper.setFav(this, aid, !isFav, new FavotiteDB.updateDataInterface() {
                         @Override
                         public void onFinish() {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toaster.toast("Favorito Eliminado");
+                                    Toaster.toast("Favorito " + (isFav ? "Eliminado" : "Agregado"));
                                     supportInvalidateOptionsMenu();
                                 }
                             });
@@ -481,78 +537,75 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                         }
                     });
                     break;
-                case R.id.favorito_no:
-                    FavoriteHelper.setFav(this, aid, true, new FavotiteDB.updateDataInterface() {
-                        @Override
-                        public void onFinish() {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toaster.toast("Favorito Agregado");
-                                    supportInvalidateOptionsMenu();
-                                }
-                            });
-                            FavSyncro.updateFavs(InfoFragments.this);
-                        }
-                    });
+                case R.id.emision:
+                    if (AutoEmisionHelper.isAnimeAdded(this, aid)) {
+                        new MaterialDialog.Builder(this)
+                                .content("¿Quieres eliminar este anime de la lista de emision?")
+                                .positiveText("aceptar")
+                                .negativeText("cancelar")
+                                .neutralText("editar")
+                                .autoDismiss(false)
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull final MaterialDialog dialog, @NonNull DialogAction which) {
+                                        AutoEmisionHelper.removeAnimeFromList(InfoFragments.this, aid, new EmisionEditDialog.SearchListener() {
+                                            @Override
+                                            public void OnResponse(EmObj obj) {
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                                                    }
+                                                });
+                                                sendBroadcast(new Intent(InfoFragments.ACTION_EDITED));
+                                                supportInvalidateOptionsMenu();
+                                                dialog.dismiss();
+                                            }
+
+                                            @Override
+                                            public void OnError() {
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                                                    }
+                                                });
+                                                dialog.dismiss();
+                                                supportInvalidateOptionsMenu();
+                                                Toaster.toast("Error al eliminar");
+                                            }
+                                        });
+                                    }
+                                })
+                                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                        dialog.dismiss();
+                                        EmisionEditDialog.create(aid, false, new EmisionEditDialog.onEditListener() {
+                                            @Override
+                                            public void onEdit() {
+                                                supportInvalidateOptionsMenu();
+                                            }
+                                        }).show(getSupportFragmentManager(), "dialog");
+                                    }
+                                }).build().show();
+                    } else {
+                        EmisionEditDialog.create(aid, true, new EmisionEditDialog.onEditListener() {
+                            @Override
+                            public void onEdit() {
+                                supportInvalidateOptionsMenu();
+                            }
+                        }).show(getSupportFragmentManager(), "dialog");
+                    }
                     break;
                 case R.id.comentarios:
-                    if (eps != null && eps.length() > 0) {
-                        dialog = new MaterialDialog.Builder(this)
-                                .title("COMENTARIOS")
-                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                .titleGravity(GravityEnum.CENTER)
-                                .customView(R.layout.comentarios, false)
-                                .positiveText("SALIR")
-                                .build();
-                        spinner = (Spinner) dialog.getCustomView().findViewById(R.id.comentarios_box_cap);
-                        final List<String> caps = parser.parseNumerobyEID(getJsonStringfromFile());
-                        String[] array = new String[caps.size()];
-                        caps.toArray(array);
-                        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, array);
-                        spinner.setAdapter(arrayAdapter);
-                        webView = (WebView) dialog.getCustomView().findViewById(R.id.comentarios_box);
-                        webView.getSettings().setJavaScriptEnabled(true);
-                        String newUA = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
-                        webView.getSettings().setUserAgentString(newUA);
-                        webView.setWebViewClient(new WebViewClient() {
-                            @Override
-                            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                                view.loadUrl(url);
-                                return true;
-                            }
-                        });
-                        String url = "";
-                        try {
-                            String num = caps.get(0).substring(caps.get(0).lastIndexOf(" ") + 1);
-                            url = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, num, eps.getJSONObject(0).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        Log.d("Comentarios", url);
-                        webView.loadUrl(url);
-                        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                            @Override
-                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                String urlch = "";
-                                try {
-                                    urlch = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1), eps.getJSONObject(position).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                Log.d("Comentarios", urlch);
-                                webView.loadUrl(urlch);
-                            }
-
-                            @Override
-                            public void onNothingSelected(AdapterView<?> parent) {
-
-                            }
-                        });
-                        dialog.show();
-                    } else {
-                        Toaster.toast("No se pueden mostrar los comentarios");
-                    }
+                    showComments();
                     break;
                 case R.id.sel_all:
                     fragmentCaps.setallAsSeen();

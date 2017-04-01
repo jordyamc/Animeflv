@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -72,9 +72,23 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             holder.name.setText(list.get(position).name);
             if (ThemeUtils.isAmoled(context)) {
                 holder.name.setTextColor(ColorsRes.SecondaryTextDark(context));
+                holder.def_ind.setColorFilter(ColorsRes.Holo_Dark(context));
             } else {
                 holder.name.setTextColor(ColorsRes.SecondaryTextLight(context));
+                holder.def_ind.setColorFilter(ColorsRes.Blanco(context));
             }
+            if (list.get(position).name.equals(FavoriteHelper.getDefaultSectionName(context))) {
+                holder.def_ind.setImageResource(R.drawable.ic_fav_lleno);
+            } else {
+                holder.def_ind.setImageResource(R.drawable.ic_fav_vacio);
+            }
+            holder.def_ind.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FavoriteHelper.setDefaultSection(context, list.get(position).name);
+                    onListChanged();
+                }
+            });
             if (!list.get(position).name.equals(FavotiteDB.NO_SECTION))
                 holder.selectable.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
@@ -314,7 +328,9 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @BindView(R.id.header_text)
         TextView name;
         @BindView(R.id.selectable)
-        LinearLayout selectable;
+        RelativeLayout selectable;
+        @BindView(R.id.default_indicator)
+        ImageView def_ind;
 
         public SectionViewHolder(View itemView) {
             super(itemView);

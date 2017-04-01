@@ -72,8 +72,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
+import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.About.AboutActivity;
@@ -189,6 +192,12 @@ public class newMain extends AppCompatActivity implements
                     Toaster.toast("Lista de capitulos vistos creada");
                 }
             });
+        }
+        String date = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(Calendar.getInstance().getTime());
+        if (!PreferenceManager.getDefaultSharedPreferences(this).getString("curr_date", "").equals(date)) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            preferences.edit().putString("curr_date", date).apply();
+            preferences.edit().putInt("add_count", 0).apply();
         }
     }
 

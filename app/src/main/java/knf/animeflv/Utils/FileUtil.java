@@ -590,6 +590,7 @@ public class FileUtil {
                 return Uri.fromFile(file);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return Uri.fromFile(file);
         }
     }

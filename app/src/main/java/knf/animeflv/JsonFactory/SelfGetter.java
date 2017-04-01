@@ -16,6 +16,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -218,7 +219,15 @@ public class SelfGetter {
                     String z = e.attr("href");
                     z = z.substring(z.lastIndexOf("http"));
                     if (z.contains("zippyshare")) {
-                        zippy = z;
+                        try {
+                            z = URLDecoder.decode(z, "utf-8");
+                            Document zi = Jsoup.connect(z).timeout(TIMEOUT).get();
+                            String t = zi.select("meta[property='og:title']").attr("content");
+                            if (!t.trim().equals(""))
+                                zippy = z;
+                        } catch (Exception ze) {
+                            ze.printStackTrace();
+                        }
                         break;
                     }
                 }
@@ -234,6 +243,7 @@ public class SelfGetter {
                     try {
                         izanagi = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file");
                     } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 } else if (el.contains("server=gdrive")) {
                     String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
@@ -283,7 +293,7 @@ public class SelfGetter {
                             try {
                                 mega = r.substring(r.indexOf("https://mega.nz"), r.indexOf("\\\" "));
                             } catch (Exception e) {
-
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -530,7 +540,7 @@ public class SelfGetter {
         } else {
             object.put("lista", old_list);
         }
-        OfflineGetter.backupJson(object, OfflineGetter.directorio);
+        OfflineGetter.backupJsonSync(object, OfflineGetter.directorio);
         if (asyncInterface != null)
             asyncInterface.onFinish(object.toString());
     }

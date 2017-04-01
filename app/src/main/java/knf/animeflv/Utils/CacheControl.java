@@ -464,8 +464,13 @@ public class CacheControl extends AppCompatActivity {
                 public void run() {
                     CacheManager.asyncGetFormatedFileSize(Keys.Dirs.UPDATE, new CacheManager.OnFinishCount() {
                         @Override
-                        public void counted(String formated) {
-                            clear_apk.setText("Borrar (" + formated + ")");
+                        public void counted(final String formated) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    clear_apk.setText("Borrar (" + formated + ")");
+                                }
+                            });
                         }
                     });
                 }

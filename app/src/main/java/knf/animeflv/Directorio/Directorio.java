@@ -614,23 +614,27 @@ public class Directorio extends AppCompatActivity {
                         }
                     });
                 } else {
-                    Toolbar ltoolbar = (Toolbar) findViewById(R.id.toolbar_l);
-                    ThemeUtils.setStatusBarPadding(Directorio.this, ltoolbar);
-                    ltoolbar.setNavigationIcon(R.drawable.ic_back_r);
-                    ltoolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (bundle == null) {
-                                if (editText.getVisibility() == View.GONE) {
-                                    finish();
+                    try {
+                        Toolbar ltoolbar = (Toolbar) findViewById(R.id.toolbar_l);
+                        ThemeUtils.setStatusBarPadding(Directorio.this, ltoolbar);
+                        ltoolbar.setNavigationIcon(R.drawable.ic_back_r);
+                        ltoolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (bundle == null) {
+                                    if (editText.getVisibility() == View.GONE) {
+                                        finish();
+                                    } else {
+                                        cancelar();
+                                    }
                                 } else {
-                                    cancelar();
+                                    finish();
                                 }
-                            } else {
-                                finish();
                             }
-                        }
-                    });
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 toolbarS.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                     @Override

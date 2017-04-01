@@ -240,10 +240,10 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 if (UpdateUtil.getState() == UpdateState.WAITING_TO_UPDATE) {
                     Toaster.toast("Actualizacion descargada, instalar para continuar");
                 } else {
-                    if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid()) && !ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+                    if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid()) && !ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                         if (!MainStates.isProcessing()) {
                             if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
-                                final int pos = holder.getAdapterPosition();
+                                final int pos = holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition();
                                 new MaterialDialog.Builder(context)
                                         .content(
                                                 "El " + getCap(Animes.get(pos).getNumero()).toLowerCase() +
@@ -257,7 +257,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                             @Override
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                                 MainStates.init(context).delFromWaitList(Animes.get(pos).getEid());
-                                                MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
+                                                MainStates.setProcessing(true, Animes.get(pos).getEid());
                                                 showLoading(holder.ib_des);
                                                 searchDownload(holder);
 

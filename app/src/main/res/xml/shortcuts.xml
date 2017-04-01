@@ -33,7 +33,7 @@
         android:shortcutShortLabel="@string/shortcut_favs">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="knf.animeflv.Favoritos"
+            android:targetClass="knf.animeflv.Favorites.FavoriteMain"
             android:targetPackage="knf.animeflv"/>
     </shortcut>
 

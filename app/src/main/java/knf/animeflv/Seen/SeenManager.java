@@ -171,15 +171,20 @@ public class SeenManager {
     }
 
     private boolean isSeenNoClose(String eid) {
-        Cursor c = db.query(TABLE_NAME, new String[]{
-                KEY_TABLE_ID
-        }, KEY_EID + "='" + eid + "'", null, null, null, null);
-        if (c.getCount() > 0) {
+        try {
+            Cursor c = db.query(TABLE_NAME, new String[]{
+                    KEY_TABLE_ID
+            }, KEY_EID + "='" + eid + "'", null, null, null, null);
+            if (c.getCount() > 0) {
+                c.close();
+                return true;
+            }
             c.close();
-            return true;
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
-        c.close();
-        return false;
     }
 
     public String getSeenList() {

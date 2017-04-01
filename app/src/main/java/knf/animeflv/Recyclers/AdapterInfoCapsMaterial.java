@@ -194,7 +194,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                         Toaster.toast("Actualizacion descargada, instalar para continuar");
                     } else {
                         if (!MainStates.isProcessing()) {
-                            if (!MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
+                            if (!MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
                                 if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
                                     holder.tv_capitulo.setTextColor(getColor());
                                     /*if (CastPlayBackManager.get(context).isDeviceConnected()){

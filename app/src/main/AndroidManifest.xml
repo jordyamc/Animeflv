@@ -75,6 +75,29 @@
                     />
             </intent-filter>
 
+            <!-- Branch URI scheme -->
+            <intent-filter>
+                <data
+                    android:host="open"
+                    android:scheme="knf-animeflv" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
+            <!-- Branch App Links -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="animeflv.app.link"
+                    android:scheme="https" />
+            </intent-filter>
+
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts"/>
@@ -314,6 +337,14 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name="io.branch.referral.InstallListener"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="knf.animeflv.RequestsBackground"
@@ -327,6 +358,17 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="8971b3733a2fd699ebd101e18ce228d80baeab92"/>
+
+        <meta-data
+            android:name="io.branch.sdk.BranchKey"
+            android:value="key_live_cnrrfYDdPE4pGR1yV14rUlpnDAbUqNQj" />
+        <meta-data
+            android:name="io.branch.sdk.BranchKey.test"
+            android:value="key_test_anDEj1EmHr0cJLWFL32ZldlpEDiVDUME" />
+
+        <meta-data
+            android:name="io.branch.sdk.TestMode"
+            android:value="false" />
 
     </application>
 

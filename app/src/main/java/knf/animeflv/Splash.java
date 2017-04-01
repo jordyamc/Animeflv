@@ -15,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -40,6 +41,10 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
+import io.branch.indexing.BranchUniversalObject;
+import io.branch.referral.Branch;
+import io.branch.referral.BranchError;
+import io.branch.referral.util.LinkProperties;
 import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.CustomSettingsIntro.CustomIntro;
@@ -403,5 +408,25 @@ public class Splash extends AwesomeSplash {
         } else {
             checkCloudflare();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Branch branch = Branch.getInstance();
+
+        branch.initSession(new Branch.BranchUniversalReferralInitListener() {
+            @Override
+            public void onInitFinished(BranchUniversalObject branchUniversalObject, LinkProperties linkProperties, BranchError error) {
+                if (error != null) {
+                    Log.i("MyApp", error.getMessage());
+                }
+            }
+        }, this.getIntent().getData(), this);
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        this.setIntent(intent);
     }
 }

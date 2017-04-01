@@ -198,6 +198,28 @@ public class AutoEmisionHelper {
         }
     }
 
+    public static void removeAnimeFromList(final Context context, final String aid, @Nullable EmisionEditDialog.SearchListener listener) {
+        try {
+            JSONArray array = getJson(context).getJSONArray(KEY_JSON_LIST);
+            for (int a = 0; a < array.length(); a++) {
+                JSONObject object = array.getJSONObject(a);
+                JSONArray sub = object.getJSONArray(KEY_JSON_AIDS);
+                for (int i = 0; i < sub.length(); i++) {
+                    if (sub.getString(i).equals(aid)) {
+                        removeAnimeFromList(context, aid, object.getInt(KEY_JSON_DAYCODE), listener);
+                        return;
+                    }
+                }
+            }
+            if (listener != null)
+                listener.OnError();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (listener != null)
+                listener.OnError();
+        }
+    }
+
     public static void getAnimeInfo(Context context, String aid, EmisionEditDialog.SearchListener listener) {
         try {
             JSONArray array = getJson(context).getJSONArray(KEY_JSON_LIST);
@@ -216,6 +238,25 @@ public class AutoEmisionHelper {
         } catch (Exception e) {
             e.printStackTrace();
             listener.OnError();
+        }
+    }
+
+    public static boolean isAnimeAdded(Context context, String aid) {
+        try {
+            JSONArray array = getJson(context).getJSONArray(KEY_JSON_LIST);
+            for (int a = 0; a < array.length(); a++) {
+                JSONObject object = array.getJSONObject(a);
+                JSONArray sub = object.getJSONArray(KEY_JSON_AIDS);
+                for (int i = 0; i < sub.length(); i++) {
+                    if (sub.getString(i).equals(aid)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

@@ -84,4 +84,8 @@ public class OfflineGetter {
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
+
+    public static void backupJsonSync(final JSONObject data, final File file) {
+        FileUtil.writeToFile(data.toString(), file);
+    }
 }

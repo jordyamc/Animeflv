@@ -106,13 +106,13 @@ public class AdapterDialogPref extends RecyclerView.Adapter<AdapterDialogPref.Vi
                             if (UtilDialogPref.getPlayer().isPlaying()) {
                                 UtilDialogPref.getPlayer().stop();
                             }
+                            setMediaPlayer(holder.getAdapterPosition());
+                            UtilDialogPref.getPlayer().start();
+                            updatebyPref(holder.getAdapterPosition());
+                            checkRadios(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        setMediaPlayer(holder.getAdapterPosition());
-                        UtilDialogPref.getPlayer().start();
-                        updatebyPref(holder.getAdapterPosition());
-                        checkRadios(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition());
                     }
                     UtilSound.setCurrentMediaPlayerInt(holder.getAdapterPosition());
                 }
@@ -170,9 +170,13 @@ public class AdapterDialogPref extends RecyclerView.Adapter<AdapterDialogPref.Vi
     }
 
     private void setMediaPlayer(int which) {
-        Log.d("AdapterDialog", "Reset Player");
-        if (!UtilDialogPref.getPlayer().isPlaying()) {
-            UtilDialogPref.setPlayer(UtilSound.getMediaPlayer(context, which));
+        try {
+            Log.d("AdapterDialog", "Reset Player");
+            if (!UtilDialogPref.getPlayer().isPlaying()) {
+                UtilDialogPref.setPlayer(UtilSound.getMediaPlayer(context, which));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
