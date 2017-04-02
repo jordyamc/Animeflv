@@ -78,6 +78,7 @@ public class AboutActivity extends MaterialAboutActivity {
                 .addCard(getBetaBuilder(context).build())
                 .addCard(getAppBuilder(context).build())
                 .addCard(getContactBuilder(context).build())
+                .addCard(getBetaTestingBuilder(context).build())
                 .build();
     }
 
@@ -264,6 +265,39 @@ public class AboutActivity extends MaterialAboutActivity {
                         .build()
         );
 
+        return builder;
+    }
+
+    private MaterialAboutCard.Builder getBetaTestingBuilder(final Context context) {
+        MaterialAboutCard.Builder builder = new MaterialAboutCard.Builder();
+        builder.title("Beta Testing");
+
+        builder.addItem(
+                new MaterialAboutActionItem.Builder()
+                        .text("Beta Tester")
+                        .subText("https://betas.to/hQdpp7RG")
+                        .icon(
+                                new IconicsDrawable(context)
+                                        .icon(CommunityMaterial.Icon.cmd_beta)
+                                        .color(iconColor(context))
+                                        .sizeDp(18)
+                        )
+                        .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://betas.to/hQdpp7RG")))
+                        .build()
+        );
+        builder.addItem(
+                new MaterialAboutActionItem.Builder()
+                        .text("Grupo Beta")
+                        .subText("Telegram")
+                        .icon(
+                                new IconicsDrawable(context)
+                                        .icon(CommunityMaterial.Icon.cmd_telegram)
+                                        .color(iconColor(context))
+                                        .sizeDp(18)
+                        )
+                        .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://betas.to/hQdpp7RG")))
+                        .build()
+        );
         return builder;
     }
 

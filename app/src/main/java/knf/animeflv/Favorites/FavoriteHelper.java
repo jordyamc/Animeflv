@@ -25,11 +25,11 @@ public class FavoriteHelper {
         }
     }
 
-    public static String getDefaultSectionName(Context context) {
+    static String getDefaultSectionName(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_DEF_SECTION, FavotiteDB.NO_SECTION);
     }
 
-    public static void setDefaultSection(Context context, String name) {
+    static void setDefaultSection(Context context, String name) {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putString(KEY_DEF_SECTION, name).apply();
     }
 
