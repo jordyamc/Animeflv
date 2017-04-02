@@ -295,7 +295,7 @@ public class AboutActivity extends MaterialAboutActivity {
                                         .color(iconColor(context))
                                         .sizeDp(18)
                         )
-                        .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://betas.to/hQdpp7RG")))
+                        .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://t.me/joinchat/AAAAAEKOzGU7YaW4Pc14_Q")))
                         .build()
         );
         return builder;
