@@ -42,17 +42,18 @@ public class zippyHelper {
                         Element center = document.select("div.center").first();
                         Element script = center.select("script").get(1);
                         String script_text = script.outerHtml().replace("<script type=\"text/javascript\">", "");
-                        String[] values = script_text.split(";");
-                        int a = Integer.parseInt(values[0].trim().replace("var a = ", ""));
-                        String script_part = values[1].substring(values[1].indexOf('"'));
-                        String code = script_part.substring(script_part.indexOf('"'), script_part.lastIndexOf('"'));
-                        String len = script_part.substring(script_part.indexOf("(") + 1, script_part.lastIndexOf(")"));
-                        String[] nums = len.trim().replace(" ", "").split(",");
-                        //int b = Integer.parseInt(values[1].trim().replace("var b = ", ""));
-                        int b = code.substring(Integer.parseInt(nums[0]), Integer.parseInt(nums[1])).length();
-                        boolean isf = script_text.contains(".omg =");
-                        String pre = script_text.substring(script_text.indexOf("/d/") + 3, script_text.indexOf("/\"+("));
-                        String d_url = url.substring(0, url.indexOf("/v/")) + "/d/" + pre + "/" + generateNumber(a, b, isf) + "/" + script_text.substring(script_text.indexOf("+\"/") + 3, script_text.indexOf(".mp4\";")) + ".mp4";
+
+                        String nums = script_text.substring(script_text.indexOf("/d/") + 3, script_text.indexOf(";"));
+                        String result = nums.substring(nums.indexOf("(") + 1, nums.lastIndexOf(")")).replace(" ", "");
+                        String[] both = result.replace("+", "/").split("/");
+                        String[] ab = both[0].split("%");
+                        String[] ac = both[1].split("%");
+
+                        int a = Integer.parseInt(ab[0]);
+                        int b = Integer.parseInt(ab[1]);
+                        int c = Integer.parseInt(ac[1]);
+                        String pre = script_text.substring(script_text.indexOf("/d/") + 3, script_text.indexOf("/\""));
+                        String d_url = url.substring(0, url.indexOf("/v/")) + "/d/" + pre + "/" + generateNumber(a, b, c) + "/" + script_text.substring(script_text.indexOf("+ \"/") + 4, script_text.indexOf(".mp4\";")) + ".mp4";
                         Log.e("Zippy Download", d_url);
                         callback.onSuccess(new zippyObject(d_url, new CookieConstructor(cookies, System.getProperty("http.agent"), url)));
                     } catch (Exception e) {
@@ -66,14 +67,8 @@ public class zippyHelper {
         });
     }
 
-    private static int generateNumber(int a, int b, boolean isf) {
-        double c;
-        if (isf) {
-            c = Math.pow(a, 3);
-        } else {
-            c = Math.ceil(a / 3);
-        }
-        return ((int) (Math.pow(a, 3) + b));
+    private static int generateNumber(int a, int b, int c) {
+        return ((int) ((a % b) + (a % c)));
     }
 
     public interface OnZippyResult {
