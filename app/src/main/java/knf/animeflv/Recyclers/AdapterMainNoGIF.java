@@ -242,7 +242,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 } else {
                     if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid()) && !ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                         if (!MainStates.isProcessing()) {
-                            if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
+                            if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                                 final int pos = holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition();
                                 new MaterialDialog.Builder(context)
                                         .content(

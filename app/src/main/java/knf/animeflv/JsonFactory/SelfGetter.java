@@ -50,7 +50,7 @@ public class SelfGetter {
                     } else {
                         main = Jsoup.connect("http://animeflv.net").userAgent(BypassHolder.getUserAgent(context)).cookies(BypassHolder.getBasicCookieMap(context)).timeout(TIMEOUT).get();
                     }
-                    Element list = main.select("ul.ListEpisodios.AX.Rows.A06.C04.D03").first();
+                    Element list = main.select("ul.ListEpisodios.AX.Rows.A06.C04.D03").last();
                     Elements caps = list.select("li");
                     JSONObject object = new JSONObject();
                     object.put("version", context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName + "-Internal_Api");
