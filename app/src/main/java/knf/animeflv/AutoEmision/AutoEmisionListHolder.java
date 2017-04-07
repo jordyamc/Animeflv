@@ -20,6 +20,7 @@ public class AutoEmisionListHolder {
     private static List<EmObj> list6;
     private static List<EmObj> list7;
 
+
     private static List<MainAnimeModel> episodes;
 
     public static void setList(int day, List<EmObj> list) {

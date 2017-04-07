@@ -272,13 +272,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 if (UpdateUtil.getState() == UpdateState.WAITING_TO_UPDATE) {
                     Toaster.toast("Actualizacion descargada, instalar para continuar");
                 } else {
-                    if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
-                        /*if (CastPlayBackManager.get(context).isDeviceConnected()){
-                            String e=Animes.get(holder.getAdapterPosition()).getEid();
-                            CastPlayBackManager.get(context).play(ServerManager.get().startStream(context,FileUtil.init(context).getFile(e)),e);
-                        }else {
-                            StreamManager.Play(context, Animes.get(holder.getAdapterPosition()).getEid());
-                        }*/
+                    if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                         StreamManager.Play(context, Animes.get(holder.getAdapterPosition()).getEid());
                     } else {
                         if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {

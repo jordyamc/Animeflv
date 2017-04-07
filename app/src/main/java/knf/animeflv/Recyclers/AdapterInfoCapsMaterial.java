@@ -195,7 +195,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                     } else {
                         if (!MainStates.isProcessing()) {
                             if (!MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                                if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
+                                if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
                                     holder.tv_capitulo.setTextColor(getColor());
                                     /*if (CastPlayBackManager.get(context).isDeviceConnected()){
                                         String e=eids.get(holder.getAdapterPosition());

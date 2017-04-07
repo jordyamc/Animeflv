@@ -83,7 +83,7 @@ public class NetworkUtils {
 
     public static void checkVersion(final Context Tcontext, final FloatingActionButton button) {
         Log.d("CheckVersion", "Start");
-        if (UpdateUtil.getState() == UpdateState.NO_UPDATE) {
+        if (UpdateUtil.getState() == UpdateState.NO_UPDATE && isNetworkAvailable()) {
             UpdateUtil.setState(UpdateState.START_UPDATE_CHECK);
             new checkAct(Tcontext, button).executeOnExecutor(ExecutorManager.getExecutor());
         }

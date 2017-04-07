@@ -220,6 +220,22 @@ public class AutoEmisionHelper {
         }
     }
 
+    public static int getListCount(Context context) {
+        try {
+            int count = 0;
+            JSONArray array = getJson(context).getJSONArray(KEY_JSON_LIST);
+            for (int a = 0; a < array.length(); a++) {
+                JSONObject object = array.getJSONObject(a);
+                JSONArray sub = object.getJSONArray(KEY_JSON_AIDS);
+                count += sub.length();
+            }
+            return count;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     public static void getAnimeInfo(Context context, String aid, EmisionEditDialog.SearchListener listener) {
         try {
             JSONArray array = getJson(context).getJSONArray(KEY_JSON_LIST);

@@ -106,7 +106,6 @@
     <orderEntry type="library" exported="" name="AwesomeSplash-v1.0.0" level="project" />
     <orderEntry type="library" exported="" name="floatingactionbutton-1.3.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-gass-10.2.1" level="project" />
-    <orderEntry type="library" exported="" name="transition-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="support-v13-25.0.0" level="project" />
     <orderEntry type="library" exported="" name="infinity-loading-0.4" level="project" />
     <orderEntry type="library" exported="" name="android-gif-drawable-1.1.7" level="project" />
@@ -120,7 +119,6 @@
     <orderEntry type="library" exported="" name="jackson-core-2.7.4" level="project" />
     <orderEntry type="library" exported="" name="crashlytics-2.6.7" level="project" />
     <orderEntry type="library" exported="" name="HintCase-1.0.2" level="project" />
-    <orderEntry type="library" exported="" name="materialdrawer-5.7.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-analytics-impl-10.2.1" level="project" />
     <orderEntry type="library" exported="" name="firebase-common-10.2.1" level="project" />
     <orderEntry type="library" exported="" name="support-v4-25.3.1" level="project" />
@@ -133,7 +131,6 @@
     <orderEntry type="library" exported="" name="butterknife-8.4.0" level="project" />
     <orderEntry type="library" exported="" name="support-vector-drawable-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-compat-25.3.1" level="project" />
-    <orderEntry type="library" exported="" name="design-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="picasso-2.5.2" level="project" />
     <orderEntry type="library" exported="" name="fillableloaders-1.02" level="project" />
     <orderEntry type="library" exported="" name="okhttp-2.4.0" level="project" />
@@ -154,18 +151,18 @@
     <orderEntry type="library" exported="" name="multidex-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="xdroid-toaster-0.0.10" level="project" />
     <orderEntry type="library" exported="" name="play-services-analytics-10.2.1" level="project" />
-    <orderEntry type="library" exported="" name="iconics-core-2.8.1" level="project" />
+    <orderEntry type="library" exported="" name="iconics-core-2.8.2" level="project" />
     <orderEntry type="library" exported="" name="fontawesome-typeface-4.7.0.0" level="project" />
     <orderEntry type="library" exported="" name="materialdatetimepicker-2.5.0" level="project" />
     <orderEntry type="library" exported="" name="jsoup-1.9.2" level="project" />
     <orderEntry type="library" exported="" name="material-about-library-1.7.1" level="project" />
     <orderEntry type="library" exported="" name="HintCaseAssets-1.0.2" level="project" />
-    <orderEntry type="library" exported="" name="fastadapter-2.0.0" level="project" />
     <orderEntry type="library" exported="" name="material-intro-1.6" level="project" />
+    <orderEntry type="library" exported="" name="transition-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="dropbox-core-sdk-2.1.2" level="project" />
     <orderEntry type="library" exported="" name="xdroid-core-0.0.10" level="project" />
+    <orderEntry type="library" exported="" name="materialize-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="guava-20.0" level="project" />
-    <orderEntry type="library" exported="" name="materialize-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="advrecyclerview-0.10.2" level="project" />
     <orderEntry type="library" exported="" name="google-material-typeface-2.2.0.3.original" level="project" />
     <orderEntry type="library" exported="" name="material-activity-chooser-0.2.1" level="project" />
@@ -179,6 +176,7 @@
     <orderEntry type="library" exported="" name="SOMAAndroidSDK5.0.9" level="project" />
     <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
     <orderEntry type="library" exported="" name="com.amulyakhare.textdrawable-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="materialdrawer-5.9.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-basement-10.2.1" level="project" />
     <orderEntry type="library" exported="" name="fab-1.6.4" level="project" />
     <orderEntry type="library" exported="" name="bolts-applinks-1.4.0" level="project" />
@@ -189,6 +187,7 @@
     <orderEntry type="library" exported="" name="gson-2.8.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-tasks-10.2.1" level="project" />
     <orderEntry type="library" exported="" name="ThinDownloadManager-1.2.5" level="project" />
+    <orderEntry type="library" exported="" name="design-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="cardview-v7-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="trace" level="project" />
     <orderEntry type="library" exported="" name="AndroidUtilities-1.6.0" level="project" />
@@ -201,6 +200,7 @@
     <orderEntry type="library" exported="" name="okio-1.11.0" level="project" />
     <orderEntry type="library" exported="" name="community-material-typeface-1.7.22.1" level="project" />
     <orderEntry type="library" exported="" name="utils-v4-1.6.1" level="project" />
+    <orderEntry type="library" exported="" name="fastadapter-2.5.0" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="material-design-iconic-typeface-2.2.0.2" level="project" />
     <orderEntry type="library" exported="" name="debug-db-1.0.0" level="project" />
@@ -209,6 +209,8 @@
     <orderEntry type="library" exported="" name="android-async-http-1.4.9" level="project" />
     <orderEntry type="library" exported="" name="animated-vector-drawable-25.3.1" level="project" />
     <orderEntry type="module" module-name="multidisplaycast" exported="" />
+    <orderEntry type="library" exported="" name="design-25.1.0" level="project" />
+    <orderEntry type="library" exported="" name="transition-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="support-fragment-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="support-core-ui-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="support-core-utils-25.1.0" level="project" />
@@ -223,6 +225,7 @@
     <orderEntry type="library" exported="" name="support-media-compat-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="support-vector-drawable-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-25.1.0" level="project" />
+    <orderEntry type="library" exported="" name="recyclerview-v7-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="javax.jmdns_3.4.1-patch2" level="project" />
   </component>
 </module>

@@ -137,18 +137,22 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (manager.isGroupExpanded(groupPosition)) {
-                    manager.collapseGroup(groupPosition);
+                try {
+                    if (manager.isGroupExpanded(groupPosition)) {
+                        manager.collapseGroup(groupPosition);
+                    }
+                    animesCapList.remove(groupPosition);
+                    notifyItemRemoved(groupPosition);
+                    //holder.card.setVisibility(View.GONE);
+                    new WaitDBHelper(context).removeList(animes.get(groupPosition).aid);
+                    MainStates.init(context).delFromGlobalWaitList(animes.get(groupPosition).aid);
+                    WaitManager.Refresh();
+                    animes = WaitManager.getAnimesList();
+                    animesCapList = WaitManager.getNumerosList();
+                    notifyDataSetChanged();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                animesCapList.remove(groupPosition);
-                notifyItemRemoved(groupPosition);
-                //holder.card.setVisibility(View.GONE);
-                new WaitDBHelper(context).removeList(animes.get(groupPosition).aid);
-                MainStates.init(context).delFromGlobalWaitList(animes.get(groupPosition).aid);
-                WaitManager.Refresh();
-                animes = WaitManager.getAnimesList();
-                animesCapList = WaitManager.getNumerosList();
-                notifyDataSetChanged();
             }
         });
         holder.start.setOnClickListener(new View.OnClickListener() {

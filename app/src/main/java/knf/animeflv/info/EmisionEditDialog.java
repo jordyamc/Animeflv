@@ -2,9 +2,7 @@ package knf.animeflv.info;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.AppCompatSpinner;
@@ -69,9 +67,7 @@ public class EmisionEditDialog extends DialogFragment {
                             @Override
                             public void OnResponse(EmObj obj) {
                                 if (getArguments().getBoolean("count")) {
-                                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                                    int count = preferences.getInt("add_count", 0);
-                                    count++;
+                                    int count = AutoEmisionHelper.getListCount(getActivity());
                                     switch (count) {
                                         case 4:
                                             Toaster.toast("Que vicioso...");
@@ -84,7 +80,6 @@ public class EmisionEditDialog extends DialogFragment {
                                             break;
 
                                     }
-                                    preferences.edit().putInt("add_count", count).apply();
                                 }
                                 object = obj;
                                 getActivity().runOnUiThread(new Runnable() {

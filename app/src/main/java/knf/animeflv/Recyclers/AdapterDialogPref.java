@@ -90,31 +90,35 @@ public class AdapterDialogPref extends RecyclerView.Adapter<AdapterDialogPref.Vi
             holder.back.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (holder.getAdapterPosition() == UtilDialogPref.getSelected()) {
-                        if (UtilDialogPref.getPlayer().isPlaying()) {
-                            UtilDialogPref.getPlayer().stop();
-                            tooglebyPref(holder.getAdapterPosition());
-                            holder.playing.setImageResource(R.drawable.ic_play);
-                        } else {
-                            setMediaPlayer(holder.getAdapterPosition());
-                            UtilDialogPref.getPlayer().start();
-                            tooglebyPref(holder.getAdapterPosition());
-                            holder.playing.setImageResource(R.drawable.ic_stop);
-                        }
-                    } else {
-                        try {
+                    try {
+                        if (holder.getAdapterPosition() == UtilDialogPref.getSelected()) {
                             if (UtilDialogPref.getPlayer().isPlaying()) {
                                 UtilDialogPref.getPlayer().stop();
+                                tooglebyPref(holder.getAdapterPosition());
+                                holder.playing.setImageResource(R.drawable.ic_play);
+                            } else {
+                                setMediaPlayer(holder.getAdapterPosition());
+                                UtilDialogPref.getPlayer().start();
+                                tooglebyPref(holder.getAdapterPosition());
+                                holder.playing.setImageResource(R.drawable.ic_stop);
                             }
-                            setMediaPlayer(holder.getAdapterPosition());
-                            UtilDialogPref.getPlayer().start();
-                            updatebyPref(holder.getAdapterPosition());
-                            checkRadios(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition());
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        } else {
+                            try {
+                                if (UtilDialogPref.getPlayer().isPlaying()) {
+                                    UtilDialogPref.getPlayer().stop();
+                                }
+                                setMediaPlayer(holder.getAdapterPosition());
+                                UtilDialogPref.getPlayer().start();
+                                updatebyPref(holder.getAdapterPosition());
+                                checkRadios(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
+                        UtilSound.setCurrentMediaPlayerInt(holder.getAdapterPosition());
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    UtilSound.setCurrentMediaPlayerInt(holder.getAdapterPosition());
                 }
             });
         } catch (Exception e) {

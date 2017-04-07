@@ -378,7 +378,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         return fragmentManager;
     }
 
-    private void addFragments(int position) {
+    private void addFragments(final int position) {
         FragmentTransaction transaction = getManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         if (position == -1) {
@@ -401,7 +401,6 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         }
         try {
             transaction.commitAllowingStateLoss();
-            fragmentInfo.startAnimation(position);
             transaction = getManager().beginTransaction();
             transaction.hide(position == -1 ? fragmentCaps : fragmentInfo);
             transaction.commitAllowingStateLoss();
@@ -409,10 +408,11 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 @Override
                 public void run() {
                     button.show();
+                    fragmentInfo.startAnimation(position);
                 }
             });
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 

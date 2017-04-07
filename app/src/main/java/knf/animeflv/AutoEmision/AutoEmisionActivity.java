@@ -15,12 +15,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Calendar;
@@ -62,6 +64,9 @@ public class AutoEmisionActivity extends AppCompatActivity {
     };
     private JSONObject listJson;
 
+    private int count = 0;
+    private TextView count_text;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         ThemeUtils.setThemeOn(this);
@@ -102,6 +107,7 @@ public class AutoEmisionActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
+                count = 0;
                 AutoEmisionListHolder.reloadEpisodes();
                 runOnUiThread(new Runnable() {
                     @Override
@@ -121,6 +127,7 @@ public class AutoEmisionActivity extends AppCompatActivity {
                         viewPager.setAdapter(adapter);
                         smartTabLayout.setViewPager(viewPager);
                         viewPager.setCurrentItem(Math.abs(getActualDayCode() - 1), true);
+                        supportInvalidateOptionsMenu();
                     }
                 });
                 return null;
@@ -135,7 +142,9 @@ public class AutoEmisionActivity extends AppCompatActivity {
         }
         Bundle bundle = new Bundle();
         bundle.putInt("day", day);
-        bundle.putString("array", AutoEmisionHelper.getDayJson(listJson, day).toString());
+        JSONArray array = AutoEmisionHelper.getDayJson(listJson, day);
+        count = count + array.length();
+        bundle.putString("array", array.toString());
         return bundle;
     }
 
@@ -160,11 +169,26 @@ public class AutoEmisionActivity extends AppCompatActivity {
         }
     }
 
+    private View.OnClickListener getCountListener() {
+        count_text.setText(String.valueOf(count));
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toaster.toast("Actualmente sigues " + count + " " + (count == 1 ? "anime" : "animes") + " de la temporada");
+            }
+        };
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (DropboxManager.islogedIn() && NetworkUtils.isNetworkAvailable()) {
             getMenuInflater().inflate(R.menu.menu_emision, menu);
+        } else {
+            getMenuInflater().inflate(R.menu.menu_emision_count, menu);
         }
+        MenuItem c = menu.findItem(R.id.count);
+        count_text = ((TextView) c.getActionView().findViewById(R.id.count_text));
+        count_text.setOnClickListener(getCountListener());
         return true;
     }
 

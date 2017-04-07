@@ -2,6 +2,7 @@ package knf.animeflv.info.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
@@ -147,12 +148,19 @@ public class FragmentInfo extends Fragment {
                 public void run() {
                     try {
                         if (position == -1) {
-                            Animation bottomUp = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_from_bottom);
+                            Animation bottomUp = AnimationUtils.loadAnimation(activity(), R.anim.slide_from_bottom);
                             nestedScrollView.startAnimation(bottomUp);
                         }
                         nestedScrollView.setVisibility(View.VISIBLE);
                     } catch (Exception e) {
                         e.printStackTrace();
+                        if (nestedScrollView == null)
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    startAnimation(position);
+                                }
+                            }, 500);
                     }
                 }
             });

@@ -4,13 +4,19 @@
     <item
         android:id="@+id/download"
         android:icon="@drawable/cloud_download"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:title="Descargar"
         app:showAsAction="always"/>
     <item
         android:id="@+id/upload"
         android:icon="@drawable/cloud_upload"
-        android:orderInCategory="200"
+        android:orderInCategory="300"
         android:title="Subir"
         app:showAsAction="always"/>
+    <item
+        android:id="@+id/count"
+        android:orderInCategory="300"
+        android:title="0"
+        app:actionLayout="@layout/menu_item_count"
+        app:showAsAction="always" />
 </menu>
