@@ -103,6 +103,13 @@
       "onclick_message": 0,
       "message": "",
       "alias": "Foxfy"
+    },
+    {
+      "name": "Ana",
+      "description": "Nuevo Miembro",
+      "onclick_message": 0,
+      "message": "",
+      "alias": "Ana_Bn"
     }
   ]
 }
