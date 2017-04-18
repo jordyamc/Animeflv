@@ -35,6 +35,11 @@ public class ColorsRes {
     }
 
     @ColorInt
+    public static int GrisLigth(Context context) {
+        return ContextCompat.getColor(context, R.color.gris_light);
+    }
+
+    @ColorInt
     public static int Verde(Context context) {
         return ContextCompat.getColor(context, R.color.theme_verde);
     }

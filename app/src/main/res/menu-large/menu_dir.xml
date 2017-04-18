@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".Main">
+    <item
+        android:id="@+id/carg"
+        android:enabled="false"
+        android:orderInCategory="100"
+        android:title="Cargando"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/re_make"
+        android:icon="@drawable/re_make_dark"
+        android:orderInCategory="200"
+        android:title="Recrear"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/ic_buscar_d"
+        android:orderInCategory="300"
+        android:title="Buscar"
+        app:showAsAction="always"/>
+
+</menu>

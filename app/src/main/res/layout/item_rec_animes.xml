@@ -15,12 +15,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@id/estado"
-        android:layout_toStartOf="@id/estado"
         android:linksClickable="true"
         android:maxLines="1"
         android:padding="10dp"
-        android:singleLine="true"
         android:text="Título"
         android:textSize="15sp"/>
 
@@ -30,6 +27,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:layout_toEndOf="@id/titulo"
+        android:layout_toRightOf="@id/titulo"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="15dp"

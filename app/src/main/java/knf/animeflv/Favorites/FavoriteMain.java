@@ -50,7 +50,7 @@ public class FavoriteMain extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.favs);
+        setContentView(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("force_phone", false) ? R.layout.favs_force : R.layout.favs);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Favoritos");
@@ -65,10 +65,12 @@ public class FavoriteMain extends AppCompatActivity {
         if (ThemeUtils.isAmoled(this)) {
             if (ThemeUtils.isTablet(this)) {
                 findViewById(R.id.l_toolbar).setBackgroundColor(ColorsRes.Negro(this));
+                findViewById(R.id.cardMain).setBackgroundColor(ColorsRes.Negro(this));
+                toolbar.getRootView().setBackgroundColor(ColorsRes.Prim(this));
             } else {
-                toolbar.setBackgroundColor(ColorsRes.Negro(this));
+                toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
             }
-            toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
+            toolbar.setBackgroundColor(ColorsRes.Negro(this));
         }
         button.setBackgroundColor(ThemeUtils.getAcentColor(this));
         try {
@@ -139,9 +141,25 @@ public class FavoriteMain extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("section_favs", false)) {
-            getMenuInflater().inflate(R.menu.menu_fav_new, menu);
+            if (ThemeUtils.isTablet(this)) {
+                if (ThemeUtils.isAmoled(this)) {
+                    getMenuInflater().inflate(R.menu.menu_fav_new_dark, menu);
+                } else {
+                    getMenuInflater().inflate(R.menu.menu_fav_new, menu);
+                }
+            } else {
+                getMenuInflater().inflate(R.menu.menu_fav_new, menu);
+            }
         } else {
-            getMenuInflater().inflate(R.menu.menu_fav_old, menu);
+            if (ThemeUtils.isTablet(this)) {
+                if (ThemeUtils.isAmoled(this)) {
+                    getMenuInflater().inflate(R.menu.menu_fav_old_dark, menu);
+                } else {
+                    getMenuInflater().inflate(R.menu.menu_fav_old, menu);
+                }
+            } else {
+                getMenuInflater().inflate(R.menu.menu_fav_old, menu);
+            }
         }
         if (!FavSyncro.isLogedIn(this) || !NetworkUtils.isNetworkAvailable())
             menu.removeItem(R.id.sync);

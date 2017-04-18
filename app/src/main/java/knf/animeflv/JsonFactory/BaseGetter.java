@@ -24,7 +24,7 @@ public class BaseGetter {
 
     }
 
-    public static void getJson(Context context, DIRECTORIO directorio, AsyncInterface asyncInterface) {
+    public static void getJson(Context context, DIRECTORIO directorio, AsyncProgressInterface asyncInterface) {
         if (NetworkUtils.isNetworkAvailable()) {
             SelfGetter.getDir(context, asyncInterface);
         } else {
@@ -58,6 +58,12 @@ public class BaseGetter {
 
     public interface AsyncInterface {
         void onFinish(String json);
+    }
+
+    public interface AsyncProgressInterface {
+        void onFinish(String json);
+
+        void onProgress(int progress);
     }
 
 }

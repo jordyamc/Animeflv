@@ -146,7 +146,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
             holder.ib_des.setColorFilter(ColorsRes.Holo_Light(context));
         }
         Boolean resaltar = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar", true);
-        if (getCap(holder.getAdapterPosition()).equals("Capítulo 1") || getCap(holder.getAdapterPosition()).equals("Preestreno") || getCap(holder.getAdapterPosition()).contains("OVA") || getCap(holder.getAdapterPosition()).contains("Pelicula")) {
+        if (getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).equals("Capítulo 1") || getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).equals("Preestreno") || getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).contains("OVA") || getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).contains("Pelicula")) {
             if (resaltar)
                 holder.card.setCardBackgroundColor(Color.argb(100, 253, 250, 93));
         }
@@ -156,19 +156,19 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         }
         setUpWeb(holder.webView);
         holder.tv_num.setTextColor(ThemeUtils.getAcentColor(context));
-        new CacheManager().mini(context, Animes.get(holder.getAdapterPosition()).getAid(), holder.iv_main);
+        new CacheManager().mini(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getAid(), holder.iv_main);
         holder.tv_tit.setText(Animes.get(position).getTitulo());
-        holder.tv_num.setText(getCap(holder.getAdapterPosition()));
-        if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+        holder.tv_num.setText(getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
+        if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
             showPlay(holder.ib_ver);
             showDelete(holder.ib_des);
         } else {
-            if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+            if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                 showPlay(holder.ib_ver);
                 showDelete(holder.ib_des);
             } else {
                 showDownload(holder.ib_des, holder.getAdapterPosition());
-                if (CastPlayBackManager.get(context).getCastingEid().equals(Animes.get(holder.getAdapterPosition()).getEid())) {
+                if (CastPlayBackManager.get(context).getCastingEid().equals(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                     showCastPlay(holder.ib_ver);
                 } else {
                     showCloudPlay(holder.ib_ver);
@@ -176,18 +176,18 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
             }
         }
         if (MainStates.isProcessing()) {
-            if (MainStates.getProcessingEid().equals(Animes.get(holder.getAdapterPosition()).getEid())) {
+            if (MainStates.getProcessingEid().equals(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                 showLoading(holder.ib_des);
             }
         }
-        if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
-            if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
+        if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
+            if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                 showCloudPlay(holder.ib_ver);
                 holder.ib_des.setImageResource(R.drawable.ic_waiting);
             } else {
                 showPlay(holder.ib_ver);
                 showDelete(holder.ib_des);
-                MainStates.init(context).delFromWaitList(Animes.get(holder.getAdapterPosition()).getEid());
+                MainStates.init(context).delFromWaitList(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
             }
         }
         holder.card.setOnClickListener(new View.OnClickListener() {
@@ -201,8 +201,8 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                             InfoHelper.open(
                                     context,
                                     new InfoHelper.SharedItem(holder.iv_main, "img"),
-                                    new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
-                                    new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getTitulo())
+                                    new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getAid()),
+                                    new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getTitulo())
                             );
                         } else {
                             MainStates.setListing(false);
@@ -218,13 +218,13 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
             @Override
             public boolean onLongClick(View v) {
                 MainStates.setListing(true);
-                if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
-                    MainStates.init(context).delFromWaitList(Animes.get(holder.getAdapterPosition()).getEid());
+                if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
+                    MainStates.init(context).delFromWaitList(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
                     holder.ib_des.setImageResource(R.drawable.ic_get_r);
                     callbacks.onDelFromList();
                 } else {
-                    if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid()) && !ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
-                        MainStates.init(context).addToWaitList(Animes.get(holder.getAdapterPosition()).getEid());
+                    if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid()) && !ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
+                        MainStates.init(context).addToWaitList(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
                         holder.ib_des.setImageResource(R.drawable.ic_waiting);
                         callbacks.onPutInList();
                     } else {
@@ -265,7 +265,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                         })
                                         .build().show();
                             } else {
-                                MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
+                                MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
                                 showLoading(holder.ib_des);
                                 searchDownload(holder);
                             }
@@ -276,7 +276,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                         MaterialDialog borrar = new MaterialDialog.Builder(context)
                                 .title("Eliminar")
                                 .titleGravity(GravityEnum.CENTER)
-                                .content("Desea eliminar el " + getCap(Animes.get(holder.getAdapterPosition()).getNumero()).toLowerCase() + " de " + Animes.get(holder.getAdapterPosition()).getTitulo() + "?")
+                                .content("Desea eliminar el " + getCap(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getNumero()).toLowerCase() + " de " + Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getTitulo() + "?")
                                 .positiveText("Eliminar")
                                 .negativeText("Cancelar")
                                 .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
@@ -284,15 +284,15 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                     @Override
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                         try {
-                                            if (FileUtil.init(context).DeleteAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
-                                                ManageDownload.cancel(context, Animes.get(holder.getAdapterPosition()).getEid());
+                                            if (FileUtil.init(context).DeleteAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
+                                                ManageDownload.cancel(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
                                                 showDownload(holder.ib_des, holder.getAdapterPosition());
                                                 showCloudPlay(holder.ib_ver);
                                                 Toaster.toast("Archivo Eliminado");
                                             } else {
-                                                if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
-                                                    if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
-                                                        ManageDownload.cancel(context, Animes.get(holder.getAdapterPosition()).getEid());
+                                                if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
+                                                    if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
+                                                        ManageDownload.cancel(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
                                                     }
                                                     showDownload(holder.ib_des, holder.getAdapterPosition());
                                                     showCloudPlay(holder.ib_ver);
@@ -320,15 +320,15 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                     if (UpdateUtil.getState() == UpdateState.WAITING_TO_UPDATE) {
                         Toaster.toast("Actualizacion descargada, instalar para continuar");
                     } else {
-                        if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition()).getEid())) {
-                            StreamManager.Play(context, Animes.get(holder.getAdapterPosition()).getEid());
+                        if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
+                            StreamManager.Play(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
                         } else {
-                            if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+                            if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                                 Toaster.toast("Descarga en proceso");
                             } else {
                                 if (NetworkUtils.isNetworkAvailable()) {
                                     if (!MainStates.isProcessing()) {
-                                        if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition()).getEid())) {
+                                        if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                                             final int pos = holder.getAdapterPosition();
                                             new MaterialDialog.Builder(context)
                                                     .content(
@@ -343,14 +343,14 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                                         @Override
                                                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                                             MainStates.init(context).delFromWaitList(Animes.get(pos).getEid());
-                                                            MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
+                                                            MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
                                                             showLoading(holder.ib_des);
                                                             searchStream(holder);
                                                         }
                                                     })
                                                     .build().show();
                                         } else {
-                                            MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition()).getEid());
+                                            MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
                                             showLoading(holder.ib_des);
                                             searchStream(holder);
                                         }

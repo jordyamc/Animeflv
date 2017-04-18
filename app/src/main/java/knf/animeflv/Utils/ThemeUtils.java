@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.UiModeManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
@@ -171,13 +170,13 @@ public class ThemeUtils {
     }
 
     public static void setOrientation(Activity activity) {
-        if (!isTablet(activity) && !(((UiModeManager) activity.getSystemService(UI_MODE_SERVICE)).getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION)) { //Portrait
+        /*if (!isTablet(activity) && !(((UiModeManager) activity.getSystemService(UI_MODE_SERVICE)).getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION)) { //Portrait
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else if (isTV(activity)) {
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         } else {
             activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
+        }*/
     }
 
     public static boolean isAmoled(Context context) {

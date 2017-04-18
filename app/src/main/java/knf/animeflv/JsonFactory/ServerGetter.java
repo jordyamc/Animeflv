@@ -74,7 +74,7 @@ public class ServerGetter {
         });
     }
 
-    public static void getDir(final Context context, final BaseGetter.AsyncInterface asyncInterface) {
+    public static void getDir(final Context context, final BaseGetter.AsyncProgressInterface asyncInterface) {
         AsyncHttpClient asyncHttpClient = getClient();
         asyncHttpClient.setLogInterface(new NoLogInterface());
         asyncHttpClient.setLoggingEnabled(false);
@@ -192,7 +192,7 @@ public class ServerGetter {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                     super.onFailure(statusCode, headers, responseString, throwable);
-                    SelfGetter.getDir(context, new BaseGetter.AsyncInterface() {
+                    SelfGetter.getDir(context, new BaseGetter.AsyncProgressInterface() {
                         @Override
                         public void onFinish(String json) {
                             try {
@@ -201,6 +201,11 @@ public class ServerGetter {
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
+                        }
+
+                        @Override
+                        public void onProgress(int progress) {
+
                         }
                     });
                 }

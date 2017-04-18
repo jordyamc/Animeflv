@@ -273,32 +273,35 @@ public class VideoControllerView extends FrameLayout implements VideoGestureList
      * show controller view
      */
     private void show() {
-        if (!mShowing && mAnchorView != null) {
+        try {
+            if (!mShowing && mAnchorView != null) {
 
-            //animate anchorview when layout changes
-            //equals android:animateLayoutChanges="true"
-            mAnchorView.setLayoutTransition(new LayoutTransition());
-            setSeekProgress();
-            if (mPauseButton != null) {
-                mPauseButton.requestFocus();
-                if (!mPlayer.canPause()) {
-                    mPauseButton.setEnabled(false);
+                //animate anchorview when layout changes
+                //equals android:animateLayoutChanges="true"
+                mAnchorView.setLayoutTransition(new LayoutTransition());
+                setSeekProgress();
+                if (mPauseButton != null) {
+                    mPauseButton.requestFocus();
+                    if (!mPlayer.canPause()) {
+                        mPauseButton.setEnabled(false);
+                    }
                 }
-            }
 
-            //add controller view to bottom of the AnchorView
-            LayoutParams tlp = new LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
+                //add controller view to bottom of the AnchorView
+                LayoutParams tlp = new LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
 //            (int) (mContext.getResources().getDisplayMetrics().density * 45)
-            mAnchorView.addView(this, tlp);
-            mShowing = true;//set view state
+                mAnchorView.addView(this, tlp);
+                mShowing = true;//set view state
+            }
+            togglePausePlay();
+            toggleFullScreen();
+            //update progress
+            mHandler.sendEmptyMessage(HANDLER_UPDATE_PROGRESS);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        togglePausePlay();
-        toggleFullScreen();
-        //update progress
-        mHandler.sendEmptyMessage(HANDLER_UPDATE_PROGRESS);
-
     }
 
     /**

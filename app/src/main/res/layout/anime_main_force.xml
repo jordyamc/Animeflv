@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:fab="http://schemas.android.com/apk/res-auto"
+              android:id="@+id/main_root"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <include
+        android:id="@+id/main_toolbar"
+        layout="@layout/toolbar"/>
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                 xmlns:fab="http://schemas.android.com/apk/res-auto"
+                 android:layout_width="match_parent"
+                 android:layout_height="match_parent">
+
+        <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                      android:id="@+id/swiperefresh"
+                                                      android:layout_width="match_parent"
+                                                      android:layout_height="match_parent">
+
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/action_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_info_m"
+            fab:fab_colorNormal="@color/dark"
+            fab:fab_colorPressed="@color/prim"
+            fab:fab_colorRipple="@color/dark"/>
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/action_download_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_get_r"
+            fab:fab_colorNormal="@color/dark"
+            fab:fab_colorPressed="@color/prim"
+            fab:fab_colorRipple="@color/dark"/>
+    </FrameLayout>
+</LinearLayout>

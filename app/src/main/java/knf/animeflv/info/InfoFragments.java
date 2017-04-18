@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -119,11 +118,6 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_info_fragments);
         ButterKnife.bind(this);
-        if (!isXLargeScreen(this)) { //set phones to portrait;
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
         setSupportActionBar(toolbar);
         context = this;
         try {
@@ -272,7 +266,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
 
     private void getJsonfromApi() {
         if (new Parser().getTitCached(aid).equals("null")) {
-            BaseGetter.getJson(this, new DIRECTORIO(), new BaseGetter.AsyncInterface() {
+            BaseGetter.getJson(this, new DIRECTORIO(), new BaseGetter.AsyncProgressInterface() {
                 @Override
                 public void onFinish(String json) {
                     if (new Parser().getTitCached(aid).equals("null")) {
@@ -281,6 +275,11 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                     } else {
                         getJsonfromApi();
                     }
+                }
+
+                @Override
+                public void onProgress(int progress) {
+
                 }
             });
         } else {

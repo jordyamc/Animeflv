@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
@@ -176,7 +175,7 @@ public class newMain extends AppCompatActivity implements
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.anime_main);
+        setContentView(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("force_phone", false) ? R.layout.anime_main_force : R.layout.anime_main);
         TrackingHelper.track(this, TrackingHelper.MAIN);
         startUp();
         setUpMain();
@@ -204,8 +203,20 @@ public class newMain extends AppCompatActivity implements
     private void setUpMain() {
         MainRegistrer.init();
         setUpVersion();
-        setUpViews();
-        setUpAmoled();
+        try {
+            setUpViews();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("force_phone", false))
+                Toaster.toast("Error al cargar pantalla, desactiva la opcion de forzar vista de telefono!!!");
+        }
+        try {
+            setUpAmoled();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("force_phone", false))
+                Toaster.toast("Error al cargar pantalla, desactiva la opcion de forzar vista de telefono!!!");
+        }
         setUpDrawer();
         getJson();
         NetworkUtils.checkVersion(this, updateButton);
@@ -240,10 +251,10 @@ public class newMain extends AppCompatActivity implements
         };
         prefs.registerOnSharedPreferenceChangeListener(listener);
         if (!DirFile.exists()) {
-            SelfGetter.getDir(this, null);
+            SelfGetter.getDir(this);
         } else if (!FileUtil.isJSONValid(FileUtil.getStringFromFile(DirFile))) {
             DirFile.delete();
-            SelfGetter.getDir(this, null);
+            SelfGetter.getDir(this);
         }
         IntentFilter filter = new IntentFilter();
         filter.addAction(DownloaderService.RECEIVER_ACTION_ERROR);
@@ -745,7 +756,7 @@ public class newMain extends AppCompatActivity implements
 
     private void cambiarColor() {
         int[] colorl = new int[]{
-                ColorsRes.Gris(this),
+                ColorsRes.GrisLigth(this),
                 ColorsRes.Prim(this)
         };
         ColorChooserDialog dialog = new ColorChooserDialog.Builder(this, R.string.color_chooser_prim)
@@ -793,7 +804,7 @@ public class newMain extends AppCompatActivity implements
         Toaster.toast(text);
     }
 
-    private void setUpAmoled() {
+    private void setUpAmoled() throws Exception {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -827,13 +838,13 @@ public class newMain extends AppCompatActivity implements
         }
     }
 
-    private void setUpViews() {
+    private void setUpViews() throws Exception {
         if (!isXLargeScreen()) { //Portrait
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             toolbar = (Toolbar) findViewById(R.id.main_toolbar);
             menu_toolbar = toolbar;
         } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             toolbar = (Toolbar) findViewById(R.id.main_toolbar);
             menu_toolbar = (Toolbar) findViewById(R.id.ltoolbar);
 
@@ -1081,7 +1092,7 @@ public class newMain extends AppCompatActivity implements
 
     @Override
     public void onColorSelection(@NonNull ColorChooserDialog dialog, @ColorInt int selectedColor) {
-        if (selectedColor == ColorsRes.Prim(this) || selectedColor == ColorsRes.Gris(context)) {
+        if (selectedColor == ColorsRes.Prim(this) || selectedColor == ColorsRes.GrisLigth(context)) {
             ThemeHolder.isDark = selectedColor == ColorsRes.Prim(this);
             int[] colorl = new int[]{
                     ColorsRes.Naranja(this),
@@ -1260,7 +1271,11 @@ public class newMain extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         if (isXLargeScreen()) {
-            getMenuInflater().inflate(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("new_user", true) ? R.menu.menu_main_dark_new : R.menu.menu_main_dark, menu);
+            if (ThemeUtils.isAmoled(this)) {
+                getMenuInflater().inflate(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("new_user", true) ? R.menu.menu_main_new : R.menu.menu_main, menu);
+            } else {
+                getMenuInflater().inflate(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("new_user", true) ? R.menu.menu_main_dark_new : R.menu.menu_main_dark, menu);
+            }
         } else {
             getMenuInflater().inflate(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("new_user", true) ? R.menu.menu_main_new : R.menu.menu_main, menu);
         }

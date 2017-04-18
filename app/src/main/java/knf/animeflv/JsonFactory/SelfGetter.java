@@ -6,6 +6,8 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.core.CrashlyticsCore;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -443,7 +445,7 @@ public class SelfGetter {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
-    public static void getDir(Context context, @Nullable final BaseGetter.AsyncInterface asyncInterface) {
+    public static void getDir(Context context) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -468,7 +470,6 @@ public class SelfGetter {
                         String last_aid = last_url.substring(last_url.lastIndexOf("/") + 1, last_url.lastIndexOf("."));
                         if (last_aid.equals(last_obj.getString("a"))) {
                             Log.e("Dir DEBUG", "Dir up to date | Animes: " + array.length());
-                            asyncInterface.onFinish(current.toString());
                             return null;
                         }
                     }
@@ -479,6 +480,96 @@ public class SelfGetter {
                     JSONArray new_array = new JSONArray();
                     int last = Integer.parseInt(last_page.ownText().trim());
                     // Log.e("Dir DEBUG", "Last Page: " + last);
+                    for (int index = 1; index <= last; index++) {
+                        Document page = Jsoup.connect("http://animeflv.net/browse?order=added&page=" + index).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get();
+                        Elements animes = page.select("article");
+                        for (Element element : animes) {
+                            String img = element.select("img[src]").first().attr("src");
+                            String a = img.substring(img.lastIndexOf("/") + 1, img.lastIndexOf("."));
+                            if (last_obj != null && a.equals(last_obj.getString("a"))) {
+                                //Log.e("Dir DEBUG", "Stop loading at AID: " + a);
+                                mergeLists(current, array, new_array);
+                                return null;
+                            }
+                            Element info = element.select("h3.Title").first().select("a").first();
+                            String b = info.ownText();
+                            String c = getType(element.select("span").first().attr("class"));
+                            String link = info.attr("href");
+                            String[] semi = link.split("/");
+                            String d = semi[3];
+                            String e = semi[2];
+                            String f = "";
+                            String gens = "";
+                            for (Element g : element.select("div.Tags").last().select("a")) {
+                                gens += g.ownText().trim();
+                                gens += ", ";
+                            }
+                            if (!gens.equals(""))
+                                f = gens.substring(0, gens.lastIndexOf(","));
+                            if (b.trim().equals(""))
+                                b = Jsoup.connect("http://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().select("meta[property='og:title']").first().attr("content").replace(" Capítulos Online", "").replace(" Ver ", "").trim();
+                            JSONObject object = new JSONObject();
+                            object.put("a", a);
+                            object.put("b", b);
+                            object.put("c", c);
+                            object.put("d", d);
+                            object.put("e", e);
+                            object.put("f", f);
+                            new_array.put(object);
+                            //Log.e("Dir DEBUG", "ADD: \na: " + a + " \nb: " + b + " \nc: " + c + " \nd: " + d + " \ne: " + e + " \nf: " + f + " \nPage: " + index);
+                        }
+                    }
+                    mergeLists(current, array, new_array);
+                    return null;
+                } catch (Exception e) {
+                    //Log.e("Dir DEBUG", "Error loading dir", e);
+                    CrashlyticsCore.getInstance().logException(e);
+                }
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    public static void getDir(Context context, @Nullable final BaseGetter.AsyncProgressInterface asyncInterface) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    JSONObject current;
+                    JSONArray array = new JSONArray();
+                    try {
+                        current = new JSONObject(OfflineGetter.getDirectorio());
+                        current.getBoolean("verified");
+                        array = current.getJSONArray("lista");
+                    } catch (Exception e) {
+                        current = new JSONObject();
+                        current.put("verified", true);
+                        current.put("lista", array);
+                    }
+                    JSONObject last_obj = null;
+                    if (array.length() > 0) {
+                        Document init = Jsoup.connect("http://animeflv.net/browse?order=added").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get();
+                        Element last = init.select("article").first();
+                        last_obj = array.getJSONObject(0);
+                        String last_url = last.select("img[src]").first().attr("src");
+                        String last_aid = last_url.substring(last_url.lastIndexOf("/") + 1, last_url.lastIndexOf("."));
+                        if (last_aid.equals(last_obj.getString("a"))) {
+                            Log.e("Dir DEBUG", "Dir up to date | Animes: " + array.length());
+                            if (asyncInterface != null)
+                                asyncInterface.onFinish(current.toString());
+                            return null;
+                        }
+                    }
+                    //Log.e("Dir DEBUG", "Start updating Dir | Dir: " + array.length());
+                    Document init = Jsoup.connect("http://animeflv.net/browse?order=added&page=1").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get();
+                    Elements pages = init.select("ul.pagination").first().select("a");
+                    Element last_page = pages.get(pages.size() - 2);
+                    JSONArray new_array = new JSONArray();
+                    int last = Integer.parseInt(last_page.ownText().trim());
+                    // Log.e("Dir DEBUG", "Last Page: " + last);
+                    int progress = 0;
+                    if (asyncInterface != null)
+                        asyncInterface.onProgress(0);
                     for (int index = 1; index <= last; index++) {
                         Document page = Jsoup.connect("http://animeflv.net/browse?order=added&page=" + index).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get();
                         Elements animes = page.select("article");
@@ -506,7 +597,7 @@ public class SelfGetter {
                             if (!gens.equals(""))
                                 f = gens.substring(0, gens.lastIndexOf(","));
                             if (b.trim().equals(""))
-                                b = Jsoup.connect("http://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().select("meta[property='og:title']").first().attr("content").replace(" Online", "");
+                                b = Jsoup.connect("http://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().select("meta[property='og:title']").first().attr("content").replace(" Capítulos Online", "").replace(" Ver ", "").trim();
                             JSONObject object = new JSONObject();
                             object.put("a", a);
                             object.put("b", b);
@@ -515,6 +606,9 @@ public class SelfGetter {
                             object.put("e", e);
                             object.put("f", f);
                             new_array.put(object);
+                            progress++;
+                            if (asyncInterface != null)
+                                asyncInterface.onProgress(progress);
                             //Log.e("Dir DEBUG", "ADD: \na: " + a + " \nb: " + b + " \nc: " + c + " \nd: " + d + " \ne: " + e + " \nf: " + f + " \nPage: " + index);
                         }
                     }
@@ -522,6 +616,7 @@ public class SelfGetter {
                     return null;
                 } catch (Exception e) {
                     //Log.e("Dir DEBUG", "Error loading dir", e);
+                    CrashlyticsCore.getInstance().logException(e);
                     if (asyncInterface != null)
                         asyncInterface.onFinish(OfflineGetter.getDirectorio());
                 }
@@ -530,7 +625,21 @@ public class SelfGetter {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
-    private static void mergeLists(JSONObject object, JSONArray old_list, JSONArray new_list, BaseGetter.AsyncInterface asyncInterface) throws JSONException {
+    private static void mergeLists(JSONObject object, JSONArray old_list, JSONArray new_list) throws JSONException {
+        Log.e("Dir DEBUG", "In Dir: " + old_list.length() + " Added: " + new_list.length());
+        if (new_list.length() > 0) {
+            for (int i = 0; i < old_list.length(); i++) {
+                new_list.put(old_list.getJSONObject(i));
+            }
+            object.put("lista", new_list);
+        } else {
+            object.put("lista", old_list);
+        }
+        OfflineGetter.backupJsonSync(object, OfflineGetter.directorio);
+    }
+
+    private static void mergeLists(JSONObject object, JSONArray old_list, JSONArray new_list, BaseGetter.AsyncProgressInterface asyncInterface) throws JSONException {
+        asyncInterface.onProgress(-1);
         Log.e("Dir DEBUG", "In Dir: " + old_list.length() + " Added: " + new_list.length());
         if (new_list.length() > 0) {
             for (int i = 0; i < old_list.length(); i++) {

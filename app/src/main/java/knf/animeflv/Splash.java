@@ -5,7 +5,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
@@ -86,13 +85,13 @@ public class Splash extends AwesomeSplash {
         );*/
         new Alarm().SetAlarm(this);
         //EmisionChecker.Refresh();
-        if (!isXLargeScreen(getApplicationContext()) && !ThemeUtils.isTV(this)) { //set phones to portrait;
+        /*if (!isXLargeScreen(getApplicationContext()) && !ThemeUtils.isTV(this)) { //set phones to portrait;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else if (ThemeUtils.isTV(this)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
+        }*/
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 /*Window window = getWindow();
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);

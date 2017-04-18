@@ -2,7 +2,6 @@ package knf.animeflv.Directorio;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,7 +42,6 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
@@ -61,6 +59,7 @@ import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterBusquedaNew;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.SearchUtils;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.TrackingHelper;
@@ -79,6 +78,8 @@ public class Directorio extends AppCompatActivity {
     FrameLayout frameLayout;
     @BindView(R.id.load)
     ProgressBar loading;
+    @BindView(R.id.load_progress)
+    TextView load_prog;
     RelativeLayout linearLayout;
     Activity context;
     EditText.OnEditorActionListener listener;
@@ -116,8 +117,8 @@ public class Directorio extends AppCompatActivity {
             FileInputStream fin = new FileInputStream(fl);
             ret = convertStreamToString(fin);
             fin.close();
-        } catch (IOException e) {
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return ret;
     }
@@ -133,15 +134,12 @@ public class Directorio extends AppCompatActivity {
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         //setUpAnimations();
-        setContentView(R.layout.directorio);
+        setContentView(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("force_phone", false) ? R.layout.directorio_force : R.layout.directorio);
         context = this;
         ButterKnife.bind(this);
         setSupportActionBar(toolbarS);
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             linearLayout = (RelativeLayout) findViewById(R.id.LY_dir);
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (isXLargeScreen(this)) {
@@ -159,6 +157,7 @@ public class Directorio extends AppCompatActivity {
             editText.setTextColor(ColorsRes.Blanco(this));
             editText.setHintTextColor(ColorsRes.SecondaryTextDark(this));
             editText.setHighlightColor(ColorsRes.Negro(this));
+            load_prog.setTextColor(ColorsRes.SecondaryTextDark(this));
             if (!isXLargeScreen(this)) {
                 toolbarS.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
                 viewPagerTab.setBackgroundColor(getResources().getColor(android.R.color.black));
@@ -166,7 +165,7 @@ public class Directorio extends AppCompatActivity {
             } else {
                 toolbarS.getRootView().setBackgroundColor(ColorsRes.Prim(this));
                 if (ThemeUtils.isTablet(this))
-                findViewById(R.id.cardMain).setBackgroundColor(ColorsRes.Negro(this));
+                    findViewById(R.id.cardMain).setBackgroundColor(ColorsRes.Negro(this));
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 if (!isXLargeScreen(this)) {
@@ -180,6 +179,7 @@ public class Directorio extends AppCompatActivity {
         } else {
             editText.setTextColor(ColorsRes.Blanco(this));
             editText.setHintTextColor(ColorsRes.SecondaryTextDark(this));
+            load_prog.setTextColor(ColorsRes.SecondaryTextLight(this));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 if (!isXLargeScreen(this)) {
                     getWindow().setStatusBarColor(getResources().getColor(R.color.dark));
@@ -199,8 +199,9 @@ public class Directorio extends AppCompatActivity {
         } else {
             Toaster.toast("Creando directorio");
             loading.setVisibility(View.VISIBLE);
+            load_prog.setVisibility(View.VISIBLE);
         }
-        BaseGetter.getJson(this, new DIRECTORIO(), new BaseGetter.AsyncInterface() {
+        BaseGetter.getJson(this, new DIRECTORIO(), new BaseGetter.AsyncProgressInterface() {
             @Override
             public void onFinish(String json) {
                 if (!json.equals("null")) {
@@ -216,6 +217,7 @@ public class Directorio extends AppCompatActivity {
                                         toolbarS.setVisibility(View.VISIBLE);
                                         viewPagerTab.setVisibility(View.VISIBLE);
                                         loading.setVisibility(View.GONE);
+                                        load_prog.setVisibility(View.GONE);
                                         Toaster.toast("Directorio creado!");
                                     }
                                 });
@@ -229,6 +231,17 @@ public class Directorio extends AppCompatActivity {
                     Toaster.toast("Error al abrir el directorio");
                     finish();
                 }
+            }
+
+            @Override
+            public void onProgress(final int progress) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String prog_text = progress >= 0 ? ("Animes agregados: " + progress) : "Creando lista...";
+                        load_prog.setText(prog_text);
+                    }
+                });
             }
         });
     }
@@ -598,7 +611,7 @@ public class Directorio extends AppCompatActivity {
                 });
                 if (!isXLargeScreen(context)) {
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
+                    getSupportActionBar().setDisplayShowHomeEnabled(true);
                     toolbarS.setNavigationOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -640,6 +653,25 @@ public class Directorio extends AppCompatActivity {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
+                            case R.id.re_make:
+                                new MaterialDialog.Builder(Directorio.this)
+                                        .content("Se recreara el directorio, esto puede tardar unos minutos")
+                                        .positiveText("continuar")
+                                        .negativeText("cancelar")
+                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                            @Override
+                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                try {
+                                                    Keys.Dirs.CACHE_DIRECTORIO.delete();
+                                                    recreate();
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                    recreate();
+                                                }
+
+                                            }
+                                        }).build().show();
+                                break;
                             case R.id.buscar_borrar:
                                 if (editText.getText().length() > 0) {
                                     editText.setText("");
@@ -662,27 +694,31 @@ public class Directorio extends AppCompatActivity {
                                 }
                                 break;
                             case R.id.search:
-                                getSupportActionBar().setTitle("");
-                                editText.setVisibility(View.VISIBLE);
-                                editText.setText("");
-                                editText.requestFocus();
-                                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                imm.showSoftInput(editText, 0);
-                                menuGlobal.clear();
-                                if (!isXLargeScreen(context)) {
-                                    getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                                } else {
-                                    getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
-                                }
-                                if (!isXLargeScreen(context)) {
-                                    linearLayout.setVisibility(View.GONE);
-                                    recyclerView.setVisibility(View.VISIBLE);
-                                    frameLayout.setVisibility(View.VISIBLE);
-                                } else {
-                                    viewPager.setVisibility(View.GONE);
-                                    viewPagerTab.setVisibility(View.GONE);
-                                    recyclerView.setVisibility(View.VISIBLE);
-                                    frameLayout.setVisibility(View.VISIBLE);
+                                try {
+                                    getSupportActionBar().setTitle("");
+                                    editText.setVisibility(View.VISIBLE);
+                                    editText.setText("");
+                                    editText.requestFocus();
+                                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    imm.showSoftInput(editText, 0);
+                                    menuGlobal.clear();
+                                    if (!isXLargeScreen(context)) {
+                                        getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
+                                    } else {
+                                        getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                                    }
+                                    if (!isXLargeScreen(context)) {
+                                        linearLayout.setVisibility(View.GONE);
+                                        recyclerView.setVisibility(View.VISIBLE);
+                                        frameLayout.setVisibility(View.VISIBLE);
+                                    } else {
+                                        viewPager.setVisibility(View.GONE);
+                                        viewPagerTab.setVisibility(View.GONE);
+                                        recyclerView.setVisibility(View.VISIBLE);
+                                        frameLayout.setVisibility(View.VISIBLE);
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                                 break;
                         }
@@ -880,10 +916,14 @@ public class Directorio extends AppCompatActivity {
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
             menuGlobal.clear();
-            if (!isXLargeScreen(context)) {
-                getMenuInflater().inflate(R.menu.menu_main, menuGlobal);
+            if (isXLargeScreen(this)) {
+                if (ThemeUtils.isAmoled(this)) {
+                    getMenuInflater().inflate(R.menu.menu_dir_dark, menuGlobal);
+                } else {
+                    getMenuInflater().inflate(R.menu.menu_dir, menuGlobal);
+                }
             } else {
-                getMenuInflater().inflate(R.menu.menu_main_dark, menuGlobal);
+                getMenuInflater().inflate(R.menu.menu_dir, menuGlobal);
             }
             getSupportActionBar().setTitle("Directorio");
             if (!loaded) {
@@ -898,7 +938,6 @@ public class Directorio extends AppCompatActivity {
                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menu);
             }
         }
-        menu.removeItem(R.id.media_route);
         return true;
     }
 

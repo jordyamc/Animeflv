@@ -99,7 +99,8 @@ public class EmisionEditDialog extends DialogFragment {
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                                        if (dialog != null)
+                                            dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
                                     }
                                 });
                                 Toaster.toast("Error al editar");

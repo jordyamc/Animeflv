@@ -5,6 +5,8 @@
     <color name="blanco">#ffffff</color>
     <color name="rojo">#F20000</color>
 
+    <color name="gris_light">#cccccc</color>
+
     <color name="newCap">#fdfa5d</color>
     <color name="in_favs">#641acef6</color>
 

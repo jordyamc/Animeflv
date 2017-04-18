@@ -77,17 +77,17 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     @Override
     public void onBindViewHolder(final AdapterInfoCapsMaterial.ViewHolder holder, final int position) {
         SetUpWeb(holder.web, holder);
-        if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
+        if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
             showDelete(holder.ib_des);
             showPlay(holder.ib_ver);
-            if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition())))
-                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition()));
+            if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition())))
+                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
         } else {
-            if (ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition()))) {
+            if (ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
                 showDelete(holder.ib_des);
                 showPlay(holder.ib_ver);
-            } else if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
-                if (CastPlayBackManager.get(context).getCastingEid().equals(eids.get(holder.getAdapterPosition()))) {
+            } else if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
+                if (CastPlayBackManager.get(context).getCastingEid().equals(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
                     showDownload(holder.ib_des);
                     showCastPlay(holder.ib_ver);
                 } else {
@@ -112,7 +112,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             holder.ib_des.setColorFilter(null);
             holder.ib_des.setColorFilter(ColorsRes.Holo_Light(context));
         }
-        if (SeenManager.get(context).isSeen(eids.get(holder.getAdapterPosition()))) {
+        if (SeenManager.get(context).isSeen(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
             holder.tv_capitulo.setTextColor(getColor());
         }
 
@@ -124,12 +124,12 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                         Toaster.toast("Actualizacion descargada, instalar para continuar");
                     } else {
                         if (!MainStates.isProcessing()) {
-                            if (!MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
-                                if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition())) && !ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition()))) {
+                            if (!MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
+                                if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition())) && !ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
                                     showLoading(holder.ib_des);
                                     searchDownload(holder);
                                 } else {
-                                    final String item = capitulo.get(holder.getAdapterPosition()).replace("Capítulo ", "").trim();
+                                    final String item = capitulo.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).replace("Capítulo ", "").trim();
                                     MaterialDialog borrar = new MaterialDialog.Builder(context)
                                             .title("Eliminar")
                                             .titleGravity(GravityEnum.CENTER)
@@ -157,7 +157,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                     borrar.show();
                                 }
                             } else {
-                                String[] data = eids.get(holder.getAdapterPosition()).replace("E", "").split("_");
+                                String[] data = eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).replace("E", "").split("_");
                                 String aid = data[0];
                                 String num = data[1];
                                 new MaterialDialog.Builder(context)
@@ -172,7 +172,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                                             @Override
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition()));
+                                                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
                                                 showLoading(holder.ib_des);
                                                 searchDownload(holder);
                                             }
@@ -198,20 +198,20 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                 if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
                                     holder.tv_capitulo.setTextColor(getColor());
                                     /*if (CastPlayBackManager.get(context).isDeviceConnected()){
-                                        String e=eids.get(holder.getAdapterPosition());
+                                        String e=eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition());
                                         CastPlayBackManager.get(context).play(ServerManager.get().startStream(context,FileUtil.init(context).getFile(e)),e);
                                     }else {
-                                        StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
+                                        StreamManager.Play(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
                                     }*/
-                                    StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
-                                } else if (ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition()))) {
+                                    StreamManager.Play(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
+                                } else if (ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
                                     Toaster.toast("Descarga en proceso");
                                 } else {
                                     showLoading(holder.ib_des);
                                     searchStream(holder);
                                 }
                             } else {
-                                String[] data = eids.get(holder.getAdapterPosition()).replace("E", "").split("_");
+                                String[] data = eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).replace("E", "").split("_");
                                 String aid = data[0];
                                 String num = data[1];
                                 new MaterialDialog.Builder(context)
@@ -226,10 +226,10 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                                             @Override
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition()));
-                                                if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
+                                                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
+                                                if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
                                                     holder.tv_capitulo.setTextColor(getColor());
-                                                    StreamManager.Play(context, eids.get(holder.getAdapterPosition()));
+                                                    StreamManager.Play(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
                                                 } else {
                                                     showLoading(holder.ib_des);
                                                     searchStream(holder);
@@ -247,12 +247,12 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             @Override
             public boolean onLongClick(View view) {
                 if (!MainStates.isListing()) {
-                    if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
-                        if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
-                            MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition()));
+                    if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
+                        if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
+                            MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
                             showDownload(holder.ib_des);
                         } else {
-                            MainStates.init(context).addToWaitList(eids.get(holder.getAdapterPosition()));
+                            MainStates.init(context).addToWaitList(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
                             holder.ib_des.setImageResource(R.drawable.ic_waiting);
                         }
                     }
@@ -265,11 +265,11 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             public void onClick(View v) {
                 try {
                     if (!MainStates.isListing()) {
-                        if (!FileUtil.init(context).isInSeen(eids.get(holder.getAdapterPosition()))) {
-                            FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition()), true);
+                        if (!FileUtil.init(context).isInSeen(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
+                            FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()), true);
                             holder.tv_capitulo.setTextColor(getColor());
                         } else {
-                            FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition()), false);
+                            FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()), false);
                             if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
                                 holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.blanco));
                             } else {
@@ -277,12 +277,12 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                             }
                         }
                     } else {
-                        if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition()))) {
-                            if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition()))) {
-                                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition()));
+                        if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
+                            if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
+                                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
                                 showDownload(holder.ib_des);
                             } else {
-                                MainStates.init(context).addToWaitList(eids.get(holder.getAdapterPosition()));
+                                MainStates.init(context).addToWaitList(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
                                 holder.ib_des.setImageResource(R.drawable.ic_waiting);
                             }
                         }
