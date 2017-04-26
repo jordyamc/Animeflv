@@ -61,6 +61,8 @@ import knf.animeflv.JsonFactory.OfflineGetter;
 import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
+import knf.animeflv.Suggestions.Algoritm.SuggestionAction;
+import knf.animeflv.Suggestions.Algoritm.SuggestionHelper;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.FileUtil;
@@ -265,6 +267,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     }
 
     private void getJsonfromApi() {
+        SuggestionHelper.register(InfoFragments.this, aid, SuggestionAction.EXPLORE);
         if (new Parser().getTitCached(aid).equals("null")) {
             BaseGetter.getJson(this, new DIRECTORIO(), new BaseGetter.AsyncProgressInterface() {
                 @Override
@@ -522,6 +525,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             switch (item.getItemId()) {
                 case R.id.favorito:
                     final boolean isFav = FavoriteHelper.isFav(this, aid);
+                    SuggestionHelper.register(InfoFragments.this, aid, isFav ? SuggestionAction.UNFAV : SuggestionAction.FAV);
                     FavoriteHelper.setFav(this, aid, !isFav, new FavotiteDB.updateDataInterface() {
                         @Override
                         public void onFinish() {
@@ -547,6 +551,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull final MaterialDialog dialog, @NonNull DialogAction which) {
+                                        SuggestionHelper.register(InfoFragments.this, aid, SuggestionAction.UNFOLLOW);
                                         AutoEmisionHelper.removeAnimeFromList(InfoFragments.this, aid, new EmisionEditDialog.SearchListener() {
                                             @Override
                                             public void OnResponse(EmObj obj) {
@@ -598,6 +603,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                         EmisionEditDialog.create(aid, true, new EmisionEditDialog.onEditListener() {
                             @Override
                             public void onEdit() {
+                                SuggestionHelper.register(InfoFragments.this, aid, SuggestionAction.FOLLOW);
                                 supportInvalidateOptionsMenu();
                             }
                         }).show(getSupportFragmentManager(), "dialog");

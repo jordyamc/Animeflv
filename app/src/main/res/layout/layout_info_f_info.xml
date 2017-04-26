@@ -9,7 +9,7 @@
     android:animateLayoutChanges="true"
     android:clipToPadding="false"
     android:paddingTop="28dp"
-    android:visibility="gone"
+    android:visibility="visible"
     app:layout_anchorGravity="top|start"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -180,6 +180,34 @@
                 android:paddingRight="3dp"
                 android:paddingTop="3dp"
                 android:text="..."
+                android:textColor="@android:color/darker_gray"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lay_rate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <me.zhanghai.android.materialratingbar.MaterialRatingBar
+                android:id="@+id/rating_bar"
+                style="@style/Widget.MaterialRatingBar.RatingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:mrb_progressTint="?attr/colorAccent"
+                app:mrb_secondaryProgressTint="?attr/colorAccent"/>
+
+            <TextView
+                android:id="@+id/info_rate_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="2"
+                android:paddingBottom="3dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:paddingTop="3dp"
+                android:text="####"
                 android:textColor="@android:color/darker_gray"/>
         </LinearLayout>
 

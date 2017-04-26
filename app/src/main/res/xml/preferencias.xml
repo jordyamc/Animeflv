@@ -101,6 +101,17 @@
             android:summary="%s"
             android:title="Servidor de descarga preferido" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="Sugerencias">
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="true"
+            android:key="skip_favs"
+            android:title="Omitir animes favoritos"/>
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="0"
+            android:key="sug_order"
+            android:summary="%s"
+            android:title="Orden de animes"/>
+    </PreferenceCategory>
     <PreferenceCategory android:title="Extras">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:key="b_log"

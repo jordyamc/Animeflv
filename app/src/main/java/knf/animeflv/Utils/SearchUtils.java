@@ -135,39 +135,47 @@ public class SearchUtils {
         return linkArray;
     }
 
-    private static String[] getGeneros() {
+    public static String[] getGeneros() {
         String[] generos = {
                 "Todos",
                 "Acción",
-                "Aventura",
+                "Artes Marciales",
+                "Aventuras",
                 "Carreras",
                 "Comedia",
-                "Cyberpunk",
+                "Demencia",
+                "Demonios",
                 "Deportes",
                 "Drama",
                 "Ecchi",
                 "Escolares",
-                "Fantasia",
-                "Ciencia-Ficcion",
-                "Gore",
+                "Espacial",
+                "Fantasía",
+                "Ciencia Ficción",
                 "Harem",
-                "Horror",
+                "Historico",
+                "Infantil",
                 "Josei",
-                "Lucha",
+                "Juegos",
                 "Magia",
                 "Mecha",
                 "Militar",
                 "Misterio",
                 "Musica",
-                "Parodias",
-                "Psicologico",
-                "Recuentos-de-la-vida",
+                "Parodia",
+                "Policía",
+                "Psicológico",
+                "Recuentos de la vida",
                 "Romance",
+                "Samurai",
                 "Seinen",
-                "Shojo",
-                "Shonen",
-                "Sin-Generos",
+                "Shoujo",
+                "Shounen",
+                "Sin Generos",
                 "Sobrenatural",
+                "Superpoderes",
+                "Suspenso",
+                "Terror",
                 "Vampiros",
                 "Yaoi",
                 "Yuri"};
@@ -180,6 +188,8 @@ public class SearchUtils {
         for (String g : gen) {
             lower.add(g.toLowerCase().trim());
         }
+        if (generos.trim().equals(""))
+            lower.add("Sin Generos");
         for (Genero genero : SearchConstructor.getGeneros()) {
             if (!lower.contains(getGeneros()[genero.getValue()].toLowerCase())) {
                 return false;

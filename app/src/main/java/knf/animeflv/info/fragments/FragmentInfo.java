@@ -23,10 +23,14 @@ import knf.animeflv.ColorsRes;
 import knf.animeflv.CustomViews.TextViewExpandableAnimation;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
+import knf.animeflv.Rate.RateDB;
+import knf.animeflv.Rate.RateHelper;
 import knf.animeflv.Recyclers.AdapterRel;
 import knf.animeflv.ServerReload.Adapter.CustomRecycler;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.AnimeDetail;
+import me.zhanghai.android.materialratingbar.MaterialRatingBar;
+import xdroid.toaster.Toaster;
 
 public class FragmentInfo extends Fragment {
     @BindView(R.id.info_descripcion)
@@ -43,6 +47,10 @@ public class FragmentInfo extends Fragment {
     TextView txt_generos;
     @BindView(R.id.debug_info)
     TextView txt_debug;
+    @BindView(R.id.rating_bar)
+    MaterialRatingBar ratingBar;
+    @BindView(R.id.info_rate_count)
+    TextView txt_rate_count;
     @BindView(R.id.rv_relacionados)
     CustomRecycler rv_rel;
 
@@ -93,6 +101,7 @@ public class FragmentInfo extends Fragment {
         txt_estado.setTextColor(color);
         txt_generos.setTextColor(color);
         txt_debug.setTextColor(color);
+        txt_rate_count.setTextColor(color);
         setInfo();
         return view;
     }
@@ -125,6 +134,31 @@ public class FragmentInfo extends Fragment {
                 txt_estado.setText(animeDetail.getEstado());
                 txt_generos.setText(animeDetail.getGeneros());
                 txt_debug.setText(aid);
+                ratingBar.setRating(animeDetail.getRate());
+                txt_rate_count.setText(animeDetail.getRate_count());
+                ratingBar.setOnRatingChangeListener(new MaterialRatingBar.OnRatingChangeListener() {
+                    @Override
+                    public void onRatingChanged(MaterialRatingBar materialRatingBar, final float v) {
+                        if (!RateDB.get(getActivity()).isRated(aid))
+                            RateHelper.rate(aid, Math.round(v), new RateHelper.RateResponse() {
+                                @Override
+                                public void onResponse(@Nullable final String votes, final double rating, boolean success) {
+                                    if (success) {
+                                        RateDB.get(getActivity()).addRate(aid, String.valueOf(v));
+                                        getActivity().runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                ratingBar.setRating((float) rating);
+                                                txt_rate_count.setText(votes);
+                                            }
+                                        });
+                                    } else {
+                                        Toaster.toast("Error al enviar!!!");
+                                    }
+                                }
+                            });
+                    }
+                });
                 final String[] urls = parser.urlsRel(json);
                 if (urls.length == 0) {
                     rv_rel.setVisibility(View.GONE);

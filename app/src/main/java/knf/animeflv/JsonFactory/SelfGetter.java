@@ -355,12 +355,14 @@ public class SelfGetter {
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
-                    Log.e("Get Anime Info", new Parser().getUrlAnimeCached(anime.getAidString()));
-                    Document document = Jsoup.connect(new Parser().getUrlAnimeCached(anime.getAidString())).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(TIMEOUT).get();
+                    Log.e("Get Anime Info", Parser.getUrlAnimeCached(anime.getAidString()));
+                    Document document = Jsoup.connect(Parser.getUrlAnimeCached(anime.getAidString())).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(TIMEOUT).get();
                     String imgUrl = document.select("div.Image").first().select("img[src]").first().attr("src");
                     String aid = imgUrl.substring(imgUrl.lastIndexOf("/") + 1, imgUrl.lastIndexOf("."));
                     String tid = document.select("div.Ficha").first().select("div.Container").first().select("span").first().attr("class");
                     String state = getState(document.select("aside.SidebarA.BFixed").first().select("div").last().attr("class"));
+                    String rate_stars = document.select("meta[itemprop='ratingValue']").first().attr("content");
+                    String rate_count = document.select("meta[itemprop='ratingCount']").first().attr("content");
                     Elements categories = document.select("div.Categories").first().select("a");
                     String generos = "";
                     String gens = "";
@@ -427,6 +429,8 @@ public class SelfGetter {
                     fobject.put("sinopsis", sinopsis);
                     fobject.put("fecha_inicio", start);
                     fobject.put("fecha_fin", state);
+                    fobject.put("rating_value", rate_stars);
+                    fobject.put("rating_count", rate_count);
                     fobject.put("generos", generos);
                     fobject.put("episodios", array);
                     fobject.put("relacionados", j_rels);

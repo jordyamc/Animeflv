@@ -374,6 +374,15 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
+        getPreferenceScreen().findPreference("sug_order").setSummary(getStringfromResourse(R.array.sug_order, "sug_order", "0"));
+        getPreferenceScreen().findPreference("sug_order").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                UtilDialogPref.init(getResources().getStringArray(R.array.sug_order), "%s", "sug_order", "0", "Selecciona", getPreferenceScreen().findPreference("sug_order"));
+                PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
+                return false;
+            }
+        });
         getPreferenceScreen().findPreference("Rpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {

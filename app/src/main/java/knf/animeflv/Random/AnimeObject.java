@@ -33,4 +33,10 @@ public class AnimeObject {
             }
         }
     }
+
+    public AnimeObject(String aid, String title, String tid) {
+        this.aid = aid;
+        this.title = title;
+        this.tid = tid;
+    }
 }

@@ -37,6 +37,7 @@ import java.util.List;
 import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.Favorites.FavotiteDB;
 import knf.animeflv.LoginActivity.DropboxManager;
+import knf.animeflv.Random.AnimeObject;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.objects.MainObject;
 
@@ -243,6 +244,27 @@ public class Parser {
             }
         }
         return FileUtil.corregirTit(ret);
+    }
+
+    public static AnimeObject getAnimeCached(String aid) {
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONObject jsonObj = new JSONObject(getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject nombreJ = jsonArray.getJSONObject(i);
+                    String n = nombreJ.getString("a");
+                    if (n.trim().equals(aid)) {
+                        return new AnimeObject(aid, FileUtil.corregirTit(nombreJ.getString("b")), nombreJ.getString("c"));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     public static int getLastAidCached() {

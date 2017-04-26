@@ -31,6 +31,8 @@ import knf.animeflv.Parser;
 import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.R;
 import knf.animeflv.StreamManager.StreamManager;
+import knf.animeflv.Suggestions.Algoritm.SuggestionAction;
+import knf.animeflv.Suggestions.Algoritm.SuggestionHelper;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
@@ -95,6 +97,7 @@ public class DownloadGetter {
                                         actionsInterface.onStartDownload();
                                         break;
                                 }
+                                SuggestionHelper.register(context, eid.trim().split("_")[0], SuggestionAction.PLAY);
                             } else {
                                 final MaterialDialog.Builder d = new MaterialDialog.Builder(context)
                                         .title(actionsInterface.isStream() ? "Streaming" : "Descarga")
@@ -108,6 +111,7 @@ public class DownloadGetter {
                                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                                             @Override
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                SuggestionHelper.register(context, eid.trim().split("_")[0], SuggestionAction.PLAY);
                                                 String des = nombres.get(sp.getSelectedItemPosition());
                                                 final String ur = urls.get(sp.getSelectedItemPosition());
                                                 switch (des.toLowerCase()) {
@@ -156,6 +160,7 @@ public class DownloadGetter {
                                     d.onNeutral(new MaterialDialog.SingleButtonCallback() {
                                         @Override
                                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                            SuggestionHelper.register(context, eid.trim().split("_")[0], SuggestionAction.PLAY);
                                             String url = urls.get(sp.getSelectedItemPosition());
                                             if (!url.toLowerCase().contains("zippyshare")) {
                                                 CastPlayBackManager.get(context).play(url, eid);

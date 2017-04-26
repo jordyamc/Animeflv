@@ -870,41 +870,7 @@ public class Directorio extends AppCompatActivity {
     }
 
     private String[] getGeneros() {
-        return new String[]{
-                "Todos",
-                "Accion",
-                "Aventuras",
-                "Carreras",
-                "Comedia",
-                "Cyberpunk",
-                "Deportes",
-                "Drama",
-                "Ecchi",
-                "Escolares",
-                "Fantasía",
-                "Ciencia Ficcion",
-                "Gore",
-                "Harem",
-                "Horror",
-                "Josei",
-                "Lucha",
-                "Magia",
-                "Mecha",
-                "Militar",
-                "Misterio",
-                "Música",
-                "Parodias",
-                "Psicologico",
-                "Recuentos de la vida",
-                "Romance",
-                "Seinen",
-                "Shojo",
-                "Shonen",
-                "Sin Genero",
-                "Sobrenatural",
-                "Vampiros",
-                "Yaoi",
-                "Yuri"};
+        return SearchUtils.getGeneros();
     }
 
     @Override

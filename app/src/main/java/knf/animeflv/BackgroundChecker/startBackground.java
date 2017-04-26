@@ -141,9 +141,11 @@ public class startBackground {
                                             if (isInFavs && desc && isnot) {
                                                 Descargar(context, st.titulo, st.eid, st.sid);
                                             }
-                                            if (onlyNotFavs && isInFavs) {
-                                                num += 1;
-                                                sts.add(st.eid);
+                                            if (onlyNotFavs) {
+                                                if (isInFavs) {
+                                                    num += 1;
+                                                    sts.add(st.eid);
+                                                }
                                             } else {
                                                 num += 1;
                                                 sts.add(st.eid);

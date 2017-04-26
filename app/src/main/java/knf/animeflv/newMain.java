@@ -105,6 +105,7 @@ import knf.animeflv.Recyclers.AdapterMain;
 import knf.animeflv.Recyclers.AdapterMainNoGIF;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.State.StateActivity;
+import knf.animeflv.Suggestions.SuggestionsActivity;
 import knf.animeflv.Tutorial.TutorialActivity;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
@@ -461,6 +462,7 @@ public class newMain extends AppCompatActivity implements
                         new PrimaryDrawerItem().withName("Favoritos").withIcon(MaterialDesignIconic.Icon.gmi_star).withIdentifier(1),
                         new PrimaryDrawerItem().withName("Directorio").withIcon(MaterialDesignIconic.Icon.gmi_view_list_alt).withIdentifier(2),
                         new PrimaryDrawerItem().withName("Emision").withIcon(MaterialDesignIconic.Icon.gmi_alarm_check).withIdentifier(3),
+                        new PrimaryDrawerItem().withName("Sugeridos").withIcon(CommunityMaterial.Icon.cmd_account_network).withIdentifier(13),
                         new PrimaryDrawerItem().withName("Random").withIcon(MaterialDesignIconic.Icon.gmi_shuffle).withIdentifier(11),
                         new PrimaryDrawerItem().withName("Explorador").withIcon(MaterialDesignIconic.Icon.gmi_folder).withIdentifier(9),
                         new PrimaryDrawerItem().withName("Historial").withIcon(MaterialDesignIconic.Icon.gmi_eye).withIdentifier(10),
@@ -531,6 +533,10 @@ public class newMain extends AppCompatActivity implements
                             case 11:
                                 result.setSelection(0, false);
                                 startActivity(new Intent(context, RandomActivity.class));
+                                break;
+                            case 13:
+                                result.setSelection(0, false);
+                                startActivity(new Intent(context, SuggestionsActivity.class));
                                 break;
                             case 15:
                                 result.setSelection(0, false);

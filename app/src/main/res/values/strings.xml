@@ -20,6 +20,10 @@
         <item>60000</item>
         <item>120000</item>
     </string-array>
+    <string-array name="sug_order">
+        <item>Primero nuevos</item>
+        <item>Primero viejos</item>
+    </string-array>
 
     <string-array name="minutos">
         <item>1 minuto</item>

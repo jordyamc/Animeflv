@@ -313,6 +313,7 @@
         <activity
             android:name="com.github.zawadz88.activitychooser.MaterialActivityChooserActivity"
             android:theme="@style/MACTheme"/>
+        <activity android:name=".Suggestions.SuggestionsActivity"/>
 
         <service
             android:name=".Tile.QuickSetting"

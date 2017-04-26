@@ -22,8 +22,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 195
-        versionName "4.7.7"
+        versionCode 196
+        versionName "4.7.8"
         multiDexEnabled = true
     }
     buildTypes {
@@ -134,6 +134,8 @@ dependencies {
     compile 'com.google.android.gms:play-services-analytics:10.2.1'
     compile 'com.google.android.gms:play-services-ads:10.2.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+
+    compile 'me.zhanghai.android.materialratingbar:library:1.0.2'
 
     compile('io.branch.sdk.android:library:2.+') {
         exclude module: 'answers-shim'
