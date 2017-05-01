@@ -12,4 +12,7 @@
     <external-path
         name="download-tmp"
         path="Animeflv/download/tmp/"/>
+    <cache-path
+        name="updates"
+        path="updates/"/>
 </paths>

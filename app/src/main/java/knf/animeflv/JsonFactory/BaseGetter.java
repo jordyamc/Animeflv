@@ -64,6 +64,8 @@ public class BaseGetter {
         void onFinish(String json);
 
         void onProgress(int progress);
+
+        void onError(Throwable throwable);
     }
 
 }

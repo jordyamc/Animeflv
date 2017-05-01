@@ -207,6 +207,11 @@ public class ServerGetter {
                         public void onProgress(int progress) {
 
                         }
+
+                        @Override
+                        public void onError(Throwable throwable) {
+                            throwable.printStackTrace();
+                        }
                     });
                 }
             });

@@ -10,11 +10,29 @@
     android:paddingTop="28dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingEnd="10dp"
+            android:paddingRight="10dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+        <com.futuremind.recyclerviewfastscroll.FastScroller
+            android:id="@+id/fastscroll"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:orientation="vertical"
+            app:fastscroll__bubbleColor="?attr/colorAccent"
+            app:fastscroll__bubbleTextAppearance="@style/FastScrollTextStyle"
+            app:fastscroll__handleColor="?attr/colorAccent"/>
+    </RelativeLayout>
 
     <com.melnykov.fab.FloatingActionButton
         android:id="@+id/action_list"

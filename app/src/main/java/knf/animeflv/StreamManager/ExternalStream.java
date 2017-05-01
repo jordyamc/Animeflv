@@ -63,6 +63,10 @@ public class ExternalStream {
         packages = pm.getInstalledApplications(0);
         String pack = "null";
         for (ApplicationInfo packageInfo : packages) {
+            if (packageInfo.packageName.equals("com.mxtech.videoplayer.beta")) {
+                pack = "com.mxtech.videoplayer.beta";
+                break;
+            }
             if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
                 pack = "com.mxtech.videoplayer.pro";
                 break;

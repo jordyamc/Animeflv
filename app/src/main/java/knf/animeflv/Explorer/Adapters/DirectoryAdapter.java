@@ -1,6 +1,7 @@
 package knf.animeflv.Explorer.Adapters;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import knf.animeflv.Explorer.Models.Directory;
 import knf.animeflv.Explorer.Models.ModelFactory;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
+import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
@@ -91,27 +93,73 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
                         .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                try {
-                                    for (String file : list.get(holder.getAdapterPosition()).getFile(context).list()) {
-                                        ManageDownload.cancel(context, file.replace(".mp4", "E"));
-                                        FileUtil.init(context).DeleteAnime(file.replace(".mp4", "E"));
+                            public void onClick(@NonNull final MaterialDialog dialog, @NonNull DialogAction which) {
+                                new AsyncTask<Void, Void, Void>() {
+                                    private MaterialDialog dialogProg;
+                                    private int progress = 0;
+
+                                    @Override
+                                    protected void onPreExecute() {
+                                        dialogProg = new MaterialDialog.Builder(context)
+                                                .content("Eliminando...")
+                                                .progress(false, list.get(holder.getAdapterPosition()).getFile(context).list().length, true)
+                                                .cancelable(false)
+                                                .build();
+                                        context.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                dialog.dismiss();
+                                                dialogProg.show();
+                                                dialogProg.setProgress(progress);
+                                            }
+                                        });
+                                        super.onPreExecute();
                                     }
-                                    if (list.get(holder.getAdapterPosition()).getFile(context).list().length == 0) {
-                                        FileUtil.init(context).DeleteAnimeDir(list.get(holder.getAdapterPosition()).getID());
-                                        list.remove(holder.getAdapterPosition());
-                                        notifyItemRemoved(holder.getAdapterPosition());
-                                        Toaster.toast("Archivos eliminados");
-                                        recreateList();
-                                    } else {
-                                        Toaster.toast("Error al eliminar");
-                                        recreateList();
+
+                                    @Override
+                                    protected Void doInBackground(Void... voids) {
+                                        try {
+                                            for (String file : list.get(holder.getAdapterPosition()).getFile(context).list()) {
+                                                ManageDownload.cancel(context, file.replace(".mp4", "E"));
+                                                FileUtil.init(context).DeleteAnime(file.replace(".mp4", "E"));
+                                                progress++;
+                                                context.runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        dialogProg.setProgress(progress);
+                                                    }
+                                                });
+                                            }
+                                            context.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    dialogProg.dismiss();
+                                                    if (list.get(holder.getAdapterPosition()).getFile(context).list().length == 0) {
+                                                        FileUtil.init(context).DeleteAnimeDir(list.get(holder.getAdapterPosition()).getID());
+                                                        list.remove(holder.getAdapterPosition());
+                                                        notifyItemRemoved(holder.getAdapterPosition());
+                                                        Toaster.toast("Archivos eliminados");
+                                                        recreateList();
+                                                    } else {
+                                                        Toaster.toast("Error al eliminar");
+                                                        recreateList();
+                                                    }
+                                                }
+                                            });
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                            context.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    dialogProg.dismiss();
+                                                }
+                                            });
+                                            Toaster.toast("Error al eliminar");
+                                            recreateList();
+                                        }
+                                        return null;
                                     }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    Toaster.toast("Error al eliminar");
-                                    recreateList();
-                                }
+                                }.executeOnExecutor(ExecutorManager.getExecutor());
                             }
                         }).build().show();
             }

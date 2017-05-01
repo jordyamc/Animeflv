@@ -41,6 +41,7 @@ public class SelfGetter {
     public static final String ua = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/5.7.15533.1010 Safari/537.36";
 
     //FIXME:OVA PELICULA
+
     public static void getInicio(final Context context, final INICIO inicio, final BaseGetter.AsyncInterface asyncInterface) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -534,7 +535,7 @@ public class SelfGetter {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
-    public static void getDir(Context context, @Nullable final BaseGetter.AsyncProgressInterface asyncInterface) {
+    static void getDir(Context context, @Nullable final BaseGetter.AsyncProgressInterface asyncInterface) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -621,8 +622,13 @@ public class SelfGetter {
                 } catch (Exception e) {
                     //Log.e("Dir DEBUG", "Error loading dir", e);
                     CrashlyticsCore.getInstance().logException(e);
+                    String dir = OfflineGetter.getDirectorio();
                     if (asyncInterface != null)
-                        asyncInterface.onFinish(OfflineGetter.getDirectorio());
+                        if (dir.equals("null")) {
+                            asyncInterface.onError(e);
+                        } else {
+                            asyncInterface.onFinish(dir);
+                        }
                 }
                 return null;
             }
@@ -654,8 +660,7 @@ public class SelfGetter {
             object.put("lista", old_list);
         }
         OfflineGetter.backupJsonSync(object, OfflineGetter.directorio);
-        if (asyncInterface != null)
-            asyncInterface.onFinish(object.toString());
+        asyncInterface.onFinish(object.toString());
     }
 
     private static String getState(String className) {

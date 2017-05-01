@@ -76,6 +76,12 @@ public class SuggestionHelper {
             public void onProgress(int progress) {
 
             }
+
+            @Override
+            public void onError(Throwable throwable) {
+                throwable.printStackTrace();
+                suggestionCreate.onError(-1);
+            }
         });
     }
 

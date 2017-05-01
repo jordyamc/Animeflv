@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -33,6 +34,7 @@ import knf.animeflv.R;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Suggestions.Algoritm.SuggestionAction;
 import knf.animeflv.Suggestions.Algoritm.SuggestionHelper;
+import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
@@ -161,15 +163,20 @@ public class DownloadGetter {
                                         @Override
                                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                             SuggestionHelper.register(context, eid.trim().split("_")[0], SuggestionAction.PLAY);
-                                            String url = urls.get(sp.getSelectedItemPosition());
-                                            if (!url.toLowerCase().contains("zippyshare")) {
-                                                CastPlayBackManager.get(context).play(url, eid);
-                                                dialog.dismiss();
-                                            } else {
+                                            dialog.dismiss();
+                                            final String url = urls.get(sp.getSelectedItemPosition());
+                                            if (url.toLowerCase().contains("zippyshare")) {
                                                 Toaster.toast("No se puede reproducir desde Zippyshare!!!");
-                                                dialog.dismiss();
+                                            } else {
+                                                new AsyncTask<Void, Void, Void>() {
+                                                    @Override
+                                                    protected Void doInBackground(Void... voids) {
+                                                        CastPlayBackManager.get(context).play(url, eid);
+                                                        actionsInterface.onStartCasting();
+                                                        return null;
+                                                    }
+                                                }.executeOnExecutor(ExecutorManager.getExecutor());
                                             }
-                                            actionsInterface.onStartCasting();
                                         }
                                     });
                                 }

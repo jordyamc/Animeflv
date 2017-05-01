@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -60,6 +61,7 @@ import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterBusquedaNew;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Keys;
+import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.SearchUtils;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.TrackingHelper;
@@ -228,7 +230,11 @@ public class Directorio extends AppCompatActivity {
                     loaded = true;
                     supportInvalidateOptionsMenu();
                 } else {
-                    Toaster.toast("Error al abrir el directorio");
+                    if (!NetworkUtils.isNetworkAvailable()) {
+                        Toaster.toast("Error al leer directorio de cache");
+                    } else {
+                        Toaster.toast("Error al abrir el directorio");
+                    }
                     finish();
                 }
             }
@@ -242,6 +248,13 @@ public class Directorio extends AppCompatActivity {
                         load_prog.setText(prog_text);
                     }
                 });
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                Toaster.toast("Error al cargar directorio");
+                Toaster.toastLong(Log.getStackTraceString(throwable));
+                finish();
             }
         });
     }
@@ -936,27 +949,31 @@ public class Directorio extends AppCompatActivity {
     }
 
     public void cancelar() {
-        editText.setText("");
-        editText.setVisibility(View.GONE);
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-        menuGlobal.clear();
-        if (!isXLargeScreen(context)) {
-            getMenuInflater().inflate(R.menu.menu_main, menuGlobal);
-        } else {
-            getMenuInflater().inflate(R.menu.menu_main_dark, menuGlobal);
-        }
-        supportInvalidateOptionsMenu();
-        getSupportActionBar().setTitle("Directorio");
-        if (!isXLargeScreen(context)) {
-            recyclerView.setVisibility(View.GONE);
-            frameLayout.setVisibility(View.GONE);
-            linearLayout.setVisibility(View.VISIBLE);
-        } else {
-            recyclerView.setVisibility(View.GONE);
-            frameLayout.setVisibility(View.GONE);
-            viewPager.setVisibility(View.VISIBLE);
-            viewPagerTab.setVisibility(View.VISIBLE);
+        try {
+            editText.setText("");
+            editText.setVisibility(View.GONE);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+            menuGlobal.clear();
+            if (!isXLargeScreen(context)) {
+                getMenuInflater().inflate(R.menu.menu_main, menuGlobal);
+            } else {
+                getMenuInflater().inflate(R.menu.menu_main_dark, menuGlobal);
+            }
+            supportInvalidateOptionsMenu();
+            getSupportActionBar().setTitle("Directorio");
+            if (!isXLargeScreen(context)) {
+                recyclerView.setVisibility(View.GONE);
+                frameLayout.setVisibility(View.GONE);
+                linearLayout.setVisibility(View.VISIBLE);
+            } else {
+                recyclerView.setVisibility(View.GONE);
+                frameLayout.setVisibility(View.GONE);
+                viewPager.setVisibility(View.VISIBLE);
+                viewPagerTab.setVisibility(View.VISIBLE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

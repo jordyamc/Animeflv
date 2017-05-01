@@ -139,30 +139,17 @@ public class MXStream {
                 break;
             }
         }
-        switch (pack) {
-            case "com.mxtech.videoplayer.pro":
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                Uri videoUri = getUrifromFile(file);
-                intent.setDataAndType(videoUri, "application/mp4");
-                intent.setPackage("com.mxtech.videoplayer.pro");
-                intent.putExtra("title", parser.getTitCached(aid) + " " + numero);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
-                SeenManager.get(context).setSeenState(eid, true);
-                break;
-            case "com.mxtech.videoplayer.ad":
-                Intent intentad = new Intent(Intent.ACTION_VIEW);
-                Uri videoUriad = getUrifromFile(file);
-                intentad.setDataAndType(videoUriad, "application/mp4");
-                intentad.setPackage("com.mxtech.videoplayer.ad");
-                intentad.putExtra("title", parser.getTitCached(aid) + " " + numero);
-                intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intentad);
-                SeenManager.get(context).setSeenState(eid, true);
-                break;
-            default:
-                Toast.makeText(context, "MX player no instalado", Toast.LENGTH_SHORT).show();
-                break;
+        if (!pack.equals("null")) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            Uri videoUri = getUrifromFile(file);
+            intent.setDataAndType(videoUri, "application/mp4");
+            intent.setPackage(pack);
+            intent.putExtra("title", parser.getTitCached(aid) + " " + numero);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+            SeenManager.get(context).setSeenState(eid, true);
+        } else {
+            Toast.makeText(context, "MX player no instalado", Toast.LENGTH_SHORT).show();
         }
     }
 

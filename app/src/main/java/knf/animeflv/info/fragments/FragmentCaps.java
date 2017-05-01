@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.futuremind.recyclerviewfastscroll.FastScroller;
+import com.futuremind.recyclerviewfastscroll.RecyclerViewScrollListener;
 import com.melnykov.fab.FloatingActionButton;
 
 import java.lang.ref.WeakReference;
@@ -34,6 +36,8 @@ import knf.animeflv.Utils.ThemeUtils;
 public class FragmentCaps extends Fragment {
     @BindView(R.id.rv)
     RecyclerView recyclerView;
+    @BindView(R.id.fastscroll)
+    FastScroller fastScroller;
     @BindView(R.id.action_list)
     FloatingActionButton button_list;
 
@@ -112,6 +116,19 @@ public class FragmentCaps extends Fragment {
                 recyclerView.setLayoutManager(layoutManager);
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setAdapter(adapter_caps);
+                fastScroller.setRecyclerView(recyclerView);
+                fastScroller.addScrollerListener(new RecyclerViewScrollListener.ScrollerListener() {
+                    @Override
+                    public void onScroll(final float v) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (!MainStates.isListing())
+                                    button_list.setVisibility(v >= 0.9f ? View.GONE : View.VISIBLE);
+                            }
+                        });
+                    }
+                });
             }
         });
     }

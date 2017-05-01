@@ -279,7 +279,7 @@ public class startBackground {
                 }
             } else {
                 Log.d("Auto", "true");
-                final File descarga = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "Animeflv_Nver.apk");
+                final File descarga = Keys.Dirs.getUpdateFile(context);
                 int isDesc = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("isDescDown", versionCode);
                 Boolean downloading = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("isDescRun", false);
                 if (descarga.exists() && isDesc < Integer.parseInt(s.trim()) && !downloading) {
@@ -337,7 +337,7 @@ public class startBackground {
                         mBuilder.setLights(Color.BLUE, 5000, 2000);
                         mBuilder.setGroup("animeflv_group");
                         Intent resultIntent = new Intent(Intent.ACTION_VIEW) //FIXME: Uri Exposed
-                                .setDataAndType(FileUtil.init(context).getUriForFile(descarga),
+                                .setDataAndType(Uri.fromFile(descarga),
                                         "application/vnd.android.package-archive");
                         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         mBuilder.setContentIntent(resultPendingIntent);

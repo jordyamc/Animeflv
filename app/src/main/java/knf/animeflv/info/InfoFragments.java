@@ -284,6 +284,12 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 public void onProgress(int progress) {
 
                 }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    Toaster.toast("Error al actualizar directorio");
+                    finish();
+                }
             });
         } else {
             BaseGetter.getJson(this, new ANIME(Integer.parseInt(aid)), new BaseGetter.AsyncInterface() {

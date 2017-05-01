@@ -413,13 +413,16 @@ public class FileUtil {
         }
     }
 
-    public boolean DeleteAnimeDir(String aid) {
+    public void DeleteAnimeDir(String aid) {
         File internal = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid);
         File external = new File(getSDPath() + "/Animeflv/download/" + aid);
         try {
-            return internal.delete() || external.delete() || getDirFromAccess(aid).delete();
+            internal.delete();
+            external.delete();
+            getDirFromAccess(aid).delete();
         } catch (NullPointerException e) {
-            return internal.delete() || external.delete();
+            internal.delete();
+            external.delete();
         }
     }
 
@@ -570,6 +573,10 @@ public class FileUtil {
         packages = pm.getInstalledApplications(0);
         String pack = "null";
         for (ApplicationInfo packageInfo : packages) {
+            if (packageInfo.packageName.equals("com.mxtech.videoplayer.beta")) {
+                pack = "com.mxtech.videoplayer.beta";
+                break;
+            }
             if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
                 pack = "com.mxtech.videoplayer.pro";
                 break;

@@ -1,5 +1,6 @@
 package knf.animeflv.Utils;
 
+import android.content.Context;
 import android.os.Environment;
 
 import java.io.File;
@@ -19,6 +20,12 @@ public class Keys {
         public static final File SOUNDS_NOMEDIA = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/.sounds/.nomedia");
         public static final File BACKUP_DATA = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/data.save");
         public static final File DISABLE_CAST = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/disable_cast.conf");
+
+        public static File getUpdateFile(Context context) {
+            File file = new File(new File(context.getCacheDir(), "updates"), "Animeflv_Nver.apk");
+            file.mkdirs();
+            return file;
+        }
     }
 
     public static class Url {

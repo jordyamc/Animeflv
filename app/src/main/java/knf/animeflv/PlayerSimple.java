@@ -19,11 +19,14 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.crashlytics.android.core.CrashlyticsCore;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import knf.animeflv.Utils.FileUtil;
+import xdroid.toaster.Toaster;
 
 @TargetApi(21)
 public class PlayerSimple extends AppCompatActivity {
@@ -64,8 +67,9 @@ public class PlayerSimple extends AppCompatActivity {
         videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                Toast.makeText(context, "Error en video", Toast.LENGTH_SHORT).show();
+                Toaster.toast("Error en video");
                 Log.d("Error:", String.valueOf(what));
+                CrashlyticsCore.getInstance().logException(new Exception("Player Simple: code " + what));
                 finish();
                 return false;
             }

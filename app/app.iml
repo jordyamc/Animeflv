@@ -162,6 +162,7 @@
     <orderEntry type="library" exported="" name="dropbox-core-sdk-2.1.2" level="project" />
     <orderEntry type="library" exported="" name="xdroid-core-0.0.10" level="project" />
     <orderEntry type="library" exported="" name="materialize-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="fastscroll-0.2.5" level="project" />
     <orderEntry type="library" exported="" name="guava-20.0" level="project" />
     <orderEntry type="library" exported="" name="advrecyclerview-0.10.2" level="project" />
     <orderEntry type="library" exported="" name="google-material-typeface-2.2.0.3.original" level="project" />

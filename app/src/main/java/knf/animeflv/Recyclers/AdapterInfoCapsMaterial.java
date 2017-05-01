@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
 
 import java.io.File;
 import java.util.List;
@@ -51,7 +52,7 @@ import xdroid.toaster.Toaster;
 /**
  * Created by Jordy on 08/08/2015.
  */
-public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCapsMaterial.ViewHolder> {
+public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCapsMaterial.ViewHolder> implements SectionTitleProvider {
 
     private List<String> capitulo;
     private String id;
@@ -479,8 +480,13 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             @Override
             public void onStartCasting() {
                 MainStates.setProcessing(false, null);
-                showDownload(holder.ib_des);
-                holder.ib_ver.setImageResource(es.munix.multidisplaycast.R.drawable.cast_on);
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showDownload(holder.ib_des);
+                        holder.ib_ver.setImageResource(es.munix.multidisplaycast.R.drawable.cast_on);
+                    }
+                });
             }
 
             @Override
@@ -600,6 +606,12 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
 
     public void toast(String text) {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public String getSectionTitle(int i) {
+        String cap = capitulo.get(i).trim();
+        return cap.substring(cap.lastIndexOf(" ") + 1);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

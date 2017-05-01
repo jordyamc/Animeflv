@@ -94,9 +94,10 @@ public class NetworkUtils {
         FloatingActionButton button;
         String update_ver;
 
-        public checkAct(Context tcontext, FloatingActionButton button) {
+        private checkAct(Context tcontext, FloatingActionButton button) {
             Tcontext = tcontext;
             this.button = button;
+            descarga = Keys.Dirs.getUpdateFile(Tcontext);
         }
 
         @Override
@@ -278,10 +279,12 @@ public class NetworkUtils {
         private void startInstall() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 Uri uri = FileProvider.getUriForFile(context, "knf.animeflv.RequestsBackground", descarga);
-                Tcontext.grantUriPermission("com.android.packageinstaller", uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                //Tcontext.grantUriPermission("com.android.packageinstaller", uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 Intent promptInstall = new Intent(Intent.ACTION_VIEW)
                         .setDataAndType(uri,
                                 "application/vnd.android.package-archive");
+                promptInstall.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
+                promptInstall.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 dialog.dismiss();
                 ((newMain) Tcontext).finish();
                 Tcontext.startActivity(promptInstall);
