@@ -142,10 +142,12 @@ public class MXStream {
         if (!pack.equals("null")) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             Uri videoUri = getUrifromFile(file);
-            intent.setDataAndType(videoUri, "application/mp4");
+            intent.setDataAndType(videoUri, "video/mp4");
             intent.setPackage(pack);
             intent.putExtra("title", parser.getTitCached(aid) + " " + numero);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             context.startActivity(intent);
             SeenManager.get(context).setSeenState(eid, true);
         } else {

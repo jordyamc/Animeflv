@@ -43,6 +43,8 @@ public class ExternalStream {
             Intent intent = new Intent(Intent.ACTION_VIEW, getUrifromFile(file));
             intent.setDataAndType(getUrifromFile(file), "video/mp4");
             intent.putExtra("title", new Parser().getTitCached(aid) + " " + numero);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             context.startActivity(intent);
             SeenManager.get(context).setSeenState(eid, true);
         }
@@ -63,10 +65,6 @@ public class ExternalStream {
         packages = pm.getInstalledApplications(0);
         String pack = "null";
         for (ApplicationInfo packageInfo : packages) {
-            if (packageInfo.packageName.equals("com.mxtech.videoplayer.beta")) {
-                pack = "com.mxtech.videoplayer.beta";
-                break;
-            }
             if (packageInfo.packageName.equals("com.mxtech.videoplayer.pro")) {
                 pack = "com.mxtech.videoplayer.pro";
                 break;

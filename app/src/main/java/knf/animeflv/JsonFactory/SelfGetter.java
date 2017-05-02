@@ -468,7 +468,7 @@ public class SelfGetter {
                     }
                     JSONObject last_obj = null;
                     if (array.length() > 0) {
-                        Document init = Jsoup.connect("http://animeflv.net/browse?order=added").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get();
+                        Document init = Jsoup.connect("http://animeflv.net/browse?order=added").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
                         Element last = init.select("article").first();
                         last_obj = array.getJSONObject(0);
                         String last_url = last.select("img[src]").first().attr("src");
@@ -479,14 +479,14 @@ public class SelfGetter {
                         }
                     }
                     //Log.e("Dir DEBUG", "Start updating Dir | Dir: " + array.length());
-                    Document init = Jsoup.connect("http://animeflv.net/browse?order=added&page=1").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get();
+                    Document init = Jsoup.connect("http://animeflv.net/browse?order=added&page=1").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
                     Elements pages = init.select("ul.pagination").first().select("a");
                     Element last_page = pages.get(pages.size() - 2);
                     JSONArray new_array = new JSONArray();
                     int last = Integer.parseInt(last_page.ownText().trim());
                     // Log.e("Dir DEBUG", "Last Page: " + last);
                     for (int index = 1; index <= last; index++) {
-                        Document page = Jsoup.connect("http://animeflv.net/browse?order=added&page=" + index).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get();
+                        Document page = Jsoup.connect("http://animeflv.net/browse?order=added&page=" + index).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
                         Elements animes = page.select("article");
                         for (Element element : animes) {
                             String img = element.select("img[src]").first().attr("src");
@@ -512,7 +512,7 @@ public class SelfGetter {
                             if (!gens.equals(""))
                                 f = gens.substring(0, gens.lastIndexOf(","));
                             if (b.trim().equals(""))
-                                b = Jsoup.connect("http://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().select("meta[property='og:title']").first().attr("content").replace(" Capítulos Online", "").replace(" Ver ", "").trim();
+                                b = Jsoup.connect("http://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get().select("meta[property='og:title']").first().attr("content").replace(" Capítulos Online", "").replace(" Ver ", "").trim();
                             JSONObject object = new JSONObject();
                             object.put("a", a);
                             object.put("b", b);
@@ -553,7 +553,7 @@ public class SelfGetter {
                     }
                     JSONObject last_obj = null;
                     if (array.length() > 0) {
-                        Document init = Jsoup.connect("http://animeflv.net/browse?order=added").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get();
+                        Document init = Jsoup.connect("http://animeflv.net/browse?order=added").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
                         Element last = init.select("article").first();
                         last_obj = array.getJSONObject(0);
                         String last_url = last.select("img[src]").first().attr("src");
@@ -566,7 +566,7 @@ public class SelfGetter {
                         }
                     }
                     //Log.e("Dir DEBUG", "Start updating Dir | Dir: " + array.length());
-                    Document init = Jsoup.connect("http://animeflv.net/browse?order=added&page=1").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get();
+                    Document init = Jsoup.connect("http://animeflv.net/browse?order=added&page=1").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
                     Elements pages = init.select("ul.pagination").first().select("a");
                     Element last_page = pages.get(pages.size() - 2);
                     JSONArray new_array = new JSONArray();
@@ -576,7 +576,7 @@ public class SelfGetter {
                     if (asyncInterface != null)
                         asyncInterface.onProgress(0);
                     for (int index = 1; index <= last; index++) {
-                        Document page = Jsoup.connect("http://animeflv.net/browse?order=added&page=" + index).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get();
+                        Document page = Jsoup.connect("http://animeflv.net/browse?order=added&page=" + index).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
                         Elements animes = page.select("article");
                         for (Element element : animes) {
                             String img = element.select("img[src]").first().attr("src");
@@ -602,7 +602,7 @@ public class SelfGetter {
                             if (!gens.equals(""))
                                 f = gens.substring(0, gens.lastIndexOf(","));
                             if (b.trim().equals(""))
-                                b = Jsoup.connect("http://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().select("meta[property='og:title']").first().attr("content").replace(" Capítulos Online", "").replace(" Ver ", "").trim();
+                                b = Jsoup.connect("http://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get().select("meta[property='og:title']").first().attr("content").replace(" Capítulos Online", "").replace(" Ver ", "").trim();
                             JSONObject object = new JSONObject();
                             object.put("a", a);
                             object.put("b", b);

@@ -175,9 +175,9 @@ public class startBackground {
                                     for (String alone : tlist) {
                                         String[] data = alone.replace("E", "").split("_");
                                         if (tlist.get(tlist.size() - 1).equals(alone)) {
-                                            temp += mainobjects.get(eids.indexOf(alone)).titulo + " " + data[1];
+                                            temp += mainobjects.get(eids.indexOf(alone)).titulo + " - " + data[1];
                                         } else {
-                                            temp += mainobjects.get(eids.indexOf(alone)).titulo + " " + data[1] + "\n";
+                                            temp += mainobjects.get(eids.indexOf(alone)).titulo + " - " + data[1] + "\n";
                                         }
                                     }
                                     if (temp.endsWith("\n")) {
