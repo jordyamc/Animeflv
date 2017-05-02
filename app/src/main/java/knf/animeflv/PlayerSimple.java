@@ -69,7 +69,7 @@ public class PlayerSimple extends AppCompatActivity {
             public boolean onError(MediaPlayer mp, int what, int extra) {
                 Toaster.toast("Error en video");
                 Log.d("Error:", String.valueOf(what));
-                CrashlyticsCore.getInstance().logException(new Exception("Player Simple: code " + what));
+                CrashlyticsCore.getInstance().logException(new Exception("Player Simple: code " + what + " and extra " + extra));
                 finish();
                 return false;
             }

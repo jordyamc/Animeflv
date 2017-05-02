@@ -9,11 +9,13 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -337,8 +339,10 @@ public class startBackground {
                         mBuilder.setLights(Color.BLUE, 5000, 2000);
                         mBuilder.setGroup("animeflv_group");
                         Intent resultIntent = new Intent(Intent.ACTION_VIEW) //FIXME: Uri Exposed
-                                .setDataAndType(Uri.fromFile(descarga),
+                                .setDataAndType(getUpdateUri(context, descarga),
                                         "application/vnd.android.package-archive");
+                        resultIntent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
+                        resultIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         mBuilder.setContentIntent(resultPendingIntent);
                         int mNotificationId = (int) Math.round(Math.random());
@@ -359,6 +363,14 @@ public class startBackground {
                     }
                 });
         downloadManager.add(downloadRequest);
+    }
+
+    private static Uri getUpdateUri(Context context, File file) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return FileProvider.getUriForFile(context, context.getPackageName() + ".RequestsBackground", file);
+        } else {
+            return Uri.fromFile(file);
+        }
     }
 
     private static void Descargar(Context context, String titulo, String eid, String sid) {
