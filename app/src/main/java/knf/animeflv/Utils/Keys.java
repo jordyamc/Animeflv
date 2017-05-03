@@ -1,6 +1,5 @@
 package knf.animeflv.Utils;
 
-import android.content.Context;
 import android.os.Environment;
 
 import java.io.File;
@@ -21,8 +20,8 @@ public class Keys {
         public static final File BACKUP_DATA = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/data.save");
         public static final File DISABLE_CAST = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/disable_cast.conf");
 
-        public static File getUpdateFile(Context context) {
-            File file = new File(new File(context.getCacheDir(), "updates"), "Animeflv_Nver.apk");
+        public static File getUpdateFile() {
+            File file = new File(Dirs.CACHE, "Animeflv_Nver.apk");
             file.mkdirs();
             return file;
         }
@@ -31,7 +30,7 @@ public class Keys {
     public static class Url {
         public static final String VERSION_INT = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html";
         public static final String VERSION_INT_TEST = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version_test.html";
-        public static final String UPDATE = "https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true";
+        public static final String UPDATE = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/app-release.apk";
         public static final String SOUNDS = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/sounds/";
         public static final String SOUNDS_JSON = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/sounds.json";
         public static final String SOUNDS_JSON_BETA = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/sounds-beta.json";

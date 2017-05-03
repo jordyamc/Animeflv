@@ -1,7 +1,6 @@
 package knf.animeflv.CustomSettingsIntro.fragments;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -118,14 +117,6 @@ public class BackupFragment extends SlideFragment {
                                 new Parser().saveBackup(getA());
                                 setNoInfo();
                             }
-                        })
-                        .cancelListener(new DialogInterface.OnCancelListener() {
-                            @Override
-                            public void onCancel(DialogInterface dialog) {
-                                Keys.Dirs.BACKUP_DATA.delete();
-                                new Parser().saveBackup(getA());
-                                setNoInfo();
-                            }
                         }).build().show();
             }
         });
@@ -150,6 +141,7 @@ public class BackupFragment extends SlideFragment {
             public void run() {
                 title.setText(getText(R.string.intro_title_1_1));
                 description.setText(getText(R.string.intro_desc_1_1));
+                button.setVisibility(View.GONE);
             }
         });
     }

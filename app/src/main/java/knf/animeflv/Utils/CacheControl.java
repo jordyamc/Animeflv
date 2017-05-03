@@ -194,7 +194,7 @@ public class CacheControl extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 getLoading().show();
-                if (Keys.Dirs.getUpdateFile(CacheControl.this).delete()) {
+                if (Keys.Dirs.getUpdateFile().delete()) {
                     checkApk();
                     rechargeTotal();
                 } else {
@@ -444,9 +444,9 @@ public class CacheControl extends AppCompatActivity {
     }
 
     private void checkApk() {
-        if (Keys.Dirs.getUpdateFile(this).exists()) {
+        if (Keys.Dirs.getUpdateFile().exists()) {
             try {
-                PackageInfo extinfo = getPackageManager().getPackageArchiveInfo(Keys.Dirs.getUpdateFile(this).getAbsolutePath(), 0);
+                PackageInfo extinfo = getPackageManager().getPackageArchiveInfo(Keys.Dirs.getUpdateFile().getAbsolutePath(), 0);
                 PackageInfo intinfo = getPackageManager().getPackageArchiveInfo(getPackageName(), 0);
                 int extCode = extinfo.versionCode;
                 int intCode = intinfo.versionCode;
@@ -462,7 +462,7 @@ public class CacheControl extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    CacheManager.asyncGetFormatedFileSize(Keys.Dirs.getUpdateFile(CacheControl.this), new CacheManager.OnFinishCount() {
+                    CacheManager.asyncGetFormatedFileSize(Keys.Dirs.getUpdateFile(), new CacheManager.OnFinishCount() {
                         @Override
                         public void counted(final String formated) {
                             runOnUiThread(new Runnable() {

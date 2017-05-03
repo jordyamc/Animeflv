@@ -97,7 +97,7 @@ public class NetworkUtils {
         private checkAct(Context tcontext, FloatingActionButton button) {
             Tcontext = tcontext;
             this.button = button;
-            descarga = Keys.Dirs.getUpdateFile(Tcontext);
+            descarga = Keys.Dirs.getUpdateFile();
         }
 
         @Override

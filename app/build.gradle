@@ -22,8 +22,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 199
-        versionName "4.8.1"
+        versionCode 200
+        versionName "4.8.2"
         multiDexEnabled = true
     }
     buildTypes {
@@ -39,8 +39,6 @@ android {
     }
     dexOptions {
         javaMaxHeapSize "50g"
-    }
-    productFlavors {
     }
     defaultConfig {
         multiDexEnabled true

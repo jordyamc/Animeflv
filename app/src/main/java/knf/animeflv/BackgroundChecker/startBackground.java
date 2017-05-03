@@ -281,7 +281,7 @@ public class startBackground {
                 }
             } else {
                 Log.d("Auto", "true");
-                final File descarga = Keys.Dirs.getUpdateFile(context);
+                final File descarga = Keys.Dirs.getUpdateFile();
                 int isDesc = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("isDescDown", versionCode);
                 Boolean downloading = context.getSharedPreferences("data", Context.MODE_PRIVATE).getBoolean("isDescRun", false);
                 if (descarga.exists() && isDesc < Integer.parseInt(s.trim()) && !downloading) {
