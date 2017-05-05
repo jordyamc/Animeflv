@@ -41,14 +41,14 @@ public class DropboxManager {
             protected Void doInBackground(Void... voids) {
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
                 accessToken = preferences.getString(KEY_DROPBOX, null);
-                if (accessToken == null && callback != null) {
+                if ((accessToken == null || accessToken.trim().equals("")) && callback != null) {
                     callback.onStartLogin();
                     Auth.startOAuth2Authentication(context, context.getResources().getString(R.string.app_key));
                 } else {
-                    if (accessToken != null)
+                    if (accessToken != null && !accessToken.trim().equals(""))
                         Log.e("AccessToken", accessToken);
                     if (callback != null)
-                        if (accessToken == null) {
+                        if (accessToken == null || accessToken.trim().equals("")) {
                             callback.onLogin(false);
                         } else {
                             preferences.edit().putString(KEY_DROPBOX, accessToken).apply();
@@ -62,8 +62,59 @@ public class DropboxManager {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
+    public static void login(final Context context, @Nullable final LoginCalbackSources callback) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+                accessToken = preferences.getString(KEY_DROPBOX, null);
+                if ((accessToken == null || accessToken.trim().equals("")) && callback != null) {
+                    callback.onStartLogin();
+                    Auth.startOAuth2Authentication(context, context.getResources().getString(R.string.app_key));
+                } else {
+                    if (accessToken != null && !accessToken.trim().equals(""))
+                        Log.e("AccessToken", accessToken);
+                    if (callback != null)
+                        if (accessToken == null || accessToken.trim().equals("")) {
+                            callback.onLogin(false);
+                        } else {
+                            preferences.edit().putString(KEY_DROPBOX, accessToken).apply();
+                            DropboxClientFactory.init(accessToken);
+                            FavSyncro.updateServer(context);
+                            callback.onLogin(true);
+                            checkSources(callback);
+                        }
+                }
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    public static void checkSources(final LoginCalbackSources calbackSources) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                try {
+                    DbxClientV2 client = DropboxClientFactory.getClient();
+                    if (client == null) {
+                        DropboxClientFactory.init(accessToken);
+                        client = DropboxClientFactory.getClient();
+                    }
+                    calbackSources.onFavs(client.files().search("", "favs").getMatches().size() > 0);
+                    calbackSources.onSeen(client.files().search("", "seen").getMatches().size() > 0);
+                    calbackSources.onEmision(client.files().search("", "emision").getMatches().size() > 0);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
     public static void init(Context context) {
         accessToken = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_DROPBOX, null);
+        if (accessToken != null && accessToken.trim().equals(""))
+            accessToken = null;
         DropboxClientFactory.init(accessToken);
     }
 
@@ -352,6 +403,8 @@ public class DropboxManager {
 
     @Nullable
     public static String getToken() {
+        if (accessToken != null && accessToken.trim().equals(""))
+            accessToken = null;
         return accessToken;
     }
 
@@ -359,6 +412,14 @@ public class DropboxManager {
         void onLogin(boolean loged);
 
         void onStartLogin();
+    }
+
+    public interface LoginCalbackSources extends LoginCallback {
+        void onFavs(boolean isAvailable);
+
+        void onSeen(boolean isAvailable);
+
+        void onEmision(boolean isAvailable);
     }
 
     public interface UploadCallback {

@@ -4,7 +4,7 @@
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="notificaciones"
-            android:title="Activar Notificaciones" />
+            android:title="Activar Notificaciones"/>
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="notFavs"
@@ -146,9 +146,10 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="Almacenamiento">
         <com.lb.material_preferences_library.custom_preferences.Preference
+            android:id="@+id/preference"
             android:defaultValue="0"
             android:key="b_cache"
-            android:title="Administrador de Cache" />
+            android:title="Administrador de Cache"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="b_video"
@@ -190,5 +191,10 @@
             android:defaultValue="false"
             android:key="betaSounds"
             android:title="Sonidos Beta" />
+        <!--Open Intro-->
+        <!--<com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="0"
+            android:key="open_intro"
+            android:title="Abrir into" />-->
     </PreferenceCategory>
 </PreferenceScreen>

@@ -35,9 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import knf.animeflv.Directorio.AnimeClass;
-import knf.animeflv.Favorites.FavotiteDB;
-import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.Random.AnimeObject;
+import knf.animeflv.Utils.BackupUtil;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.objects.MainObject;
 
@@ -438,6 +437,10 @@ public class Parser {
             }
         }
         return ret;
+    }
+
+    public static Response restoreBackup(Context context) {
+        return BackupUtil.restore(context);
     }
 
     public String[] parseTitulos(String json) {
@@ -980,102 +983,7 @@ public class Parser {
     }
 
     public void saveBackup(Context context) {
-        try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("email_login", PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null"));
-            jsonObject.put("email_coded", PreferenceManager.getDefaultSharedPreferences(context).getString("login_email_coded", "null"));
-            jsonObject.put("pass_coded", PreferenceManager.getDefaultSharedPreferences(context).getString("login_pass_coded", "null"));
-            jsonObject.put("access_token", PreferenceManager.getDefaultSharedPreferences(context).getString(DropboxManager.KEY_DROPBOX, null));
-            jsonObject.put("accentColor", PreferenceManager.getDefaultSharedPreferences(context).getInt("accentColor", ColorsRes.Naranja(context)));
-            jsonObject.put("favoritos", new FavotiteDB(context).getDBJSON(true).toString());
-            jsonObject.put("vistos", context.getSharedPreferences("data", Context.MODE_PRIVATE).getString("vistos", ""));
-            JSONArray jsonArray = new JSONArray();
-            JSONObject not = new JSONObject();
-            not.put("name", "notificaciones");
-            not.put("value", PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true));
-            JSONObject tmp = new JSONObject();
-            tmp.put("name", "tiempo");
-            tmp.put("value", PreferenceManager.getDefaultSharedPreferences(context).getString("tiempo", "60000"));
-            JSONObject sonido = new JSONObject();
-            sonido.put("name", "sonido");
-            sonido.put("value", PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
-            JSONObject conx = new JSONObject();
-            conx.put("name", "t_conexion");
-            conx.put("value", PreferenceManager.getDefaultSharedPreferences(context).getString("t_conexion", "2"));
-            JSONObject tbus = new JSONObject();
-            tbus.put("name", "t_busqueda");
-            tbus.put("value", PreferenceManager.getDefaultSharedPreferences(context).getString("t_busqueda", "0"));
-            JSONObject resaltar = new JSONObject();
-            resaltar.put("name", "resaltar");
-            resaltar.put("value", PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar", true));
-            JSONObject autodes = new JSONObject();
-            autodes.put("name", "autoDesc");
-            autodes.put("value", PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoDesc", false));
-            JSONObject autoUp = new JSONObject();
-            autoUp.put("name", "autoUpdate");
-            autoUp.put("value", PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoUpdate", false));
-            JSONObject playVid = new JSONObject();
-            playVid.put("name", "t_video");
-            playVid.put("value", PreferenceManager.getDefaultSharedPreferences(context).getString("t_video", "0"));
-            JSONObject playStream = new JSONObject();
-            playStream.put("name", "t_streaming");
-            playStream.put("value", PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
-            JSONObject isAmoled = new JSONObject();
-            isAmoled.put("name", "is_amoled");
-            isAmoled.put("value", PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false));
-            jsonArray.put(not);
-            jsonArray.put(tmp);
-            jsonArray.put(sonido);
-            jsonArray.put(conx);
-            jsonArray.put(tbus);
-            jsonArray.put(resaltar);
-            jsonArray.put(autodes);
-            jsonArray.put(autoUp);
-            jsonArray.put(playVid);
-            jsonArray.put(playStream);
-            jsonArray.put(isAmoled);
-            jsonObject.put("preferencias", jsonArray);
-            File saveData = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/data.save");
-            if (saveData.exists()) {
-                writeToFile(jsonObject.toString(), saveData);
-            } else {
-                if (saveData.createNewFile()) {
-                    writeToFile(jsonObject.toString(), saveData);
-                } else {
-                    Log.e("---->", "Error al crear respaldo");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public Response restoreBackup(String json, Context context) {
-        try {
-            JSONObject j = new JSONObject(json);
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email", j.getString("email_login")).apply();
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_email_coded", j.getString("email_coded")).apply();
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("login_pass_coded", j.getString("pass_coded")).apply();
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString(DropboxManager.KEY_DROPBOX, j.getString("access_token")).apply();
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("accentColor", j.getInt("accentColor")).apply();
-            new FavotiteDB(context).updatebyJSON(new JSONObject(j.getString("favoritos")), null);
-            context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putString("vistos", j.getString("vistos")).apply();
-            JSONArray jsonArray = j.getJSONArray("preferencias");
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonA = jsonArray.getJSONObject(i);
-                String name = jsonA.getString("name");
-                Object value = jsonA.get("value");
-                if (value instanceof String) {
-                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString(name, (String) value).apply();
-                } else if (value instanceof Boolean) {
-                    PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(name, (Boolean) value).apply();
-                }
-            }
-            return Response.OK;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.ERROR;
-        }
+        BackupUtil.backup(context);
     }
 
     public void writeToFile(String body, File file) {

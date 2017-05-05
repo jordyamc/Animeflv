@@ -21,7 +21,6 @@ import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
-import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
@@ -97,8 +96,7 @@ public class BackupFragment extends SlideFragment {
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                String save = FileUtil.getStringFromFile(Keys.Dirs.BACKUP_DATA.getPath());
-                                if (new Parser().restoreBackup(save, getA()) != Parser.Response.OK) {
+                                if (new Parser().restoreBackup(getA()) != Parser.Response.OK) {
                                     Toaster.toast("Error al restaurar");
                                     Keys.Dirs.BACKUP_DATA.delete();
                                     new Parser().saveBackup(getA());

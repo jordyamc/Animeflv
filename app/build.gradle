@@ -17,13 +17,13 @@ apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '26.0.0-rc1'
     defaultConfig {
         applicationId "knf.animeflv"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 200
-        versionName "4.8.2"
+        versionCode 201
+        versionName "4.8.3"
         multiDexEnabled = true
     }
     buildTypes {
@@ -31,6 +31,8 @@ android {
             lintOptions {
                 disable 'MissingTranslation'
                 disable 'StaticFieldLeak'
+                disable 'HardcodedText'
+                disable 'ContentDescription'
             }
             shrinkResources false
             minifyEnabled false
@@ -53,6 +55,8 @@ android {
             v2SigningEnabled true
         }
     }
+    productFlavors {
+    }
 }
 allprojects {
     repositories {
@@ -74,9 +78,7 @@ dependencies {
         transitive = true
     }
     compile files('jsoup-1.9.2.jar')
-
     compile files('src/trace.jar')
-
     compile files('src/SOMAAndroidSDK5.0.9.jar')
     compile project(':multidisplaycast')
     compile 'com.mikepenz:iconics-core:2.8.1@aar'
@@ -132,22 +134,18 @@ dependencies {
     compile 'agency.tango.android:material-intro-screen:0.0.5'
     compile 'org.adw.library:discrete-seekbar:1.0.1'
     compile 'com.github.daniel-stoneuk:material-about-library:1.7.1'
-
     compile 'com.google.android.gms:play-services-analytics:10.2.1'
     compile 'com.google.android.gms:play-services-ads:10.2.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
-
     compile 'me.zhanghai.android.materialratingbar:library:1.0.2'
-
     compile 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
-
     compile('io.branch.sdk.android:library:2.+') {
         exclude module: 'answers-shim'
     }
     compile('io.fabric.sdk.android:fabric:1.3.10@aar') {
         transitive = true
     }
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.7@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
         transitive = true
     }
 }

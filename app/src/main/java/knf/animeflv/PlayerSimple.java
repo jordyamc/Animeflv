@@ -35,7 +35,7 @@ public class PlayerSimple extends AppCompatActivity {
     Intent intent;
     String ops;
     String url;
-    int stopPosition=0;
+    int stopPosition = 0;
     Map<String, String> options;
     Handler handler = new Handler();
     Context context;
@@ -70,6 +70,14 @@ public class PlayerSimple extends AppCompatActivity {
                 Toaster.toast("Error en video");
                 Log.d("Error:", String.valueOf(what));
                 CrashlyticsCore.getInstance().logException(new Exception("Player Simple: code " + what + " and extra " + extra));
+                switch (extra) {
+                    case MediaPlayer.MEDIA_ERROR_MALFORMED:
+                        mp.reset();
+                        break;
+                    default:
+                        finish();
+                        break;
+                }
                 finish();
                 return false;
             }
@@ -153,7 +161,7 @@ public class PlayerSimple extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (videoView!=null){
+        if (videoView != null) {
             videoView.start();
             videoView.seekTo(stopPosition);
         }

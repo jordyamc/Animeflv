@@ -1,5 +1,6 @@
 package knf.animeflv.BackgroundChecker;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -51,6 +52,13 @@ import knf.animeflv.Utils.objects.MainObject;
 import knf.animeflv.newMain;
 
 public class startBackground {
+
+    private static final String CHANNEL_ANIMES = "animeflv_app_channel_anime";
+    private static final String CHANNEL_UPDATES = "animeflv_app_channel_updates";
+
+    private static final int ACTION_ANIME = 0;
+    private static final int ACTION_UPDATE = 1;
+
     public static void compareNots(final Context context) {
         if (NetworkUtils.isNetworkAvailable()) {
             try {
@@ -210,7 +218,7 @@ public class startBackground {
                                     int mNotificationId = 6991;
                                     NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                                     mNotifyMgr.cancel(mNotificationId);
-                                    mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                                    showNotification(mNotifyMgr, mBuilder, ACTION_ANIME, mNotificationId);
                                 } else {
                                     if (UtilNotBlocker.isBlocked()) {
                                         Log.d("Not Service", "isBlocked");
@@ -277,7 +285,7 @@ public class startBackground {
                     mBuilder.setContentIntent(resultPendingIntent);
                     int mNotificationId = 1964;
                     NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                    showNotification(mNotifyMgr, mBuilder, ACTION_UPDATE, mNotificationId);
                 }
             } else {
                 Log.d("Auto", "true");
@@ -347,7 +355,7 @@ public class startBackground {
                         mBuilder.setContentIntent(resultPendingIntent);
                         int mNotificationId = (int) Math.round(Math.random());
                         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                        showNotification(mNotifyMgr, mBuilder, ACTION_UPDATE, mNotificationId);
                     }
 
                     @Override
@@ -402,6 +410,25 @@ public class startBackground {
         mBuilder.setContentIntent(resultPendingIntent);
         int mNotificationId = (int) Math.round(Math.random());
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+        showNotification(mNotifyMgr, mBuilder, ACTION_ANIME, mNotificationId);
+    }
+
+    private static void showNotification(NotificationManager manager, NotificationCompat.Builder builder, int action, int id) {
+        if (action == ACTION_ANIME) {
+            createChannel(manager, CHANNEL_ANIMES);
+        } else {
+            createChannel(manager, CHANNEL_UPDATES);
+        }
+        manager.notify(id, builder.build());
+    }
+
+    @TargetApi(Build.VERSION_CODES.N_MR1)
+    private static void createChannel(NotificationManager manager, String id) {
+        /*NotificationChannel channel=new NotificationChannel(id,id.equals(CHANNEL_ANIMES)?"Animes Recientes":"Actualizaciones",NotificationManager.IMPORTANCE_MAX);
+        channel.enableLights(true);
+        channel.setLightColor(Color.BLUE);
+        channel.enableVibration(true);
+        channel.setVibrationPattern(new long[]{100, 200, 100, 500});
+        manager.createNotificationChannel(channel);*/
     }
 }

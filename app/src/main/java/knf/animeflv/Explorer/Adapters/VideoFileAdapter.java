@@ -197,6 +197,7 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
                 getProgressHandler().postDelayed(getSyncroRunnable(holder), 1);
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

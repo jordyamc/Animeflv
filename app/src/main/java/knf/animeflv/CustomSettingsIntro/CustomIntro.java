@@ -14,6 +14,7 @@ import agency.tango.materialintroscreen.MaterialIntroActivity;
 import agency.tango.materialintroscreen.SlideFragmentBuilder;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.CustomSettingsIntro.fragments.BackupFragment;
+import knf.animeflv.CustomSettingsIntro.fragments.CloudFragment;
 import knf.animeflv.CustomSettingsIntro.fragments.ThemeFragment;
 import knf.animeflv.R;
 import knf.animeflv.ThemeHolder;
@@ -59,6 +60,7 @@ public class CustomIntro extends MaterialIntroActivity implements ColorChooserDi
             }
         });
         addSlide(themeFragment);
+        addSlide(CloudFragment.get());
         addSlide(
                 new SlideFragmentBuilder()
                         .title(getString(R.string.intro_title_5))

@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 
 import knf.animeflv.Changelog.ChangelogActivity;
+import knf.animeflv.CustomSettingsIntro.CustomIntro;
 import knf.animeflv.LoginActivity.LoginBase;
 import knf.animeflv.LoginActivity.LoginUser;
 import knf.animeflv.SDControl.SDManager;
@@ -117,7 +118,13 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
 
         //FIXME:TEST AREA
         //Test Area
-
+        getPreferenceScreen().findPreference("open_intro").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                context.startActivity(new Intent(context, CustomIntro.class));
+                return false;
+            }
+        });
         //<----------
 
         Boolean activado = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("notificaciones", true);
