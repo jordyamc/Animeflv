@@ -110,14 +110,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         return result;
     }
 
-    @Override
-    public void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.preferencias);
-        context = getActivity();
-
-        //FIXME:TEST AREA
-        //Test Area
+    //FIXME:TEST AREA
+    private void doTests() throws Exception {
         getPreferenceScreen().findPreference("open_intro").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -125,6 +119,20 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
+    }
+
+    @Override
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        addPreferencesFromResource(R.xml.preferencias);
+        context = getActivity();
+
+        //Test Area
+        try {
+            doTests();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //<----------
 
         Boolean activado = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("notificaciones", true);
