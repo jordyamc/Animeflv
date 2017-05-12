@@ -31,7 +31,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import knf.animeflv.Explorer.Models.ModelFactory;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.Utils.Files.FileSearchResponse;
 
@@ -245,8 +247,7 @@ public class FileUtil {
 
     public static boolean isNumber(String number) {
         try {
-            Integer.parseInt(number);
-            return true;
+            return Pattern.compile("^-*[0-9,.]+$").matcher(number).matches();
         } catch (NumberFormatException e) {
             return false;
         }
@@ -365,27 +366,22 @@ public class FileUtil {
         if (storage.exists()) {
             for (File dir : storage.listFiles()) {
                 if (dir.isDirectory()) {
-                    if (dir.canWrite()) {
+                    if (RootFileHaveAccess()) {
                         if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
                             if (!sdNames.contains(dir.getName())) {
-                                sdNames.add(dir.getName());
+                                if (RootFileHaveAccess(dir.getName())) {
+                                    sdNames.add(dir.getName());
+                                } else {
+                                    sdNames.add("_noWrite_" + dir.getName());
+                                }
                                 sdDirs.add(dir.getAbsolutePath());
                             }
                         }
                     } else {
                         if (!dir.getName().equals(intName) && !exclude.contains(dir.getName())) {
                             if (!sdNames.contains(dir.getName())) {
-                                if (!DocumentFile.fromFile(dir).canWrite()) {
-                                    if (RootFileHaveAccess()) {
-                                        sdNames.add(dir.getName());
-                                    } else {
-                                        sdNames.add("_noWrite_" + dir.getName());
-                                    }
-                                    sdDirs.add(dir.getAbsolutePath());
-                                } else {
-                                    sdNames.add(dir.getName());
-                                    sdDirs.add(dir.getAbsolutePath());
-                                }
+                                sdNames.add("_noWrite_" + dir.getName());
+                                sdDirs.add(dir.getAbsolutePath());
                             }
                         }
                     }
@@ -520,6 +516,21 @@ public class FileUtil {
             if (treeUri != null) {
                 DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
                 return sdFile != null && sdFile.canWrite();
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean RootFileHaveAccess(@Nullable String name) {
+        Uri treeUri;
+        try {
+            treeUri = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null));
+            if (treeUri != null) {
+                DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
+                return sdFile != null && sdFile.canWrite() && (name != null ? (treeUri.toString().contains(name)) : (RootFileHaveAccess(ModelFactory.getRootSDFile(context).getName())));
             } else {
                 return false;
             }

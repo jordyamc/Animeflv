@@ -22,21 +22,18 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputEditText;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -79,6 +76,7 @@ import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.About.AboutActivity;
+import knf.animeflv.AdminControl.PushManager;
 import knf.animeflv.AutoEmision.AutoEmisionActivity;
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.Cloudflare.Bypass;
@@ -88,7 +86,6 @@ import knf.animeflv.Explorer.ExplorerRoot;
 import knf.animeflv.Favorites.FavoriteMain;
 import knf.animeflv.Favorites.FavotiteDB;
 import knf.animeflv.HallFame.HallActivity;
-import knf.animeflv.Interfaces.EncryptionListener;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
@@ -107,7 +104,6 @@ import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.State.StateActivity;
 import knf.animeflv.Suggestions.SuggestionsActivity;
 import knf.animeflv.Tutorial.TutorialActivity;
-import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.Logger;
@@ -126,7 +122,6 @@ import knf.animeflv.WaitList.WaitList;
 import knf.animeflv.history.HistoryActivity;
 import xdroid.toaster.Toaster;
 
-import static knf.animeflv.Utils.Keys.Login.EMAIL_NORMAL;
 import static knf.animeflv.Utils.Keys.Url.ADMINS;
 
 public class newMain extends AppCompatActivity implements
@@ -136,10 +131,6 @@ public class newMain extends AppCompatActivity implements
         ColorChooserDialog.ColorCallback,
         MainRecyclerCallbacks {
     public Drawer result;
-    SwitchCompat typeEncrypt;
-    TextInputEditText normalText;
-    TextInputEditText finalText;
-    TextInputLayout inputLayout;
     private boolean isAmoled;
     private boolean doubleBackToExitPressedOnce = false;
     private String ext_storage_state = Environment.getExternalStorageState();
@@ -161,7 +152,6 @@ public class newMain extends AppCompatActivity implements
     private Parser parser = new Parser();
     private boolean shouldExecuteOnResume;
     private TaskType normal = TaskType.NORMAL;
-    private TaskType secundario = TaskType.SECUNDARIA;
     private boolean frun = true;
     private boolean favs_data_ok = false;
     private boolean dropboxloging = false;
@@ -467,8 +457,8 @@ public class newMain extends AppCompatActivity implements
                         new PrimaryDrawerItem().withName("Explorador").withIcon(MaterialDesignIconic.Icon.gmi_folder).withIdentifier(9),
                         new PrimaryDrawerItem().withName("Historial").withIcon(MaterialDesignIconic.Icon.gmi_eye).withIdentifier(10),
                         new PrimaryDrawerItem().withName("Lista").withIcon(MaterialDesignIconic.Icon.gmi_assignment_returned).withIdentifier(4),
-                        new PrimaryDrawerItem().withName("Sobre la app").withIcon(CommunityMaterial.Icon.cmd_information_outline).withIdentifier(20),
-                        new PrimaryDrawerItem().withName("Publicidad").withIcon(MaterialDesignIconic.Icon.gmi_cloud).withIdentifier(8)
+                        new PrimaryDrawerItem().withName("Sobre la app").withIcon(CommunityMaterial.Icon.cmd_information_outline).withIdentifier(20)
+                        //new PrimaryDrawerItem().withName("Publicidad").withIcon(MaterialDesignIconic.Icon.gmi_cloud).withIdentifier(8)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -625,8 +615,8 @@ public class newMain extends AppCompatActivity implements
     }
 
     private User getUser(JSONObject object) {
-        String email = PreferenceManager.getDefaultSharedPreferences(this).getString(EMAIL_NORMAL, "null");
-        if (email.equals("null")) {
+        String email = FavSyncro.getEmail(this);
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             return new User(false);
         }
         try {
@@ -684,80 +674,11 @@ public class newMain extends AppCompatActivity implements
         adminListeners listeners = new adminListeners(context);
         result.addItem(new DividerDrawerItem());
         result.addItem(new SecondaryDrawerItem().withName("ADMIN - " + current.getName()).withSelectable(false));
-        result.addItem(new PrimaryDrawerItem().withName("Des/Encriptor").withIcon(MaterialDesignIconic.Icon.gmi_lock_open).withOnDrawerItemClickListener(listeners.onEncButton()).withIdentifier(55));
-        result.addItem(new PrimaryDrawerItem().withName("Actualizar Server").withIcon(MaterialDesignIconic.Icon.gmi_refresh_sync).withOnDrawerItemClickListener(listeners.onManualButton()).withIdentifier(56));
-        result.addItem(new PrimaryDrawerItem().withName("Control de Cuentas").withIcon(MaterialDesignIconic.Icon.gmi_account_circle).withOnDrawerItemClickListener(listeners.onAccountsButton()).withIdentifier(57));
-        result.addItem(new PrimaryDrawerItem().withName("Filtrar Emision").withIcon(CommunityMaterial.Icon.cmd_filter_remove).withOnDrawerItemClickListener(listeners.onFilterList()).withIdentifier(58));
+        result.addItem(new PrimaryDrawerItem().withName("Notificaciones").withIcon(CommunityMaterial.Icon.cmd_code_not_equal_variant).withOnDrawerItemClickListener(listeners.onEncButton()).withIdentifier(55));
     }
 
     public void showEncDialog() {
-        MaterialDialog encrypt = new MaterialDialog.Builder(context)
-                .customView(R.layout.encrypt_dialog, false)
-                .positiveText("COMENZAR")
-                .negativeText("CERRAR")
-                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                .autoDismiss(false)
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        finalText.requestFocus();
-                        finalText.setHint("Procesando...");
-                        inputLayout.setHint("Procesando...");
-                        BackEncryption encryption = new BackEncryption(typeEncrypt.isChecked() ? BackEncryption.Type.DECRYPT : BackEncryption.Type.ENCRYPT, normalText.getText().toString());
-                        encryption.setOnFinishEncryptListener(new EncryptionListener() {
-                            @Override
-                            public void onFinish(final String finalString) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (finalString != null) {
-                                            finalText.setHint("OK");
-                                            inputLayout.setHint("OK");
-                                            finalText.setText(finalString);
-                                            finalText.requestFocus();
-                                        } else {
-                                            finalText.setHint("Error!");
-                                            inputLayout.setHint("Error");
-                                            finalText.setError("Error al ejecutar!");
-                                            finalText.requestFocus();
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                        encryption.executeOnExecutor(ExecutorManager.getExecutor());
-                    }
-                })
-                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        dialog.dismiss();
-                    }
-                })
-                .build();
-        boolean isAmoled = ThemeUtils.isAmoled(this);
-        View root = encrypt.getCustomView();
-        typeEncrypt = (SwitchCompat) root.findViewById(R.id.switch_type);
-        typeEncrypt.setTextColor(isAmoled ? ColorsRes.Blanco(context) : ColorsRes.Prim(context));
-        inputLayout = (TextInputLayout) root.findViewById(R.id.text_input_layout);
-        normalText = (TextInputEditText) root.findViewById(R.id.normalText);
-        normalText.setHintTextColor(isAmoled ? ColorsRes.Blanco(context) : ColorsRes.Prim(context));
-        finalText = (TextInputEditText) root.findViewById(R.id.finalText);
-        finalText.setHintTextColor(ColorsRes.Blanco(context));
-        typeEncrypt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    typeEncrypt.setText("Desencriptar");
-                } else {
-                    typeEncrypt.setText("Encriptar");
-                }
-                finalText.setText("");
-                finalText.setHint("Resultado");
-                inputLayout.setHint("Resultado");
-            }
-        });
-        encrypt.show();
+        startActivity(new Intent(this, PushManager.class));
     }
 
     private void cambiarColor() {
@@ -1324,7 +1245,7 @@ public class newMain extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        //PlayBackManager.get(this).addCallbacks();
+        PlayBackManager.get(this).addCallbacks();
     }
 
     @Override

@@ -2,7 +2,6 @@ package knf.animeflv.WaitList;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -82,11 +81,6 @@ public class WaitList extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wait_list_lay);
         context = this;
-        if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
         toolbar = (Toolbar) findViewById(R.id.toolbar_wait);
         if (ThemeUtils.isAmoled(this)) {
             toolbar.setBackgroundColor(getResources().getColor(android.R.color.black));

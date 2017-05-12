@@ -165,8 +165,8 @@ public class startBackground {
                                         }
                                     }
                                 }
-                                if (isnot && !UtilNotBlocker.isBlocked()) {
-                                    int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
+                                int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
+                                if (isnot && !UtilNotBlocker.isBlocked() && nCaps > 0) {
                                     context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putInt("nCaps", nCaps).apply();
                                     context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", sts).apply();
                                     String mess;

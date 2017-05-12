@@ -130,6 +130,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         //Test Area
         try {
             doTests();
+        } catch (NullPointerException n) {
+            //null;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -402,7 +404,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putString("SDPath", null).commit();
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, "null").commit();
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null).commit();
                 getActivity().recreate();
                 return false;
             }
@@ -727,7 +729,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 if (sharedPreferences.getBoolean(key, false)) {
                     if (FileUtil.init(context).getSDPath() == null) {
                         getPreferenceScreen().findPreference(key).setEnabled(false);
-                        sharedPreferences.edit().putBoolean(key, false);
+                        sharedPreferences.edit().putBoolean(key, false).apply();
                     }
                 }
                 break;

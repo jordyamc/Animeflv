@@ -43,6 +43,7 @@
         <item>Solo WiFi</item>
         <item>Solo Datos Moviles</item>
         <item>WiFi + Datos Moviles</item>
+        <item>Ethernet</item>
     </string-array>
     <string-array name="players">
         <item>Interno</item>
@@ -199,4 +200,8 @@
 
     <string name="app_key">stz1g2qeh9nldga</string>
     <string name="app_secret">od4i0crlfzmw1hj</string>
+
+    <string name="com.zendesk.sdk.url" translatable="false">https://fabric-jordyamchotmailcom.zendesk.com</string>
+    <string name="com.zendesk.sdk.identifier" translatable="false">bb6267051481163d3fea4e98f1ca016488b5da0c25e0c0b4</string>
+    <string name="com.zendesk.sdk.clientIdentifier" translatable="false">mobile_sdk_client_4b7e15fc9bf5a9fc9265</string>
 </resources>

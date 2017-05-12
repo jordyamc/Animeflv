@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.ThemeUtils;
 
 public class AutoStart extends BroadcastReceiver
 {
@@ -76,6 +77,7 @@ public class AutoStart extends BroadcastReceiver
                                     .setContentText(mess);
                     mBuilder.setStyle(bigTextStyle);
                     mBuilder.setAutoCancel(true);
+                    mBuilder.setColor(ThemeUtils.getAcentColor(context));
                     mBuilder.setLights(Color.argb(0, 255, 128, 0), 5000, 2000);
                     mBuilder.setGroup("animeflv_group");
                     Intent resultIntent = new Intent(context, newMain.class);

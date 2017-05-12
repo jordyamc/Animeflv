@@ -3,7 +3,6 @@ package knf.animeflv.Explorer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -70,11 +69,6 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.explorer_root);
-        if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         if (ThemeUtils.isAmoled(this)) {
@@ -97,8 +91,15 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
                 commitDownloadInSD(false);
             } else {
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-                    if (PreferenceManager.getDefaultSharedPreferences(this).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null) == null) {
+                    if (!FileUtil.init(this).RootFileHaveAccess()) {
                         Toaster.toast("Se necesitan permisos de escritura!!");
+                        waitForResult = true;
+                        FragmentExtras.KEY = Configuracion.GET_WRITE_PERMISSIONS;
+                        Intent intent = new Intent(this, Configuracion.class);
+                        intent.putExtra("return", 12877);
+                        startActivityForResult(intent, 1547);
+                    } else if (!FileUtil.init(this).RootFileHaveAccess(ModelFactory.getDirectoryFile(this).getName())) {
+                        Toaster.toast("El permiso de escritura no concuerda con la SD seleccionada!!");
                         waitForResult = true;
                         FragmentExtras.KEY = Configuracion.GET_WRITE_PERMISSIONS;
                         Intent intent = new Intent(this, Configuracion.class);

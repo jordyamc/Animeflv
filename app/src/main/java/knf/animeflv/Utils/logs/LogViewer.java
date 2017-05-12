@@ -2,7 +2,6 @@ package knf.animeflv.Utils.logs;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
@@ -98,11 +97,6 @@ public class LogViewer extends AppCompatActivity {
             }
         } else {
             correo.setTextColor(ColorsRes.Negro(this));
-        }
-        if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Informe de Error");

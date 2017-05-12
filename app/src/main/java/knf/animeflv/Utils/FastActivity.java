@@ -2,14 +2,20 @@ package knf.animeflv.Utils;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 
 import knf.animeflv.Configuracion;
 
 public class FastActivity extends AppCompatActivity {
     public static final int STOP_SOUND = 1;
     public static final int OPEN_CONF_SOUNDS = 2;
+    public static final int SHOW_DIALOG = 3;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,8 +34,24 @@ public class FastActivity extends AppCompatActivity {
                         FragmentExtras.KEY = Configuracion.OPEN_SOUNDS;
                         startActivity(new Intent(this, Configuracion.class));
                         break;
+                    case SHOW_DIALOG:
+                        new MaterialDialog.Builder(this)
+                                .content(bundle.getString("content", "No content"))
+                                .theme(ThemeUtils.isAmoled(this) ? Theme.DARK : Theme.LIGHT)
+                                .positiveText("OK")
+                                .cancelable(false)
+                                .positiveColor(ThemeUtils.getAcentColor(this))
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                        finish();
+                                    }
+                                })
+                                .build().show();
+                        break;
                 }
-                finish();
+                if (bundle.getInt("key") != SHOW_DIALOG)
+                    finish();
             } else {
                 finish();
             }

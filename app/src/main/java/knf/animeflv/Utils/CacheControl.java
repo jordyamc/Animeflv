@@ -2,7 +2,6 @@ package knf.animeflv.Utils;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -487,11 +486,6 @@ public class CacheControl extends AppCompatActivity {
     }
 
     private void setUpTheme() {
-        if (!isXLargeScreen()) { //Portrait
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
         if (ThemeUtils.isAmoled(this)) {
             layout.getRootView().setBackgroundColor(ColorsRes.Negro(this));
             changeTextsColor(layout, ColorsRes.SecondaryTextDark(this));

@@ -11,6 +11,7 @@ apply plugin: 'com.android.application'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
+    maven { url 'https://zendesk.jfrog.io/zendesk/repo' }
 }
 
 apply plugin: 'io.fabric'
@@ -20,10 +21,10 @@ android {
     buildToolsVersion '26.0.0-rc1'
     defaultConfig {
         applicationId "knf.animeflv"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 25
-        versionCode 202
-        versionName "4.8.3"
+        versionCode 203
+        versionName "4.8.4"
         multiDexEnabled = true
     }
     buildTypes {
@@ -34,8 +35,8 @@ android {
                 disable 'HardcodedText'
                 disable 'ContentDescription'
             }
-            shrinkResources false
-            minifyEnabled false
+            shrinkResources true
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -45,6 +46,8 @@ android {
     defaultConfig {
         multiDexEnabled true
         renderscriptSupportModeEnabled true
+        manifestPlaceholders = [onesignal_app_id: "81c836a4-a6ff-48b7-b696-c411fa59ab39",
+                                onesignal_google_project_number: "REMOTE"]
     }
     signingConfigs {
         release {
@@ -102,12 +105,13 @@ dependencies {
     compile 'com.shamanland:xdroid-toaster:0.0.10'
     compile 'com.karumi:dexter:2.3.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:leanback-v17:25.3.1'
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.android.support:cardview-v7:25.3.1'
     compile 'com.jakewharton:butterknife:8.4.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
-    compile 'com.squareup.okhttp3:okhttp:3.5.0'
+    compile 'com.squareup.okhttp3:okhttp:3.6.0'
     compile 'com.squareup.okio:okio:1.11.0'
     compile 'com.ogaclejapan.smarttablayout:library:1.6.1@aar'
     compile 'com.ogaclejapan.smarttablayout:utils-v4:1.6.1@aar'
@@ -115,7 +119,7 @@ dependencies {
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'com.github.panwrona:DownloadProgressBar:1.1'
     compile 'com.mani:ThinDownloadManager:1.2.5'
-    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.5'
     compile 'com.github.simbiose:Encryption:1.4.0'
     compile 'com.heinrichreimersoftware:material-intro:1.6'
     compile 'com.parse.bolts:bolts-android:1.+'
@@ -134,11 +138,12 @@ dependencies {
     compile 'agency.tango.android:material-intro-screen:0.0.5'
     compile 'org.adw.library:discrete-seekbar:1.0.1'
     compile 'com.github.daniel-stoneuk:material-about-library:1.7.1'
-    compile 'com.google.android.gms:play-services-analytics:10.2.1'
-    compile 'com.google.android.gms:play-services-ads:10.2.1'
+    compile 'com.google.android.gms:play-services-analytics:10.2.4'
+    compile 'com.google.android.gms:play-services-ads:10.2.4'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'me.zhanghai.android.materialratingbar:library:1.0.2'
     compile 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
+    compile 'com.onesignal:OneSignal:[3.5.3,4.0.0)'
     compile('io.branch.sdk.android:library:2.+') {
         exclude module: 'answers-shim'
     }
@@ -147,6 +152,9 @@ dependencies {
     }
     compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
         transitive = true
+    }
+    compile('com.zendesk:sdk:1.9.2.1@aar') {
+        transitive = true;
     }
 }
 apply plugin: 'com.google.gms.google-services'

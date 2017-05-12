@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -87,10 +86,7 @@ public class Favoritos extends AppCompatActivity implements RequestFav.callback,
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         setContentView(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("force_phone", false) ? R.layout.anime_favs_force : R.layout.anime_favs);
-        if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        if (isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             ltoolbar = (Toolbar) findViewById(R.id.ltoolbar_fav);
         }
         context = this;

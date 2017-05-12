@@ -98,7 +98,6 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     WebView webView;
     String aid;
     String u;
-    Menu Amenu;
     String global_json;
     boolean isInInfo = true;
     boolean infoSeted = false;
@@ -193,7 +192,8 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         IntentFilter filter = new IntentFilter();
         filter.addAction(DownloaderService.RECEIVER_ACTION_ERROR);
         registerReceiver(getReceiver(), filter);
-        getJsonfromApi();
+        if (savedInstanceState == null)
+            getJsonfromApi();
     }
 
     private BroadcastReceiver getReceiver() {

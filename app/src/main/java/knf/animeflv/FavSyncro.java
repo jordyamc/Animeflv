@@ -1,6 +1,7 @@
 package knf.animeflv;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -58,6 +59,36 @@ public class FavSyncro {
         } else {
             return "Animeflv";
         }
+    }
+
+    public static String getEmailHelp(Context context) {
+        if (LoginServer.isLogedIn(context) || DropboxManager.islogedIn()) {
+            if (LoginServer.isLogedIn(context)) {
+                String email = LoginServer.getEmail(context);
+                if (email != null)
+                    return email;
+            }
+            if (DropboxManager.islogedIn()) {
+                String email = DropboxManager.getEmail(context);
+                if (email != null) {
+                    return email;
+                } else if (NetworkUtils.isNetworkAvailable()) {
+                    DropboxManager.setEmail(context);
+                }
+            }
+            return getGeneratedHelp(context);
+        } else {
+            return getGeneratedHelp(context);
+        }
+    }
+
+    public static String getGeneratedHelp(Context context) {
+        String email = PreferenceManager.getDefaultSharedPreferences(context).getString("help_email", null);
+        if (email == null) {
+            email = "animeflv-" + System.currentTimeMillis() + "@animeflvapp.com";
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("help_email", email).apply();
+        }
+        return email;
     }
 
     public static void updateLocal(final Context context, final UpdateCallback callback) {

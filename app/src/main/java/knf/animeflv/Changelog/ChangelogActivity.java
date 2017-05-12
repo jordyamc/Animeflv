@@ -1,7 +1,6 @@
 package knf.animeflv.Changelog;
 
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -64,11 +63,6 @@ public class ChangelogActivity extends AppCompatActivity {
     }
 
     private void setUpColors() {
-        if (!isXLargeScreen(getApplicationContext())) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             ThemeUtils.setStatusBarPadding(this, recyclerView);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

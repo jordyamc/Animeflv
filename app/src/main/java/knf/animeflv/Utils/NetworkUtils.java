@@ -62,16 +62,20 @@ public class NetworkUtils {
             switch (Tcon) {
                 case 0:
                     NetworkInfo Wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-                    net = Wifi.isConnected();
+                    net = Wifi.isConnectedOrConnecting();
                     break;
                 case 1:
                     NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                    net = mobile.isConnected();
+                    net = mobile.isConnectedOrConnecting();
                     break;
                 case 2:
                     NetworkInfo WifiA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                     NetworkInfo mobileA = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-                    net = WifiA.isConnected() || mobileA.isConnected();
+                    net = WifiA.isConnectedOrConnecting() || mobileA.isConnectedOrConnecting();
+                    break;
+                case 3:
+                    NetworkInfo ethernet = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET);
+                    net = ethernet.isConnectedOrConnecting();
                     break;
             }
             NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();

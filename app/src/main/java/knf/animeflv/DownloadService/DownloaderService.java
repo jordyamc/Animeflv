@@ -10,8 +10,11 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.StatFs;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import com.crashlytics.android.core.CrashlyticsCore;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,7 +22,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Random;
 
+import knf.animeflv.Errors.NoInternetException;
+import knf.animeflv.Errors.NoSDAccessDetectedException;
+import knf.animeflv.Errors.NoSpaceException;
+import knf.animeflv.Errors.WrongAccessPermissionException;
 import knf.animeflv.Explorer.ExplorerRoot;
+import knf.animeflv.Explorer.Models.ModelFactory;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
@@ -29,6 +37,11 @@ public class DownloaderService extends IntentService {
     public static final int CANCELED = 1554785;
     private static final int DOWNLOAD_NOTIFICATION_ID = 4458758;
     private static final int NULL = 388744;
+    private static final String CAUSE_INTERNET = "NO SE DETECTA INTERNET";
+    private static final String CAUSE_SD_ACCESS = "NO HAY PERMISO PARA ESCRIBIR EN LA SD";
+    private static final String CAUSE_WRONG_SD = "LA SD SELECCIONADA NO CONCUERDA CON EL PERMISO";
+    private static final String CAUSE_NO_SPACE = "NO HAY SUFICIENTE ESPACIO EN LA SD";
+    private static final String CAUSE_UNKNOWN = "ERROR DESCONOCIDO";
     public static String RECEIVER_ACTION_ERROR = "knf.animeflv.DownloadService.DownloadService.RECIEVER_ERROR";
     private NotificationManager manager;
     private NotificationCompat.Builder downloading;
@@ -58,7 +71,14 @@ public class DownloaderService extends IntentService {
             if (new SQLiteHelperDownloads(this).getState(eid) == DownloadManager.STATUS_RUNNING)
                 FileUtil.init(this).DeleteAnime(eid);
             if (!NetworkUtils.isNetworkAvailable())
-                throw new IllegalStateException();
+                throw new NoInternetException(null);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                if (FileUtil.init(this).RootFileHaveAccess()) {
+                    if (!FileUtil.init(this).RootFileHaveAccess(null))
+                        throw new WrongAccessPermissionException(ModelFactory.getRootSDFile(this).getName());
+                } else {
+                    throw new NoSDAccessDetectedException(null);
+                }
             onStartDownload(eid);
             URL url = new URL(bundle.getString("url"));
             URLConnection conection = url.openConnection();
@@ -68,7 +88,9 @@ public class DownloaderService extends IntentService {
                 conection.setRequestProperty("User-Agent", bundle.getString("useragent"));
             }
             conection.connect();
-            int lenghtOfFile = conection.getContentLength();
+            long lenghtOfFile = conection.getContentLength();
+            if (lenghtOfFile > getAvailableSpace())
+                throw new NoSpaceException(null);
             InputStream input = conection.getInputStream();
             OutputStream output = FileUtil.init(this).getOutputStream(eid);
             byte data[] = new byte[1024 * 6];
@@ -96,10 +118,28 @@ public class DownloaderService extends IntentService {
             FileUtil.init(this).DeleteAnime(eid);
             DownloadListManager.delete(this, eid + "_" + bundle.getLong("downloadID"));
             new SQLiteHelperDownloads(this).delete(eid).close();
+        } catch (NoInternetException nie) {
+            Log.e("DownloadService", nie.getMessage());
+            onDownloadFailed(eid, intent, CAUSE_INTERNET);
+        } catch (NoSDAccessDetectedException nsad) {
+            Log.e("DownloadService", nsad.getMessage());
+            onDownloadFailed(eid, intent, CAUSE_SD_ACCESS);
+        } catch (WrongAccessPermissionException wap) {
+            Log.e("DownloadService", wap.getMessage());
+            onDownloadFailed(eid, intent, CAUSE_WRONG_SD);
+        } catch (NoSpaceException nse) {
+            Log.e("DownloadService", nse.getMessage());
+            onDownloadFailed(eid, intent, CAUSE_NO_SPACE);
         } catch (Exception e) {
             Log.e("DownloadService", "error on try", e);
             onDownloadFailed(eid, intent);
+            CrashlyticsCore.getInstance().logException(e);
         }
+    }
+
+    private long getAvailableSpace() {
+        StatFs stat = new StatFs(ModelFactory.getRootSDFile(this).getPath());
+        return (long) stat.getBlockSize() * (long) stat.getBlockCount();
     }
 
     private void onStartDownload(String eid) {
@@ -158,12 +198,39 @@ public class DownloaderService extends IntentService {
         Intent n_intent = new Intent(DownloadBroadCaster.ACTION_RETRY);
         n_intent.putExtras(intent.getExtras());
         n_intent.putExtra("not_id", getDownloadID(eid));
+        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
+        bigTextStyle.setBigContentTitle("CAUSA:");
+        bigTextStyle.bigText(CAUSE_UNKNOWN);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(android.R.drawable.stat_notify_error)
                 .setContentTitle(new Parser().getTitCached(semi[0]) + " - " + semi[1])
                 .setContentText("ERROR AL DESCARGAR")
+                .setStyle(bigTextStyle)
                 .addAction(R.drawable.redo, "REINTENTAR", PendingIntent.getBroadcast(this, new Random().nextInt(), n_intent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .setOngoing(false);
+        getManager().notify(getDownloadID(eid), builder.build());
+        new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_FAILED).delete(eid);
+        sendBroadcast(new Intent(RECEIVER_ACTION_ERROR));
+    }
+
+    private void onDownloadFailed(String eid, Intent intent, String cause) {
+        FileUtil.init(this).DeleteAnime(eid);
+        DownloadListManager.delete(this, eid + "_" + getSharedPreferences("data", MODE_PRIVATE).getLong(eid + "_downloadID", -1));
+        String[] semi = eid.replace("E", "").split("_");
+        Intent n_intent = new Intent(DownloadBroadCaster.ACTION_RETRY);
+        n_intent.putExtras(intent.getExtras());
+        n_intent.putExtra("not_id", getDownloadID(eid));
+        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
+        bigTextStyle.setBigContentTitle("CAUSA:");
+        bigTextStyle.bigText(cause);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(android.R.drawable.stat_notify_error)
+                .setContentTitle(new Parser().getTitCached(semi[0]) + " - " + semi[1])
+                .setContentText("ERROR AL DESCARGAR")
+                .setStyle(bigTextStyle)
+                .setOngoing(false);
+        if (cause.equals(CAUSE_INTERNET) || cause.equals(CAUSE_NO_SPACE))
+            builder.addAction(R.drawable.redo, "REINTENTAR", PendingIntent.getBroadcast(this, new Random().nextInt(), n_intent, PendingIntent.FLAG_UPDATE_CURRENT));
         getManager().notify(getDownloadID(eid), builder.build());
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_FAILED).delete(eid);
         sendBroadcast(new Intent(RECEIVER_ACTION_ERROR));

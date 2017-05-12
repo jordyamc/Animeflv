@@ -23,11 +23,15 @@ import com.danielstone.materialaboutlibrary.model.MaterialAboutList;
 import com.mikepenz.community_material_typeface_library.CommunityMaterial;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.zendesk.sdk.model.access.AnonymousIdentity;
+import com.zendesk.sdk.network.impl.ZendeskConfig;
+import com.zendesk.sdk.support.SupportActivity;
 
 import java.util.List;
 
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.ColorsRes;
+import knf.animeflv.FavSyncro;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.State.StateActivity;
@@ -126,6 +130,32 @@ public class AboutActivity extends MaterialAboutActivity {
                             @Override
                             public void onClick() {
                                 startActivity(new Intent(context, StateActivity.class));
+                            }
+                        })
+                        .build());
+        info.addItem(
+                new MaterialAboutActionItem.Builder()
+                        .text("Ayuda")
+                        .icon(new IconicsDrawable(context)
+                                .icon(CommunityMaterial.Icon.cmd_help)
+                                .color(iconColor(context))
+                                .sizeDp(18))
+                        .setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+                            @Override
+                            public void onClick() {
+                                ZendeskConfig.INSTANCE.init(context,
+                                        context.getString(R.string.com_zendesk_sdk_url),
+                                        context.getString(R.string.com_zendesk_sdk_identifier),
+                                        context.getString(R.string.com_zendesk_sdk_clientIdentifier));
+
+                                ZendeskConfig.INSTANCE.setIdentity(
+                                        new AnonymousIdentity.Builder()
+                                                .withNameIdentifier("User")
+                                                .withEmailIdentifier(FavSyncro.getEmailHelp(context))
+                                                .build()
+                                );
+
+                                new SupportActivity.Builder().show(context);
                             }
                         })
                         .build());

@@ -102,6 +102,10 @@ public class ModelFactory {
         }
     }
 
+    public static File getRootSDFile(Context context) {
+        return new File(FileUtil.init(context).getSDPath());
+    }
+
     public static DocumentFile getDirectoryFileAccess(Context context) {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false)) {
             return FileUtil.init(context).getDownloadDirFromAccess();

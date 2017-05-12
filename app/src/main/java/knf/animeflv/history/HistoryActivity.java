@@ -1,6 +1,5 @@
 package knf.animeflv.history;
 
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -63,11 +62,6 @@ public class HistoryActivity extends AppCompatActivity implements HistoryAdapter
     }
 
     private void setUpTheme() {
-        if (!isXLargeScreen()) { //Portrait
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
         if (ThemeUtils.isAmoled(this)) {
             toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
             noHistory.setTextColor(ColorsRes.SecondaryTextDark(this));

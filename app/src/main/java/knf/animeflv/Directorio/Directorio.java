@@ -467,13 +467,11 @@ public class Directorio extends AppCompatActivity {
             public void run() {
                 try {
                     if (bundle == null) {
-                        Bundle b = new Bundle();
-                        b.putString("json", json);
                         FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
                                 getSupportFragmentManager(), FragmentPagerItems.with(Directorio.this)
-                                .add("ANIMES", Animes.class, b)
-                                .add("OVAS", Ovas.class, b)
-                                .add("PELICULAS", Peliculas.class, b)
+                                .add("ANIMES", Animes.class)
+                                .add("OVAS", Ovas.class)
+                                .add("PELICULAS", Peliculas.class)
                                 .create());
                         viewPager.setOffscreenPageLimit(3);
                         viewPager.setAdapter(adapter);
