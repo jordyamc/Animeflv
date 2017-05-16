@@ -368,6 +368,10 @@
             android:name=".DownloadService.DownloaderService"
             android:exported="false"
             android:label="@string/app_name"/>
+        <service
+            android:name=".Utils.UpdateService"
+            android:exported="false"
+            android:label="@string/app_name"/>
 
         <receiver
             android:name=".DownloadService.DownloadBroadCaster"

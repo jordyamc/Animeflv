@@ -26,7 +26,7 @@
             android:paddingRight="4dp"
             app:stl_defaultTabTextColor="@android:color/white"
             app:stl_defaultTabTextHorizontalPadding="20dp"
-            app:stl_distributeEvenly="true"
+            app:stl_distributeEvenly="false"
             app:stl_dividerColor="@android:color/transparent"
             app:stl_dividerThickness="0dp"
             app:stl_indicatorColor="@color/dark"

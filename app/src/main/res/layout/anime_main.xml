@@ -33,20 +33,9 @@
             android:id="@+id/action_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_info_m"
-            fab:fab_colorNormal="@color/dark"
-            fab:fab_colorPressed="@color/prim"
-            fab:fab_colorRipple="@color/dark" />
-
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/action_download_update"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:src="@drawable/ic_get_r"
+            android:src="@drawable/ic_info_m"
             fab:fab_colorNormal="@color/dark"
             fab:fab_colorPressed="@color/prim"
             fab:fab_colorRipple="@color/dark" />

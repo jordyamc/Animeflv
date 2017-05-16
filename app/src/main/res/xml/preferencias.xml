@@ -53,6 +53,20 @@
             android:summary="Esperar %s para cancelar bypass"
             android:title="Bypass"/>
     </PreferenceCategory>
+    <PreferenceCategory android:title="Actualizaciones">
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="true"
+            android:key="update_nots"
+            android:title="Notificar nuevas actualizaciones"/>
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="true"
+            android:key="update_check_start"
+            android:title="Buscar actualizaciones al iniciar"/>
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="0"
+            android:key="update_check_now"
+            android:title="Comprobar actualizaciones"/>
+    </PreferenceCategory>
     <PreferenceCategory android:title="Busqueda">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
@@ -160,6 +174,10 @@
             android:key="b_vistos"
             android:summary="Borrar historial de capitulos vistos"
             android:title="Capítulos vistos"/>
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="use_ext_downloader"
+            android:title="Usar administrador de descargas externo"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="null"
             android:key="SDpath"

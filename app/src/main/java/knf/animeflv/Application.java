@@ -1,6 +1,7 @@
 package knf.animeflv;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -23,10 +24,12 @@ import org.json.JSONObject;
 import es.munix.multidisplaycast.CastManager;
 import io.branch.referral.Branch;
 import io.fabric.sdk.android.Fabric;
+import knf.animeflv.DownloadService.SSLCertificateHandler;
 import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.Utils.FastActivity;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.UtilsInit;
+import xdroid.toaster.Toaster;
 
 
 public class Application extends MultiDexApplication {
@@ -42,6 +45,7 @@ public class Application extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         context = this;
+        SSLCertificateHandler.nuke();
         UtilsInit.init(this);
         Dexter.initialize(getApplicationContext());
         android.webkit.CookieSyncManager.createInstance(this);
@@ -126,6 +130,9 @@ public class Application extends MultiDexApplication {
                             break;
                     }
                 }
+            } catch (ActivityNotFoundException e) {
+                e.printStackTrace();
+                Toaster.toast("No se encontro ninguna aplicacion disponible");
             } catch (Exception e) {
                 e.printStackTrace();
                 CrashlyticsCore.getInstance().logException(e);

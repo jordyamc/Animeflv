@@ -167,6 +167,8 @@ public class DownloadGetter {
                                             final String url = urls.get(sp.getSelectedItemPosition());
                                             if (url.toLowerCase().contains("zippyshare")) {
                                                 Toaster.toast("No se puede reproducir desde Zippyshare!!!");
+                                                MainStates.setProcessing(false, null);
+                                                actionsInterface.onCancelDownload();
                                             } else {
                                                 new AsyncTask<Void, Void, Void>() {
                                                     @Override
@@ -209,7 +211,10 @@ public class DownloadGetter {
                             Toaster.toast("No hay internet!!!");
                         }
                     }
-                    Looper.loop();
+                    try {
+                        Looper.loop();
+                    } catch (Exception e) {
+                    }
                 }
             });
         } else {
@@ -222,6 +227,10 @@ public class DownloadGetter {
     private static void startDownload(boolean isStreaming, Activity context, String eid, String url) {
         if (isStreaming) {
             StreamManager.Stream(context, eid, url);
+        } else if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_ext_downloader", false)) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.parse(url), "video/mp4");
+            context.startActivity(intent);
         } else {
             ManageDownload.chooseDownDir(context, eid, url);
         }

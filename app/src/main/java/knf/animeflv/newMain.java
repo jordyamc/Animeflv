@@ -148,7 +148,6 @@ public class newMain extends AppCompatActivity implements
     private String headerTit;
     private Context context;
     private FloatingActionButton actionButton;
-    private com.github.clans.fab.FloatingActionButton updateButton;
     private Parser parser = new Parser();
     private boolean shouldExecuteOnResume;
     private TaskType normal = TaskType.NORMAL;
@@ -210,7 +209,8 @@ public class newMain extends AppCompatActivity implements
         }
         setUpDrawer();
         getJson();
-        NetworkUtils.checkVersion(this, updateButton);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("update_check_start", true))
+            NetworkUtils.checkVersion(this);
         ActualizarFavoritos();
         SharedPreferences prefs = this.getSharedPreferences("data", MODE_PRIVATE);
         frun = true;
@@ -228,7 +228,6 @@ public class newMain extends AppCompatActivity implements
                     if (NetworkUtils.isNetworkAvailable()) {
                         Log.d("NewMain", "Block Nots");
                         UtilNotBlocker.setBlocked(true);
-                        NetworkUtils.checkVersion(context, updateButton);
                         loadMainJson();
                     } else {
                         if (mswipe.isRefreshing()) {
@@ -788,13 +787,8 @@ public class newMain extends AppCompatActivity implements
             }
         });
         actionButton.setVisibility(View.GONE);
-        updateButton = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.action_download_update);
-        updateButton.setColorNormal(getColor());
-        updateButton.setColorPressed(getColor());
         Drawable icon = getResources().getDrawable(R.drawable.ic_get_r);
         icon.setColorFilter(ColorsRes.Blanco(context), PorterDuff.Mode.SRC_ATOP);
-        updateButton.setImageDrawable(icon);
-        updateButton.hide(false);
         mswipe = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
         mswipe.setOnRefreshListener(this);
         recyclerView.setHasFixedSize(true);
@@ -919,7 +913,6 @@ public class newMain extends AppCompatActivity implements
                 //eids = parser.parseEID(json);
                 //tipos = parser.parseTipos(json);
                 //EmisionChecker.Refresh();
-                NetworkUtils.checkVersion(newMain.this, updateButton);
                 Status.reload();
                 if (Status.getCacheStatusInt() == 1) {
                     getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("isDown", false).apply();

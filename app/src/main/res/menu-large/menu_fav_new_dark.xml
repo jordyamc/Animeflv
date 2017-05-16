@@ -4,7 +4,7 @@
     <item
         android:id="@+id/add"
         android:icon="@drawable/plus"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:title="Agregar Seccion"
         app:showAsAction="always"/>
 
@@ -13,5 +13,11 @@
         android:icon="@drawable/sync"
         android:orderInCategory="100"
         android:title="Sincronizar con la nube"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/ic_buscar"
+        android:orderInCategory="300"
+        android:title="Buscar"
         app:showAsAction="always"/>
 </menu>

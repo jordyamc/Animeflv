@@ -7,7 +7,8 @@ public enum UpdateState {
     NO_UPDATE(0),
     DOWNLOADING(1),
     WAITING_TO_UPDATE(2),
-    START_UPDATE_CHECK(3);
+    START_UPDATE_CHECK(3),
+    FINISHED(4);
     int value;
 
     UpdateState(int value) {

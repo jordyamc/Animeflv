@@ -160,12 +160,12 @@ public class WaitList extends AppCompatActivity implements
     }
 
     @Override
-    public void onGroupCollapse(int groupPosition, boolean fromUser) {
+    public void onGroupCollapse(int i, boolean b, Object o) {
 
     }
 
     @Override
-    public void onGroupExpand(int groupPosition, boolean fromUser) {
+    public void onGroupExpand(int i, boolean b, Object o) {
 
     }
 

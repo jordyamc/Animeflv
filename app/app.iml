@@ -142,7 +142,6 @@
     <orderEntry type="library" exported="" name="support-core-ui-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="android-gif-drawable-1.2.5" level="project" />
     <orderEntry type="library" exported="" name="crashlytics-core-2.3.17" level="project" />
-    <orderEntry type="library" exported="" name="CircularReveal-1.1.1" level="project" />
     <orderEntry type="library" exported="" name="renderscript-v8" level="project" />
     <orderEntry type="library" exported="" name="library-1.6.1" level="project" />
     <orderEntry type="library" exported="" name="firebase-iid-10.2.4" level="project" />
@@ -163,6 +162,7 @@
     <orderEntry type="library" exported="" name="play-services-cast-10.2.4" level="project" />
     <orderEntry type="library" exported="" name="java-common-1.11" level="project" />
     <orderEntry type="library" exported="" name="iconics-core-2.8.2" level="project" />
+    <orderEntry type="library" exported="" name="persistentsearchview-1.0.4" level="project" />
     <orderEntry type="library" exported="" name="fontawesome-typeface-4.7.0.0" level="project" />
     <orderEntry type="library" exported="" name="materialdatetimepicker-2.5.0" level="project" />
     <orderEntry type="library" exported="" name="jsoup-1.9.2" level="project" />
@@ -175,9 +175,9 @@
     <orderEntry type="library" exported="" name="materialize-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="fastscroll-0.2.5" level="project" />
     <orderEntry type="library" exported="" name="guava-20.0" level="project" />
-    <orderEntry type="library" exported="" name="advrecyclerview-0.10.2" level="project" />
     <orderEntry type="library" exported="" name="google-material-typeface-2.2.0.3.original" level="project" />
     <orderEntry type="library" exported="" name="material-activity-chooser-0.2.1" level="project" />
+    <orderEntry type="library" exported="" name="advrecyclerview-0.10.6" level="project" />
     <orderEntry type="library" exported="" name="filepicker-2.5.2" level="project" />
     <orderEntry type="library" exported="" name="library-1.3.0" level="project" />
     <orderEntry type="library" exported="" name="bolts-android-1.4.0" level="project" />
@@ -190,8 +190,8 @@
     <orderEntry type="library" exported="" name="com.amulyakhare.textdrawable-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="answers-shim-0.0.6" level="project" />
     <orderEntry type="library" exported="" name="materialdrawer-5.9.0" level="project" />
+    <orderEntry type="library" exported="" name="OneSignal-3.5.6" level="project" />
     <orderEntry type="library" exported="" name="play-services-basement-10.2.4" level="project" />
-    <orderEntry type="library" exported="" name="OneSignal-3.5.5" level="project" />
     <orderEntry type="library" exported="" name="fab-1.6.4" level="project" />
     <orderEntry type="library" exported="" name="bolts-applinks-1.4.0" level="project" />
     <orderEntry type="library" exported="" name="nanohttpd-2.2.0" level="project" />

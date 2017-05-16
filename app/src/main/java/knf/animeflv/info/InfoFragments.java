@@ -117,6 +117,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         setContentView(R.layout.layout_info_fragments);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);

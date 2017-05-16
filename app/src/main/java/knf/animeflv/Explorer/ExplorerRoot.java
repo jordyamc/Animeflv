@@ -90,7 +90,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
                 Toaster.toast("No se encontro la memoria SD");
                 commitDownloadInSD(false);
             } else {
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     if (!FileUtil.init(this).RootFileHaveAccess()) {
                         Toaster.toast("Se necesitan permisos de escritura!!");
                         waitForResult = true;
@@ -98,7 +98,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
                         Intent intent = new Intent(this, Configuracion.class);
                         intent.putExtra("return", 12877);
                         startActivityForResult(intent, 1547);
-                    } else if (!FileUtil.init(this).RootFileHaveAccess(ModelFactory.getDirectoryFile(this).getName())) {
+                    } else if (!FileUtil.init(this).RootFileHaveAccess(null)) {
                         Toaster.toast("El permiso de escritura no concuerda con la SD seleccionada!!");
                         waitForResult = true;
                         FragmentExtras.KEY = Configuracion.GET_WRITE_PERMISSIONS;

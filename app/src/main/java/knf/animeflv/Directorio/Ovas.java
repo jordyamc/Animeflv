@@ -43,14 +43,18 @@ public class Ovas extends Fragment {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                List<AnimeClass> animes = AnimeSorter.sortByName(parser.DirOvas(getJson()));
-                final AdapterDirPeliculaNew adapter = new AdapterDirPeliculaNew(getActivity(), animes);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        rvAnimes.setAdapter(adapter);
-                    }
-                });
+                try {
+                    List<AnimeClass> animes = AnimeSorter.sortByName(parser.DirOvas(getJson()));
+                    final AdapterDirPeliculaNew adapter = new AdapterDirPeliculaNew(getActivity(), animes);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            rvAnimes.setAdapter(adapter);
+                        }
+                    });
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());

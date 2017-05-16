@@ -55,8 +55,10 @@ import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.SoundsLoader;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.Utils.UpdateUtil;
 import knf.animeflv.Utils.UtilDialogPref;
 import knf.animeflv.Utils.UtilSound;
+import knf.animeflv.Utils.eNums.UpdateState;
 import xdroid.toaster.Toaster;
 
 //@SuppressWarnings("all")
@@ -176,6 +178,17 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                     cleanSounds();
                 } else {
                     Toaster.toast("Se necesita internet para esto...");
+                }
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("update_check_now").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if (UpdateUtil.getState() != UpdateState.DOWNLOADING) {
+                    NetworkUtils.checkVersion(context, true);
+                } else {
+                    Toaster.toast("La actualizacion se esta descargando");
                 }
                 return false;
             }

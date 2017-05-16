@@ -78,24 +78,8 @@ public class Splash extends AwesomeSplash {
     @Override
     public void initSplash(ConfigSplash configSplash) {
         context = this;
-        /*Toaster.toastLong(
-                "isXLarge = "+String.valueOf(isXLargeScreen(this))+"\n"+
-                "isUITelevision = "+String.valueOf((((UiModeManager)getSystemService(UI_MODE_SERVICE)).getCurrentModeType()==Configuration.UI_MODE_TYPE_TELEVISION))+"\n"+
-                "isTabletBool = "+String.valueOf(getResources().getBoolean(R.bool.isTelevision))
-        );*/
         new Alarm().SetAlarm(this);
-        //EmisionChecker.Refresh();
-        /*if (!isXLargeScreen(getApplicationContext()) && !ThemeUtils.isTV(this)) { //set phones to portrait;
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } else if (ThemeUtils.isTV(this)) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }*/
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                /*Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);*/
             getWindow().setNavigationBarColor(ContextCompat.getColor(this, getSplashColor()));
             getWindow().setStatusBarColor(ContextCompat.getColor(this, getSplashColor()));
         }
@@ -305,6 +289,11 @@ public class Splash extends AwesomeSplash {
     private void proceed() {
         if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("intro", false)) {
             finish();
+            /*if (ThemeUtils.isTV(this)){
+                startActivity(new Intent(context, Main.class));
+            }else {
+                startActivity(new Intent(context, newMain.class));
+            }*/
             startActivity(new Intent(context, newMain.class));
         } else {
             finish();

@@ -529,6 +529,7 @@ public class FileUtil {
         try {
             treeUri = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null));
             if (treeUri != null) {
+                Log.e("SD Read", "Search: " + name + " in " + treeUri.toString());
                 DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
                 return sdFile != null && sdFile.canWrite() && (name != null ? (treeUri.toString().contains(name)) : (RootFileHaveAccess(ModelFactory.getRootSDFile(context).getName())));
             } else {
@@ -603,7 +604,7 @@ public class FileUtil {
     public Uri getUriForFile(File file) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                return FileProvider.getUriForFile(context, context.getPackageName() + ".RequestBackground", file);
+                return FileProvider.getUriForFile(context, "knf.animeflv.RequestsBackground", file);
             } else {
                 return Uri.fromFile(file);
             }

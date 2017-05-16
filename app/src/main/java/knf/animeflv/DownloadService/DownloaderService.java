@@ -16,11 +16,15 @@ import android.util.Log;
 
 import com.crashlytics.android.core.CrashlyticsCore;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Random;
+
+import javax.net.ssl.SSLException;
 
 import knf.animeflv.Errors.NoInternetException;
 import knf.animeflv.Errors.NoSDAccessDetectedException;
@@ -42,6 +46,8 @@ public class DownloaderService extends IntentService {
     private static final String CAUSE_WRONG_SD = "LA SD SELECCIONADA NO CONCUERDA CON EL PERMISO";
     private static final String CAUSE_NO_SPACE = "NO HAY SUFICIENTE ESPACIO EN LA SD";
     private static final String CAUSE_UNKNOWN = "ERROR DESCONOCIDO";
+    private static final String CAUSE_DISCONNECTION = "CONEXION INTERRUMPIDA";
+    private static final String CAUSE_SSL = "ERROR EN CERTIFICADO SSL";
     public static String RECEIVER_ACTION_ERROR = "knf.animeflv.DownloadService.DownloadService.RECIEVER_ERROR";
     private NotificationManager manager;
     private NotificationCompat.Builder downloading;
@@ -130,9 +136,22 @@ public class DownloaderService extends IntentService {
         } catch (NoSpaceException nse) {
             Log.e("DownloadService", nse.getMessage());
             onDownloadFailed(eid, intent, CAUSE_NO_SPACE);
+        } catch (ProtocolException pe) {
+            Log.e("DownloadService", pe.getMessage());
+            onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
+        } catch (SSLException ssl) {
+            Log.e("DownloadService", ssl.getMessage());
+            onDownloadFailed(eid, intent, CAUSE_SSL);
+        } catch (IOException ioe) {
+            Log.e("DownloadService", ioe.getMessage());
+            if (ioe.getMessage().trim().equalsIgnoreCase("unexpected end of stream")) {
+                onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
+            } else {
+                onDownloadFailed(eid, intent, ioe);
+            }
         } catch (Exception e) {
             Log.e("DownloadService", "error on try", e);
-            onDownloadFailed(eid, intent);
+            onDownloadFailed(eid, intent, e);
             CrashlyticsCore.getInstance().logException(e);
         }
     }
@@ -180,7 +199,9 @@ public class DownloaderService extends IntentService {
                 if (pending > 1) {
                     mBuilder.setNumber(pending);
                 } else {
-                    mBuilder.setNumber(-1);
+                    downloading = null;
+                    mBuilder = getDownloadingBuilder()
+                            .setProgress(100, progress, false);
                 }
             }
         }
@@ -191,26 +212,8 @@ public class DownloaderService extends IntentService {
         new SQLiteHelperDownloads(this).updateProgress(eid, progress).close();
     }
 
-    private void onDownloadFailed(String eid, Intent intent) {
-        FileUtil.init(this).DeleteAnime(eid);
-        DownloadListManager.delete(this, eid + "_" + getSharedPreferences("data", MODE_PRIVATE).getLong(eid + "_downloadID", -1));
-        String[] semi = eid.replace("E", "").split("_");
-        Intent n_intent = new Intent(DownloadBroadCaster.ACTION_RETRY);
-        n_intent.putExtras(intent.getExtras());
-        n_intent.putExtra("not_id", getDownloadID(eid));
-        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
-        bigTextStyle.setBigContentTitle("CAUSA:");
-        bigTextStyle.bigText(CAUSE_UNKNOWN);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(android.R.drawable.stat_notify_error)
-                .setContentTitle(new Parser().getTitCached(semi[0]) + " - " + semi[1])
-                .setContentText("ERROR AL DESCARGAR")
-                .setStyle(bigTextStyle)
-                .addAction(R.drawable.redo, "REINTENTAR", PendingIntent.getBroadcast(this, new Random().nextInt(), n_intent, PendingIntent.FLAG_UPDATE_CURRENT))
-                .setOngoing(false);
-        getManager().notify(getDownloadID(eid), builder.build());
-        new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_FAILED).delete(eid);
-        sendBroadcast(new Intent(RECEIVER_ACTION_ERROR));
+    private void onDownloadFailed(String eid, Intent intent, Exception e) {
+        onDownloadFailed(eid, intent, CAUSE_UNKNOWN + "\n\n" + Log.getStackTraceString(e));
     }
 
     private void onDownloadFailed(String eid, Intent intent, String cause) {
@@ -227,6 +230,7 @@ public class DownloaderService extends IntentService {
                 .setSmallIcon(android.R.drawable.stat_notify_error)
                 .setContentTitle(new Parser().getTitCached(semi[0]) + " - " + semi[1])
                 .setContentText("ERROR AL DESCARGAR")
+                .setGroup("animeflv_failed_download")
                 .setStyle(bigTextStyle)
                 .setOngoing(false);
         if (cause.equals(CAUSE_INTERNET) || cause.equals(CAUSE_NO_SPACE))
@@ -253,6 +257,7 @@ public class DownloaderService extends IntentService {
                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
                 .setContentTitle(title + " - " + eid.replace("E", "").split("_")[1])
                 .setContentText("DESCARGA COMPLETADA")
+                .setGroup("animeflv_success_group")
                 .setAutoCancel(true)
                 .setOngoing(false);
         if (Build.VERSION.SDK_INT < 24) {

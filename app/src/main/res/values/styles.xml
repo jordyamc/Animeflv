@@ -908,27 +908,33 @@
         <item name="android:textSize">15sp</item>
     </style>
 
-    <style name="SplashNormal" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Splash" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+    </style>
+
+    <style name="SplashNormal" parent="Splash">
         <item name="colorPrimaryDark">@color/nmain</item>
     </style>
 
-    <style name="SplashDark" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="SplashDark" parent="Splash">
         <item name="colorPrimaryDark">@color/prim</item>
     </style>
 
-    <style name="SplashNavidad" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="SplashNavidad" parent="Splash">
         <item name="colorPrimaryDark">@color/navidad</item>
     </style>
 
-    <style name="SplashAnuevo" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="SplashAnuevo" parent="Splash">
         <item name="colorPrimaryDark">@color/anuevo</item>
     </style>
 
-    <style name="SplashAmor" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="SplashAmor" parent="Splash">
         <item name="colorPrimaryDark">@color/amor</item>
     </style>
 
-    <style name="SplashNegro" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="SplashNegro" parent="Splash">
         <item name="colorPrimaryDark">@color/negro</item>
     </style>
 

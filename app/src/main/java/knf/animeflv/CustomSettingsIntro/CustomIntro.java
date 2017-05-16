@@ -170,6 +170,11 @@ public class CustomIntro extends MaterialIntroActivity implements ColorChooserDi
     @Override
     public void onFinish() {
         getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("intro", true).apply();
+        /*if (ThemeUtils.isTV(this)){
+            startActivity(new Intent(this, Main.class));
+        }else {
+            startActivity(new Intent(this, newMain.class));
+        }*/
         startActivity(new Intent(this, newMain.class));
     }
 

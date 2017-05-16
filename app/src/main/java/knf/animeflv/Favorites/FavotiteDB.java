@@ -422,6 +422,10 @@ public class FavotiteDB {
     }
 
     public List<FavObject> getAllSectionsExtended(boolean close, boolean wSections) {
+        return getAllSectionsExtended(close, wSections, "");
+    }
+
+    public List<FavObject> getAllSectionsExtended(boolean close, boolean wSections, String search) {
         List<FavObject> sections = new ArrayList<>();
         try {
             if (wSections) {
@@ -432,19 +436,58 @@ public class FavotiteDB {
                     while (cursor_sections.moveToNext()) {
                         if (!URLDecoder.decode(cursor_sections.getString(0), "utf-8").equals(NO_SECTION)) {
                             FavObject section = new FavObject(URLDecoder.decode(cursor_sections.getString(0), "utf-8"));
-                            sections.add(section);
-                            sections.addAll(getSection(URLDecoder.decode(cursor_sections.getString(0), "utf-8")).sectionList);
+                            List<FavObject> tmp = getSection(URLDecoder.decode(cursor_sections.getString(0), "utf-8")).sectionList;
+                            if (!search.trim().equals("")) {
+                                List<FavObject> tmp_new = new ArrayList<>();
+                                for (FavObject fav : tmp) {
+                                    if (fav.name.toLowerCase().contains(search.trim().toLowerCase()))
+                                        tmp_new.add(fav);
+                                }
+                                if (tmp_new.size() > 0) {
+                                    sections.add(section);
+                                    sections.addAll(tmp_new);
+                                }
+                            } else {
+                                sections.add(section);
+                                sections.addAll(tmp);
+                            }
                         }
                     }
                     FavObject section = new FavObject(NO_SECTION);
-                    sections.add(section);
                     List<FavObject> no_list = getSection(NO_SECTION).sectionList;
-                    SortNoSectionList(no_list);
-                    sections.addAll(no_list);
+                    if (!search.trim().equals("")) {
+                        List<FavObject> tmp_new = new ArrayList<>();
+                        for (FavObject fav : no_list) {
+                            if (fav.name.toLowerCase().contains(search.trim().toLowerCase()))
+                                tmp_new.add(fav);
+                        }
+                        if (tmp_new.size() > 0) {
+                            sections.add(section);
+                            SortNoSectionList(tmp_new);
+                            sections.addAll(tmp_new);
+                        }
+                    } else {
+                        sections.add(section);
+                        SortNoSectionList(no_list);
+                        sections.addAll(no_list);
+                    }
                 } else {
                     FavObject section = new FavObject(NO_SECTION);
                     sections.add(section);
-                    sections.addAll(getSection(NO_SECTION).sectionList);
+                    List<FavObject> no_list = getSection(NO_SECTION).sectionList;
+                    if (!search.trim().equals("")) {
+                        List<FavObject> tmp_new = new ArrayList<>();
+                        for (FavObject fav : no_list) {
+                            if (fav.name.toLowerCase().contains(search.trim().toLowerCase()))
+                                tmp_new.add(fav);
+                        }
+                        SortNoSectionList(tmp_new);
+                        sections.addAll(tmp_new);
+                    } else {
+                        SortNoSectionList(no_list);
+                        sections.addAll(no_list);
+                    }
+                    sections.addAll(no_list);
                 }
                 cursor_sections.close();
             } else {
@@ -457,7 +500,13 @@ public class FavotiteDB {
                 }, KEY_TYPE_ID + "='" + TYPE_FAV + "'", null, null, null, null);
                 if (cursor_all.getCount() > 0) {
                     while (cursor_all.moveToNext()) {
-                        sections.add(new FavObject(URLDecoder.decode(cursor_all.getString(1), "utf-8"), cursor_all.getString(2), URLDecoder.decode(cursor_all.getString(3), "utf-8"), cursor_all.getInt(4)));
+                        FavObject object = new FavObject(URLDecoder.decode(cursor_all.getString(1), "utf-8"), cursor_all.getString(2), URLDecoder.decode(cursor_all.getString(3), "utf-8"), cursor_all.getInt(4));
+                        if (!search.trim().equals("")) {
+                            if (object.name.toLowerCase().contains(search.trim().toLowerCase()))
+                                sections.add(object);
+                        } else {
+                            sections.add(object);
+                        }
                     }
                     SortNoSectionList(sections);
                 }

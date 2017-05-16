@@ -40,11 +40,19 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private boolean moving = false;
     private boolean sectionsEnabled = false;
     private boolean editing = false;
+    private boolean searching = false;
 
     public FavoriteAdapter(Activity context) {
         this.context = context;
         this.sectionsEnabled = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("section_favs", false);
         this.list = new FavotiteDB(context).getAllSectionsExtended(true, sectionsEnabled);
+        setHasStableIds(true);
+    }
+
+    public FavoriteAdapter(Activity context, String search) {
+        this.context = context;
+        this.sectionsEnabled = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("section_favs", false);
+        this.list = new FavotiteDB(context).getAllSectionsExtended(true, sectionsEnabled, search);
         setHasStableIds(true);
     }
 
@@ -232,9 +240,13 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         editing = e;
     }
 
+    public void setSearching(boolean s) {
+        searching = s;
+    }
+
     @Override
     public boolean onCheckCanStartDrag(RecyclerView.ViewHolder holder, int position, int x, int y) {
-        return (!list.get(holder.getAdapterPosition()).isSection) && !moving && sectionsEnabled;
+        return (!list.get(holder.getAdapterPosition()).isSection) && !moving && sectionsEnabled && !searching;
     }
 
     @Override
@@ -281,6 +293,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             });
         }
     }
+
 
     @Override
     public boolean onCheckCanDrop(int draggingPosition, int dropPosition) {

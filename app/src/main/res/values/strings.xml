@@ -43,7 +43,7 @@
         <item>Solo WiFi</item>
         <item>Solo Datos Moviles</item>
         <item>WiFi + Datos Moviles</item>
-        <item>Ethernet</item>
+        <item>Todos</item>
     </string-array>
     <string-array name="players">
         <item>Interno</item>

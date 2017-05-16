@@ -25,6 +25,7 @@
 -dontwarn retrofit2.**
 -dontwarn com.github.siyamed.**
 -dontwarn com.zendesk.**
+-dontwarn io.codetail.animation.**
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
 -keep public class * extends java.lang.Exception

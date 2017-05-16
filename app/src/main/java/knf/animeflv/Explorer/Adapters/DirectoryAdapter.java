@@ -87,7 +87,7 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
             @Override
             public void onClick(View v) {
                 new MaterialDialog.Builder(context)
-                        .content("Esta seguro que desea eliminar todos los capitulos descargados de " + list.get(holder.getAdapterPosition()).getTitle() + "?")
+                        .content("Esta seguro que desea eliminar todos los capitulos descargados de " + list.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getTitle() + "?")
                         .positiveText("Eliminar")
                         .negativeText("cancelar")
                         .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
@@ -97,27 +97,35 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
                                 new AsyncTask<Void, Void, Void>() {
                                     private MaterialDialog dialogProg;
                                     private int progress = 0;
+                                    private boolean empty = false;
 
                                     @Override
                                     protected void onPreExecute() {
-                                        dialogProg = new MaterialDialog.Builder(context)
-                                                .content("Eliminando...")
-                                                .progress(false, list.get(holder.getAdapterPosition()).getFile(context).list().length, true)
-                                                .cancelable(false)
-                                                .build();
-                                        context.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                dialog.dismiss();
-                                                dialogProg.show();
-                                                dialogProg.setProgress(progress);
-                                            }
-                                        });
+                                        try {
+                                            int length = list.get(holder.getAdapterPosition()).getFile(context).list().length;
+                                            dialogProg = new MaterialDialog.Builder(context)
+                                                    .content("Eliminando...")
+                                                    .progress(false, length, true)
+                                                    .cancelable(false)
+                                                    .build();
+                                            context.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    dialog.dismiss();
+                                                    dialogProg.show();
+                                                    dialogProg.setProgress(progress);
+                                                }
+                                            });
+                                        } catch (Exception e) {
+                                            empty = true;
+                                        }
                                         super.onPreExecute();
                                     }
 
                                     @Override
                                     protected Void doInBackground(Void... voids) {
+                                        if (empty)
+                                            return null;
                                         try {
                                             for (String file : list.get(holder.getAdapterPosition()).getFile(context).list()) {
                                                 ManageDownload.cancel(context, file.replace(".mp4", "E"));

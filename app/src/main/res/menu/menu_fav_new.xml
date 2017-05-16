@@ -14,4 +14,11 @@
         android:orderInCategory="100"
         android:title="Sincronizar con la nube"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/ic_buscar"
+        android:orderInCategory="300"
+        android:title="Buscar"
+        app:showAsAction="always"/>
 </menu>
