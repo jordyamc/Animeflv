@@ -1,6 +1,7 @@
 package knf.animeflv.Utils;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -35,7 +36,7 @@ public class FastActivity extends AppCompatActivity {
                         startActivity(new Intent(this, Configuracion.class));
                         break;
                     case SHOW_DIALOG:
-                        new MaterialDialog.Builder(this)
+                        MaterialDialog.Builder builder = new MaterialDialog.Builder(this)
                                 .content(bundle.getString("content", "No content"))
                                 .theme(ThemeUtils.isAmoled(this) ? Theme.DARK : Theme.LIGHT)
                                 .positiveText("OK")
@@ -46,8 +47,21 @@ public class FastActivity extends AppCompatActivity {
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                         finish();
                                     }
-                                })
-                                .build().show();
+                                });
+                        final String url = bundle.getString("web", null);
+                        if (url != null) {
+                            builder.neutralText("ABRIR WEB")
+                                    .neutralColor(ThemeUtils.getAcentColor(this))
+                                    .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(intent);
+                                        }
+                                    });
+                        }
+                        builder.build().show();
                         break;
                 }
                 if (bundle.getInt("key") != SHOW_DIALOG)

@@ -9,7 +9,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -22,6 +21,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.onesignal.OneSignal;
 
 import knf.animeflv.Utils.ThemeUtils;
 
@@ -111,9 +111,8 @@ public class Configuracion extends AppCompatActivity implements LoginServer.call
                 .titleGravity(GravityEnum.CENTER)
                 .customView(R.layout.lay_info, false)
                 .build();
-        final String id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        final String id = OneSignal.getPermissionSubscriptionState().getSubscriptionStatus().getUserId();
         TextView textView = (TextView) dialog.getCustomView().findViewById(R.id.help_id);
-        TextView cert = (TextView) dialog.getCustomView().findViewById(R.id.help_certification);
         textView.setText(id);
         textView.setTextColor(ThemeUtils.getAcentColor(this));
         textView.setOnClickListener(new View.OnClickListener() {

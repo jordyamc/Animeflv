@@ -375,7 +375,7 @@ public class SelfGetter {
                         generos = gens.substring(0, gens.lastIndexOf(","));
                     String start = "Sin Fecha";
 
-                    String title = document.select("h1").first().text();
+                    String title = document.select("h1.Title").first().text();
                     if (title.trim().equals("") || title.contains("protected"))
                         title = document.select("meta[property='og:title']").attr("content").replace(" Online", "");
                     String sinopsis = Parser.InValidateSinopsis(document.select("div.Description").first().select("p").first().text().trim());

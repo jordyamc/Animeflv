@@ -8,9 +8,9 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Patterns;
@@ -60,18 +60,24 @@ public class PushManager extends AppCompatActivity {
     TextView title_fast;
     @BindView(R.id.options)
     AppCompatSpinner spinner;
+    @BindView(R.id.test)
+    SwitchCompat test;
     @BindView(R.id.title)
     TextInputEditText title;
     @BindView(R.id.subtitle)
     TextInputEditText subtitle;
     @BindView(R.id.dialog_text)
     TextInputEditText dialog_text;
+    @BindView(R.id.input_web)
+    TextInputEditText web_url;
     @BindView(R.id.title_input)
     TextInputLayout title_input;
     @BindView(R.id.subtitle_input)
     TextInputLayout subtitle_input;
-    @BindView(R.id.dialog_input)
-    TextInputLayout layout;
+    @BindView(R.id.dialog_text_input)
+    TextInputLayout layout_dialog;
+    @BindView(R.id.dialog_web_input)
+    TextInputLayout layout_web;
 
     @BindView(R.id.send)
     Button send;
@@ -100,20 +106,18 @@ public class PushManager extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        layout_dialog.setVisibility(View.GONE);
+                        layout_web.setVisibility(View.GONE);
                         switch (getTypes()[position]) {
                             case "DIALOG":
-                                layout.setVisibility(View.VISIBLE);
-                                layout.setHint("Texto del dialogo");
-                                dialog_text.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                                layout_dialog.setVisibility(View.VISIBLE);
                                 break;
                             case "WEB":
-                                layout.setVisibility(View.VISIBLE);
-                                layout.setHint("URL");
-                                dialog_text.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT);
+                                layout_web.setVisibility(View.VISIBLE);
                                 break;
-                            default:
-                                layout.setVisibility(View.GONE);
-                                break;
+                            case "DIALOG-WEB":
+                                layout_dialog.setVisibility(View.VISIBLE);
+                                layout_web.setVisibility(View.VISIBLE);
                         }
                     }
                 });
@@ -164,7 +168,7 @@ public class PushManager extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                layout.setError(null);
+                layout_dialog.setError(null);
             }
 
             @Override
@@ -204,7 +208,8 @@ public class PushManager extends AppCompatActivity {
         return new String[]{
                 "MAIN",
                 "DIALOG",
-                "WEB"
+                "WEB",
+                "DIALOG-WEB"
         };
     }
 
@@ -216,10 +221,12 @@ public class PushManager extends AppCompatActivity {
         cardView.setCardBackgroundColor(ThemeUtils.isAmoled(this) ? ColorsRes.Prim(this) : ColorsRes.Blanco(this));
         cardView_fast.setCardBackgroundColor(ThemeUtils.isAmoled(this) ? ColorsRes.Prim(this) : ColorsRes.Blanco(this));
         type.setTextColor(getTextColor());
+        test.setTextColor(getTextColor());
         title_fast.setTextColor(getTextColor());
         title.setHintTextColor(getTextColor());
         subtitle.setHintTextColor(getTextColor());
         dialog_text.setHintTextColor(getTextColor());
+        web_url.setHintTextColor(getTextColor());
     }
 
     public void setFast(View view) {
@@ -242,7 +249,8 @@ public class PushManager extends AppCompatActivity {
             public void run() {
                 spinner.setSelection(0, true);
                 title.setText("Aviso importante");
-                layout.setVisibility(View.GONE);
+                layout_dialog.setVisibility(View.GONE);
+                layout_web.setVisibility(View.GONE);
                 subtitle.requestFocus();
             }
         });
@@ -255,9 +263,7 @@ public class PushManager extends AppCompatActivity {
                 spinner.setSelection(1, true);
                 title.setText("Aviso importante");
                 subtitle.setText("Click para leer");
-                layout.setVisibility(View.VISIBLE);
-                layout.setHint("Texto del dialogo");
-                dialog_text.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                layout_dialog.setVisibility(View.VISIBLE);
                 dialog_text.requestFocus();
             }
         });
@@ -270,10 +276,8 @@ public class PushManager extends AppCompatActivity {
                 spinner.setSelection(2, true);
                 title.setText("Publicacion importante");
                 subtitle.setText("Click para abrir");
-                layout.setVisibility(View.VISIBLE);
-                layout.setHint("URL");
-                dialog_text.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT);
-                dialog_text.requestFocus();
+                layout_web.setVisibility(View.VISIBLE);
+                web_url.requestFocus();
             }
         });
     }
@@ -296,18 +300,31 @@ public class PushManager extends AppCompatActivity {
                 boolean isEmpty = dialog_text.getText().toString().trim().equals("");
                 Log.e("PushManager", "Dialog empty " + isEmpty);
                 if (isEmpty)
-                    layout.setError("EL mensaje no debe estar vacio");
+                    layout_dialog.setError("EL mensaje no debe estar vacio");
                 return !isEmpty;
             case "WEB":
-                boolean isValid = Patterns.WEB_URL.matcher(dialog_text.getText().toString().trim()).matches();
+                boolean isValid = Patterns.WEB_URL.matcher(web_url.getText().toString().trim()).matches();
                 if (!isValid) {
-                    layout.setError("URL invalida");
+                    layout_web.setError("URL invalida");
                 } else {
-                    String url = dialog_text.getText().toString().trim();
+                    String url = web_url.getText().toString().trim();
                     if (!url.startsWith("http://") && !url.startsWith("https://"))
-                        dialog_text.setText("http://" + url);
+                        web_url.setText("http://" + url);
                 }
                 return isValid;
+            case "DIALOG-WEB":
+                boolean dialog_valid = !dialog_text.getText().toString().trim().equals("");
+                boolean web_valid = Patterns.WEB_URL.matcher(web_url.getText().toString().trim()).matches();
+                if (!dialog_valid)
+                    layout_dialog.setError("EL mensaje no debe estar vacio");
+                if (!web_valid) {
+                    layout_web.setError("URL invalida");
+                } else {
+                    String url = web_url.getText().toString().trim();
+                    if (!url.startsWith("http://") && !url.startsWith("https://"))
+                        web_url.setText("http://" + url);
+                }
+                return dialog_valid && web_valid;
             default:
                 return true;
         }
@@ -322,7 +339,11 @@ public class PushManager extends AppCompatActivity {
                 object.put("text", dialog_text.getText().toString());
                 break;
             case "WEB":
-                object.put("url", dialog_text.getText().toString());
+                object.put("url", web_url.getText().toString());
+                break;
+            case "DIALOG-WEB":
+                object.put("text", dialog_text.getText().toString());
+                object.put("url", web_url.getText().toString());
                 break;
         }
         return object;
@@ -349,7 +370,11 @@ public class PushManager extends AppCompatActivity {
 
     private JSONArray getSegments() {
         JSONArray array = new JSONArray();
-        array.put("All");
+        if (test.isChecked()) {
+            array.put("Beta");
+        } else {
+            array.put("All");
+        }
         return array;
     }
 

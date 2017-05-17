@@ -118,6 +118,16 @@ public class Application extends MultiDexApplication {
                             intent.putExtras(bundle);
                             getApplicationContext().startActivity(intent);
                             break;
+                        case "DIALOG-WEB":
+                            Bundle bundle_web = new Bundle();
+                            bundle_web.putInt("key", FastActivity.SHOW_DIALOG);
+                            bundle_web.putString("content", data.getString("text"));
+                            bundle_web.putString("web", data.getString("url"));
+                            Intent intent_web = new Intent(getApplicationContext(), FastActivity.class);
+                            intent_web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent_web.putExtras(bundle_web);
+                            getApplicationContext().startActivity(intent_web);
+                            break;
                         case "MAIN":
                             Intent splash = new Intent(getApplicationContext(), Splash.class);
                             splash.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -128,6 +138,8 @@ public class Application extends MultiDexApplication {
                             web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             getApplicationContext().startActivity(web);
                             break;
+                        default:
+                            Toaster.toast("La accion " + data.getString("action") + " no esta disponible en esta version!!!");
                     }
                 }
             } catch (ActivityNotFoundException e) {
