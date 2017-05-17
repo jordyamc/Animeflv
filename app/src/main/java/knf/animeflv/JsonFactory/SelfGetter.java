@@ -123,7 +123,7 @@ public class SelfGetter {
                                     return;
                                 }
                             }
-                            asyncInterface.onFinish("null");
+                            asyncInterface.onFinish("null1");
                         } catch (Exception e) {
                             if (json.startsWith("error") && json.contains("503")) {
                                 asyncInterface.onFinish(json);
@@ -364,7 +364,7 @@ public class SelfGetter {
                     String state = getState(document.select("aside.SidebarA.BFixed").first().select("div").last().attr("class"));
                     String rate_stars = document.select("meta[itemprop='ratingValue']").first().attr("content");
                     String rate_count = document.select("meta[itemprop='ratingCount']").first().attr("content");
-                    Elements categories = document.select("div.Categories").first().select("a");
+                    Elements categories = document.select("nav.Nvgnrs").first().select("a");
                     String generos = "";
                     String gens = "";
                     for (Element gen : categories) {
@@ -378,24 +378,28 @@ public class SelfGetter {
                     String title = document.select("h1").first().text();
                     if (title.trim().equals("") || title.contains("protected"))
                         title = document.select("meta[property='og:title']").attr("content").replace(" Online", "");
-                    String sinopsis = Parser.InValidateSinopsis(document.select("div.Sect.Descrtn").first().select("p").first().text().trim());
+                    String sinopsis = Parser.InValidateSinopsis(document.select("div.Description").first().select("p").first().text().trim());
                     JSONArray array = new JSONArray();
                     try {
-                        Elements epis = document.select("ul.ListEpisodes").first().select("li");
+                        Elements epis = document.select("ul.ListCaps").first().select("li");
                         for (Element ep : epis) {
-                            JSONObject object = new JSONObject();
-                            String name = ep.select("a").first().ownText().trim();
-                            String num = name.replace(title, "").trim();
-                            String s_id = ep.select("a").first().attr("href").split("/")[2];
-                            if (num.contains(":")) {
-                                num = num.replace(" ", "").split(":")[0];
+                            String link = ep.select("a").first().attr("href");
+                            if (!link.trim().equals("#")) {
+                                JSONObject object = new JSONObject();
+                                String name = ep.select("a").first().select("p").first().ownText();
+                                String num = name.substring(name.lastIndexOf(" ")).trim();
+                                String s_id = ep.select("a").first().attr("href").split("/")[2];
+                                if (num.contains(":")) {
+                                    num = num.replace(" ", "").split(":")[0];
+                                }
+                                object.put("num", num);
+                                object.put("eid", aid + "_" + num + "E");
+                                object.put("sid", s_id);
+                                array.put(object);
                             }
-                            object.put("num", num);
-                            object.put("eid", aid + "_" + num + "E");
-                            object.put("sid", s_id);
-                            array.put(object);
                         }
                     } catch (Exception e) {
+                        e.printStackTrace();
                         Log.e("Get Anime Info", "No Ep List");
                     }
                     JSONArray j_rels = new JSONArray();

@@ -184,6 +184,8 @@ public class PushManager extends AppCompatActivity {
                             }
                         });
                         send();
+                    } else {
+                        Toaster.toast("Informacion invalida!!!");
                     }
                 } else {
                     Toaster.toast("Se necesita internet!!!");
@@ -281,6 +283,7 @@ public class PushManager extends AppCompatActivity {
     }
 
     private boolean isEmpty(EditText editText, TextInputLayout layout) {
+        Log.e("PushManager", "Empty Edit Text");
         boolean empty = editText.getText().toString().trim().equals("");
         if (empty)
             layout.setError("No debe estar vacio");
@@ -291,9 +294,10 @@ public class PushManager extends AppCompatActivity {
         switch (getTypes()[spinner.getSelectedItemPosition()]) {
             case "DIALOG":
                 boolean isEmpty = dialog_text.getText().toString().trim().equals("");
+                Log.e("PushManager", "Dialog empty " + isEmpty);
                 if (isEmpty)
                     layout.setError("EL mensaje no debe estar vacio");
-                return isEmpty;
+                return !isEmpty;
             case "WEB":
                 boolean isValid = Patterns.WEB_URL.matcher(dialog_text.getText().toString().trim()).matches();
                 if (!isValid) {
