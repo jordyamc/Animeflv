@@ -15,6 +15,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -50,6 +51,7 @@ import knf.animeflv.AutoEmision.AutoEmisionHelper;
 import knf.animeflv.AutoEmision.EmObj;
 import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.ColorsRes;
+import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.DownloadService.DownloaderService;
 import knf.animeflv.FavSyncro;
 import knf.animeflv.Favorites.FavoriteHelper;
@@ -66,6 +68,7 @@ import knf.animeflv.Suggestions.Algoritm.SuggestionHelper;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
@@ -101,6 +104,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     String global_json;
     boolean isInInfo = true;
     boolean infoSeted = false;
+    String status_string = "OK";
     private FragmentInfo fragmentInfo;
     private FragmentCaps fragmentCaps;
     private FragmentManager fragmentManager;
@@ -157,6 +161,13 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                         toogleFragments();
                     }
                 });
+            }
+        });
+        button.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toaster.toast(status_string);
+                return true;
             }
         });
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -297,7 +308,23 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 @Override
                 public void onFinish(String json) {
                     if (json.startsWith("error")) {
-                        json = OfflineGetter.getAnime(new ANIME(Integer.parseInt(aid)));
+                        switch (json.split(":")[1]) {
+                            case "404":
+                                Snackbar.make(layout, "Error en directorio", Snackbar.LENGTH_INDEFINITE)
+                                        .setAction("RECREAR", new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Keys.Dirs.CACHE_DIRECTORIO.delete();
+                                                finish();
+                                                startActivity(new Intent(InfoFragments.this, Directorio.class));
+                                            }
+                                        }).show();
+                                break;
+                            default:
+                                json = OfflineGetter.getAnime(new ANIME(Integer.parseInt(aid)));
+                                status_string = "CACHE";
+                                break;
+                        }
                     }
                     if (!json.equals("null")) {
                         global_json = json;

@@ -18,7 +18,7 @@ apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '26.0.0-rc1'
+    buildToolsVersion '26.0.0-rc2'
     defaultConfig {
         applicationId "knf.animeflv"
         minSdkVersion 17
@@ -108,6 +108,7 @@ dependencies {
     compile "com.android.support:leanback-v17:$project.g_apps"
     compile "com.android.support:recyclerview-v7:$project.g_apps"
     compile "com.android.support:cardview-v7:$project.g_apps"
+    compile "com.android.support:design:$project.g_apps"
     compile 'com.jakewharton:butterknife:8.4.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp:okhttp:2.4.0'

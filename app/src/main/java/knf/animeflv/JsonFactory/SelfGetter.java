@@ -426,9 +426,7 @@ public class SelfGetter {
                     OfflineGetter.backupJson(fobject, new File(OfflineGetter.animecache, anime.getAidString() + ".txt"));
                     asyncInterface.onFinish(fobject.toString());
                 } catch (HttpStatusException he) {
-                    if (he.getStatusCode() == 503) {
-                        asyncInterface.onFinish("error:503");
-                    }
+                    asyncInterface.onFinish("error:" + he.getStatusCode());
                 } catch (Exception e) {
                     asyncInterface.onFinish(OfflineGetter.getAnime(anime));
                     e.printStackTrace();

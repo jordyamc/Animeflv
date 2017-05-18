@@ -22,7 +22,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/build/intermediates/classes/debug" />
     <output-test url="file://$MODULE_DIR$/build/intermediates/classes/test/debug" />
     <exclude-output />
@@ -87,6 +87,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/multi-dex" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/pre-dexed" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/prebuild" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/proguard-rules" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
@@ -143,16 +144,15 @@
     <orderEntry type="library" exported="" name="okhttp-2.4.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-base-10.2.4" level="project" />
     <orderEntry type="library" exported="" name="bolts-tasks-1.4.0" level="project" />
-    <orderEntry type="library" exported="" name="android-gif-drawable-1.2.5" level="project" />
     <orderEntry type="library" exported="" name="support-core-ui-25.3.1" level="project" />
+    <orderEntry type="library" exported="" name="android-gif-drawable-1.2.5" level="project" />
     <orderEntry type="library" exported="" name="crashlytics-core-2.3.17" level="project" />
     <orderEntry type="library" exported="" name="renderscript-v8" level="project" />
     <orderEntry type="library" exported="" name="library-1.6.1" level="project" />
     <orderEntry type="library" exported="" name="firebase-iid-10.2.4" level="project" />
     <orderEntry type="library" exported="" name="palette-v7-25.3.1" level="project" />
-    <orderEntry type="library" exported="" name="glide-3.7.0" level="project" />
-    <orderEntry type="library" exported="" name="support-fragment-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-core-utils-25.3.1" level="project" />
+    <orderEntry type="library" exported="" name="support-fragment-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="exoplayer-r1.5.9" level="project" />
     <orderEntry type="library" exported="" name="library-2.1.4" level="project" />
     <orderEntry type="library" exported="" name="play-services-ads-10.2.4" level="project" />
@@ -198,12 +198,10 @@
     <orderEntry type="library" exported="" name="materialdrawer-5.9.0" level="project" />
     <orderEntry type="library" exported="" name="OneSignal-3.5.6" level="project" />
     <orderEntry type="library" exported="" name="play-services-basement-10.2.4" level="project" />
-    <orderEntry type="library" exported="" name="AmazonFling" level="project" />
     <orderEntry type="library" exported="" name="fab-1.6.4" level="project" />
     <orderEntry type="library" exported="" name="bolts-applinks-1.4.0" level="project" />
     <orderEntry type="library" exported="" name="nanohttpd-2.2.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-25.3.1" level="project" />
-    <orderEntry type="library" exported="" name="javax.jmdns_3.4.1-patch2" level="project" />
     <orderEntry type="library" exported="" name="exomedia-3.0.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-gcm-10.0.1" level="project" />
     <orderEntry type="library" exported="" name="gson-2.8.0" level="project" />
@@ -220,21 +218,24 @@
     <orderEntry type="library" exported="" name="library-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-ads-lite-10.2.4" level="project" />
     <orderEntry type="library" exported="" name="sdk-providers-1.9.2.1" level="project" />
-    <orderEntry type="library" exported="" name="java-websocket-1.3.1" level="project" />
     <orderEntry type="library" exported="" name="firebase-analytics-impl-10.2.4" level="project" />
     <orderEntry type="library" exported="" name="beta-1.2.5" level="project" />
     <orderEntry type="library" exported="" name="okio-1.11.0" level="project" />
     <orderEntry type="library" exported="" name="community-material-typeface-1.7.22.1" level="project" />
-    <orderEntry type="library" exported="" name="WhisperPlay" level="project" />
     <orderEntry type="library" exported="" name="utils-v4-1.6.1" level="project" />
     <orderEntry type="library" exported="" name="fastadapter-2.5.0" level="project" />
-    <orderEntry type="library" exported="" name="material-design-iconic-typeface-2.2.0.2" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-25.3.1" level="project" />
+    <orderEntry type="library" exported="" name="material-design-iconic-typeface-2.2.0.2" level="project" />
     <orderEntry type="library" exported="" name="debug-db-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="android-shape-imageview-0.9.3" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="android-async-http-1.4.9" level="project" />
     <orderEntry type="library" exported="" name="animated-vector-drawable-25.3.1" level="project" />
     <orderEntry type="module" module-name="multidisplaycast" exported="" />
+    <orderEntry type="library" exported="" name="glide-3.7.0" level="project" />
+    <orderEntry type="library" exported="" name="java-websocket-1.3.1" level="project" />
+    <orderEntry type="library" exported="" name="AmazonFling" level="project" />
+    <orderEntry type="library" exported="" name="WhisperPlay" level="project" />
+    <orderEntry type="library" exported="" name="javax.jmdns_3.4.1-patch2" level="project" />
   </component>
 </module>
