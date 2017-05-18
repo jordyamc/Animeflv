@@ -361,7 +361,7 @@ public class SelfGetter {
                     String imgUrl = document.select("div.Image").first().select("img[src]").first().attr("src");
                     String aid = imgUrl.substring(imgUrl.lastIndexOf("/") + 1, imgUrl.lastIndexOf("."));
                     String tid = document.select("div.Ficha").first().select("div.Container").first().select("span").first().attr("class");
-                    String state = getState(document.select("aside.SidebarA.BFixed").first().select("div").last().attr("class"));
+                    String state = getState(document.select("aside.SidebarA.BFixed").first().select("p").last().attr("class"));
                     String rate_stars = document.select("meta[itemprop='ratingValue']").first().attr("content");
                     String rate_count = document.select("meta[itemprop='ratingCount']").first().attr("content");
                     Elements categories = document.select("nav.Nvgnrs").first().select("a");
@@ -381,22 +381,10 @@ public class SelfGetter {
                     String sinopsis = Parser.InValidateSinopsis(document.select("div.Description").first().select("p").first().text().trim());
                     JSONArray array = new JSONArray();
                     try {
-                        Elements epis = document.select("ul.ListCaps").first().select("li");
-                        for (Element ep : epis) {
-                            String link = ep.select("a").first().attr("href");
-                            if (!link.trim().equals("#")) {
-                                JSONObject object = new JSONObject();
-                                String name = ep.select("a").first().select("p").first().ownText();
-                                String num = name.substring(name.lastIndexOf(" ")).trim();
-                                String s_id = ep.select("a").first().attr("href").split("/")[2];
-                                if (num.contains(":")) {
-                                    num = num.replace(" ", "").split(":")[0];
-                                }
-                                object.put("num", num);
-                                object.put("eid", aid + "_" + num + "E");
-                                object.put("sid", s_id);
-                                array.put(object);
-                            }
+                        try {
+                            tryNewEpMethod(document, aid, array);
+                        } catch (NullPointerException e) {
+                            tryOldEpMethod(document, aid, title, array);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -404,26 +392,28 @@ public class SelfGetter {
                     }
                     JSONArray j_rels = new JSONArray();
                     try {
-                        Elements rels = document.select("ul.ListAnimRela").first().select("li");
+                        Elements rels = document.select("ul.ListAnmRel").first().select("li");
                         for (Element rel : rels) {
                             //FIXME: Buscar diferencia de Precuela/Secuela
                             //String t_tid = rel.select("b").first().ownText();
-                            Element link = rel.select("a").get(1);
+                            Element link = rel.select("a").first();
                             String full_link = "http://animeflv.net" + link.attr("href");
                             String name = link.ownText();
-                            String type = rel.select("span").first().attr("class");
-                            Document t_document = Jsoup.connect(full_link).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get();
+                            String t_rel_t = rel.ownText();
+                            String type = t_rel_t.substring(t_rel_t.indexOf("(") + 1, t_rel_t.lastIndexOf(")")).trim();
+                            Document t_document = Jsoup.connect(full_link).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
                             String t_imgUrl = t_document.select("div.Image").first().select("img[src]").first().attr("src");
                             String t_aid = t_imgUrl.substring(t_imgUrl.lastIndexOf("/") + 1, t_imgUrl.lastIndexOf("."));
+                            String rel_t = t_document.select("div.Ficha").first().select("div.Container").first().select("span").first().attr("class");
                             JSONObject object = new JSONObject();
                             object.put("aid", t_aid);
-                            object.put("tid", type);
+                            object.put("tid", rel_t);
                             object.put("titulo", name);
-                            object.put("rel_tipo", "");
+                            object.put("rel_tipo", type);
                             j_rels.put(object);
                         }
                     } catch (Exception e) {
-                        //e.printStackTrace();
+                        e.printStackTrace();
                         Log.e("Get Anime Info", "No Rel List");
                     }
                     JSONObject fobject = new JSONObject();
@@ -452,6 +442,43 @@ public class SelfGetter {
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    public static void tryNewEpMethod(Document document, String aid, JSONArray array) throws Exception {
+        Elements epis = document.select("ul.ListCaps").first().select("li");
+        for (Element ep : epis) {
+            String link = ep.select("a").first().attr("href");
+            if (!link.trim().equals("#")) {
+                JSONObject object = new JSONObject();
+                String name = ep.select("a").first().select("p").first().ownText();
+                String num = name.substring(name.lastIndexOf(" ")).trim();
+                String s_id = ep.select("a").first().attr("href").split("/")[2];
+                if (num.contains(":")) {
+                    num = num.replace(" ", "").split(":")[0];
+                }
+                object.put("num", num);
+                object.put("eid", aid + "_" + num + "E");
+                object.put("sid", s_id);
+                array.put(object);
+            }
+        }
+    }
+
+    public static void tryOldEpMethod(Document document, String aid, String title, JSONArray array) throws Exception {
+        Elements epis = document.select("ul.ListEpisodes").first().select("li");
+        for (Element ep : epis) {
+            JSONObject object = new JSONObject();
+            String name = ep.select("a").first().ownText().trim();
+            String num = name.replace(title, "").trim();
+            String s_id = ep.select("a").first().attr("href").split("/")[2];
+            if (num.contains(":")) {
+                num = num.replace(" ", "").split(":")[0];
+            }
+            object.put("num", num);
+            object.put("eid", aid + "_" + num + "E");
+            object.put("sid", s_id);
+            array.put(object);
+        }
     }
 
     public static void getDir(Context context) {
@@ -668,12 +695,13 @@ public class SelfGetter {
     }
 
     private static String getState(String className) {
-        if (className.contains("On")) {
-            return "0000-00-00";
-        } else if (className.contains("Off")) {
-            return "1";
-        } else {
-            return "prox";
+        switch (className) {
+            case "AnmStts":
+                return "0000-00-00";
+            case "AnmStts A":
+                return "1";
+            default:
+                return "prox";
         }
     }
 

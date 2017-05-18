@@ -370,6 +370,17 @@ public class Parser {
         }
     }
 
+    public static String getType(String tid) {
+        switch (tid) {
+            case "Type tv":
+                return "Anime";
+            case "Type ova":
+                return "OVA";
+            default:
+                return "Pelicula";
+        }
+    }
+
     /*public static String getCap(String tid, String num, boolean more) {
         switch (tid) {
             case "Anime":
@@ -627,8 +638,8 @@ public class Parser {
                 JSONObject childJSONObject = jsonArray.getJSONObject(i);
                 String rel_tipo = childJSONObject.getString("rel_tipo");
                 String tid = childJSONObject.getString("tid");
-                //eidsArray.add(rel_tipo + " - " + tid);
-                eidsArray.add(getTid(tid));
+                eidsArray.add(rel_tipo + " - " + getType(tid));
+                //eidsArray.add(getTid(tid));
             }
         } catch (Exception e) {
             e.printStackTrace();
