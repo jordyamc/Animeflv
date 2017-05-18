@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 
 import org.json.JSONArray;
@@ -217,21 +218,24 @@ public class SelfGetter {
             aid = link.substring(link.lastIndexOf("/") + 1, link.lastIndexOf("."));
             eid = aid + "_" + num + "E";
             Elements descargas = main.select("a.Button.Sm.fa-download");
-            if (descargas.outerHtml().contains("zippyshare")) {
-                for (Element e : descargas) {
-                    String z = e.attr("href");
-                    z = z.substring(z.lastIndexOf("http"));
-                    if (z.contains("zippyshare")) {
-                        try {
-                            z = URLDecoder.decode(z, "utf-8");
-                            Document zi = Jsoup.connect(z).timeout(TIMEOUT).get();
-                            String t = zi.select("meta[property='og:title']").attr("content");
-                            if (!t.trim().equals(""))
-                                zippy = z;
-                        } catch (Exception ze) {
-                            ze.printStackTrace();
-                        }
-                        break;
+            for (Element e : descargas) {
+                String z = e.attr("href");
+                z = z.substring(z.lastIndexOf("http"));
+                if (z.contains("zippyshare")) {
+                    try {
+                        z = URLDecoder.decode(z, "utf-8");
+                        Document zi = Jsoup.connect(z).timeout(TIMEOUT).get();
+                        String t = zi.select("meta[property='og:title']").attr("content");
+                        if (!t.trim().equals(""))
+                            zippy = z;
+                    } catch (Exception ze) {
+                        ze.printStackTrace();
+                    }
+                } else if (z.contains("mega.nz")) {
+                    try {
+                        mega = URLDecoder.decode(z, "utf-8");
+                    } catch (Exception zee) {
+                        zee.printStackTrace();
                     }
                 }
             }
@@ -288,17 +292,6 @@ public class SelfGetter {
                         }
                     } catch (Exception e) {
                         Log.e("Yotta", "Error getting Yotta: " + down_link.replace("embed", "check"));
-                    }
-                } else if (el.contains("https://mega.nz")) {
-                    String[] p = el.split("\",\"");
-                    for (String r : p) {
-                        if (r.contains("https://mega.nz")) {
-                            try {
-                                mega = r.substring(r.indexOf("https://mega.nz"), r.indexOf("\\\" "));
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
                     }
                 } else if (el.contains("server=minhateca")) {
                     String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
@@ -388,6 +381,7 @@ public class SelfGetter {
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
+                        Crashlytics.logException(e);
                         Log.e("Get Anime Info", "No Ep List");
                     }
                     JSONArray j_rels = new JSONArray();
@@ -444,7 +438,7 @@ public class SelfGetter {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
-    public static void tryNewEpMethod(Document document, String aid, JSONArray array) throws Exception {
+    private static void tryNewEpMethod(Document document, String aid, JSONArray array) throws Exception {
         Elements epis = document.select("ul.ListCaps").first().select("li");
         for (Element ep : epis) {
             String link = ep.select("a").first().attr("href");
@@ -464,7 +458,7 @@ public class SelfGetter {
         }
     }
 
-    public static void tryOldEpMethod(Document document, String aid, String title, JSONArray array) throws Exception {
+    private static void tryOldEpMethod(Document document, String aid, String title, JSONArray array) throws Exception {
         Elements epis = document.select("ul.ListEpisodes").first().select("li");
         for (Element ep : epis) {
             JSONObject object = new JSONObject();
