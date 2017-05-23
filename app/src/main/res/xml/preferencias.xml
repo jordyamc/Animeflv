@@ -68,6 +68,10 @@
             android:title="Comprobar actualizaciones"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Busqueda">
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="use_tags"
+            android:title="Activar busqueda por generos" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_busqueda"

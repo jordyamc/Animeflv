@@ -352,7 +352,7 @@
         <activity android:name=".TV.Main"/>
         <activity
             android:name=".AdminControl.PushManager"
-            android:configChanges="orientation|screenSize|keyboard"/>
+            android:configChanges="orientation|screenSize|keyboard" />
 
         <service
             android:name=".Tile.QuickSetting"

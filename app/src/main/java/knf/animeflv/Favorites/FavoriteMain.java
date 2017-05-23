@@ -187,50 +187,54 @@ public class FavoriteMain extends AppCompatActivity {
     }
 
     private void setAdapter(FavoriteAdapter favoriteAdapter) {
-        dragDropManager = new RecyclerViewDragDropManager();
-        dragDropManager.setInitiateOnLongPress(true);
-        dragDropManager.setInitiateOnMove(false);
-        dragDropManager.setDraggingItemShadowDrawable(
-                (NinePatchDrawable) ContextCompat.getDrawable(this, R.drawable.material_shadow_z3));
-        adapter = favoriteAdapter;
-        wraped = dragDropManager.createWrappedAdapter(favoriteAdapter);
-        final GeneralItemAnimator animator = new DraggableItemAnimator();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                recyclerView.setLayoutManager(new LinearLayoutManager(FavoriteMain.this));
-                recyclerView.setAdapter(wraped);
-                recyclerView.setItemAnimator(animator);
+        try {
+            dragDropManager = new RecyclerViewDragDropManager();
+            dragDropManager.setInitiateOnLongPress(true);
+            dragDropManager.setInitiateOnMove(false);
+            dragDropManager.setDraggingItemShadowDrawable(
+                    (NinePatchDrawable) ContextCompat.getDrawable(this, R.drawable.material_shadow_z3));
+            adapter = favoriteAdapter;
+            wraped = dragDropManager.createWrappedAdapter(favoriteAdapter);
+            final GeneralItemAnimator animator = new DraggableItemAnimator();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    recyclerView.setLayoutManager(new LinearLayoutManager(FavoriteMain.this));
+                    recyclerView.setAdapter(wraped);
+                    recyclerView.setItemAnimator(animator);
 
-                try {
-                    if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
-                        recyclerView.addItemDecoration(new ItemShadowDecorator((NinePatchDrawable) ContextCompat.getDrawable(FavoriteMain.this, R.drawable.material_shadow_z1)));
+                    try {
+                        if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
+                            recyclerView.addItemDecoration(new ItemShadowDecorator((NinePatchDrawable) ContextCompat.getDrawable(FavoriteMain.this, R.drawable.material_shadow_z1)));
+                        }
+                        dragDropManager.attachRecyclerView(recyclerView);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    dragDropManager.attachRecyclerView(recyclerView);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if (PreferenceManager.getDefaultSharedPreferences(FavoriteMain.this).getBoolean("section_favs", false)) {
-                    if (search_opened) {
-                        button.setVisibility(View.GONE);
-                    } else {
-                        button.setVisibility(View.VISIBLE);
-                        button.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (adapter.isEditing()) {
-                                    button.setImageResource(R.drawable.move);
-                                    adapter.setEditing(false);
-                                } else {
-                                    button.setImageResource(R.drawable.check);
-                                    adapter.setEditing(true);
+                    if (PreferenceManager.getDefaultSharedPreferences(FavoriteMain.this).getBoolean("section_favs", false)) {
+                        if (search_opened) {
+                            button.setVisibility(View.GONE);
+                        } else {
+                            button.setVisibility(View.VISIBLE);
+                            button.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if (adapter.isEditing()) {
+                                        button.setImageResource(R.drawable.move);
+                                        adapter.setEditing(false);
+                                    } else {
+                                        button.setImageResource(R.drawable.check);
+                                        adapter.setEditing(true);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 }
-            }
-        });
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void startAsync() {

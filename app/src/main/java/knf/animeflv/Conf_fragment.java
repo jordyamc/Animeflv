@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
@@ -25,6 +26,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
@@ -39,6 +41,7 @@ import java.util.Locale;
 
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.CustomSettingsIntro.CustomIntro;
+import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.LoginActivity.LoginBase;
 import knf.animeflv.LoginActivity.LoginUser;
 import knf.animeflv.SDControl.SDManager;
@@ -648,7 +651,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
         Log.d("Preference", key);
         switch (key) {
             case "notificaciones":
@@ -785,6 +788,34 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                     }
                 }
                 break;
+            case "use_tags":
+                if (sharedPreferences.getBoolean(key, false))
+                    new MaterialDialog.Builder(getActivity())
+                            .content("Activar esta opcion requiere recrear el directorio, por los nuevos cambios de la pagina se tardara mas tiempo de lo normal (hasta 10 minutos dependiendo de la velocidad del internet)")
+                            .positiveText("ACTIVAR")
+                            .negativeText("CANCELAR")
+                            .canceledOnTouchOutside(true)
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    Keys.Dirs.CACHE_DIRECTORIO.delete();
+                                    getActivity().startActivity(new Intent(getActivity(), Directorio.class));
+                                }
+                            })
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    sharedPreferences.edit().putBoolean(key, false).apply();
+                                    ((com.lb.material_preferences_library.custom_preferences.SwitchPreference) getPreferenceScreen().findPreference(key)).setChecked(false);
+                                }
+                            })
+                            .cancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    sharedPreferences.edit().putBoolean(key, false).apply();
+                                    ((com.lb.material_preferences_library.custom_preferences.SwitchPreference) getPreferenceScreen().findPreference(key)).setChecked(false);
+                                }
+                            }).build().show();
         }
     }
 

@@ -98,7 +98,7 @@ public class StateActivity extends AppCompatActivity {
         cardView_bypass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(StateActivity.this, DebugBypass.class));
+                startActivityForResult(new Intent(StateActivity.this, DebugBypass.class), 55878);
             }
         });
         cardView_bypass.setOnLongClickListener(new View.OnLongClickListener() {
@@ -250,5 +250,11 @@ public class StateActivity extends AppCompatActivity {
             default:
                 return ColorsRes.Rojo(this);
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        checkBypass();
     }
 }

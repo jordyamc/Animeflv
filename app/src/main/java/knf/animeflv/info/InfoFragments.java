@@ -175,7 +175,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                onBackPressed();
             }
         });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
@@ -664,7 +664,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         if (!isInInfo) {
             toogleFragments();
         } else {
-            finish();
+            super.onBackPressed();
         }
     }
 

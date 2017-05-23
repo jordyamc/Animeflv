@@ -263,6 +263,8 @@ public class Directorio extends AppCompatActivity {
                 }
             }
         });
+        if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("use_tags", false))
+            genero.hideButtonInMenu(true);
     }
 
     private void initAsync(final String json) {
@@ -940,7 +942,8 @@ public class Directorio extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
+        if (loaded)
+            finish();
     }
 
     @Override

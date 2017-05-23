@@ -473,7 +473,7 @@ public class SelfGetter {
         }
     }
 
-    public static void getDir(Context context) {
+    public static void getDir(final Context context, @Nullable final BaseGetter.AsyncProgressInterface asyncInterface) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -491,98 +491,20 @@ public class SelfGetter {
                     }
                     JSONObject last_obj = null;
                     if (array.length() > 0) {
-                        Document init = Jsoup.connect("http://animeflv.net/browse?order=added").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
-                        Element last = init.select("article").first();
-                        last_obj = array.getJSONObject(0);
-                        String last_url = last.select("img[src]").first().attr("src");
-                        String last_aid = last_url.substring(last_url.lastIndexOf("/") + 1, last_url.lastIndexOf("."));
-                        if (last_aid.equals(last_obj.getString("a"))) {
-                            Log.e("Dir DEBUG", "Dir up to date | Animes: " + array.length());
-                            return null;
-                        }
-                    }
-                    //Log.e("Dir DEBUG", "Start updating Dir | Dir: " + array.length());
-                    Document init = Jsoup.connect("http://animeflv.net/browse?order=added&page=1").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
-                    Elements pages = init.select("ul.pagination").first().select("a");
-                    Element last_page = pages.get(pages.size() - 2);
-                    JSONArray new_array = new JSONArray();
-                    int last = Integer.parseInt(last_page.ownText().trim());
-                    // Log.e("Dir DEBUG", "Last Page: " + last);
-                    for (int index = 1; index <= last; index++) {
-                        Document page = Jsoup.connect("http://animeflv.net/browse?order=added&page=" + index).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
-                        Elements animes = page.select("article");
-                        for (Element element : animes) {
-                            String img = element.select("img[src]").first().attr("src");
-                            String a = img.substring(img.lastIndexOf("/") + 1, img.lastIndexOf("."));
-                            if (last_obj != null && a.equals(last_obj.getString("a"))) {
-                                //Log.e("Dir DEBUG", "Stop loading at AID: " + a);
-                                mergeLists(current, array, new_array);
+                        try {
+                            Document init = Jsoup.connect("http://animeflv.net/browse?order=added").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
+                            Element last = init.select("article").first();
+                            last_obj = array.getJSONObject(0);
+                            String last_url = last.select("img[src]").first().attr("src");
+                            String last_aid = last_url.substring(last_url.lastIndexOf("/") + 1, last_url.lastIndexOf("."));
+                            if (last_aid.equals(last_obj.getString("a"))) {
+                                Log.e("Dir DEBUG", "Dir up to date | Animes: " + array.length());
+                                if (asyncInterface != null)
+                                    asyncInterface.onFinish(current.toString());
                                 return null;
                             }
-                            Element info = element.select("h3.Title").first().select("a").first();
-                            String b = info.ownText();
-                            String c = getType(element.select("span").first().attr("class"));
-                            String link = info.attr("href");
-                            String[] semi = link.split("/");
-                            String d = semi[3];
-                            String e = semi[2];
-                            String f = "";
-                            String gens = "";
-                            for (Element g : element.select("div.Tags").last().select("a")) {
-                                gens += g.ownText().trim();
-                                gens += ", ";
-                            }
-                            if (!gens.equals(""))
-                                f = gens.substring(0, gens.lastIndexOf(","));
-                            if (b.trim().equals(""))
-                                b = Jsoup.connect("http://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get().select("meta[property='og:title']").first().attr("content").replace(" Capítulos Online", "").replace(" Ver ", "").trim();
-                            JSONObject object = new JSONObject();
-                            object.put("a", a);
-                            object.put("b", b);
-                            object.put("c", c);
-                            object.put("d", d);
-                            object.put("e", e);
-                            object.put("f", f);
-                            new_array.put(object);
-                            //Log.e("Dir DEBUG", "ADD: \na: " + a + " \nb: " + b + " \nc: " + c + " \nd: " + d + " \ne: " + e + " \nf: " + f + " \nPage: " + index);
-                        }
-                    }
-                    mergeLists(current, array, new_array);
-                    return null;
-                } catch (Exception e) {
-                    //Log.e("Dir DEBUG", "Error loading dir", e);
-                    CrashlyticsCore.getInstance().logException(e);
-                }
-                return null;
-            }
-        }.executeOnExecutor(ExecutorManager.getExecutor());
-    }
-
-    static void getDir(Context context, @Nullable final BaseGetter.AsyncProgressInterface asyncInterface) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    JSONObject current;
-                    JSONArray array = new JSONArray();
-                    try {
-                        current = new JSONObject(OfflineGetter.getDirectorio());
-                        current.getBoolean("verified");
-                        array = current.getJSONArray("lista");
-                    } catch (Exception e) {
-                        current = new JSONObject();
-                        current.put("verified", true);
-                        current.put("lista", array);
-                    }
-                    JSONObject last_obj = null;
-                    if (array.length() > 0) {
-                        Document init = Jsoup.connect("http://animeflv.net/browse?order=added").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
-                        Element last = init.select("article").first();
-                        last_obj = array.getJSONObject(0);
-                        String last_url = last.select("img[src]").first().attr("src");
-                        String last_aid = last_url.substring(last_url.lastIndexOf("/") + 1, last_url.lastIndexOf("."));
-                        if (last_aid.equals(last_obj.getString("a"))) {
-                            Log.e("Dir DEBUG", "Dir up to date | Animes: " + array.length());
+                        } catch (Exception e) {
+                            Log.e("Dir DEBUG", "Dir Error Cancel", e);
                             if (asyncInterface != null)
                                 asyncInterface.onFinish(current.toString());
                             return null;
@@ -609,21 +531,28 @@ public class SelfGetter {
                                 mergeLists(current, array, new_array, asyncInterface);
                                 return null;
                             }
-                            Element info = element.select("h3.Title").first().select("a").first();
+                            Element info = element.select("h3.Title").first();
                             String b = info.ownText();
                             String c = getType(element.select("span").first().attr("class"));
-                            String link = info.attr("href");
+                            String link = element.select("a").first().attr("href");
                             String[] semi = link.split("/");
                             String d = semi[3];
                             String e = semi[2];
                             String f = "";
                             String gens = "";
-                            for (Element g : element.select("div.Tags").last().select("a")) {
-                                gens += g.ownText().trim();
-                                gens += ", ";
-                            }
-                            if (!gens.equals(""))
-                                f = gens.substring(0, gens.lastIndexOf(","));
+                            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_tags", false))
+                                try {
+                                    Document tags = Jsoup.connect("http://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
+                                    for (Element g : tags.select("nav.Nvgnrs").first().select("a")) {
+                                        gens += g.ownText().trim();
+                                        gens += ", ";
+                                    }
+                                    if (!gens.equals(""))
+                                        f = gens.substring(0, gens.lastIndexOf(","));
+                                    Log.e("Dir DEBUG", "Tags: " + f);
+                                } catch (NullPointerException nog) {
+                                    Log.e("Dir DEBUG", "No Tags");
+                                }
                             if (b.trim().equals(""))
                                 b = Jsoup.connect("http://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get().select("meta[property='og:title']").first().attr("content").replace(" Capítulos Online", "").replace(" Ver ", "").trim();
                             JSONObject object = new JSONObject();
@@ -643,7 +572,7 @@ public class SelfGetter {
                     mergeLists(current, array, new_array, asyncInterface);
                     return null;
                 } catch (Exception e) {
-                    //Log.e("Dir DEBUG", "Error loading dir", e);
+                    Log.e("Dir DEBUG", "Error loading dir", e);
                     CrashlyticsCore.getInstance().logException(e);
                     String dir = OfflineGetter.getDirectorio();
                     if (asyncInterface != null)

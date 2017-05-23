@@ -241,14 +241,55 @@ public class newMain extends AppCompatActivity implements
         };
         prefs.registerOnSharedPreferenceChangeListener(listener);
         if (!DirFile.exists()) {
-            SelfGetter.getDir(this);
+            blockToUpdateDir();
         } else if (!FileUtil.isJSONValid(FileUtil.getStringFromFile(DirFile))) {
             DirFile.delete();
-            SelfGetter.getDir(this);
+            blockToUpdateDir();
         }
         IntentFilter filter = new IntentFilter();
         filter.addAction(DownloaderService.RECEIVER_ACTION_ERROR);
         registerReceiver(getReceiver(), filter);
+    }
+
+    private void blockToUpdateDir() {
+        final MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .progress(true, 0)
+                .content("Creando directorio...\n\nAgregados: 0")
+                .cancelable(false)
+                .build();
+        dialog.show();
+        SelfGetter.getDir(this, new BaseGetter.AsyncProgressInterface() {
+            @Override
+            public void onFinish(String json) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                    }
+                });
+            }
+
+            @Override
+            public void onProgress(final int progress) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.setContent("Creando directorio...\n\nAgregados: " + progress);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                        Toaster.toast("Error al crear directorio!!!");
+                    }
+                });
+            }
+        });
     }
 
     private BroadcastReceiver getReceiver() {

@@ -27,6 +27,7 @@ import java.util.Random;
 import javax.net.ssl.SSLException;
 
 import knf.animeflv.Errors.NoInternetException;
+import knf.animeflv.Errors.NoInternetFoundException;
 import knf.animeflv.Errors.NoSDAccessDetectedException;
 import knf.animeflv.Errors.NoSpaceException;
 import knf.animeflv.Errors.WrongAccessPermissionException;
@@ -106,7 +107,7 @@ public class DownloaderService extends IntentService {
                 if (preferences.getLong(eid + "_downloadID", -1) != downloadID)
                     throw new DownloadCanceledException(String.valueOf(downloadID));
                 if (!NetworkUtils.isNetworkAvailable())
-                    throw new IllegalStateException();
+                    throw new NoInternetFoundException(null);
                 total += count;
                 int tprog = (int) ((total * 100) / lenghtOfFile);
                 if (tprog > prog) {
@@ -138,6 +139,9 @@ public class DownloaderService extends IntentService {
             onDownloadFailed(eid, intent, CAUSE_NO_SPACE);
         } catch (ProtocolException pe) {
             Log.e("DownloadService", pe.getMessage());
+            onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
+        } catch (NoInternetFoundException nife) {
+            Log.e("DownloadService", nife.getMessage());
             onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
         } catch (SSLException ssl) {
             Log.e("DownloadService", ssl.getMessage());

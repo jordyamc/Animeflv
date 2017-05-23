@@ -23,8 +23,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 208
-        versionName "4.8.9"
+        versionCode 209
+        versionName "4.9"
         multiDexEnabled = true
     }
     buildTypes {
@@ -60,6 +60,10 @@ android {
         }
     }
     productFlavors {
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 allprojects {
@@ -139,8 +143,8 @@ dependencies {
     compile 'agency.tango.android:material-intro-screen:0.0.5'
     compile 'org.adw.library:discrete-seekbar:1.0.1'
     compile 'com.github.daniel-stoneuk:material-about-library:1.7.1'
-    compile 'com.google.android.gms:play-services-analytics:10.2.4'
-    compile 'com.google.android.gms:play-services-ads:10.2.4'
+    compile 'com.google.android.gms:play-services-analytics:10.2.6'
+    compile 'com.google.android.gms:play-services-ads:10.2.6'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'me.zhanghai.android.materialratingbar:library:1.0.2'
     compile 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
@@ -149,9 +153,6 @@ dependencies {
     compile ('com.github.ViksaaSkool:AwesomeSplash:v1.0.0'){
         exclude module: 'CircularReveal'
     }
-//    compile ('com.github.ozodrukh:CircularReveal:2.0.1@aar') {
-//        transitive = true
-//    }
     compile('io.branch.sdk.android:library:2.+') {
         exclude module: 'answers-shim'
     }

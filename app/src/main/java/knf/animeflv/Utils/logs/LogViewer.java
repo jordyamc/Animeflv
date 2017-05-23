@@ -191,6 +191,7 @@ public class LogViewer extends AppCompatActivity {
         new AsyncHttpClient().post(new Parser().getBaseUrl(TaskType.NORMAL, this) + "logs.php?correo=" + correoS + "&info=" + getPhoneInfo(), params, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                if (throwable.getMessage() != null && throwable.getMessage().trim().length() > 0)
                 Log.d("Upload", throwable.getMessage());
             }
 
