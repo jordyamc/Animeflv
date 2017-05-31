@@ -207,7 +207,8 @@ public class SelfGetter {
         String Yotta720 = "null";
         String Yotta480 = "null";
         String Yotta360 = "null";
-        String[] names = new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 720p", "Yotta 480p", "Yotta 360p", "Mp4Upload", "YourUpload", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
+        String Clup = "null";
+        String[] names = new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 720p", "Yotta 480p", "Yotta 360p", "Clup", "Mp4Upload", "YourUpload", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
         try {
             Log.e("Url", url);
             Document main = Jsoup.connect(url).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(TIMEOUT).get();
@@ -293,6 +294,12 @@ public class SelfGetter {
                     } catch (Exception e) {
                         Log.e("Yotta", "Error getting Yotta: " + down_link.replace("embed", "check"));
                     }
+                } else if (el.contains("cldup.com")) {
+                    try {
+                        Clup = el.substring(el.indexOf("https://cldup.com"), el.lastIndexOf(".mp4") + 4);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 } else if (el.contains("server=minhateca")) {
                     String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
                     String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
@@ -322,7 +329,7 @@ public class SelfGetter {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String[] links = new String[]{izanagi, mina, Yotta, Yotta720, Yotta480, Yotta360, mp4upload, yourupload, zippy, sync, mega, aflv, maru};
+        String[] links = new String[]{izanagi, mina, Yotta, Yotta720, Yotta480, Yotta360, Clup, mp4upload, yourupload, zippy, sync, mega, aflv, maru};
         try {
             JSONObject object = new JSONObject();
             object.put("version", context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName + "-Internal_Api");
@@ -510,13 +517,11 @@ public class SelfGetter {
                             return null;
                         }
                     }
-                    //Log.e("Dir DEBUG", "Start updating Dir | Dir: " + array.length());
                     Document init = Jsoup.connect("http://animeflv.net/browse?order=added&page=1").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
                     Elements pages = init.select("ul.pagination").first().select("a");
                     Element last_page = pages.get(pages.size() - 2);
                     JSONArray new_array = new JSONArray();
                     int last = Integer.parseInt(last_page.ownText().trim());
-                    // Log.e("Dir DEBUG", "Last Page: " + last);
                     int progress = 0;
                     if (asyncInterface != null)
                         asyncInterface.onProgress(0);
@@ -527,7 +532,6 @@ public class SelfGetter {
                             String img = element.select("img[src]").first().attr("src");
                             String a = img.substring(img.lastIndexOf("/") + 1, img.lastIndexOf("."));
                             if (last_obj != null && a.equals(last_obj.getString("a"))) {
-                                //Log.e("Dir DEBUG", "Stop loading at AID: " + a);
                                 mergeLists(current, array, new_array, asyncInterface);
                                 return null;
                             }
@@ -566,7 +570,6 @@ public class SelfGetter {
                             progress++;
                             if (asyncInterface != null)
                                 asyncInterface.onProgress(progress);
-                            //Log.e("Dir DEBUG", "ADD: \na: " + a + " \nb: " + b + " \nc: " + c + " \nd: " + d + " \ne: " + e + " \nf: " + f + " \nPage: " + index);
                         }
                     }
                     mergeLists(current, array, new_array, asyncInterface);
@@ -600,8 +603,9 @@ public class SelfGetter {
         OfflineGetter.backupJsonSync(object, OfflineGetter.directorio);
     }
 
-    private static void mergeLists(JSONObject object, JSONArray old_list, JSONArray new_list, BaseGetter.AsyncProgressInterface asyncInterface) throws JSONException {
-        asyncInterface.onProgress(-1);
+    private static void mergeLists(JSONObject object, JSONArray old_list, JSONArray new_list, @Nullable BaseGetter.AsyncProgressInterface asyncInterface) throws JSONException {
+        if (asyncInterface != null)
+            asyncInterface.onProgress(-1);
         Log.e("Dir DEBUG", "In Dir: " + old_list.length() + " Added: " + new_list.length());
         if (new_list.length() > 0) {
             for (int i = 0; i < old_list.length(); i++) {
@@ -612,7 +616,8 @@ public class SelfGetter {
             object.put("lista", old_list);
         }
         OfflineGetter.backupJsonSync(object, OfflineGetter.directorio);
-        asyncInterface.onFinish(object.toString());
+        if (asyncInterface != null)
+            asyncInterface.onFinish(object.toString());
     }
 
     private static String getState(String className) {

@@ -366,134 +366,145 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     }
 
     private void searchDownload(final ViewHolder holder) {
-        DownloadGetter.search(context, eids.get(holder.getAdapterPosition()), new DownloadGetter.ActionsInterface() {
-            @Override
-            public boolean isStream() {
-                return false;
-            }
+        try {
+            DownloadGetter.search(context, eids.get(holder.getAdapterPosition()), new DownloadGetter.ActionsInterface() {
+                @Override
+                public boolean isStream() {
+                    return false;
+                }
 
-            @Override
-            public void onStartDownload() {
-                showDelete(holder.ib_des);
-                showPlay(holder.ib_ver);
-            }
+                @Override
+                public void onStartDownload() {
+                    showDelete(holder.ib_des);
+                    showPlay(holder.ib_ver);
+                }
 
-            @Override
-            public void onStartZippy(final String url) {
-                zippyHelper.calculate(url, new zippyHelper.OnZippyResult() {
-                    @Override
-                    public void onSuccess(zippyHelper.zippyObject object) {
-                        MainStates.setProcessing(false, null);
-                        showDelete(holder.ib_des);
-                        showPlay(holder.ib_ver);
-                        ManageDownload.chooseDownDir(context, eids.get(holder.getAdapterPosition()), object.download_url, object.cookieConstructor);
-                    }
+                @Override
+                public void onStartZippy(final String url) {
+                    zippyHelper.calculate(url, new zippyHelper.OnZippyResult() {
+                        @Override
+                        public void onSuccess(zippyHelper.zippyObject object) {
+                            MainStates.setProcessing(false, null);
+                            showDelete(holder.ib_des);
+                            showPlay(holder.ib_ver);
+                            ManageDownload.chooseDownDir(context, eids.get(holder.getAdapterPosition()), object.download_url, object.cookieConstructor);
+                        }
 
-                    @Override
-                    public void onError() {
-                        Toaster.toast("Error al obtener link, reintentando en modo nativo");
-                        MainStates.setZippyState(DownloadTask.DESCARGA, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
-                        holder.web.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                holder.web.loadUrl(url);
-                            }
-                        });
-                    }
-                });
-            }
+                        @Override
+                        public void onError() {
+                            Toaster.toast("Error al obtener link, reintentando en modo nativo");
+                            MainStates.setZippyState(DownloadTask.DESCARGA, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
+                            holder.web.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    holder.web.loadUrl(url);
+                                }
+                            });
+                        }
+                    });
+                }
 
-            @Override
-            public void onCancelDownload() {
-                showDownload(holder.ib_des);
-            }
+                @Override
+                public void onCancelDownload() {
+                    MainStates.setProcessing(false, null);
+                    showDownload(holder.ib_des);
+                }
 
-            @Override
-            public void onStartCasting() {
+                @Override
+                public void onStartCasting() {
 
-            }
+                }
 
-            @Override
-            public void onLogError(Exception e) {
-                Logger.Error(AdapterInfoCapsMaterial.this.getClass(), e);
-            }
-        });
+                @Override
+                public void onLogError(Exception e) {
+                    Logger.Error(AdapterInfoCapsMaterial.this.getClass(), e);
+                }
+            });
+        } catch (Exception e) {
+            MainStates.setProcessing(false, null);
+            showDownload(holder.ib_des);
+        }
     }
 
     private void searchStream(final ViewHolder holder) {
-        DownloadGetter.search(context, eids.get(holder.getAdapterPosition()), new DownloadGetter.ActionsInterface() {
-            @Override
-            public boolean isStream() {
-                return true;
-            }
+        try {
+            DownloadGetter.search(context, eids.get(holder.getAdapterPosition()), new DownloadGetter.ActionsInterface() {
+                @Override
+                public boolean isStream() {
+                    return true;
+                }
 
-            @Override
-            public void onStartDownload() {
-                MainStates.setProcessing(false, null);
-                showDownload(holder.ib_des);
-            }
+                @Override
+                public void onStartDownload() {
+                    MainStates.setProcessing(false, null);
+                    showDownload(holder.ib_des);
+                }
 
-            @Override
-            public void onStartZippy(final String url) {
-                zippyHelper.calculate(url, new zippyHelper.OnZippyResult() {
-                    @Override
-                    public void onSuccess(zippyHelper.zippyObject object) {
-                        MainStates.setProcessing(false, null);
-                        showDownload(holder.ib_des);
-                        int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
-                        if (type == 1) {
-                            StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), object.download_url, object.cookieConstructor);
-                        } else {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                StreamManager.internal(context).Stream(eids.get(holder.getAdapterPosition()), object.download_url, object.cookieConstructor);
+                @Override
+                public void onStartZippy(final String url) {
+                    zippyHelper.calculate(url, new zippyHelper.OnZippyResult() {
+                        @Override
+                        public void onSuccess(zippyHelper.zippyObject object) {
+                            MainStates.setProcessing(false, null);
+                            showDownload(holder.ib_des);
+                            int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
+                            if (type == 1) {
+                                StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), object.download_url, object.cookieConstructor);
                             } else {
-                                if (FileUtil.init(context).isMXinstalled()) {
-                                    Toaster.toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
-                                    StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), object.download_url, object.cookieConstructor);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    StreamManager.internal(context).Stream(eids.get(holder.getAdapterPosition()), object.download_url, object.cookieConstructor);
                                 } else {
-                                    Toaster.toast("No hay reproductor adecuado disponible");
+                                    if (FileUtil.init(context).isMXinstalled()) {
+                                        Toaster.toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
+                                        StreamManager.mx(context).Stream(eids.get(holder.getAdapterPosition()), object.download_url, object.cookieConstructor);
+                                    } else {
+                                        Toaster.toast("No hay reproductor adecuado disponible");
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    @Override
-                    public void onError() {
-                        Toaster.toast("Error al obtener link, reintentando en modo nativo");
-                        MainStates.setZippyState(DownloadTask.STREAMING, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
-                        holder.web.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                holder.web.loadUrl(url);
-                            }
-                        });
-                    }
-                });
-            }
+                        @Override
+                        public void onError() {
+                            Toaster.toast("Error al obtener link, reintentando en modo nativo");
+                            MainStates.setZippyState(DownloadTask.STREAMING, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
+                            holder.web.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    holder.web.loadUrl(url);
+                                }
+                            });
+                        }
+                    });
+                }
 
-            @Override
-            public void onCancelDownload() {
-                MainStates.setProcessing(false, null);
-                showDownload(holder.ib_des);
-            }
+                @Override
+                public void onCancelDownload() {
+                    MainStates.setProcessing(false, null);
+                    showDownload(holder.ib_des);
+                }
 
-            @Override
-            public void onStartCasting() {
-                MainStates.setProcessing(false, null);
-                context.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        showDownload(holder.ib_des);
-                        holder.ib_ver.setImageResource(es.munix.multidisplaycast.R.drawable.cast_on);
-                    }
-                });
-            }
+                @Override
+                public void onStartCasting() {
+                    MainStates.setProcessing(false, null);
+                    context.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showDownload(holder.ib_des);
+                            holder.ib_ver.setImageResource(es.munix.multidisplaycast.R.drawable.cast_on);
+                        }
+                    });
+                }
 
-            @Override
-            public void onLogError(Exception e) {
-                Logger.Error(AdapterInfoCapsMaterial.this.getClass(), e);
-            }
-        });
+                @Override
+                public void onLogError(Exception e) {
+                    Logger.Error(AdapterInfoCapsMaterial.this.getClass(), e);
+                }
+            });
+        } catch (Exception e) {
+            MainStates.setProcessing(false, null);
+            showDownload(holder.ib_des);
+        }
     }
 
     public void onStartList() {

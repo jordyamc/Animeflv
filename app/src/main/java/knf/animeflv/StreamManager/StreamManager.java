@@ -13,10 +13,12 @@ import android.util.Log;
 
 import java.io.File;
 
+import knf.animeflv.DownloadManager.ExternalManager;
 import knf.animeflv.FileMover;
 import knf.animeflv.Parser;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.history.adapter.HistoryHelper;
+import xdroid.toaster.Toaster;
 
 public class StreamManager {
     public static InternalStream internal(Context context) {
@@ -38,7 +40,11 @@ public class StreamManager {
         String cap = data[1].replace("E", "");
         File sd = new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sd.exists() && getStreamType(context) == 1) {
-            FileMover.PrepareToPlay(context, eid);
+            if (!ExternalManager.isDownloading(context, eid)) {
+                FileMover.PrepareToPlay(context, eid);
+            } else {
+                Toaster.toast("Espera a que se complete la descarga para poder reproducir");
+            }
         } else {
             HistoryHelper.addToList(context, aid, new Parser().getTitCached(aid), cap);
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
