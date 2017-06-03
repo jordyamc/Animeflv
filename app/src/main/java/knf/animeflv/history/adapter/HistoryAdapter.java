@@ -77,7 +77,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                         new InfoHelper.SharedItem(holder.img, "img"),
                         new InfoHelper.BundleItem("aid", HistoryHelper.getAidFrom(jsonArray,holder.getAdapterPosition())),
                         new InfoHelper.BundleItem("title", HistoryHelper.getTitFrom(jsonArray,holder.getAdapterPosition())),
-                        new InfoHelper.BundleItem("position", String.valueOf(holder.getAdapterPosition()))
+                        new InfoHelper.BundleItem("position", HistoryHelper.getLastNumFrom(jsonArray, holder.getAdapterPosition()))
                 );
             }
         });

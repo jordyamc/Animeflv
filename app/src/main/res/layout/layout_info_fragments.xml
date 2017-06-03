@@ -18,43 +18,89 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="250dp"
             android:clickable="true"
             android:fitsSystemWindows="true"
             android:transitionName="title"
             app:collapsedTitleGravity="start|center_vertical"
             app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleMarginBottom="?attr/actionBarSize"
             app:expandedTitleMarginEnd="64dp"
-            app:expandedTitleMarginStart="48dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            app:expandedTitleMarginStart="20dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
             <ImageView
                 android:id="@+id/image"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:adjustViewBounds="true"
                 android:clickable="true"
                 android:fitsSystemWindows="true"
-                android:maxHeight="300dp"
-                android:minHeight="300dp"
+
                 android:scaleType="centerCrop"
                 android:transitionName="img"
                 app:layout_collapseMode="parallax"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0.3"
+                android:background="@android:color/black"
+                android:fitsSystemWindows="true" />
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="top"
+                android:layout_marginBottom="48dp"
                 android:clickable="true"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
+            <!--<android.support.design.widget.TabLayout
+                android:id="@+id/tabs"
+                android:layout_width="wrap_content"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="bottom|start"
+                app:tabMode="fixed"
+                app:tabMinWidth="100dp"
+                app:tabGravity="fill"
+                app:tabContentStart="72dp" >
+                <android.support.design.widget.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="Info"/>
+                <android.support.design.widget.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Capitulos"/>
+            </android.support.design.widget.TabLayout>-->
+
+            <com.ogaclejapan.smarttablayout.SmartTabLayout
+                android:id="@+id/viewpagertab"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="bottom|start"
+                app:stl_defaultTabTextColor="@color/blanco"
+                app:stl_defaultTabTextMinWidth="100dp"
+                app:stl_distributeEvenly="false"
+                app:stl_dividerColor="@android:color/transparent"
+                app:stl_dividerThickness="0dp"
+                app:stl_indicatorAlwaysInCenter="false"
+                app:stl_indicatorColor="?attr/colorAccent"
+                app:stl_indicatorCornerRadius="1.5dp"
+                app:stl_indicatorInterpolation="smart"
+                app:stl_indicatorThickness="3dp"
+                app:stl_underlineColor="@color/transparent" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
     </android.support.design.widget.AppBarLayout>
 
-    <FrameLayout
-        android:id="@+id/root"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
@@ -66,7 +112,7 @@
         android:layout_margin="16dp"
         android:clickable="true"
         android:elevation="5dp"
-        android:src="@drawable/playlist"
+        android:src="@drawable/star_off"
         app:layout_anchor="@id/app_bar_layout"
         app:layout_anchorGravity="bottom|right|end"/>
 </android.support.design.widget.CoordinatorLayout>

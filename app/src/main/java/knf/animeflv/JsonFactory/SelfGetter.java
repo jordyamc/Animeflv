@@ -253,10 +253,19 @@ public class SelfGetter {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                } else if (el.contains("server=gdrive")) {
+                } else if (el.contains("drive.google.com")) {
                     String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
                     String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    String id = down_link.substring(down_link.indexOf("/d/") + 3, down_link.lastIndexOf("/preview"));
                     try {
+                        String d_link = "https://drive.google.com/uc?id=" + id + "&export=download";
+                        Log.e("Yotta", d_link);
+                        Document d_document = Jsoup.connect(d_link).get();
+                        Yotta = "https://drive.google.com" + d_document.select("a#uc-download-link").first().attr("href");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    /*try {
                         JSONArray ja = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getJSONArray("sources");
                         if (ja.length() > 1) {
                             for (int i = 0; i <= ja.length(); i++) {
@@ -293,7 +302,7 @@ public class SelfGetter {
                         }
                     } catch (Exception e) {
                         Log.e("Yotta", "Error getting Yotta: " + down_link.replace("embed", "check"));
-                    }
+                    }*/
                 } else if (el.contains("cldup.com")) {
                     try {
                         Clup = el.substring(el.indexOf("https://cldup.com"), el.lastIndexOf(".mp4") + 4);

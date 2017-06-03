@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ProtocolException;
+import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Random;
@@ -109,10 +111,14 @@ public class DownloaderService extends IntentService {
                 if (!NetworkUtils.isNetworkAvailable())
                     throw new NoInternetFoundException(null);
                 total += count;
-                int tprog = (int) ((total * 100) / lenghtOfFile);
-                if (tprog > prog) {
-                    prog = tprog;
-                    updateCurrentProgress(eid, prog);
+                if (lenghtOfFile != -1) {
+                    int tprog = (int) ((total * 100) / lenghtOfFile);
+                    if (tprog > prog) {
+                        prog = tprog;
+                        updateCurrentProgress(eid, prog);
+                    }
+                } else {
+                    updateCurrentProgressMB(eid, total);
                 }
                 output.write(data, 0, count);
                 output.flush();
@@ -142,6 +148,9 @@ public class DownloaderService extends IntentService {
             onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
         } catch (NoInternetFoundException nife) {
             Log.e("DownloadService", nife.getMessage());
+            onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
+        } catch (SocketException se) {
+            Log.e("DownloadService", se.getMessage());
             onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
         } catch (SSLException ssl) {
             Log.e("DownloadService", ssl.getMessage());
@@ -212,6 +221,40 @@ public class DownloaderService extends IntentService {
         getManager().notify(DOWNLOAD_NOTIFICATION_ID, mBuilder.build());
     }
 
+    private void updateCurrentProgressMB(String eid, long downloaded) {
+        updateSavedProgress(eid, 0);
+        int pending = new SQLiteHelperDownloads(this).getTotalDownloads();
+        String title = new Parser().getTitCached(eid.replace("E", "").split("_")[0]);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(android.R.drawable.stat_sys_download)
+                .setContentTitle(title)
+                .setContentText("Descargado - " + formqatSize(downloaded))
+                .setOngoing(true);
+        if (pending - 1 > 0) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                mBuilder.setSubText(pending - 1 + (pending - 1 == 1 ? " pendiente" : " pendientes"));
+            } else {
+                mBuilder.setNumber(pending);
+            }
+        }
+        getManager().notify(DOWNLOAD_NOTIFICATION_ID, mBuilder.build());
+    }
+
+    private String formqatSize(long length) {
+        long fileSizeInKB = length / 1024;
+        if (fileSizeInKB > 1024) {
+            long fileSizeInMB = fileSizeInKB / 1024;
+            if (fileSizeInMB > 1024) {
+                long fileSizeInGB = fileSizeInMB / 1024;
+                return fileSizeInGB + "GB";
+            } else {
+                return fileSizeInMB + "MB";
+            }
+        } else {
+            return fileSizeInKB + "KB";
+        }
+    }
+
     private void updateSavedProgress(String eid, int progress) {
         new SQLiteHelperDownloads(this).updateProgress(eid, progress).close();
     }
@@ -233,11 +276,12 @@ public class DownloaderService extends IntentService {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(android.R.drawable.stat_notify_error)
                 .setContentTitle(new Parser().getTitCached(semi[0]) + " - " + semi[1])
+                .setColor(Color.parseColor("#F44336"))
                 .setContentText("ERROR AL DESCARGAR")
                 .setGroup("animeflv_failed_download")
                 .setStyle(bigTextStyle)
                 .setOngoing(false);
-        if (cause.equals(CAUSE_INTERNET) || cause.equals(CAUSE_NO_SPACE))
+        if (cause.equals(CAUSE_INTERNET) || cause.equals(CAUSE_NO_SPACE) || cause.equals(CAUSE_DISCONNECTION))
             builder.addAction(R.drawable.redo, "REINTENTAR", PendingIntent.getBroadcast(this, new Random().nextInt(), n_intent, PendingIntent.FLAG_UPDATE_CURRENT));
         getManager().notify(getDownloadID(eid), builder.build());
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_FAILED).delete(eid);
@@ -259,6 +303,7 @@ public class DownloaderService extends IntentService {
         String title = new Parser().getTitCached(eid.replace("E", "").split("_")[0]);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
+                .setColor(Color.parseColor("#8BC34A"))
                 .setContentTitle(title + " - " + eid.replace("E", "").split("_")[1])
                 .setContentText("DESCARGA COMPLETADA")
                 .setGroup("animeflv_success_group")

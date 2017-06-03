@@ -57,7 +57,6 @@ import knf.animeflv.ColorsRes;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.DIRECTORIO;
 import knf.animeflv.JsonFactory.OfflineGetter;
-import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterBusquedaNew;
 import knf.animeflv.Utils.FileUtil;
@@ -209,23 +208,21 @@ public class Directorio extends AppCompatActivity {
             public void onFinish(String json) {
                 if (!json.equals("null")) {
                     if (!json.equals(j)) {
-                        if (new Parser().checkStatus(json) == new Parser().checkStatus(j)) {
-                            if (prestarted) {
-                                initAsync(json);
-                            } else {
-                                prestarted = true;
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        toolbarS.setVisibility(View.VISIBLE);
-                                        viewPagerTab.setVisibility(View.VISIBLE);
-                                        loading.setVisibility(View.GONE);
-                                        load_prog.setVisibility(View.GONE);
-                                        Toaster.toast("Directorio creado!");
-                                    }
-                                });
-                                init(json);
-                            }
+                        if (prestarted) {
+                            initAsync(json);
+                        } else {
+                            prestarted = true;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    toolbarS.setVisibility(View.VISIBLE);
+                                    viewPagerTab.setVisibility(View.VISIBLE);
+                                    loading.setVisibility(View.GONE);
+                                    load_prog.setVisibility(View.GONE);
+                                    Toaster.toast("Directorio creado!");
+                                }
+                            });
+                            init(json);
                         }
                     }
                     loaded = true;

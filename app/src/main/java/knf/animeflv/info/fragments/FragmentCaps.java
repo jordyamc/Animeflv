@@ -1,6 +1,7 @@
 package knf.animeflv.info.fragments;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -34,23 +35,25 @@ import knf.animeflv.Utils.ThemeUtils;
  */
 
 public class FragmentCaps extends Fragment {
+    public static final String ACTION_RESET = "knf.animeflv.caps.RESET";
     @BindView(R.id.rv)
     RecyclerView recyclerView;
     @BindView(R.id.fastscroll)
     FastScroller fastScroller;
     @BindView(R.id.action_list)
     FloatingActionButton button_list;
-
     private boolean blocked = false;
 
     private AdapterInfoCapsMaterial adapter_caps;
-    private RecyclerView.LayoutManager layoutManager;
+    private LinearLayoutManager layoutManager;
 
     private WeakReference<Activity> activityWeakReference;
 
     private String json;
 
     private int progress = 0;
+
+    private BroadcastReceiver receiver;
 
     public FragmentCaps() {
     }
@@ -100,11 +103,12 @@ public class FragmentCaps extends Fragment {
             }
         });
         setCaps();
+
         return view;
     }
 
     private void setCaps() {
-        Bundle bundle = getArguments();
+        final Bundle bundle = getArguments();
         final String aid = bundle.getString("aid");
         json = bundle.getString("json");
         final Parser parser = new Parser();
@@ -129,6 +133,9 @@ public class FragmentCaps extends Fragment {
                         });
                     }
                 });
+                int position = bundle.getInt("position", -1);
+                if (position != -1)
+                    layoutManager.scrollToPositionWithOffset(position, 20);
             }
         });
     }

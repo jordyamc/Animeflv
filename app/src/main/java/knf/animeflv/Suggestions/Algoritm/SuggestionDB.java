@@ -136,6 +136,11 @@ public class SuggestionDB {
         }
     }
 
+    public void reset() {
+        db.delete(TABLE_NAME, null, null);
+        close();
+    }
+
     public class Suggestion {
         public String name;
         public int count;

@@ -157,6 +157,10 @@ public class SuggestionHelper {
         return finalList;
     }
 
+    public static void clear(Context context) {
+        SuggestionDB.get(context).reset();
+    }
+
     private static List<SuggestionDB.Suggestion> getGenresCount(Context context) {
         return SuggestionDB.get(context).getSuggestions();
     }

@@ -1,9 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/re_make"
+        android:icon="@drawable/re_make"
+        android:orderInCategory="100"
+        android:title="Estadisticas"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/status"
         android:icon="@drawable/stadistics"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:title="Estadisticas"
         app:showAsAction="always"/>
 </menu>

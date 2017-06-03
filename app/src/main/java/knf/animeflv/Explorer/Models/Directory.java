@@ -12,8 +12,8 @@ import knf.animeflv.Utils.FileUtil;
 
 
 public class Directory {
+    public String title;
     private File src;
-    private String title;
     private DocumentFile srcAccess;
     private boolean inSD;
     private String filenumber;
@@ -28,7 +28,7 @@ public class Directory {
             this.filenumber = String.valueOf(srcAccess.listFiles().length) + " archivos";
             this.id = srcAccess.getName();
         }
-        this.title = new Parser().getTitCached(getID());
+        //this.title = new Parser().getTitCached(getID());
     }
 
     public Directory(DocumentFile srce, boolean inSD) {
@@ -41,7 +41,7 @@ public class Directory {
             this.filenumber = String.valueOf(srcAccess.listFiles().length) + " archivos";
             this.id = srcAccess.getName();
         }
-        this.title = new Parser().getTitCached(getID());
+        //this.title = new Parser().getTitCached(getID());
     }
 
     public String getPath() {
@@ -71,6 +71,7 @@ public class Directory {
     public String getTitle() {
         return title;
     }
+
 
     public String getFilesNumber() {
         return filenumber;

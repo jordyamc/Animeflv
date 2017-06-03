@@ -16,8 +16,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -37,6 +36,9 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.zawadz88.activitychooser.MaterialActivityChooserBuilder;
+import com.ogaclejapan.smarttablayout.SmartTabLayout;
+import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
+import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -92,6 +94,10 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     FloatingActionButton button;
     @BindView(R.id.coordinator)
     CoordinatorLayout layout;
+    @BindView(R.id.viewpagertab)
+    SmartTabLayout tabLayout;
+    @BindView(R.id.pager)
+    ViewPager pager;
     String ext_storage_state = Environment.getExternalStorageState();
     File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
     Parser parser = new Parser();
@@ -100,16 +106,17 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     Activity context;
     WebView webView;
     String aid;
+    int position = -1;
     String u;
     String global_json;
     boolean isInInfo = true;
     boolean infoSeted = false;
     String status_string = "OK";
-    private FragmentInfo fragmentInfo;
-    private FragmentCaps fragmentCaps;
-    private FragmentManager fragmentManager;
     private JSONArray eps;
     private BroadcastReceiver receiver;
+
+    private FragmentCaps fragmentCaps;
+    private FragmentInfo fragmentInfo;
 
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
@@ -142,6 +149,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                     finish();
                 }
             } else {
+                position = Integer.parseInt(getIntent().getExtras().getString("position", "-1"));
                 setCollapsingToolbarLayoutTitle(getIntent().getExtras().getString("title"));
                 u = Parser.getUrlAnimeCached(aid);
             }
@@ -150,15 +158,25 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             Toaster.toast("Error al abrir informacion desde link!!!");
             finish();
         }
+        button.setImageResource(FavoriteHelper.isFav(this, aid) ? R.drawable.star_on : R.drawable.star_off);
         TrackingHelper.track(this, TrackingHelper.INFO + aid);
         new CacheManager().portada(this, aid, imageView);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                runOnUiThread(new Runnable() {
+                final boolean isFav = FavoriteHelper.isFav(InfoFragments.this, aid);
+                SuggestionHelper.register(InfoFragments.this, aid, isFav ? SuggestionAction.UNFAV : SuggestionAction.FAV);
+                FavoriteHelper.setFav(InfoFragments.this, aid, !isFav, new FavotiteDB.updateDataInterface() {
                     @Override
-                    public void run() {
-                        toogleFragments();
+                    public void onFinish() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toaster.toast("Favorito " + (isFav ? "Eliminado" : "Agregado"));
+                                button.setImageResource(FavoriteHelper.isFav(InfoFragments.this, aid) ? R.drawable.star_on : R.drawable.star_off);
+                            }
+                        });
+                        FavSyncro.updateFavs(InfoFragments.this);
                     }
                 });
             }
@@ -190,7 +208,6 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
             }
         }
-        button.hide();
         MainStates.setListing(false);
         imageView.setOnClickListener(getExpandListener());
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -265,17 +282,6 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 barLayout.setExpanded(true, true);
             }
         };
-    }
-
-    private void scrollToTop() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                barLayout.setExpanded(true, true);
-                if (fragmentInfo != null)
-                    fragmentInfo.scrollTop();
-            }
-        });
     }
 
     private void getJsonfromApi() {
@@ -363,90 +369,86 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     public void setInfo(final String json) {
         if (!infoSeted) {
             infoSeted = true;
-            fragmentInfo = FragmentInfo.get(aid, json);
-            fragmentCaps = FragmentCaps.get(aid, json);
-            fragmentInfo.setReference(this);
-            fragmentCaps.setReference(this);
-            String pos = getIntent().getStringExtra("position");
-            final int position = pos == null ? -1 : Integer.valueOf(pos);
-            addFragments(position);
-            if (position == -1) {
-                scrollToTop();
-            }
             supportInvalidateOptionsMenu();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("aid", aid);
+                    bundle.putString("json", json);
+                    bundle.putInt("position", position);
+                    FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
+                            getSupportFragmentManager(), FragmentPagerItems.with(InfoFragments.this)
+                            .add("INFO", FragmentInfo.class, bundle)
+                            .add("CAPITULOS", FragmentCaps.class, bundle)
+                            .create());
+                    pager.setAdapter(adapter);
+                    tabLayout.setDistributeEvenly(false);
+                    tabLayout.setViewPager(pager);
+                    tabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                        @Override
+                        public void onPageScrolled(int i, float v, int i1) {
+
+                        }
+
+                        @Override
+                        public void onPageSelected(int i) {
+                            if (i == 1) {
+                                isInInfo = false;
+                                barLayout.setExpanded(false, true);
+                            } else {
+                                isInInfo = true;
+                                barLayout.setExpanded(true, true);
+                            }
+                            supportInvalidateOptionsMenu();
+                        }
+
+                        @Override
+                        public void onPageScrollStateChanged(int i) {
+
+                        }
+                    });
+                    tabLayout.setOnTabClickListener(new SmartTabLayout.OnTabClickListener() {
+                        @Override
+                        public void onTabClicked(int position) {
+                            if (position == 1) {
+                                isInInfo = false;
+                                barLayout.setExpanded(false, true);
+                            } else {
+                                isInInfo = true;
+                                barLayout.setExpanded(true, true);
+                            }
+                            supportInvalidateOptionsMenu();
+                        }
+                    });
+                    fragmentInfo = (FragmentInfo) adapter.getPage(0);
+                    fragmentCaps = (FragmentCaps) adapter.getPage(1);
+                    if (position != -1)
+                        pager.setCurrentItem(1);
+                }
+            });
         }
     }
 
     private void toogleFragments() {
         try {
-            FragmentTransaction transaction = getManager().beginTransaction();
-            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             if (isInInfo) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        barLayout.setExpanded(false, true);
+                        pager.setCurrentItem(1);
                     }
                 });
-                button.setImageResource(R.drawable.information);
-                transaction.hide(fragmentInfo);
-                transaction.show(fragmentCaps);
-                fragmentCaps.resetListButton();
-                isInInfo = false;
+
             } else {
-                scrollToTop();
-                button.setImageResource(R.drawable.playlist);
-                transaction.hide(fragmentCaps);
-                transaction.show(fragmentInfo);
-                isInInfo = true;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        pager.setCurrentItem(0);
+                    }
+                });
             }
-            transaction.commit();
             supportInvalidateOptionsMenu();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private FragmentManager getManager() {
-        if (fragmentManager == null) {
-            fragmentManager = getSupportFragmentManager();
-        }
-        return fragmentManager;
-    }
-
-    private void addFragments(final int position) {
-        FragmentTransaction transaction = getManager().beginTransaction();
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        if (position == -1) {
-            isInInfo = true;
-            if (!fragmentCaps.isAdded())
-                transaction.add(R.id.root, fragmentCaps, "caps");
-            if (!fragmentInfo.isAdded())
-                transaction.add(R.id.root, fragmentInfo, "info");
-            transaction.hide(fragmentCaps);
-            button.setImageResource(R.drawable.playlist);
-        } else {
-            isInInfo = false;
-            if (!fragmentInfo.isAdded())
-                transaction.add(R.id.root, fragmentInfo, "info");
-            if (!fragmentCaps.isAdded())
-                transaction.add(R.id.root, fragmentCaps, "caps");
-            transaction.hide(fragmentInfo);
-            button.setImageResource(R.drawable.information);
-            supportInvalidateOptionsMenu();
-        }
-        try {
-            transaction.commitAllowingStateLoss();
-            transaction = getManager().beginTransaction();
-            transaction.hide(position == -1 ? fragmentCaps : fragmentInfo);
-            transaction.commitAllowingStateLoss();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    button.show();
-                    fragmentInfo.startAnimation(position);
-                }
-            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -527,8 +529,6 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 } else {
                     getMenuInflater().inflate(R.menu.menu_fav_no_em, menu);
                 }
-                if (FavoriteHelper.isFav(this, aid))
-                    menu.findItem(R.id.favorito).setIcon(R.drawable.ic_fav_lleno);
                 if (infoSeted) {
                     if (isEmision()) {
                         if (AutoEmisionHelper.isAnimeAdded(this, aid))
@@ -557,23 +557,6 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
             switch (item.getItemId()) {
-                case R.id.favorito:
-                    final boolean isFav = FavoriteHelper.isFav(this, aid);
-                    SuggestionHelper.register(InfoFragments.this, aid, isFav ? SuggestionAction.UNFAV : SuggestionAction.FAV);
-                    FavoriteHelper.setFav(this, aid, !isFav, new FavotiteDB.updateDataInterface() {
-                        @Override
-                        public void onFinish() {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toaster.toast("Favorito " + (isFav ? "Eliminado" : "Agregado"));
-                                    supportInvalidateOptionsMenu();
-                                }
-                            });
-                            FavSyncro.updateFavs(InfoFragments.this);
-                        }
-                    });
-                    break;
                 case R.id.emision:
                     if (AutoEmisionHelper.isAnimeAdded(this, aid)) {
                         new MaterialDialog.Builder(this)

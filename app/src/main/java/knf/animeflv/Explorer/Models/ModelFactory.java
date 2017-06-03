@@ -8,6 +8,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.provider.DocumentFile;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
@@ -38,30 +41,31 @@ public class ModelFactory {
             @Override
             protected String doInBackground(String... strings) {
                 try {
+                    List<Directory> files = new ArrayList<>();
+                    List<String> aids = new ArrayList<>();
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        List<Directory> files = new ArrayList<>();
                         try {
                             for (DocumentFile file : getDirectoryFileAccess(context).listFiles()) {
                                 if (file.isDirectory() && file.listFiles().length > 0) {
+                                    aids.add(file.getName());
                                     files.add(new Directory(file, PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sd_down", false)));
                                 }
                             }
-                            Collections.sort(files, new DirectoryComparator());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        listener.onCreated(files);
                     } else {
-                        List<Directory> files = new ArrayList<>();
                         if (!getDirectoryFile(context).exists()) {
                             getDirectoryFile(context).mkdirs();
                         }
                         for (File file : getDirectoryFile(context).listFiles(dirFilter)) {
-                            files.add(new Directory(file));
+                            if (file.isDirectory() && file.listFiles().length > 0) {
+                                aids.add(file.getName());
+                                files.add(new Directory(file));
+                            }
                         }
-                        Collections.sort(files, new DirectoryComparator());
-                        listener.onCreated(files);
                     }
+                    replaceNames(aids, files, listener);
                 } catch (Exception e) {
                     e.printStackTrace();
                     List<Directory> files = new ArrayList<>();
@@ -70,6 +74,43 @@ public class ModelFactory {
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    private static void replaceNames(List<String> names, List<Directory> directories, AsyncDirectoryListener listener) {
+        List<Directory> n_dirs = new ArrayList<>();
+        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
+        File file = new File(file_loc);
+        if (file.exists()) {
+            try {
+                JSONObject jsonObj = new JSONObject(FileUtil.getStringFromFile(file_loc));
+                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    if (n_dirs.size() >= names.size())
+                        break;
+                    JSONObject nombreJ = jsonArray.getJSONObject(i);
+                    String n = nombreJ.getString("a");
+                    if (names.contains(n.trim())) {
+                        Directory dir = getSelectedDirectory(n.trim(), directories);
+                        if (dir != null) {
+                            dir.title = FileUtil.corregirTit(nombreJ.getString("b"));
+                            n_dirs.add(dir);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        Collections.sort(n_dirs, new DirectoryComparator());
+        listener.onCreated(n_dirs);
+    }
+
+    private static Directory getSelectedDirectory(String id, List<Directory> directories) {
+        for (Directory directory : directories) {
+            if (directory.getID().equals(id))
+                return directory;
+        }
+        return null;
     }
 
     public static void createVideosListAsync(final File file, final AsyncFileListener listener) {

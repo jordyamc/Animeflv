@@ -37,6 +37,14 @@ public class HistoryHelper {
         }
     }
 
+    public static String getLastNumFrom(JSONArray array, int position) {
+        try {
+            return array.getJSONObject(position).getString("last");
+        } catch (Exception e) {
+            return "-1";
+        }
+    }
+
     public static String getAidFrom(JSONArray array,int position){
         try {
             return array.getJSONObject(position).getString("aid");

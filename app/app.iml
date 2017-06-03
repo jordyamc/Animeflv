@@ -199,7 +199,7 @@
     <orderEntry type="library" exported="" name="support-annotations-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="exomedia-3.0.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-gcm-10.0.1" level="project" />
-    <orderEntry type="library" exported="" name="gson-2.8.0" level="project" />
+    <orderEntry type="library" exported="" name="gson-2.8.1" level="project" />
     <orderEntry type="library" exported="" name="firebase-analytics-10.2.6" level="project" />
     <orderEntry type="library" exported="" name="ThinDownloadManager-1.2.5" level="project" />
     <orderEntry type="library" exported="" name="design-25.3.1" level="project" />

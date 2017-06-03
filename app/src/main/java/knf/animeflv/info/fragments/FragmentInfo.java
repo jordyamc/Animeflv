@@ -173,6 +173,7 @@ public class FragmentInfo extends Fragment {
                 }
             }
         });
+        startAnimation(bundle.getInt("position", -1));
     }
 
     public void startAnimation(final int position) {
