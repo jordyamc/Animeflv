@@ -100,6 +100,7 @@ public class Directorio extends AppCompatActivity {
     List<Integer> lastSearch = Arrays.asList(new Integer[]{0});
     boolean loaded = false;
     private boolean prestarted = false;
+    private boolean menuOpen = false;
 
     public static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -506,6 +507,7 @@ public class Directorio extends AppCompatActivity {
                 actionMenu.setOnMenuToggleListener(new FloatingActionMenu.OnMenuToggleListener() {
                     @Override
                     public void onMenuToggle(boolean opened) {
+                        menuOpen = opened;
                         if (opened) {
                             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                             imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
@@ -938,9 +940,10 @@ public class Directorio extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        if (loaded)
-            finish();
+        if (menuOpen) {
+            actionMenu.close(true);
+        } else if (loaded)
+            super.onBackPressed();
     }
 
     @Override

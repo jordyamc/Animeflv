@@ -85,7 +85,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
     @Override
     public GroupHolder onCreateGroupViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_wait_group, parent, false);
-        return new GroupHolder(v);
+        return new GroupHolder(v, context);
     }
 
     @Override

@@ -1,8 +1,10 @@
 package knf.animeflv.AutoEmision;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -49,7 +51,7 @@ public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.
     public AutoEmisionAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(context).
                 inflate(R.layout.item_anime_em, parent, false);
-        return new AutoEmisionAdapter.ViewHolder(itemView);
+        return new AutoEmisionAdapter.ViewHolder(itemView, context);
     }
 
     @Override
@@ -240,9 +242,11 @@ public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.
         @BindView(R.id.state)
         ImageView state;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
+                imageView.setPadding(0, 0, 0, 0);
         }
     }
 

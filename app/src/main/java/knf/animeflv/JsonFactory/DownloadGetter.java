@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
@@ -72,7 +73,7 @@ public class DownloadGetter {
                                 }
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            Log.e("Default Server", "No default");
                         }
                         if (nombres.size() != 0) {
                             int pref = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("def_download", "0"));
@@ -87,6 +88,21 @@ public class DownloadGetter {
                                     case "zippyshare fast":
                                         startDownload(actionsInterface.isStream(), context, eid, ur, new CookieConstructor(datas.get(0)));
                                         actionsInterface.onStartDownload();
+                                        break;
+                                    case "openload":
+                                        OpenLoadGetter.get(context, ur, new OpenLoadGetter.OpenLoadInterface() {
+                                            @Override
+                                            public void onSuccess(String url_final) {
+                                                startDownload(actionsInterface.isStream(), context, eid, url_final);
+                                                actionsInterface.onStartDownload();
+                                            }
+
+                                            @Override
+                                            public void onError(String error) {
+                                                Toaster.toast(error);
+                                                actionsInterface.onCancelDownload();
+                                            }
+                                        });
                                         break;
                                     case "mega":
                                         context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
@@ -119,15 +135,27 @@ public class DownloadGetter {
                                                 switch (des.toLowerCase()) {
                                                     case "zippyshare":
                                                         actionsInterface.onStartZippy(ur);
-                                                        dialog.dismiss();
                                                         break;
                                                     case "zippyshare fast":
-                                                        dialog.dismiss();
                                                         startDownload(actionsInterface.isStream(), context, eid, ur, new CookieConstructor(datas.get(0)));
                                                         actionsInterface.onStartDownload();
                                                         break;
+                                                    case "openload":
+                                                        OpenLoadGetter.get(context, ur, new OpenLoadGetter.OpenLoadInterface() {
+                                                            @Override
+                                                            public void onSuccess(String url_final) {
+                                                                startDownload(actionsInterface.isStream(), context, eid, url_final);
+                                                                actionsInterface.onStartDownload();
+                                                            }
+
+                                                            @Override
+                                                            public void onError(String error) {
+                                                                Toaster.toast(error);
+                                                                actionsInterface.onCancelDownload();
+                                                            }
+                                                        });
+                                                        break;
                                                     case "mega":
-                                                        dialog.dismiss();
                                                         context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
                                                         MainStates.setProcessing(false, null);
                                                         actionsInterface.onStartDownload();
@@ -136,9 +164,9 @@ public class DownloadGetter {
                                                         startDownload(actionsInterface.isStream(), context, eid, ur);
                                                         MainStates.setProcessing(false, null);
                                                         actionsInterface.onStartDownload();
-                                                        dialog.dismiss();
                                                         break;
                                                 }
+                                                dialog.dismiss();
                                             }
                                         })
                                         .onNegative(new MaterialDialog.SingleButtonCallback() {
@@ -204,6 +232,8 @@ public class DownloadGetter {
                             } else if (json.startsWith("error") && json.contains("503")) {
                                 Toaster.toast("No se pudo acceder a la pagina de Animeflv");
                                 Bypass.check(context, null);
+                            } else if (json.startsWith("error") && json.contains("521")) {
+                                Toaster.toast("Pagina de Animeflv caida");
                             } else {
                                 Toaster.toast("Error en json");
                             }

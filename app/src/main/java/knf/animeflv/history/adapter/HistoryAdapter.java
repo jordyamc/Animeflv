@@ -1,6 +1,8 @@
 package knf.animeflv.history.adapter;
 
 import android.app.Activity;
+import android.content.Context;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -47,7 +49,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     public HistoryAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(activity).
                 inflate(R.layout.item_history, parent, false);
-        return new HistoryAdapter.ViewHolder(itemView);
+        return new HistoryAdapter.ViewHolder(itemView, activity);
     }
 
     @Override
@@ -119,12 +121,14 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         @BindView(R.id.tv_current)
         public TextView tv_current;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setAlpha(1);
             itemView.setTranslationX(0);
             itemView.setTranslationY(0);
+            if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
+                img.setPadding(0, 0, 0, 0);
         }
 
         @Override

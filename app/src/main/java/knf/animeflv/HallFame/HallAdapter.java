@@ -1,6 +1,8 @@
 package knf.animeflv.HallFame;
 
 import android.app.Activity;
+import android.content.Context;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -43,7 +45,7 @@ public class HallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case 0:
                 return new HallAdapter.ViewHolderTitle(LayoutInflater.from(activity).inflate(R.layout.item_hall_title, parent, false));
             case 1:
-                return new HallAdapter.ViewHolderItem(LayoutInflater.from(activity).inflate(R.layout.item_hall_person, parent, false));
+                return new HallAdapter.ViewHolderItem(LayoutInflater.from(activity).inflate(R.layout.item_hall_person, parent, false), activity);
             default:
                 return new HallAdapter.ViewHolderTitle(LayoutInflater.from(activity).inflate(R.layout.item_hall_person, parent, false));
         }
@@ -104,9 +106,11 @@ public class HallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         @BindView(R.id.card)
         CardView card;
 
-        public ViewHolderItem(View itemView) {
+        public ViewHolderItem(View itemView, Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
+                itemView.setPadding(0, 0, 0, 0);
         }
     }
 }

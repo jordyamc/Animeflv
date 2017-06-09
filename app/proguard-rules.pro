@@ -28,6 +28,7 @@
 -dontwarn io.codetail.animation.**
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
+-keepattributes JavascriptInterface
 -keep public class * extends java.lang.Exception
 -keep class com.crashlytics.** { *; }
 -dontwarn com.crashlytics.**
@@ -43,5 +44,10 @@ public *;
 #}
 -keepclassmembers class fqcn.of.javascript.interface.for.webview {
   public *;
+}
+-keep public class knf.animeflv.JsonFactory$UrlGetter
+-keep public class * implements knf.animeflv.JsonFactory$UrlGetter
+-keepclassmembers class knf.animeflv.JsonFactory$UrlGetter {
+    <methods>;
 }
 

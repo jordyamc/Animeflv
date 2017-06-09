@@ -128,7 +128,11 @@ public class FragmentCaps extends Fragment {
                             @Override
                             public void run() {
                                 if (!MainStates.isListing())
-                                    button_list.setVisibility(v >= 0.9f ? View.GONE : View.VISIBLE);
+                                    if (v >= 0.9f) {
+                                        button_list.hide(true);
+                                    } else {
+                                        button_list.show(true);
+                                    }
                             }
                         });
                     }

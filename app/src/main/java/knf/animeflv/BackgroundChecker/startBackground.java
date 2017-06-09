@@ -104,6 +104,14 @@ public class startBackground {
         }
     }
 
+    private static boolean checkList(List<MainObject> old, List<MainObject> actual) {
+        for (MainObject object : actual) {
+            if (object.eid.equals(old.get(0).eid))
+                return true;
+        }
+        return false;
+    }
+
     private static void startCompare(Context context, @Nullable JSONObject s) {
         try {
             if (new Parser().checkStatus(s) == 0) {
@@ -145,25 +153,26 @@ public class startBackground {
                                 Set<String> sts = context.getSharedPreferences("data", Context.MODE_PRIVATE).getStringSet("eidsNot", new HashSet<String>());
                                 loop:
                                 {
-                                    for (MainObject st : mainobjects) {
-                                        if (!st.eid.equals(oldobjects.get(0).eid)) {
-                                            Boolean isInFavs = FavoriteHelper.isFav(context, st.aid);
-                                            if (isInFavs && desc && isnot) {
-                                                Descargar(context, st.titulo, st.eid, st.sid);
-                                            }
-                                            if (onlyNotFavs) {
-                                                if (isInFavs) {
+                                    if (checkList(oldobjects, mainobjects))
+                                        for (MainObject st : mainobjects) {
+                                            if (!st.eid.equals(oldobjects.get(0).eid)) {
+                                                Boolean isInFavs = FavoriteHelper.isFav(context, st.aid);
+                                                if (isInFavs && desc && isnot) {
+                                                    Descargar(context, st.titulo, st.eid, st.sid);
+                                                }
+                                                if (onlyNotFavs) {
+                                                    if (isInFavs) {
+                                                        num += 1;
+                                                        sts.add(st.eid);
+                                                    }
+                                                } else {
                                                     num += 1;
                                                     sts.add(st.eid);
                                                 }
                                             } else {
-                                                num += 1;
-                                                sts.add(st.eid);
+                                                break loop;
                                             }
-                                        } else {
-                                            break loop;
                                         }
-                                    }
                                 }
                                 int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0) + num;
                                 if (isnot && !UtilNotBlocker.isBlocked() && nCaps > 0) {

@@ -132,6 +132,7 @@ public class newMain extends AppCompatActivity implements
         MainRecyclerCallbacks {
     public Drawer result;
     private boolean isAmoled;
+    private boolean isSpaced = false;
     private boolean doubleBackToExitPressedOnce = false;
     private String ext_storage_state = Environment.getExternalStorageState();
     private File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
@@ -214,6 +215,7 @@ public class newMain extends AppCompatActivity implements
         ActualizarFavoritos();
         SharedPreferences prefs = this.getSharedPreferences("data", MODE_PRIVATE);
         frun = true;
+        isSpaced = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("use_space", false);
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                 if (key.equals("reload") && !UtilNotBlocker.isPaused()) {
@@ -1122,7 +1124,8 @@ public class newMain extends AppCompatActivity implements
         UtilNotBlocker.setPaused(false);
         if (shouldExecuteOnResume) {
             Bypass.check(this, null);
-            if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false) != isAmoled) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            if (preferences.getBoolean("is_amoled", false) != isAmoled || preferences.getBoolean("use_space", false) != isSpaced) {
                 recreate();
             }
             if (NetworkUtils.isNetworkAvailable()) {

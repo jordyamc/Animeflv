@@ -17,6 +17,7 @@ import android.util.Log;
 
 import com.crashlytics.android.core.CrashlyticsCore;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -51,6 +52,7 @@ public class DownloaderService extends IntentService {
     private static final String CAUSE_UNKNOWN = "ERROR DESCONOCIDO";
     private static final String CAUSE_DISCONNECTION = "CONEXION INTERRUMPIDA";
     private static final String CAUSE_SSL = "ERROR EN CERTIFICADO SSL";
+    private static final String CAUSE_NOT_FOUND = "ARCHIVO NO ENCONTRADO EN SERVIDOR";
     public static String RECEIVER_ACTION_ERROR = "knf.animeflv.DownloadService.DownloadService.RECIEVER_ERROR";
     private NotificationManager manager;
     private NotificationCompat.Builder downloading;
@@ -126,6 +128,9 @@ public class DownloaderService extends IntentService {
             output.close();
             input.close();
             onSuccess(eid);
+        } catch (FileNotFoundException fnfe) {
+            Log.e("DownloadService", fnfe.getMessage());
+            onDownloadFailed(eid, intent, CAUSE_NOT_FOUND);
         } catch (DownloadCanceledException canceled) {
             Log.e("DownloadService", "Canceled - Eid: " + eid + " ID: " + canceled.getMessage());
             FileUtil.init(this).DeleteAnime(eid);
@@ -281,7 +286,7 @@ public class DownloaderService extends IntentService {
                 .setGroup("animeflv_failed_download")
                 .setStyle(bigTextStyle)
                 .setOngoing(false);
-        if (cause.equals(CAUSE_INTERNET) || cause.equals(CAUSE_NO_SPACE) || cause.equals(CAUSE_DISCONNECTION))
+        if (cause.equals(CAUSE_INTERNET) || cause.equals(CAUSE_NO_SPACE) || cause.equals(CAUSE_DISCONNECTION) || cause.equals(CAUSE_NOT_FOUND))
             builder.addAction(R.drawable.redo, "REINTENTAR", PendingIntent.getBroadcast(this, new Random().nextInt(), n_intent, PendingIntent.FLAG_UPDATE_CURRENT));
         getManager().notify(getDownloadID(eid), builder.build());
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_FAILED).delete(eid);

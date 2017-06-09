@@ -202,8 +202,7 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
     }
 
     private Handler getProgressHandler() {
-        if (handler != null) return handler;
-        handler = new Handler();
+        if (handler == null) handler = new Handler();
         return handler;
     }
 
@@ -337,6 +336,7 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
         public ImageView iV_visto;
         @BindView(R.id.progress)
         ProgressBar progress;
+
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);

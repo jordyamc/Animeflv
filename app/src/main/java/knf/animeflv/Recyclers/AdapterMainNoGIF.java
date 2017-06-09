@@ -1,9 +1,12 @@
 package knf.animeflv.Recyclers;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
@@ -18,7 +21,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Spinner;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -33,12 +36,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
@@ -52,6 +52,7 @@ import knf.animeflv.Recientes.MainAnimeModel;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Utils.CacheManager;
+import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
@@ -67,17 +68,11 @@ import xdroid.toaster.Toaster;
 
 public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.ViewHolder> {
 
-    int corePoolSize = 60;
-    int maximumPoolSize = 80;
-    int keepAliveTime = 10;
-    BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>(maximumPoolSize);
-    Executor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue);
+    private final int UPDATE_FREQUENCY = 3000;
     private Activity context;
     private List<MainAnimeModel> Animes = new ArrayList<>();
     private MainRecyclerCallbacks callbacks;
-    private Parser parser = new Parser();
-    private Spinner sp;
-    private MaterialDialog d;
+    private Handler handler;
 
     public AdapterMainNoGIF(Activity context) {
         this.context = context;
@@ -131,7 +126,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
     public AdapterMainNoGIF.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(context).
                 inflate(R.layout.item_main_ng, parent, false);
-        return new AdapterMainNoGIF.ViewHolder(itemView);
+        return new AdapterMainNoGIF.ViewHolder(itemView, context);
     }
 
     @Override
@@ -289,6 +284,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                                 showDownload(holder.ib_des, holder.getAdapterPosition());
                                                 showCloudPlay(holder.ib_ver);
                                                 Toaster.toast("Archivo Eliminado");
+                                                cancelDownload(holder);
                                             } else {
                                                 if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                                                     if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
@@ -297,6 +293,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                                     showDownload(holder.ib_des, holder.getAdapterPosition());
                                                     showCloudPlay(holder.ib_ver);
                                                     Toaster.toast("Archivo Eliminado");
+                                                    cancelDownload(holder);
                                                 } else {
                                                     Toaster.toast("Error al Eliminar");
                                                 }
@@ -364,6 +361,120 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 }
             }
         });
+        if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+            startDownload(holder);
+        } else {
+            holder.progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    private void cancelDownload(final AdapterMainNoGIF.ViewHolder holder) {
+        getHandler().removeCallbacks(null);
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                holder.progressBar.setVisibility(View.GONE);
+                notifyItemChanged(holder.getAdapterPosition());
+            }
+        });
+    }
+
+    private void startDownload(final AdapterMainNoGIF.ViewHolder holder) {
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                holder.progressBar.setVisibility(View.VISIBLE);
+            }
+        });
+        getHandler().post(getProgressRunnable(holder));
+    }
+
+    private Handler getHandler() {
+        if (handler == null) handler = new Handler();
+        return handler;
+    }
+
+    private Runnable getProgressRunnable(final AdapterMainNoGIF.ViewHolder holder) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    new AsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            try {
+                                switch (ManageDownload.getDownloadSate(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+                                    case DownloadManager.STATUS_RUNNING:
+                                        final int progress = ManageDownload.getProgress(context, Animes.get(holder.getAdapterPosition()).getEid());
+                                        if (progress != -1) {
+                                            context.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    holder.progressBar.setIndeterminate(false);
+                                                    holder.progressBar.setVisibility(View.VISIBLE);
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                                        holder.progressBar.setProgress(progress, true);
+                                                    } else {
+                                                        holder.progressBar.setProgress(progress);
+                                                    }
+                                                }
+                                            });
+                                        } else {
+                                            context.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    holder.progressBar.setVisibility(View.VISIBLE);
+                                                    holder.progressBar.setIndeterminate(true);
+                                                }
+                                            });
+                                        }
+                                        setHandler(holder, UPDATE_FREQUENCY);
+                                        break;
+                                    case DownloadManager.STATUS_FAILED:
+                                        context.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                holder.progressBar.setVisibility(View.GONE);
+                                                notifyDataSetChanged();
+                                            }
+                                        });
+                                        break;
+                                    case DownloadManager.STATUS_SUCCESSFUL:
+                                        context.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                holder.progressBar.setVisibility(View.GONE);
+                                            }
+                                        });
+                                        break;
+                                    case -1:
+                                        setHandler(holder, UPDATE_FREQUENCY);
+                                        break;
+                                    default:
+                                        context.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                holder.progressBar.setVisibility(View.VISIBLE);
+                                                holder.progressBar.setIndeterminate(true);
+                                            }
+                                        });
+                                        setHandler(holder, UPDATE_FREQUENCY);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            return null;
+                        }
+                    }.executeOnExecutor(ExecutorManager.getExecutor());
+                } catch (Exception e) {
+
+                }
+            }
+        };
+    }
+
+    private void setHandler(AdapterMainNoGIF.ViewHolder holder, int time) {
+        getHandler().postDelayed(getProgressRunnable(holder), time);
     }
 
 
@@ -537,132 +648,149 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
     }
 
     private void searchDownload(final AdapterMainNoGIF.ViewHolder holder) {
-        DownloadGetter.search(context, Animes.get(holder.getAdapterPosition()).getEid(), new knf.animeflv.JsonFactory.DownloadGetter.ActionsInterface() {
-            @Override
-            public boolean isStream() {
-                return false;
-            }
+        try {
+            DownloadGetter.search(context, Animes.get(holder.getAdapterPosition()).getEid(), new knf.animeflv.JsonFactory.DownloadGetter.ActionsInterface() {
+                @Override
+                public boolean isStream() {
+                    return false;
+                }
 
-            @Override
-            public void onStartDownload() {
-                MainStates.setProcessing(false, null);
-                showDelete(holder.ib_des);
-                showPlay(holder.ib_ver);
-            }
+                @Override
+                public void onStartDownload() {
+                    MainStates.setProcessing(false, null);
+                    showDelete(holder.ib_des);
+                    showPlay(holder.ib_ver);
+                    startDownload(holder);
+                }
 
-            @Override
-            public void onStartZippy(final String url) {
-                zippyHelper.calculate(url, new zippyHelper.OnZippyResult() {
-                    @Override
-                    public void onSuccess(zippyHelper.zippyObject object) {
-                        MainStates.setProcessing(false, null);
-                        showDelete(holder.ib_des);
-                        showPlay(holder.ib_ver);
-                        ManageDownload.chooseDownDir(context, Animes.get(holder.getAdapterPosition()).getEid(), object.download_url, object.cookieConstructor);
-                    }
+                @Override
+                public void onStartZippy(final String url) {
+                    zippyHelper.calculate(url, new zippyHelper.OnZippyResult() {
+                        @Override
+                        public void onSuccess(zippyHelper.zippyObject object) {
+                            MainStates.setProcessing(false, null);
+                            showDelete(holder.ib_des);
+                            showPlay(holder.ib_ver);
+                            ManageDownload.chooseDownDir(context, Animes.get(holder.getAdapterPosition()).getEid(), object.download_url, object.cookieConstructor);
+                            startDownload(holder);
+                        }
 
-                    @Override
-                    public void onError() {
-                        Toaster.toast("Error al obtener link, reintentando en modo nativo");
-                        MainStates.setZippyState(DownloadTask.DESCARGA, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
-                        holder.webView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                holder.webView.loadUrl(url);
-                            }
-                        });
-                    }
-                });
-            }
+                        @Override
+                        public void onError() {
+                            Toaster.toast("Error al obtener link, reintentando en modo nativo");
+                            MainStates.setZippyState(DownloadTask.DESCARGA, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
+                            holder.webView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    holder.webView.loadUrl(url);
+                                }
+                            });
+                        }
+                    });
+                }
 
-            @Override
-            public void onCancelDownload() {
-                MainStates.setProcessing(false, null);
-                showDownload(holder.ib_des, holder.getAdapterPosition());
-            }
+                @Override
+                public void onCancelDownload() {
+                    MainStates.setProcessing(false, null);
+                    showDownload(holder.ib_des, holder.getAdapterPosition());
+                }
 
-            @Override
-            public void onStartCasting() {
+                @Override
+                public void onStartCasting() {
 
-            }
+                }
 
-            @Override
-            public void onLogError(Exception e) {
-                Logger.Error(AdapterMainNoGIF.this.getClass(), e);
-            }
-        });
+                @Override
+                public void onLogError(Exception e) {
+                    Logger.Error(AdapterMainNoGIF.this.getClass(), e);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toaster.toast("Error inesperado, intente de nuevo!");
+            MainStates.setProcessing(false, null);
+            showDownload(holder.ib_des, holder.getAdapterPosition());
+        }
     }
 
     private void searchStream(final AdapterMainNoGIF.ViewHolder holder) {
-        DownloadGetter.search(context, Animes.get(holder.getAdapterPosition()).getEid(), new knf.animeflv.JsonFactory.DownloadGetter.ActionsInterface() {
-            @Override
-            public boolean isStream() {
-                return true;
-            }
+        try {
+            DownloadGetter.search(context, Animes.get(holder.getAdapterPosition()).getEid(), new knf.animeflv.JsonFactory.DownloadGetter.ActionsInterface() {
+                @Override
+                public boolean isStream() {
+                    return true;
+                }
 
-            @Override
-            public void onStartDownload() {
-                MainStates.setProcessing(false, null);
-                showDownload(holder.ib_des, holder.getAdapterPosition());
-            }
+                @Override
+                public void onStartDownload() {
+                    MainStates.setProcessing(false, null);
+                    showDownload(holder.ib_des, holder.getAdapterPosition());
+                }
 
-            @Override
-            public void onStartZippy(final String url) {
-                zippyHelper.calculate(url, new zippyHelper.OnZippyResult() {
-                    @Override
-                    public void onSuccess(zippyHelper.zippyObject object) {
-                        MainStates.setProcessing(false, null);
-                        showDownload(holder.ib_des, holder.getAdapterPosition());
-                        int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
-                        if (type == 1) {
-                            StreamManager.mx(context).Stream(Animes.get(holder.getAdapterPosition()).getEid(), object.download_url, object.cookieConstructor);
-                        } else {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                StreamManager.internal(context).Stream(Animes.get(holder.getAdapterPosition()).getEid(), object.download_url, object.cookieConstructor);
+                @Override
+                public void onStartZippy(final String url) {
+                    zippyHelper.calculate(url, new zippyHelper.OnZippyResult() {
+                        @Override
+                        public void onSuccess(zippyHelper.zippyObject object) {
+                            MainStates.setProcessing(false, null);
+                            showDownload(holder.ib_des, holder.getAdapterPosition());
+                            int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
+                            if (type == 1) {
+                                StreamManager.mx(context).Stream(Animes.get(holder.getAdapterPosition()).getEid(), object.download_url, object.cookieConstructor);
                             } else {
-                                if (FileUtil.init(context).isMXinstalled()) {
-                                    Toaster.toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
-                                    StreamManager.mx(context).Stream(Animes.get(holder.getAdapterPosition()).getEid(), object.download_url, object.cookieConstructor);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    StreamManager.internal(context).Stream(Animes.get(holder.getAdapterPosition()).getEid(), object.download_url, object.cookieConstructor);
                                 } else {
-                                    Toaster.toast("No hay reproductor adecuado disponible");
+                                    if (FileUtil.init(context).isMXinstalled()) {
+                                        Toaster.toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
+                                        StreamManager.mx(context).Stream(Animes.get(holder.getAdapterPosition()).getEid(), object.download_url, object.cookieConstructor);
+                                    } else {
+                                        Toaster.toast("No hay reproductor adecuado disponible");
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    @Override
-                    public void onError() {
-                        Toaster.toast("Error al obtener link, reintentando en modo nativo");
-                        MainStates.setZippyState(DownloadTask.STREAMING, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
-                        holder.webView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                holder.webView.loadUrl(url);
-                            }
-                        });
-                    }
-                });
-            }
+                        @Override
+                        public void onError() {
+                            Toaster.toast("Error al obtener link, reintentando en modo nativo");
+                            MainStates.setZippyState(DownloadTask.STREAMING, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
+                            holder.webView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    holder.webView.loadUrl(url);
+                                }
+                            });
+                        }
+                    });
+                }
 
-            @Override
-            public void onCancelDownload() {
-                MainStates.setProcessing(false, null);
-                showDownload(holder.ib_des, holder.getAdapterPosition());
-                showCloudPlay(holder.ib_ver);
-            }
+                @Override
+                public void onCancelDownload() {
+                    MainStates.setProcessing(false, null);
+                    showDownload(holder.ib_des, holder.getAdapterPosition());
+                    showCloudPlay(holder.ib_ver);
+                }
 
-            @Override
-            public void onStartCasting() {
-                MainStates.setProcessing(false, null);
-                showDownload(holder.ib_des, holder.getAdapterPosition());
-                showCastPlay(holder.ib_ver);
-            }
+                @Override
+                public void onStartCasting() {
+                    MainStates.setProcessing(false, null);
+                    showDownload(holder.ib_des, holder.getAdapterPosition());
+                    showCastPlay(holder.ib_ver);
+                }
 
-            @Override
-            public void onLogError(Exception e) {
-                Logger.Error(AdapterMainNoGIF.this.getClass(), e);
-            }
-        });
+                @Override
+                public void onLogError(Exception e) {
+                    Logger.Error(AdapterMainNoGIF.this.getClass(), e);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toaster.toast("Error inesperado, intente de nuevo!");
+            MainStates.setProcessing(false, null);
+            showDownload(holder.ib_des, holder.getAdapterPosition());
+            showCloudPlay(holder.ib_ver);
+        }
     }
 
     @Override
@@ -671,23 +799,28 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.img_main)
         public ImageView iv_main;
+        @BindView(R.id.tv_main_Tit)
         public TextView tv_tit;
+        @BindView(R.id.tv_main_Cap)
         public TextView tv_num;
+        @BindView(R.id.card_main)
         public CardView card;
+        @BindView(R.id.ib_main_ver)
         public ImageButton ib_ver;
+        @BindView(R.id.ib_main_descargar)
         public ImageButton ib_des;
+        @BindView(R.id.wv_main)
         public WebView webView;
+        @BindView(R.id.progress)
+        ProgressBar progressBar;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, Context context) {
             super(itemView);
-            this.iv_main = (ImageView) itemView.findViewById(R.id.img_main);
-            this.tv_tit = (TextView) itemView.findViewById(R.id.tv_main_Tit);
-            this.tv_num = (TextView) itemView.findViewById(R.id.tv_main_Cap);
-            this.card = (CardView) itemView.findViewById(R.id.card_main);
-            this.ib_ver = (ImageButton) itemView.findViewById(R.id.ib_main_ver);
-            this.ib_des = (ImageButton) itemView.findViewById(R.id.ib_main_descargar);
-            this.webView = (WebView) itemView.findViewById(R.id.wv_main);
+            ButterKnife.bind(this, itemView);
+            if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
+                iv_main.setPadding(0, 0, 0, 0);
         }
     }
 

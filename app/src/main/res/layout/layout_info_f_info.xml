@@ -211,16 +211,11 @@
                 android:textColor="@android:color/darker_gray"/>
         </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:alpha="0.12"
-            android:background="@android:color/black"/>
-
         <knf.animeflv.ServerReload.Adapter.CustomRecycler
             android:id="@+id/rv_relacionados"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+            android:layout_marginTop="5dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

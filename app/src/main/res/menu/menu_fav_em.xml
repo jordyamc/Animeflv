@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!--<item
-        android:id="@+id/favorito"
-        android:icon="@drawable/ic_fav_vacio"
-        android:orderInCategory="200"
-        android:title="Favoritos"
-        app:showAsAction="always" />-->
     <item
         android:id="@+id/emision"
         android:icon="@drawable/alarm_add"
         android:orderInCategory="100"
         android:title="Seguir"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/share"
+        android:icon="@drawable/share"
+        android:orderInCategory="200"
+        android:title="Compartir"
         app:showAsAction="always"/>
 </menu>

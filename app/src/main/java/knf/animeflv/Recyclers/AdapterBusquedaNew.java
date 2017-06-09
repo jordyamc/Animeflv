@@ -32,6 +32,8 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.Parser;
@@ -94,7 +96,7 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
     public AdapterBusquedaNew.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(context).
                 inflate(R.layout.item_anime_rel, parent, false);
-        return new AdapterBusquedaNew.ViewHolder(itemView);
+        return new AdapterBusquedaNew.ViewHolder(itemView, context);
     }
 
     @Override
@@ -224,19 +226,22 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.imgCardInfoRel)
         public ImageView iv_rel;
+        @BindView(R.id.tv_info_rel_tit)
         public TextView tv_tit;
+        @BindView(R.id.tv_info_rel_tipo)
         public TextView tv_tipo;
+        @BindView(R.id.tv_b_noC)
         public TextView tv_noC;
+        @BindView(R.id.cardRel)
         public CardView card;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, Context context) {
             super(itemView);
-            this.iv_rel = (ImageView) itemView.findViewById(R.id.imgCardInfoRel);
-            this.tv_tit = (TextView) itemView.findViewById(R.id.tv_info_rel_tit);
-            this.tv_tipo = (TextView) itemView.findViewById(R.id.tv_info_rel_tipo);
-            this.tv_noC = (TextView) itemView.findViewById(R.id.tv_b_noC);
-            this.card = (CardView) itemView.findViewById(R.id.cardRel);
+            ButterKnife.bind(this, itemView);
+            if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
+                iv_rel.setPadding(0, 0, 0, 0);
         }
     }
 

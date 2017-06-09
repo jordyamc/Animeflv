@@ -1,6 +1,7 @@
 package knf.animeflv.Favorites;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -64,7 +65,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case FavotiteDB.TYPE_SECTION:
                 return new SectionViewHolder(inflater.inflate(R.layout.item_anime_fav_header, parent, false));
             case FavotiteDB.TYPE_FAV:
-                return new FavViewHolder(inflater.inflate(R.layout.item_anime_fav, parent, false));
+                return new FavViewHolder(inflater.inflate(R.layout.item_anime_fav, parent, false), context);
         }
     }
 
@@ -331,9 +332,11 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @BindView(R.id.title)
         TextView name;
 
-        public FavViewHolder(View itemView) {
+        public FavViewHolder(View itemView, Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
+                imageView.setPadding(0, 0, 0, 0);
         }
     }
 

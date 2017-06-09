@@ -29,17 +29,18 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <com.github.siyamed.shapeimageview.CircularImageView
-                xmlns:app="http://schemas.android.com/tools"
+            <com.github.siyamed.shapeimageview.CircularImageView xmlns:app="http://schemas.android.com/tools"
                 android:id="@+id/img"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:layout_margin="5dp"
+                android:cropToPadding="true"
                 android:padding="5dp"
+                android:scaleType="centerCrop"
                 android:src="@drawable/ic_block_r"
                 app:siBorderAlpha="0.0"
                 app:siBorderColor="@android:color/transparent"
-                app:siBorderWidth="0dp"/>
+                app:siBorderWidth="0dp" />
 
             <RelativeLayout
                 android:layout_width="match_parent"

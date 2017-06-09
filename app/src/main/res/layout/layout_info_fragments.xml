@@ -36,7 +36,6 @@
                 android:adjustViewBounds="true"
                 android:clickable="true"
                 android:fitsSystemWindows="true"
-
                 android:scaleType="centerCrop"
                 android:transitionName="img"
                 app:layout_collapseMode="parallax"/>

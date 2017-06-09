@@ -1,7 +1,9 @@
 package knf.animeflv.Explorer.Adapters;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -51,7 +53,7 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
     public DirectoryAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(context).
                 inflate(R.layout.explorer_item, parent, false);
-        return new DirectoryAdapter.ViewHolder(itemView);
+        return new DirectoryAdapter.ViewHolder(itemView, context);
     }
 
     @Override
@@ -244,6 +246,7 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+
         @BindView(R.id.root)
         public RelativeLayout root;
         @BindView(R.id.img)
@@ -259,9 +262,13 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
         @BindView(R.id.seen)
         public ImageView iV_visto;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            img.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            img.setCropToPadding(true);
+            if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
+                img.setPadding(0, 0, 0, 0);
         }
     }
 }

@@ -128,18 +128,22 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
     }
 
     private void showDirectory() {
-        isDirectory = true;
-        textView.setText(ModelFactory.getDirectoryFile(this).getAbsolutePath());
-        directoryFragment.recharge(this);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        if (directoryFragment.isAdded()) {
-            transaction.show(directoryFragment);
-        } else {
-            transaction.add(R.id.root, directoryFragment, TAG_DIRECTORY);
+        try {
+            isDirectory = true;
+            textView.setText(ModelFactory.getDirectoryFile(this).getAbsolutePath());
+            directoryFragment.recharge(this);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            if (directoryFragment.isAdded()) {
+                transaction.show(directoryFragment);
+            } else {
+                transaction.add(R.id.root, directoryFragment, TAG_DIRECTORY);
+            }
+            if (videoFilesFragment.isAdded()) transaction.remove(videoFilesFragment);
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        if (videoFilesFragment.isAdded()) transaction.remove(videoFilesFragment);
-        transaction.commit();
     }
 
     private void showVideoFile(File file) {

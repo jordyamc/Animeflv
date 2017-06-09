@@ -12,6 +12,7 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -208,8 +209,11 @@ public class SelfGetter {
         String Yotta480 = "null";
         String Yotta360 = "null";
         String Clup = "null";
-        String[] names = new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 720p", "Yotta 480p", "Yotta 360p", "Clup", "Mp4Upload", "YourUpload", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
+        String openload = "null";
+        String hyperion = "null";
+        String[] names = new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 720p", "Yotta 480p", "Yotta 360p", "Hyperion", "Clup", /*"Openload",*/ "Mp4Upload", "YourUpload", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
         try {
+            JSONArray links = new JSONArray();
             Log.e("Url", url);
             Document main = Jsoup.connect(url).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(TIMEOUT).get();
             String titinfo = main.select("h1").first().text();
@@ -238,6 +242,18 @@ public class SelfGetter {
                     } catch (Exception zee) {
                         zee.printStackTrace();
                     }
+                } else if (z.contains("cldup.com")) {
+                    try {
+                        Clup = URLDecoder.decode(z, "utf-8");
+                    } catch (Exception ze) {
+                        ze.printStackTrace();
+                    }
+                } else if (z.contains("openload")) {
+                    try {
+                        openload = URLDecoder.decode(z, "utf-8");
+                    } catch (Exception ze) {
+                        ze.printStackTrace();
+                    }
                 }
             }
             Element script = main.select("script").last();
@@ -253,6 +269,14 @@ public class SelfGetter {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else if (el.contains("server=hyperion")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
+                        hyperion = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file");
+                    } catch (Exception e) {
+                        Log.e("No Hyperion", down_link.replace("embed", "check"));
+                    }
                 } else if (el.contains("drive.google.com")) {
                     String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
                     String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
@@ -265,7 +289,10 @@ public class SelfGetter {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    /*try {
+                } else if (el.contains("server=gdrive")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
                         JSONArray ja = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getJSONArray("sources");
                         if (ja.length() > 1) {
                             for (int i = 0; i <= ja.length(); i++) {
@@ -302,10 +329,11 @@ public class SelfGetter {
                         }
                     } catch (Exception e) {
                         Log.e("Yotta", "Error getting Yotta: " + down_link.replace("embed", "check"));
-                    }*/
+                    }
                 } else if (el.contains("cldup.com")) {
                     try {
-                        Clup = el.substring(el.indexOf("https://cldup.com"), el.lastIndexOf(".mp4") + 4);
+                        if (Clup.equals("null"))
+                            Clup = el.substring(el.indexOf("https://cldup.com"), el.lastIndexOf(".mp4") + 4);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -325,20 +353,40 @@ public class SelfGetter {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else if (el.contains("mp4upload.com")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
+                        Connection.Response response = Jsoup.connect(down_link.replace("embed-", ""))
+                                .data("op", "download2")
+                                .data("id", down_link.substring(down_link.lastIndexOf("/") + 1, down_link.lastIndexOf(".")))
+                                .data("rand", "")
+                                .data("referer", "")
+                                .data("method_free", "")
+                                .data("method_premium", "")
+                                .method(Connection.Method.POST)
+                                .followRedirects(false)
+                                .execute();
+                        String location = response.header("Location");
+                        if (location != null && !location.trim().equals(""))
+                            mp4upload = location;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 } else if (el.contains("server=yourupload")) {
                     String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
                     String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
                     try {
                         yourupload = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file");
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Log.e("No YourUpload", down_link.replace("embed", "check"));
                     }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String[] links = new String[]{izanagi, mina, Yotta, Yotta720, Yotta480, Yotta360, Clup, mp4upload, yourupload, zippy, sync, mega, aflv, maru};
+        String[] links = new String[]{izanagi, mina, Yotta, Yotta720, Yotta480, Yotta360, hyperion, Clup, /*openload,*/mp4upload, yourupload, zippy, sync, mega, aflv, maru};
         try {
             JSONObject object = new JSONObject();
             object.put("version", context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName + "-Internal_Api");
@@ -358,6 +406,13 @@ public class SelfGetter {
             e.printStackTrace();
             return "null";
         }
+    }
+
+    private static JSONObject getdownloadObject(String name, String url) throws JSONException {
+        JSONObject object = new JSONObject();
+        object.put("name", name);
+        object.put("url", url);
+        return object;
     }
 
     public static void getAnime(final Context context, final ANIME anime, final BaseGetter.AsyncInterface asyncInterface) {

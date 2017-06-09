@@ -30,6 +30,7 @@ public class FileMover {
         final MaterialDialog dialog = new MaterialDialog.Builder(activity)
                 .progress(true, 0)
                 .content("Preparando archivo...")
+                .cancelable(false)
                 .build();
         new AsyncTask<Void, Void, Void>() {
             @Override

@@ -1,7 +1,9 @@
 package knf.animeflv.Random;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,6 +17,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
@@ -41,7 +45,7 @@ public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.ViewHolder
     public RandomAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(activity).
                 inflate(R.layout.item_random, parent, false);
-        return new RandomAdapter.ViewHolder(itemView);
+        return new RandomAdapter.ViewHolder(itemView, activity);
     }
 
     @Override
@@ -210,17 +214,20 @@ public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.ViewHolder
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.imgCardInfoRel)
         public ImageView iv_rel;
+        @BindView(R.id.tv_info_rel_tit)
         public TextView tv_tit;
+        @BindView(R.id.tv_info_rel_tipo)
         public TextView tv_tipo;
+        @BindView(R.id.cardRel)
         public CardView card;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, Context context) {
             super(itemView);
-            this.iv_rel = (ImageView) itemView.findViewById(R.id.imgCardInfoRel);
-            this.tv_tit = (TextView) itemView.findViewById(R.id.tv_info_rel_tit);
-            this.tv_tipo = (TextView) itemView.findViewById(R.id.tv_info_rel_tipo);
-            this.card = (CardView) itemView.findViewById(R.id.cardRel);
+            ButterKnife.bind(this, itemView);
+            if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
+                iv_rel.setPadding(0, 0, 0, 0);
         }
     }
 

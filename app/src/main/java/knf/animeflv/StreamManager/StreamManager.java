@@ -39,6 +39,7 @@ public class StreamManager {
         String semi = eid.replace("E", "");
         String cap = data[1].replace("E", "");
         File sd = new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
+        HistoryHelper.addToList(context, aid, new Parser().getTitCached(aid), cap);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sd.exists() && getStreamType(context) == 1) {
             if (!ExternalManager.isDownloading(context, eid)) {
                 FileMover.PrepareToPlay(context, eid);
@@ -46,7 +47,6 @@ public class StreamManager {
                 Toaster.toast("Espera a que se complete la descarga para poder reproducir");
             }
         } else {
-            HistoryHelper.addToList(context, aid, new Parser().getTitCached(aid), cap);
             File file = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
             switch (getStreamType(context)) {
                 case 0:

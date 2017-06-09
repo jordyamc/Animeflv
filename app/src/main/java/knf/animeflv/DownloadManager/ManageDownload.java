@@ -1,7 +1,6 @@
 package knf.animeflv.DownloadManager;
 
 import android.app.Activity;
-import android.app.DownloadManager;
 import android.content.Context;
 import android.preference.PreferenceManager;
 
@@ -111,7 +110,7 @@ public class ManageDownload {
             case EXTERNAL:
                 return ExternalManager.getDownloadState(activity, eid);
             default:
-                return DownloadManager.STATUS_FAILED;
+                return -1;
         }
     }
 

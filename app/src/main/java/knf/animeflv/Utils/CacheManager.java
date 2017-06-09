@@ -270,7 +270,7 @@ public class CacheManager {
 
                 @Override
                 public void onError() {
-                    PicassoCache.getPicassoInstance(context).load("http://animeflv.net/uploads/animes/covers/80x80/" + aid + ".jpg").error(R.drawable.ic_block_r).into(imageView, new Callback() {
+                    PicassoCache.getPicassoInstance(context).load("http://animeflv.net/uploads/animes/covers/" + aid + ".jpg").error(R.drawable.ic_block_r).into(imageView, new Callback() {
                         @Override
                         public void onSuccess() {
                             if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true))

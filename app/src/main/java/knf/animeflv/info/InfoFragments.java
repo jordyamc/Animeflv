@@ -210,13 +210,6 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         }
         MainStates.setListing(false);
         imageView.setOnClickListener(getExpandListener());
-        imageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                shareAid();
-                return true;
-            }
-        });
         toolbar.setOnClickListener(getExpandListener());
         IntentFilter filter = new IntentFilter();
         filter.addAction(DownloaderService.RECEIVER_ACTION_ERROR);
@@ -269,10 +262,14 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         intent.setAction(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_TEXT, u);
         intent.setType("text/plain");
-        new MaterialActivityChooserBuilder(context)
-                .withIntent(intent)
-                .withTitle("Compartir Link")
-                .show();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            startActivity(Intent.createChooser(intent, "Compartir Link"));
+        } else {
+            new MaterialActivityChooserBuilder(context)
+                    .withIntent(intent)
+                    .withTitle("Compartir Link")
+                    .show();
+        }
     }
 
     private View.OnClickListener getExpandListener() {
@@ -634,6 +631,9 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                     break;
                 case R.id.sel_none:
                     fragmentCaps.setallAsNotSeen();
+                    break;
+                case R.id.share:
+                    shareAid();
                     break;
             }
         } catch (Exception e) {

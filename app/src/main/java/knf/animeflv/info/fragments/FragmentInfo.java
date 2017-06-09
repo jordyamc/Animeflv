@@ -203,14 +203,4 @@ public class FragmentInfo extends Fragment {
             e.printStackTrace();
         }
     }
-
-    public void scrollTop() {
-        activity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (nestedScrollView != null)
-                    nestedScrollView.scrollTo(0, 1 * -1000);
-            }
-        });
-    }
 }

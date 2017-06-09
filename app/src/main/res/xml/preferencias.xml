@@ -4,17 +4,17 @@
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="notificaciones"
-            android:title="Activar Notificaciones"/>
+            android:title="Activar Notificaciones" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="notFavs"
             android:summary="Solo notificara capitulos nuevos de animes en favoritos"
-            android:title="Solo notificar capitulos nuevos en favoritos"/>
+            android:title="Solo notificar capitulos nuevos en favoritos" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="autoDesc"
             android:summary="Genera una notificacion para descargar capitulos nuevos de animes en favoritos"
-            android:title="Notificar descarga de capitulos en favoritos"/>
+            android:title="Notificar descarga de capitulos en favoritos" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="60000"
             android:enabled="true"
@@ -32,7 +32,7 @@
             android:enabled="true"
             android:key="ind_sounds"
             android:summary="%s"
-            android:title="Indicador"/>
+            android:title="Indicador" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:enabled="true"
@@ -51,21 +51,21 @@
             android:enabled="true"
             android:key="bypass_time"
             android:summary="Esperar %s para cancelar bypass"
-            android:title="Bypass"/>
+            android:title="Bypass" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Actualizaciones">
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="update_nots"
-            android:title="Notificar nuevas actualizaciones"/>
+            android:title="Notificar nuevas actualizaciones" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="update_check_start"
-            android:title="Buscar actualizaciones al iniciar"/>
+            android:title="Buscar actualizaciones al iniciar" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="update_check_now"
-            android:title="Comprobar actualizaciones"/>
+            android:title="Comprobar actualizaciones" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Busqueda">
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
@@ -112,6 +112,17 @@
             android:summary="%s"
             android:title="Ordenar favoritos" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="Diseño">
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="use_space"
+            android:summary="Se aplicara a toda la app donde aparezca la miniatura del anime"
+            android:title="Diseño espaciado" />
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="true"
+            android:key="noGif"
+            android:title="Desactivar Gifs" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="Descargas">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
@@ -123,12 +134,12 @@
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="skip_favs"
-            android:title="Omitir animes favoritos"/>
+            android:title="Omitir animes favoritos" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="sug_order"
             android:summary="%s"
-            android:title="Orden de animes"/>
+            android:title="Orden de animes" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Extras">
         <com.lb.material_preferences_library.custom_preferences.Preference
@@ -149,10 +160,6 @@
             android:summary="Descarga la actualizacion en segundo plano, y crea una notificacion para instalarla"
             android:title="Autodescargar Actualizaciones" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
-            android:defaultValue="true"
-            android:key="noGif"
-            android:title="Desactivar Gifs" />
-        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="statusShown"
             android:title="Ocultar informacion de Server" />
@@ -160,14 +167,14 @@
             android:defaultValue="false"
             android:key="force_phone"
             android:summary="Esta opcion podria crashear la app"
-            android:title="Forzar vista de telefono"/>
+            android:title="Forzar vista de telefono" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Almacenamiento">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:id="@+id/preference"
             android:defaultValue="0"
             android:key="b_cache"
-            android:title="Administrador de Cache"/>
+            android:title="Administrador de Cache" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="b_video"
@@ -177,11 +184,11 @@
             android:defaultValue="0"
             android:key="b_vistos"
             android:summary="Borrar historial de capitulos vistos"
-            android:title="Capítulos vistos"/>
+            android:title="Capítulos vistos" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="use_ext_downloader"
-            android:title="Usar administrador de descargas externo"/>
+            android:title="Usar administrador de descargas externo" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="null"
             android:key="SDpath"
@@ -194,7 +201,7 @@
             android:defaultValue="null"
             android:key="sd_access"
             android:summary="En caso de tener errores al descargar/eliminar animes"
-            android:title="Conceder permisos de escritura"/>
+            android:title="Conceder permisos de escritura" />
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="b_move"

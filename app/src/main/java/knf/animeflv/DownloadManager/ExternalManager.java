@@ -86,7 +86,7 @@ public class ExternalManager {
         String epID = sharedPreferences.getString("epIDS_descarga", "");
         sharedPreferences.edit().putString("titulos_descarga", tits.replace(titulo + ":::", "")).apply();
         sharedPreferences.edit().putString("epIDS_descarga", epID.replace(aid + "_" + numero + ":::", "")).apply();
-        new SQLiteHelperDownloads(context).updateState(eid, DownloaderService.CANCELED).delete(eid);
+        new SQLiteHelperDownloads(context).updateState(eid, DownloaderService.CANCELED).delete(eid).close();
         DownloadListManager.delete(context, eid + "_" + sharedPreferences.getLong(eid + "_downloadID", -1));
     }
 
