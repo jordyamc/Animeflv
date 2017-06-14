@@ -1,13 +1,13 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '26.0.0 rc1'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.0-rc2'
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 3
         versionName "2.01"
         /**
@@ -44,6 +44,9 @@ allprojects {
         maven {
             url "https://jitpack.io"
         }
+        maven {
+            url "https://maven.google.com"
+        }
     }
 }
 
@@ -70,7 +73,7 @@ dependencies {
     compile "com.android.support:appcompat-v7:$project.g_apps"
     compile "com.android.support:mediarouter-v7:$project.g_apps"
     compile "com.android.support:design:$project.g_apps"
-    compile 'com.google.android.gms:play-services-cast:10.2.6'
+    compile 'com.google.android.gms:play-services-cast:11.0.0'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.google.code.gson:gson:+'
     compile 'com.github.munix:AndroidUtilities:1.6.0'

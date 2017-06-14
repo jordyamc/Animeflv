@@ -11,7 +11,8 @@ import knf.animeflv.Utils.FileUtil;
 
 public class HistoryHelper {
     private static final String jsonKey="history_json";
-    public static JSONArray getHistoryArray(Activity activity){
+
+    public static JSONArray getHistoryArray(Context activity) {
         try {
             return new JSONArray(activity.getSharedPreferences("data", Context.MODE_PRIVATE).getString(jsonKey,"null"));
         }catch (Exception e){
@@ -70,7 +71,7 @@ public class HistoryHelper {
         }
     }
 
-    public static JSONArray addToList(Activity activity,String aid,String tit,String last){
+    public static JSONArray addToList(Context activity, String aid, String tit, String last) {
         try {
             JSONArray carray=getHistoryArray(activity);
             JSONObject object=new JSONObject();
@@ -93,7 +94,7 @@ public class HistoryHelper {
         }
     }
 
-    private static void modifyListSave(Activity activity,JSONArray array){
+    private static void modifyListSave(Context activity, JSONArray array) {
         Log.d("Array",array.toString());
         activity.getSharedPreferences("data",Context.MODE_PRIVATE).edit().putString(jsonKey,array.toString()).apply();
     }

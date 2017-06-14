@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -105,11 +104,12 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         Boolean resaltar = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar", true);
         if (getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).equals("Capítulo 1") || getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).equals("Preestreno") || getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).contains("OVA") || getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).contains("Pelicula")) {
             if (resaltar)
-                holder.card.setCardBackgroundColor(Color.argb(100, 253, 250, 93));
+                holder.card.setCardBackgroundColor(ColorsRes.in_new(context));
         }
         if (FavoriteHelper.isFav(context, Animes.get(position).getAid())) {
             if (resaltar)
-                holder.card.setCardBackgroundColor(Color.argb(100, 26, 206, 246));
+                holder.card.setCardBackgroundColor(ColorsRes.in_favs(context));
+
         }
         setUpWeb(holder.webView);
         holder.tv_num.setTextColor(ThemeUtils.getAcentColor(context));

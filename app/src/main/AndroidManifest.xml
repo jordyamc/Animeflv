@@ -37,6 +37,7 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:manageSpaceActivity=".Utils.CacheControl"
+        android:roundIcon="@mipmap/ic_launcher_o_round"
         android:theme="@style/AppTheme"
         tools:replace="icon,label">
         <activity

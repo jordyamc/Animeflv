@@ -211,7 +211,11 @@ public class SelfGetter {
         String Clup = "null";
         String openload = "null";
         String hyperion = "null";
-        String[] names = new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 720p", "Yotta 480p", "Yotta 360p", "Hyperion", "Clup", /*"Openload",*/ "Mp4Upload", "YourUpload", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
+        String hyperiondirect = "null";
+        String hyperion360 = "null";
+        String hyperion480 = "null";
+        String hyperion720 = "null";
+        String[] names = new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 720p", "Yotta 480p", "Yotta 360p", "Hyperion", "Hyperion Direct", "Hyperion 360p", "Hyperion 480p", "Hyperion 720p", "Clup", /*"Openload",*/ "Mp4Upload", "YourUpload", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
         try {
             JSONArray links = new JSONArray();
             Log.e("Url", url);
@@ -256,8 +260,15 @@ public class SelfGetter {
                     }
                 }
             }
-            Element script = main.select("script").last();
-            String j = script.outerHtml();
+            Elements s_script = main.select("script");
+            String j = "";
+            for (Element element : s_script) {
+                String s_el = element.outerHtml();
+                if (s_el.contains("var video = [];")) {
+                    j = s_el;
+                    break;
+                }
+            }
             String json = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()"));
             String[] parts = json.split("video");
             for (String el : parts) {
@@ -273,9 +284,27 @@ public class SelfGetter {
                     String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
                     String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
                     try {
-                        hyperion = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file");
+                        JSONArray array = new JSONObject(Jsoup.connect(down_link.replace("embed_hyperion", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getJSONArray("streams");
+                        for (int i = 0; i < array.length(); i++) {
+                            switch (array.getJSONObject(i).getInt("label")) {
+                                case 360:
+                                    hyperion360 = array.getJSONObject(i).getString("file");
+                                    break;
+                                case 480:
+                                    hyperion480 = array.getJSONObject(i).getString("file");
+                                    break;
+                                case 720:
+                                    hyperion720 = array.getJSONObject(i).getString("file");
+                                    break;
+                                default:
+                                    hyperion = array.getJSONObject(i).getString("file");
+
+                            }
+                        }
+                        hyperiondirect = new JSONObject(Jsoup.connect(down_link.replace("embed_hyperion", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("direct");
                     } catch (Exception e) {
-                        Log.e("No Hyperion", down_link.replace("embed", "check"));
+                        e.printStackTrace();
+                        Log.e("No Hyperion", down_link.replace("embed_hyperion", "check"));
                     }
                 } else if (el.contains("drive.google.com")) {
                     String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
@@ -386,7 +415,7 @@ public class SelfGetter {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String[] links = new String[]{izanagi, mina, Yotta, Yotta720, Yotta480, Yotta360, hyperion, Clup, /*openload,*/mp4upload, yourupload, zippy, sync, mega, aflv, maru};
+        String[] links = new String[]{izanagi, mina, Yotta, Yotta720, Yotta480, Yotta360, hyperion, hyperiondirect, hyperion360, hyperion480, hyperion720, Clup, /*openload,*/mp4upload, yourupload, zippy, sync, mega, aflv, maru};
         try {
             JSONObject object = new JSONObject();
             object.put("version", context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName + "-Internal_Api");
@@ -478,7 +507,6 @@ public class SelfGetter {
                             j_rels.put(object);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
                         Log.e("Get Anime Info", "No Rel List");
                     }
                     JSONObject fobject = new JSONObject();

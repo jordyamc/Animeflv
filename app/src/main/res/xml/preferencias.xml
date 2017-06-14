@@ -112,7 +112,9 @@
             android:summary="%s"
             android:title="Ordenar favoritos" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="Diseño">
+    <PreferenceCategory
+        android:key="design"
+        android:title="Diseño">
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="use_space"
@@ -122,6 +124,25 @@
             android:defaultValue="true"
             android:key="noGif"
             android:title="Desactivar Gifs" />
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="true"
+            android:key="resaltar"
+            android:summary="Animes, OVAS, Peliculas nuevas, y Animes en favoritos"
+            android:title="Resaltar" />
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="0"
+            android:key="color_favs"
+            android:summary="[color]"
+            android:title="Favoritos resaltados" />
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="0"
+            android:key="color_new"
+            android:summary="[color]"
+            android:title="Nuevos animes resaltados" />
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="0"
+            android:key="color_default"
+            android:title="Colores Predeterminados" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Descargas">
         <com.lb.material_preferences_library.custom_preferences.Preference
@@ -149,11 +170,6 @@
             android:defaultValue="null"
             android:key="open_tutorial"
             android:title="Tutorial" />
-        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
-            android:defaultValue="true"
-            android:key="resaltar"
-            android:summary="Animes, OVAS, Peliculas nuevas, y Animes en favoritos"
-            android:title="Resaltar" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="autoUpdate"

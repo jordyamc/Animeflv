@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
-import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.decoration.ItemShadowDecorator;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
 
@@ -85,7 +84,7 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
                     (NinePatchDrawable) ContextCompat.getDrawable(getContext(), R.drawable.material_shadow_z3));
             adapter = new AutoEmisionAdapter(getActivity(), list, day, AutoEmisionFragment.this);
             wraped = dragDropManager.createWrappedAdapter(adapter);
-            final GeneralItemAnimator animator = new DraggableItemAnimator();
+            final DraggableItemAnimator animator = new DraggableItemAnimator();
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

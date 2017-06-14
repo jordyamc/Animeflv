@@ -1,10 +1,15 @@
 package knf.animeflv;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
@@ -31,6 +36,15 @@ import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.UtilsInit;
 import xdroid.toaster.Toaster;
 
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_ANIMES;
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_ANIMES_DESC;
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_COM_DOWNLOAD;
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_COM_DOWNLOAD_DESC;
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_CURR_DOWNLOAD;
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_CURR_DOWNLOAD_DESC;
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_UPDATES;
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_UPDATES_DESC;
+
 
 public class Application extends MultiDexApplication {
     private static NotificationResponse handler;
@@ -46,6 +60,8 @@ public class Application extends MultiDexApplication {
         super.onCreate();
         context = this;
         SSLCertificateHandler.nuke();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            initChannels();
         UtilsInit.init(this);
         Dexter.initialize(getApplicationContext());
         android.webkit.CookieSyncManager.createInstance(this);
@@ -94,6 +110,40 @@ public class Application extends MultiDexApplication {
         if (handler == null)
             handler = new NotificationResponse();
         return handler;
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private void initChannels() {
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        createChannel(manager, CHANNEL_ANIMES, CHANNEL_ANIMES_DESC, "Animes", NotificationManager.IMPORTANCE_MAX, Color.argb(0, 255, 128, 0), true, true);
+        createChannel(manager, CHANNEL_UPDATES, CHANNEL_UPDATES_DESC, "Actualizaciones", NotificationManager.IMPORTANCE_MAX, Color.BLUE, true);
+        createChannel(manager, CHANNEL_CURR_DOWNLOAD, CHANNEL_CURR_DOWNLOAD_DESC, "Descargas en progreso", NotificationManager.IMPORTANCE_DEFAULT, -1, false);
+        createChannel(manager, CHANNEL_COM_DOWNLOAD, CHANNEL_COM_DOWNLOAD_DESC, "Descargas terminadas", NotificationManager.IMPORTANCE_DEFAULT, Color.parseColor("#8BC34A"), false);
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private void createChannel(NotificationManager manager, String id, String desc, String name, int importance, int ligths, boolean vibration) {
+        createChannel(manager, id, desc, name, importance, ligths, vibration, false);
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private void createChannel(NotificationManager manager, String id, String desc, String name, int importance, int ligths, boolean vibration, boolean badge) {
+        try {
+            NotificationChannel channel = new NotificationChannel(id, name, importance);
+            channel.setDescription(desc);
+            channel.enableLights(true);
+            if (ligths != -1)
+                channel.setLightColor(ligths);
+            if (vibration) {
+                channel.enableVibration(true);
+                channel.setVibrationPattern(new long[]{100, 200, 100, 500});
+            }
+            if (badge)
+                channel.setShowBadge(true);
+            manager.createNotificationChannel(channel);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public class NotificationResponse implements OneSignal.NotificationOpenedHandler {

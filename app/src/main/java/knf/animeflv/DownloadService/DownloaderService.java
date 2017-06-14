@@ -41,6 +41,9 @@ import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.NetworkUtils;
 
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_COM_DOWNLOAD;
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_CURR_DOWNLOAD;
+
 public class DownloaderService extends IntentService {
     public static final int CANCELED = 1554785;
     private static final int DOWNLOAD_NOTIFICATION_ID = 4458758;
@@ -187,7 +190,7 @@ public class DownloaderService extends IntentService {
                 .setContentText("Capítulo " + eid.replace("E", "").split("_")[1])
                 .setContentIntent(PendingIntent.getActivity(this, 0, getDownloadingIntent(eid.split("_")[0]), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setProgress(100, 0, true);
-        getManager().notify(DOWNLOAD_NOTIFICATION_ID, mBuilder.build());
+        showNotification(DOWNLOAD_NOTIFICATION_ID, mBuilder, CHANNEL_CURR_DOWNLOAD);
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_RUNNING).close();
     }
 
@@ -223,7 +226,7 @@ public class DownloaderService extends IntentService {
                 }
             }
         }
-        getManager().notify(DOWNLOAD_NOTIFICATION_ID, mBuilder.build());
+        showNotification(DOWNLOAD_NOTIFICATION_ID, mBuilder, CHANNEL_CURR_DOWNLOAD);
     }
 
     private void updateCurrentProgressMB(String eid, long downloaded) {
@@ -242,7 +245,7 @@ public class DownloaderService extends IntentService {
                 mBuilder.setNumber(pending);
             }
         }
-        getManager().notify(DOWNLOAD_NOTIFICATION_ID, mBuilder.build());
+        showNotification(DOWNLOAD_NOTIFICATION_ID, mBuilder, CHANNEL_CURR_DOWNLOAD);
     }
 
     private String formqatSize(long length) {
@@ -288,9 +291,15 @@ public class DownloaderService extends IntentService {
                 .setOngoing(false);
         if (cause.equals(CAUSE_INTERNET) || cause.equals(CAUSE_NO_SPACE) || cause.equals(CAUSE_DISCONNECTION) || cause.equals(CAUSE_NOT_FOUND))
             builder.addAction(R.drawable.redo, "REINTENTAR", PendingIntent.getBroadcast(this, new Random().nextInt(), n_intent, PendingIntent.FLAG_UPDATE_CURRENT));
-        getManager().notify(getDownloadID(eid), builder.build());
+        showNotification(getDownloadID(eid), builder, CHANNEL_COM_DOWNLOAD);
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_FAILED).delete(eid);
         sendBroadcast(new Intent(RECEIVER_ACTION_ERROR));
+    }
+
+    private void showNotification(int id, NotificationCompat.Builder builder, String channelId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            builder.setChannelId(channelId);
+        getManager().notify(id, builder.build());
     }
 
     private int getDownloadID(String eid) {
@@ -321,7 +330,7 @@ public class DownloaderService extends IntentService {
             PendingIntent pendingIntent = PendingIntent.getActivity(this, getDownloadID(eid), intent, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(pendingIntent);
         }
-        getManager().notify(getDownloadID(eid), builder.build());
+        showNotification(getDownloadID(eid), builder, CHANNEL_COM_DOWNLOAD);
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_SUCCESSFUL).delete(eid);
     }
 

@@ -1,6 +1,8 @@
 package knf.animeflv;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
 
@@ -122,5 +124,15 @@ public class ColorsRes {
     @ColorInt
     public static int Transparent(Context context) {
         return ContextCompat.getColor(context, android.R.color.transparent);
+    }
+
+    @ColorInt
+    public static int in_favs(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getInt("color_favs", Color.argb(100, 26, 206, 246));
+    }
+
+    @ColorInt
+    public static int in_new(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getInt("color_new", Color.argb(100, 253, 250, 93));
     }
 }

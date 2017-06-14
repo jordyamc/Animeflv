@@ -1,6 +1,7 @@
 package knf.animeflv.Recyclers;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -62,7 +63,7 @@ public class AdapterDirPeliculaNew extends RecyclerView.Adapter<AdapterDirPelicu
     public AdapterDirPeliculaNew.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(context).
                 inflate(R.layout.item_anime_fav, parent, false);
-        return new AdapterDirPeliculaNew.ViewHolder(itemView);
+        return new AdapterDirPeliculaNew.ViewHolder(itemView, context);
     }
 
     @Override
@@ -140,9 +141,11 @@ public class AdapterDirPeliculaNew extends RecyclerView.Adapter<AdapterDirPelicu
         @BindView(R.id.card)
         public CardView card;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
+                iv_rel.setPadding(0, 0, 0, 0);
         }
     }
 }

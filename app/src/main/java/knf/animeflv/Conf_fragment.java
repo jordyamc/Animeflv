@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -19,9 +20,11 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.ArrayRes;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.provider.DocumentFile;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -39,6 +42,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import es.dmoral.coloromatic.ColorOMaticDialog;
+import es.dmoral.coloromatic.ColorOMaticUtil;
+import es.dmoral.coloromatic.IndicatorMode;
+import es.dmoral.coloromatic.OnColorSelectedListener;
+import es.dmoral.coloromatic.colormode.ColorMode;
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.CustomSettingsIntro.CustomIntro;
 import knf.animeflv.Directorio.Directorio;
@@ -126,6 +134,76 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         });
     }
 
+    private void setColorsPrefs() {
+        final Preference color_favs = getPreferenceScreen().findPreference("color_favs");
+        final Preference color_new = getPreferenceScreen().findPreference("color_new");
+        final int def_color_favs = PreferenceManager.getDefaultSharedPreferences(getActivity()).getInt("color_favs", Color.argb(100, 26, 206, 246));
+        final int def_color_new = PreferenceManager.getDefaultSharedPreferences(getActivity()).getInt("color_new", Color.argb(100, 253, 250, 93));
+        color_favs.setSummary(ColorOMaticUtil.getFormattedColorString(def_color_favs, true));
+        color_new.setSummary(ColorOMaticUtil.getFormattedColorString(def_color_new, true));
+        color_favs.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new ColorOMaticDialog.Builder()
+                        .initialColor(def_color_favs)
+                        .colorMode(ColorMode.ARGB) // RGB, ARGB, HVS
+                        .indicatorMode(IndicatorMode.HEX) // HEX or DECIMAL; Note that using HSV with IndicatorMode.HEX is not recommended
+                        .onColorSelected(new OnColorSelectedListener() {
+                            @Override
+                            public void onColorSelected(@ColorInt int i) {
+                                color_favs.setSummary(ColorOMaticUtil.getFormattedColorString(i, true));
+                                PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putInt("color_favs", i).apply();
+                            }
+                        })
+                        .showColorIndicator(true)
+                        .create()
+                        .show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "ColorOMaticDialog");
+                return false;
+            }
+        });
+        color_new.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new ColorOMaticDialog.Builder()
+                        .initialColor(def_color_new)
+                        .colorMode(ColorMode.ARGB) // RGB, ARGB, HVS
+                        .indicatorMode(IndicatorMode.HEX) // HEX or DECIMAL; Note that using HSV with IndicatorMode.HEX is not recommended
+                        .onColorSelected(new OnColorSelectedListener() {
+                            @Override
+                            public void onColorSelected(@ColorInt int i) {
+                                color_new.setSummary(ColorOMaticUtil.getFormattedColorString(i, true));
+                                PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putInt("color_new", i).apply();
+                            }
+                        })
+                        .showColorIndicator(true)
+                        .create()
+                        .show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "ColorOMaticDialog");
+                return false;
+            }
+        });
+        getPreferenceScreen().findPreference("color_default").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                new MaterialDialog.Builder(getActivity())
+                        .content("¿Restaurar colores predeterminados?")
+                        .positiveText("Continuar")
+                        .negativeText("cancelar")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                color_favs.setSummary(ColorOMaticUtil.getFormattedColorString(Color.argb(100, 26, 206, 246), true));
+                                color_new.setSummary(ColorOMaticUtil.getFormattedColorString(Color.argb(100, 253, 250, 93), true));
+                                PreferenceManager.getDefaultSharedPreferences(getActivity()).edit()
+                                        .putInt("color_favs", Color.argb(100, 26, 206, 246))
+                                        .putInt("color_new", Color.argb(100, 253, 250, 93))
+                                        .apply();
+                            }
+                        }).build().show();
+                return false;
+            }
+        });
+    }
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,6 +219,8 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             e.printStackTrace();
         }
         //<----------
+
+        setColorsPrefs();
 
         Boolean activado = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("notificaciones", true);
         if (!activado) {
@@ -816,6 +896,17 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                                     ((com.lb.material_preferences_library.custom_preferences.SwitchPreference) getPreferenceScreen().findPreference(key)).setChecked(false);
                                 }
                             }).build().show();
+                break;
+            case "resaltar":
+                if (sharedPreferences.getBoolean(key, true)) {
+                    getPreferenceScreen().findPreference("color_favs").setEnabled(true);
+                    getPreferenceScreen().findPreference("color_new").setEnabled(true);
+                    getPreferenceScreen().findPreference("color_default").setEnabled(true);
+                } else {
+                    getPreferenceScreen().findPreference("color_favs").setEnabled(false);
+                    getPreferenceScreen().findPreference("color_new").setEnabled(false);
+                    getPreferenceScreen().findPreference("color_default").setEnabled(false);
+                }
         }
     }
 

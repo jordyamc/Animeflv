@@ -26,7 +26,6 @@ import android.widget.ImageView;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
-import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
 import com.h6ah4i.android.widget.advrecyclerview.decoration.ItemShadowDecorator;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
 
@@ -195,7 +194,7 @@ public class FavoriteMain extends AppCompatActivity {
                     (NinePatchDrawable) ContextCompat.getDrawable(this, R.drawable.material_shadow_z3));
             adapter = favoriteAdapter;
             wraped = dragDropManager.createWrappedAdapter(favoriteAdapter);
-            final GeneralItemAnimator animator = new DraggableItemAnimator();
+            final DraggableItemAnimator animator = new DraggableItemAnimator();
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

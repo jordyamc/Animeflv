@@ -17,14 +17,14 @@ repositories {
 apply plugin: 'io.fabric'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion '26.0.0-rc2'
     defaultConfig {
         applicationId "knf.animeflv"
         minSdkVersion 17
-        targetSdkVersion 25
-        versionCode 212
-        versionName "5.0.1"
+        targetSdkVersion 26
+        versionCode 213
+        versionName "5.1.0"
         multiDexEnabled = true
     }
     buildTypes {
@@ -73,15 +73,29 @@ allprojects {
             url "https://jitpack.io"
         }
         maven { url 'https://maven.fabric.io/public' }
+        maven {
+            url "https://maven.google.com"
+        }
+    }
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def requested = details.requested
+        if (requested.group == 'com.android.support') {
+            if (!requested.name.startsWith("multidex")) {
+                details.useVersion '26.0.0-beta2'
+            }
+        }
     }
 }
 
 dependencies {
     debugCompile 'com.amitshekhar.android:debug-db:1.0.0'
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile('com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:0.10.6@aar') {
+    /*compile('com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:0.10.6@aar') {
         transitive = true
-    }
+    }*/
     compile('com.mikepenz:materialdrawer:5.9.0@aar') {
         transitive = true
     }
@@ -89,6 +103,7 @@ dependencies {
     compile files('src/trace.jar')
     compile files('src/SOMAAndroidSDK5.0.9.jar')
     compile project(':multidisplaycast')
+    compile project(':library')
     compile 'com.mikepenz:iconics-core:2.8.1@aar'
     compile 'com.mikepenz:google-material-typeface:2.2.0.3.original@aar'
     compile 'com.mikepenz:material-design-iconic-typeface:2.2.0.2@aar'
@@ -109,6 +124,7 @@ dependencies {
     compile 'com.shamanland:xdroid-toaster:0.0.10'
     compile 'com.karumi:dexter:2.3.1'
     compile "com.android.support:appcompat-v7:$project.g_apps"
+    compile "com.android.support:support-core-ui:$project.g_apps"
     compile "com.android.support:leanback-v17:$project.g_apps"
     compile "com.android.support:recyclerview-v7:$project.g_apps"
     compile "com.android.support:cardview-v7:$project.g_apps"
@@ -143,13 +159,15 @@ dependencies {
     compile 'agency.tango.android:material-intro-screen:0.0.5'
     compile 'org.adw.library:discrete-seekbar:1.0.1'
     compile 'com.github.daniel-stoneuk:material-about-library:1.7.1'
-    compile 'com.google.android.gms:play-services-analytics:10.2.6'
-    compile 'com.google.android.gms:play-services-ads:10.2.6'
+    compile 'com.google.android.gms:play-services-analytics:11.0.0'
+    compile 'com.google.android.gms:play-services-ads:11.0.0'
+    compile 'com.google.android.gms:play-services-iid:11.0.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'me.zhanghai.android.materialratingbar:library:1.0.2'
     compile 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
     compile 'com.onesignal:OneSignal:[3.5.3,4.0.0)'
     compile 'org.cryse.widget:persistentsearchview:1.0.4@aar'
+    compile 'com.github.GrenderG:Color-O-Matic:1.1.5'
     compile ('com.github.ViksaaSkool:AwesomeSplash:v1.0.0'){
         exclude module: 'CircularReveal'
     }

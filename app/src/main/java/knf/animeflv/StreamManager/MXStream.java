@@ -15,6 +15,7 @@ import java.util.List;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.Parser;
 import knf.animeflv.Seen.SeenManager;
+import knf.animeflv.history.adapter.HistoryHelper;
 
 /**
  * Created by Jordy on 04/03/2016.
@@ -75,6 +76,7 @@ public class MXStream {
     public void Stream(String eid, String url, CookieConstructor constructor) {
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
+        HistoryHelper.addToList(context, aid, new Parser().getTitCached(aid), numero);
         List<ApplicationInfo> packages;
         PackageManager pm;
         pm = context.getPackageManager();
