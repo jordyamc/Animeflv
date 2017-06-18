@@ -22,7 +22,6 @@ import org.json.JSONArray;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.ThemeUtils;
@@ -33,10 +32,12 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     HistoryAdapterInterface historyInterface;
     private Activity activity;
     private JSONArray jsonArray;
+    private ThemeUtils.Theme theme;
     public HistoryAdapter(Activity activity) {
         this.activity = activity;
         jsonArray = HistoryHelper.getHistoryArray(activity);
         historyInterface = (HistoryAdapterInterface)activity;
+        theme = ThemeUtils.Theme.create(activity);
         setHasStableIds(true);
     }
 
@@ -59,15 +60,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        if (ThemeUtils.isAmoled(activity)) {
-            holder.card.setCardBackgroundColor(ColorsRes.Prim(activity));
-            holder.tv_tit.setTextColor(ColorsRes.SecondaryTextDark(activity));
-            holder.tv_current.setTextColor(ThemeUtils.getAcentColor(activity));
-        } else {
-            holder.card.setCardBackgroundColor(ColorsRes.Blanco(activity));
-            holder.tv_tit.setTextColor(ColorsRes.SecondaryTextLight(activity));
-            holder.tv_current.setTextColor(ThemeUtils.getAcentColor(activity));
-        }
+        holder.card.setCardBackgroundColor(theme.card_normal);
+        holder.tv_tit.setTextColor(theme.textColor);
+        holder.tv_current.setTextColor(theme.accent);
         holder.tv_tit.setText(HistoryHelper.getTitFrom(jsonArray,holder.getAdapterPosition()));
         holder.tv_current.setText(HistoryHelper.getLastFrom(jsonArray,holder.getAdapterPosition()));
         new CacheManager().mini(activity,HistoryHelper.getAidFrom(jsonArray,holder.getAdapterPosition()),holder.img);

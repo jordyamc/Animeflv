@@ -1,6 +1,7 @@
 package knf.animeflv.Random;
 
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -15,7 +16,6 @@ import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.ThemeUtils;
@@ -82,9 +82,12 @@ public class RandomActivity extends AppCompatActivity implements RandomInterface
     }
 
     private void setTheme() {
-        if (ThemeUtils.isAmoled(this)) {
-            toolbar.setBackgroundColor(ColorsRes.Negro(this));
-            toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
+        toolbar.setBackgroundColor(theme.primary);
+        toolbar.getRootView().setBackgroundColor(theme.background);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(theme.primaryDark);
+            getWindow().setNavigationBarColor(theme.primary);
         }
     }
 

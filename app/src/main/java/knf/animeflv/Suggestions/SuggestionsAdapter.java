@@ -16,7 +16,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 import knf.animeflv.Random.AnimeObject;
 import knf.animeflv.Utils.CacheManager;
@@ -27,10 +26,12 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
 
     private Activity activity;
     private List<AnimeObject> animes = new ArrayList<>();
+    private ThemeUtils.Theme theme;
 
     public SuggestionsAdapter(Activity activity, List<AnimeObject> list) {
         this.activity = activity;
         this.animes = list;
+        this.theme = ThemeUtils.Theme.create(activity);
     }
 
     @Override
@@ -42,9 +43,9 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
 
     @Override
     public void onBindViewHolder(final SuggestionsAdapter.ViewHolder holder, final int position) {
-        holder.card.setBackgroundColor(ThemeUtils.isAmoled(activity) ? ColorsRes.Prim(activity) : ColorsRes.Blanco(activity));
-        holder.tv_tit.setTextColor(ThemeUtils.isAmoled(activity) ? ColorsRes.SecondaryTextDark(activity) : ColorsRes.SecondaryTextLight(activity));
-        holder.tv_tipo.setTextColor(ThemeUtils.getAcentColor(activity));
+        holder.card.setCardBackgroundColor(theme.card_normal);
+        holder.tv_tit.setTextColor(theme.textColor);
+        holder.tv_tipo.setTextColor(theme.accent);
         new CacheManager().mini(activity, animes.get(getPosition(holder, position)).aid, holder.iv_rel);
         holder.tv_tit.setText(animes.get(getPosition(holder, position)).title);
         holder.tv_tipo.setText(animes.get(getPosition(holder, position)).tid);

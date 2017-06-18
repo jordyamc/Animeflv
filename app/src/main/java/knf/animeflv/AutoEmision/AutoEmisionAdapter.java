@@ -2,7 +2,6 @@ package knf.animeflv.AutoEmision;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
@@ -38,12 +37,14 @@ public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.
     private int daycode;
     private OnListInteraction interaction;
     private boolean isUpdating = false;
+    private ThemeUtils.Theme theme;
 
     public AutoEmisionAdapter(Activity context, List<EmObj> list, int daycode, OnListInteraction interaction) {
         this.context = context;
         this.daycode = daycode;
         this.list = list;
         this.interaction = interaction;
+        this.theme = ThemeUtils.Theme.create(context);
         setHasStableIds(true);
     }
 
@@ -57,14 +58,9 @@ public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.
     @Override
     public void onBindViewHolder(final AutoEmisionAdapter.ViewHolder holder, final int position) {
         new CacheManager().mini(context, list.get(position).getAid(), holder.imageView);
-        if (ThemeUtils.isAmoled(context)) {
-            holder.title.setTextColor(ColorsRes.Blanco(context));
-            holder.cardView.setCardBackgroundColor(ColorsRes.Prim(context));
-        } else {
-            holder.title.setTextColor(Color.parseColor("#4d4d4d"));
-            holder.cardView.setCardBackgroundColor(ColorsRes.Blanco(context));
-        }
-        holder.state.setColorFilter(ThemeUtils.getAcentColor(context));
+        holder.title.setTextColor(theme.textColor);
+        holder.cardView.setCardBackgroundColor(theme.card_normal);
+        holder.state.setColorFilter(theme.accent);
         setIconbyState(getState(list.get(position).getAid()), holder.state);
         holder.title.setText(list.get(position).getTitle());
         holder.cardView.setOnClickListener(new View.OnClickListener() {
@@ -81,11 +77,11 @@ public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.
         final int dragState = holder.getDragStateFlags();
         if (((dragState & Draggable.STATE_FLAG_IS_UPDATED) != 0)) {
             if ((dragState & Draggable.STATE_FLAG_IS_ACTIVE) != 0) {
-                holder.cardView.setCardBackgroundColor(ThemeUtils.getAcentColor(context));
-                holder.state.setColorFilter(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context));
+                holder.cardView.setCardBackgroundColor(theme.accent);
+                holder.state.setColorFilter(theme.card_normal);
                 holder.title.setTextColor(ColorsRes.Blanco(context));
             } else {
-                holder.cardView.setCardBackgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context));
+                holder.cardView.setCardBackgroundColor(theme.card_normal);
             }
         }
     }

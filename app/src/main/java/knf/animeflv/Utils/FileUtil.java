@@ -245,6 +245,27 @@ public class FileUtil {
         return ret;
     }
 
+    public static String getStringFromFile(Context context, Uri uri) {
+        String path = uri.getPath();
+        if (path.startsWith("file")) {
+            return getStringFromFile(new File(uri.getPath()));
+        } else {
+            return getStringFromUri(context, uri);
+        }
+    }
+
+    public static String getStringFromUri(Context context, Uri uri) {
+        String ret = "";
+        try {
+            InputStream fin = context.getContentResolver().openInputStream(uri);
+            ret = convertStreamToString(fin);
+            fin.close();
+        } catch (IOException e) {
+        } catch (Exception e) {
+        }
+        return ret;
+    }
+
     public static boolean isNumber(String number) {
         try {
             return Pattern.compile("^-*[0-9,.]+$").matcher(number).matches();

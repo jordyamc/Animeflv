@@ -141,8 +141,10 @@ public class Directorio extends AppCompatActivity {
         context = this;
         ButterKnife.bind(this);
         setSupportActionBar(toolbarS);
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
             linearLayout = (RelativeLayout) findViewById(R.id.LY_dir);
+            linearLayout.setBackgroundColor(theme.tablet_background);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (isXLargeScreen(this)) {
@@ -155,43 +157,29 @@ public class Directorio extends AppCompatActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
-        if (ThemeUtils.isAmoled(this)) {
-            toolbarS.setBackgroundColor(getResources().getColor(android.R.color.black));
-            editText.setTextColor(ColorsRes.Blanco(this));
-            editText.setHintTextColor(ColorsRes.SecondaryTextDark(this));
-            editText.setHighlightColor(ColorsRes.Negro(this));
-            load_prog.setTextColor(ColorsRes.SecondaryTextDark(this));
+        toolbarS.setBackgroundColor(theme.primary);
+        toolbarS.setTitleTextColor(ColorsRes.Blanco(this));
+        editText.setTextColor(theme.textColor);
+        editText.setHintTextColor(theme.isDark ? ColorsRes.SecondaryTextDark(this) : ColorsRes.SecondaryTextLight(this));
+        editText.setBackgroundColor(ColorsRes.Transparent(this));
+        load_prog.setTextColor(theme.isDark ? ColorsRes.SecondaryTextDark(this) : ColorsRes.SecondaryTextLight(this));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(theme.primaryDark);
             if (!isXLargeScreen(this)) {
-                toolbarS.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
-                viewPagerTab.setBackgroundColor(getResources().getColor(android.R.color.black));
-                viewPagerTab.setSelectedIndicatorColors(getResources().getColor(R.color.prim));
+                getWindow().setNavigationBarColor(theme.primary);
             } else {
-                toolbarS.getRootView().setBackgroundColor(ColorsRes.Prim(this));
-                if (ThemeUtils.isTablet(this))
-                    findViewById(R.id.cardMain).setBackgroundColor(ColorsRes.Negro(this));
+                getWindow().setNavigationBarColor(ColorsRes.Transparent(this));
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                if (!isXLargeScreen(this)) {
-                    getWindow().setStatusBarColor(getResources().getColor(R.color.negro));
-                    getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
-                } else {
-                    getWindow().setStatusBarColor(ColorsRes.Prim(this));
-                    getWindow().setNavigationBarColor(ColorsRes.Transparent(this));
-                }
-            }
+        }
+        viewPagerTab.setSelectedIndicatorColors(theme.indicatorColor);
+        if (!isXLargeScreen(this)) {
+            toolbarS.getRootView().setBackgroundColor(theme.background);
+            viewPagerTab.setBackgroundColor(theme.primary);
         } else {
-            editText.setTextColor(ColorsRes.Blanco(this));
-            editText.setHintTextColor(ColorsRes.SecondaryTextDark(this));
-            load_prog.setTextColor(ColorsRes.SecondaryTextLight(this));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                if (!isXLargeScreen(this)) {
-                    getWindow().setStatusBarColor(getResources().getColor(R.color.dark));
-                    getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
-                } else {
-                    getWindow().setStatusBarColor(ColorsRes.Dark(this));
-                    getWindow().setNavigationBarColor(ColorsRes.Transparent(this));
-                }
-            }
+            viewPagerTab.setBackgroundColor(theme.tablet_toolbar);
+            toolbarS.getRootView().setBackgroundColor(theme.tablet_background);
+            if (ThemeUtils.isTablet(this))
+                findViewById(R.id.cardMain).setBackgroundColor(theme.primary);
         }
         final String j = OfflineGetter.getDirectorio();
         if (!j.equals("null")) {
@@ -647,6 +635,9 @@ public class Directorio extends AppCompatActivity {
                 } else {
                     try {
                         Toolbar ltoolbar = (Toolbar) findViewById(R.id.toolbar_l);
+                        ThemeUtils.Theme theme = ThemeUtils.Theme.create(Directorio.this);
+                        ltoolbar.setBackgroundColor(theme.tablet_toolbar);
+                        ((Toolbar) findViewById(R.id.extra_toolbar)).setBackgroundColor(theme.tablet_toolbar);
                         ThemeUtils.setStatusBarPadding(Directorio.this, ltoolbar);
                         ltoolbar.setNavigationIcon(R.drawable.ic_back_r);
                         ltoolbar.setNavigationOnClickListener(new View.OnClickListener() {

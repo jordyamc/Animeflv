@@ -71,17 +71,20 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
         setContentView(R.layout.explorer_root);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        if (ThemeUtils.isAmoled(this)) {
-            textView.getRootView().setBackgroundColor(ColorsRes.Negro(this));
-            textView.setTextColor(ColorsRes.Holo_Dark(this));
-            toolbar.setBackgroundColor(ColorsRes.Negro(this));
-        }
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
+        textView.getRootView().setBackgroundColor(theme.background);
+        textView.setTextColor(theme.textColor);
+        toolbar.setBackgroundColor(theme.primary);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBackPressed();
             }
         });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(theme.primaryDark);
+            getWindow().setNavigationBarColor(theme.primary);
+        }
         getSupportActionBar().setTitle("Explorador");
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

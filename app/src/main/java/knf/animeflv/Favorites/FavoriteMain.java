@@ -76,15 +76,7 @@ public class FavoriteMain extends AppCompatActivity {
                 finish();
             }
         });
-        if (!ThemeUtils.isAmoled(this)) {
-            if (ThemeUtils.isTablet(this)) {
-                ((HomeButton) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.button_home)).setArrowDrawableColor(ColorsRes.Blanco(this));
-                ((CardView) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.cardview_search)).setCardBackgroundColor(ColorsRes.Dark(this));
-                ((EditText) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.edittext_search)).setTextColor(ColorsRes.Blanco(this));
-                ((EditText) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.edittext_search)).setHintTextColor(ColorsRes.SecondaryTextDark(this));
-                ((ImageView) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.button_mic)).setColorFilter(ColorsRes.Blanco(this));
-            }
-        } else {
+        if (ThemeUtils.isAmoled(this)) {
             try {
                 Drawable arrow = toolbar.getNavigationIcon();
                 arrow.setColorFilter(ColorsRes.Blanco(this), PorterDuff.Mode.SRC_ATOP);
@@ -149,17 +141,35 @@ public class FavoriteMain extends AppCompatActivity {
             }
         });
         searchView.closeSearch();
-        if (ThemeUtils.isAmoled(this)) {
-            if (ThemeUtils.isTablet(this)) {
-                findViewById(R.id.l_toolbar).setBackgroundColor(ColorsRes.Negro(this));
-                findViewById(R.id.cardMain).setBackgroundColor(ColorsRes.Negro(this));
-                toolbar.getRootView().setBackgroundColor(ColorsRes.Prim(this));
-            } else {
-                toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
-            }
-            toolbar.setBackgroundColor(ColorsRes.Negro(this));
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(theme.primaryDark);
+            getWindow().setNavigationBarColor(theme.primary);
         }
-        button.setBackgroundColor(ThemeUtils.getAcentColor(this));
+        if (ThemeUtils.isTablet(this)) {
+            findViewById(R.id.l_toolbar).setBackgroundColor(theme.tablet_toolbar);
+            findViewById(R.id.cardMain).setBackgroundColor(theme.primary);
+            toolbar.getRootView().setBackgroundColor(theme.tablet_background);
+            toolbar.setTitleTextColor(ColorsRes.Blanco(this));
+        } else {
+            toolbar.getRootView().setBackgroundColor(theme.background);
+        }
+        if (ThemeUtils.isTablet(this))
+            if (theme.isDark) {
+                ((HomeButton) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.button_home)).setArrowDrawableColor(ColorsRes.Holo_Light(this));
+                ((CardView) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.cardview_search)).setCardBackgroundColor(ColorsRes.Blanco(this));
+                ((EditText) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.edittext_search)).setTextColor(ColorsRes.Negro(this));
+                ((EditText) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.edittext_search)).setHintTextColor(ColorsRes.SecondaryTextLight(this));
+                ((ImageView) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.button_mic)).setColorFilter(ColorsRes.Holo_Light(this));
+            } else {
+                ((HomeButton) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.button_home)).setArrowDrawableColor(ColorsRes.Blanco(this));
+                ((CardView) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.cardview_search)).setCardBackgroundColor(ColorsRes.Dark(this));
+                ((EditText) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.edittext_search)).setTextColor(ColorsRes.Blanco(this));
+                ((EditText) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.edittext_search)).setHintTextColor(ColorsRes.SecondaryTextDark(this));
+                ((ImageView) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.button_mic)).setColorFilter(ColorsRes.Blanco(this));
+            }
+        toolbar.setBackgroundColor(theme.primary);
+        button.setBackgroundColor(theme.accent);
         try {
             final MaterialDialog dialog = new MaterialDialog.Builder(this)
                     .progress(true, 0)

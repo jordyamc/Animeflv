@@ -2,7 +2,6 @@ package knf.animeflv.Recyclers;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,7 +12,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import knf.animeflv.ColorsRes;
 import knf.animeflv.JsonFactory.OfflineGetter;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
@@ -29,12 +27,14 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
     private String[] url;
     private String[] aids;
     private Activity context;
+    private ThemeUtils.Theme theme;
     public AdapterRel(Activity context, List<String> titulos, List<String> tipos, String[] urls, String[] aid) {
         this.context = context;
         this.titulosCard = titulos;
         this.tiposCard = tipos;
         this.url = urls;
         this.aids=aid;
+        this.theme = ThemeUtils.Theme.create(context);
     }
 
     @Override
@@ -46,11 +46,9 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
 
     @Override
     public void onBindViewHolder(final AdapterRel.ViewHolder holder, final int position) {
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
-            holder.card.setCardBackgroundColor(ColorsRes.Prim(context));
-            holder.tv_tit.setTextColor(ColorsRes.Blanco(context));
-        }
-        holder.tv_tipo.setTextColor(ThemeUtils.getAcentColor(context));
+        holder.card.setCardBackgroundColor(theme.card_normal);
+        holder.tv_tit.setTextColor(theme.textColor);
+        holder.tv_tipo.setTextColor(theme.accent);
         new CacheManager().mini(context,aids[position],holder.iv_rel);
         holder.tv_tit.setText(titulosCard.get(position));
         holder.tv_tipo.setText(tiposCard.get(position));

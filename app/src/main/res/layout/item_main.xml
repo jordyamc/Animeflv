@@ -15,6 +15,7 @@
     android:elevation="6dp"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
+    android:tag=":aesthetic_ignore"
     card_view:cardCornerRadius="5dp"
     card_view:cardElevation="6dp"
     card_view:cardPreventCornerOverlap="false"
@@ -77,6 +78,7 @@
                     android:lines="1"
                     android:maxLines="1"
                     android:scrollHorizontally="true"
+                    android:tag=":aesthetic_ignore"
                     android:text="Título"
                     android:transitionName="title" />
 
@@ -88,7 +90,9 @@
                     android:background="@android:color/transparent"
                     android:lines="1"
                     android:maxLines="1"
-                    android:text="N Capítulo" />
+                    android:tag=":aesthetic_ignore"
+                    android:text="N Capítulo"
+                    android:textColor="?attr/colorAccent" />
 
             </LinearLayout>
 

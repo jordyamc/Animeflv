@@ -3,6 +3,7 @@ package knf.animeflv.Recyclers;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -72,16 +73,19 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
     private List<MainAnimeModel> Animes = new ArrayList<>();
     private MainRecyclerCallbacks callbacks;
     private Handler handler;
+    private ThemeUtils.Theme theme;
 
     public AdapterMainNoGIF(Activity context) {
         this.context = context;
         this.callbacks = (MainRecyclerCallbacks) context;
+        this.theme = ThemeUtils.Theme.create(context);
     }
 
     public AdapterMainNoGIF(Activity context, List<MainAnimeModel> data) {
         this.context = context;
         this.callbacks = (MainRecyclerCallbacks) context;
         this.Animes = data;
+        this.theme = ThemeUtils.Theme.create(context);
     }
 
     public static String convertStreamToString(InputStream is) throws Exception {
@@ -130,26 +134,23 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
 
     @Override
     public void onBindViewHolder(final AdapterMainNoGIF.ViewHolder holder, final int position) {
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
-            holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
-            holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
-            holder.ib_des.setColorFilter(ColorsRes.Holo_Dark(context));
-            holder.ib_ver.setColorFilter(ColorsRes.Holo_Dark(context));
-        } else {
-            holder.card.setCardBackgroundColor(ColorsRes.Blanco(context));
-            holder.ib_des.setColorFilter(ColorsRes.Holo_Light(context));
-        }
+        holder.card.setCardBackgroundColor(theme.card_normal);
+        holder.tv_tit.setTextColor(theme.textColor);
+        holder.tv_num.setTextColor(theme.accent);
+        holder.ib_ver.setColorFilter(theme.iconFilter);
+        holder.ib_des.setColorFilter(theme.iconFilter);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+            holder.progressBar.getProgressDrawable().setColorFilter(theme.accent, PorterDuff.Mode.SRC_ATOP);
         Boolean resaltar = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar", true);
         if (getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).equals("Capítulo 1") || getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).equals("Preestreno") || getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).contains("OVA") || getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).contains("Pelicula")) {
             if (resaltar)
-                holder.card.setCardBackgroundColor(ColorsRes.in_new(context));
+                holder.card.setCardBackgroundColor(theme.card_new);
         }
         if (FavoriteHelper.isFav(context, Animes.get(position).getAid())) {
             if (resaltar)
-                holder.card.setCardBackgroundColor(ColorsRes.in_favs(context));
+                holder.card.setCardBackgroundColor(theme.card_fav);
         }
         setUpWeb(holder.webView);
-        holder.tv_num.setTextColor(ThemeUtils.getAcentColor(context));
         new CacheManager().mini(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getAid(), holder.iv_main);
         holder.tv_tit.setText(Animes.get(position).getTitulo());
         holder.tv_num.setText(getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
@@ -253,7 +254,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                                 MainStates.init(context).delFromWaitList(Animes.get(pos).getEid());
                                                 MainStates.setProcessing(true, Animes.get(pos).getEid());
                                                 showLoading(holder.ib_des);
-                                                searchDownload(holder);
+                                                searchDownload(holder, position);
 
                                             }
                                         })
@@ -261,7 +262,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                             } else {
                                 MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
                                 showLoading(holder.ib_des);
-                                searchDownload(holder);
+                                searchDownload(holder, position);
                             }
                         } else {
                             Toaster.toast("Procesando");
@@ -341,14 +342,14 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                                             MainStates.init(context).delFromWaitList(Animes.get(pos).getEid());
                                                             MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
                                                             showLoading(holder.ib_des);
-                                                            searchStream(holder);
+                                                            searchStream(holder, position);
                                                         }
                                                     })
                                                     .build().show();
                                         } else {
                                             MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
                                             showLoading(holder.ib_des);
-                                            searchStream(holder);
+                                            searchStream(holder, position);
                                         }
                                     }
                                 }
@@ -360,12 +361,17 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 }
             }
         });
-        if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid())) {
+        if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid()) && showProgress()) {
             startDownload(holder);
         } else {
             holder.progressBar.setVisibility(View.GONE);
         }
     }
+
+    private boolean showProgress() {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("prog_rec", true);
+    }
+
 
     private void cancelDownload(final AdapterMainNoGIF.ViewHolder holder) {
         getHandler().removeCallbacks(null);
@@ -379,13 +385,15 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
     }
 
     private void startDownload(final AdapterMainNoGIF.ViewHolder holder) {
-        context.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                holder.progressBar.setVisibility(View.VISIBLE);
-            }
-        });
-        getHandler().post(getProgressRunnable(holder));
+        if (showProgress()) {
+            context.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    holder.progressBar.setVisibility(View.VISIBLE);
+                }
+            });
+            getHandler().post(getProgressRunnable(holder));
+        }
     }
 
     private Handler getHandler() {
@@ -646,9 +654,9 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         notifyDataSetChanged();
     }
 
-    private void searchDownload(final AdapterMainNoGIF.ViewHolder holder) {
+    private void searchDownload(final ViewHolder holder, final int position) {
         try {
-            DownloadGetter.search(context, Animes.get(holder.getAdapterPosition()).getEid(), new knf.animeflv.JsonFactory.DownloadGetter.ActionsInterface() {
+            DownloadGetter.search(context, Animes.get(getPosition(holder.getAdapterPosition(), position)).getEid(), new DownloadGetter.ActionsInterface() {
                 @Override
                 public boolean isStream() {
                     return false;
@@ -670,14 +678,14 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                             MainStates.setProcessing(false, null);
                             showDelete(holder.ib_des);
                             showPlay(holder.ib_ver);
-                            ManageDownload.chooseDownDir(context, Animes.get(holder.getAdapterPosition()).getEid(), object.download_url, object.cookieConstructor);
+                            ManageDownload.chooseDownDir(context, Animes.get(getPosition(holder.getAdapterPosition(), position)).getEid(), object.download_url, object.cookieConstructor);
                             startDownload(holder);
                         }
 
                         @Override
                         public void onError() {
                             Toaster.toast("Error al obtener link, reintentando en modo nativo");
-                            MainStates.setZippyState(DownloadTask.DESCARGA, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
+                            MainStates.setZippyState(DownloadTask.DESCARGA, url, holder.ib_des, holder.ib_ver, getPosition(holder.getAdapterPosition(), position));
                             holder.webView.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -691,7 +699,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 @Override
                 public void onCancelDownload() {
                     MainStates.setProcessing(false, null);
-                    showDownload(holder.ib_des, holder.getAdapterPosition());
+                    showDownload(holder.ib_des, getPosition(holder.getAdapterPosition(), position));
                 }
 
                 @Override
@@ -708,13 +716,13 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
             e.printStackTrace();
             Toaster.toast("Error inesperado, intente de nuevo!");
             MainStates.setProcessing(false, null);
-            showDownload(holder.ib_des, holder.getAdapterPosition());
+            showDownload(holder.ib_des, getPosition(holder.getAdapterPosition(), position));
         }
     }
 
-    private void searchStream(final AdapterMainNoGIF.ViewHolder holder) {
+    private void searchStream(final ViewHolder holder, final int position) {
         try {
-            DownloadGetter.search(context, Animes.get(holder.getAdapterPosition()).getEid(), new knf.animeflv.JsonFactory.DownloadGetter.ActionsInterface() {
+            DownloadGetter.search(context, Animes.get(getPosition(holder.getAdapterPosition(), position)).getEid(), new DownloadGetter.ActionsInterface() {
                 @Override
                 public boolean isStream() {
                     return true;
@@ -723,7 +731,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 @Override
                 public void onStartDownload() {
                     MainStates.setProcessing(false, null);
-                    showDownload(holder.ib_des, holder.getAdapterPosition());
+                    showDownload(holder.ib_des, getPosition(holder.getAdapterPosition(), position));
                 }
 
                 @Override
@@ -732,17 +740,17 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                         @Override
                         public void onSuccess(zippyHelper.zippyObject object) {
                             MainStates.setProcessing(false, null);
-                            showDownload(holder.ib_des, holder.getAdapterPosition());
+                            showDownload(holder.ib_des, getPosition(holder.getAdapterPosition(), position));
                             int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
                             if (type == 1) {
-                                StreamManager.mx(context).Stream(Animes.get(holder.getAdapterPosition()).getEid(), object.download_url, object.cookieConstructor);
+                                StreamManager.mx(context).Stream(Animes.get(getPosition(holder.getAdapterPosition(), position)).getEid(), object.download_url, object.cookieConstructor);
                             } else {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    StreamManager.internal(context).Stream(Animes.get(holder.getAdapterPosition()).getEid(), object.download_url, object.cookieConstructor);
+                                    StreamManager.internal(context).Stream(Animes.get(getPosition(holder.getAdapterPosition(), position)).getEid(), object.download_url, object.cookieConstructor);
                                 } else {
                                     if (FileUtil.init(context).isMXinstalled()) {
                                         Toaster.toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
-                                        StreamManager.mx(context).Stream(Animes.get(holder.getAdapterPosition()).getEid(), object.download_url, object.cookieConstructor);
+                                        StreamManager.mx(context).Stream(Animes.get(getPosition(holder.getAdapterPosition(), position)).getEid(), object.download_url, object.cookieConstructor);
                                     } else {
                                         Toaster.toast("No hay reproductor adecuado disponible");
                                     }
@@ -753,7 +761,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                         @Override
                         public void onError() {
                             Toaster.toast("Error al obtener link, reintentando en modo nativo");
-                            MainStates.setZippyState(DownloadTask.STREAMING, url, holder.ib_des, holder.ib_ver, holder.getAdapterPosition());
+                            MainStates.setZippyState(DownloadTask.STREAMING, url, holder.ib_des, holder.ib_ver, getPosition(holder.getAdapterPosition(), position));
                             holder.webView.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -767,15 +775,16 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 @Override
                 public void onCancelDownload() {
                     MainStates.setProcessing(false, null);
-                    showDownload(holder.ib_des, holder.getAdapterPosition());
+                    showDownload(holder.ib_des, getPosition(holder.getAdapterPosition(), position));
                     showCloudPlay(holder.ib_ver);
                 }
 
                 @Override
                 public void onStartCasting() {
                     MainStates.setProcessing(false, null);
-                    showDownload(holder.ib_des, holder.getAdapterPosition());
+                    showDownload(holder.ib_des, getPosition(holder.getAdapterPosition(), position));
                     showCastPlay(holder.ib_ver);
+                    resetIcon();
                 }
 
                 @Override
@@ -787,9 +796,29 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
             e.printStackTrace();
             Toaster.toast("Error inesperado, intente de nuevo!");
             MainStates.setProcessing(false, null);
-            showDownload(holder.ib_des, holder.getAdapterPosition());
+            showDownload(holder.ib_des, getPosition(holder.getAdapterPosition(), position));
             showCloudPlay(holder.ib_ver);
         }
+    }
+
+    private void resetIcon() {
+        String eid = CastPlayBackManager.get(context).getCastingEid();
+        int pos = AnimesContainsEid(eid);
+        if (pos != -1) {
+            notifyItemChanged(pos);
+        }
+    }
+
+    private int AnimesContainsEid(String eid) {
+        for (int i = 0; i < Animes.size(); i++) {
+            if (Animes.get(i).getEid().equals(eid))
+                return i;
+        }
+        return -1;
+    }
+
+    private int getPosition(int holder, int pos) {
+        return holder == -1 ? pos : holder;
     }
 
     @Override

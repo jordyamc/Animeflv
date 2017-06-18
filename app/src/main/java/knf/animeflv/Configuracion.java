@@ -8,14 +8,11 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,25 +49,14 @@ public class Configuracion extends AppCompatActivity implements LoginServer.call
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.configuracion);
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(getResources().getColor(R.color.dark));
-            getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
+            getWindow().setStatusBarColor(theme.primaryDark);
+            getWindow().setNavigationBarColor(theme.primary);
         }
         Toolbar toolbar=(Toolbar) findViewById(R.id.conf_toolbar);
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("is_amoled", false)) {
-            toolbar.setBackgroundColor(getResources().getColor(android.R.color.black));
-            toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(getResources().getColor(R.color.negro));
-                getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
-            }
-        }
+        toolbar.setBackgroundColor(theme.primary);
+        toolbar.getRootView().setBackgroundColor(theme.background);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Configuracion");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

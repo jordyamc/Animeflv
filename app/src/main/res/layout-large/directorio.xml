@@ -6,15 +6,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include
+    <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_l"
-        layout="@layout/toolbar" />
+        android:layout_width="match_parent"
+        android:layout_height="70dp" />
+
 
     <com.ogaclejapan.smarttablayout.SmartTabLayout
         android:id="@+id/viewpagertab2"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginTop="10dp"
         android:background="@color/prim"
         android:clipToPadding="false"
         android:paddingBottom="8dp"
@@ -37,7 +38,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include layout="@layout/toolbar" />
+        <include
+            android:id="@+id/extra_toolbar"
+            layout="@layout/toolbar" />
 
         <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/cardMain"

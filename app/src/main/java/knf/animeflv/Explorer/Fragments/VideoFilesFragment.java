@@ -18,7 +18,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import knf.animeflv.ColorsRes;
 import knf.animeflv.Explorer.Adapters.DirectoryAdapter;
 import knf.animeflv.Explorer.Adapters.VideoFileAdapter;
 import knf.animeflv.Explorer.Models.ModelFactory;
@@ -43,13 +42,10 @@ public class VideoFilesFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View root = inflater.inflate(R.layout.explorer_fragment, container, false);
         ButterKnife.bind(this, root);
-        loading.setProgressColor(ThemeUtils.getAcentColor(getActivity()));
-        if (ThemeUtils.isAmoled(getActivity())) {
-            root.getRootView().setBackgroundColor(ColorsRes.Negro(getActivity()));
-            noAnime.setTextColor(ColorsRes.SecondaryTextDark(getActivity()));
-        } else {
-            noAnime.setTextColor(ColorsRes.SecondaryTextLight(getActivity()));
-        }
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(getActivity());
+        root.getRootView().setBackgroundColor(theme.background);
+        noAnime.setTextColor(theme.secondaryTextColor);
+        loading.setProgressColor(theme.accent);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         final File file = new File(getArguments().getString("path"));
         ModelFactory.createVideosListAsync(file, new ModelFactory.AsyncFileListener() {

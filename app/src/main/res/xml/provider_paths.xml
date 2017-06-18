@@ -7,6 +7,9 @@
         name="cache"
         path="Animeflv/cache/"/>
     <external-path
+        name="themes"
+        path="Animeflv/cache/theme/" />
+    <external-path
         name="download"
         path="Animeflv/download/"/>
     <external-path

@@ -42,11 +42,13 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private boolean sectionsEnabled = false;
     private boolean editing = false;
     private boolean searching = false;
+    private ThemeUtils.Theme theme;
 
     public FavoriteAdapter(Activity context) {
         this.context = context;
         this.sectionsEnabled = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("section_favs", false);
         this.list = new FavotiteDB(context).getAllSectionsExtended(true, sectionsEnabled);
+        this.theme = ThemeUtils.Theme.create(context);
         setHasStableIds(true);
     }
 
@@ -54,6 +56,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.context = context;
         this.sectionsEnabled = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("section_favs", false);
         this.list = new FavotiteDB(context).getAllSectionsExtended(true, sectionsEnabled, search);
+        this.theme = ThemeUtils.Theme.create(context);
         setHasStableIds(true);
     }
 
@@ -79,13 +82,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (h.getItemViewType() == FavotiteDB.TYPE_SECTION) {
             final SectionViewHolder holder = (SectionViewHolder) h;
             holder.name.setText(list.get(position).name);
-            if (ThemeUtils.isAmoled(context)) {
-                holder.name.setTextColor(ColorsRes.SecondaryTextDark(context));
-                holder.def_ind.setColorFilter(ColorsRes.Holo_Dark(context));
-            } else {
-                holder.name.setTextColor(ColorsRes.SecondaryTextLight(context));
-                holder.def_ind.setColorFilter(ColorsRes.Blanco(context));
-            }
+            holder.name.setTextColor(theme.textColor);
+            holder.def_ind.setColorFilter(theme.iconFilter);
             if (list.get(position).name.equals(FavoriteHelper.getDefaultSectionName(context))) {
                 holder.def_ind.setImageResource(R.drawable.ic_fav_lleno);
             } else {
@@ -170,11 +168,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             final FavViewHolder holder = (FavViewHolder) h;
             new CacheManager().mini(context, list.get(position).aid, holder.imageView);
             holder.name.setText(list.get(position).name);
-            if (ThemeUtils.isAmoled(context)) {
-                holder.name.setTextColor(ColorsRes.SecondaryTextDark(context));
-            } else {
-                holder.name.setTextColor(ColorsRes.SecondaryTextLight(context));
-            }
+            holder.name.setTextColor(theme.textColor);
+            holder.cardView.setCardBackgroundColor(theme.card_normal);
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -224,10 +219,10 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             final int dragState = holder.getDragStateFlags();
             if (((dragState & FavoriteAdapter.Draggable.STATE_FLAG_IS_UPDATED) != 0)) {
                 if ((dragState & FavoriteAdapter.Draggable.STATE_FLAG_IS_ACTIVE) != 0) {
-                    holder.cardView.setCardBackgroundColor(ThemeUtils.getAcentColor(context));
+                    holder.cardView.setCardBackgroundColor(theme.accent);
                     holder.name.setTextColor(ColorsRes.Blanco(context));
                 } else {
-                    holder.cardView.setCardBackgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context));
+                    holder.cardView.setCardBackgroundColor(theme.card_normal);
                 }
             }
         }

@@ -14,6 +14,7 @@ public class Keys {
         public static final File CACHE_PORTADA = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/portada");
         public static final File CACHE_THUMBS = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/thumbs");
         public static final File CACHE_DIRECTORIO = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
+        public static final File CACHE_THEMES = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/theme");
         public static final File DOWNLOADS = new File(Environment.getExternalStorageDirectory() + "/Animeflv/downloads");
         public static final File UPDATE = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "Animeflv_Nver.apk");
         public static final File SOUNDS_NOMEDIA = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/.sounds/.nomedia");

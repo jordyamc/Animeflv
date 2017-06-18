@@ -10,6 +10,11 @@
     <string name="next">Siguiente</string>
     <string name="back">Atras</string>
 
+    <string name="done">Hecho</string>
+    <string name="cancel">Cancelar</string>
+    <string name="presents">Sugerido</string>
+    <string name="custom">Modificar</string>
+
     <string-array name="time_bypass">
         <item>30 segundos</item>
         <item>1 minuto</item>

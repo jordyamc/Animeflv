@@ -15,6 +15,19 @@
         <item name="android:windowAnimationStyle">@style/Animations</item>
     </style>
 
+    <style name="AestethicThemeLigth" parent="MaterialDrawerTheme.Light.DarkToolbar">
+        <item name="material_drawer_selected">?android:windowBackground</item>
+        <item name="material_drawer_selected_text">?attr/colorAccent</item>
+        <item name="material_drawer_divider">?attr/colorAccent</item>
+    </style>
+
+    <style name="AestethicThemeDark" parent="AestethicThemeLigth">
+        <item name="material_drawer_background">@color/negro</item>
+        <item name="material_drawer_primary_text">@color/blanco</item>
+        <item name="material_drawer_primary_icon">@color/blanco</item>
+        <item name="material_drawer_secondary_text">@color/blanco</item>
+    </style>
+
     <style name="MenuLabelsStyle">
         <item name="android:background">@drawable/label</item>
         <item name="android:textColor">#FFFFFF</item>
@@ -532,7 +545,7 @@
         <item name="colorAccent">@color/theme_naranja</item>
         <item name="android:colorBackground">@color/blanco</item>
         <item name="material_drawer_selected">#EDEDED</item>
-        <item name="material_drawer_selected_text">@color/theme_naranja</item>
+        <item name="material_drawer_selected_text">?attr/colorAccent</item>
         <item name="material_drawer_divider">@color/theme_naranja</item>
         <item name="android:editTextColor">@color/blanco</item>
         <item name="android:textColorHint">@color/dark</item>

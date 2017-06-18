@@ -18,13 +18,13 @@ apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.0-rc2'
+    buildToolsVersion '26.0.0'
     defaultConfig {
         applicationId "knf.animeflv"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 213
-        versionName "5.1.0"
+        versionCode 214
+        versionName "5.2.0"
         multiDexEnabled = true
     }
     buildTypes {
@@ -65,6 +65,9 @@ android {
     lintOptions {
         abortOnError false
     }
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
+    }
 }
 allprojects {
     repositories {
@@ -96,7 +99,7 @@ dependencies {
     /*compile('com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:0.10.6@aar') {
         transitive = true
     }*/
-    compile('com.mikepenz:materialdrawer:5.9.0@aar') {
+    compile('com.mikepenz:materialdrawer:5.9.2@aar') {
         transitive = true
     }
     compile files('jsoup-1.9.2.jar')
@@ -109,8 +112,8 @@ dependencies {
     compile 'com.mikepenz:material-design-iconic-typeface:2.2.0.2@aar'
     compile 'com.mikepenz:fontawesome-typeface:4.7.0.0@aar'
     compile 'com.mikepenz:community-material-typeface:1.7.22.1@aar'
-    compile 'com.afollestad.material-dialogs:core:0.9.1.0'
-    compile 'com.afollestad.material-dialogs:commons:0.9.1.0'
+    compile 'com.afollestad.material-dialogs:core:0.9.4.3'
+    compile 'com.afollestad.material-dialogs:commons:0.9.4.3'
     compile 'jp.wasabeef:recyclerview-animators:2.2.3'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'com.cleveroad:audiowidget:1.0.0'
@@ -165,7 +168,7 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'me.zhanghai.android.materialratingbar:library:1.0.2'
     compile 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
-    compile 'com.onesignal:OneSignal:[3.5.3,4.0.0)'
+    compile 'com.onesignal:OneSignal:3.+@aar'
     compile 'org.cryse.widget:persistentsearchview:1.0.4@aar'
     compile 'com.github.GrenderG:Color-O-Matic:1.1.5'
     compile ('com.github.ViksaaSkool:AwesomeSplash:v1.0.0'){

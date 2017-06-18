@@ -71,6 +71,7 @@ public class AboutActivity extends MaterialAboutActivity {
             toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
     }
 
+
     @Override
     protected MaterialAboutList getMaterialAboutList(final Context context) {
 

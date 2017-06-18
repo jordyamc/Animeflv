@@ -23,4 +23,9 @@ public class ThemeHolder {
         ThemeUtils.setAmoled(context, isDark);
         PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("accentColor", accentColor).apply();
     }
+
+    public static void resetOld() {
+        old_isDark = false;
+        old_accentColor = -1;
+    }
 }

@@ -126,6 +126,11 @@
             android:title="Desactivar Gifs" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
+            android:key="prog_rec"
+            android:summary="Recientes"
+            android:title="Progreso de descarga" />
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="true"
             android:key="resaltar"
             android:summary="Animes, OVAS, Peliculas nuevas, y Animes en favoritos"
             android:title="Resaltar" />

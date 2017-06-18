@@ -190,23 +190,20 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         });
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBackPressed();
             }
         });
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        layout.setBackgroundColor(theme.background);
+        collapsingToolbarLayout.setContentScrimColor(theme.primary);
+        collapsingToolbarLayout.setStatusBarScrimColor(ColorsRes.Transparent(context));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        if (ThemeUtils.isAmoled(this)) {
-            layout.setBackgroundColor(ColorsRes.Negro(this));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
-            }
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
-            }
+            getWindow().setStatusBarColor(theme.primaryDark);
+            getWindow().setNavigationBarColor(theme.primary);
         }
         MainStates.setListing(false);
         imageView.setOnClickListener(getExpandListener());

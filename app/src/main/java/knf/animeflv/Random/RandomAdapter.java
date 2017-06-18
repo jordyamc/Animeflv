@@ -19,7 +19,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.ExecutorManager;
@@ -34,11 +33,13 @@ public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.ViewHolder
     private int lastPosition = -1;
     private List<AnimeObject> aids = new ArrayList<>();
     private List<AnimeObject> list = new ArrayList<>();
+    private ThemeUtils.Theme theme;
 
     public RandomAdapter(Activity activity) {
         this.activity = activity;
         this.interfaces = (RandomInterfaces) activity;
         this.list = RandomHelper.getList(MAX_ITEMS);
+        this.theme = ThemeUtils.Theme.create(activity);
     }
 
     @Override
@@ -50,9 +51,9 @@ public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(final RandomAdapter.ViewHolder holder, final int position) {
-        holder.card.setBackgroundColor(ThemeUtils.isAmoled(activity) ? ColorsRes.Prim(activity) : ColorsRes.Blanco(activity));
-        holder.tv_tit.setTextColor(ThemeUtils.isAmoled(activity) ? ColorsRes.SecondaryTextDark(activity) : ColorsRes.SecondaryTextLight(activity));
-        holder.tv_tipo.setTextColor(ThemeUtils.getAcentColor(activity));
+        holder.card.setCardBackgroundColor(theme.card_normal);
+        holder.tv_tit.setTextColor(theme.textColor);
+        holder.tv_tipo.setTextColor(theme.accent);
         if (list == null) {
             final AnimeObject object = aids.get(holder.getAdapterPosition());
             activity.runOnUiThread(new Runnable() {

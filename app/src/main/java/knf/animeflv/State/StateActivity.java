@@ -1,6 +1,7 @@
 package knf.animeflv.State;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
@@ -113,11 +114,14 @@ public class StateActivity extends AppCompatActivity {
                 return true;
             }
         });
-        if (ThemeUtils.isAmoled(this)) {
-            toolbar.setBackgroundColor(ColorsRes.Negro(this));
-            toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
-            cardView.setCardBackgroundColor(ColorsRes.Prim(this));
-            cardView_bypass.setCardBackgroundColor(ColorsRes.Prim(this));
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
+        toolbar.setBackgroundColor(theme.primary);
+        toolbar.getRootView().setBackgroundColor(theme.background);
+        cardView.setCardBackgroundColor(theme.card_normal);
+        cardView_bypass.setCardBackgroundColor(theme.card_normal);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(theme.primaryDark);
+            getWindow().setNavigationBarColor(theme.primary);
         }
         startCheck();
     }

@@ -34,7 +34,6 @@ import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 import cz.msebera.android.httpclient.message.BasicHeader;
 import cz.msebera.android.httpclient.protocol.HTTP;
-import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
@@ -200,8 +199,8 @@ public class PushManager extends AppCompatActivity {
     }
 
     @ColorInt
-    private int getTextColor() {
-        return ThemeUtils.isAmoled(this) ? ColorsRes.SecondaryTextDark(this) : ColorsRes.SecondaryTextLight(this);
+    private int getTextColor(ThemeUtils.Theme theme) {
+        return theme.secondaryTextColor;
     }
 
     private String[] getTypes() {
@@ -214,19 +213,18 @@ public class PushManager extends AppCompatActivity {
     }
 
     private void customViews() {
-        if (ThemeUtils.isAmoled(this)) {
-            toolbar.setBackgroundColor(ColorsRes.Negro(this));
-            toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
-        }
-        cardView.setCardBackgroundColor(ThemeUtils.isAmoled(this) ? ColorsRes.Prim(this) : ColorsRes.Blanco(this));
-        cardView_fast.setCardBackgroundColor(ThemeUtils.isAmoled(this) ? ColorsRes.Prim(this) : ColorsRes.Blanco(this));
-        type.setTextColor(getTextColor());
-        test.setTextColor(getTextColor());
-        title_fast.setTextColor(getTextColor());
-        title.setHintTextColor(getTextColor());
-        subtitle.setHintTextColor(getTextColor());
-        dialog_text.setHintTextColor(getTextColor());
-        web_url.setHintTextColor(getTextColor());
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
+        toolbar.setBackgroundColor(theme.primary);
+        toolbar.getRootView().setBackgroundColor(theme.background);
+        cardView.setCardBackgroundColor(theme.card_normal);
+        cardView_fast.setCardBackgroundColor(theme.card_normal);
+        type.setTextColor(getTextColor(theme));
+        test.setTextColor(getTextColor(theme));
+        title_fast.setTextColor(getTextColor(theme));
+        title.setHintTextColor(getTextColor(theme));
+        subtitle.setHintTextColor(getTextColor(theme));
+        dialog_text.setHintTextColor(getTextColor(theme));
+        web_url.setHintTextColor(getTextColor(theme));
     }
 
     public void setFast(View view) {

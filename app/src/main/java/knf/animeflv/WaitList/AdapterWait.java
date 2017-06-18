@@ -2,7 +2,6 @@ package knf.animeflv.WaitList;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +48,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
     private Activity context;
     private Parser parser = new Parser();
     private WaitDownloadCallback callback;
+    private ThemeUtils.Theme theme;
 
     AdapterWait(Activity context, RecyclerViewExpandableItemManager manager, RecyclerViewSwipeManager swipeManager) {
         setHasStableIds(true);
@@ -58,6 +58,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
         animes = WaitManager.getAnimesList();
         animesCapList = WaitManager.getNumerosList();
         callback = (WaitDownloadCallback) context;
+        theme = ThemeUtils.Theme.create(context);
     }
 
     @Override
@@ -96,18 +97,10 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
 
     @Override
     public void onBindGroupViewHolder(final GroupHolder holder, final int groupPosition, int viewType) {
-        if (ThemeUtils.isAmoled(context)) {
-            holder.card.setCardBackgroundColor(ColorsRes.Prim(context));
-            holder.titulo.setTextColor(ColorsRes.Blanco(context));
-            holder.delete.setColorFilter(ColorsRes.Holo_Dark(context));
-            holder.start.setColorFilter(ColorsRes.Holo_Dark(context));
-        } else {
-            holder.card.setCardBackgroundColor(ColorsRes.Blanco(context));
-            holder.titulo.setTextColor(ColorsRes.SecondaryTextLight(context));
-            holder.delete.setColorFilter(ColorsRes.Holo_Light(context));
-            holder.start.setColorFilter(ColorsRes.Holo_Light(context));
-        }
-        //PicassoCache.getPicassoInstance(context).load(Uri.parse(getUrlImg(animes.get(groupPosition)))).error(R.drawable.ic_block_r).into(holder.image);
+        holder.card.setCardBackgroundColor(theme.card_normal);
+        holder.titulo.setTextColor(theme.textColor);
+        holder.delete.setColorFilter(theme.iconFilter);
+        holder.start.setColorFilter(theme.iconFilter);
         new CacheManager().mini(context, animes.get(groupPosition).aid, holder.image);
         holder.titulo.setText(parser.getTitCached(animes.get(groupPosition).aid));
         holder.image.setOnClickListener(new View.OnClickListener() {
@@ -189,17 +182,10 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
 
     @Override
     public void onBindChildViewHolder(final ChildHolder holder, final int groupPosition, final int childPosition, int viewType) {
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
-            holder.card.setCardBackgroundColor(ColorsRes.Prim(context));
-            holder.cap.setTextColor(ColorsRes.Blanco(context));
-            holder.delete.setColorFilter(ColorsRes.Holo_Dark(context));
-            holder.download.setColorFilter(ColorsRes.Holo_Dark(context));
-        } else {
-            holder.card.setCardBackgroundColor(ColorsRes.Blanco(context));
-            holder.cap.setTextColor(ColorsRes.SecondaryTextLight(context));
-            holder.delete.setColorFilter(ColorsRes.Holo_Light(context));
-            holder.download.setColorFilter(ColorsRes.Holo_Light(context));
-        }
+        holder.card.setCardBackgroundColor(theme.card_normal);
+        holder.cap.setTextColor(theme.textColor);
+        holder.delete.setColorFilter(theme.iconFilter);
+        holder.download.setColorFilter(theme.iconFilter);
         holder.cap.setText(Parser.getCap(animes.get(groupPosition).type, String.valueOf(animesCapList.get(groupPosition).get(childPosition)), animesCapList.get(groupPosition).size() > 1));
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override

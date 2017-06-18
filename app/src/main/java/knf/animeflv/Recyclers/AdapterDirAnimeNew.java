@@ -18,6 +18,7 @@ import butterknife.ButterKnife;
 import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
+import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
 
 /**
@@ -27,9 +28,11 @@ public class AdapterDirAnimeNew extends RecyclerView.Adapter<AdapterDirAnimeNew.
 
     List<AnimeClass> Animes;
     private Activity context;
+    private ThemeUtils.Theme theme;
     public AdapterDirAnimeNew(Activity context, List<AnimeClass> animes) {
         this.context = context;
         this.Animes = animes;
+        this.theme = ThemeUtils.Theme.create(context);
     }
 
     public static String byte2HexFormatted(byte[] arr) {
@@ -54,10 +57,8 @@ public class AdapterDirAnimeNew extends RecyclerView.Adapter<AdapterDirAnimeNew.
 
     @Override
     public void onBindViewHolder(final AdapterDirAnimeNew.ViewHolder holder, final int position) {
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
-            holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
-            holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
-        }
+        holder.card.setCardBackgroundColor(theme.card_normal);
+        holder.tv_tit.setTextColor(theme.textColor);
         new CacheManager().mini(context,Animes.get(holder.getAdapterPosition()).getAid(),holder.iv_rel);
         holder.tv_tit.setText(Animes.get(holder.getAdapterPosition()).getNombre());
         holder.card.setOnClickListener(new View.OnClickListener() {

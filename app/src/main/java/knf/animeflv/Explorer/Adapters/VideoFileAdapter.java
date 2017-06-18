@@ -3,6 +3,7 @@ package knf.animeflv.Explorer.Adapters;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -49,6 +50,7 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
     private File current;
     private Handler handler;
     private DirectoryAdapter.OnFinishListListener listListener;
+    private ThemeUtils.Theme theme;
 
     public VideoFileAdapter(Activity context, File file, List<VideoFile> list, DirectoryAdapter.OnFinishListListener listListener) {
         this.context = context;
@@ -56,6 +58,7 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
         this.interfaces = (ExplorerInterfaces) context;
         this.current = file;
         this.listListener = listListener;
+        this.theme = ThemeUtils.Theme.create(context);
     }
 
     @Override
@@ -102,16 +105,12 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
             holder.iV_visto.setColorFilter(ThemeUtils.getAcentColor(context));
             holder.titulo.setText(list.get(holder.getAdapterPosition()).getTitle());
             holder.cap.setText(list.get(holder.getAdapterPosition()).getDuration(context));
-            holder.cap.setTextColor(ThemeUtils.getAcentColor(context));
-            if (ThemeUtils.isAmoled(context)) {
-                holder.titulo.setTextColor(ColorsRes.Holo_Dark(context));
-                holder.ver.setColorFilter(ColorsRes.Holo_Dark(context));
-                holder.del.setColorFilter(ColorsRes.Holo_Dark(context));
-            } else {
-                holder.titulo.setTextColor(ColorsRes.Holo_Light(context));
-                holder.ver.setColorFilter(ColorsRes.Holo_Light(context));
-                holder.del.setColorFilter(ColorsRes.Holo_Light(context));
-            }
+            holder.cap.setTextColor(theme.accent);
+            holder.titulo.setTextColor(theme.textColor);
+            holder.ver.setColorFilter(theme.iconFilter);
+            holder.del.setColorFilter(theme.iconFilter);
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+                holder.progress.getProgressDrawable().setColorFilter(theme.accent, PorterDuff.Mode.SRC_ATOP);
             holder.root.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {

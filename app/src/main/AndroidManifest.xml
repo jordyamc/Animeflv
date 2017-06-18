@@ -175,6 +175,32 @@
             android:name=".PlayerSimple"
             android:label="@string/app_name"/>
         <activity
+            android:name=".CustomSettingsIntro.fragments.ThemeFragmentAdvanced"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="file" />
+                <data android:host="*" />
+                <data android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.aflvtheme" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="content" />
+                <data android:host="*" />
+                <data android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.aflvtheme" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".PlayerExo"
             android:label="@string/app_name"/>
         <activity

@@ -25,6 +25,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -33,7 +34,6 @@ import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -80,6 +80,7 @@ import knf.animeflv.AdminControl.PushManager;
 import knf.animeflv.AutoEmision.AutoEmisionActivity;
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.Cloudflare.Bypass;
+import knf.animeflv.CustomSettingsIntro.fragments.ThemeFragmentAdvanced;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.DownloadService.DownloaderService;
 import knf.animeflv.Explorer.ExplorerRoot;
@@ -724,7 +725,7 @@ public class newMain extends AppCompatActivity implements
     }
 
     private void cambiarColor() {
-        int[] colorl = new int[]{
+        /*int[] colorl = new int[]{
                 ColorsRes.GrisLigth(this),
                 ColorsRes.Prim(this)
         };
@@ -739,7 +740,8 @@ public class newMain extends AppCompatActivity implements
                 .preselect(ThemeUtils.isAmoled(this) ? ColorsRes.Dark(this) : ColorsRes.Gris(this))
                 .accentMode(true)
                 .build();
-        dialog.show(this);
+        dialog.show(this);*/
+        startActivityForResult(new Intent(this, ThemeFragmentAdvanced.class), 6699);
     }
 
     private boolean isXLargeScreen() {
@@ -774,49 +776,37 @@ public class newMain extends AppCompatActivity implements
     }
 
     private void setUpAmoled() throws Exception {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        }
-        if (ThemeUtils.isAmoled(this)) {
-            isAmoled = true;
-            toolbar.setBackgroundColor(getResources().getColor(R.color.negro));
-            if (!isXLargeScreen()) {
-                toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.negro));
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
+        isAmoled = theme.isDark;
+        toolbar.setBackgroundColor(theme.primary);
+        try {
+            if (isXLargeScreen()) {
+                findViewById(R.id.frame).setBackgroundColor(theme.primary);
+                ((CardView) findViewById(R.id.cardMain)).setCardBackgroundColor(theme.primary);
+                menu_toolbar.setBackgroundColor(theme.tablet_toolbar);
+                menu_toolbar.getRootView().setBackgroundColor(theme.tablet_background);
+                toolbar.getRootView().setBackgroundColor(theme.tablet_background);
             } else {
-                try {
-                    findViewById(R.id.frame).setBackgroundColor(ColorsRes.Negro(this));
-                    toolbar.getRootView().setBackgroundColor(ColorsRes.Prim(this));
-                    findViewById(R.id.cardMain).setBackgroundColor(ColorsRes.Negro(this));
-                } catch (Exception e) {
-
-                }
+                toolbar.getRootView().setBackgroundColor(theme.background);
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                if (!isXLargeScreen()) {
-                    getWindow().setStatusBarColor(getResources().getColor(R.color.negro));
-                    getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
-                } else {
-                    getWindow().setStatusBarColor(ColorsRes.Prim(this));
-                    getWindow().setNavigationBarColor(ColorsRes.Negro(this));
-                }
-            }
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                getWindow().setNavigationBarColor(ColorsRes.Prim(this));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+            //getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(theme.primaryDark);
+            getWindow().setNavigationBarColor(theme.primary);
         }
     }
 
     private void setUpViews() throws Exception {
-        if (!isXLargeScreen()) { //Portrait
-            //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        if (!isXLargeScreen()) {
             menu_toolbar = toolbar;
         } else {
-            //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            toolbar = (Toolbar) findViewById(R.id.main_toolbar);
             menu_toolbar = (Toolbar) findViewById(R.id.ltoolbar);
-
+            toolbar.setTitleTextColor(ThemeUtils.isAmoled(this) ? ColorsRes.Blanco(context) : ColorsRes.Negro(context));
         }
         root = (LinearLayout) findViewById(R.id.main_root);
         recyclerView = (RecyclerView) findViewById(R.id.rv_main);
@@ -1087,6 +1077,11 @@ public class newMain extends AppCompatActivity implements
     }
 
     @Override
+    public void onColorChooserDismissed(@NonNull ColorChooserDialog colorChooserDialog) {
+
+    }
+
+    @Override
     public void onRefresh() {
         if (NetworkUtils.isNetworkAvailable()) {
 //            ActualizarFavoritos();
@@ -1296,6 +1291,8 @@ public class newMain extends AppCompatActivity implements
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1147) {
             setUpDrawer();
+        } else if (requestCode == 6699 && resultCode == 1506) {
+            recreate();
         }
     }
 

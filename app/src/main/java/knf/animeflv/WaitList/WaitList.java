@@ -14,8 +14,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
@@ -81,27 +79,14 @@ public class WaitList extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wait_list_lay);
         context = this;
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
         toolbar = (Toolbar) findViewById(R.id.toolbar_wait);
-        if (ThemeUtils.isAmoled(this)) {
-            toolbar.setBackgroundColor(getResources().getColor(android.R.color.black));
-            toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(getResources().getColor(R.color.negro));
-                getWindow().setNavigationBarColor(getResources().getColor(R.color.negro));
-            }
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                window.setStatusBarColor(getResources().getColor(R.color.dark));
-                getWindow().setNavigationBarColor(getResources().getColor(R.color.prim));
-            }
+        toolbar.setBackgroundColor(theme.primary);
+        toolbar.getRootView().setBackgroundColor(theme.background);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(theme.primaryDark);
+            getWindow().setNavigationBarColor(theme.primary);
         }
-        toolbar = (Toolbar) findViewById(R.id.toolbar_wait);
         recyclerView = (RecyclerView) findViewById(R.id.rv_wait_list);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {

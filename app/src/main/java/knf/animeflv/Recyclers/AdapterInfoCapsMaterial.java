@@ -60,12 +60,14 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     private String ext_storage_state = Environment.getExternalStorageState();
     private Boolean streaming = false;
     private Activity context;
+    private ThemeUtils.Theme theme;
 
     public AdapterInfoCapsMaterial(Activity context, List<String> capitulos, String aid, List<String> eid) {
         this.capitulo = capitulos;
         this.context = context;
         this.id = aid;
         this.eids = eid;
+        this.theme = ThemeUtils.Theme.create(context);
     }
 
     @Override
@@ -101,18 +103,12 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             }
         }
         holder.tv_capitulo.setText(capitulo.get(position));
-        holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
-            holder.card.setCardBackgroundColor(ColorsRes.Prim(context));
-            holder.tv_capitulo.setTextColor(ColorsRes.Blanco(context));
-            holder.ib_ver.setColorFilter(ColorsRes.Holo_Dark(context));
-            holder.ib_des.setColorFilter(null);
-            holder.ib_des.setColorFilter(ColorsRes.Holo_Dark(context));
-        } else {
-            holder.ib_ver.setColorFilter(ColorsRes.Holo_Light(context));
-            holder.ib_des.setColorFilter(null);
-            holder.ib_des.setColorFilter(ColorsRes.Holo_Light(context));
-        }
+        holder.tv_capitulo.setTextColor(theme.textColor);
+        holder.card.setCardBackgroundColor(theme.card_normal);
+        holder.ib_des.setColorFilter(null);
+        holder.ib_ver.setColorFilter(null);
+        holder.ib_ver.setColorFilter(theme.iconFilter);
+        holder.ib_des.setColorFilter(theme.iconFilter);
         if (SeenManager.get(context).isSeen(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
             holder.tv_capitulo.setTextColor(getColor());
         }
@@ -362,7 +358,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
 
     @ColorInt
     private int getColor() {
-        return ThemeUtils.getAcentColor(context);
+        return theme.accent;
     }
 
     private void searchDownload(final ViewHolder holder) {

@@ -29,7 +29,6 @@ import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import knf.animeflv.ColorsRes;
 import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.R;
 import knf.animeflv.Utils.ExecutorManager;
@@ -77,25 +76,21 @@ public class AutoEmisionActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Emision");
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
-        if (ThemeUtils.isAmoled(this)) {
-            toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
-            toolbar.setBackgroundColor(ColorsRes.Negro(this));
-            smartTabLayout.setBackgroundColor(ColorsRes.Negro(this));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(ColorsRes.Negro(this));
-                getWindow().setNavigationBarColor(ColorsRes.Negro(this));
-            }
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(ColorsRes.Dark(this));
-                getWindow().setNavigationBarColor(ColorsRes.Prim(this));
-            }
+        toolbar.getRootView().setBackgroundColor(theme.background);
+        toolbar.setBackgroundColor(theme.primary);
+        smartTabLayout.setBackgroundColor(theme.primary);
+        smartTabLayout.setSelectedIndicatorColors(theme.indicatorColor);
+        smartTabLayout.setDefaultTabTextColor(theme.textColor);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(theme.primaryDark);
+            getWindow().setNavigationBarColor(theme.primary);
         }
         IntentFilter filter = new IntentFilter();
         filter.addAction(InfoFragments.ACTION_EDITED);

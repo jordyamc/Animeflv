@@ -51,7 +51,7 @@
             android:clickable="true"
             android:elevation="5dp"
             android:src="@drawable/move"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
     </FrameLayout>
 

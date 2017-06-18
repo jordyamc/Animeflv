@@ -163,6 +163,11 @@ public class CustomIntro extends MaterialIntroActivity implements ColorChooserDi
     }
 
     @Override
+    public void onColorChooserDismissed(@NonNull ColorChooserDialog colorChooserDialog) {
+
+    }
+
+    @Override
     public void onBackPressed() {
 
     }

@@ -215,7 +215,9 @@ public class SelfGetter {
         String hyperion360 = "null";
         String hyperion480 = "null";
         String hyperion720 = "null";
-        String[] names = new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 720p", "Yotta 480p", "Yotta 360p", "Hyperion", "Hyperion Direct", "Hyperion 360p", "Hyperion 480p", "Hyperion 720p", "Clup", /*"Openload",*/ "Mp4Upload", "YourUpload", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
+        String okrusd = "null";
+        String okruhd = "null";
+        String[] names = new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 720p", "Yotta 480p", "Yotta 360p", "Hyperion", "Hyperion Direct", "Hyperion 360p", "Hyperion 480p", "Hyperion 720p", "Okru SD", "Okru HD", "Clup", /*"Openload",*/ "Mp4Upload", "YourUpload", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
         try {
             JSONArray links = new JSONArray();
             Log.e("Url", url);
@@ -270,7 +272,7 @@ public class SelfGetter {
                 }
             }
             String json = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()"));
-            String[] parts = json.split("video");
+            String[] parts = json.split("video[^a-z]");
             for (String el : parts) {
                 if (el.contains("server=izanagi")) {
                     String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
@@ -306,6 +308,24 @@ public class SelfGetter {
                         e.printStackTrace();
                         Log.e("No Hyperion", down_link.replace("embed_hyperion", "check"));
                     }
+                } else if (el.contains("ok.ru")) {
+                    try {
+                        String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                        String down_link = "http:" + Jsoup.parse(frame).select("iframe").first().attr("src");
+                        String e_json = Jsoup.connect(down_link).get().select("div[data-module='OKVideo']").first().attr("data-options");
+                        String cut_json = "{" + e_json.substring(e_json.lastIndexOf("\\\"videos"), e_json.indexOf(",\\\"metadataEmbedded")).replace("\\&quot;", "\"").replace("\\u0026", "&").replace("\\", "") + "}";
+                        JSONArray array = new JSONObject(cut_json).getJSONArray("videos");
+                        for (int i = 0; i < array.length(); i++) {
+                            JSONObject object = array.getJSONObject(i);
+                            if (object.getString("name").equals("sd")) {
+                                okrusd = object.getString("url");
+                            } else if (object.getString("name").equals("hd")) {
+                                okruhd = object.getString("url");
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 } else if (el.contains("drive.google.com")) {
                     String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
                     String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
@@ -318,38 +338,38 @@ public class SelfGetter {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                } else if (el.contains("server=gdrive")) {
+                } else if (el.contains("server=yotta")) {
                     String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
                     String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
                     try {
-                        JSONArray ja = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getJSONArray("sources");
+                        JSONArray ja = new JSONObject(Jsoup.connect(down_link.replace("embed", "check_yotta")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getJSONArray("sources");
                         if (ja.length() > 1) {
                             for (int i = 0; i <= ja.length(); i++) {
-                                String label = ja.getJSONObject(i).getString("label");
+                                int label = ja.getJSONObject(i).getInt("label");
                                 String link_self = ja.getJSONObject(i).getString("file");
                                 switch (label) {
-                                    case "360":
+                                    case 360:
                                         Yotta360 = link_self;
                                         break;
-                                    case "480":
+                                    case 480:
                                         Yotta480 = link_self;
                                         break;
-                                    case "720":
+                                    case 720:
                                         Yotta720 = link_self;
                                         break;
                                 }
                             }
                         } else {
-                            String label = ja.getJSONObject(0).getString("label");
+                            int label = ja.getJSONObject(0).getInt("label");
                             String link_self = ja.getJSONObject(0).getString("file");
                             switch (label) {
-                                case "360":
+                                case 360:
                                     Yotta360 = link_self;
                                     break;
-                                case "480":
+                                case 480:
                                     Yotta480 = link_self;
                                     break;
-                                case "720":
+                                case 720:
                                     Yotta720 = link_self;
                                     break;
                                 default:
@@ -357,7 +377,7 @@ public class SelfGetter {
                             }
                         }
                     } catch (Exception e) {
-                        Log.e("Yotta", "Error getting Yotta: " + down_link.replace("embed", "check"));
+                        Log.e("Yotta", "Error getting Yotta: " + down_link.replace("embed", "check_yotta"));
                     }
                 } else if (el.contains("cldup.com")) {
                     try {
@@ -415,7 +435,7 @@ public class SelfGetter {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String[] links = new String[]{izanagi, mina, Yotta, Yotta720, Yotta480, Yotta360, hyperion, hyperiondirect, hyperion360, hyperion480, hyperion720, Clup, /*openload,*/mp4upload, yourupload, zippy, sync, mega, aflv, maru};
+        String[] links = new String[]{izanagi, mina, Yotta, Yotta720, Yotta480, Yotta360, hyperion, hyperiondirect, hyperion360, hyperion480, hyperion720, okrusd, okruhd, Clup, /*openload,*/mp4upload, yourupload, zippy, sync, mega, aflv, maru};
         try {
             JSONObject object = new JSONObject();
             object.put("version", context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName + "-Internal_Api");

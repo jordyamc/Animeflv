@@ -42,11 +42,13 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
     List<Directory> list;
     private Activity context;
     private ExplorerInterfaces interfaces;
+    private ThemeUtils.Theme theme;
 
     public DirectoryAdapter(Activity context, List<Directory> list) {
         this.context = context;
         this.list = list;
         this.interfaces = (ExplorerInterfaces) context;
+        this.theme = ThemeUtils.Theme.create(context);
     }
 
     @Override
@@ -58,7 +60,6 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
 
     @Override
     public void onBindViewHolder(final DirectoryAdapter.ViewHolder holder, final int position) {
-        //PicassoCache.getPicassoInstance(context).load(Uri.parse(list.get(holder.getAdapterPosition()).getImageUrl(context))).error(R.drawable.ic_block_r).into(holder.img);
         if (list.get(holder.getAdapterPosition()).getFilesNumber().startsWith("0")) {
             holder.root.setVisibility(View.GONE);
         }
@@ -71,14 +72,9 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
         }
         holder.cap.setText(caps);
         holder.ver.setVisibility(View.GONE);
-        holder.cap.setTextColor(ThemeUtils.getAcentColor(context));
-        if (ThemeUtils.isAmoled(context)) {
-            holder.titulo.setTextColor(ColorsRes.Holo_Dark(context));
-            holder.del.setColorFilter(ColorsRes.Holo_Dark(context));
-        } else {
-            holder.titulo.setTextColor(ColorsRes.Holo_Light(context));
-            holder.del.setColorFilter(ColorsRes.Holo_Light(context));
-        }
+        holder.cap.setTextColor(theme.accent);
+        holder.titulo.setTextColor(theme.textColor);
+        holder.del.setColorFilter(theme.iconFilter);
         holder.root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

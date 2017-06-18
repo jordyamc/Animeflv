@@ -17,6 +17,7 @@ import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterDirPeliculaNew;
 import knf.animeflv.Utils.ExecutorManager;
+import knf.animeflv.Utils.ThemeUtils;
 
 public class Animes extends Fragment{
     RecyclerView rvAnimes;
@@ -29,6 +30,8 @@ public class Animes extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.directorio_animes,container,false);
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(getActivity());
+        view.setBackgroundColor(ThemeUtils.isTablet(getActivity()) ? theme.primary : theme.background);
         rvAnimes = (RecyclerView) view.findViewById(R.id.rv_animes);
         rvAnimes.setHasFixedSize(true);
         rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));

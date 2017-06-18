@@ -22,7 +22,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import knf.animeflv.ColorsRes;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterInfoCapsMaterial;
@@ -73,9 +72,10 @@ public class FragmentCaps extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.layout_info_f_caps, container, false);
         ButterKnife.bind(this, view);
-        recyclerView.getRootView().setBackgroundColor(ThemeUtils.isAmoled(activity()) ? ColorsRes.Negro(activity()) : ColorsRes.Blanco(activity()));
-        button_list.setColorNormal(ThemeUtils.getAcentColor(getActivity()));
-        button_list.setColorPressed(ThemeUtils.getAcentColor(getActivity()));
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(getActivity());
+        recyclerView.getRootView().setBackgroundColor(theme.background);
+        button_list.setColorNormal(theme.accent);
+        button_list.setColorPressed(theme.accent);
         button_list.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

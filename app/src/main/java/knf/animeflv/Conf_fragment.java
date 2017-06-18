@@ -22,11 +22,14 @@ import android.provider.Settings;
 import android.support.annotation.ArrayRes;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -202,6 +205,13 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        view.setBackgroundColor(ThemeUtils.Theme.create(getActivity()).background);
+        return view;
     }
 
     @Override
@@ -1027,5 +1037,10 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             if (requestCode == 5260 & Settings.canDrawOverlays(context)) {
                 UtilSound.getAudioWidget().show(100, 100);
             }
+    }
+
+    @Override
+    public void onFolderChooserDismissed(@NonNull FolderChooserDialog folderChooserDialog) {
+
     }
 }

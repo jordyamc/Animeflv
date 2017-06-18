@@ -19,7 +19,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import knf.animeflv.ColorsRes;
 import knf.animeflv.CustomViews.TextViewExpandableAnimation;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
@@ -77,23 +76,22 @@ public class FragmentInfo extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.layout_info_f_info, container, false);
         ButterKnife.bind(this, view);
-        if (ThemeUtils.isAmoled(getActivity())) {
-            view.setBackgroundColor(ColorsRes.Negro(getActivity()));
-            txt_sinopsis.setTextColor(getResources().getColor(R.color.blanco));
-            TextView tit0 = (TextView) view.findViewById(R.id.info_titles0);
-            TextView tit1 = (TextView) view.findViewById(R.id.info_titles1);
-            TextView tit2 = (TextView) view.findViewById(R.id.info_titles2);
-            TextView tit3 = (TextView) view.findViewById(R.id.info_titles3);
-            TextView tit4 = (TextView) view.findViewById(R.id.info_titles4);
-            TextView tit5 = (TextView) view.findViewById(R.id.info_titles5);
-            tit0.setTextColor(ColorsRes.Blanco(getActivity()));
-            tit1.setTextColor(ColorsRes.Blanco(getActivity()));
-            tit2.setTextColor(ColorsRes.Blanco(getActivity()));
-            tit3.setTextColor(ColorsRes.Blanco(getActivity()));
-            tit4.setTextColor(ColorsRes.Blanco(getActivity()));
-            tit5.setTextColor(ColorsRes.Blanco(getActivity()));
-        }
-        int color = ThemeUtils.getAcentColor(getActivity());
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(getActivity());
+        view.setBackgroundColor(theme.background);
+        txt_sinopsis.setTextColor(theme.textColor);
+        TextView tit0 = (TextView) view.findViewById(R.id.info_titles0);
+        TextView tit1 = (TextView) view.findViewById(R.id.info_titles1);
+        TextView tit2 = (TextView) view.findViewById(R.id.info_titles2);
+        TextView tit3 = (TextView) view.findViewById(R.id.info_titles3);
+        TextView tit4 = (TextView) view.findViewById(R.id.info_titles4);
+        TextView tit5 = (TextView) view.findViewById(R.id.info_titles5);
+        tit0.setTextColor(theme.textColor);
+        tit1.setTextColor(theme.textColor);
+        tit2.setTextColor(theme.textColor);
+        tit3.setTextColor(theme.textColor);
+        tit4.setTextColor(theme.textColor);
+        tit5.setTextColor(theme.textColor);
+        int color = theme.accent;
         txt_sinopsis.setStateColorFilter(color);
         txt_titulo.setTextColor(color);
         txt_tipo.setTextColor(color);

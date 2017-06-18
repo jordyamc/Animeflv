@@ -49,10 +49,12 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
 
     List<AnimeClass> Animes;
     private Activity context;
+    private ThemeUtils.Theme theme;
 
     public AdapterBusquedaNew(Activity context, List<AnimeClass> animes) {
         this.context = context;
         this.Animes = animes;
+        this.theme = ThemeUtils.Theme.create(context);
     }
 
     public static String convertStreamToString(InputStream is) throws Exception {
@@ -102,13 +104,11 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
     @Override
     public void onBindViewHolder(final AdapterBusquedaNew.ViewHolder holder, final int position) {
         restartViews(holder);
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
-            holder.card.setCardBackgroundColor(context.getResources().getColor(R.color.prim));
-            holder.tv_tit.setTextColor(context.getResources().getColor(R.color.blanco));
-            holder.tv_noC.setTextColor(context.getResources().getColor(R.color.blanco));
-        }
-        holder.tv_tipo.setTextColor(ThemeUtils.getAcentColor(context));
-        //PicassoCache.getPicassoInstance(context).load(new Parser().getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + getCertificateSHA1Fingerprint() + "&thumb=" + Animes.get(holder.getAdapterPosition()).getImagen()).error(R.drawable.ic_block_r).into(holder.iv_rel);
+        holder.card.setCardBackgroundColor(theme.card_normal);
+        holder.tv_tit.setTextColor(theme.textColor);
+        holder.tv_noC.setTextColor(theme.textColor);
+        holder.tv_tipo.setTextColor(theme.accent);
+
         new CacheManager().mini(context,Animes.get(holder.getAdapterPosition()).getAid(),holder.iv_rel);
         holder.tv_tit.setText(Animes.get(holder.getAdapterPosition()).getNombre());
         holder.tv_tipo.setText(Animes.get(holder.getAdapterPosition()).getTipo());

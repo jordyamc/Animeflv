@@ -1,5 +1,6 @@
 package knf.animeflv.Suggestions;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -20,7 +21,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import knf.animeflv.ColorsRes;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.SelfGetter;
 import knf.animeflv.R;
@@ -60,12 +60,13 @@ public class SuggestionsActivity extends AppCompatActivity {
                 finish();
             }
         });
-        if (ThemeUtils.isAmoled(this)) {
-            toolbar.setBackgroundColor(ColorsRes.Negro(this));
-            toolbar.getRootView().setBackgroundColor(ColorsRes.Negro(this));
-            advice.setTextColor(ColorsRes.SecondaryTextDark(this));
-        } else {
-            advice.setTextColor(ColorsRes.SecondaryTextLight(this));
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
+        toolbar.setBackgroundColor(theme.primary);
+        toolbar.getRootView().setBackgroundColor(theme.background);
+        advice.setTextColor(theme.secondaryTextColor);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(theme.primaryDark);
+            getWindow().setNavigationBarColor(theme.primary);
         }
         if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("use_tags", false)) {
             final MaterialDialog dialog = new MaterialDialog.Builder(this)
