@@ -4,8 +4,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -59,11 +57,13 @@ public class Configuracion extends AppCompatActivity implements LoginServer.call
         toolbar.getRootView().setBackgroundColor(theme.background);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Configuracion");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        final Drawable upArrow = getResources().getDrawable(R.drawable.ic_back_r);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setTitleTextColor(theme.textColorToolbar);
+        ThemeUtils.setNavigationColor(toolbar, theme.toolbarNavigation);
+        /*final Drawable upArrow = getResources().getDrawable(R.drawable.ic_back_r);
         upArrow.setColorFilter(getResources().getColor(R.color.blanco), PorterDuff.Mode.SRC_ATOP);
-        getSupportActionBar().setHomeAsUpIndicator(upArrow);
+        getSupportActionBar().setHomeAsUpIndicator(upArrow);*/
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,6 +85,7 @@ public class Configuracion extends AppCompatActivity implements LoginServer.call
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_ayuda, menu);
+        ThemeUtils.setMenuColor(menu, ThemeUtils.Theme.get(this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
         return true;
     }
 

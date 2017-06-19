@@ -98,6 +98,8 @@ public class WaitList extends AppCompatActivity implements
         getSupportActionBar().setTitle("Lista de Espera");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
+        toolbar.setTitleTextColor(theme.textColorToolbar);
+        ThemeUtils.setNavigationColor(toolbar, theme.toolbarNavigation);
         processing = new MaterialDialog.Builder(this)
                 .content("Procesando...")
                 .progress(true, 0)

@@ -53,6 +53,7 @@ import es.dmoral.coloromatic.colormode.ColorMode;
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.CustomSettingsIntro.CustomIntro;
 import knf.animeflv.Directorio.Directorio;
+import knf.animeflv.JsonFactory.SelfGetter;
 import knf.animeflv.LoginActivity.LoginBase;
 import knf.animeflv.LoginActivity.LoginUser;
 import knf.animeflv.SDControl.SDManager;
@@ -488,11 +489,11 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        getPreferenceScreen().findPreference("def_download").setSummary(getStringfromResourse(R.array.download_name, "def_download", "0"));
+        getPreferenceScreen().findPreference("def_download").setSummary(getStringfromResourse(SelfGetter.getDownloadServersOptions(), "def_download", "0"));
         getPreferenceScreen().findPreference("def_download").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                UtilDialogPref.init(getResources().getStringArray(R.array.download_name), "%s", "def_download", "0", "Selecciona", getPreferenceScreen().findPreference("def_download"));
+                UtilDialogPref.init(SelfGetter.getDownloadServersOptions(), "%s", "def_download", "0", "Selecciona", getPreferenceScreen().findPreference("def_download"));
                 PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
                 return false;
             }
@@ -663,18 +664,22 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     }
 
     private String getStringfromResourse(@ArrayRes int array, String key, String def) {
+        return getStringfromResourse(getResources().getStringArray(array), key, def);
+    }
+
+    private String getStringfromResourse(String[] array, String key, String def) {
         try {
-            return getResources().getStringArray(array)[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString(key, def))];
+            return array[Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(myContext).getString(key, def))];
         } catch (IndexOutOfBoundsException e) {
             if (key.equals("tiempo")) {
-                return getResources().getStringArray(array)[Arrays.asList(getResources().getStringArray(R.array.min_val)).indexOf(PreferenceManager.getDefaultSharedPreferences(myContext).getString(key, def))];
+                return array[Arrays.asList(getResources().getStringArray(R.array.min_val)).indexOf(PreferenceManager.getDefaultSharedPreferences(myContext).getString(key, def))];
             } else if (key.equals("bypass_time")) {
-                return getResources().getStringArray(array)[Arrays.asList(getResources().getStringArray(R.array.time_val_bypass)).indexOf(PreferenceManager.getDefaultSharedPreferences(myContext).getString(key, def))];
+                return array[Arrays.asList(getResources().getStringArray(R.array.time_val_bypass)).indexOf(PreferenceManager.getDefaultSharedPreferences(myContext).getString(key, def))];
             } else {
                 Logger.Error(getClass(), e);
                 PreferenceManager.getDefaultSharedPreferences(myContext).edit().putString(key, def).apply();
                 Toaster.toast("Error en " + key + ", opcion reiniciada");
-                return getResources().getStringArray(array)[0];
+                return array[0];
             }
         }
     }

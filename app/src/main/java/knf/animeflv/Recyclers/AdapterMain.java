@@ -96,7 +96,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     @Override
     public void onBindViewHolder(final AdapterMain.ViewHolder holder, final int position) {
         holder.card.setCardBackgroundColor(theme.card_normal);
-        holder.tv_tit.setTextColor(theme.textColor);
+        holder.tv_tit.setTextColor(theme.textColorCard);
         holder.tv_num.setTextColor(theme.accent);
         holder.ib_ver.setColorFilter(theme.iconFilter);
         holder.ib_des.setColorFilter(theme.iconFilter);

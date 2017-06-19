@@ -23,6 +23,7 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -190,6 +191,16 @@ public class SelfGetter {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
+    public static String[] getDownloadServersOptions() {
+        ArrayList<String> arrayList = new ArrayList<String>(Arrays.asList(new String[]{"Ninguno"}));
+        arrayList.addAll(Arrays.asList(getDownloadServers()));
+        return arrayList.toArray(new String[0]);
+    }
+
+    public static String[] getDownloadServers() {
+        return new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 720p", "Yotta 480p", "Yotta 360p", "Hyperion", "Hyperion Direct", "Hyperion 360p", "Hyperion 480p", "Hyperion 720p", "Okru SD", "Okru HD", "Clup", /*"Openload",*/ "Mp4Upload", "YourUpload", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
+    }
+
     private static String getDownloadInfo(final Context context, final String url) {
         String tit = "null";
         String num = "null";
@@ -217,7 +228,7 @@ public class SelfGetter {
         String hyperion720 = "null";
         String okrusd = "null";
         String okruhd = "null";
-        String[] names = new String[]{"Izanagi", "Minhateca", "Yotta", "Yotta 720p", "Yotta 480p", "Yotta 360p", "Hyperion", "Hyperion Direct", "Hyperion 360p", "Hyperion 480p", "Hyperion 720p", "Okru SD", "Okru HD", "Clup", /*"Openload",*/ "Mp4Upload", "YourUpload", "Zippyshare", "4Sync", "Mega", "Animeflv", "Maru"};
+        String[] names = getDownloadServers();
         try {
             JSONArray links = new JSONArray();
             Log.e("Url", url);

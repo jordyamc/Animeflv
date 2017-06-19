@@ -57,7 +57,7 @@ public class LogAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 holder.name.setTextColor(ColorsRes.Negro(activity));
             }
             holder.name.setText(logs.get(holder.getAdapterPosition()).description);
-            holder.card.setBackgroundColor(getCardColor(logs.get(holder.getAdapterPosition()).type));
+            holder.card.setCardBackgroundColor(getCardColor(logs.get(holder.getAdapterPosition()).type));
             holder.card.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
@@ -73,7 +73,7 @@ public class LogAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 holder.name.setTextColor(ColorsRes.Negro(activity));
             }
             holder.name.setText(logs.get(holder.getAdapterPosition()).description);
-            holder.card.setBackgroundColor(getCardColor(logs.get(holder.getAdapterPosition()).type));
+            holder.card.setCardBackgroundColor(getCardColor(logs.get(holder.getAdapterPosition()).type));
             holder.card.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {

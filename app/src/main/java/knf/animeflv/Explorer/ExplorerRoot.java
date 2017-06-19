@@ -81,6 +81,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
                 onBackPressed();
             }
         });
+        toolbar.setTitleTextColor(theme.textColorToolbar);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(theme.primaryDark);
             getWindow().setNavigationBarColor(theme.primary);
@@ -88,6 +89,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
         getSupportActionBar().setTitle("Explorador");
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ThemeUtils.setNavigationColor(toolbar, theme.toolbarNavigation);
         if (downloadInSD()) {
             if (!FileUtil.init(this).searchforSD().existSD()) {
                 Toaster.toast("No se encontro la memoria SD");
@@ -279,6 +281,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
                 }
             }
         }
+        ThemeUtils.setMenuColor(menu, ThemeUtils.Theme.get(this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
         return true;
     }
 

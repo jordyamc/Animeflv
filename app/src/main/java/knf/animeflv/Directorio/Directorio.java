@@ -158,7 +158,8 @@ public class Directorio extends AppCompatActivity {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
         toolbarS.setBackgroundColor(theme.primary);
-        toolbarS.setTitleTextColor(ColorsRes.Blanco(this));
+        toolbarS.setTitleTextColor(theme.textColorToolbar);
+        ThemeUtils.setNavigationColor(toolbarS, theme.toolbarNavigation);
         editText.setTextColor(theme.textColor);
         editText.setHintTextColor(theme.isDark ? ColorsRes.SecondaryTextDark(this) : ColorsRes.SecondaryTextLight(this));
         editText.setBackgroundColor(ColorsRes.Transparent(this));
@@ -172,6 +173,7 @@ public class Directorio extends AppCompatActivity {
             }
         }
         viewPagerTab.setSelectedIndicatorColors(theme.indicatorColor);
+        viewPagerTab.setDefaultTabTextColor(theme.textColorToolbar);
         if (!isXLargeScreen(this)) {
             toolbarS.getRootView().setBackgroundColor(theme.background);
             viewPagerTab.setBackgroundColor(theme.primary);
@@ -323,6 +325,7 @@ public class Directorio extends AppCompatActivity {
                             } else {
                                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                             }
+                            ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                             List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, null));
                             AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                             recyclerView.setAdapter(adapterBusqueda);
@@ -348,6 +351,7 @@ public class Directorio extends AppCompatActivity {
                         } else {
                             getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                         }
+                        ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                         if (!isXLargeScreen(context)) {
                             linearLayout.setVisibility(View.GONE);
                             recyclerView.setVisibility(View.VISIBLE);
@@ -378,6 +382,7 @@ public class Directorio extends AppCompatActivity {
                                 } else {
                                     getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
                                 }
+                                ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                             } else {
                                 if (editText.getVisibility() == View.VISIBLE) {
                                     menuGlobal.clear();
@@ -386,6 +391,7 @@ public class Directorio extends AppCompatActivity {
                                     } else {
                                         getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                                     }
+                                    ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                                 }
                             }
                             List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, s.toString()));
@@ -407,6 +413,7 @@ public class Directorio extends AppCompatActivity {
                                     getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                                 }
                             }
+                            ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                         }
                     }
                 }, 150);
@@ -440,6 +447,7 @@ public class Directorio extends AppCompatActivity {
                             getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                         }
                     }
+                    ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                     List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, s.toString()));
                     AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                     recyclerView.setAdapter(adapterBusqueda);
@@ -618,6 +626,7 @@ public class Directorio extends AppCompatActivity {
                 if (!isXLargeScreen(context)) {
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                     getSupportActionBar().setDisplayShowHomeEnabled(true);
+                    ThemeUtils.setNavigationColor(toolbarS, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                     toolbarS.setNavigationOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -640,6 +649,7 @@ public class Directorio extends AppCompatActivity {
                         ((Toolbar) findViewById(R.id.extra_toolbar)).setBackgroundColor(theme.tablet_toolbar);
                         ThemeUtils.setStatusBarPadding(Directorio.this, ltoolbar);
                         ltoolbar.setNavigationIcon(R.drawable.ic_back_r);
+                        ThemeUtils.setNavigationColor(ltoolbar, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                         ltoolbar.setNavigationOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -716,6 +726,7 @@ public class Directorio extends AppCompatActivity {
                                     } else {
                                         getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                                     }
+                                    ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                                     if (!isXLargeScreen(context)) {
                                         linearLayout.setVisibility(View.GONE);
                                         recyclerView.setVisibility(View.VISIBLE);
@@ -753,6 +764,7 @@ public class Directorio extends AppCompatActivity {
                                             } else {
                                                 getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
                                             }
+                                            ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                                         }
                                     } else {
                                         if (editText.getVisibility() == View.VISIBLE) {
@@ -763,6 +775,7 @@ public class Directorio extends AppCompatActivity {
                                                 } else {
                                                     getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                                                 }
+                                                ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                                             }
                                         }
                                     }
@@ -778,6 +791,7 @@ public class Directorio extends AppCompatActivity {
                                             } else {
                                                 getMenuInflater().inflate(R.menu.menu_buscar_borrar_d, menuGlobal);
                                             }
+                                            ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                                         }
                                     } else {
                                         if (menuGlobal != null) {
@@ -787,6 +801,7 @@ public class Directorio extends AppCompatActivity {
                                             } else {
                                                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                                             }
+                                            ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                                         }
                                     }
                                 }
@@ -828,6 +843,7 @@ public class Directorio extends AppCompatActivity {
                                     getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                                 }
                             }
+                            ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                             List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, s.toString()));
                             AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                             recyclerView.setAdapter(adapterBusqueda);
@@ -842,13 +858,11 @@ public class Directorio extends AppCompatActivity {
                 getSharedPreferences("data", MODE_PRIVATE).edit().putInt("genero", 0).apply();
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setLayoutManager(new LinearLayoutManager(Directorio.this));
-                Bundle b = new Bundle();
-                b.putString("json", json);
                 FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
                         getSupportFragmentManager(), FragmentPagerItems.with(Directorio.this)
-                        .add("ANIMES", Animes.class, b)
-                        .add("OVAS", Ovas.class, b)
-                        .add("PELICULAS", Peliculas.class, b)
+                        .add("ANIMES", Animes.class)
+                        .add("OVAS", Ovas.class)
+                        .add("PELICULAS", Peliculas.class)
                         .create());
                 viewPager = (ViewPager) findViewById(R.id.viewpager2);
                 viewPager.setOffscreenPageLimit(3);
@@ -913,6 +927,7 @@ public class Directorio extends AppCompatActivity {
                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menu);
             }
         }
+        ThemeUtils.setMenuColor(menu, ThemeUtils.Theme.get(this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
         return true;
     }
 

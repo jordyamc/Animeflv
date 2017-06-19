@@ -34,6 +34,8 @@ import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -202,6 +204,7 @@ public class newMain extends AppCompatActivity implements
             if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("force_phone", false))
                 Toaster.toast("Error al cargar pantalla, desactiva la opcion de forzar vista de telefono!!!");
         }
+        setUpDrawer();
         try {
             setUpAmoled();
         } catch (Exception e) {
@@ -209,7 +212,6 @@ public class newMain extends AppCompatActivity implements
             if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("force_phone", false))
                 Toaster.toast("Error al cargar pantalla, desactiva la opcion de forzar vista de telefono!!!");
         }
-        setUpDrawer();
         getJson();
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("update_check_start", true))
             NetworkUtils.checkVersion(this);
@@ -251,6 +253,7 @@ public class newMain extends AppCompatActivity implements
         }
         IntentFilter filter = new IntentFilter();
         filter.addAction(DownloaderService.RECEIVER_ACTION_ERROR);
+        filter.addAction(ThemeFragmentAdvanced.ACTION_THEME_CHANGE);
         registerReceiver(getReceiver(), filter);
     }
 
@@ -300,8 +303,16 @@ public class newMain extends AppCompatActivity implements
             receiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    if (intent.getAction().equals(DownloaderService.RECEIVER_ACTION_ERROR))
+                    if (intent.getAction().equals(DownloaderService.RECEIVER_ACTION_ERROR)) {
                         loadMainJson();
+                    } else if (intent.getAction().equals(ThemeFragmentAdvanced.ACTION_THEME_CHANGE)) {
+                        try {
+                            setUpAmoled();
+                            loadMainJson();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             };
         return receiver;
@@ -320,6 +331,7 @@ public class newMain extends AppCompatActivity implements
                 .withHeaderBackground(getHDraw(false))
                 .withCompactStyle(true)
                 .withDividerBelowHeader(false)
+                .withTranslucentStatusBar(true)
                 .withCloseDrawerOnProfileListClick(false)
                 .withSelectionListEnabled(true)
                 .withProfileImagesClickable(true);
@@ -484,9 +496,10 @@ public class newMain extends AppCompatActivity implements
         headerResult = builder.build();
         result = new DrawerBuilder()
                 .withActivity(this)
-                .withToolbar(menu_toolbar)
-                .withActionBarDrawerToggleAnimated(true)
+                //.withToolbar(menu_toolbar)
+                //.withActionBarDrawerToggleAnimated(true)
                 .withAccountHeader(headerResult)
+                .withTranslucentStatusBar(true)
                 .withHeaderDivider(false)
                 .withFooterDivider(false)
                 .withStickyFooterDivider(false)
@@ -614,6 +627,7 @@ public class newMain extends AppCompatActivity implements
                     }
                 })
                 .build();
+
         setUpAdmin(NetworkUtils.isNetworkAvailable());
     }
 
@@ -776,28 +790,54 @@ public class newMain extends AppCompatActivity implements
     }
 
     private void setUpAmoled() throws Exception {
-        ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
-        isAmoled = theme.isDark;
-        toolbar.setBackgroundColor(theme.primary);
-        try {
-            if (isXLargeScreen()) {
-                findViewById(R.id.frame).setBackgroundColor(theme.primary);
-                ((CardView) findViewById(R.id.cardMain)).setCardBackgroundColor(theme.primary);
-                menu_toolbar.setBackgroundColor(theme.tablet_toolbar);
-                menu_toolbar.getRootView().setBackgroundColor(theme.tablet_background);
-                toolbar.getRootView().setBackgroundColor(theme.tablet_background);
-            } else {
-                toolbar.getRootView().setBackgroundColor(theme.background);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ThemeUtils.Theme theme = ThemeUtils.Theme.create(newMain.this);
+                isAmoled = theme.isDark;
+                toolbar.setBackgroundColor(theme.primary);
+                toolbar.setTitleTextColor(theme.textColorToolbar);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    result.getDrawerLayout().setStatusBarBackgroundColor(theme.primaryDark);
+                    setTranslucentStatusFlag(true);
+                    getWindow().setNavigationBarColor(theme.primary);
+                }
+                try {
+                    if (isXLargeScreen()) {
+                        findViewById(R.id.frame).setBackgroundColor(theme.primary);
+                        ((CardView) findViewById(R.id.cardMain)).setCardBackgroundColor(theme.primary);
+                        menu_toolbar.setBackgroundColor(theme.tablet_toolbar);
+                        menu_toolbar.getRootView().setBackgroundColor(theme.tablet_background);
+                        ThemeUtils.setNavigationColor(menu_toolbar, theme.toolbarNavigation);
+                        toolbar.getRootView().setBackgroundColor(theme.tablet_background);
+                    } else {
+                        toolbar.getRootView().setBackgroundColor(theme.background);
+                    }
+                    menu_toolbar.setNavigationIcon(R.drawable.menu);
+                    ThemeUtils.setNavigationColor(menu_toolbar, ThemeUtils.Theme.get(newMain.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
+                    menu_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            result.openDrawer();
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        });
+    }
+
+    private void setTranslucentStatusFlag(boolean on) {
+        Window win = getWindow();
+        WindowManager.LayoutParams winParams = win.getAttributes();
+        final int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+        if (on) {
+            winParams.flags |= bits;
+        } else {
+            winParams.flags &= ~bits;
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-            //getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            getWindow().setStatusBarColor(theme.primaryDark);
-            getWindow().setNavigationBarColor(theme.primary);
-        }
+        win.setAttributes(winParams);
     }
 
     private void setUpViews() throws Exception {
@@ -1245,7 +1285,7 @@ public class newMain extends AppCompatActivity implements
                         mediaRouteMenuItem);
         mediaRouteActionProvider.setRouteSelector(PlayBackManager.get(this).getSelector());*/
         CastPlayBackManager.get(this).registrerMenu(menu, R.id.media_route);
-
+        ThemeUtils.setMenuColor(menu, ThemeUtils.Theme.get(this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
         return true;
     }
 

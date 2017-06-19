@@ -1,7 +1,5 @@
 package knf.animeflv.Favorites;
 
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.NinePatchDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -76,15 +74,6 @@ public class FavoriteMain extends AppCompatActivity {
                 finish();
             }
         });
-        if (ThemeUtils.isAmoled(this)) {
-            try {
-                Drawable arrow = toolbar.getNavigationIcon();
-                arrow.setColorFilter(ColorsRes.Blanco(this), PorterDuff.Mode.SRC_ATOP);
-                toolbar.setNavigationIcon(arrow);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
         searchView.hideSuggestions();
         ((EditText) searchView.findViewById(org.cryse.widget.persistentsearch.R.id.edittext_search)).addTextChangedListener(new TextWatcher() {
             @Override
@@ -142,6 +131,8 @@ public class FavoriteMain extends AppCompatActivity {
         });
         searchView.closeSearch();
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
+        ThemeUtils.setNavigationColor(toolbar, theme.toolbarNavigation);
+        toolbar.setTitleTextColor(theme.textColorToolbar);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(theme.primaryDark);
             getWindow().setNavigationBarColor(theme.primary);
@@ -275,6 +266,7 @@ public class FavoriteMain extends AppCompatActivity {
         }
         if (!FavSyncro.isLogedIn(this) || !NetworkUtils.isNetworkAvailable())
             menu.removeItem(R.id.sync);
+        ThemeUtils.setMenuColor(menu, ThemeUtils.Theme.get(this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
         return true;
     }
 

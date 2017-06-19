@@ -33,11 +33,11 @@ public class HistoryActivity extends AppCompatActivity implements HistoryAdapter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.history);
         ButterKnife.bind(this);
-        setUpTheme();
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Historial");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        setUpTheme();
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -55,6 +55,8 @@ public class HistoryActivity extends AppCompatActivity implements HistoryAdapter
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
         toolbar.setBackgroundColor(theme.primary);
         toolbar.getRootView().setBackgroundColor(theme.background);
+        toolbar.setTitleTextColor(theme.textColorToolbar);
+        ThemeUtils.setNavigationColor(toolbar, theme.toolbarNavigation);
         noHistory.setTextColor(theme.secondaryTextColor);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(theme.primaryDark);

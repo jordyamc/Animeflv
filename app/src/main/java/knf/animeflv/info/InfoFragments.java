@@ -361,67 +361,66 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     }
 
     public void setInfo(final String json) {
-        if (!infoSeted) {
-            infoSeted = true;
-            supportInvalidateOptionsMenu();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("aid", aid);
-                    bundle.putString("json", json);
-                    bundle.putInt("position", position);
-                    FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
-                            getSupportFragmentManager(), FragmentPagerItems.with(InfoFragments.this)
-                            .add("INFO", FragmentInfo.class, bundle)
-                            .add("CAPITULOS", FragmentCaps.class, bundle)
-                            .create());
-                    pager.setAdapter(adapter);
-                    tabLayout.setDistributeEvenly(false);
-                    tabLayout.setViewPager(pager);
-                    tabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                        @Override
-                        public void onPageScrolled(int i, float v, int i1) {
+        infoSeted = true;
+        supportInvalidateOptionsMenu();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Bundle bundle = new Bundle();
+                bundle.putString("aid", aid);
+                bundle.putString("json", json);
+                bundle.putInt("position", position);
+                FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
+                        getSupportFragmentManager(), FragmentPagerItems.with(InfoFragments.this)
+                        .add("INFO", FragmentInfo.class, bundle)
+                        .add("CAPITULOS", FragmentCaps.class, bundle)
+                        .create());
+                pager.setAdapter(adapter);
+                tabLayout.setDistributeEvenly(false);
+                tabLayout.setViewPager(pager);
+                tabLayout.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                    @Override
+                    public void onPageScrolled(int i, float v, int i1) {
 
-                        }
+                    }
 
-                        @Override
-                        public void onPageSelected(int i) {
-                            if (i == 1) {
-                                isInInfo = false;
-                                barLayout.setExpanded(false, true);
-                            } else {
-                                isInInfo = true;
-                                barLayout.setExpanded(true, true);
-                            }
-                            supportInvalidateOptionsMenu();
+                    @Override
+                    public void onPageSelected(int i) {
+                        if (i == 1) {
+                            isInInfo = false;
+                            barLayout.setExpanded(false, true);
+                        } else {
+                            isInInfo = true;
+                            barLayout.setExpanded(true, true);
                         }
+                        supportInvalidateOptionsMenu();
+                    }
 
-                        @Override
-                        public void onPageScrollStateChanged(int i) {
+                    @Override
+                    public void onPageScrollStateChanged(int i) {
 
+                    }
+                });
+                tabLayout.setOnTabClickListener(new SmartTabLayout.OnTabClickListener() {
+                    @Override
+                    public void onTabClicked(int position) {
+                        if (position == 1) {
+                            isInInfo = false;
+                            barLayout.setExpanded(false, true);
+                        } else {
+                            isInInfo = true;
+                            barLayout.setExpanded(true, true);
                         }
-                    });
-                    tabLayout.setOnTabClickListener(new SmartTabLayout.OnTabClickListener() {
-                        @Override
-                        public void onTabClicked(int position) {
-                            if (position == 1) {
-                                isInInfo = false;
-                                barLayout.setExpanded(false, true);
-                            } else {
-                                isInInfo = true;
-                                barLayout.setExpanded(true, true);
-                            }
-                            supportInvalidateOptionsMenu();
-                        }
-                    });
-                    fragmentInfo = (FragmentInfo) adapter.getPage(0);
-                    fragmentCaps = (FragmentCaps) adapter.getPage(1);
+                        supportInvalidateOptionsMenu();
+                    }
+                });
+                fragmentInfo = (FragmentInfo) adapter.getPage(0);
+                fragmentCaps = (FragmentCaps) adapter.getPage(1);
+                if (!infoSeted)
                     if (position != -1)
                         pager.setCurrentItem(1);
-                }
-            });
-        }
+            }
+        });
     }
 
     private void toogleFragments() {

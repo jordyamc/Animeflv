@@ -63,6 +63,8 @@ public class SuggestionsActivity extends AppCompatActivity {
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
         toolbar.setBackgroundColor(theme.primary);
         toolbar.getRootView().setBackgroundColor(theme.background);
+        toolbar.setTitleTextColor(theme.textColorToolbar);
+        ThemeUtils.setNavigationColor(toolbar, theme.toolbarNavigation);
         advice.setTextColor(theme.secondaryTextColor);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(theme.primaryDark);
@@ -201,8 +203,10 @@ public class SuggestionsActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (suggestionsList != null)
+        if (suggestionsList != null) {
             getMenuInflater().inflate(R.menu.menu_suggestions, menu);
+            ThemeUtils.setMenuColor(menu, ThemeUtils.Theme.get(this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
+        }
         return true;
     }
 

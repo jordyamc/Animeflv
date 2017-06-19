@@ -216,6 +216,8 @@ public class PushManager extends AppCompatActivity {
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
         toolbar.setBackgroundColor(theme.primary);
         toolbar.getRootView().setBackgroundColor(theme.background);
+        toolbar.setTitleTextColor(theme.textColorToolbar);
+        ThemeUtils.setNavigationColor(toolbar, theme.toolbarNavigation);
         cardView.setCardBackgroundColor(theme.card_normal);
         cardView_fast.setCardBackgroundColor(theme.card_normal);
         type.setTextColor(getTextColor(theme));

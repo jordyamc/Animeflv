@@ -85,9 +85,11 @@ public class AutoEmisionActivity extends AppCompatActivity {
         });
         toolbar.getRootView().setBackgroundColor(theme.background);
         toolbar.setBackgroundColor(theme.primary);
+        toolbar.setTitleTextColor(theme.textColorToolbar);
+        ThemeUtils.setNavigationColor(toolbar, theme.toolbarNavigation);
         smartTabLayout.setBackgroundColor(theme.primary);
         smartTabLayout.setSelectedIndicatorColors(theme.indicatorColor);
-        smartTabLayout.setDefaultTabTextColor(theme.textColor);
+        smartTabLayout.setDefaultTabTextColor(theme.textColorToolbar);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(theme.primaryDark);
             getWindow().setNavigationBarColor(theme.primary);
@@ -184,6 +186,7 @@ public class AutoEmisionActivity extends AppCompatActivity {
         MenuItem c = menu.findItem(R.id.count);
         count_text = ((TextView) c.getActionView().findViewById(R.id.count_text));
         count_text.setOnClickListener(getCountListener());
+        ThemeUtils.setMenuColor(menu, ThemeUtils.Theme.get(this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
         return true;
     }
 

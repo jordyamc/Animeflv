@@ -7,11 +7,15 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
-import android.util.Log;
+import android.support.annotation.StyleRes;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.View;
 
 import org.json.JSONArray;
@@ -137,6 +141,52 @@ public class ThemeUtils {
         setOrientation(context);
     }
 
+    @StyleRes
+    public static int getTheme(Activity context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int accent = getAcentColor(context);
+        if (preferences.getBoolean("is_amoled", false)) {
+            if (accent == ColorsRes.Rojo(context)) {
+                return (R.style.AppThemeDarkRojo);
+            }
+            if (accent == ColorsRes.Naranja(context)) {
+                return (R.style.AppThemeDarkNaranja);
+            }
+            if (accent == ColorsRes.Gris(context)) {
+                return (R.style.AppThemeDarkGris);
+            }
+            if (accent == ColorsRes.Verde(context)) {
+                return (R.style.AppThemeDarkVerde);
+            }
+            if (accent == ColorsRes.Rosa(context)) {
+                return (R.style.AppThemeDarkRosa);
+            }
+            if (accent == ColorsRes.Morado(context)) {
+                return (R.style.AppThemeDarkMorado);
+            }
+        } else {
+            if (accent == ColorsRes.Rojo(context)) {
+                return (R.style.AppThemeRojo);
+            }
+            if (accent == ColorsRes.Naranja(context)) {
+                return (R.style.AppThemeNaranja);
+            }
+            if (accent == ColorsRes.Gris(context)) {
+                return (R.style.AppThemeGris);
+            }
+            if (accent == ColorsRes.Verde(context)) {
+                return (R.style.AppThemeVerde);
+            }
+            if (accent == ColorsRes.Rosa(context)) {
+                return (R.style.AppThemeRosa);
+            }
+            if (accent == ColorsRes.Morado(context)) {
+                return (R.style.AppThemeMorado);
+            }
+        }
+        return R.style.AppThemeDark;
+    }
+
     public static void setThemeDark(Activity context) {
         int accent = getAcentColor(context);
         if (accent == ColorsRes.Rojo(context)) {
@@ -153,6 +203,29 @@ public class ThemeUtils {
             context.setTheme(R.style.AppThemeDarkMorado);
         }
         setOrientation(context);
+    }
+
+    public static void setMenuColor(Menu menu, int color) {
+        for (int i = 0; i < menu.size(); i++) {
+            try {
+                Drawable drawable = menu.getItem(i).getIcon();
+                drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+                menu.getItem(i).setIcon(drawable);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void setNavigationColor(Toolbar toolbar, int color) {
+        try {
+            Drawable drawable = toolbar.getNavigationIcon();
+            drawable.clearColorFilter();
+            drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            toolbar.setNavigationIcon(drawable);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void setSplashTheme(Activity activity, @ColorRes int color) {
@@ -218,6 +291,10 @@ public class ThemeUtils {
         public static final String KEY_BACKGROUND_T = "theme_background_tablet";
         public static final String KEY_CARD_T = "theme_card_tablet";
         public static final String KEY_TOOLBAR_T = "theme_toolbar_tablet";
+        public static final String KEY_TEXT_COLOR_CARD = "theme_card_text";
+        public static final String KEY_TEXT_COLOR_TOOLBAR = "theme_toolbar_text";
+        public static final String KEY_ICON_FILTER = "theme_icon_filter";
+        public static final String KEY_TOOLBAR_NAVIGATION = "theme_toolbar_navigation";
 
         public int primary;
         public int primaryDark;
@@ -232,7 +309,13 @@ public class ThemeUtils {
 
         public int iconFilter;
 
+        public int textColorToolbar;
+        public int textColorCard;
+        public int toolbarNavigation;
+
         public int textColor;
+
+        public int textColorNormal;
         public int textColorI;
 
         public int secondaryTextColor;
@@ -253,8 +336,14 @@ public class ThemeUtils {
             card_fav = ColorsRes.in_favs(context);
             card_new = ColorsRes.in_new(context);
             background = preferences.getInt(KEY_BACKGROUND, isDark ? ColorsRes.Negro(context) : ColorsRes.Blanco(context));
-            textColor = isDark ? ColorsRes.Blanco(context) : Color.parseColor("#4d4d4d");
+            textColorNormal = isDark ? ColorsRes.Blanco(context) : Color.parseColor("#4d4d4d");
             textColorI = !isDark ? ColorsRes.Blanco(context) : Color.parseColor("#4d4d4d");
+
+            textColorToolbar = preferences.getInt(KEY_TEXT_COLOR_TOOLBAR, isTablet(context) ? (isDark ? ColorsRes.Blanco(context) : Color.parseColor("#4d4d4d")) : ColorsRes.Blanco(context));
+            textColorCard = preferences.getInt(KEY_TEXT_COLOR_CARD, isDark ? ColorsRes.SecondaryTextDark(context) : ColorsRes.SecondaryTextLight(context));
+            toolbarNavigation = preferences.getInt(KEY_TOOLBAR_NAVIGATION, isTablet(context) ? (isDark ? ColorsRes.Blanco(context) : Color.parseColor("#4d4d4d")) : ColorsRes.Blanco(context));
+
+            textColor = textColorCard;
 
             tablet_background = preferences.getInt(KEY_BACKGROUND_T, isDark ? ColorsRes.Negro(context) : ColorsRes.Blanco(context));
             tablet_toolbar = preferences.getInt(KEY_TOOLBAR_T, isDark ? ColorsRes.Negro(context) : ColorsRes.Prim(context));
@@ -270,13 +359,12 @@ public class ThemeUtils {
             }
 
             secondaryTextColor = isDark ? ColorsRes.SecondaryTextDark(context) : ColorsRes.SecondaryTextLight(context);
-            iconFilter = isDark ? ColorsRes.Holo_Dark(context) : ColorsRes.Holo_Light(context);
+            iconFilter = preferences.getInt(KEY_ICON_FILTER, isDark ? ColorsRes.Holo_Dark(context) : ColorsRes.Holo_Light(context));
             accent = getAcentColor(context);
         }
 
         private Theme(Context context, JSONArray array) throws JSONException {
             this.context = context;
-            Log.e("Theme from Json", array.toString());
             for (int i = 0; i < array.length(); i++) {
                 JSONObject object = array.getJSONObject(i);
                 switch (object.getString("key")) {
@@ -310,6 +398,18 @@ public class ThemeUtils {
                     case KEY_TOOLBAR_T:
                         tablet_toolbar = value(object);
                         break;
+                    case KEY_TEXT_COLOR_CARD:
+                        textColorCard = value(object);
+                        break;
+                    case KEY_TEXT_COLOR_TOOLBAR:
+                        textColorToolbar = value(object);
+                        break;
+                    case KEY_ICON_FILTER:
+                        iconFilter = value(object);
+                        break;
+                    case KEY_TOOLBAR_NAVIGATION:
+                        toolbarNavigation = value(object);
+                        break;
                 }
             }
             textColor = isDark ? ColorsRes.Blanco(context) : Color.parseColor("#4d4d4d");
@@ -326,7 +426,7 @@ public class ThemeUtils {
             }
 
             secondaryTextColor = isDark ? ColorsRes.SecondaryTextDark(context) : ColorsRes.SecondaryTextLight(context);
-            iconFilter = isDark ? ColorsRes.Holo_Dark(context) : ColorsRes.Holo_Light(context);
+            checkForNull(context);
         }
 
         public static Theme create(Context context) {
@@ -335,6 +435,22 @@ public class ThemeUtils {
 
         public static Theme fromJson(Context context, JSONArray array) throws JSONException {
             return new Theme(context, array);
+        }
+
+        public static int get(Context context, String key) {
+            return PreferenceManager.getDefaultSharedPreferences(context).getInt(key, ThemeFragmentAdvanced.getDefault(context, key));
+        }
+
+        private void checkForNull(Context context) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            if (textColorCard == 0)
+                textColorCard = preferences.getInt(KEY_TEXT_COLOR_CARD, isDark ? ColorsRes.SecondaryTextDark(context) : ColorsRes.SecondaryTextLight(context));
+            if (textColorToolbar == 0)
+                textColorToolbar = preferences.getInt(KEY_TEXT_COLOR_TOOLBAR, isTablet(context) ? (isDark ? ColorsRes.Blanco(context) : Color.parseColor("#4d4d4d")) : ColorsRes.Blanco(context));
+            if (iconFilter == 0)
+                iconFilter = preferences.getInt(KEY_ICON_FILTER, isDark ? ColorsRes.Holo_Dark(context) : ColorsRes.Holo_Light(context));
+            if (toolbarNavigation == 0)
+                toolbarNavigation = preferences.getInt(KEY_TOOLBAR_NAVIGATION, isTablet(context) ? (isDark ? ColorsRes.Blanco(context) : Color.parseColor("#4d4d4d")) : ColorsRes.Blanco(context));
         }
 
         private int value(JSONObject object) throws JSONException {
@@ -373,6 +489,10 @@ public class ThemeUtils {
                 array.put(getPref(KEY_BACKGROUND_T));
                 array.put(getPref(KEY_CARD_T));
                 array.put(getPref(KEY_TOOLBAR_T));
+                array.put(getPref(KEY_TOOLBAR_NAVIGATION));
+                array.put(getPref(KEY_TEXT_COLOR_TOOLBAR));
+                array.put(getPref(KEY_TEXT_COLOR_CARD));
+                array.put(getPref(KEY_ICON_FILTER));
                 object.put("theme", array);
                 return object;
             } catch (Exception e) {

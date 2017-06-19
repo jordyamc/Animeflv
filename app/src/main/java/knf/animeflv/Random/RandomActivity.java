@@ -43,12 +43,12 @@ public class RandomActivity extends AppCompatActivity implements RandomInterface
         }
         setContentView(R.layout.random_layout);
         ButterKnife.bind(this);
-        setTheme();
         swipeRefreshLayout.setOnRefreshListener(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Random");
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setTheme();
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,6 +85,8 @@ public class RandomActivity extends AppCompatActivity implements RandomInterface
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
         toolbar.setBackgroundColor(theme.primary);
         toolbar.getRootView().setBackgroundColor(theme.background);
+        toolbar.setTitleTextColor(theme.textColorToolbar);
+        ThemeUtils.setNavigationColor(toolbar, theme.toolbarNavigation);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(theme.primaryDark);
             getWindow().setNavigationBarColor(theme.primary);

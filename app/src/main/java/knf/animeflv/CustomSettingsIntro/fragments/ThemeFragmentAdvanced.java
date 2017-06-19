@@ -31,6 +31,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -64,6 +65,7 @@ import xdroid.toaster.Toaster;
 
 public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorChooserDialog.ColorCallback {
 
+    public static final String ACTION_THEME_CHANGE = "knf.animeflv.ACTION_THEME_CHANGE";
     private final int DURATION = 500;
     private final int MODE_NORMAL = 0;
     private final int MODE_PREVIEW = 1;
@@ -93,14 +95,20 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
     TextView title1;
     @BindView(R.id.cap1)
     TextView cap1;
+    @BindView(R.id.a_button_1)
+    ImageButton action1;
     @BindView(R.id.tit2)
     TextView title2;
     @BindView(R.id.cap2)
     TextView cap2;
+    @BindView(R.id.a_button_2)
+    ImageButton action2;
     @BindView(R.id.tit3)
     TextView title3;
     @BindView(R.id.cap3)
     TextView cap3;
+    @BindView(R.id.a_button_3)
+    ImageButton action3;
     @BindView(R.id.sync)
     ImageView sync;
     @BindView(R.id.share)
@@ -139,6 +147,14 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
                 return preferences.getInt(key, isDarkMode ? ColorsRes.Negro(context) : ColorsRes.Blanco(context));
             case "theme_toolbar_tablet":
                 return preferences.getInt(key, isDarkMode ? ColorsRes.Negro(context) : ColorsRes.Prim(context));
+            case "theme_card_text":
+                return preferences.getInt(key, isDarkMode ? ColorsRes.SecondaryTextDark(context) : ColorsRes.SecondaryTextLight(context));
+            case "theme_toolbar_text":
+                return preferences.getInt(key, ThemeUtils.isTablet(context) ? (isDarkMode ? ColorsRes.Blanco(context) : Color.parseColor("#4d4d4d")) : ColorsRes.Blanco(context));
+            case "theme_icon_filter":
+                return preferences.getInt(key, isDarkMode ? ColorsRes.Holo_Dark(context) : ColorsRes.Holo_Light(context));
+            case "theme_toolbar_navigation":
+                return preferences.getInt(key, ThemeUtils.isTablet(context) ? (isDarkMode ? ColorsRes.Blanco(context) : Color.parseColor("#4d4d4d")) : ColorsRes.Blanco(context));
             default:
                 return ColorsRes.Prim(context);
         }
@@ -162,9 +178,11 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.inflateMenu(R.menu.menu_main_sample);
-        toolbar.setTitleTextColor(ColorsRes.Blanco(getA()));
+        toolbar.setTitleTextColor(getDefault("theme_toolbar_text"));
         toolbar.setTitle("Recientes");
         toolbar.setBackgroundColor(getDefault("theme_toolbar"));
+        ThemeUtils.setNavigationColor(toolbar, getDefault("theme_toolbar_navigation"));
+        toolbar.setTag(getDefault("theme_toolbar_navigation"));
         button_apply.setBackgroundColor(ThemeUtils.getAcentColor(getA()));
         linearLayout.setBackgroundColor(getDefault("theme_background"));
         switchCompat.setChecked(ThemeUtils.isAmoled(getA()));
@@ -172,12 +190,18 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
         card1.setCardBackgroundColor(getDefault("theme_card_normal"));
         card2.setCardBackgroundColor(getDefault("color_favs"));
         card3.setCardBackgroundColor(getDefault("color_new"));
-        title1.setTextColor(ThemeUtils.isAmoled(getA()) ? ColorsRes.SecondaryTextDark(getA()) : ColorsRes.SecondaryTextLight(getA()));
-        title2.setTextColor(ThemeUtils.isAmoled(getA()) ? ColorsRes.SecondaryTextDark(getA()) : ColorsRes.SecondaryTextLight(getA()));
-        title3.setTextColor(ThemeUtils.isAmoled(getA()) ? ColorsRes.SecondaryTextDark(getA()) : ColorsRes.SecondaryTextLight(getA()));
+        title1.setTextColor(getDefault("theme_card_text"));
+        title2.setTextColor(getDefault("theme_card_text"));
+        title3.setTextColor(getDefault("theme_card_text"));
         cap1.setTextColor(ThemeUtils.getAcentColor(getA()));
         cap2.setTextColor(ThemeUtils.getAcentColor(getA()));
         cap3.setTextColor(ThemeUtils.getAcentColor(getA()));
+        action1.setColorFilter(getDefault("theme_icon_filter"));
+        action1.setTag(getDefault("theme_icon_filter"));
+        action2.setColorFilter(getDefault("theme_icon_filter"));
+        action2.setTag(getDefault("theme_icon_filter"));
+        action3.setColorFilter(getDefault("theme_icon_filter"));
+        action3.setTag(getDefault("theme_icon_filter"));
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -224,25 +248,49 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showColorDialog("theme_toolbar", ColorType.CUSTOM);
+                showToolbarPopup(view);
+            }
+        });
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showNavigationPopup(view);
             }
         });
         card1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showColorDialog("theme_card_normal", ColorType.CUSTOM);
+                showCardPopup("theme_card_normal", false, view);
             }
         });
         card2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showColorDialog("color_favs", ColorType.CUSTOM_ARGB);
+                showCardPopup("color_favs", true, view);
             }
         });
         card3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showColorDialog("color_new", ColorType.CUSTOM_ARGB);
+                showCardPopup("color_new", true, view);
+            }
+        });
+        action1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showColorDialog("theme_icon_filter", ColorType.CUSTOM);
+            }
+        });
+        action2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showColorDialog("theme_icon_filter", ColorType.CUSTOM);
+            }
+        });
+        action3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showColorDialog("theme_icon_filter", ColorType.CUSTOM);
             }
         });
         linearLayout.setOnClickListener(new View.OnClickListener() {
@@ -261,28 +309,49 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
         toolbar.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                setDefault("theme_toolbar");
+                showDefaultToolbarPopup(view);
                 return true;
             }
         });
         card1.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                setDefault("theme_card_normal");
+                showDefaultCardPopup("theme_card_normal", view);
                 return true;
             }
         });
         card2.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                setDefault("color_favs");
+                showDefaultCardPopup("color_favs", view);
                 return true;
             }
         });
         card3.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                setDefault("color_new");
+                showDefaultCardPopup("color_new", view);
+                return true;
+            }
+        });
+        action1.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                setDefault("theme_icon_filter");
+                return true;
+            }
+        });
+        action2.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                setDefault("theme_icon_filter");
+                return true;
+            }
+        });
+        action3.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                setDefault("theme_icon_filter");
                 return true;
             }
         });
@@ -443,7 +512,7 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
                         ColorsRes.Morado(this)
                 };
                 new ColorChooserDialog.Builder(this, R.string.color_chooser)
-                        .theme(ThemeUtils.isAmoled(this) ? Theme.DARK : Theme.LIGHT)
+                        .theme(Theme.DARK)
                         .customColors(colorl, null)
                         .dynamicButtonColor(true)
                         .allowUserColorInput(false)
@@ -495,6 +564,14 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
                 return preferences.getInt(key, isDarkMode ? ColorsRes.Negro(this) : ColorsRes.Blanco(this));
             case "theme_toolbar_tablet":
                 return preferences.getInt(key, isDarkMode ? ColorsRes.Negro(this) : ColorsRes.Prim(this));
+            case "theme_card_text":
+                return preferences.getInt(key, isDarkMode ? ColorsRes.SecondaryTextDark(getA()) : ColorsRes.SecondaryTextLight(getA()));
+            case "theme_toolbar_text":
+                return preferences.getInt(key, ThemeUtils.isTablet(getA()) ? (isDarkMode ? ColorsRes.Blanco(getA()) : Color.parseColor("#4d4d4d")) : ColorsRes.Blanco(getA()));
+            case "theme_icon_filter":
+                return preferences.getInt(key, isDarkMode ? ColorsRes.Holo_Dark(getA()) : ColorsRes.Holo_Light(getA()));
+            case "theme_toolbar_navigation":
+                return preferences.getInt(key, ThemeUtils.isTablet(getA()) ? (isDarkMode ? ColorsRes.Blanco(getA()) : Color.parseColor("#4d4d4d")) : ColorsRes.Blanco(getA()));
             default:
                 return ColorsRes.Prim(this);
         }
@@ -540,6 +617,18 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
                                 case "theme_toolbar_tablet":
                                     preferences.putInt(key, isDarkMode ? ColorsRes.Negro(getA()) : ColorsRes.Prim(getA()));
                                     break;
+                                case "theme_card_text":
+                                    preferences.putInt(key, isDarkMode ? ColorsRes.SecondaryTextDark(getA()) : ColorsRes.SecondaryTextLight(getA()));
+                                    break;
+                                case "theme_toolbar_text":
+                                    preferences.putInt(key, ThemeUtils.isTablet(getA()) ? (isDarkMode ? ColorsRes.Blanco(getA()) : Color.parseColor("#4d4d4d")) : ColorsRes.Blanco(getA()));
+                                    break;
+                                case "theme_icon_filter":
+                                    preferences.putInt(key, isDarkMode ? ColorsRes.Holo_Dark(getA()) : ColorsRes.Holo_Light(getA()));
+                                    break;
+                                case "theme_toolbar_navigation":
+                                    preferences.putInt(key, ThemeUtils.isTablet(getA()) ? (isDarkMode ? ColorsRes.Blanco(getA()) : Color.parseColor("#4d4d4d")) : ColorsRes.Blanco(getA()));
+                                    break;
                             }
                             preferences.apply();
                             onColorChange();
@@ -551,7 +640,7 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
         if (MODE != MODE_PREVIEW && MODE != MODE_PREVIEW_FROM_FILE)
             new MaterialDialog.Builder(this)
                     .content("¿Desea aplicar el tema original " + (ThemeHolder.isDark ? "obscuro" : "claro") + "?")
-                    .theme(ThemeHolder.isDark ? Theme.DARK : Theme.LIGHT)
+
                     .positiveText("continuar")
                     .negativeText("cancelar")
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -568,6 +657,10 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
                                     .putInt("theme_background_tablet", isDarkMode ? ColorsRes.Negro(getA()) : ColorsRes.Blanco(getA()))
                                     .putInt("theme_card_tablet", isDarkMode ? ColorsRes.Negro(getA()) : ColorsRes.Blanco(getA()))
                                     .putInt("theme_toolbar_tablet", isDarkMode ? ColorsRes.Negro(getA()) : ColorsRes.Prim(getA()))
+                                    .putInt("theme_toolbar_navigation", ThemeUtils.isTablet(getA()) ? (isDarkMode ? ColorsRes.Blanco(getA()) : Color.parseColor("#4d4d4d")) : ColorsRes.Blanco(getA()))
+                                    .putInt("theme_icon_filter", isDarkMode ? ColorsRes.Holo_Dark(getA()) : ColorsRes.Holo_Light(getA()))
+                                    .putInt("theme_toolbar_text", ThemeUtils.isTablet(getA()) ? (isDarkMode ? ColorsRes.Blanco(getA()) : Color.parseColor("#4d4d4d")) : ColorsRes.Blanco(getA()))
+                                    .putInt("theme_card_text", isDarkMode ? ColorsRes.SecondaryTextDark(getA()) : ColorsRes.SecondaryTextLight(getA()))
                                     .apply();
                             onColorChange();
                         }
@@ -615,6 +708,42 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
             }
         });
         animM.start();
+
+        ValueAnimator animTN = ValueAnimator.ofInt((int) toolbar.getTag(), theme.toolbarNavigation);
+        animTN.setEvaluator(new ArgbEvaluator());
+        animTN.setDuration(DURATION);
+        animTN.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(final ValueAnimator animation) {
+                getA().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (toolbar != null)
+                            ThemeUtils.setNavigationColor(toolbar, (Integer) animation.getAnimatedValue());
+                    }
+                });
+            }
+        });
+        animTN.start();
+
+        toolbar.setTag(theme.toolbarNavigation);
+
+        ValueAnimator animTT = ValueAnimator.ofInt(getToolbarTitleColor(), theme.textColorToolbar);
+        animTT.setEvaluator(new ArgbEvaluator());
+        animTT.setDuration(DURATION);
+        animTT.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(final ValueAnimator animation) {
+                getA().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (toolbar != null)
+                            toolbar.setTitleTextColor((Integer) animation.getAnimatedValue());
+                    }
+                });
+            }
+        });
+        animTT.start();
 
         if (l_toolbar != null) {
             ValueAnimator animLT = ValueAnimator.ofInt(((ColorDrawable) l_toolbar.getBackground()).getColor(), theme.tablet_toolbar);
@@ -722,7 +851,7 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
         });
         animN.start();
 
-        ValueAnimator animT = ValueAnimator.ofInt(title1.getCurrentTextColor(), theme.secondaryTextColor);
+        ValueAnimator animT = ValueAnimator.ofInt(title1.getCurrentTextColor(), theme.textColorCard);
         animT.setEvaluator(new ArgbEvaluator());
         animT.setDuration(DURATION);
         animT.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -741,6 +870,34 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
             }
         });
         animT.start();
+
+        ValueAnimator animI = ValueAnimator.ofInt((int) action1.getTag(), theme.iconFilter);
+        animI.setEvaluator(new ArgbEvaluator());
+        animI.setDuration(DURATION);
+        animI.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(final ValueAnimator animation) {
+                getA().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (action1 != null && action2 != null && action3 != null) {
+                            action1.clearColorFilter();
+                            action2.clearColorFilter();
+                            action3.clearColorFilter();
+                            action1.setColorFilter((Integer) animation.getAnimatedValue());
+                            action2.setColorFilter((Integer) animation.getAnimatedValue());
+                            action3.setColorFilter((Integer) animation.getAnimatedValue());
+                        }
+                    }
+                });
+            }
+        });
+        animI.start();
+
+        int def_filter = theme.iconFilter;
+        action1.setColorFilter(def_filter);
+        action2.setColorFilter(def_filter);
+        action3.setColorFilter(def_filter);
 
         ValueAnimator animS = ValueAnimator.ofInt(ThemeHolder.accentColor, theme.accent);
         animS.setEvaluator(new ArgbEvaluator());
@@ -828,6 +985,42 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
             }
         });
         animM.start();
+
+        ValueAnimator animTN = ValueAnimator.ofInt((int) toolbar.getTag(), getDefault("theme_toolbar_navigation"));
+        animTN.setEvaluator(new ArgbEvaluator());
+        animTN.setDuration(DURATION);
+        animTN.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(final ValueAnimator animation) {
+                getA().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (toolbar != null)
+                            ThemeUtils.setNavigationColor(toolbar, (Integer) animation.getAnimatedValue());
+                    }
+                });
+            }
+        });
+        animTN.start();
+
+        toolbar.setTag(getDefault("theme_toolbar_navigation"));
+
+        ValueAnimator animTT = ValueAnimator.ofInt(getToolbarTitleColor(), getDefault("theme_toolbar_text"));
+        animTT.setEvaluator(new ArgbEvaluator());
+        animTT.setDuration(DURATION);
+        animTT.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(final ValueAnimator animation) {
+                getA().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (toolbar != null)
+                            toolbar.setTitleTextColor((Integer) animation.getAnimatedValue());
+                    }
+                });
+            }
+        });
+        animTT.start();
 
         if (l_toolbar != null) {
             ValueAnimator animLT = ValueAnimator.ofInt(((ColorDrawable) l_toolbar.getBackground()).getColor(), getDefault("theme_toolbar_tablet"));
@@ -935,7 +1128,7 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
         });
         animN.start();
 
-        ValueAnimator animT = ValueAnimator.ofInt(title1.getCurrentTextColor(), (ThemeHolder.isDark ? ColorsRes.SecondaryTextDark(getA()) : ColorsRes.SecondaryTextLight(getA())));
+        ValueAnimator animT = ValueAnimator.ofInt(title1.getCurrentTextColor(), getDefault("theme_card_text"));
         animT.setEvaluator(new ArgbEvaluator());
         animT.setDuration(DURATION);
         animT.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -954,6 +1147,34 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
             }
         });
         animT.start();
+
+        ValueAnimator animI = ValueAnimator.ofInt((int) action1.getTag(), getDefault("theme_icon_filter"));
+        animI.setEvaluator(new ArgbEvaluator());
+        animI.setDuration(DURATION);
+        animI.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(final ValueAnimator animation) {
+                getA().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (action1 != null && action2 != null && action3 != null) {
+                            action1.clearColorFilter();
+                            action2.clearColorFilter();
+                            action3.clearColorFilter();
+                            action1.setColorFilter((Integer) animation.getAnimatedValue());
+                            action2.setColorFilter((Integer) animation.getAnimatedValue());
+                            action3.setColorFilter((Integer) animation.getAnimatedValue());
+                        }
+                    }
+                });
+            }
+        });
+        animI.start();
+
+        int def_filter = getDefault("theme_icon_filter");
+        action1.setColorFilter(def_filter);
+        action2.setColorFilter(def_filter);
+        action3.setColorFilter(def_filter);
 
         ValueAnimator animS = ValueAnimator.ofInt((ThemeHolder.old_accentColor == -1 ? ThemeUtils.getAcentColor(getA()) : ThemeHolder.old_accentColor), ThemeHolder.accentColor);
         animS.setEvaluator(new ArgbEvaluator());
@@ -1003,6 +1224,17 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
         });
         animS.start();
         setResult(1506);
+        sendBroadcast(new Intent(ACTION_THEME_CHANGE));
+    }
+
+    private int getToolbarTitleColor() {
+        for (int i = 0; i < toolbar.getChildCount(); ++i) {
+            View child = toolbar.getChildAt(i);
+            if (child instanceof TextView) {
+                return ((TextView) child).getCurrentTextColor();
+            }
+        }
+        return ColorsRes.Blanco(this);
     }
 
     private ColorStateList getTrackColor(int color) {
@@ -1237,6 +1469,111 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
             });
             popup.show();
         }
+    }
+
+    public void showDefaultToolbarPopup(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_theme_toolbar, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.text:
+                        setDefault("theme_toolbar_text");
+                        break;
+                    case R.id.color:
+                        setDefault("theme_toolbar");
+                        break;
+                }
+                return false;
+            }
+        });
+        popup.show();
+    }
+
+    public void showToolbarPopup(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_theme_toolbar, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.text:
+                        showColorDialog("theme_toolbar_text", ColorType.CUSTOM);
+                        break;
+                    case R.id.color:
+                        showColorDialog("theme_toolbar", ColorType.CUSTOM);
+                        break;
+                }
+                return false;
+            }
+        });
+        popup.show();
+    }
+
+    public void showNavigationPopup(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_theme_navigationr, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.color:
+                        showColorDialog("theme_toolbar_navigation", ColorType.CUSTOM);
+                        break;
+                    case R.id.undo:
+                        setDefault("theme_toolbar_navigation");
+                        break;
+                }
+                return false;
+            }
+        });
+        popup.show();
+    }
+
+    public void showDefaultCardPopup(final String key, View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_theme_toolbar, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.text:
+                        setDefault("theme_card_text");
+                        break;
+                    case R.id.color:
+                        setDefault(key);
+                        break;
+                }
+                return false;
+            }
+        });
+        popup.show();
+    }
+
+    public void showCardPopup(final String key, final boolean alpha, View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_theme_toolbar, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.text:
+                        showColorDialog("theme_card_text", ColorType.CUSTOM);
+                        break;
+                    case R.id.color:
+                        showColorDialog(key, alpha ? ColorType.CUSTOM_ARGB : ColorType.CUSTOM);
+                        break;
+                }
+                return false;
+            }
+        });
+        popup.show();
     }
 
     @Override

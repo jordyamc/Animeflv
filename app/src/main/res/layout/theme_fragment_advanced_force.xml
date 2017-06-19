@@ -147,6 +147,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -156,9 +157,10 @@
                         android:src="@drawable/ic_block_r" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
                         android:background="@android:color/transparent"
                         android:gravity="center_vertical"
                         android:orientation="vertical"
@@ -175,7 +177,7 @@
                             android:lines="1"
                             android:maxLines="1"
                             android:scrollHorizontally="true"
-                            android:text="Título"
+                            android:text="Tarjeta Normal"
                             android:textColor="#4d4d4d"
                             android:textSize="13sp" />
 
@@ -192,6 +194,19 @@
                             android:textSize="13sp" />
 
                     </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/a_button_1"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:adjustViewBounds="false"
+                        android:clickable="true"
+                        android:cropToPadding="false"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_get_r" />
+
 
                 </LinearLayout>
 
@@ -215,6 +230,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -224,9 +240,10 @@
                         android:src="@drawable/ic_block_r" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
                         android:background="@android:color/transparent"
                         android:gravity="center_vertical"
                         android:orientation="vertical"
@@ -243,7 +260,7 @@
                             android:lines="1"
                             android:maxLines="1"
                             android:scrollHorizontally="true"
-                            android:text="Título"
+                            android:text="Anime en favoritos"
                             android:textColor="#4d4d4d"
                             android:textSize="13sp" />
 
@@ -260,6 +277,18 @@
                             android:textSize="13sp" />
 
                     </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/a_button_2"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:adjustViewBounds="false"
+                        android:clickable="true"
+                        android:cropToPadding="false"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_get_r" />
 
                 </LinearLayout>
 
@@ -283,6 +312,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -292,9 +322,10 @@
                         android:src="@drawable/ic_block_r" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
                         android:background="@android:color/transparent"
                         android:gravity="center_vertical"
                         android:orientation="vertical"
@@ -311,7 +342,7 @@
                             android:lines="1"
                             android:maxLines="1"
                             android:scrollHorizontally="true"
-                            android:text="Título"
+                            android:text="Anime nuevo"
                             android:textColor="#4d4d4d"
                             android:textSize="13sp" />
 
@@ -328,6 +359,18 @@
                             android:textSize="13sp" />
 
                     </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/a_button_3"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:adjustViewBounds="false"
+                        android:clickable="true"
+                        android:cropToPadding="false"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_get_r" />
 
                 </LinearLayout>
 

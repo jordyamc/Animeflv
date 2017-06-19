@@ -23,8 +23,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 214
-        versionName "5.2.0"
+        versionCode 215
+        versionName "5.2.1"
         multiDexEnabled = true
     }
     buildTypes {
@@ -114,6 +114,7 @@ dependencies {
     compile 'com.mikepenz:community-material-typeface:1.7.22.1@aar'
     compile 'com.afollestad.material-dialogs:core:0.9.4.3'
     compile 'com.afollestad.material-dialogs:commons:0.9.4.3'
+    //compile 'com.afollestad:aesthetic:0.4.6'
     compile 'jp.wasabeef:recyclerview-animators:2.2.3'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'com.cleveroad:audiowidget:1.0.0'

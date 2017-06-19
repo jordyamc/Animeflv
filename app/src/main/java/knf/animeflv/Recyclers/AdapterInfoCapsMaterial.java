@@ -103,7 +103,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             }
         }
         holder.tv_capitulo.setText(capitulo.get(position));
-        holder.tv_capitulo.setTextColor(theme.textColor);
+        holder.tv_capitulo.setTextColor(theme.textColorNormal);
         holder.card.setCardBackgroundColor(theme.card_normal);
         holder.ib_des.setColorFilter(null);
         holder.ib_ver.setColorFilter(null);

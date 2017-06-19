@@ -39,10 +39,10 @@ public class VersionAdapter extends RecyclerView.Adapter<VersionAdapter.ViewHold
     @Override
     public void onBindViewHolder(final VersionAdapter.ViewHolder holder, final int position) {
         if (ThemeUtils.isAmoled(activity)) {
-            holder.card.setBackgroundColor(ColorsRes.Prim(activity));
+            holder.card.setCardBackgroundColor(ColorsRes.Prim(activity));
             holder.name.setTextColor(ColorsRes.SecondaryTextDark(activity));
         } else {
-            holder.card.setBackgroundColor(ColorsRes.Blanco(activity));
+            holder.card.setCardBackgroundColor(ColorsRes.Blanco(activity));
             holder.name.setTextColor(ColorsRes.SecondaryTextLight(activity));
         }
         String name = versions.get(holder.getAdapterPosition()).name;

@@ -3,9 +3,11 @@
     <group>
         <item
             android:id="@+id/save"
+            android:icon="@drawable/save"
             android:title="Guardar tema" />
         <item
             android:id="@+id/load"
+            android:icon="@drawable/load"
             android:title="Cargar tema" />
     </group>
 
