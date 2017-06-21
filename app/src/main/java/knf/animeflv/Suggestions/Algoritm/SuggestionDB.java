@@ -110,7 +110,7 @@ public class SuggestionDB {
         close();
     }
 
-    List<Suggestion> getSuggestions() {
+    List<Suggestion> getSuggestions(List<String> blacklist) {
         List<Suggestion> list = new ArrayList<>();
         try {
             Cursor c = db.query(TABLE_NAME, new String[]{
@@ -119,7 +119,8 @@ public class SuggestionDB {
             }, null, null, null, null, null);
             if (c.getCount() > 0) {
                 while (c.moveToNext()) {
-                    list.add(new Suggestion(c.getString(0), c.getInt(1)));
+                    if (!blacklist.contains(c.getString(0)))
+                        list.add(new Suggestion(c.getString(0), c.getInt(1)));
                 }
                 c.close();
                 close();

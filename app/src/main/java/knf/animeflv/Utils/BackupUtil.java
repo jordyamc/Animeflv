@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -39,6 +40,7 @@ public class BackupUtil {
             array.put(ConfigurationBackups.getDownloads(context));
             array.put(ConfigurationBackups.getSugestions(context));
             array.put(ConfigurationBackups.getExtras(context));
+            array.put(ConfigurationBackups.getTheme(context));
             object.put("list", array);
             if (SAVE_FILE.exists()) {
                 FileUtil.writeToFile(object.toString(), SAVE_FILE);
@@ -59,28 +61,45 @@ public class BackupUtil {
         try {
             JSONArray array = new JSONObject(FileUtil.getStringFromFile(SAVE_FILE)).getJSONArray("list");
             for (int i = 0; i < array.length(); i++) {
-                JSONObject object = array.getJSONObject(i);
-                Log.e("Restoring", object.getString("name"));
-                JSONArray sub = object.getJSONArray("list");
-                SharedPreferences.Editor preferences = Shared.Default(context).edit();
-                for (int o = 0; o < sub.length(); o++) {
-                    JSONObject pref = sub.getJSONObject(o);
-                    String name = pref.getString("name");
-                    if (!name.equals("favoritos") && !name.equals("accentColor")) {
-                        Object value = pref.get("value");
-                        if (value instanceof String) {
-                            preferences.putString(name, (String) value);
-                        } else if (value instanceof Boolean) {
-                            preferences.putBoolean(name, (Boolean) value);
+                try {
+                    JSONObject object = array.getJSONObject(i);
+                    Log.e("Restoring", object.getString("name"));
+                    SharedPreferences.Editor preferences = Shared.Default(context).edit();
+                    if (!object.getString("name").equals("theme")) {
+                        JSONArray sub = object.getJSONArray("list");
+                        for (int o = 0; o < sub.length(); o++) {
+                            JSONObject pref = sub.getJSONObject(o);
+                            String name = pref.getString("name");
+                            if (!name.equals("favoritos") && !name.equals("accentColor") && !name.equals("theme")) {
+                                Object value = pref.get("value");
+                                if (value instanceof String) {
+                                    preferences.putString(name, (String) value);
+                                } else if (value instanceof Boolean) {
+                                    preferences.putBoolean(name, (Boolean) value);
+                                }
+                            } else if (name.equals("favoritos")) {
+                                new FavotiteDB(context).updatebyJSON(pref.getJSONObject("value"), null);
+                            } else {
+                                preferences.putInt(name, pref.getInt("value"));
+                            }
                         }
-                    } else if (name.equals("favoritos")) {
-                        new FavotiteDB(context).updatebyJSON(pref.getJSONObject("value"), null);
                     } else {
-                        preferences.putInt(name, pref.getInt("value"));
+                        JSONArray sub = object.getJSONArray("theme");
+                        for (int o = 0; o < sub.length(); o++) {
+                            JSONObject pref = sub.getJSONObject(o);
+                            String key = pref.getString("key");
+                            if (key.equals(ThemeUtils.Theme.KEY_DARK)) {
+                                preferences.putBoolean(key, pref.getBoolean("value"));
+                            } else {
+                                preferences.putInt(key, pref.getInt("value"));
+                            }
+                        }
                     }
+                    Log.e("Restoring", object.getString("name") + " Complete!!!!!");
+                    preferences.apply();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                Log.e("Restoring", object.getString("name") + " Complete!!!!!");
-                preferences.apply();
             }
             return Parser.Response.OK;
         } catch (Exception e) {
@@ -223,6 +242,12 @@ public class BackupUtil {
                 array.put(item);
             }
             object.put("list", array);
+        }
+
+        private static JSONObject getTheme(Context context) throws JSONException {
+            JSONObject object = ThemeUtils.Theme.create(context).toJson();
+            object.put("name", "theme");
+            return object;
         }
 
         private static Pref[] getLogs(Context context) {

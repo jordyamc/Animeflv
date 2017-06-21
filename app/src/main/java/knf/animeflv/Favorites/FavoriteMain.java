@@ -38,6 +38,7 @@ import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.R;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.Utils.TrackingHelper;
 
 public class FavoriteMain extends AppCompatActivity {
     @BindView(R.id.toolbar)
@@ -342,5 +343,11 @@ public class FavoriteMain extends AppCompatActivity {
         if (!cloud_updated)
             DropboxManager.updateFavs(getApplicationContext(), null);
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        TrackingHelper.track(this, TrackingHelper.FAVORITOS);
     }
 }

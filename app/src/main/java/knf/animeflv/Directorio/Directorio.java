@@ -143,8 +143,12 @@ public class Directorio extends AppCompatActivity {
         setSupportActionBar(toolbarS);
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
         if (!isXLargeScreen(getApplicationContext())) { //set phones to portrait;
-            linearLayout = (RelativeLayout) findViewById(R.id.LY_dir);
-            linearLayout.setBackgroundColor(theme.tablet_background);
+            try {
+                linearLayout = findViewById(R.id.LY_dir);
+                linearLayout.setBackgroundColor(theme.background);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (isXLargeScreen(this)) {
@@ -174,14 +178,18 @@ public class Directorio extends AppCompatActivity {
         }
         viewPagerTab.setSelectedIndicatorColors(theme.indicatorColor);
         viewPagerTab.setDefaultTabTextColor(theme.textColorToolbar);
-        if (!isXLargeScreen(this)) {
-            toolbarS.getRootView().setBackgroundColor(theme.background);
-            viewPagerTab.setBackgroundColor(theme.primary);
-        } else {
-            viewPagerTab.setBackgroundColor(theme.tablet_toolbar);
-            toolbarS.getRootView().setBackgroundColor(theme.tablet_background);
-            if (ThemeUtils.isTablet(this))
-                findViewById(R.id.cardMain).setBackgroundColor(theme.primary);
+        try {
+            if (!isXLargeScreen(this)) {
+                toolbarS.getRootView().setBackgroundColor(theme.background);
+                viewPagerTab.setBackgroundColor(theme.primary);
+            } else {
+                viewPagerTab.setBackgroundColor(theme.tablet_toolbar);
+                toolbarS.getRootView().setBackgroundColor(theme.tablet_background);
+                if (ThemeUtils.isTablet(this))
+                    findViewById(R.id.cardMain).setBackgroundColor(theme.primary);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         final String j = OfflineGetter.getDirectorio();
         if (!j.equals("null")) {

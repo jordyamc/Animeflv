@@ -22,7 +22,7 @@ import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
 
-public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.ViewHolder> {
+public class SuggestionsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Activity activity;
     private List<AnimeObject> animes = new ArrayList<>();
@@ -35,40 +35,57 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
     }
 
     @Override
-    public SuggestionsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(activity).
-                inflate(R.layout.item_suggestion, parent, false);
-        return new SuggestionsAdapter.ViewHolder(itemView, activity);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType) {
+            default:
+            case 0:
+                return new SuggestionsAdapter.ViewHolder(LayoutInflater.from(activity).inflate(R.layout.item_suggestion, parent, false), activity);
+            case 1:
+                return new SuggestionsAdapter.Header(LayoutInflater.from(activity).inflate(R.layout.item_suggestion_header, parent, false));
+        }
+
     }
 
     @Override
-    public void onBindViewHolder(final SuggestionsAdapter.ViewHolder holder, final int position) {
-        holder.card.setCardBackgroundColor(theme.card_normal);
-        holder.tv_tit.setTextColor(theme.textColor);
-        holder.tv_tipo.setTextColor(theme.accent);
-        new CacheManager().mini(activity, animes.get(getPosition(holder, position)).aid, holder.iv_rel);
-        holder.tv_tit.setText(animes.get(getPosition(holder, position)).title);
-        holder.tv_tipo.setText(animes.get(getPosition(holder, position)).tid);
-        holder.card.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                InfoHelper.open(
-                        activity,
-                        new InfoHelper.SharedItem(holder.iv_rel, "img"),
-                        new InfoHelper.BundleItem("title", animes.get(getPosition(holder, position)).title),
-                        new InfoHelper.BundleItem("aid", animes.get(getPosition(holder, position)).aid)
-                );
-            }
-        });
+    public void onBindViewHolder(final RecyclerView.ViewHolder h, final int position) {
+        if (animes.get(h.getAdapterPosition()).isAnime) {
+            final ViewHolder holder = (ViewHolder) h;
+            holder.card.setCardBackgroundColor(theme.card_normal);
+            holder.tv_tit.setTextColor(theme.textColor);
+            holder.tv_tipo.setTextColor(theme.accent);
+            new CacheManager().mini(activity, animes.get(getPosition(holder, position)).aid, holder.iv_rel);
+            holder.tv_tit.setText(animes.get(getPosition(holder, position)).title);
+            holder.tv_tipo.setText(animes.get(getPosition(holder, position)).tid);
+            holder.card.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    InfoHelper.open(
+                            activity,
+                            new InfoHelper.SharedItem(holder.iv_rel, "img"),
+                            new InfoHelper.BundleItem("title", animes.get(getPosition(holder, position)).title),
+                            new InfoHelper.BundleItem("aid", animes.get(getPosition(holder, position)).aid)
+                    );
+                }
+            });
+        } else {
+            Header holder = (Header) h;
+            holder.header.setTextColor(theme.secondaryTextColor);
+            holder.header.setText(animes.get(getPosition(holder, position)).title);
+        }
     }
 
-    private int getPosition(ViewHolder holder, int position) {
+    private int getPosition(RecyclerView.ViewHolder holder, int position) {
         return holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition();
     }
 
     @Override
     public int getItemCount() {
         return animes.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return animes.get(position).isAnime ? 0 : 1;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -86,6 +103,16 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
             ButterKnife.bind(this, itemView);
             if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
                 iv_rel.setPadding(0, 0, 0, 0);
+        }
+    }
+
+    public static class Header extends RecyclerView.ViewHolder {
+        @BindView(R.id.header_text)
+        public TextView header;
+
+        public Header(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
         }
     }
 

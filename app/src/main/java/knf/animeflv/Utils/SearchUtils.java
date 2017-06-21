@@ -136,8 +136,13 @@ public class SearchUtils {
     }
 
     public static String[] getGeneros() {
-        String[] generos = {
-                "Todos",
+        ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(new String[]{"Todos"}));
+        arrayList.addAll(Arrays.asList(getGenerosOnly()));
+        return arrayList.toArray(new String[0]);
+    }
+
+    public static String[] getGenerosOnly() {
+        return new String[]{
                 "Acción",
                 "Artes Marciales",
                 "Aventuras",
@@ -179,7 +184,6 @@ public class SearchUtils {
                 "Vampiros",
                 "Yaoi",
                 "Yuri"};
-        return generos;
     }
 
     private static boolean containsGenero(String generos) {

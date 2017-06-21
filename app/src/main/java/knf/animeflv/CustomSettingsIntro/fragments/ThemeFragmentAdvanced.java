@@ -61,6 +61,7 @@ import knf.animeflv.ThemeHolder;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.Utils.TrackingHelper;
 import xdroid.toaster.Toaster;
 
 public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorChooserDialog.ColorCallback {
@@ -640,7 +641,6 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
         if (MODE != MODE_PREVIEW && MODE != MODE_PREVIEW_FROM_FILE)
             new MaterialDialog.Builder(this)
                     .content("¿Desea aplicar el tema original " + (ThemeHolder.isDark ? "obscuro" : "claro") + "?")
-
                     .positiveText("continuar")
                     .negativeText("cancelar")
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -1593,6 +1593,12 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
     @Override
     public void onColorChooserDismissed(@NonNull ColorChooserDialog colorChooserDialog) {
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        TrackingHelper.track(this, TrackingHelper.THEME);
     }
 
     @Override

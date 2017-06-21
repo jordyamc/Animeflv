@@ -207,6 +207,21 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         }
         MainStates.setListing(false);
         imageView.setOnClickListener(getExpandListener());
+        imageView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                final CacheManager cacheManager = new CacheManager();
+                cacheManager.invalidatePortada(aid);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        cacheManager.portada(InfoFragments.this, aid, imageView);
+                        Toaster.toast("Portada recreada");
+                    }
+                });
+                return true;
+            }
+        });
         toolbar.setOnClickListener(getExpandListener());
         IntentFilter filter = new IntentFilter();
         filter.addAction(DownloaderService.RECEIVER_ACTION_ERROR);

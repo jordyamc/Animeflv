@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.CustomViews.TextViewExpandableAnimation;
+import knf.animeflv.JsonFactory.MALGetter;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Rate.RateDB;
@@ -168,6 +170,28 @@ public class FragmentInfo extends Fragment {
                     rv_rel.setLayoutManager(new LinearLayoutManager(getActivity()));
                     AdapterRel adapter = new AdapterRel(getActivity(), titulos, tipos, urls, aids);
                     rv_rel.setAdapter(adapter);
+                }
+            }
+        });
+        MALGetter.getAnimeSearch(animeDetail.getTitulo(), new MALGetter.SearchInterface() {
+            @Override
+            public void onFinishSearch(String result, boolean success) {
+                if (success) {
+                    final String date = MALGetter.parseStartDate(result, animeDetail.getTitulo());
+                    if (!date.startsWith("_error")) {
+                        try {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    txt_fsalida.setText(date);
+                                }
+                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Log.e("MAL Error", date);
+                    }
                 }
             }
         });

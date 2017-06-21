@@ -524,7 +524,6 @@ public class newMain extends AppCompatActivity implements
                                 result.setSelection(0, false);
                                 break;
                             case 1:
-                                //startActivity(new Intent(context, Favoritos.class));
                                 if (favs_data_ok)
                                     startActivity(new Intent(context, FavoriteMain.class));
                                 result.setSelection(0, false);
@@ -534,7 +533,6 @@ public class newMain extends AppCompatActivity implements
                                 result.setSelection(0, false);
                                 break;
                             case 3:
-                                //startActivity(new Intent(context, newEmisionTest.class));
                                 startActivity(new Intent(context, AutoEmisionActivity.class));
                                 result.setSelection(0, false);
                                 result.closeDrawer();

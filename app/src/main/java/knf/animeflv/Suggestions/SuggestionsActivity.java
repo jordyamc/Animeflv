@@ -6,17 +6,21 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import org.zakariya.stickyheaders.StickyHeaderLayoutManager;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -28,6 +32,7 @@ import knf.animeflv.Random.AnimeObject;
 import knf.animeflv.Suggestions.Algoritm.SuggestionDB;
 import knf.animeflv.Suggestions.Algoritm.SuggestionHelper;
 import knf.animeflv.Utils.Keys;
+import knf.animeflv.Utils.SearchUtils;
 import knf.animeflv.Utils.ThemeUtils;
 
 /**
@@ -151,8 +156,8 @@ public class SuggestionsActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        SuggestionsAdapter adapter = new SuggestionsAdapter(SuggestionsActivity.this, animes);
-                        recyclerView.setLayoutManager(new LinearLayoutManager(SuggestionsActivity.this));
+                        SuggestionsAdapterSticky adapter = new SuggestionsAdapterSticky(SuggestionsActivity.this, animes);
+                        recyclerView.setLayoutManager(new StickyHeaderLayoutManager());
                         recyclerView.setAdapter(adapter);
                         dialog.dismiss();
                     }
@@ -210,6 +215,27 @@ public class SuggestionsActivity extends AppCompatActivity {
         return true;
     }
 
+    private Integer[] getExcluded() {
+        String[] genres = SearchUtils.getGenerosOnly();
+        List<String> excluded = SuggestionHelper.getExcluded(this);
+        List<Integer> integers = new ArrayList<>();
+        for (int i = 0; i < genres.length; i++) {
+            if (excluded.contains(genres[i]))
+                integers.add(i);
+        }
+        return integers.toArray(new Integer[0]);
+    }
+
+    private void saveExcluded(Integer[] excluded) {
+        String[] genres = SearchUtils.getGenerosOnly();
+        List<String> ex = new ArrayList<>();
+        for (int item : excluded) {
+            ex.add(genres[item]);
+        }
+        SuggestionHelper.saveExcluded(this, TextUtils.join(";", ex.toArray(new String[0])));
+        startList();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -225,6 +251,25 @@ public class SuggestionsActivity extends AppCompatActivity {
                 new MaterialDialog.Builder(this)
                         .content(status)
                         .positiveText("OK")
+                        .neutralText("blacklist")
+                        .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                new MaterialDialog.Builder(SuggestionsActivity.this)
+                                        .title("Blacklist")
+                                        .titleGravity(GravityEnum.CENTER)
+                                        .items(SearchUtils.getGenerosOnly())
+                                        .itemsCallbackMultiChoice(getExcluded(), new MaterialDialog.ListCallbackMultiChoice() {
+                                            @Override
+                                            public boolean onSelection(MaterialDialog materialDialog, Integer[] integers, CharSequence[] charSequences) {
+                                                saveExcluded(integers);
+                                                return true;
+                                            }
+                                        })
+                                        .positiveText("aceptar")
+                                        .negativeText("cancelar").build().show();
+                            }
+                        })
                         .build().show();
                 break;
             case R.id.re_make:

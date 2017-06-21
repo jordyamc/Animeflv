@@ -23,8 +23,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 215
-        versionName "5.2.1"
+        versionCode 216
+        versionName "5.2.2"
         multiDexEnabled = true
     }
     buildTypes {
@@ -172,6 +172,7 @@ dependencies {
     compile 'com.onesignal:OneSignal:3.+@aar'
     compile 'org.cryse.widget:persistentsearchview:1.0.4@aar'
     compile 'com.github.GrenderG:Color-O-Matic:1.1.5'
+    compile 'org.zakariya.stickyheaders:stickyheaders:0.7.6'
     compile ('com.github.ViksaaSkool:AwesomeSplash:v1.0.0'){
         exclude module: 'CircularReveal'
     }

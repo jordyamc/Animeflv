@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.annotation.UiThread;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -206,6 +207,11 @@ public class CacheManager {
         return number;
     }
 
+    public void invalidatePortada(String aid) {
+        new File(portadaCache, aid + ".jpg").delete();
+    }
+
+    @UiThread
     public void portada(final Activity context, final String aid, final ImageView imageView) {
         checkCacheDirs();
         final File localFile = new File(portadaCache, aid + ".jpg");
@@ -213,41 +219,48 @@ public class CacheManager {
         if (localFile.exists()) {
             PicassoCache.getPicassoInstance(context).load(localFile).into(imageView);
             isHD = isHD(localFile);
-            if (isHD) Log.d("Local", "is HD!!!");
+            if (isHD) Log.e("Local", "is HD!!!");
         }
         if (NetworkUtils.isNetworkAvailable() && !isHD) {
-            MALGetter.getAnimeSearch(new Parser().getTitCached(aid).trim(), new MALGetter.SearchInterface() {
+            final String title = new Parser().getTitCached(aid).trim();
+            MALGetter.getAnimeSearch(title, new MALGetter.SearchInterface() {
                 @Override
-                public void onFinishSearch(String result) {
-                    Log.e("Image Getter", result);
-                    if (!result.contains("_error")) {
-                        if (localFile.exists())
-                            PicassoCache.getPicassoInstance(context).invalidate(localFile);
-                        PicassoCache.getPicassoInstance(context).load(result).noFade().noPlaceholder().into(imageView, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
-                                    saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
-                            }
+                public void onFinishSearch(String r, boolean success) {
+                    try {
+                        String result = MALGetter.parseImageHtml(r, title);
+                        if (success && !result.startsWith("_error")) {
+                            Log.e("Image Getter", result);
+                            if (localFile.exists())
+                                PicassoCache.getPicassoInstance(context).invalidate(localFile);
+                            PicassoCache.getPicassoInstance(context).load(result).noFade().noPlaceholder().into(imageView, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
+                                        saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                                }
 
-                            @Override
-                            public void onError() {
+                                @Override
+                                public void onError() {
 
-                            }
-                        });
-                    } else {
-                        PicassoCache.getPicassoInstance(context).load("http://animeflv.net/uploads/animes/covers/" + aid + ".jpg").noFade().noPlaceholder().into(imageView, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
-                                    saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
-                            }
+                                }
+                            });
+                        } else {
+                            Log.e("Portada", "Searching in page: " + "http://animeflv.net/uploads/animes/covers/" + aid + ".jpg");
+                            PicassoCache.getPicassoInstance(context).load("http://animeflv.net/uploads/animes/covers/" + aid + ".jpg").noFade().noPlaceholder().into(imageView, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
+                                        saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                                }
 
-                            @Override
-                            public void onError() {
+                                @Override
+                                public void onError() {
 
-                            }
-                        });
+                                }
+                            });
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             });
@@ -258,32 +271,36 @@ public class CacheManager {
         checkCacheDirs();
         final File localFile = new File(miniCache, aid + ".jpg");
         imageView.setImageResource(android.R.color.transparent);
-        if (localFile.exists()) {
-            PicassoCache.getPicassoInstance(context).load(localFile).into(imageView);
-        } else {
-            PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + Parser.getCertificateSHA1Fingerprint(context) + "&thumb=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").into(imageView, new Callback() {
-                @Override
-                public void onSuccess() {
-                    if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true))
-                        saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
-                }
+        try {
+            if (localFile.exists()) {
+                PicassoCache.getPicassoInstance(context).load(localFile).into(imageView);
+            } else {
+                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + Parser.getCertificateSHA1Fingerprint(context) + "&thumb=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true))
+                            saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                    }
 
-                @Override
-                public void onError() {
-                    PicassoCache.getPicassoInstance(context).load("http://animeflv.net/uploads/animes/covers/" + aid + ".jpg").error(R.drawable.ic_block_r).into(imageView, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true))
-                                saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
-                        }
+                    @Override
+                    public void onError() {
+                        PicassoCache.getPicassoInstance(context).load("http://animeflv.net/uploads/animes/covers/" + aid + ".jpg").error(R.drawable.ic_block_r).into(imageView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true))
+                                    saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                            }
 
-                        @Override
-                        public void onError() {
+                            @Override
+                            public void onError() {
 
-                        }
-                    });
-                }
-            });
+                            }
+                        });
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

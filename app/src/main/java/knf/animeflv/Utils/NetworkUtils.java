@@ -1,5 +1,6 @@
 package knf.animeflv.Utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -159,6 +160,7 @@ public class NetworkUtils {
                                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull final MaterialDialog dialog, @NonNull DialogAction which) {
+                                        TrackingHelper.track((Activity) context, TrackingHelper.UPDATING + update_ver);
                                         context.startService(new Intent(context, UpdateService.class));
                                         dialog.dismiss();
                                     }

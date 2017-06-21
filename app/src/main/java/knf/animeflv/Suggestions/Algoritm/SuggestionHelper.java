@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -91,13 +92,14 @@ public class SuggestionHelper {
         List<AnimeObject> ac = new ArrayList<>();
         List<AnimeObject> bc = new ArrayList<>();
         List<AnimeObject> a_b_c = new ArrayList<>();
+        List<String> blacklist = getExcluded(context);
         for (int i = 0; i < array.length(); i++) {
             JSONObject object = array.getJSONObject(i);
             String genres = object.getString("f");
             String aid = object.getString("a");
             boolean skip = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("skip_favs", true) && FavoriteHelper.isFav(context, aid);
             if (!skip)
-                if (genres.contains(list.get(0).name) || genres.contains(list.get(1).name) || genres.contains(list.get(2).name)) {
+                if (genres.contains(list.get(0).name) || genres.contains(list.get(1).name) || genres.contains(list.get(2).name) && !isExcluded(blacklist, genres)) {
                     AnimeObject current = new AnimeObject(aid, FileUtil.corregirTit(object.getString("b")), object.getString("c"));
                     if (genres.contains(list.get(0).name) && genres.contains(list.get(1).name) && genres.contains(list.get(2).name)) {
                         abc.add(current);
@@ -113,11 +115,16 @@ public class SuggestionHelper {
                 }
         }
         List<AnimeObject> finalList = new ArrayList<>();
-        finalList.addAll(abc);
-        finalList.addAll(ab);
-        finalList.addAll(ac);
-        finalList.addAll(bc);
-        finalList.addAll(a_b_c);
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name, list.get(2).name), true, abc));
+        //finalList.addAll(abc);
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name), true, ab));
+        //finalList.addAll(ab);
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(2).name), true, ac));
+        //finalList.addAll(ac);
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(1).name, list.get(2).name), true, bc));
+        //finalList.addAll(bc);
+        finalList.add(new AnimeObject(getSuggestionGenresFinals(list.get(0).name, list.get(1).name, list.get(2).name), true, a_b_c));
+        //finalList.addAll(a_b_c);
         return finalList;
     }
 
@@ -127,13 +134,14 @@ public class SuggestionHelper {
         List<AnimeObject> ac = new ArrayList<>();
         List<AnimeObject> bc = new ArrayList<>();
         List<AnimeObject> a_b_c = new ArrayList<>();
+        List<String> blacklist = getExcluded(context);
         for (int i = array.length() - 1; i >= 0; i--) {
             JSONObject object = array.getJSONObject(i);
             String genres = object.getString("f");
             String aid = object.getString("a");
             boolean skip = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("skip_favs", true) && FavoriteHelper.isFav(context, aid);
             if (!skip)
-                if (genres.contains(list.get(0).name) || genres.contains(list.get(1).name) || genres.contains(list.get(2).name)) {
+                if (genres.contains(list.get(0).name) || genres.contains(list.get(1).name) || genres.contains(list.get(2).name) && !isExcluded(blacklist, genres)) {
                     AnimeObject current = new AnimeObject(aid, FileUtil.corregirTit(object.getString("b")), object.getString("c"));
                     if (genres.contains(list.get(0).name) && genres.contains(list.get(1).name) && genres.contains(list.get(2).name)) {
                         abc.add(current);
@@ -149,12 +157,49 @@ public class SuggestionHelper {
                 }
         }
         List<AnimeObject> finalList = new ArrayList<>();
-        finalList.addAll(abc);
-        finalList.addAll(ab);
-        finalList.addAll(ac);
-        finalList.addAll(bc);
-        finalList.addAll(a_b_c);
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name, list.get(2).name), true, abc));
+        //finalList.addAll(abc);
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name), true, ab));
+        //finalList.addAll(ab);
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(2).name), true, ac));
+        //finalList.addAll(ac);
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(1).name, list.get(2).name), true, bc));
+        //finalList.addAll(bc);
+        finalList.add(new AnimeObject(getSuggestionGenresFinals(list.get(0).name, list.get(1).name, list.get(2).name), true, a_b_c));
+        //finalList.addAll(a_b_c);
         return finalList;
+    }
+
+    private static boolean isExcluded(List<String> blacklist, String genres) {
+        if (blacklist.size() > 0) {
+            for (String genre : genres.split(",")) {
+                if (blacklist.contains(genre.trim()))
+                    return true;
+            }
+            return false;
+        } else {
+            return false;
+        }
+    }
+
+    private static String getSuggestionGenres(String... genres) {
+        StringBuilder builder = new StringBuilder("");
+        for (String genre : genres) {
+            builder.append(genre)
+                    .append(", ");
+        }
+        String g = builder.toString().trim();
+        return g.endsWith(",") ? g.substring(0, g.lastIndexOf(",")) : g;
+    }
+
+    private static String getSuggestionGenresFinals(String... genres) {
+        StringBuilder builder = new StringBuilder("");
+        for (String genre : genres) {
+            builder.append(genre)
+                    .append(" || ");
+        }
+        String g = builder.toString().trim();
+        return g.endsWith(" ||") ? g.substring(0, g.lastIndexOf(" ")) : g;
     }
 
     public static void clear(Context context) {
@@ -162,7 +207,16 @@ public class SuggestionHelper {
     }
 
     private static List<SuggestionDB.Suggestion> getGenresCount(Context context) {
-        return SuggestionDB.get(context).getSuggestions();
+        return SuggestionDB.get(context).getSuggestions(getExcluded(context));
+    }
+
+    public static List<String> getExcluded(Context context) {
+        String[] excludedList = PreferenceManager.getDefaultSharedPreferences(context).getString("suggestion_blacklist", "").split(";");
+        return Arrays.asList(excludedList);
+    }
+
+    public static void saveExcluded(Context context, String excluded) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("suggestion_blacklist", excluded).apply();
     }
 
     private static void registerPoints(Context context, String genre, int value, boolean isOld) {
