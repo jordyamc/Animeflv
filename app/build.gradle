@@ -167,6 +167,7 @@ dependencies {
     compile "com.google.android.gms:play-services-analytics:$project.p_services"
     compile "com.google.android.gms:play-services-ads:$project.p_services"
     compile "com.google.android.gms:play-services-iid:$project.p_services"
+    compile "com.google.android.gms:play-services-gcm:$project.p_services"
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'me.zhanghai.android.materialratingbar:library:1.0.2'
     compile 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
