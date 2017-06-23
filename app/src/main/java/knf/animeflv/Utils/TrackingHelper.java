@@ -28,6 +28,13 @@ public class TrackingHelper {
         tracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
+    public static void track(Application activity, String screen) {
+        Log.e("Traking", screen);
+        Tracker tracker = activity.getDefaultTracker();
+        tracker.setScreenName(screen);
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+    }
+
     public static void action(Activity activity, String screen) {
         Tracker tracker = Application.get(activity).getDefaultTracker();
         tracker.setScreenName(screen);

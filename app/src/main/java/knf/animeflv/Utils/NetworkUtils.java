@@ -1,6 +1,5 @@
 package knf.animeflv.Utils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -24,6 +23,7 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import java.io.File;
 
 import cz.msebera.android.httpclient.Header;
+import knf.animeflv.Application;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Utils.eNums.UpdateState;
 import knf.animeflv.newMain;
@@ -135,7 +135,7 @@ public class NetworkUtils {
                     }
                     update_ver = vers;
                     Log.d("Version", Integer.toString(versionCode) + " >> " + vers.trim());
-                    if (versionCode > Integer.parseInt(vers.trim())) {
+                    if (versionCode >= Integer.parseInt(vers.trim())) {
                         UpdateUtil.isBeta = versionCode > Integer.parseInt(vers.trim());
                         if (Integer.parseInt(vers.trim()) == 0) {
                             checkMessage();
@@ -160,8 +160,8 @@ public class NetworkUtils {
                                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull final MaterialDialog dialog, @NonNull DialogAction which) {
-                                        TrackingHelper.track((Activity) context, TrackingHelper.UPDATING + update_ver);
-                                        context.startService(new Intent(context, UpdateService.class));
+                                        TrackingHelper.track((Application) context, TrackingHelper.UPDATING + update_ver);
+                                        Tcontext.startService(new Intent(Tcontext, UpdateService.class));
                                         dialog.dismiss();
                                     }
                                 })
