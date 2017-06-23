@@ -21,6 +21,7 @@ import android.provider.Settings;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -82,7 +83,6 @@ import knf.animeflv.AdminControl.PushManager;
 import knf.animeflv.AutoEmision.AutoEmisionActivity;
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.Cloudflare.Bypass;
-import knf.animeflv.CustomSettingsIntro.fragments.ThemeFragmentAdvanced;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.DownloadService.DownloaderService;
 import knf.animeflv.Explorer.ExplorerRoot;
@@ -105,6 +105,7 @@ import knf.animeflv.Recyclers.AdapterMain;
 import knf.animeflv.Recyclers.AdapterMainNoGIF;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.State.StateActivity;
+import knf.animeflv.Style.ThemeFragmentAdvanced;
 import knf.animeflv.Suggestions.SuggestionsActivity;
 import knf.animeflv.Tutorial.TutorialActivity;
 import knf.animeflv.Utils.FileUtil;
@@ -318,7 +319,6 @@ public class newMain extends AppCompatActivity implements
         return receiver;
     }
 
-    //FIXME: FIX SERVER LOGIN
     private void setUpDrawer() {
         Drawable ic_main;
         if (ThemeUtils.isAmoled(this)) {
@@ -592,7 +592,7 @@ public class newMain extends AppCompatActivity implements
                                 break;
                             case -1:
                                 Intent intent = new Intent(context, Configuracion.class);
-                                startActivity(intent);
+                                startActivityForResult(intent, 1326);
                                 result.closeDrawer();
                                 result.setSelection(0, false);
                                 break;
@@ -806,13 +806,12 @@ public class newMain extends AppCompatActivity implements
                         ((CardView) findViewById(R.id.cardMain)).setCardBackgroundColor(theme.primary);
                         menu_toolbar.setBackgroundColor(theme.tablet_toolbar);
                         menu_toolbar.getRootView().setBackgroundColor(theme.tablet_background);
-                        ThemeUtils.setNavigationColor(menu_toolbar, theme.toolbarNavigation);
                         toolbar.getRootView().setBackgroundColor(theme.tablet_background);
                     } else {
                         toolbar.getRootView().setBackgroundColor(theme.background);
                     }
                     menu_toolbar.setNavigationIcon(R.drawable.menu);
-                    ThemeUtils.setNavigationColor(menu_toolbar, ThemeUtils.Theme.get(newMain.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
+                    ThemeUtils.setNavigationColor(menu_toolbar, theme.toolbarNavigation);
                     menu_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -826,6 +825,7 @@ public class newMain extends AppCompatActivity implements
         });
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private void setTranslucentStatusFlag(boolean on) {
         Window win = getWindow();
         WindowManager.LayoutParams winParams = win.getAttributes();
@@ -873,6 +873,18 @@ public class newMain extends AppCompatActivity implements
         }
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Recientes");
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(final RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    if (!recyclerView.canScrollVertically(-1)) {
+                        toolbar.setElevation(0);
+                    } else {
+                        toolbar.setElevation(50);
+                    }
+            }
+        });
         shouldExecuteOnResume = false;
     }
 
@@ -1007,11 +1019,11 @@ public class newMain extends AppCompatActivity implements
                         recreate();
                     } else {
                         if (frun) {
-                            mainNo = new AdapterMainNoGIF(newMain.this, MainOrganizer.init(json).list());
+                            mainNo = new AdapterMainNoGIF(newMain.this, MainOrganizer.init(json).list(newMain.this));
                             recyclerView.setAdapter(mainNo);
                             frun = false;
                         } else {
-                            mainNo.setData(MainOrganizer.init(json).list());
+                            mainNo.setData(MainOrganizer.init(json).list(newMain.this));
                         }
                     }
                 } else {
@@ -1019,11 +1031,11 @@ public class newMain extends AppCompatActivity implements
                         recreate();
                     } else {
                         if (frun) {
-                            main = new AdapterMain(newMain.this, MainOrganizer.init(json).list());
+                            main = new AdapterMain(newMain.this, MainOrganizer.init(json).list(newMain.this));
                             recyclerView.setAdapter(main);
                             frun = false;
                         } else {
-                            main.setData(MainOrganizer.init(json).list());
+                            main.setData(MainOrganizer.init(json).list(newMain.this));
                         }
                     }
                 }
@@ -1330,6 +1342,8 @@ public class newMain extends AppCompatActivity implements
         if (requestCode == 1147) {
             setUpDrawer();
         } else if (requestCode == 6699 && resultCode == 1506) {
+            recreate();
+        } else if (resultCode == 9988) {
             recreate();
         }
     }

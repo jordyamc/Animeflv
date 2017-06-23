@@ -1,5 +1,7 @@
 package knf.animeflv.Recientes;
 
+import android.content.Context;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -56,10 +58,10 @@ public class MainOrganizer {
         return cList;
     }
 
-    public List<MainAnimeModel> list() {
+    public List<MainAnimeModel> list(Context context) {
         List<MainAnimeModel> list = new ArrayList<>();
         for (int i = 0; i < eids.size(); i++) {
-            list.add(new MainAnimeModel(eids.get(i), tipos.get(i), tits.get(i)));
+            list.add(new MainAnimeModel(context, eids.get(i), tipos.get(i), tits.get(i)));
         }
         cList = list;
         return list;

@@ -24,7 +24,10 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_main"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp" />
 
 
         </android.support.v4.widget.SwipeRefreshLayout>

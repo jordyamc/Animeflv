@@ -35,7 +35,7 @@ public class Main extends AppCompatActivity {
         SelfGetter.getInicio(this, new INICIO(), new BaseGetter.AsyncInterface() {
             @Override
             public void onFinish(String json) {
-                final AdapterMain adapterMain = new AdapterMain(Main.this, MainOrganizer.init(json).list());
+                final AdapterMain adapterMain = new AdapterMain(Main.this, MainOrganizer.init(json).list(Main.this));
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

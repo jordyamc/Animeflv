@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<com.github.captain_miao.optroundcardview.OptRoundCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_main"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,18 +12,24 @@
     android:clickable="true"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:elevation="6dp"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
-    card_view:cardCornerRadius="5dp"
-    card_view:cardElevation="6dp"
-    card_view:cardPreventCornerOverlap="false"
-    card_view:cardUseCompatPadding="false">
+    app:optRoundCardCornerRadius="5dp"
+    app:optRoundCardElevation="8dp"
+    app:optRoundCardPreventCornerOverlap="false"
+    app:optRoundCardUseCompatPadding="false">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <View
+            android:id="@+id/separator_top"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:alpha="0.2"
+            android:background="@color/negro" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -37,7 +43,7 @@
                 android:layout_height="0dp"
                 android:visibility="gone" />
 
-            <ImageView
+            <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/img_main"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
@@ -138,4 +144,4 @@
             android:indeterminate="true"
             android:visibility="gone" />
     </LinearLayout>
-</android.support.v7.widget.CardView>
+</com.github.captain_miao.optroundcardview.OptRoundCardView>

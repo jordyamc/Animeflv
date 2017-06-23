@@ -3,20 +3,20 @@ package knf.animeflv.history.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.preference.PreferenceManager;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.captain_miao.optroundcardview.OptRoundCardView;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAction;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionDefault;
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionRemoveItem;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemViewHolder;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import org.json.JSONArray;
 
@@ -24,6 +24,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
+import knf.animeflv.Utils.DesignUtils;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
 
@@ -60,6 +61,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
+        DesignUtils.setCardStyle(activity, getItemCount(), getPosition(holder, position), holder.card, holder.separator, holder.img);
         holder.card.setCardBackgroundColor(theme.card_normal);
         holder.tv_tit.setTextColor(theme.textColor);
         holder.tv_current.setTextColor(theme.accent);
@@ -78,6 +80,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                 );
             }
         });
+    }
+
+    private int getPosition(RecyclerView.ViewHolder holder, int position) {
+        return holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition();
     }
 
     @Override
@@ -108,13 +114,15 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     public static class ViewHolder extends AbstractSwipeableItemViewHolder {
         @BindView(R.id.card)
-        public CardView card;
+        public OptRoundCardView card;
         @BindView(R.id.img)
-        public ImageView img;
+        public RoundedImageView img;
         @BindView(R.id.tv_tit)
         public TextView tv_tit;
         @BindView(R.id.tv_current)
         public TextView tv_current;
+        @BindView(R.id.separator_top)
+        View separator;
 
         public ViewHolder(View itemView, Context context) {
             super(itemView);
@@ -124,6 +132,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             itemView.setTranslationY(0);
             if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
                 img.setPadding(0, 0, 0, 0);
+            DesignUtils.setCardSpaceStyle(context, card);
         }
 
         @Override

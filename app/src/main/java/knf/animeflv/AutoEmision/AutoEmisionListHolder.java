@@ -1,5 +1,7 @@
 package knf.animeflv.AutoEmision;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,9 +135,9 @@ public class AutoEmisionListHolder {
         return episodes;
     }
 
-    public static void reloadEpisodes() {
+    public static void reloadEpisodes(Context context) {
         try {
-            episodes = MainOrganizer.init(OfflineGetter.getInicio()).list();
+            episodes = MainOrganizer.init(OfflineGetter.getInicio()).list(context);
         } catch (Exception e) {
             e.printStackTrace();
             episodes = new ArrayList<>();

@@ -507,6 +507,15 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
+        getPreferenceScreen().findPreference("list_style").setSummary(getStringfromResourse(R.array.list_styles, "list_style", "0"));
+        getPreferenceScreen().findPreference("list_style").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                UtilDialogPref.init(getResources().getStringArray(R.array.list_styles), "%s", "list_style", "0", "Selecciona", getPreferenceScreen().findPreference("list_style"));
+                PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
+                return false;
+            }
+        });
         getPreferenceScreen().findPreference("Rpath").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -922,6 +931,9 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                     getPreferenceScreen().findPreference("color_new").setEnabled(false);
                     getPreferenceScreen().findPreference("color_default").setEnabled(false);
                 }
+                break;
+            case "list_style":
+                getActivity().setResult(9988);
         }
     }
 

@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,13 +19,14 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.captain_miao.optroundcardview.OptRoundCardView;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,7 +42,6 @@ import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
-import knf.animeflv.Favorites.FavoriteHelper;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
 import knf.animeflv.JsonFactory.DownloadGetter;
 import knf.animeflv.Parser;
@@ -52,6 +51,7 @@ import knf.animeflv.Recientes.MainAnimeModel;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Utils.CacheManager;
+import knf.animeflv.Utils.DesignUtils;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Logger;
@@ -128,7 +128,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
     @Override
     public AdapterMainNoGIF.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(context).
-                inflate(R.layout.item_main_ng, parent, false);
+                inflate(PreferenceManager.getDefaultSharedPreferences(context).getBoolean("force_phone", false) ? R.layout.item_main_ng_force : R.layout.item_main_ng, parent, false);
         return new AdapterMainNoGIF.ViewHolder(itemView, context);
     }
 
@@ -139,16 +139,15 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         holder.tv_num.setTextColor(theme.accent);
         holder.ib_ver.setColorFilter(theme.iconFilter);
         holder.ib_des.setColorFilter(theme.iconFilter);
+        DesignUtils.setCardStyle(context, getItemCount(), getPosition(holder.getAdapterPosition(), position), holder.card, holder.separator, holder.iv_main);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
             holder.progressBar.getProgressDrawable().setColorFilter(theme.accent, PorterDuff.Mode.SRC_ATOP);
+        MainAnimeModel.Type type = Animes.get(getPosition(holder.getAdapterPosition(), position)).getType();
         Boolean resaltar = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resaltar", true);
-        if (getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).equals("Capítulo 1") || getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).equals("Preestreno") || getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).contains("OVA") || getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).contains("Pelicula")) {
-            if (resaltar)
-                holder.card.setCardBackgroundColor(theme.card_new);
-        }
-        if (FavoriteHelper.isFav(context, Animes.get(position).getAid())) {
-            if (resaltar)
-                holder.card.setCardBackgroundColor(theme.card_fav);
+        if (resaltar && type != MainAnimeModel.Type.NORMAL) {
+            holder.card.setCardBackgroundColor(type == MainAnimeModel.Type.FAV ? theme.card_fav : theme.card_new);
+        } else {
+            holder.card.setCardBackgroundColor(theme.card_normal);
         }
         setUpWeb(holder.webView);
         new CacheManager().mini(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getAid(), holder.iv_main);
@@ -828,13 +827,13 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.img_main)
-        public ImageView iv_main;
+        public RoundedImageView iv_main;
         @BindView(R.id.tv_main_Tit)
         public TextView tv_tit;
         @BindView(R.id.tv_main_Cap)
         public TextView tv_num;
         @BindView(R.id.card_main)
-        public CardView card;
+        public OptRoundCardView card;
         @BindView(R.id.ib_main_ver)
         public ImageButton ib_ver;
         @BindView(R.id.ib_main_descargar)
@@ -843,12 +842,15 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         public WebView webView;
         @BindView(R.id.progress)
         ProgressBar progressBar;
+        @BindView(R.id.separator_top)
+        View separator;
 
         public ViewHolder(View itemView, Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
                 iv_main.setPadding(0, 0, 0, 0);
+            DesignUtils.setCardSpaceStyle(context, card);
         }
     }
 

@@ -1,4 +1,4 @@
-package knf.animeflv.CustomSettingsIntro.fragments;
+package knf.animeflv.Style;
 
 import android.animation.Animator;
 import android.animation.ArgbEvaluator;
@@ -58,6 +58,7 @@ import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 import knf.animeflv.ThemeHolder;
+import knf.animeflv.Utils.BackupUtil;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.ThemeUtils;
@@ -1599,6 +1600,12 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
     protected void onResume() {
         super.onResume();
         TrackingHelper.track(this, TrackingHelper.THEME);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BackupUtil.backup(this);
     }
 
     @Override

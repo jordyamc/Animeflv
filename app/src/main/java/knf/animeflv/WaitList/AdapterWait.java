@@ -3,6 +3,7 @@ package knf.animeflv.WaitList;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.TaskType;
 import knf.animeflv.Utils.CacheManager;
+import knf.animeflv.Utils.DesignUtils;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.WaitList.Costructor.WaitManager;
@@ -92,7 +94,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
     @Override
     public ChildHolder onCreateChildViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_wait_child, parent, false);
-        return new ChildHolder(v);
+        return new ChildHolder(v, context);
     }
 
     @Override
@@ -166,6 +168,10 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
         });
     }
 
+    private int getPosition(RecyclerView.ViewHolder holder, int position) {
+        return holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition();
+    }
+
     private String getUrlImg(String aid) {
         return parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?thumb=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg&certificate=" + parser.getCertificateSHA1Fingerprint(context);
     }
@@ -182,6 +188,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
 
     @Override
     public void onBindChildViewHolder(final ChildHolder holder, final int groupPosition, final int childPosition, int viewType) {
+        DesignUtils.setCardStyle(context, animesCapList.get(groupPosition).size(), childPosition, holder.card, holder.separator, null);
         holder.card.setCardBackgroundColor(theme.card_normal);
         holder.cap.setTextColor(theme.textColor);
         holder.delete.setColorFilter(theme.iconFilter);

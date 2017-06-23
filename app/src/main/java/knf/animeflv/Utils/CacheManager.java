@@ -12,6 +12,8 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
+import com.makeramen.roundedimageview.RoundedDrawable;
+import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Callback;
 
 import java.io.File;
@@ -287,8 +289,13 @@ public class CacheManager {
                         PicassoCache.getPicassoInstance(context).load("http://animeflv.net/uploads/animes/covers/" + aid + ".jpg").error(R.drawable.ic_block_r).into(imageView, new Callback() {
                             @Override
                             public void onSuccess() {
-                                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true))
-                                    saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true)) {
+                                    if (imageView instanceof RoundedImageView) {
+                                        saveBitmap(((RoundedDrawable) imageView.getDrawable()).toBitmap(), localFile);
+                                    } else {
+                                        saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                                    }
+                                }
                             }
 
                             @Override

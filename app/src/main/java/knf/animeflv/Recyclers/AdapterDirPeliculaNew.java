@@ -3,26 +3,16 @@ package knf.animeflv.Recyclers;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.preference.PreferenceManager;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
+import com.github.captain_miao.optroundcardview.OptRoundCardView;
+import com.makeramen.roundedimageview.RoundedImageView;
+
 import java.util.List;
 
 import butterknife.BindView;
@@ -32,6 +22,7 @@ import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
+import knf.animeflv.Utils.DesignUtils;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
 
@@ -65,12 +56,13 @@ public class AdapterDirPeliculaNew extends RecyclerView.Adapter<AdapterDirPelicu
     @Override
     public AdapterDirPeliculaNew.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(context).
-                inflate(R.layout.item_anime_fav, parent, false);
+                inflate(DesignUtils.forcePhone(context) ? R.layout.item_anime_fav_force : R.layout.item_anime_fav, parent, false);
         return new AdapterDirPeliculaNew.ViewHolder(itemView, context);
     }
 
     @Override
     public void onBindViewHolder(final AdapterDirPeliculaNew.ViewHolder holder, final int position) {
+        DesignUtils.setCardStyle(context, getItemCount(), getPosition(holder.getAdapterPosition(), position), holder.card, holder.separator, holder.iv_rel);
         holder.card.setCardBackgroundColor(theme.card_normal);
         holder.tv_tit.setTextColor(theme.textColor);
         new CacheManager().mini(context, Animes.get(holder.getAdapterPosition()).getAid(), holder.iv_rel);
@@ -84,48 +76,14 @@ public class AdapterDirPeliculaNew extends RecyclerView.Adapter<AdapterDirPelicu
                         Intent.FLAG_ACTIVITY_NEW_TASK,
                         new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
                         new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getNombre()),
-                        new InfoHelper.BundleItem("link", new Parser().getUrlAnimeCached(Animes.get(holder.getAdapterPosition()).getAid()))
+                        new InfoHelper.BundleItem("link", Parser.getUrlAnimeCached(Animes.get(holder.getAdapterPosition()).getAid()))
                 );
             }
         });
     }
 
-    private String getCertificateSHA1Fingerprint() {
-        PackageManager pm = context.getPackageManager();
-        String packageName = context.getPackageName();
-        int flags = PackageManager.GET_SIGNATURES;
-        PackageInfo packageInfo = null;
-        try {
-            packageInfo = pm.getPackageInfo(packageName, flags);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        Signature[] signatures = packageInfo.signatures;
-        byte[] cert = signatures[0].toByteArray();
-        InputStream input = new ByteArrayInputStream(cert);
-        CertificateFactory cf = null;
-        try {
-            cf = CertificateFactory.getInstance("X509");
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        X509Certificate c = null;
-        try {
-            c = (X509Certificate) cf.generateCertificate(input);
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-        String hexString = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA1");
-            byte[] publicKey = md.digest(c.getEncoded());
-            hexString = byte2HexFormatted(publicKey);
-        } catch (NoSuchAlgorithmException e1) {
-            e1.printStackTrace();
-        } catch (CertificateEncodingException e) {
-            e.printStackTrace();
-        }
-        return hexString;
+    private int getPosition(int holder, int pos) {
+        return holder == -1 ? pos : holder;
     }
 
     @Override
@@ -135,17 +93,20 @@ public class AdapterDirPeliculaNew extends RecyclerView.Adapter<AdapterDirPelicu
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.img)
-        public ImageView iv_rel;
+        public RoundedImageView iv_rel;
         @BindView(R.id.title)
         public TextView tv_tit;
         @BindView(R.id.card)
-        public CardView card;
+        public OptRoundCardView card;
+        @BindView(R.id.separator_top)
+        View separator;
 
         public ViewHolder(View itemView, Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
                 iv_rel.setPadding(0, 0, 0, 0);
+            DesignUtils.setCardSpaceStyle(context, card);
         }
     }
 }

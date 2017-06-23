@@ -1,11 +1,22 @@
 package knf.animeflv.Utils;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.os.Environment;
 
 import java.io.File;
 
 
 public class Keys {
+    public static int getNavBarSize(Context context) {
+        Resources resources = context.getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return resources.getDimensionPixelSize(resourceId);
+        }
+        return 0;
+    }
+
     public static class Dirs {
         public static final File LOGS = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/logs");
         public static final File SOUNDS = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/.sounds");

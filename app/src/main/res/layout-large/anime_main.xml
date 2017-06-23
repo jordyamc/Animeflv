@@ -7,15 +7,15 @@
               android:orientation="vertical">
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                 android:layout_width="match_parent"
-                 android:layout_height="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="false">
 
         <include
             android:id="@+id/ltoolbar"
-            layout="@layout/ltoolbar"/>
+            layout="@layout/ltoolbar" />
 
-        <android.support.v7.widget.CardView
-            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/cardMain"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -34,24 +34,22 @@
 
                 <include
                     android:id="@+id/main_toolbar"
-                    layout="@layout/toolbar_blanco"/>
+                    layout="@layout/toolbar_blanco" />
 
                 <View
                     android:id="@+id/separator"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:alpha="0.12"
-                    android:background="@android:color/black"/>
+                    android:background="@android:color/black" />
 
-                <FrameLayout
-                    xmlns:android="http://schemas.android.com/apk/res/android"
+                <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     xmlns:fab="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/frame"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <android.support.v4.widget.SwipeRefreshLayout
-                        xmlns:android="http://schemas.android.com/apk/res/android"
+                    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
                         android:id="@+id/swiperefresh"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
@@ -60,7 +58,11 @@
                         <android.support.v7.widget.RecyclerView
                             android:id="@+id/rv_main"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"/>
+                            android:layout_height="match_parent"
+                            android:clipToPadding="false"
+                            android:paddingEnd="50dp"
+                            android:paddingStart="50dp"
+                            android:paddingTop="10dp" />
 
 
                     </android.support.v4.widget.SwipeRefreshLayout>
@@ -74,7 +76,7 @@
                         android:src="@drawable/ic_info_m"
                         fab:fab_colorNormal="@color/dark"
                         fab:fab_colorPressed="@color/prim"
-                        fab:fab_colorRipple="@color/dark"/>
+                        fab:fab_colorRipple="@color/dark" />
                 </FrameLayout>
             </LinearLayout>
         </android.support.v7.widget.CardView>

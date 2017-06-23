@@ -16,7 +16,9 @@ import knf.animeflv.JsonFactory.OfflineGetter;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterDirPeliculaNew;
+import knf.animeflv.Utils.DesignUtils;
 import knf.animeflv.Utils.ExecutorManager;
+import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.ThemeUtils;
 
 /**
@@ -35,9 +37,13 @@ public class Peliculas extends Fragment {
         view=inflater.inflate(R.layout.directorio_peliculas,container,false);
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(getActivity());
         view.setBackgroundColor(ThemeUtils.isTablet(getActivity()) ? theme.primary : theme.background);
-        rvAnimes = (RecyclerView) view.findViewById(R.id.rv_peliculas);
+        rvAnimes = view.findViewById(R.id.rv_peliculas);
         rvAnimes.setHasFixedSize(true);
         rvAnimes.setLayoutManager(new LinearLayoutManager(getActivity()));
+        if (ThemeUtils.isTablet(getActivity()) && !DesignUtils.forcePhone(getActivity())) {
+            rvAnimes.setPadding(0, (int) Parser.toPx(getActivity(), 10), 0, Keys.getNavBarSize(getActivity()));
+            rvAnimes.setClipToPadding(false);
+        }
         setDirectory();
         return view;
     }

@@ -23,8 +23,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import knf.animeflv.ColorsRes;
-import knf.animeflv.CustomSettingsIntro.fragments.ThemeFragmentAdvanced;
 import knf.animeflv.R;
+import knf.animeflv.Style.ThemeFragmentAdvanced;
 
 import static android.content.Context.UI_MODE_SERVICE;
 

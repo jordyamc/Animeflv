@@ -548,6 +548,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             } else {
                 getMenuInflater().inflate(R.menu.menu_fast_seen, menu);
             }
+            ThemeUtils.setMenuColor(menu, ColorsRes.Blanco(this));
         } catch (Exception e) {
             e.printStackTrace();
             Toaster.toast("Error al crear Menu");

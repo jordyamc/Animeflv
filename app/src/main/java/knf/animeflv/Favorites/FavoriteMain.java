@@ -18,6 +18,7 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -35,7 +36,9 @@ import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.FavSyncro;
 import knf.animeflv.LoginActivity.DropboxManager;
+import knf.animeflv.Parser;
 import knf.animeflv.R;
+import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.TrackingHelper;
@@ -143,6 +146,9 @@ public class FavoriteMain extends AppCompatActivity {
             findViewById(R.id.cardMain).setBackgroundColor(theme.primary);
             toolbar.getRootView().setBackgroundColor(theme.tablet_background);
             toolbar.setTitleTextColor(ColorsRes.Blanco(this));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            }
         } else {
             toolbar.getRootView().setBackgroundColor(theme.background);
         }
@@ -203,7 +209,10 @@ public class FavoriteMain extends AppCompatActivity {
                     recyclerView.setLayoutManager(new LinearLayoutManager(FavoriteMain.this));
                     recyclerView.setAdapter(wraped);
                     recyclerView.setItemAnimator(animator);
-
+                    if (ThemeUtils.isTablet(FavoriteMain.this)) {
+                        recyclerView.setPadding(0, (int) Parser.toPx(FavoriteMain.this, 10), 0, Keys.getNavBarSize(FavoriteMain.this));
+                        recyclerView.setClipToPadding(false);
+                    }
                     try {
                         if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
                             recyclerView.addItemDecoration(new ItemShadowDecorator((NinePatchDrawable) ContextCompat.getDrawable(FavoriteMain.this, R.drawable.material_shadow_z1)));

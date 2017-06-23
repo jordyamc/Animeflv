@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:orientation="vertical">
-    <android.support.v7.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+
+    <com.github.captain_miao.optroundcardview.OptRoundCardView
         android:id="@+id/card_descargas_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,25 +17,26 @@
         android:layout_marginTop="3dp"
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground"
-        card_view:cardBackgroundColor="@android:color/white"
-        card_view:cardCornerRadius="3dp"
-        card_view:cardElevation="4dp">
+        app:optRoundCardCornerRadius="5dp"
+        app:optRoundCardElevation="8dp"
+        app:optRoundCardPreventCornerOverlap="false"
+        app:optRoundCardUseCompatPadding="false">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <!--<LinearLayout
-                android:orientation="vertical"
-                android:layout_width="120dp"
+            <View
+                android:id="@+id/separator_top"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:alpha="0.2"
+                android:background="@color/negro" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:weightSum="2"
-                android:gravity="center_vertical"
-                android:background="@android:color/transparent"
-                android:paddingLeft="15dp"
-                android:paddingTop="15dp"
-                android:paddingRight="15dp"
-                android:paddingBottom="10dp">-->
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tv_cardD_capitulo"
@@ -52,44 +53,46 @@
                     android:textColor="@android:color/black"
                     android:textSize="@dimen/abc_text_size_button_material" />
 
-            <!--</LinearLayout>-->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical|end"
-                android:orientation="horizontal">
-                <ImageButton
-                    android:id="@+id/ib_ver_rv"
-                    style="?android:attr/borderlessButtonStyle"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:longClickable="true"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_cloud_play" />
-                <ImageButton
-                    android:id="@+id/ib_descargar_rv"
-                    style="?android:attr/borderlessButtonStyle"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:clickable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:longClickable="true"
-                    android:scaleType="fitEnd"
-                    android:src="@drawable/ic_get_r" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|end"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/ib_ver_rv"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:clickable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:longClickable="true"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_cloud_play" />
+
+                    <ImageButton
+                        android:id="@+id/ib_descargar_rv"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:clickable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:longClickable="true"
+                        android:scaleType="fitEnd"
+                        android:src="@drawable/ic_get_r" />
+
+                </LinearLayout>
+
+                <WebView
+                    android:id="@+id/wv_anime_zippy"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone" />
 
             </LinearLayout>
-
-            <WebView
-                android:id="@+id/wv_anime_zippy"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone" />
-
         </LinearLayout>
 
 
-    </android.support.v7.widget.CardView>
+    </com.github.captain_miao.optroundcardview.OptRoundCardView>
 
 </LinearLayout>

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +11,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.captain_miao.optroundcardview.OptRoundCardView;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.Calendar;
 import java.util.List;
@@ -27,6 +28,7 @@ import knf.animeflv.R;
 import knf.animeflv.Recientes.MainAnimeModel;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.Utils.CacheManager;
+import knf.animeflv.Utils.DesignUtils;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
@@ -57,6 +59,7 @@ public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.
 
     @Override
     public void onBindViewHolder(final AutoEmisionAdapter.ViewHolder holder, final int position) {
+        DesignUtils.setCardStyle(context, getItemCount(), getPosition(holder.getAdapterPosition(), position), holder.cardView, holder.separator, holder.imageView);
         new CacheManager().mini(context, list.get(position).getAid(), holder.imageView);
         holder.title.setTextColor(theme.textColor);
         holder.cardView.setCardBackgroundColor(theme.card_normal);
@@ -84,6 +87,10 @@ public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.
                 holder.cardView.setCardBackgroundColor(theme.card_normal);
             }
         }
+    }
+
+    private int getPosition(int holder, int pos) {
+        return holder == -1 ? pos : holder;
     }
 
     public void setIconbyState(StateType type, final ImageView imageView) {
@@ -230,19 +237,22 @@ public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.
 
     public static class ViewHolder extends AbstractDraggableItemViewHolder {
         @BindView(R.id.cardRel)
-        CardView cardView;
+        OptRoundCardView cardView;
         @BindView(R.id.imgCardInfoRel)
-        ImageView imageView;
+        RoundedImageView imageView;
         @BindView(R.id.tv_info_rel_tit)
         TextView title;
         @BindView(R.id.state)
         ImageView state;
+        @BindView(R.id.separator_top)
+        View separator;
 
         public ViewHolder(View itemView, Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
                 imageView.setPadding(0, 0, 0, 0);
+            DesignUtils.setCardSpaceStyle(context, cardView);
         }
     }
 

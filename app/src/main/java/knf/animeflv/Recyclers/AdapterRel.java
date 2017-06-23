@@ -1,7 +1,9 @@
 package knf.animeflv.Recyclers;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,6 +18,7 @@ import knf.animeflv.JsonFactory.OfflineGetter;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
+import knf.animeflv.Utils.DesignUtils;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
@@ -41,7 +44,7 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
     public AdapterRel.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(context).
                 inflate(R.layout.item_anime_rel, parent, false);
-        return new AdapterRel.ViewHolder(itemView);
+        return new AdapterRel.ViewHolder(itemView, context);
     }
 
     @Override
@@ -80,12 +83,15 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
         public TextView tv_tipo;
         public CardView card;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, Context context) {
             super(itemView);
             this.iv_rel = (ImageView) itemView.findViewById(R.id.imgCardInfoRel);
             this.tv_tit = (TextView) itemView.findViewById(R.id.tv_info_rel_tit);
             this.tv_tipo = (TextView) itemView.findViewById(R.id.tv_info_rel_tipo);
             this.card = (CardView) itemView.findViewById(R.id.cardRel);
+            if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
+                iv_rel.setPadding(0, 0, 0, 0);
+            DesignUtils.setCardSpaceStyle(context, card);
         }
     }
 

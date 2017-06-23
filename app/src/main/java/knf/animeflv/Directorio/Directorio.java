@@ -152,11 +152,7 @@ public class Directorio extends AppCompatActivity {
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (isXLargeScreen(this)) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    getWindow().setFlags(
-                            WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
-                            WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-                }
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
             }
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -183,6 +179,7 @@ public class Directorio extends AppCompatActivity {
                 toolbarS.getRootView().setBackgroundColor(theme.background);
                 viewPagerTab.setBackgroundColor(theme.primary);
             } else {
+                actionMenu.setPadding(0, 0, 0, Keys.getNavBarSize(this));
                 viewPagerTab.setBackgroundColor(theme.tablet_toolbar);
                 toolbarS.getRootView().setBackgroundColor(theme.tablet_background);
                 if (ThemeUtils.isTablet(this))
@@ -866,6 +863,7 @@ public class Directorio extends AppCompatActivity {
                 getSharedPreferences("data", MODE_PRIVATE).edit().putInt("genero", 0).apply();
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setLayoutManager(new LinearLayoutManager(Directorio.this));
+
                 FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
                         getSupportFragmentManager(), FragmentPagerItems.with(Directorio.this)
                         .add("ANIMES", Animes.class)

@@ -105,7 +105,7 @@ public class AutoEmisionActivity extends AppCompatActivity {
             @Override
             protected Void doInBackground(Void... params) {
                 count = 0;
-                AutoEmisionListHolder.reloadEpisodes();
+                AutoEmisionListHolder.reloadEpisodes(AutoEmisionActivity.this);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

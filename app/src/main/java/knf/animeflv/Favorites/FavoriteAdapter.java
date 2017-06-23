@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,10 +17,12 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.captain_miao.optroundcardview.OptRoundCardView;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemConstants;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,7 @@ import knf.animeflv.ColorsRes;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
+import knf.animeflv.Utils.DesignUtils;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
 
@@ -66,14 +68,16 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         switch (viewType) {
             default:
             case FavotiteDB.TYPE_SECTION:
-                return new SectionViewHolder(inflater.inflate(R.layout.item_anime_fav_header, parent, false));
+                return new SectionViewHolder(inflater.inflate(DesignUtils.forcePhone(context) ? R.layout.item_anime_fav_header_force : R.layout.item_anime_fav_header, parent, false));
             case FavotiteDB.TYPE_FAV:
-                return new FavViewHolder(inflater.inflate(R.layout.item_anime_fav, parent, false), context);
+                return new FavViewHolder(inflater.inflate(DesignUtils.forcePhone(context) ? R.layout.item_anime_fav_force : R.layout.item_anime_fav, parent, false), context);
         }
     }
 
     @Override
     public int getItemViewType(int position) {
+        if (position == -1)
+            return getItemViewType(0);
         return list.get(position).isSection ? FavotiteDB.TYPE_SECTION : FavotiteDB.TYPE_FAV;
     }
 
@@ -169,6 +173,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             new CacheManager().mini(context, list.get(position).aid, holder.imageView);
             holder.name.setText(list.get(position).name);
             holder.name.setTextColor(theme.textColor);
+            DesignUtils.setCardStyle(context, getItemCount(), getPosition(holder.getAdapterPosition(), position), holder.cardView, holder.separator, holder.imageView);
             holder.cardView.setCardBackgroundColor(theme.card_normal);
             holder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -226,6 +231,10 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 }
             }
         }
+    }
+
+    private int getPosition(int holder, int pos) {
+        return holder == -1 ? pos : holder;
     }
 
     public boolean isEditing() {
@@ -321,17 +330,20 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public static class FavViewHolder extends AbstractDraggableItemViewHolder {
         @BindView(R.id.card)
-        CardView cardView;
+        OptRoundCardView cardView;
         @BindView(R.id.img)
-        ImageView imageView;
+        RoundedImageView imageView;
         @BindView(R.id.title)
         TextView name;
+        @BindView(R.id.separator_top)
+        View separator;
 
         public FavViewHolder(View itemView, Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
                 imageView.setPadding(0, 0, 0, 0);
+            DesignUtils.setCardSpaceStyle(context, cardView);
         }
     }
 

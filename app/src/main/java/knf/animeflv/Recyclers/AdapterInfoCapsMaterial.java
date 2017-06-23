@@ -7,7 +7,6 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +24,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
+import com.github.captain_miao.optroundcardview.OptRoundCardView;
 
 import java.io.File;
 import java.util.List;
@@ -38,6 +38,7 @@ import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.R;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.StreamManager.StreamManager;
+import knf.animeflv.Utils.DesignUtils;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
@@ -74,11 +75,12 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     public AdapterInfoCapsMaterial.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(context).
                 inflate(R.layout.item_anime_descarga, parent, false);
-        return new AdapterInfoCapsMaterial.ViewHolder(itemView);
+        return new AdapterInfoCapsMaterial.ViewHolder(itemView, context);
     }
 
     @Override
     public void onBindViewHolder(final AdapterInfoCapsMaterial.ViewHolder holder, final int position) {
+        DesignUtils.setCardStyle(context, getItemCount(), getPosition(holder, position), holder.card, holder.separator, null);
         SetUpWeb(holder.web, holder);
         if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
             showDelete(holder.ib_des);
@@ -289,6 +291,10 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                 }
             }
         });
+    }
+
+    private int getPosition(RecyclerView.ViewHolder holder, int position) {
+        return holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition();
     }
 
     @Override
@@ -625,17 +631,20 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
         public TextView tv_capitulo;
         public ImageButton ib_ver;
         public ImageButton ib_des;
-        public CardView card;
+        public OptRoundCardView card;
         public RecyclerView recyclerView;
         public WebView web;
+        public View separator;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, Context context) {
             super(itemView);
-            this.tv_capitulo = (TextView) itemView.findViewById(R.id.tv_cardD_capitulo);
-            this.ib_ver = (ImageButton) itemView.findViewById(R.id.ib_ver_rv);
-            this.ib_des = (ImageButton) itemView.findViewById(R.id.ib_descargar_rv);
-            this.card = (CardView) itemView.findViewById(R.id.card_descargas_info);
-            this.web = (WebView) itemView.findViewById(R.id.wv_anime_zippy);
+            this.tv_capitulo = itemView.findViewById(R.id.tv_cardD_capitulo);
+            this.ib_ver = itemView.findViewById(R.id.ib_ver_rv);
+            this.ib_des = itemView.findViewById(R.id.ib_descargar_rv);
+            this.card = itemView.findViewById(R.id.card_descargas_info);
+            this.web = itemView.findViewById(R.id.wv_anime_zippy);
+            this.separator = itemView.findViewById(R.id.separator_top);
+            DesignUtils.setCardSpaceStyle(context, card);
         }
     }
 

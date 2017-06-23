@@ -4,15 +4,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.github.captain_miao.optroundcardview.OptRoundCardView;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
+import knf.animeflv.Utils.DesignUtils;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
@@ -51,6 +53,7 @@ public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(final RandomAdapter.ViewHolder holder, final int position) {
+        DesignUtils.setCardStyle(activity, getItemCount(), getPosition(holder, position), holder.card, holder.separator, holder.iv_rel);
         holder.card.setCardBackgroundColor(theme.card_normal);
         holder.tv_tit.setTextColor(theme.textColor);
         holder.tv_tipo.setTextColor(theme.accent);
@@ -76,6 +79,10 @@ public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.ViewHolder
                 }
             }
         }
+    }
+
+    private int getPosition(RecyclerView.ViewHolder holder, int position) {
+        return holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition();
     }
 
     private void doSlideOut(final RandomAdapter.ViewHolder holder, final int position) {
@@ -216,19 +223,22 @@ public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.ViewHolder
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.imgCardInfoRel)
-        public ImageView iv_rel;
+        public RoundedImageView iv_rel;
         @BindView(R.id.tv_info_rel_tit)
         public TextView tv_tit;
         @BindView(R.id.tv_info_rel_tipo)
         public TextView tv_tipo;
         @BindView(R.id.cardRel)
-        public CardView card;
+        public OptRoundCardView card;
+        @BindView(R.id.separator_top)
+        View separator;
 
         public ViewHolder(View itemView, Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
                 iv_rel.setPadding(0, 0, 0, 0);
+            DesignUtils.setCardSpaceStyle(context, card);
         }
     }
 

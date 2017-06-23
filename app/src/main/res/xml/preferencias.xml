@@ -115,11 +115,16 @@
     <PreferenceCategory
         android:key="design"
         android:title="Diseño">
+        <com.lb.material_preferences_library.custom_preferences.Preference
+            android:defaultValue="0"
+            android:key="list_style"
+            android:summary="%s"
+            android:title="Estilo de listas" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="use_space"
             android:summary="Se aplicara a toda la app donde aparezca la miniatura del anime"
-            android:title="Diseño espaciado" />
+            android:title="Miniaturas espaciadas" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="noGif"
