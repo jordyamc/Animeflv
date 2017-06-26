@@ -9,8 +9,7 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+import android.view.View;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
@@ -31,7 +30,6 @@ import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
 import knf.animeflv.Parser;
 import knf.animeflv.PlayBack.CastPlayBackManager;
-import knf.animeflv.R;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Suggestions.Algoritm.SuggestionAction;
 import knf.animeflv.Suggestions.Algoritm.SuggestionHelper;
@@ -42,7 +40,6 @@ import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
 public class DownloadGetter {
-    private static Spinner sp;
 
     public static void search(final Activity context, final String eid, final ActionsInterface actionsInterface) {
         if (eid.contains("_") && eid.endsWith("E")) {
@@ -76,6 +73,8 @@ public class DownloadGetter {
                             Log.e("Default Server", "No default");
                         }
                         if (nombres.size() != 0) {
+                            String last = PreferenceManager.getDefaultSharedPreferences(context).getString(actionsInterface.isStream() ? "last_download" : "last_download", "null");
+                            final int last_pos = nombres.contains(last) ? nombres.indexOf(last) : 0;
                             int pref = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("def_download", "0"));
                             if (pref > 0 && !jsonArray.getJSONObject(pref - 1).getString("url").equals("null") && !(CastPlayBackManager.get(context).isDeviceConnected() && actionsInterface.isStream())) {
                                 JSONObject current = jsonArray.getJSONObject(pref - 1);
@@ -120,19 +119,18 @@ public class DownloadGetter {
                                 final MaterialDialog.Builder d = new MaterialDialog.Builder(context)
                                         .title(actionsInterface.isStream() ? "Streaming" : "Descarga")
                                         .titleGravity(GravityEnum.CENTER)
-                                        .customView(R.layout.dialog_down, false)
-                                        .cancelable(true)
-                                        .autoDismiss(false)
+                                        .items(nombres)
+                                        .autoDismiss(true)
                                         .positiveText(actionsInterface.isStream() ? "Reproducir" : "Descargar")
                                         .negativeText("Cancelar")
                                         .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                        .itemsCallbackSingleChoice(last_pos, new MaterialDialog.ListCallbackSingleChoice() {
                                             @Override
-                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                            public boolean onSelection(MaterialDialog materialDialog, View view, int i, CharSequence charSequence) {
                                                 SuggestionHelper.register(context, eid.trim().split("_")[0], SuggestionAction.PLAY);
-                                                String des = nombres.get(sp.getSelectedItemPosition());
-                                                final String ur = urls.get(sp.getSelectedItemPosition());
-                                                switch (des.toLowerCase()) {
+                                                PreferenceManager.getDefaultSharedPreferences(context).edit().putString(actionsInterface.isStream() ? "last_download" : "last_download", charSequence.toString()).apply();
+                                                final String ur = urls.get(i);
+                                                switch (charSequence.toString().toLowerCase()) {
                                                     case "zippyshare":
                                                         actionsInterface.onStartZippy(ur);
                                                         break;
@@ -166,7 +164,7 @@ public class DownloadGetter {
                                                         actionsInterface.onStartDownload();
                                                         break;
                                                 }
-                                                dialog.dismiss();
+                                                return true;
                                             }
                                         })
                                         .onNegative(new MaterialDialog.SingleButtonCallback() {
@@ -174,13 +172,11 @@ public class DownloadGetter {
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                                 MainStates.setProcessing(false, null);
                                                 actionsInterface.onCancelDownload();
-                                                dialog.dismiss();
                                             }
                                         })
                                         .cancelListener(new DialogInterface.OnCancelListener() {
                                             @Override
                                             public void onCancel(DialogInterface dialog) {
-                                                dialog.dismiss();
                                                 MainStates.setProcessing(false, null);
                                                 actionsInterface.onCancelDownload();
                                             }
@@ -191,8 +187,7 @@ public class DownloadGetter {
                                         @Override
                                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                             SuggestionHelper.register(context, eid.trim().split("_")[0], SuggestionAction.PLAY);
-                                            dialog.dismiss();
-                                            final String url = urls.get(sp.getSelectedItemPosition());
+                                            final String url = urls.get(dialog.getSelectedIndex());
                                             if (url.toLowerCase().contains("zippyshare")) {
                                                 Toaster.toast("No se puede reproducir desde Zippyshare!!!");
                                                 MainStates.setProcessing(false, null);
@@ -210,11 +205,7 @@ public class DownloadGetter {
                                         }
                                     });
                                 }
-                                MaterialDialog builded = d.build();
-                                sp = (Spinner) builded.getCustomView().findViewById(R.id.spinner_down);
-                                sp.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, nombres));
-                                sp.setBackgroundColor((ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context)));
-                                builded.show();
+                                d.build().show();
                             }
                         } else {
                             Toaster.toast("No hay links!!! Intenta mas tarde!!!");

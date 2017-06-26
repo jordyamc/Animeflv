@@ -44,6 +44,12 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
     private RecyclerViewDragDropManager dragDropManager;
     private RecyclerView.Adapter wraped;
     private AutoEmisionAdapter adapter;
+    private EmisionRemoveListener listener;
+
+    private List<EmObj> list;
+    private int day;
+
+    private int removeCount = 0;
 
     public AutoEmisionFragment() {
     }
@@ -53,7 +59,6 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frag_emision, container, false);
         ButterKnife.bind(this, view);
-        asyncStart();
         return view;
     }
 
@@ -62,8 +67,8 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    int day = getArguments().getInt("day");
-                    List<EmObj> list = AutoEmisionHelper.getDayList(getArguments().getString("array"), day);
+                    day = getArguments().getInt("day");
+                    list = AutoEmisionHelper.getDayList(getArguments().getString("array"), day);
                     startVerification(list, day);
                     setRecycler(list, day);
                 } catch (Exception e) {
@@ -72,6 +77,12 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    public void setListener(EmisionRemoveListener listener) {
+        Log.e("Emision Fragment", "Listener setted!!!");
+        this.listener = listener;
+        asyncStart();
     }
 
     private void setRecycler(List<EmObj> list, int day) {
@@ -127,6 +138,7 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
                                     AutoEmisionListHolder.deleteFromList(new_list, obj.getAid(), day);
                                     AutoEmisionHelper.removeAnimeFromList(getActivity(), obj.getAid(), day, null);
                                     edited = true;
+                                    removeCount++;
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -143,6 +155,7 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
                                                 AutoEmisionListHolder.deleteFromList(new_list, obj.getAid(), day);
                                                 AutoEmisionHelper.removeAnimeFromList(getActivity(), obj.getAid(), day, null);
                                                 edited = true;
+                                                removeCount++;
                                             }
                                         } catch (Exception e) {
                                             e.printStackTrace();
@@ -154,8 +167,8 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
                     }
                     if (edited) {
                         setRecycler(new_list, day);
-                        /*AutoEmisionListHolder.setList(day,new_list);
-                        adapter.updatelist();*/
+                        if (listener != null)
+                            listener.onEmisionRemove(removeCount);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -200,5 +213,9 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
             wraped = null;
         }
         super.onDestroyView();
+    }
+
+    interface EmisionRemoveListener {
+        void onEmisionRemove(int removeCount);
     }
 }

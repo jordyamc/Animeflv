@@ -101,6 +101,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="support-annotations-26.0.0-beta2" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-animators-2.2.3" level="project" />
+    <orderEntry type="library" exported="" name="xdroid-toaster-0.3.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-tagmanager-v4-impl-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="AwesomeSplash-v1.0.0" level="project" />
     <orderEntry type="library" exported="" name="floatingactionbutton-1.3.0" level="project" />
@@ -129,8 +130,7 @@
     <orderEntry type="library" exported="" name="Encryption-1.4.0" level="project" />
     <orderEntry type="library" exported="" name="crashlytics-2.6.8" level="project" />
     <orderEntry type="library" exported="" name="firebase-common-11.0.1" level="project" />
-    <orderEntry type="library" exported="" name="butterknife-annotations-8.4.0" level="project" />
-    <orderEntry type="library" exported="" name="butterknife-8.4.0" level="project" />
+    <orderEntry type="library" exported="" name="dexter-4.1.0" level="project" />
     <orderEntry type="library" exported="" name="picasso-2.5.2" level="project" />
     <orderEntry type="library" exported="" name="fillableloaders-1.02" level="project" />
     <orderEntry type="library" exported="" name="firebase-iid-11.0.1" level="project" />
@@ -146,14 +146,13 @@
     <orderEntry type="library" exported="" name="library-2.1.4" level="project" />
     <orderEntry type="library" exported="" name="library-2.9.1" level="project" />
     <orderEntry type="library" exported="" name="support-v13-26.0.0-beta2" level="project" />
+    <orderEntry type="library" exported="" name="okio-1.13.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-safetynet-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="retrofit-2.1.0" level="project" />
     <orderEntry type="library" exported="" name="converter-gson-2.1.0" level="project" />
     <orderEntry type="library" exported="" name="answers-1.3.13" level="project" />
-    <orderEntry type="library" exported="" name="okhttp-3.6.0" level="project" />
     <orderEntry type="library" exported="" name="Color-O-Matic-1.1.5" level="project" />
     <orderEntry type="library" exported="" name="multidex-1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="xdroid-toaster-0.0.10" level="project" />
     <orderEntry type="library" exported="" name="play-services-cast-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="java-common-1.11" level="project" />
     <orderEntry type="library" exported="" name="play-services-analytics-11.0.1" level="project" />
@@ -161,15 +160,12 @@
     <orderEntry type="library" exported="" name="persistentsearchview-1.0.4" level="project" />
     <orderEntry type="library" exported="" name="iconics-core-2.8.5" level="project" />
     <orderEntry type="library" exported="" name="fontawesome-typeface-4.7.0.0" level="project" />
-    <orderEntry type="library" exported="" name="materialdatetimepicker-2.5.0" level="project" />
     <orderEntry type="library" exported="" name="jsoup-1.9.2" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-26.0.0-beta2" level="project" />
     <orderEntry type="library" exported="" name="palette-v7-26.0.0-beta2" level="project" />
     <orderEntry type="library" exported="" name="material-about-library-1.7.1" level="project" />
     <orderEntry type="library" exported="" name="HintCaseAssets-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="material-intro-1.6" level="project" />
-    <orderEntry type="library" exported="" name="dropbox-core-sdk-2.1.2" level="project" />
-    <orderEntry type="library" exported="" name="xdroid-core-0.0.10" level="project" />
     <orderEntry type="library" exported="" name="mediarouter-v7-26.0.0-beta2" level="project" />
     <orderEntry type="library" exported="" name="materialize-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-ads-11.0.1" level="project" />
@@ -178,24 +174,25 @@
     <orderEntry type="library" exported="" name="material-activity-chooser-0.2.1" level="project" />
     <orderEntry type="library" exported="" name="filepicker-2.5.2" level="project" />
     <orderEntry type="library" exported="" name="bolts-android-1.4.0" level="project" />
-    <orderEntry type="library" exported="" name="dexter-2.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-core-ui-26.0.0-beta2" level="project" />
     <orderEntry type="library" exported="" name="DownloadProgressBar-1.1" level="project" />
     <orderEntry type="library" exported="" name="discrete-seekbar-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="SOMAAndroidSDK5.0.9" level="project" />
     <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
     <orderEntry type="library" exported="" name="support-compat-26.0.0-beta2" level="project" />
+    <orderEntry type="library" exported="" name="butterknife-annotations-8.6.0" level="project" />
     <orderEntry type="library" exported="" name="com.amulyakhare.textdrawable-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="roundedimageview-2.3.0" level="project" />
     <orderEntry type="library" exported="" name="OneSignal-3.5.8" level="project" />
     <orderEntry type="library" exported="" name="answers-shim-0.0.6" level="project" />
     <orderEntry type="library" exported="" name="support-v4-26.0.0-beta2" level="project" />
     <orderEntry type="library" exported="" name="materialdrawer-5.9.2" level="project" />
+    <orderEntry type="library" exported="" name="xdroid-core-0.3.0" level="project" />
     <orderEntry type="library" exported="" name="support-core-utils-26.0.0-beta2" level="project" />
     <orderEntry type="library" exported="" name="fab-1.6.4" level="project" />
     <orderEntry type="library" exported="" name="bolts-applinks-1.4.0" level="project" />
     <orderEntry type="library" exported="" name="leanback-v17-26.0.0-beta2" level="project" />
-    <orderEntry type="library" exported="" name="nanohttpd-2.2.0" level="project" />
+    <orderEntry type="library" exported="" name="butterknife-8.6.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-tasks-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-media-compat-26.0.0-beta2" level="project" />
     <orderEntry type="library" exported="" name="exomedia-3.0.1" level="project" />
@@ -206,22 +203,25 @@
     <orderEntry type="library" exported="" name="trace" level="project" />
     <orderEntry type="library" exported="" name="sdk-1.9.2.1" level="project" />
     <orderEntry type="library" exported="" name="transition-26.0.0-beta2" level="project" />
+    <orderEntry type="library" exported="" name="dropbox-core-sdk-3.0.3" level="project" />
     <orderEntry type="library" exported="" name="AndroidUtilities-1.6.0" level="project" />
-    <orderEntry type="library" exported="" name="library-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="library-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="library-1.4.0" level="project" />
     <orderEntry type="library" exported="" name="support-fragment-26.0.0-beta2" level="project" />
     <orderEntry type="library" exported="" name="sdk-providers-1.9.2.1" level="project" />
     <orderEntry type="library" exported="" name="beta-1.2.5" level="project" />
-    <orderEntry type="library" exported="" name="okio-1.11.0" level="project" />
     <orderEntry type="library" exported="" name="community-material-typeface-1.7.22.1" level="project" />
+    <orderEntry type="library" exported="" name="okhttp-3.8.1" level="project" />
     <orderEntry type="library" exported="" name="fastadapter-2.5.3" level="project" />
     <orderEntry type="library" exported="" name="firebase-analytics-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="utils-v4-1.6.1" level="project" />
+    <orderEntry type="library" exported="" name="library-2.0" level="project" />
+    <orderEntry type="library" exported="" name="materialdatetimepicker-3.2.2" level="project" />
     <orderEntry type="library" exported="" name="firebase-analytics-impl-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="material-design-iconic-typeface-2.2.0.2" level="project" />
     <orderEntry type="library" exported="" name="debug-db-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="android-shape-imageview-0.9.3" level="project" />
+    <orderEntry type="library" exported="" name="nanohttpd-2.3.1" level="project" />
     <orderEntry type="library" exported="" name="android-async-http-1.4.9" level="project" />
     <orderEntry type="library" exported="" name="play-services-iid-11.0.1" level="project" />
     <orderEntry type="library" exported="" name="design-26.0.0-beta2" level="project" />
@@ -256,24 +256,24 @@
     <orderEntry type="library" exported="" scope="TEST" name="robolectric-3.1.2" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="asm-tree-5.0.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="sqlite4java-0.282" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="maven-project-2.2.1" level="project" />
     <orderEntry type="library" exported="" name="support-v4-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-media-compat-25.3.1" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="maven-project-2.2.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="plexus-container-default-1.0-alpha-9-stable-1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-25.3.1" level="project" />
-    <orderEntry type="library" exported="" name="support-vector-drawable-25.3.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="classworlds-1.1-alpha-2" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="plexus-interpolation-1.11" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="maven-artifact-manager-2.2.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="shadows-core-v23-3.1.2" level="project" />
+    <orderEntry type="library" exported="" name="support-vector-drawable-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-compat-25.3.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="maven-ant-tasks-2.1.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="ant-1.8.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="ant-launcher-1.8.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="xpp3_min-1.1.4c" level="project" />
-    <orderEntry type="library" exported="" name="design-25.3.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="maven-error-diagnostics-2.2.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="wagon-file-1.0-beta-6" level="project" />
+    <orderEntry type="library" exported="" name="design-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-core-ui-25.3.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="xstream-1.4.8" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="wagon-provider-api-1.0-beta-6" level="project" />
@@ -291,8 +291,8 @@
     <orderEntry type="library" exported="" scope="TEST" name="protobuf-java-2.6.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-core-1.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="vtd-xml-2.11" level="project" />
-    <orderEntry type="library" exported="" name="recyclerview-v7-25.3.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.12" level="project" />
+    <orderEntry type="library" exported="" name="recyclerview-v7-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="animated-vector-drawable-25.3.1" level="project" />
   </component>

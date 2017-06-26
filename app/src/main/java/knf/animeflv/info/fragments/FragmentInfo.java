@@ -81,12 +81,12 @@ public class FragmentInfo extends Fragment {
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(getActivity());
         view.setBackgroundColor(theme.background);
         txt_sinopsis.setTextColor(theme.textColorNormal);
-        TextView tit0 = (TextView) view.findViewById(R.id.info_titles0);
-        TextView tit1 = (TextView) view.findViewById(R.id.info_titles1);
-        TextView tit2 = (TextView) view.findViewById(R.id.info_titles2);
-        TextView tit3 = (TextView) view.findViewById(R.id.info_titles3);
-        TextView tit4 = (TextView) view.findViewById(R.id.info_titles4);
-        TextView tit5 = (TextView) view.findViewById(R.id.info_titles5);
+        TextView tit0 = view.findViewById(R.id.info_titles0);
+        TextView tit1 = view.findViewById(R.id.info_titles1);
+        TextView tit2 = view.findViewById(R.id.info_titles2);
+        TextView tit3 = view.findViewById(R.id.info_titles3);
+        TextView tit4 = view.findViewById(R.id.info_titles4);
+        TextView tit5 = view.findViewById(R.id.info_titles5);
         tit0.setTextColor(theme.textColorNormal);
         tit1.setTextColor(theme.textColorNormal);
         tit2.setTextColor(theme.textColorNormal);
@@ -186,6 +186,8 @@ public class FragmentInfo extends Fragment {
                                     txt_fsalida.setText(date);
                                 }
                             });
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

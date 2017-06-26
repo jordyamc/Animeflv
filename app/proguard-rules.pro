@@ -21,7 +21,9 @@
 -dontwarn com.smaato.soma.**
 -dontwarn com.dropbox.**
 -dontwarn com.cleveroad.audiowidget.**
+-dontwarn com.daimajia.androidanimations.library.**
 -dontwarn okio.**
+-dontwarn okhttp3.**
 -dontwarn retrofit2.**
 -dontwarn com.github.siyamed.**
 -dontwarn com.zendesk.**

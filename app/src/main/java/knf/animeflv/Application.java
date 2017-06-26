@@ -20,7 +20,6 @@ import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
-import com.karumi.dexter.Dexter;
 import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal;
 
@@ -63,7 +62,6 @@ public class Application extends MultiDexApplication {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             initChannels();
         UtilsInit.init(this);
-        Dexter.initialize(getApplicationContext());
         android.webkit.CookieSyncManager.createInstance(this);
         android.webkit.CookieManager.getInstance().setAcceptCookie(true);
         WebkitCookieManagerProxy coreCookieManager = new WebkitCookieManagerProxy(null, java.net.CookiePolicy.ACCEPT_ALL);

@@ -42,6 +42,7 @@ import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
 public class LogViewer extends AppCompatActivity {
+    final int CODE_EMAIL = 9955;
     @BindView(R.id.et_correo)
     AppCompatEditText correo;
     @BindView(R.id.text_input)
@@ -54,7 +55,6 @@ public class LogViewer extends AppCompatActivity {
     FloatingActionButton button;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-
     String correoS;
     File current;
 
@@ -122,6 +122,18 @@ public class LogViewer extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
 
+            }
+        });
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"animeflvapp@hotmail.com"});
+                intent.putExtra(Intent.EXTRA_STREAM, new FileUtil(LogViewer.this).getUriForFile(current));
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Error Log - AnimeflvApp");
+                intent.putExtra(Intent.EXTRA_TEXT, getPhoneInfo(current.getPath()));
+                startActivityForResult(Intent.createChooser(intent, "Enviar reporte"), CODE_EMAIL);
             }
         });
     }
@@ -206,6 +218,12 @@ public class LogViewer extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Toaster.toast("Reporte enviado");
     }
 
     @Override

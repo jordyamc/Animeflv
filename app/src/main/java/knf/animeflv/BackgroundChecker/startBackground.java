@@ -209,7 +209,7 @@ public class startBackground {
                                     bigTextStyle.setBigContentTitle("Animes:");
                                     bigTextStyle.bigText(temp);
                                     NotificationCompat.Builder mBuilder =
-                                            new NotificationCompat.Builder(context)
+                                            new NotificationCompat.Builder(context, CHANNEL_ANIMES)
                                                     .setSmallIcon(R.drawable.ic_not_r)
                                                     .setContentTitle(NotTit)
                                                     .setContentText(mess);
@@ -231,7 +231,7 @@ public class startBackground {
                                     int mNotificationId = 6991;
                                     NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                                     mNotifyMgr.cancel(mNotificationId);
-                                    showNotification(mNotifyMgr, mBuilder, CHANNEL_ANIMES, mNotificationId);
+                                    showNotification(mNotifyMgr, mBuilder, mNotificationId);
                                 } else {
                                     if (UtilNotBlocker.isBlocked()) {
                                         Log.d("Not Service", "isBlocked");
@@ -279,7 +279,7 @@ public class startBackground {
                 } else {
                     sharedPreferences.edit().putBoolean("notVer", true).apply();
                     NotificationCompat.Builder mBuilder =
-                            new NotificationCompat.Builder(context)
+                            new NotificationCompat.Builder(context, CHANNEL_UPDATES)
                                     .setSmallIcon(R.drawable.ic_not_r)
                                     .setContentTitle("AnimeFLV")
                                     .setContentText("Nueva Version Disponible!!!");
@@ -298,7 +298,7 @@ public class startBackground {
                     mBuilder.setContentIntent(resultPendingIntent);
                     int mNotificationId = 1964;
                     NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                    showNotification(mNotifyMgr, mBuilder, CHANNEL_UPDATES, mNotificationId);
+                    showNotification(mNotifyMgr, mBuilder, mNotificationId);
                 }
             } else {
                 Log.d("Auto", "true");
@@ -349,7 +349,7 @@ public class startBackground {
                         int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
                         Uri ring = UtilSound.getSoundUri(not);
                         NotificationCompat.Builder mBuilder =
-                                new NotificationCompat.Builder(context)
+                                new NotificationCompat.Builder(context, CHANNEL_UPDATES)
                                         .setSmallIcon(R.drawable.ic_not_r)
                                         .setContentTitle("AnimeFLV")
                                         .setContentText("Instalar version " + s.trim());
@@ -368,7 +368,7 @@ public class startBackground {
                         mBuilder.setContentIntent(resultPendingIntent);
                         int mNotificationId = (int) Math.round(Math.random());
                         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                        showNotification(mNotifyMgr, mBuilder, CHANNEL_UPDATES, mNotificationId);
+                        showNotification(mNotifyMgr, mBuilder, mNotificationId);
                     }
 
                     @Override
@@ -401,7 +401,7 @@ public class startBackground {
         int not = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("sonido", "0"));
         Uri ring = UtilSound.getSoundUri(not);
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
+                new NotificationCompat.Builder(context, CHANNEL_ANIMES)
                         .setSmallIcon(R.drawable.ic_not_r)
                         .setContentTitle(titulo)
                         .setContentText("Descargar capitulo " + num);
@@ -423,12 +423,10 @@ public class startBackground {
         mBuilder.setContentIntent(resultPendingIntent);
         int mNotificationId = (int) Math.round(Math.random());
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        showNotification(mNotifyMgr, mBuilder, CHANNEL_ANIMES, mNotificationId);
+        showNotification(mNotifyMgr, mBuilder, mNotificationId);
     }
 
-    private static void showNotification(NotificationManager manager, NotificationCompat.Builder builder, String actionid, int id) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            builder.setChannelId(actionid);
+    private static void showNotification(NotificationManager manager, NotificationCompat.Builder builder, int id) {
         manager.notify(id, builder.build());
     }
 }

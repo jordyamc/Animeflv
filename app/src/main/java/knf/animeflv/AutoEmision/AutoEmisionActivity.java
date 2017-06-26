@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -42,7 +43,7 @@ import xdroid.toaster.Toaster;
  * Created by Jordy on 09/01/2017.
  */
 
-public class AutoEmisionActivity extends AppCompatActivity {
+public class AutoEmisionActivity extends AppCompatActivity implements AutoEmisionFragment.EmisionRemoveListener {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -124,12 +125,23 @@ public class AutoEmisionActivity extends AppCompatActivity {
                         viewPager.setAdapter(adapter);
                         smartTabLayout.setViewPager(viewPager);
                         viewPager.setCurrentItem(Math.abs(getActualDayCode() - 1), true);
+                        setFragmentsListener(adapter);
                         supportInvalidateOptionsMenu();
                     }
                 });
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    private void setFragmentsListener(FragmentPagerItemAdapter adapter) {
+        try {
+            for (int i = 0; i < 8; i++) {
+                ((AutoEmisionFragment) adapter.getPage(i)).setListener(this);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Bundle getDayBundle(int day) {
@@ -166,6 +178,19 @@ public class AutoEmisionActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onEmisionRemove(int removeCount) {
+        count -= removeCount;
+        if (count_text != null)
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    count_text.setOnClickListener(getCountListener());
+                }
+            });
+    }
+
+    @UiThread
     private View.OnClickListener getCountListener() {
         count_text.setText(String.valueOf(count));
         return new View.OnClickListener() {
@@ -184,9 +209,11 @@ public class AutoEmisionActivity extends AppCompatActivity {
             getMenuInflater().inflate(R.menu.menu_emision_count, menu);
         }
         MenuItem c = menu.findItem(R.id.count);
-        count_text = ((TextView) c.getActionView().findViewById(R.id.count_text));
+        count_text = (c.getActionView().findViewById(R.id.count_text));
         count_text.setOnClickListener(getCountListener());
-        ThemeUtils.setMenuColor(menu, ThemeUtils.Theme.get(this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
+        int color = ThemeUtils.Theme.get(this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION);
+        count_text.setTextColor(color);
+        ThemeUtils.setMenuColor(menu, color);
         return true;
     }
 

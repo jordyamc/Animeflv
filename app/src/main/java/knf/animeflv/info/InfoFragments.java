@@ -226,8 +226,12 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
         IntentFilter filter = new IntentFilter();
         filter.addAction(DownloaderService.RECEIVER_ACTION_ERROR);
         registerReceiver(getReceiver(), filter);
-        if (savedInstanceState == null)
-            getJsonfromApi();
+        if (savedInstanceState != null) {
+            isInInfo = savedInstanceState.getBoolean("isInInfo", true);
+            if (!isInInfo)
+                position = savedInstanceState.getInt("f_item", -1);
+        }
+        getJsonfromApi();
     }
 
     private BroadcastReceiver getReceiver() {
@@ -478,13 +482,13 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                     .customView(R.layout.comentarios, false)
                     .positiveText("SALIR")
                     .build();
-            spinner = (Spinner) dialog.getCustomView().findViewById(R.id.comentarios_box_cap);
+            spinner = dialog.getCustomView().findViewById(R.id.comentarios_box_cap);
             final List<String> caps = parser.parseNumerobyEID(getJsonStringfromFile());
             String[] array = new String[caps.size()];
             caps.toArray(array);
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, array);
             spinner.setAdapter(arrayAdapter);
-            webView = (WebView) dialog.getCustomView().findViewById(R.id.comentarios_box);
+            webView = dialog.getCustomView().findViewById(R.id.comentarios_box);
             webView.getSettings().setJavaScriptEnabled(true);
             String newUA = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
             webView.getSettings().setUserAgentString(newUA);
@@ -652,6 +656,26 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             e.printStackTrace();
         }
         return true;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (fragmentCaps != null) {
+            outState.putBoolean("isInInfo", isInInfo);
+            outState.putInt("f_item", fragmentCaps.getFirstItem());
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            isInInfo = savedInstanceState.getBoolean("isInInfo", true);
+            if (!isInInfo)
+                position = savedInstanceState.getInt("f_item", -1);
+        }
+
+        super.onRestoreInstanceState(savedInstanceState);
     }
 
     @Override

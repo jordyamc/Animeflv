@@ -331,15 +331,15 @@ public class Splash extends AwesomeSplash {
     public void checkPermission() {
         final String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Dexter.checkPermission(new PermissionListener() {
+            Dexter.withActivity(this).withPermission(permission).withListener(new PermissionListener() {
                 @Override
-                public void onPermissionGranted(PermissionGrantedResponse response) {
+                public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
                     checkCloudflare();
                 }
 
                 @Override
-                public void onPermissionDenied(PermissionDeniedResponse response) {
-                    if (!response.isPermanentlyDenied()) {
+                public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+                    if (!permissionDeniedResponse.isPermanentlyDenied()) {
                         String titulo = "Leer/Escribir archivos";
                         String desc = "Este permiso es necesario para descargar los animes, asi como para funcionar sin conexion";
                         new MaterialDialog.Builder(context)
@@ -367,7 +367,7 @@ public class Splash extends AwesomeSplash {
                 }
 
                 @Override
-                public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
                     String titulo = "Leer/Escribir archivos";
                     String desc = "Este permiso es necesario para descargar los animes, asi como para funcionar sin conexion";
                     new MaterialDialog.Builder(context)
@@ -390,9 +390,7 @@ public class Splash extends AwesomeSplash {
                             })
                             .build().show();
                 }
-
-
-            }, permission);
+            }).check();
         } else {
             checkCloudflare();
         }

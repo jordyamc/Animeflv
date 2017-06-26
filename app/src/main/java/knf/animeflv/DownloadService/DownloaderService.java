@@ -56,6 +56,7 @@ public class DownloaderService extends IntentService {
     private static final String CAUSE_DISCONNECTION = "CONEXION INTERRUMPIDA";
     private static final String CAUSE_SSL = "ERROR EN CERTIFICADO SSL";
     private static final String CAUSE_NOT_FOUND = "ARCHIVO NO ENCONTRADO EN SERVIDOR";
+    private static final String CAUSE_DATABASE = "ERROR EN BASE DE DATOS";
     public static String RECEIVER_ACTION_ERROR = "knf.animeflv.DownloadService.DownloadService.RECIEVER_ERROR";
     private NotificationManager manager;
     private NotificationCompat.Builder downloading;
@@ -151,14 +152,14 @@ public class DownloaderService extends IntentService {
         } catch (NoSpaceException nse) {
             Log.e("DownloadService", nse.getMessage());
             onDownloadFailed(eid, intent, CAUSE_NO_SPACE);
-        } catch (ProtocolException pe) {
-            Log.e("DownloadService", pe.getMessage());
-            onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
         } catch (NoInternetFoundException nife) {
             Log.e("DownloadService", nife.getMessage());
             onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
         } catch (SocketException se) {
             Log.e("DownloadService", se.getMessage());
+            onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
+        } catch (ProtocolException pe) {
+            Log.e("DownloadService", pe.getMessage());
             onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
         } catch (SSLException ssl) {
             Log.e("DownloadService", ssl.getMessage());
@@ -169,6 +170,13 @@ public class DownloaderService extends IntentService {
                 onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
             } else {
                 onDownloadFailed(eid, intent, ioe);
+            }
+        } catch (RuntimeException rte) {
+            Log.e("DownloadService", rte.getMessage());
+            if (rte.getMessage().toLowerCase().contains("cursor")) {
+                onDownloadFailed(eid, intent, CAUSE_DATABASE);
+            } else {
+                onDownloadFailed(eid, intent, rte);
             }
         } catch (Exception e) {
             Log.e("DownloadService", "error on try", e);
@@ -190,7 +198,7 @@ public class DownloaderService extends IntentService {
                 .setContentText("Capítulo " + eid.replace("E", "").split("_")[1])
                 .setContentIntent(PendingIntent.getActivity(this, 0, getDownloadingIntent(eid.split("_")[0]), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setProgress(100, 0, true);
-        showNotification(DOWNLOAD_NOTIFICATION_ID, mBuilder, CHANNEL_CURR_DOWNLOAD);
+        showNotification(DOWNLOAD_NOTIFICATION_ID, mBuilder);
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_RUNNING).close();
     }
 
@@ -202,7 +210,7 @@ public class DownloaderService extends IntentService {
 
     private NotificationCompat.Builder getDownloadingBuilder() {
         if (downloading == null)
-            downloading = new NotificationCompat.Builder(this)
+            downloading = new NotificationCompat.Builder(this, CHANNEL_CURR_DOWNLOAD)
                     .setSmallIcon(android.R.drawable.stat_sys_download)
                     .setOngoing(true);
         return downloading;
@@ -226,14 +234,14 @@ public class DownloaderService extends IntentService {
                 }
             }
         }
-        showNotification(DOWNLOAD_NOTIFICATION_ID, mBuilder, CHANNEL_CURR_DOWNLOAD);
+        showNotification(DOWNLOAD_NOTIFICATION_ID, mBuilder);
     }
 
     private void updateCurrentProgressMB(String eid, long downloaded) {
         updateSavedProgress(eid, 0);
         int pending = new SQLiteHelperDownloads(this).getTotalDownloads();
         String title = new Parser().getTitCached(eid.replace("E", "").split("_")[0]);
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_CURR_DOWNLOAD)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(title)
                 .setContentText("Descargado - " + formqatSize(downloaded))
@@ -245,7 +253,7 @@ public class DownloaderService extends IntentService {
                 mBuilder.setNumber(pending);
             }
         }
-        showNotification(DOWNLOAD_NOTIFICATION_ID, mBuilder, CHANNEL_CURR_DOWNLOAD);
+        showNotification(DOWNLOAD_NOTIFICATION_ID, mBuilder);
     }
 
     private String formqatSize(long length) {
@@ -281,24 +289,34 @@ public class DownloaderService extends IntentService {
         NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
         bigTextStyle.setBigContentTitle("CAUSA:");
         bigTextStyle.bigText(cause);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_COM_DOWNLOAD)
                 .setSmallIcon(android.R.drawable.stat_notify_error)
                 .setContentTitle(new Parser().getTitCached(semi[0]) + " - " + semi[1])
                 .setColor(Color.parseColor("#F44336"))
                 .setContentText("ERROR AL DESCARGAR")
-                .setGroup("animeflv_failed_download")
                 .setStyle(bigTextStyle)
                 .setOngoing(false);
-        if (cause.equals(CAUSE_INTERNET) || cause.equals(CAUSE_NO_SPACE) || cause.equals(CAUSE_DISCONNECTION) || cause.equals(CAUSE_NOT_FOUND))
+        if (retryFromCause(cause))
             builder.addAction(R.drawable.redo, "REINTENTAR", PendingIntent.getBroadcast(this, new Random().nextInt(), n_intent, PendingIntent.FLAG_UPDATE_CURRENT));
-        showNotification(getDownloadID(eid), builder, CHANNEL_COM_DOWNLOAD);
+        showNotification(getDownloadID(eid), builder);
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_FAILED).delete(eid);
         sendBroadcast(new Intent(RECEIVER_ACTION_ERROR));
     }
 
-    private void showNotification(int id, NotificationCompat.Builder builder, String channelId) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            builder.setChannelId(channelId);
+    private boolean retryFromCause(String cause) {
+        switch (cause) {
+            case CAUSE_INTERNET:
+            case CAUSE_NO_SPACE:
+            case CAUSE_DISCONNECTION:
+            case CAUSE_NOT_FOUND:
+            case CAUSE_DATABASE:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void showNotification(int id, NotificationCompat.Builder builder) {
         getManager().notify(id, builder.build());
     }
 
@@ -315,12 +333,11 @@ public class DownloaderService extends IntentService {
     private void onSuccess(String eid) {
         DownloadListManager.delete(this, eid + "_" + getSharedPreferences("data", MODE_PRIVATE).getLong(eid + "_downloadID", -1));
         String title = new Parser().getTitCached(eid.replace("E", "").split("_")[0]);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_COM_DOWNLOAD)
                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
                 .setColor(Color.parseColor("#8BC34A"))
                 .setContentTitle(title + " - " + eid.replace("E", "").split("_")[1])
                 .setContentText("DESCARGA COMPLETADA")
-                .setGroup("animeflv_success_group")
                 .setAutoCancel(true)
                 .setOngoing(false);
         if (Build.VERSION.SDK_INT < 24) {
@@ -330,7 +347,7 @@ public class DownloaderService extends IntentService {
             PendingIntent pendingIntent = PendingIntent.getActivity(this, getDownloadID(eid), intent, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(pendingIntent);
         }
-        showNotification(getDownloadID(eid), builder, CHANNEL_COM_DOWNLOAD);
+        showNotification(getDownloadID(eid), builder);
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_SUCCESSFUL).delete(eid);
     }
 

@@ -10,6 +10,9 @@
         name="themes"
         path="Animeflv/cache/theme/" />
     <external-path
+        name="logs"
+        path="Animeflv/cache/logs/" />
+    <external-path
         name="download"
         path="Animeflv/download/"/>
     <external-path

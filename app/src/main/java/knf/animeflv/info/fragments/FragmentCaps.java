@@ -239,6 +239,14 @@ public class FragmentCaps extends Fragment {
         });
     }
 
+    public int getFirstItem() {
+        if (layoutManager != null) {
+            return layoutManager.findFirstVisibleItemPosition();
+        } else {
+            return -1;
+        }
+    }
+
     public interface SeenProgress {
         void onStep();
 
