@@ -423,6 +423,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                 }
             });
         } catch (Exception e) {
+            e.printStackTrace();
             MainStates.setProcessing(false, null);
             showDownload(holder.ib_des);
         }

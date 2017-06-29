@@ -14,8 +14,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.JsonFactory.OfflineGetter;
-import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.DesignUtils;
@@ -59,7 +59,7 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
             @Override
             public void onClick(View v) {
                 String json = FileUtil.getStringFromFile(OfflineGetter.directorio);
-                String link = new Parser().getUrlFavs(json, aids[position]);
+                String link = DirectoryHelper.get(context).getAnimeUrl(aids[position]);
                 InfoHelper.open(
                         context,
                         new InfoHelper.SharedItem(holder.iv_rel, "img"),

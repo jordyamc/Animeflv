@@ -30,7 +30,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
-import knf.animeflv.Parser;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.DesignUtils;
@@ -185,7 +185,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                                 Intent.FLAG_ACTIVITY_NEW_TASK,
                                 new InfoHelper.BundleItem("aid", list.get(position).aid),
                                 new InfoHelper.BundleItem("title", list.get(position).name),
-                                new InfoHelper.BundleItem("link", Parser.getUrlAnimeCached(list.get(position).aid))
+                                new InfoHelper.BundleItem("link", DirectoryHelper.get(context).getAnimeUrl(list.get(position).aid))
                         );
                     } else {
                         final List<String> sectionNames = new FavotiteDB(context).getSectionListName();

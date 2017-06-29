@@ -4,7 +4,6 @@ import android.content.Context;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.FileNotFoundException;
@@ -13,12 +12,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Directorio.DB.DirectoryDB;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Favorites.FavoriteHelper;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DIRECTORIO;
 import knf.animeflv.Random.AnimeObject;
-import knf.animeflv.Utils.FileUtil;
 
 /**
  * Created by Jordy on 21/04/2017.
@@ -49,16 +50,17 @@ public class SuggestionHelper {
     }
 
     public static void getSuggestions(final Context context, final SuggestionCreate suggestionCreate) {
-        BaseGetter.getJson(context, new DIRECTORIO(), new BaseGetter.AsyncProgressInterface() {
+        BaseGetter.getJson(context, new DIRECTORIO(), new BaseGetter.AsyncProgressDBInterface() {
             @Override
-            public void onFinish(String json) {
+            public void onFinish(List<AnimeClass> l) {
                 try {
-                    if (json.equals("null")) throw new FileNotFoundException("Directory null!!!");
+                    if (!DirectoryHelper.get(context).isDirectoryValid())
+                        throw new FileNotFoundException("Directory null!!!");
                     List<SuggestionDB.Suggestion> list = getGenresCount(context);
                     if (list.size() < 3) throw new IllegalStateException("List minor of 3");
                     Collections.sort(list, new SuggestionCompare());
-                    JSONArray array = new JSONObject(json).getJSONArray("lista");
-                    List<AnimeObject> finalList = PreferenceManager.getDefaultSharedPreferences(context).getString("sug_order", "0").equals("0") ? searchNew(context, list, array) : searchOld(context, list, array);
+                    List<DirectoryDB.DirectoryItem> items = new DirectoryDB(context).getAllAnimesCGen(list.get(0).name, true);
+                    List<AnimeObject> finalList = PreferenceManager.getDefaultSharedPreferences(context).getString("sug_order", "0").equals("0") ? searchNew(context, list, items) : searchOld(context, list, items);
                     Log.e("Suggestions", "Found " + finalList.size() + " Animes");
                     suggestionCreate.onListCreated(finalList, list);
                 } catch (FileNotFoundException fe) {
@@ -80,27 +82,26 @@ public class SuggestionHelper {
 
             @Override
             public void onError(Throwable throwable) {
-                throwable.printStackTrace();
-                suggestionCreate.onError(-1);
+
             }
         });
     }
 
-    private static List<AnimeObject> searchNew(Context context, List<SuggestionDB.Suggestion> list, JSONArray array) throws Exception {
+    private static List<AnimeObject> searchNew(Context context, List<SuggestionDB.Suggestion> list, List<DirectoryDB.DirectoryItem> array) throws Exception {
         List<AnimeObject> abc = new ArrayList<>();
         List<AnimeObject> ab = new ArrayList<>();
         List<AnimeObject> ac = new ArrayList<>();
         List<AnimeObject> bc = new ArrayList<>();
         List<AnimeObject> a_b_c = new ArrayList<>();
         List<String> blacklist = getExcluded(context);
-        for (int i = 0; i < array.length(); i++) {
-            JSONObject object = array.getJSONObject(i);
-            String genres = object.getString("f");
-            String aid = object.getString("a");
+        Collections.reverse(array);
+        for (DirectoryDB.DirectoryItem item : array) {
+            String genres = item.genres;
+            String aid = item.aid;
             boolean skip = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("skip_favs", true) && FavoriteHelper.isFav(context, aid);
             if (!skip)
                 if (genres.contains(list.get(0).name) || genres.contains(list.get(1).name) || genres.contains(list.get(2).name) && !isExcluded(blacklist, genres)) {
-                    AnimeObject current = new AnimeObject(aid, FileUtil.corregirTit(object.getString("b")), object.getString("c"));
+                    AnimeObject current = new AnimeObject(aid, item.name, item.type);
                     if (genres.contains(list.get(0).name) && genres.contains(list.get(1).name) && genres.contains(list.get(2).name)) {
                         abc.add(current);
                     } else if (genres.contains(list.get(0).name) && genres.contains(list.get(1).name)) {
@@ -116,33 +117,27 @@ public class SuggestionHelper {
         }
         List<AnimeObject> finalList = new ArrayList<>();
         finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name, list.get(2).name), true, abc));
-        //finalList.addAll(abc);
         finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name), true, ab));
-        //finalList.addAll(ab);
         finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(2).name), true, ac));
-        //finalList.addAll(ac);
         finalList.add(new AnimeObject(getSuggestionGenres(list.get(1).name, list.get(2).name), true, bc));
-        //finalList.addAll(bc);
         finalList.add(new AnimeObject(getSuggestionGenresFinals(list.get(0).name, list.get(1).name, list.get(2).name), true, a_b_c));
-        //finalList.addAll(a_b_c);
         return finalList;
     }
 
-    private static List<AnimeObject> searchOld(Context context, List<SuggestionDB.Suggestion> list, JSONArray array) throws Exception {
+    private static List<AnimeObject> searchOld(Context context, List<SuggestionDB.Suggestion> list, List<DirectoryDB.DirectoryItem> array) throws Exception {
         List<AnimeObject> abc = new ArrayList<>();
         List<AnimeObject> ab = new ArrayList<>();
         List<AnimeObject> ac = new ArrayList<>();
         List<AnimeObject> bc = new ArrayList<>();
         List<AnimeObject> a_b_c = new ArrayList<>();
         List<String> blacklist = getExcluded(context);
-        for (int i = array.length() - 1; i >= 0; i--) {
-            JSONObject object = array.getJSONObject(i);
-            String genres = object.getString("f");
-            String aid = object.getString("a");
+        for (DirectoryDB.DirectoryItem item : array) {
+            String genres = item.genres;
+            String aid = item.aid;
             boolean skip = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("skip_favs", true) && FavoriteHelper.isFav(context, aid);
             if (!skip)
                 if (genres.contains(list.get(0).name) || genres.contains(list.get(1).name) || genres.contains(list.get(2).name) && !isExcluded(blacklist, genres)) {
-                    AnimeObject current = new AnimeObject(aid, FileUtil.corregirTit(object.getString("b")), object.getString("c"));
+                    AnimeObject current = new AnimeObject(aid, item.name, item.type);
                     if (genres.contains(list.get(0).name) && genres.contains(list.get(1).name) && genres.contains(list.get(2).name)) {
                         abc.add(current);
                     } else if (genres.contains(list.get(0).name) && genres.contains(list.get(1).name)) {
@@ -158,15 +153,10 @@ public class SuggestionHelper {
         }
         List<AnimeObject> finalList = new ArrayList<>();
         finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name, list.get(2).name), true, abc));
-        //finalList.addAll(abc);
         finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name), true, ab));
-        //finalList.addAll(ab);
         finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(2).name), true, ac));
-        //finalList.addAll(ac);
         finalList.add(new AnimeObject(getSuggestionGenres(list.get(1).name, list.get(2).name), true, bc));
-        //finalList.addAll(bc);
         finalList.add(new AnimeObject(getSuggestionGenresFinals(list.get(0).name, list.get(1).name, list.get(2).name), true, a_b_c));
-        //finalList.addAll(a_b_c);
         return finalList;
     }
 

@@ -1,6 +1,7 @@
 package knf.animeflv.Utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.JsonFactory.MALGetter;
 import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
@@ -224,7 +226,7 @@ public class CacheManager {
             if (isHD) Log.e("Local", "is HD!!!");
         }
         if (NetworkUtils.isNetworkAvailable() && !isHD) {
-            final String title = new Parser().getTitCached(aid).trim();
+            final String title = DirectoryHelper.get(context).getTitle(aid).trim();
             MALGetter.getAnimeSearch(title, new MALGetter.SearchInterface() {
                 @Override
                 public void onFinishSearch(String r, boolean success) {
@@ -269,7 +271,7 @@ public class CacheManager {
         }
     }
 
-    public void mini(final Activity context, final String aid, final ImageView imageView) {
+    public void mini(final Context context, final String aid, final ImageView imageView) {
         checkCacheDirs();
         final File localFile = new File(miniCache, aid + ".jpg");
         imageView.setImageResource(android.R.color.transparent);

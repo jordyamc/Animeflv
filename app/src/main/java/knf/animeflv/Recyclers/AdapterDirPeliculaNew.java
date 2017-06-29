@@ -1,6 +1,5 @@
 package knf.animeflv.Recyclers;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.preference.PreferenceManager;
@@ -18,8 +17,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Directorio.Directorio;
-import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.DesignUtils;
@@ -32,9 +31,10 @@ import knf.animeflv.info.Helper.InfoHelper;
 public class AdapterDirPeliculaNew extends RecyclerView.Adapter<AdapterDirPeliculaNew.ViewHolder> {
 
     List<AnimeClass> Animes;
-    private Activity context;
+    private Context context;
     private ThemeUtils.Theme theme;
-    public AdapterDirPeliculaNew(Activity context, List<AnimeClass> animes) {
+
+    public AdapterDirPeliculaNew(Context context, List<AnimeClass> animes) {
         this.context = context;
         this.Animes = animes;
         this.theme = ThemeUtils.Theme.create(context);
@@ -76,7 +76,7 @@ public class AdapterDirPeliculaNew extends RecyclerView.Adapter<AdapterDirPelicu
                         Intent.FLAG_ACTIVITY_NEW_TASK,
                         new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
                         new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getNombre()),
-                        new InfoHelper.BundleItem("link", Parser.getUrlAnimeCached(Animes.get(holder.getAdapterPosition()).getAid()))
+                        new InfoHelper.BundleItem("link", DirectoryHelper.get(context).getAnimeUrl(Animes.get(holder.getAdapterPosition()).getAid()))
                 );
             }
         });

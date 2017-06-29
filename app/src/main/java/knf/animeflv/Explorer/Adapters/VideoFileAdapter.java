@@ -294,7 +294,7 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
 
     private void recreateList() {
         interfaces.OnDirectoryFileChange();
-        ModelFactory.createVideosListAsync(current, new ModelFactory.AsyncFileListener() {
+        ModelFactory.createVideosListAsync(context, current, new ModelFactory.AsyncFileListener() {
             @Override
             public void onCreated(List<VideoFile> l) {
                 list = l;

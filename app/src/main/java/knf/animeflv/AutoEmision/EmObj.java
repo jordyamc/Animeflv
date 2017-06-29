@@ -1,6 +1,8 @@
 package knf.animeflv.AutoEmision;
 
-import knf.animeflv.Parser;
+import android.content.Context;
+
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 
 /**
  * Created by Jordy on 09/01/2017.
@@ -12,9 +14,9 @@ public class EmObj {
     private int daycode = 0;
     private int id = -1;
 
-    public EmObj(String aid, int daycode) {
+    public EmObj(Context context, String aid, int daycode) {
         this.aid = aid;
-        this.title = new Parser().getTitCached(aid);
+        this.title = DirectoryHelper.get(context).getTitle(aid);
         this.daycode = daycode;
         this.id = Math.abs(aid.hashCode()) + daycode;
     }

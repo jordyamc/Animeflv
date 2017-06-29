@@ -48,7 +48,7 @@ public class VideoFilesFragment extends Fragment {
         loading.setProgressColor(theme.accent);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         final File file = new File(getArguments().getString("path"));
-        ModelFactory.createVideosListAsync(file, new ModelFactory.AsyncFileListener() {
+        ModelFactory.createVideosListAsync(getActivity(), file, new ModelFactory.AsyncFileListener() {
             @Override
             public void onCreated(final List<VideoFile> list) {
                 try {

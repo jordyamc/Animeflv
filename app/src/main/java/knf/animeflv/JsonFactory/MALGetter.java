@@ -1,6 +1,7 @@
 package knf.animeflv.JsonFactory;
 
 import android.os.Looper;
+import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.SyncHttpClient;
@@ -38,7 +39,9 @@ public class MALGetter {
             AsyncHttpClient client = getClient();
             client.setBasicAuth("animeflvapp", "cLSmWldhYdSO");
             client.setTimeout(TIMEOUT);
-            client.get("https://myanimelist.net/api/anime/search.xml?q=" + getTitleEncoded(title.toLowerCase()), null, new TextHttpResponseHandler() {
+            String url = "https://myanimelist.net/api/anime/search.xml?q=" + getTitleEncoded(title.toLowerCase());
+            Log.e("MAL Search", url);
+            client.get(url, null, new TextHttpResponseHandler() {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                     searchInterface.onFinishSearch("_error: " + responseString, false);
@@ -63,7 +66,7 @@ public class MALGetter {
                     return entry.select("image").first().ownText();
                 }
             }
-            return "_error: Anime Not Found";
+            return "_error: Anime Not Found -";
         } catch (Exception e) {
             e.printStackTrace();
             return "_error: Parsing";
@@ -79,7 +82,7 @@ public class MALGetter {
                     return entry.select("start_date").first().ownText();
                 }
             }
-            return "_error: Anime Not Found";
+            return "_error: Anime Not Found - " + org_title;
         } catch (Exception e) {
             e.printStackTrace();
             return "_error: Parsing";

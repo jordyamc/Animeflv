@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import java.io.File;
 
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.Parser;
 import knf.animeflv.Seen.SeenManager;
@@ -26,7 +27,7 @@ public class InternalStream {
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         Intent interno = parser.getPrefIntPlayer(context);
         interno.putExtra("url", url);
-        interno.putExtra("title", parser.getTitCached(aid) + " " + numero);
+        interno.putExtra("title", DirectoryHelper.get(context).getTitle(aid) + " " + numero);
         interno.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(interno);
         SeenManager.get(context).setSeenState(eid, true);
@@ -37,7 +38,7 @@ public class InternalStream {
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         Bundle bundle = new Bundle();
         bundle.putString("url", url);
-        bundle.putString("title", parser.getTitCached(aid) + " " + numero);
+        bundle.putString("title", DirectoryHelper.get(context).getTitle(aid) + " " + numero);
         bundle.putString("ops", "cookie:::" + constructor.getCookie() + ";;;" + "User-Agent:::" + constructor.getUseAgent() + ";;;" + "Accept:::text/html, application/xhtml+xml, */*;;;" + "Accept-Language:::en-US,en;q=0.7,he;q=0.3;;;" + "Referer:::" + constructor.getReferer());
         Intent intent = parser.getPrefIntPlayer(context);
         intent.putExtras(bundle);
@@ -51,7 +52,7 @@ public class InternalStream {
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
         Intent interno = parser.getPrefIntPlayer(context);
         interno.putExtra("file", file.getAbsolutePath());
-        interno.putExtra("title", parser.getTitCached(aid) + " " + numero);
+        interno.putExtra("title", DirectoryHelper.get(context).getTitle(aid) + " " + numero);
         interno.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(interno);
         SeenManager.get(context).setSeenState(eid, true);

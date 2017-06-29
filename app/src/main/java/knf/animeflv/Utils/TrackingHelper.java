@@ -1,6 +1,7 @@
 package knf.animeflv.Utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 
 import com.google.android.gms.analytics.HitBuilders;
@@ -21,18 +22,18 @@ public class TrackingHelper {
 
     public static final String ACTION_SHARE = "Share: ";
 
-    public static void track(Activity activity, String screen) {
+    public static void track(Context activity, String screen) {
         Log.e("Traking", screen);
-        Tracker tracker = Application.get(activity).getDefaultTracker();
-        tracker.setScreenName(screen);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
-    }
-
-    public static void track(Application activity, String screen) {
-        Log.e("Traking", screen);
-        Tracker tracker = activity.getDefaultTracker();
-        tracker.setScreenName(screen);
-        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        Tracker tracker = null;
+        if (activity instanceof Activity) {
+            tracker = Application.get((Activity) activity).getDefaultTracker();
+        } else if (activity instanceof Application) {
+            tracker = ((Application) activity).getDefaultTracker();
+        }
+        if (tracker != null) {
+            tracker.setScreenName(screen);
+            tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        }
     }
 
     public static void action(Activity activity, String screen) {

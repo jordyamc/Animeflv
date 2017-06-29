@@ -13,9 +13,9 @@ import android.util.Log;
 
 import java.io.File;
 
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.DownloadManager.ExternalManager;
 import knf.animeflv.FileMover;
-import knf.animeflv.Parser;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.history.adapter.HistoryHelper;
 import xdroid.toaster.Toaster;
@@ -39,7 +39,7 @@ public class StreamManager {
         String semi = eid.replace("E", "");
         String cap = data[1].replace("E", "");
         File sd = new File(FileUtil.init(context).getSDPath() + "/Animeflv/download/" + aid + "/" + semi + ".mp4");
-        HistoryHelper.addToList(context, aid, new Parser().getTitCached(aid), cap);
+        HistoryHelper.addToList(context, aid, DirectoryHelper.get(context).getTitle(aid), cap);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && sd.exists() && getStreamType(context) == 1) {
             if (!ExternalManager.isDownloading(context, eid)) {
                 FileMover.PrepareToPlay(context, eid);
@@ -88,7 +88,7 @@ public class StreamManager {
         String[] data = eid.replace("E", "").split("_");
         String aid = data[0];
         String cap = data[1].replace("E", "");
-        HistoryHelper.addToList(context, aid, new Parser().getTitCached(aid), cap);
+        HistoryHelper.addToList(context, aid, DirectoryHelper.get(context).getTitle(aid), cap);
         int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
         Log.d("Streaming", PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
         switch (type) {

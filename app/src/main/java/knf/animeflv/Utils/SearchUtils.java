@@ -1,15 +1,14 @@
 package knf.animeflv.Utils;
 
+import android.content.Context;
 import android.util.Log;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Directorio.SearchConstructor;
 import knf.animeflv.Utils.eNums.Genero;
 import knf.animeflv.Utils.eNums.SearchType;
@@ -18,7 +17,7 @@ import knf.animeflv.Utils.eNums.SearchType;
  * Created by Jordy on 29/03/2016.
  */
 public class SearchUtils {
-    public static List<AnimeClass> Search(String json, String s) {
+    public static List<AnimeClass> Search(Context context, String s) {
         String search;
         if (s != null) {
             search = s.toLowerCase();
@@ -30,104 +29,36 @@ public class SearchUtils {
             SearchType type = SearchConstructor.getType();
             if (type == SearchType.NOMBRE) {
                 if (search == null) {
-                    JSONObject jsonObj = new JSONObject(json);
-                    JSONArray jsonArray = jsonObj.getJSONArray("lista");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject object = jsonArray.getJSONObject(i);
-                        String tipo = object.getString("c");
-                        String nombre = FileUtil.corregirTit(object.getString("b"));
-                        String aid = object.getString("a");
-                        String url = "http://animeflv.net/uploads/animes/covers/80x80/" + aid + ".jpg";
-                        linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
-
-                    }
+                    linkArray = DirectoryHelper.get(context).getAll();
                 } else {
-                    JSONObject jsonObj = new JSONObject(json);
-                    JSONArray jsonArray = jsonObj.getJSONArray("lista");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject object = jsonArray.getJSONObject(i);
-                        String nombre = FileUtil.corregirTit(object.getString("b"));
-                        String aid = object.getString("a");
-                        if (nombre.toLowerCase().contains(search.toLowerCase())) {
-                            String tipo = object.getString("c");
-                            String url = "http://animeflv.net/uploads/animes/covers/80x80/" + aid + ".jpg";
-                            linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
-                        }
-                    }
+                    linkArray = DirectoryHelper.get(context).searchName(search);
                 }
             }
             if (type == SearchType.GENEROS) {
                 try {
                     if (SearchConstructor.getGeneros().contains(Genero.TODOS)) {
-                        JSONObject jsonObj = new JSONObject(json);
-                        JSONArray jsonArray = jsonObj.getJSONArray("lista");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject object = jsonArray.getJSONObject(i);
-                            String tipo = object.getString("c");
-                            String nombre = FileUtil.corregirTit(object.getString("b"));
-                            String aid = object.getString("a");
-                            String url = "http://animeflv.net/uploads/animes/covers/80x80/" + aid + ".jpg";
-                            linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
-                        }
+                        linkArray = DirectoryHelper.get(context).getAll();
                     } else {
-                        JSONObject jsonObj = new JSONObject(json);
-                        JSONArray jsonArray = jsonObj.getJSONArray("lista");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject object = jsonArray.getJSONObject(i);
-                            String generos = object.getString("f");
-                            String nombre = FileUtil.corregirTit(object.getString("b"));
-                            if (containsGenero(generos) && nombre.toLowerCase().contains(search)) {
-                                String tipo = object.getString("c");
-                                String aid = object.getString("a");
-                                String url = "http://animeflv.net/uploads/animes/covers/80x80/" + aid + ".jpg";
-                                linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
-                            }
-
-                        }
+                        linkArray = DirectoryHelper.get(context).searchGenres(search);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    JSONObject jsonObj = new JSONObject(json);
-                    JSONArray jsonArray = jsonObj.getJSONArray("lista");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject object = jsonArray.getJSONObject(i);
-                        String tipo = object.getString("c");
-                        String nombre = FileUtil.corregirTit(object.getString("b"));
-                        String aid = object.getString("a");
-                        String url = "http://animeflv.net/uploads/animes/covers/80x80/" + aid + ".jpg";
-                        linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
-                    }
+                    linkArray = DirectoryHelper.get(context).getAll();
                 }
             }
             if (type == SearchType.ID) {
                 if (search == null) {
-                    linkArray.add(new AnimeClass("_aid_", "_aid_", "_aid_", "_aid_", 0));
+                    linkArray.add(new AnimeClass("_aid_", "_aid_", "_aid_"));
                 } else {
                     if (!search.trim().equals("")) {
-                        JSONObject jsonObj = new JSONObject(json);
-                        JSONArray jsonArray = jsonObj.getJSONArray("lista");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject object = jsonArray.getJSONObject(i);
-                            if (FileUtil.isNumber(search.trim())) {
-                                String nombre = FileUtil.corregirTit(object.getString("b"));
-                                String aid = object.getString("a");
-                                if (aid.equals(search.trim())) {
-                                    String tipo = object.getString("c");
-                                    String url = "http://animeflv.net/uploads/animes/covers/80x80/" + aid + ".jpg";
-                                    linkArray.add(new AnimeClass(nombre, aid, tipo, url, i + 1));
-                                }
-                            } else {
-                                linkArray.add(new AnimeClass(search.replace("aid:", "").trim(), "_NoNum_", "_NoNum_", "_NoNum_", 0));
-                                break;
-                            }
-                        }
+                        linkArray = DirectoryHelper.get(context).searchID(search);
                     } else {
-                        linkArray.add(new AnimeClass("_aid_", "_aid_", "_aid_", "_aid_", 0));
+                        linkArray.add(new AnimeClass("_aid_", "_aid_", "_aid_"));
                     }
                 }
             }
             if (linkArray.isEmpty()) {
-                linkArray.add(new AnimeClass("none", "none", "none", "none", 0));
+                linkArray.add(new AnimeClass("none", "none", "none"));
             }
         } catch (Exception e) {
             Log.e("DirAnimes", e.getMessage());
@@ -186,7 +117,7 @@ public class SearchUtils {
                 "Yuri"};
     }
 
-    private static boolean containsGenero(String generos) {
+    public static boolean containsGenero(String generos) {
         List<String> gen = Arrays.asList(generos.split(","));
         List<String> lower = new ArrayList<>();
         for (String g : gen) {

@@ -2,6 +2,10 @@ package knf.animeflv.JsonFactory;
 
 import android.content.Context;
 
+import java.util.List;
+
+import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DIRECTORIO;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
@@ -29,6 +33,14 @@ public class BaseGetter {
             SelfGetter.getDir(context, asyncInterface);
         } else {
             asyncInterface.onFinish(OfflineGetter.getDirectorio());
+        }
+    }
+
+    public static void getJson(Context context, DIRECTORIO directorio, AsyncProgressDBInterface asyncInterface) {
+        if (NetworkUtils.isNetworkAvailable()) {
+            SelfGetter.getDirDB(context, asyncInterface);
+        } else {
+            asyncInterface.onFinish(DirectoryHelper.get(context).getAll());
         }
     }
 
@@ -62,6 +74,14 @@ public class BaseGetter {
 
     public interface AsyncProgressInterface {
         void onFinish(String json);
+
+        void onProgress(int progress);
+
+        void onError(Throwable throwable);
+    }
+
+    public interface AsyncProgressDBInterface {
+        void onFinish(List<AnimeClass> list);
 
         void onProgress(int progress);
 

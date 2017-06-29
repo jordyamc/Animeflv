@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import knf.animeflv.DManager;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.DownloadService.DownloadListManager;
 import knf.animeflv.DownloadService.DownloadObject;
 import knf.animeflv.DownloadService.DownloaderService;
@@ -77,7 +78,7 @@ public class ExternalManager {
     public void cancelDownload(String eid) {
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
-        String titulo = parser.getTitCached(aid);
+        String titulo = DirectoryHelper.get(context).getTitle(aid);
         sharedPreferences.edit().putString(eid + "dtype", "2").apply();
         DManager.getManager().cancel(Integer.parseInt(sharedPreferences.getString(eid, "0")));
         String descargados = sharedPreferences.getString("eids_descarga", "");

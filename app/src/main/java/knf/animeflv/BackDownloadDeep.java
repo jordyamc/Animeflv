@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.JsonFactory.DownloadGetter;
@@ -148,9 +149,9 @@ public class BackDownloadDeep extends AppCompatActivity {
         String full = getIntent().getDataString();
         String url = full.substring(full.lastIndexOf("/") + 1).replace(".html", "");
         final String cortado = url.substring(0, url.lastIndexOf("-"));
-        aid = parser.getAidCached(cortado);
+        aid = DirectoryHelper.get(this).getAid(cortado);
         num = url.substring(url.lastIndexOf("-") + 1);
-        titulo = parser.getTitCached(aid);
+        titulo = DirectoryHelper.get(this).getTitle(aid);
         eid = aid + "_" + num + "E";
         options = new MaterialDialog.Builder(this)
                 .title("OPCIONES")

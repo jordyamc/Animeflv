@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Utils.ExecutorManager;
@@ -161,7 +162,7 @@ public class FileMover {
 
     private static void moveNormal(Context context, File file, OnProgressListener listener) {
         String[] name = file.getName().replace(".mp4", "").split("_");
-        String title = Parser.getTitleCached(name[0]) + " " + name[1];
+        String title = DirectoryHelper.get(context).getTitle(name[0]) + " " + name[1];
         DocumentFile fileout = FileUtil.init(context).getFileFromAccess(file.getName().replace(".mp4", "E"));
         try {
             FileInputStream in = new FileInputStream(file);
@@ -199,7 +200,7 @@ public class FileMover {
 
     private static void moveAccess(Activity activity, File file, OnProgressListener listener) {
         String[] name = file.getName().replace(".mp4", "").split("_");
-        String title = Parser.getTitleCached(name[0]) + " " + name[1];
+        String title = DirectoryHelper.get(activity).getTitle(name[0]) + " " + name[1];
         DocumentFile fileout = FileUtil.init(activity).getFileFromAccess(file.getName().replace(".mp4", "E"));
         try {
             InputStream in = new FileInputStream(file);

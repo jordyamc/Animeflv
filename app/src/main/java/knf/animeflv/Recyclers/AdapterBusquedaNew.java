@@ -26,7 +26,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.Directorio.AnimeClass;
-import knf.animeflv.Parser;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.DesignUtils;
@@ -117,7 +117,7 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
                             Intent.FLAG_ACTIVITY_NEW_TASK,
                             new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
                             new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getNombre()),
-                            new InfoHelper.BundleItem("link", new Parser().getUrlFavs(json, Animes.get(holder.getAdapterPosition()).getAid()))
+                            new InfoHelper.BundleItem("link", DirectoryHelper.get(context).getAnimeUrl(Animes.get(holder.getAdapterPosition()).getAid()))
                     );
                 }
             }

@@ -30,6 +30,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Configuracion;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Explorer.Fragments.DirectoryFragment;
 import knf.animeflv.Explorer.Fragments.VideoFilesFragment;
 import knf.animeflv.Explorer.Models.ModelFactory;
@@ -125,7 +126,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
                 File file = new File(ModelFactory.getDirectoryFile(this), aid_extra);
                 isDirectory = false;
                 textView.setText(file.getAbsolutePath());
-                getSupportActionBar().setTitle(new Parser().getTitCached(aid_extra));
+                getSupportActionBar().setTitle(DirectoryHelper.get(this).getTitle(aid_extra));
                 showVideoFile(file);
                 supportInvalidateOptionsMenu();
             }

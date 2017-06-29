@@ -63,7 +63,7 @@ public class EmisionEditDialog extends DialogFragment {
                     @Override
                     public void onClick(@NonNull final MaterialDialog d, @NonNull DialogAction which) {
                         d.getActionButton(DialogAction.POSITIVE).setEnabled(false);
-                        AutoEmisionHelper.editAnimetoList(getActivity(), object, new EmObj(object.getAid(), daycode), new SearchListener() {
+                        AutoEmisionHelper.editAnimetoList(getActivity(), object, new EmObj(getActivity(), object.getAid(), daycode), new SearchListener() {
                             @Override
                             public void OnResponse(EmObj obj) {
                                 if (getArguments().getBoolean("count")) {
@@ -138,7 +138,7 @@ public class EmisionEditDialog extends DialogFragment {
                             daycode = obj.getDaycode();
                             spinner.setSelection(daycode, true);
                         } else {
-                            object = new EmObj(getArguments().getString("aid"), getActualDayCode());
+                            object = new EmObj(getActivity(), getArguments().getString("aid"), getActualDayCode());
                             daycode = getActualDayCode();
                             spinner.setSelection(getActualDayCode(), true);
                         }

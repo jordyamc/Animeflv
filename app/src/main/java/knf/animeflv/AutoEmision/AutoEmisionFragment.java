@@ -68,7 +68,7 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
             protected Void doInBackground(Void... params) {
                 try {
                     day = getArguments().getInt("day");
-                    list = AutoEmisionHelper.getDayList(getArguments().getString("array"), day);
+                    list = AutoEmisionHelper.getDayList(getActivity(), getArguments().getString("array"), day);
                     startVerification(list, day);
                     setRecycler(list, day);
                 } catch (Exception e) {

@@ -52,6 +52,7 @@ import es.dmoral.coloromatic.OnColorSelectedListener;
 import es.dmoral.coloromatic.colormode.ColorMode;
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.CustomSettingsIntro.CustomIntro;
+import knf.animeflv.Directorio.DB.DirectoryDB;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.JsonFactory.SelfGetter;
 import knf.animeflv.LoginActivity.LoginBase;
@@ -903,6 +904,7 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                     Keys.Dirs.CACHE_DIRECTORIO.delete();
+                                    new DirectoryDB(getActivity()).reset();
                                     getActivity().startActivity(new Intent(getActivity(), Directorio.class));
                                 }
                             })

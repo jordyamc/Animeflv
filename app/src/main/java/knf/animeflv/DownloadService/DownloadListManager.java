@@ -7,7 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import knf.animeflv.Parser;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 
 public class DownloadListManager {
     private static final String DOWNLOAD_QUEQUE = "download_queque_list_json";
@@ -37,7 +37,7 @@ public class DownloadListManager {
                 try {
                     String e = list.getJSONObject(i).getString(KEY_DOWNLOAD_ID);
                     if (!e.equals(eid_code)) {
-                        builder.append(new Parser().getTitCached(e.split("_")[0]));
+                        builder.append(DirectoryHelper.get(activity).getTitle(e.split("_")[0]));
                         builder.append(" ");
                         builder.append(e.split("_")[1].replace("E", ""));
                         builder.append("\n");

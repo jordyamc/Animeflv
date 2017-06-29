@@ -53,6 +53,8 @@ import knf.animeflv.AutoEmision.AutoEmisionHelper;
 import knf.animeflv.AutoEmision.EmObj;
 import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.ColorsRes;
+import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.DownloadService.DownloaderService;
 import knf.animeflv.FavSyncro;
@@ -140,10 +142,10 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 String url = u.replace("http://animeflv.net/", "");
                 String[] data = url.split("/");
                 Log.e("Debug", data[2]);
-                aid = parser.getAidCached(data[2]);
+                aid = DirectoryHelper.get(this).getAid(data[2]);
                 Log.e("Debug", aid);
                 if (aid != null) {
-                    setCollapsingToolbarLayoutTitle(parser.getTitCached(aid));
+                    setCollapsingToolbarLayoutTitle(DirectoryHelper.get(this).getTitle(aid));
                 } else {
                     Toaster.toast("Error al abrir informacion desde link!!!");
                     finish();
@@ -151,7 +153,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             } else {
                 position = Integer.parseInt(getIntent().getExtras().getString("position", "-1"));
                 setCollapsingToolbarLayoutTitle(getIntent().getExtras().getString("title"));
-                u = Parser.getUrlAnimeCached(aid);
+                u = DirectoryHelper.get(context).getAnimeUrl(aid);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -299,11 +301,11 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
 
     private void getJsonfromApi() {
         SuggestionHelper.register(InfoFragments.this, aid, SuggestionAction.EXPLORE);
-        if (new Parser().getTitCached(aid).equals("null")) {
-            BaseGetter.getJson(this, new DIRECTORIO(), new BaseGetter.AsyncProgressInterface() {
+        if (DirectoryHelper.get(this).getTitle(aid).equals("null")) {
+            BaseGetter.getJson(this, new DIRECTORIO(), new BaseGetter.AsyncProgressDBInterface() {
                 @Override
-                public void onFinish(String json) {
-                    if (new Parser().getTitCached(aid).equals("null")) {
+                public void onFinish(List<AnimeClass> list) {
+                    if (DirectoryHelper.get(InfoFragments.this).getTitle(aid).equals("null")) {
                         Toaster.toast("Error al actualizar directorio");
                         finish();
                     } else {
@@ -502,7 +504,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             String url = "";
             try {
                 String num = caps.get(0).substring(caps.get(0).lastIndexOf(" ") + 1);
-                url = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, num, eps.getJSONObject(0).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
+                url = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(DirectoryHelper.get(this).getEpUrl(aid, num, eps.getJSONObject(0).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -513,7 +515,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     String urlch = "";
                     try {
-                        urlch = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(new Parser().getUrlCached(aid, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1), eps.getJSONObject(position).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
+                        urlch = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(DirectoryHelper.get(InfoFragments.this).getEpUrl(aid, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1), eps.getJSONObject(position).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import java.io.File;
 
 import cz.msebera.android.httpclient.Header;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
@@ -35,7 +36,7 @@ public class ServerGetter {
     }
 
     private static String getAnime(Context context, ANIME anime) {
-        return new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + new Parser().getUrlAnimeCached(anime.getAidString()) + "&certificate=" + Parser.getCertificateSHA1Fingerprint(context);
+        return new Parser().getInicioUrl(TaskType.NORMAL, context) + "?url=" + DirectoryHelper.get(context).getAnimeUrl(anime.getAidString()) + "&certificate=" + Parser.getCertificateSHA1Fingerprint(context);
     }
 
     public static AsyncHttpClient getClient() {

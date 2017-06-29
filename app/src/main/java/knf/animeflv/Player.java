@@ -23,6 +23,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.HashMap;
 
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.playerSources.ResizeSurfaceView;
 import knf.animeflv.playerSources.VideoControllerView;
@@ -331,7 +332,7 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
                 if (nextCap.exists()) {
                     Intent i = new Intent(this, Player.class);
                     i.putExtra("file", nextCap.getAbsolutePath());
-                    i.putExtra("title", new Parser().getTitCached(aid) + " - " + (num + 1));
+                    i.putExtra("title", DirectoryHelper.get(this).getTitle(aid) + " - " + (num + 1));
                     i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     FileUtil.init(this).setSeenState(aid + "_" + (num + 1) + "E", true);
                     finish();

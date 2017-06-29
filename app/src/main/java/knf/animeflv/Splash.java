@@ -370,25 +370,29 @@ public class Splash extends AwesomeSplash {
                 public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
                     String titulo = "Leer/Escribir archivos";
                     String desc = "Este permiso es necesario para descargar los animes, asi como para funcionar sin conexion";
-                    new MaterialDialog.Builder(context)
-                            .title(titulo)
-                            .content(desc)
-                            .positiveText("ACTIVAR")
-                            .cancelable(false)
-                            .autoDismiss(true)
-                            .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    finish();
-                                    Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                    i.addCategory(Intent.CATEGORY_DEFAULT);
-                                    i.setData(Uri.parse("package:" + getPackageName()));
-                                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivityForResult(i, 5548);
-                                }
-                            })
-                            .build().show();
+                    try {
+                        new MaterialDialog.Builder(context)
+                                .title(titulo)
+                                .content(desc)
+                                .positiveText("ACTIVAR")
+                                .cancelable(false)
+                                .autoDismiss(true)
+                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                        finish();
+                                        Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                        i.addCategory(Intent.CATEGORY_DEFAULT);
+                                        i.setData(Uri.parse("package:" + getPackageName()));
+                                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivityForResult(i, 5548);
+                                    }
+                                })
+                                .build().show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }).check();
         } else {

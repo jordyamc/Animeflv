@@ -75,6 +75,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
@@ -83,6 +84,8 @@ import knf.animeflv.AdminControl.PushManager;
 import knf.animeflv.AutoEmision.AutoEmisionActivity;
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.Cloudflare.Bypass;
+import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.DownloadService.DownloaderService;
 import knf.animeflv.Explorer.ExplorerRoot;
@@ -246,11 +249,8 @@ public class newMain extends AppCompatActivity implements
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(listener);
-        if (!DirFile.exists()) {
-            blockToUpdateDir();
-        } else if (!FileUtil.isJSONValid(FileUtil.getStringFromFile(DirFile))) {
-            DirFile.delete();
-            blockToUpdateDir();
+        if (!DirectoryHelper.get(this).isDirectoryValid()) {
+            blockToUpdateDB();
         }
         IntentFilter filter = new IntentFilter();
         filter.addAction(DownloaderService.RECEIVER_ACTION_ERROR);
@@ -258,20 +258,24 @@ public class newMain extends AppCompatActivity implements
         registerReceiver(getReceiver(), filter);
     }
 
-    private void blockToUpdateDir() {
+    private void blockToUpdateDB() {
         final MaterialDialog dialog = new MaterialDialog.Builder(this)
                 .progress(true, 0)
                 .content("Creando directorio...\n\nAgregados: 0")
                 .cancelable(false)
                 .build();
         dialog.show();
-        SelfGetter.getDir(this, new BaseGetter.AsyncProgressInterface() {
+        SelfGetter.getDirDB(this, new BaseGetter.AsyncProgressDBInterface() {
             @Override
-            public void onFinish(String json) {
+            public void onFinish(List<AnimeClass> list) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        dialog.dismiss();
+                        try {
+                            dialog.dismiss();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             }
@@ -281,7 +285,11 @@ public class newMain extends AppCompatActivity implements
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        dialog.setContent("Creando directorio...\n\nAgregados: " + progress);
+                        try {
+                            dialog.setContent("Creando directorio...\n\nAgregados: " + progress);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             }
@@ -291,8 +299,12 @@ public class newMain extends AppCompatActivity implements
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        dialog.dismiss();
-                        Toaster.toast("Error al crear directorio!!!");
+                        try {
+                            dialog.dismiss();
+                            Toaster.toast("Error al crear directorio!!!");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             }
@@ -625,7 +637,6 @@ public class newMain extends AppCompatActivity implements
                     }
                 })
                 .build();
-
         setUpAdmin(NetworkUtils.isNetworkAvailable());
     }
 

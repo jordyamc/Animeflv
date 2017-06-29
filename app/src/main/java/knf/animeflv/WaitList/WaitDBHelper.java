@@ -9,7 +9,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import knf.animeflv.Parser;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 
 /**
  * Created by Jordy on 02/01/2017.
@@ -96,7 +96,7 @@ public class WaitDBHelper {
         }, null, null, null, null, null);
         if (c.getCount() > 0) {
             while (c.moveToNext()) {
-                list.add(new WaitObject(c.getString(0).trim()));
+                list.add(new WaitObject(context, c.getString(0).trim()));
             }
         }
         c.close();
@@ -139,9 +139,9 @@ public class WaitDBHelper {
         public String aid;
         public String type;
 
-        public WaitObject(String aid) {
+        public WaitObject(Context context, String aid) {
             this.aid = aid;
-            this.type = Parser.getTypeCached(aid);
+            this.type = DirectoryHelper.get(context).getType(aid);
         }
     }
 }

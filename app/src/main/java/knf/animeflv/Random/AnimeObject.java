@@ -1,16 +1,12 @@
 package knf.animeflv.Random;
 
-import android.os.Environment;
+import android.content.Context;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.File;
 import java.util.List;
 
-import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 
 public class AnimeObject {
     public String title = "null";
@@ -19,20 +15,16 @@ public class AnimeObject {
     public boolean isAnime = false;
     public List<AnimeObject> objects;
 
-    public AnimeObject(String aid) {
+    public AnimeObject(Context context, String aid) {
         isAnime = true;
-        String file_loc = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-        File file = new File(file_loc);
-        if (file.exists()) {
+        if (DirectoryHelper.get(context).isDirectoryValid()) {
             try {
-                Log.d("Random", aid);
-                JSONObject jsonObj = new JSONObject(FileUtil.getStringFromFile(file_loc));
-                JSONArray jsonArray = jsonObj.getJSONArray("lista");
+                List<AnimeClass> list = DirectoryHelper.get(context).getAll();
                 int position = Integer.parseInt(aid);
-                JSONObject nombreJ = jsonArray.getJSONObject(position <= jsonArray.length() ? position : RandomHelper.getRandomNumber());
-                this.aid = nombreJ.getString("a");
-                title = FileUtil.corregirTit(nombreJ.getString("b"));
-                tid = nombreJ.getString("c");
+                AnimeClass animeClass = list.get(position <= list.size() ? position : RandomHelper.getRandomNumber(context));
+                this.aid = animeClass.getAid();
+                title = animeClass.getNombre();
+                tid = animeClass.getTipo();
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -24,6 +24,7 @@ import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractExpandableItemAda
 import java.util.List;
 
 import knf.animeflv.ColorsRes;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Interfaces.WaitDownloadCallback;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
@@ -104,7 +105,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
         holder.delete.setColorFilter(theme.iconFilter);
         holder.start.setColorFilter(theme.iconFilter);
         new CacheManager().mini(context, animes.get(groupPosition).aid, holder.image);
-        holder.titulo.setText(parser.getTitCached(animes.get(groupPosition).aid));
+        holder.titulo.setText(DirectoryHelper.get(context).getTitle(animes.get(groupPosition).aid));
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,7 +114,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
                         new InfoHelper.SharedItem(holder.image, "img"),
                         Intent.FLAG_ACTIVITY_NEW_TASK,
                         new InfoHelper.BundleItem("aid", animes.get(groupPosition).aid),
-                        new InfoHelper.BundleItem("title", parser.getTitCached(animes.get(groupPosition).aid))
+                        new InfoHelper.BundleItem("title", DirectoryHelper.get(context).getTitle(animes.get(groupPosition).aid))
                 );
             }
         });

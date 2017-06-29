@@ -20,6 +20,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ import java.util.List;
 import java.util.Locale;
 
 import knf.animeflv.Cloudflare.BypassHolder;
+import knf.animeflv.Directorio.DB.DirectoryDB;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
@@ -122,12 +125,14 @@ public class SelfGetter {
                             for (int i = 0; i < array.length(); i++) {
                                 JSONObject object = array.getJSONObject(i);
                                 if (object.getString("eid").equals(download.eid)) {
-                                    asyncInterface.onFinish(getDownloadInfo(context, Parser.getUrlCached(download.eid, object.getString("sid"))));
+                                    asyncInterface.onFinish(getDownloadInfo(context, DirectoryHelper.get(context).getEpUrl(download.eid, object.getString("sid"))));
                                     return;
                                 }
                             }
                             asyncInterface.onFinish("null1");
+                            Crashlytics.logException(new FileNotFoundException("Not found: " + download.eid + " in:\n\n" + array.toString()));
                         } catch (Exception e) {
+                            Crashlytics.logException(e);
                             if (json.startsWith("error") && json.contains("503")) {
                                 asyncInterface.onFinish(json);
                             } else {
@@ -154,7 +159,7 @@ public class SelfGetter {
                             for (int i = 0; i < array.length(); i++) {
                                 JSONObject object = array.getJSONObject(i);
                                 if (eids.contains(object.getString("eid"))) {
-                                    String url = Parser.getUrlCached(object.getString("eid"), object.getString("sid"));
+                                    String url = DirectoryHelper.get(context).getEpUrl(object.getString("eid"), object.getString("sid"));
                                     JSONObject obj = new JSONObject(getDownloadInfo(context, url));
                                     JSONArray links = obj.getJSONArray("downloads");
                                     int pref = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("def_download", "0"));
@@ -230,7 +235,6 @@ public class SelfGetter {
         String okruhd = "null";
         String[] names = getDownloadServers();
         try {
-            JSONArray links = new JSONArray();
             Log.e("Url", url);
             Document main = Jsoup.connect(url).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(TIMEOUT).get();
             String titinfo = main.select("h1").first().text();
@@ -480,8 +484,8 @@ public class SelfGetter {
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
-                    Log.e("Get Anime Info", Parser.getUrlAnimeCached(anime.getAidString()));
-                    Document document = Jsoup.connect(Parser.getUrlAnimeCached(anime.getAidString())).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(TIMEOUT).get();
+                    Log.e("Get Anime Info", DirectoryHelper.get(context).getAnimeUrl(anime.getAidString()));
+                    Document document = Jsoup.connect(DirectoryHelper.get(context).getAnimeUrl(anime.getAidString())).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(TIMEOUT).get();
                     String imgUrl = document.select("div.Image").first().select("img[src]").first().attr("src");
                     String aid = imgUrl.substring(imgUrl.lastIndexOf("/") + 1, imgUrl.lastIndexOf("."));
                     String tid = document.select("div.Ficha").first().select("div.Container").first().select("span").first().attr("class");
@@ -603,6 +607,106 @@ public class SelfGetter {
         }
     }
 
+    public static void getDirDB(final Context context, @Nullable final BaseGetter.AsyncProgressDBInterface asyncInterface) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                DirectoryDB db = new DirectoryDB(context);
+                int last_page_num = 0;
+                try {
+                    if (!db.isDBEmpty(false)) {
+                        try {
+                            Document init = Jsoup.connect("http://animeflv.net/browse?order=added").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
+                            Element last = init.select("article").first();
+                            String last_url = last.select("img[src]").first().attr("src");
+                            String last_aid = last_url.substring(last_url.lastIndexOf("/") + 1, last_url.lastIndexOf("."));
+                            if (db.animedExist(last_aid, false)) {
+                                Log.e("Dir DEBUG", "Dir up to date | Animes: " + db.getCount(false));
+                                if (asyncInterface != null)
+                                    asyncInterface.onFinish(db.getAll(false));
+                                db.close();
+                                return null;
+                            }
+                        } catch (Exception e) {
+                            Log.e("Dir DEBUG", "Dir Error Cancel", e);
+                            if (asyncInterface != null)
+                                asyncInterface.onFinish(db.getAll(false));
+                            db.close();
+                            return null;
+                        }
+                    }
+                    Document init = Jsoup.connect("http://animeflv.net/browse?order=added&page=1").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
+                    Elements pages = init.select("ul.pagination").first().select("a");
+                    Element last_page = pages.get(pages.size() - 2);
+                    last_page_num = Integer.parseInt(last_page.ownText().trim());
+                    int progress = 0;
+                    if (asyncInterface != null)
+                        asyncInterface.onProgress(0);
+                    for (int index = 1; index <= last_page_num; index++) {
+                        Document page = Jsoup.connect("http://animeflv.net/browse?order=added&page=" + index).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
+                        Elements animes = page.select("article");
+                        for (Element element : animes) {
+                            String img = element.select("img[src]").first().attr("src");
+                            String a = img.substring(img.lastIndexOf("/") + 1, img.lastIndexOf("."));
+                            if (db.animedExist(a, false)) {
+                                if (asyncInterface != null)
+                                    asyncInterface.onFinish(db.getAll(false));
+                                db.close();
+                                return null;
+                            }
+                            Element info = element.select("h3.Title").first();
+                            String b = info.ownText();
+                            String c = getType(element.select("span").first().attr("class"));
+                            String link = element.select("a").first().attr("href");
+                            String[] semi = link.split("/");
+                            String d = semi[3];
+                            String e = semi[2];
+                            String f = "";
+                            String gens = "";
+                            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_tags", false))
+                                try {
+                                    Document tags = Jsoup.connect("http://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
+                                    for (Element g : tags.select("nav.Nvgnrs").first().select("a")) {
+                                        gens += g.ownText().trim();
+                                        gens += ", ";
+                                    }
+                                    if (!gens.equals(""))
+                                        f = gens.substring(0, gens.lastIndexOf(","));
+                                    Log.e("Dir DEBUG", "Tags: " + f);
+                                } catch (NullPointerException nog) {
+                                    Log.e("Dir DEBUG", "No Tags");
+                                }
+                            if (b.trim().equals(""))
+                                b = Jsoup.connect("http://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get().select("meta[property='og:title']").first().attr("content").replace(" Capítulos Online", "").replace(" Ver ", "").trim();
+                            db.addAnime(new DirectoryDB.DirectoryItem(a, b, c, d, e, f));
+                            progress++;
+                            if (asyncInterface != null)
+                                asyncInterface.onProgress(progress);
+                        }
+                    }
+                    if (asyncInterface != null)
+                        asyncInterface.onFinish(db.getAll(false));
+                    db.close();
+                    return null;
+                } catch (Exception e) {
+                    Log.e("Dir DEBUG", "Error loading dir", e);
+                    Crashlytics.logException(e);
+                    if (asyncInterface != null)
+                        if (db.isDBEmpty(false)) {
+                            asyncInterface.onError(e);
+                        } else if (db.getAll(false).size() <= ((last_page_num - 1) * 24)) {
+                            db.reset();
+                            asyncInterface.onError(e);
+                        } else {
+                            asyncInterface.onFinish(db.getAll(false));
+                        }
+                    db.close();
+                }
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
     public static void getDir(final Context context, @Nullable final BaseGetter.AsyncProgressInterface asyncInterface) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -711,19 +815,6 @@ public class SelfGetter {
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
-    }
-
-    private static void mergeLists(JSONObject object, JSONArray old_list, JSONArray new_list) throws JSONException {
-        Log.e("Dir DEBUG", "In Dir: " + old_list.length() + " Added: " + new_list.length());
-        if (new_list.length() > 0) {
-            for (int i = 0; i < old_list.length(); i++) {
-                new_list.put(old_list.getJSONObject(i));
-            }
-            object.put("lista", new_list);
-        } else {
-            object.put("lista", old_list);
-        }
-        OfflineGetter.backupJsonSync(object, OfflineGetter.directorio);
     }
 
     private static void mergeLists(JSONObject object, JSONArray old_list, JSONArray new_list, @Nullable BaseGetter.AsyncProgressInterface asyncInterface) throws JSONException {

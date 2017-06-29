@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.FavSyncro;
 import knf.animeflv.Favorites.comparators.favComparator;
 import knf.animeflv.Favorites.comparators.favNoSectionAidComparator;
 import knf.animeflv.Favorites.comparators.favNoSectionNameComparator;
 import knf.animeflv.Favorites.comparators.sectionComparator;
-import knf.animeflv.Parser;
 import knf.animeflv.Utils.ExecutorManager;
 import xdroid.toaster.Toaster;
 
@@ -659,7 +659,7 @@ public class FavotiteDB {
                         aids.toArray(favoritos);
                         int count = 0;
                         for (String aid : aids) {
-                            addFav(new FavObject(Parser.getTitleCached(aid), aid, NO_SECTION, count));
+                            addFav(new FavObject(DirectoryHelper.get(context).getTitle(aid), aid, NO_SECTION, count));
                             count++;
                         }
                         sharedPreferences.edit().putString("favoritos", "").apply();

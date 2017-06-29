@@ -15,6 +15,7 @@ import com.thin.downloadmanager.ThinDownloadManager;
 import java.io.File;
 
 import knf.animeflv.DManager;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Parser;
 import xdroid.toaster.Toaster;
 
@@ -65,7 +66,7 @@ public class InternalManager {
             if (URLUtil.isValidUrl(downUrl)) {
                 String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
                 String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
-                String titulo = parser.getTitCached(aid);
+                String titulo = DirectoryHelper.get(context).getTitle(aid);
                 File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid);
                 if (Environment.getExternalStorageState().equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                     if (!Dstorage.exists()) {
@@ -107,7 +108,7 @@ public class InternalManager {
         if (URLUtil.isValidUrl(downUrl)) {
             String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
             String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
-            String titulo = parser.getTitCached(aid);
+            String titulo = DirectoryHelper.get(context).getTitle(aid);
             File Dstorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + aid);
             if (Environment.getExternalStorageState().equalsIgnoreCase(Environment.MEDIA_MOUNTED)) {
                 if (!Dstorage.exists()) {
@@ -153,7 +154,7 @@ public class InternalManager {
     public void cancelDownload(String eid) {
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
-        String titulo = parser.getTitCached(aid);
+        String titulo = DirectoryHelper.get(context).getTitle(aid);
         sharedPreferences.edit().putString(eid + "dtype", "2").apply();
         long l = Long.parseLong(sharedPreferences.getString(eid, "0"));
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
@@ -244,6 +245,6 @@ public class InternalManager {
     }
 
     public String getDownloadTitle(String eid) {
-        return parser.getTitCached(eid.substring(0, eid.lastIndexOf("_")));
+        return DirectoryHelper.get(context).getTitle(eid.substring(0, eid.lastIndexOf("_")));
     }
 }

@@ -9,6 +9,7 @@ import es.munix.multidisplaycast.CastControlsActivity;
 import es.munix.multidisplaycast.CastManager;
 import es.munix.multidisplaycast.interfaces.CastListener;
 import es.munix.multidisplaycast.interfaces.PlayStatusListener;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Parser;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.TaskType;
@@ -72,8 +73,8 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
             String[] semi = eid.replace("E", "").split("_");
             String aid = semi[0];
             String num = semi[1];
-            HistoryHelper.addToList(activity, aid, new Parser().getTitCached(aid), num);
-            CastManager.getInstance().playMedia(url, "video/mp4", new Parser().getTitCached(aid), "Capítulo " + num, getPreviewUrl());
+            HistoryHelper.addToList(activity, aid, DirectoryHelper.get(activity).getTitle(aid), num);
+            CastManager.getInstance().playMedia(url, "video/mp4", DirectoryHelper.get(activity).getTitle(aid), "Capítulo " + num, getPreviewUrl());
         } else {
             isConnected = false;
             Toaster.toast("No hay dispositivos conectados");

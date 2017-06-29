@@ -3,7 +3,7 @@ package knf.animeflv.Favorites;
 import android.content.Context;
 import android.preference.PreferenceManager;
 
-import knf.animeflv.Parser;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 
 /**
  * Created by Jordy on 19/03/2017.
@@ -19,7 +19,7 @@ public class FavoriteHelper {
 
     public static void setFav(Context context, String aid, boolean add, FavotiteDB.updateDataInterface dataInterface) {
         if (add) {
-            new FavotiteDB(context).addFav(new FavObject(Parser.getTitleCached(aid), aid, getDefaultSectionName(context)), dataInterface);
+            new FavotiteDB(context).addFav(new FavObject(DirectoryHelper.get(context).getTitle(aid), aid, getDefaultSectionName(context)), dataInterface);
         } else {
             new FavotiteDB(context).deleteFav(aid, dataInterface);
         }

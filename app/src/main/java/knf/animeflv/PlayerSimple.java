@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Utils.FileUtil;
 import xdroid.toaster.Toaster;
 
@@ -106,7 +107,7 @@ public class PlayerSimple extends AppCompatActivity {
                         if (nextCap.exists()) {
                             Intent i = new Intent(PlayerSimple.this, PlayerSimple.class);
                             i.putExtra("file", nextCap.getAbsolutePath());
-                            i.putExtra("title", new Parser().getTitCached(aid) + " - " + (num + 1));
+                            i.putExtra("title", DirectoryHelper.get(PlayerSimple.this).getTitle(aid) + " - " + (num + 1));
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             FileUtil.init(PlayerSimple.this).setSeenState(aid + "_" + (num + 1) + "E", true);
                             finish();

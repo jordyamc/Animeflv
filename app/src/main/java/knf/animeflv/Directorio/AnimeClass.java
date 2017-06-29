@@ -2,7 +2,7 @@ package knf.animeflv.Directorio;
 
 import org.json.JSONObject;
 
-import knf.animeflv.Parser;
+import knf.animeflv.Utils.FileUtil;
 
 /**
  * Created by Jordy on 15/02/2016.
@@ -11,21 +11,17 @@ public class AnimeClass {
     private String nombre;
     private String aid;
     private String tipo;
-    private String imagen;
-    private int index;
 
-    public AnimeClass(String nombre, String aid, String tipo, String imagen, int index) {
-        this.nombre = nombre;
+    public AnimeClass(String nombre, String aid, String tipo) {
+        this.nombre = FileUtil.corregirTit(nombre);
         this.aid = aid;
         this.tipo = tipo;
-        this.imagen = imagen;
-        this.index = index;
     }
 
     public AnimeClass(String json) {
         try {
             JSONObject jsonObj = new JSONObject(json);
-            this.nombre = new Parser().corregirTit(jsonObj.getString("titulo"));
+            this.nombre = FileUtil.corregirTit(jsonObj.getString("titulo"));
             this.aid = jsonObj.getString("aid");
         } catch (Exception e) {
             e.printStackTrace();
@@ -42,10 +38,6 @@ public class AnimeClass {
         return tipo;
     }
 
-    public String getImagen() {
-        return imagen;
-    }
-
     public String getAid() {
         return aid;
     }
@@ -56,9 +48,5 @@ public class AnimeClass {
         } catch (Exception e) {
             return 0;
         }
-    }
-
-    public int getIndex() {
-        return index;
     }
 }

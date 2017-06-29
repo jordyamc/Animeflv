@@ -18,8 +18,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Directorio.Directorio;
-import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.DesignUtils;
@@ -75,7 +75,7 @@ public class AdapterDirovaNew extends RecyclerView.Adapter<AdapterDirovaNew.View
                         new InfoHelper.SharedItem(holder.iv_rel, "img"),
                         Intent.FLAG_ACTIVITY_NEW_TASK,
                         new InfoHelper.BundleItem("aid", Animes.get(holder.getAdapterPosition()).getAid()),
-                        new InfoHelper.BundleItem("link", Parser.getUrlAnimeCached(Animes.get(holder.getAdapterPosition()).getAid())),
+                        new InfoHelper.BundleItem("link", DirectoryHelper.get(context).getAnimeUrl(Animes.get(holder.getAdapterPosition()).getAid())),
                         new InfoHelper.BundleItem("title", Animes.get(holder.getAdapterPosition()).getNombre())
                 );
             }

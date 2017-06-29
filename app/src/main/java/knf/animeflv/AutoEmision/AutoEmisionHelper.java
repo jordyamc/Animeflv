@@ -244,7 +244,7 @@ public class AutoEmisionHelper {
                 JSONArray sub = object.getJSONArray(KEY_JSON_AIDS);
                 for (int i = 0; i < sub.length(); i++) {
                     if (sub.getString(i).equals(aid)) {
-                        listener.OnResponse(new EmObj(aid, object.getInt(KEY_JSON_DAYCODE)));
+                        listener.OnResponse(new EmObj(context, aid, object.getInt(KEY_JSON_DAYCODE)));
                         return;
                     }
                 }
@@ -276,27 +276,12 @@ public class AutoEmisionHelper {
         }
     }
 
-    public static List<EmObj> getDayList(Context context, int daycode) {
-        try {
-            JSONObject object = getJson(context);
-            JSONArray array = object.getJSONArray(KEY_JSON_LIST);
-            List<EmObj> objs = new ArrayList<>();
-            for (int a = 0; a < array.length(); a++) {
-                objs.add(new EmObj(array.getString(a), daycode));
-            }
-            return objs;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
-    }
-
-    public static List<EmObj> getDayList(String arrayString, int daycode) {
+    public static List<EmObj> getDayList(Context context, String arrayString, int daycode) {
         try {
             JSONArray array = new JSONArray(arrayString);
             List<EmObj> objs = new ArrayList<>();
             for (int a = 0; a < array.length(); a++) {
-                objs.add(new EmObj(array.getString(a), daycode));
+                objs.add(new EmObj(context, array.getString(a), daycode));
             }
             return objs;
         } catch (Exception e) {

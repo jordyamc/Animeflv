@@ -17,6 +17,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.Crashlytics;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -25,10 +26,10 @@ import java.util.List;
 import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.ColorsRes;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
-import knf.animeflv.Parser;
 import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Suggestions.Algoritm.SuggestionAction;
@@ -218,15 +219,21 @@ public class DownloadGetter {
                         actionsInterface.onCancelDownload();
                         actionsInterface.onLogError(e);
                         if (NetworkUtils.isNetworkAvailable()) {
-                            if (Parser.getUrlCached(eid, "000").equals("null")) {
+                            if (DirectoryHelper.get(context).getEpUrl(eid, "000").equals("null")) {
                                 Toaster.toast("Anime no encontrado en directorio!");
                             } else if (json.startsWith("error") && json.contains("503")) {
                                 Toaster.toast("No se pudo acceder a la pagina de Animeflv");
                                 Bypass.check(context, null);
                             } else if (json.startsWith("error") && json.contains("521")) {
                                 Toaster.toast("Pagina de Animeflv caida");
+                            } else if (json.startsWith("error")) {
+                                Toaster.toast("Error en conexion: " + json);
+                            } else if (e instanceof JSONException) {
+                                Toaster.toast("Error en json: " + e.getMessage());
+                                Crashlytics.logException(e);
                             } else {
-                                Toaster.toast("Error en json");
+                                Toaster.toast("Error desconocido: " + e.getMessage());
+                                Crashlytics.logException(e);
                             }
                         } else {
                             Toaster.toast("No hay internet!!!");

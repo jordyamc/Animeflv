@@ -12,6 +12,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.List;
 
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.Parser;
 import knf.animeflv.Seen.SeenManager;
@@ -52,7 +53,7 @@ public class MXStream {
                 Uri videoUri = Uri.parse(url);
                 intent.setDataAndType(videoUri, "video/mp4");
                 intent.setPackage("com.mxtech.videoplayer.pro");
-                intent.putExtra("title", parser.getTitCached(aid) + " " + numero);
+                intent.putExtra("title", DirectoryHelper.get(context).getTitle(aid) + " " + numero);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
                 SeenManager.get(context).setSeenState(eid, true);
@@ -62,7 +63,7 @@ public class MXStream {
                 Uri videoUriad = Uri.parse(url);
                 intentad.setDataAndType(videoUriad, "video/mp4");
                 intentad.setPackage("com.mxtech.videoplayer.ad");
-                intentad.putExtra("title", parser.getTitCached(aid) + " " + numero);
+                intentad.putExtra("title", DirectoryHelper.get(context).getTitle(aid) + " " + numero);
                 intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intentad);
                 SeenManager.get(context).setSeenState(eid, true);
@@ -76,7 +77,7 @@ public class MXStream {
     public void Stream(String eid, String url, CookieConstructor constructor) {
         String aid = eid.replace("E", "").substring(0, eid.lastIndexOf("_"));
         String numero = eid.replace("E", "").substring(eid.lastIndexOf("_") + 1);
-        HistoryHelper.addToList(context, aid, new Parser().getTitCached(aid), numero);
+        HistoryHelper.addToList(context, aid, DirectoryHelper.get(context).getTitle(aid), numero);
         List<ApplicationInfo> packages;
         PackageManager pm;
         pm = context.getPackageManager();
@@ -98,7 +99,7 @@ public class MXStream {
                 Uri videoUri = Uri.parse(url);
                 intent.setDataAndType(videoUri, "application/mp4");
                 intent.setPackage("com.mxtech.videoplayer.pro");
-                intent.putExtra("title", parser.getTitCached(aid) + " " + numero);
+                intent.putExtra("title", DirectoryHelper.get(context).getTitle(aid) + " " + numero);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 String[] headers = {"cookie", constructor.getCookie(), "User-Agent", constructor.getUseAgent(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", constructor.getReferer()};
                 intent.putExtra("headers", headers);
@@ -110,7 +111,7 @@ public class MXStream {
                 Uri videoUriad = Uri.parse(url);
                 intentad.setDataAndType(videoUriad, "application/mp4");
                 intentad.setPackage("com.mxtech.videoplayer.ad");
-                intentad.putExtra("title", parser.getTitCached(aid) + " " + numero);
+                intentad.putExtra("title", DirectoryHelper.get(context).getTitle(aid) + " " + numero);
                 intentad.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 String[] headers1 = {"cookie", constructor.getCookie(), "User-Agent", constructor.getUseAgent(), "Accept", "text/html, application/xhtml+xml, *" + "/" + "*", "Accept-Language", "en-US,en;q=0.7,he;q=0.3", "Referer", constructor.getReferer()};
                 intentad.putExtra("headers", headers1);
@@ -146,7 +147,7 @@ public class MXStream {
             Uri videoUri = getUrifromFile(file);
             intent.setDataAndType(videoUri, "video/mp4");
             intent.setPackage(pack);
-            intent.putExtra("title", parser.getTitCached(aid) + " " + numero);
+            intent.putExtra("title", DirectoryHelper.get(context).getTitle(aid) + " " + numero);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);

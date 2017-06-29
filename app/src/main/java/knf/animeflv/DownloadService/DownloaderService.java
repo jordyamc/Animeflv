@@ -29,6 +29,7 @@ import java.util.Random;
 
 import javax.net.ssl.SSLException;
 
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Errors.NoInternetException;
 import knf.animeflv.Errors.NoInternetFoundException;
 import knf.animeflv.Errors.NoSDAccessDetectedException;
@@ -36,7 +37,6 @@ import knf.animeflv.Errors.NoSpaceException;
 import knf.animeflv.Errors.WrongAccessPermissionException;
 import knf.animeflv.Explorer.ExplorerRoot;
 import knf.animeflv.Explorer.Models.ModelFactory;
-import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.NetworkUtils;
@@ -192,7 +192,7 @@ public class DownloaderService extends IntentService {
 
     private void onStartDownload(String eid) {
         getManager().cancel(getDownloadID(eid));
-        String title = new Parser().getTitCached(eid.replace("E", "").split("_")[0]);
+        String title = DirectoryHelper.get(this).getTitle(eid.replace("E", "").split("_")[0]);
         NotificationCompat.Builder mBuilder = getDownloadingBuilder()
                 .setContentTitle(title)
                 .setContentText("Capítulo " + eid.replace("E", "").split("_")[1])
@@ -240,7 +240,7 @@ public class DownloaderService extends IntentService {
     private void updateCurrentProgressMB(String eid, long downloaded) {
         updateSavedProgress(eid, 0);
         int pending = new SQLiteHelperDownloads(this).getTotalDownloads();
-        String title = new Parser().getTitCached(eid.replace("E", "").split("_")[0]);
+        String title = DirectoryHelper.get(this).getTitle(eid.replace("E", "").split("_")[0]);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_CURR_DOWNLOAD)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(title)
@@ -291,7 +291,7 @@ public class DownloaderService extends IntentService {
         bigTextStyle.bigText(cause);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_COM_DOWNLOAD)
                 .setSmallIcon(android.R.drawable.stat_notify_error)
-                .setContentTitle(new Parser().getTitCached(semi[0]) + " - " + semi[1])
+                .setContentTitle(DirectoryHelper.get(this).getTitle(semi[0]) + " - " + semi[1])
                 .setColor(Color.parseColor("#F44336"))
                 .setContentText("ERROR AL DESCARGAR")
                 .setStyle(bigTextStyle)
@@ -332,7 +332,7 @@ public class DownloaderService extends IntentService {
 
     private void onSuccess(String eid) {
         DownloadListManager.delete(this, eid + "_" + getSharedPreferences("data", MODE_PRIVATE).getLong(eid + "_downloadID", -1));
-        String title = new Parser().getTitCached(eid.replace("E", "").split("_")[0]);
+        String title = DirectoryHelper.get(this).getTitle(eid.replace("E", "").split("_")[0]);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_COM_DOWNLOAD)
                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
                 .setColor(Color.parseColor("#8BC34A"))

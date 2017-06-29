@@ -40,6 +40,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Random.RandomHelper;
@@ -205,11 +206,11 @@ public class TutorialActivity extends AppCompatActivity implements SwipeRefreshL
                     Log.d("Aid", "-" + aid + "-");
                     final int position = random.indexOf(aid);
                     final String id = String.valueOf(aid).trim();
-                    String type = Parser.getTypeCached(id);
+                    String type = DirectoryHelper.get(TutorialActivity.this).getType(id);
                     if (type.equals("Anime")) type = "Capítulo";
                     final String number = !type.equals("Pelicula") ? " 1" : "";
                     final String result = type + number;
-                    final String title = parser.getTitCached(id);
+                    final String title = DirectoryHelper.get(TutorialActivity.this).getTitle(id);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -431,9 +432,9 @@ public class TutorialActivity extends AppCompatActivity implements SwipeRefreshL
 
     private List<Integer> getRandomaids() {
         List<Integer> integers = new ArrayList<>();
-        integers.add(RandomHelper.getRandomNumber());
-        integers.add(RandomHelper.getRandomNumber());
-        integers.add(RandomHelper.getRandomNumber());
+        integers.add(RandomHelper.getRandomNumber(this));
+        integers.add(RandomHelper.getRandomNumber(this));
+        integers.add(RandomHelper.getRandomNumber(this));
         return integers;
     }
 

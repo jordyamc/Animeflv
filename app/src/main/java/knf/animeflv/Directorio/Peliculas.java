@@ -1,17 +1,19 @@
 package knf.animeflv.Directorio;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
 
-import knf.animeflv.AnimeSorter;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.JsonFactory.OfflineGetter;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
@@ -44,18 +46,19 @@ public class Peliculas extends Fragment {
             rvAnimes.setPadding(0, (int) Parser.toPx(getActivity(), 10), 0, Keys.getNavBarSize(getActivity()));
             rvAnimes.setClipToPadding(false);
         }
-        setDirectory();
+        setDirectory(getActivity());
+        Log.e(this.getClass().getName(), "Created!!!");
         return view;
     }
 
-    private void setDirectory() {
+    public void setDirectory(final Activity context) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
-                    List<AnimeClass> animes = AnimeSorter.sortByName(parser.DirPelis(getJson()));
-                    final AdapterDirPeliculaNew adapter = new AdapterDirPeliculaNew(getActivity(), animes);
-                    getActivity().runOnUiThread(new Runnable() {
+                    List<AnimeClass> animes = DirectoryHelper.get(context).getAllType("Pelicula");
+                    final AdapterDirPeliculaNew adapter = new AdapterDirPeliculaNew(context, animes);
+                    context.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             rvAnimes.setAdapter(adapter);

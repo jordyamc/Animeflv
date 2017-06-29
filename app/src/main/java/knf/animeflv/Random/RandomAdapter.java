@@ -40,7 +40,7 @@ public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.ViewHolder
     public RandomAdapter(Activity activity) {
         this.activity = activity;
         this.interfaces = (RandomInterfaces) activity;
-        this.list = RandomHelper.getList(MAX_ITEMS);
+        this.list = RandomHelper.getList(activity, MAX_ITEMS);
         this.theme = ThemeUtils.Theme.create(activity);
     }
 
@@ -204,7 +204,7 @@ public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.ViewHolder
         new AsyncTask<String, String, String>() {
             @Override
             protected String doInBackground(String... strings) {
-                list = RandomHelper.getList(MAX_ITEMS);
+                list = RandomHelper.getList(activity, MAX_ITEMS);
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

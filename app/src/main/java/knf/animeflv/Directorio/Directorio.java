@@ -40,11 +40,6 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -52,11 +47,11 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import knf.animeflv.AnimeSorter;
 import knf.animeflv.ColorsRes;
+import knf.animeflv.Directorio.DB.DirectoryDB;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.DIRECTORIO;
-import knf.animeflv.JsonFactory.OfflineGetter;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterBusquedaNew;
 import knf.animeflv.Utils.FileUtil;
@@ -102,29 +97,7 @@ public class Directorio extends AppCompatActivity {
     private boolean prestarted = false;
     private boolean menuOpen = false;
 
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-
-    public static String getStringFromFile(String filePath) {
-        String ret = "";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ret;
-    }
+    private int DELAY = 100;
 
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
@@ -136,7 +109,6 @@ public class Directorio extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
-        //setUpAnimations();
         setContentView(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("force_phone", false) ? R.layout.directorio_force : R.layout.directorio);
         context = this;
         ButterKnife.bind(this);
@@ -161,9 +133,9 @@ public class Directorio extends AppCompatActivity {
         toolbarS.setTitleTextColor(theme.textColorToolbar);
         ThemeUtils.setNavigationColor(toolbarS, theme.toolbarNavigation);
         editText.setTextColor(theme.textColor);
-        editText.setHintTextColor(theme.isDark ? ColorsRes.SecondaryTextDark(this) : ColorsRes.SecondaryTextLight(this));
+        editText.setHintTextColor(theme.secondaryTextColor);
         editText.setBackgroundColor(ColorsRes.Transparent(this));
-        load_prog.setTextColor(theme.isDark ? ColorsRes.SecondaryTextDark(this) : ColorsRes.SecondaryTextLight(this));
+        load_prog.setTextColor(theme.secondaryTextColor);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(theme.primaryDark);
             if (!isXLargeScreen(this)) {
@@ -188,24 +160,28 @@ public class Directorio extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        final String j = OfflineGetter.getDirectorio();
-        if (!j.equals("null")) {
+        final int size = DirectoryHelper.get(this).getAll().size();
+        final MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .progress(true, 0)
+                .content("Creando directorio...\n\nAgregados: 0")
+                .cancelable(false)
+                .build();
+        if (DirectoryHelper.get(this).isDirectoryValid()) {
             prestarted = true;
             toolbarS.setVisibility(View.VISIBLE);
             viewPagerTab.setVisibility(View.VISIBLE);
-            init(j);
+            init();
         } else {
             Toaster.toast("Creando directorio");
-            loading.setVisibility(View.VISIBLE);
-            load_prog.setVisibility(View.VISIBLE);
+            dialog.show();
         }
-        BaseGetter.getJson(this, new DIRECTORIO(), new BaseGetter.AsyncProgressInterface() {
+        BaseGetter.getJson(this, new DIRECTORIO(), new BaseGetter.AsyncProgressDBInterface() {
             @Override
-            public void onFinish(String json) {
-                if (!json.equals("null")) {
-                    if (!json.equals(j)) {
+            public void onFinish(List<AnimeClass> list) {
+                if (list.size() > 0) {
+                    if (list.size() != size) {
                         if (prestarted) {
-                            initAsync(json);
+                            initAsync();
                         } else {
                             prestarted = true;
                             runOnUiThread(new Runnable() {
@@ -215,10 +191,11 @@ public class Directorio extends AppCompatActivity {
                                     viewPagerTab.setVisibility(View.VISIBLE);
                                     loading.setVisibility(View.GONE);
                                     load_prog.setVisibility(View.GONE);
+                                    dialog.dismiss();
                                     Toaster.toast("Directorio creado!");
+                                    recreate();
                                 }
                             });
-                            init(json);
                         }
                     }
                     loaded = true;
@@ -240,12 +217,19 @@ public class Directorio extends AppCompatActivity {
                     public void run() {
                         String prog_text = progress >= 0 ? ("Animes agregados: " + progress) : "Creando lista...";
                         load_prog.setText(prog_text);
+                        dialog.setContent("Creando directorio...\n\nAgregados: " + progress);
                     }
                 });
             }
 
             @Override
             public void onError(Throwable throwable) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                    }
+                });
                 if (throwable instanceof SocketTimeoutException) {
                     Toaster.toastLong("Error de red: Internet muy lento");
                     finish();
@@ -260,7 +244,8 @@ public class Directorio extends AppCompatActivity {
             genero.hideButtonInMenu(true);
     }
 
-    private void initAsync(final String json) {
+    private void initAsync() {
+        Log.e("InitAsync", "Prestarted: " + prestarted + " Loaded: " + loaded);
         final Bundle bundle = getIntent().getExtras();
         genero.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -299,7 +284,7 @@ public class Directorio extends AppCompatActivity {
                                     SearchConstructor.SetSearch(SearchType.GENEROS, nArray);
                                     editText.setHint("Generos: " + which.length);
                                 }
-                                List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, editText.getEditableText().toString()));
+                                List<AnimeClass> animes = SearchUtils.Search(Directorio.this, editText.getEditableText().toString());
                                 AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                                 recyclerView.setAdapter(adapterBusqueda);
                                 return true;
@@ -331,7 +316,7 @@ public class Directorio extends AppCompatActivity {
                                 getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                             }
                             ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
-                            List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, null));
+                            List<AnimeClass> animes = SearchUtils.Search(Directorio.this, null);
                             AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                             recyclerView.setAdapter(adapterBusqueda);
                         }
@@ -399,7 +384,7 @@ public class Directorio extends AppCompatActivity {
                                     ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                                 }
                             }
-                            List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, s.toString()));
+                            List<AnimeClass> animes = SearchUtils.Search(Directorio.this, s.toString());
                             AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                             recyclerView.setAdapter(adapterBusqueda);
                         } else {
@@ -421,7 +406,7 @@ public class Directorio extends AppCompatActivity {
                             ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
                         }
                     }
-                }, 150);
+                }, DELAY);
             }
 
             @Override
@@ -453,7 +438,7 @@ public class Directorio extends AppCompatActivity {
                         }
                     }
                     ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
-                    List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, s.toString()));
+                    List<AnimeClass> animes = SearchUtils.Search(Directorio.this, s.toString());
                     AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                     recyclerView.setAdapter(adapterBusqueda);
                 }
@@ -461,7 +446,7 @@ public class Directorio extends AppCompatActivity {
             }
         };
         editText.setOnEditorActionListener(listener);
-        List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, editText.getText().toString()));
+        List<AnimeClass> animes = SearchUtils.Search(Directorio.this, editText.getText().toString());
         final AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
         runOnUiThread(new Runnable() {
             @Override
@@ -477,6 +462,14 @@ public class Directorio extends AppCompatActivity {
                         viewPager.setOffscreenPageLimit(3);
                         viewPager.setAdapter(adapter);
                         viewPagerTab.setViewPager(viewPager);
+                        /*try {
+                            ((Animes)adapter.getItem(0)).setDirectory(Directorio.this);
+                            ((Ovas)adapter.getItem(1)).setDirectory(Directorio.this);
+                            ((Peliculas)adapter.getItem(2)).setDirectory(Directorio.this);
+                        }catch (Exception e){
+                            Log.e("InitAsyncPages","Error",e);
+                            //null
+                        }*/
                     }
                     recyclerView.setAdapter(adapterBusqueda);
                     Toaster.toast("Directorio Actualizado");
@@ -488,7 +481,8 @@ public class Directorio extends AppCompatActivity {
         });
     }
 
-    private void init(final String json) {
+    private void init() {
+        Log.e("InitSync", "Prestarted: " + prestarted + " Loaded: " + loaded);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -591,7 +585,7 @@ public class Directorio extends AppCompatActivity {
                                             SearchConstructor.SetSearch(SearchType.GENEROS, nArray);
                                             editText.setHint("Generos: " + which.length);
                                         }
-                                        List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, editText.getEditableText().toString()));
+                                        List<AnimeClass> animes = SearchUtils.Search(Directorio.this, editText.getText().toString());
                                         AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                                         recyclerView.setAdapter(adapterBusqueda);
                                         return true;
@@ -687,6 +681,7 @@ public class Directorio extends AppCompatActivity {
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                                 try {
                                                     Keys.Dirs.CACHE_DIRECTORIO.delete();
+                                                    new DirectoryDB(Directorio.this).reset();
                                                     recreate();
                                                 } catch (Exception e) {
                                                     e.printStackTrace();
@@ -705,7 +700,7 @@ public class Directorio extends AppCompatActivity {
                                     } else {
                                         getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
                                     }
-                                    List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, null));
+                                    List<AnimeClass> animes = SearchUtils.Search(Directorio.this, null);
                                     AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                                     recyclerView.setAdapter(adapterBusqueda);
                                 }
@@ -784,7 +779,7 @@ public class Directorio extends AppCompatActivity {
                                             }
                                         }
                                     }
-                                    List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, s.toString()));
+                                    List<AnimeClass> animes = SearchUtils.Search(Directorio.this, s.toString());
                                     AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                                     recyclerView.setAdapter(adapterBusqueda);
                                 } else {
@@ -811,7 +806,7 @@ public class Directorio extends AppCompatActivity {
                                     }
                                 }
                             }
-                        }, 150);
+                        }, DELAY);
                     }
 
                     @Override
@@ -849,7 +844,7 @@ public class Directorio extends AppCompatActivity {
                                 }
                             }
                             ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
-                            List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, s.toString()));
+                            List<AnimeClass> animes = SearchUtils.Search(Directorio.this, s.toString());
                             AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                             recyclerView.setAdapter(adapterBusqueda);
                         }
@@ -874,6 +869,14 @@ public class Directorio extends AppCompatActivity {
                 viewPager.setOffscreenPageLimit(3);
                 viewPager.setAdapter(adapter);
                 viewPagerTab.setViewPager(viewPager);
+                /*try {
+                    ((Animes)adapter.getItem(0)).setDirectory(Directorio.this);
+                    ((Ovas)adapter.getItem(1)).setDirectory(Directorio.this);
+                    ((Peliculas)adapter.getItem(2)).setDirectory(Directorio.this);
+                }catch (Exception e){
+                    Log.e("InitPages","Error",e);
+                    //null
+                }*/
                 if (bundle != null) {
                     if (!isXLargeScreen(context)) {
                         try {
@@ -891,7 +894,7 @@ public class Directorio extends AppCompatActivity {
                         frameLayout.setVisibility(View.VISIBLE);
                     }
                 }
-                List<AnimeClass> animes = AnimeSorter.sort(Directorio.this, SearchUtils.Search(json, null));
+                List<AnimeClass> animes = SearchUtils.Search(Directorio.this, null);
                 final AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
                 recyclerView.setAdapter(adapterBusqueda);
             }
