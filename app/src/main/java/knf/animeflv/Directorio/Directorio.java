@@ -40,6 +40,8 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import org.jsoup.HttpStatusException;
+
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -233,6 +235,8 @@ public class Directorio extends AppCompatActivity {
                 if (throwable instanceof SocketTimeoutException) {
                     Toaster.toastLong("Error de red: Internet muy lento");
                     finish();
+                } else if (throwable instanceof HttpStatusException) {
+                    Toaster.toastLong("Error de red: Imposible conectar a la pagina de animeflv");
                 } else {
                     Toaster.toast("Error al cargar directorio");
                     Toaster.toastLong(Log.getStackTraceString(throwable));
