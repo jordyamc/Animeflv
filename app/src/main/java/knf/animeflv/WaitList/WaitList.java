@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import knf.animeflv.ColorsRes;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.Interfaces.WaitDownloadCallback;
 import knf.animeflv.JsonFactory.SelfGetter;
@@ -32,7 +33,6 @@ import knf.animeflv.R;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.ThemeUtils;
-import knf.animeflv.Utils.UrlUtils;
 import knf.animeflv.WaitList.Costructor.WaitManager;
 
 public class WaitList extends AppCompatActivity implements
@@ -176,10 +176,10 @@ public class WaitList extends AppCompatActivity implements
     @Override
     public void onAllCapsDownload(final String aid, final List<Integer> list) {
         processing.show();
-        processing.setContent(UrlUtils.getTitCached(aid));
+        processing.setContent(DirectoryHelper.get(context).getTitle(aid));
         urls.clear();
         eids.clear();
-        Log.d("DownloadAll", "Start " + UrlUtils.getUrlAnimeCached(aid));
+        Log.d("DownloadAll", "Start " + DirectoryHelper.get(context).getAnimeUrl(aid));
         new startAllDownloads(aid, list).executeOnExecutor(ExecutorManager.getExecutor());
     }
 
@@ -189,7 +189,7 @@ public class WaitList extends AppCompatActivity implements
         processing.setContent("Capítulo " + cap);
         urls.clear();
         eids.clear();
-        Log.d("DownloadSingle", "Start " + UrlUtils.getUrlAnimeCached(aid));
+        Log.d("DownloadSingle", "Start " + DirectoryHelper.get(context).getAnimeUrl(aid));
         List<Integer> list = new ArrayList<>();
         list.add(cap);
         new startSingleDownload(aid, list).executeOnExecutor(ExecutorManager.getExecutor());

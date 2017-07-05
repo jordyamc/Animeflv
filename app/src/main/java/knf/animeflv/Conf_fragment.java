@@ -967,15 +967,18 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
     private void takePermission(Intent data) {
         Uri treeUri = data.getData();
         final int takeFlags = (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        context.getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
-        PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, treeUri.toString()).apply();
-        DocumentFile pickedDir = DocumentFile.fromTreeUri(context, treeUri);
-        DocumentFile newFile = pickedDir.createFile("text/plain", "Prueba");
         try {
+            context.getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
+            PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, treeUri.toString()).apply();
+            DocumentFile pickedDir = DocumentFile.fromTreeUri(context, treeUri);
+            DocumentFile newFile = pickedDir.createFile("text/plain", "Prueba");
             OutputStream out = context.getContentResolver().openOutputStream(newFile.getUri());
             out.write("Prueba".getBytes());
             out.close();
             newFile.delete();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Toaster.toast(data.getDataString() + " Directorio no encontrado o invalido");
         } catch (Exception e) {
             e.printStackTrace();
             Toaster.toast("Error al obtener permiso");

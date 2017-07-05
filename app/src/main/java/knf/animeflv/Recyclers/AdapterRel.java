@@ -4,16 +4,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.preference.PreferenceManager;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.github.captain_miao.optroundcardview.OptRoundCardView;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.JsonFactory.OfflineGetter;
 import knf.animeflv.R;
@@ -49,6 +52,7 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
 
     @Override
     public void onBindViewHolder(final AdapterRel.ViewHolder holder, final int position) {
+        DesignUtils.setCardStyle(context, getItemCount(), position, holder.card, holder.separator, holder.iv_rel);
         holder.card.setCardBackgroundColor(theme.card_normal);
         holder.tv_tit.setTextColor(theme.textColor);
         holder.tv_tipo.setTextColor(theme.accent);
@@ -78,17 +82,20 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView iv_rel;
+        @BindView(R.id.imgCardInfoRel)
+        public RoundedImageView iv_rel;
+        @BindView(R.id.tv_info_rel_tit)
         public TextView tv_tit;
+        @BindView(R.id.tv_info_rel_tipo)
         public TextView tv_tipo;
-        public CardView card;
+        @BindView(R.id.cardRel)
+        public OptRoundCardView card;
+        @BindView(R.id.separator_top)
+        public View separator;
 
         public ViewHolder(View itemView, Context context) {
             super(itemView);
-            this.iv_rel = (ImageView) itemView.findViewById(R.id.imgCardInfoRel);
-            this.tv_tit = (TextView) itemView.findViewById(R.id.tv_info_rel_tit);
-            this.tv_tipo = (TextView) itemView.findViewById(R.id.tv_info_rel_tipo);
-            this.card = (CardView) itemView.findViewById(R.id.cardRel);
+            ButterKnife.bind(this, itemView);
             if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
                 iv_rel.setPadding(0, 0, 0, 0);
             DesignUtils.setCardSpaceStyle(context, card);

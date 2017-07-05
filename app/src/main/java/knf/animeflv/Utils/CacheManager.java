@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.UiThread;
@@ -16,6 +17,7 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 import com.makeramen.roundedimageview.RoundedDrawable;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Callback;
+import com.squareup.picasso.RequestCreator;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,7 +31,6 @@ import knf.animeflv.JsonFactory.MALGetter;
 import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
-import knf.animeflv.TaskType;
 import xdroid.toaster.Toaster;
 
 public class CacheManager {
@@ -279,32 +280,24 @@ public class CacheManager {
             if (localFile.exists()) {
                 PicassoCache.getPicassoInstance(context).load(localFile).into(imageView);
             } else {
-                PicassoCache.getPicassoInstance(context).load(parser.getBaseUrl(TaskType.NORMAL, context) + "imagen.php?certificate=" + Parser.getCertificateSHA1Fingerprint(context) + "&thumb=http://cdn.animeflv.net/img/portada/thumb_80/" + aid + ".jpg").into(imageView, new Callback() {
+                RequestCreator creator = PicassoCache.getPicassoInstance(context).load("http://animeflv.net/uploads/animes/covers/" + aid + ".jpg").error(R.drawable.ic_block_r);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP && ((imageView.getMeasuredWidth() > 0) || (imageView.getMeasuredHeight() > 0)))
+                    creator.centerCrop().resize(imageView.getMeasuredWidth(), imageView.getMeasuredHeight());
+                creator.into(imageView, new Callback() {
                     @Override
                     public void onSuccess() {
-                        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true))
-                            saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true)) {
+                            if (imageView instanceof RoundedImageView) {
+                                saveBitmap(((RoundedDrawable) imageView.getDrawable()).toBitmap(), localFile);
+                            } else {
+                                saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                            }
+                        }
                     }
 
                     @Override
                     public void onError() {
-                        PicassoCache.getPicassoInstance(context).load("http://animeflv.net/uploads/animes/covers/" + aid + ".jpg").error(R.drawable.ic_block_r).into(imageView, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_mini", true)) {
-                                    if (imageView instanceof RoundedImageView) {
-                                        saveBitmap(((RoundedDrawable) imageView.getDrawable()).toBitmap(), localFile);
-                                    } else {
-                                        saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
-                                    }
-                                }
-                            }
 
-                            @Override
-                            public void onError() {
-
-                            }
-                        });
                     }
                 });
             }

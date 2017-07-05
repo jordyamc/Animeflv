@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import knf.animeflv.Directorio.DB.DirectoryHelper;
-import knf.animeflv.JsonFactory.OfflineGetter;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterDirPeliculaNew;
@@ -67,9 +66,5 @@ public class Animes extends Fragment{
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
-    }
-
-    public String getJson() {
-        return OfflineGetter.getDirectorio();
     }
 }

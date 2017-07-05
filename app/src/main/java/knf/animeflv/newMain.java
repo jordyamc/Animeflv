@@ -143,7 +143,6 @@ public class newMain extends AppCompatActivity implements
     private boolean doubleBackToExitPressedOnce = false;
     private String ext_storage_state = Environment.getExternalStorageState();
     private File mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache");
-    private File DirFile = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt");
     private RecyclerView recyclerView;
     private LinearLayout root;
     private Toolbar toolbar;

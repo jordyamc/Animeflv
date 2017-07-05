@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +28,6 @@ import knf.animeflv.R;
 import knf.animeflv.Rate.RateDB;
 import knf.animeflv.Rate.RateHelper;
 import knf.animeflv.Recyclers.AdapterRel;
-import knf.animeflv.ServerReload.Adapter.CustomRecycler;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.AnimeDetail;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
@@ -53,7 +53,7 @@ public class FragmentInfo extends Fragment {
     @BindView(R.id.info_rate_count)
     TextView txt_rate_count;
     @BindView(R.id.rv_relacionados)
-    CustomRecycler rv_rel;
+    RecyclerView rv_rel;
 
     @BindView(R.id.nested)
     NestedScrollView nestedScrollView;
@@ -166,7 +166,7 @@ public class FragmentInfo extends Fragment {
                     final List<String> titulos = parser.parseTitRel(json);
                     final List<String> tipos = parser.parseTiposRel(json);
                     final String[] aids = parser.parseAidRel(json);
-                    rv_rel.setHasFixedSize(true);
+                    //rv_rel.setHasFixedSize(true);
                     rv_rel.setLayoutManager(new LinearLayoutManager(getActivity()));
                     AdapterRel adapter = new AdapterRel(getActivity(), titulos, tipos, urls, aids);
                     rv_rel.setAdapter(adapter);

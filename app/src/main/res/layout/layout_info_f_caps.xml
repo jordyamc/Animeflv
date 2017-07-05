@@ -20,7 +20,7 @@
             android:paddingBottom="10dp"
             android:paddingEnd="10dp"
             android:paddingStart="0dp"
-            android:paddingTop="30dp"
+            android:paddingTop="35dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
         <com.futuremind.recyclerviewfastscroll.FastScroller

@@ -229,12 +229,12 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
         return PreferenceManager.getDefaultSharedPreferences(this).getBoolean("sd_down", false);
     }
 
-    @SuppressLint("CommitPrefEdits")
+    @SuppressLint({"CommitPrefEdits", "ApplySharedPref"})
     private void commitDownloadInSD(boolean inSD) {
         PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("sd_down", inSD).commit();
     }
 
-    @SuppressLint("CommitPrefEdits")
+    @SuppressLint({"CommitPrefEdits", "ApplySharedPref"})
     @Override
     public boolean onKeyLongPress(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {

@@ -17,6 +17,7 @@ import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Files.FileSearchResponse;
 import knf.animeflv.Utils.ThemeUtils;
+import xdroid.toaster.Toaster;
 
 public class SDSearcher extends Fragment implements SDAdapter.OnOptionsClicklistener {
 
@@ -40,8 +41,13 @@ public class SDSearcher extends Fragment implements SDAdapter.OnOptionsClicklist
         ButterKnife.bind(this, view);
         textView.setTextColor(ThemeUtils.isAmoled(getActivity()) ? ColorsRes.SecondaryTextDark(getActivity()) : ColorsRes.SecondaryTextLight(getActivity()));
         response = FileUtil.init(getActivity()).searchforSD();
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setAdapter(new SDAdapter(getActivity(), response, this));
+        if (response.existSD()) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            recyclerView.setAdapter(new SDAdapter(getActivity(), response, this));
+        } else {
+            Toaster.toast("SD no encontrada");
+            getActivity().finish();
+        }
         return view;
     }
 

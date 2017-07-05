@@ -61,7 +61,7 @@ public class DirectoryHelper {
         return new DirectoryDB(context).getAllByType(type, true);
     }
 
-    public List<AnimeClass> getAll() {
+    public synchronized List<AnimeClass> getAll() {
         return new DirectoryDB(context).getAll(true);
     }
 

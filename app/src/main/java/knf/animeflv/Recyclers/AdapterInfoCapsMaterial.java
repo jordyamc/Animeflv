@@ -30,6 +30,7 @@ import java.io.File;
 import java.util.List;
 
 import knf.animeflv.ColorsRes;
+import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.JsonFactory.DownloadGetter;
@@ -44,7 +45,6 @@ import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UpdateUtil;
-import knf.animeflv.Utils.UrlUtils;
 import knf.animeflv.Utils.eNums.DownloadTask;
 import knf.animeflv.Utils.eNums.UpdateState;
 import knf.animeflv.zippy.zippyHelper;
@@ -162,7 +162,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                 new MaterialDialog.Builder(context)
                                         .content(
                                                 "El capitulo " + num +
-                                                        " de " + UrlUtils.getTitCached(aid) +
+                                                        " de " + DirectoryHelper.get(context).getTitle(aid) +
                                                         " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
                                         .autoDismiss(true)
                                         .positiveText("Continuar")
@@ -216,7 +216,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                 new MaterialDialog.Builder(context)
                                         .content(
                                                 "El capitulo " + num +
-                                                        " de " + UrlUtils.getTitCached(aid) +
+                                                        " de " + DirectoryHelper.get(context).getTitle(aid) +
                                                         " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
                                         .autoDismiss(true)
                                         .positiveText("Continuar")

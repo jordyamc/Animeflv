@@ -14,14 +14,13 @@ import knf.animeflv.BackgroundChecker.startBackground;
 public class Alarm extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.e("Received", intent.getAction());
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
-        wl.acquire();
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "notifications");
+        wl.acquire(10000);
         Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones",true);
         if (not) {
-            Log.d("Service", "Servicio Iniciado");
-            //new RequestsBackground(context, TaskType.NOT).executeOnExecutor(ExecutorManager.getExecutor());
-            //new RequestsBackground(context,TaskType.VERSION).executeOnExecutor(ExecutorManager.getExecutor());
+            Log.e("Service", "Servicio Iniciado");
             startBackground.compareNots(context);
             try {
                 startBackground.checkUpdate(context);
@@ -29,7 +28,7 @@ public class Alarm extends BroadcastReceiver {
                 e.printStackTrace();
             }
         } else {
-            Log.d("Service", "Servicio Desactivado");
+            Log.e("Service", "Servicio Desactivado");
         }
         wl.release();
     }
@@ -37,12 +36,10 @@ public class Alarm extends BroadcastReceiver {
     public void StartAlarm(Context context) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
-        wl.acquire();
+        wl.acquire(10000);
         Boolean not = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
         if (not) {
-            Log.d("Service", "Servicio Iniciado");
-            //new RequestsBackground(context, TaskType.NOT).executeOnExecutor(ExecutorManager.getExecutor());
-            //new RequestsBackground(context,TaskType.VERSION).executeOnExecutor(ExecutorManager.getExecutor());
+            Log.e("Service", "Servicio Iniciado");
             startBackground.compareNots(context);
             try {
                 startBackground.checkUpdate(context);

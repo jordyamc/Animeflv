@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +45,7 @@ public class DirectoryDB {
             db = context.openOrCreateDatabase(DATABASE_NAME, Context.MODE_PRIVATE, null, null);
             db.execSQL(DATABASE_CREATE);
         } catch (Exception e) {
+            Crashlytics.logException(e);
             e.printStackTrace();
         }
     }

@@ -54,6 +54,7 @@ import knf.animeflv.AutoEmision.EmObj;
 import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Directorio.AnimeClass;
+import knf.animeflv.Directorio.DB.DirectoryDB;
 import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.DownloadService.DownloaderService;
@@ -336,6 +337,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                                             @Override
                                             public void onClick(View v) {
                                                 Keys.Dirs.CACHE_DIRECTORIO.delete();
+                                                new DirectoryDB(context).reset();
                                                 finish();
                                                 startActivity(new Intent(InfoFragments.this, Directorio.class));
                                             }

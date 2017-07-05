@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Environment;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class AutoStart extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
+            Log.e("Received", intent.getAction());
             boolean activate;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 activate = intent.getAction().equals(Intent.ACTION_LOCKED_BOOT_COMPLETED) || intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED);

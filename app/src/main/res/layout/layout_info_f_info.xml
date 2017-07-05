@@ -15,7 +15,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
         <knf.animeflv.CustomViews.TextViewExpandableAnimation
@@ -211,11 +211,13 @@
                 android:textColor="@android:color/darker_gray"/>
         </LinearLayout>
 
-        <knf.animeflv.ServerReload.Adapter.CustomRecycler
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_relacionados"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="15dp"
+            android:paddingTop="10dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

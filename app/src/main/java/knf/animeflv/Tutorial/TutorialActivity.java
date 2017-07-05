@@ -41,7 +41,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Directorio.DB.DirectoryHelper;
-import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Random.RandomHelper;
 import knf.animeflv.Utils.CacheManager;
@@ -112,15 +111,12 @@ public class TutorialActivity extends AppCompatActivity implements SwipeRefreshL
     private CardView[] cards;
     private ImageButton[] dButtons;
 
-    private Parser parser = new Parser();
-
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tutorial);
-        toolbar = (Toolbar) findViewById(R.id.toolbar_tuto);
+        toolbar = findViewById(R.id.toolbar_tuto);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Tutorial");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -218,6 +214,8 @@ public class TutorialActivity extends AppCompatActivity implements SwipeRefreshL
                             new CacheManager().mini(TutorialActivity.this, id, images[position]);
                             tits[position].setText(title);
                             caps[position].setText(result);
+                            if (!PreferenceManager.getDefaultSharedPreferences(TutorialActivity.this).getBoolean("use_space", false))
+                                images[position].setPadding(0, 0, 0, 0);
                             String eid = id + "_1E";
                             if (MainStates.init(TutorialActivity.this).WaitContains(eid)) {
                                 dButtons[position].setImageResource(R.drawable.ic_waiting);

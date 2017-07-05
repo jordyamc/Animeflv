@@ -29,7 +29,7 @@ import knf.animeflv.info.Helper.InfoHelper;
 
 public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.ViewHolder> {
 
-    private final int MAX_ITEMS = 10;
+    private final int MAX_ITEMS = 15;
     private Activity activity;
     private RandomInterfaces interfaces;
     private int lastPosition = -1;
@@ -69,13 +69,13 @@ public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.ViewHolder
             });
             doOnlySlideOut(holder, holder.getAdapterPosition());
         } else {
-            if (holder.getAdapterPosition() <= lastPosition) {
+            if (holder.getAdapterPosition() < lastPosition) {
                 loadData(holder);
             } else {
                 if (holder.card.getVisibility() == View.INVISIBLE) {
                     doSlideIn(holder, holder.getAdapterPosition());
                 } else {
-                    doSlideOut(holder, holder.getAdapterPosition());
+                    //doSlideOut(holder, holder.getAdapterPosition());
                 }
             }
         }

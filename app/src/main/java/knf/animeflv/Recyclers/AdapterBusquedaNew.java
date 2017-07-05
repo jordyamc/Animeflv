@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -107,8 +106,6 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
             @Override
             public void onClick(View v) {
                 if (!Animes.get(holder.getAdapterPosition()).getTipo().equals("none")) {
-                    String file = Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt";
-                    String json = getStringFromFile(file);
                     SharedPreferences.Editor sharedPreferences = context.getSharedPreferences("data", Context.MODE_PRIVATE).edit();
                     sharedPreferences.putString("aid", Animes.get(holder.getAdapterPosition()).getAid()).apply();
                     InfoHelper.open(

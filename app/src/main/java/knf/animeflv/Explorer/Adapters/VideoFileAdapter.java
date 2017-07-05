@@ -159,7 +159,7 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
                                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        ManageDownload.cancel(context, list.get(position).getEID());
+                                        ManageDownload.cancel(context, list.get(holder.getAdapterPosition()).getEID());
                                         if (FileUtil.init(context).DeleteAnime(list.get(holder.getAdapterPosition()).getEID())) {
                                             context.runOnUiThread(new Runnable() {
                                                 @Override
@@ -169,12 +169,13 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
                                             });
                                             if (list.size() - 1 < 1) {
                                                 FileUtil.init(context).DeleteAnimeDir(list.get(holder.getAdapterPosition()).getID());
-                                                list.remove(holder.getAdapterPosition());
-                                                notifyItemRemoved(holder.getAdapterPosition());
                                                 try {
                                                     interfaces.OnDirectoryEmpty(list.get(0).getID());
                                                 } catch (Exception e) {
+                                                    e.printStackTrace();
                                                 }
+                                                list.remove(holder.getAdapterPosition());
+                                                notifyItemRemoved(holder.getAdapterPosition());
                                             } else {
                                                 Toaster.toast("Archivo eliminado");
                                                 notifyItemRemoved(holder.getAdapterPosition());

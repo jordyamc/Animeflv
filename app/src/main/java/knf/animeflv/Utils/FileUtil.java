@@ -318,10 +318,6 @@ public class FileUtil {
         return sb.toString();
     }
 
-    public static boolean existDir() {
-        return new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/directorio.txt").exists();
-    }
-
     public String getSDPath() {
         String sSDpath = null;
         File fileCur = null;

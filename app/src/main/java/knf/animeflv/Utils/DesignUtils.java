@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v7.widget.CardView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.github.captain_miao.optroundcardview.OptRoundCardView;
@@ -105,6 +106,8 @@ public class DesignUtils {
             if (!use_space && roundedImageView != null)
                 roundedImageView.setCornerRadius(10, 0, 10, 0);
         }
+        if (roundedImageView != null)
+            roundedImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
     }
 
     public static void setCardStyle(Context context, int total, int position, @Nullable View separator) {
