@@ -24,6 +24,7 @@ public class PicassoDownloader extends UrlConnectionDownloader {
         HttpURLConnection conn = super.openConnection(path);
         conn.setRequestProperty("Cookie", BypassHolder.cookieKeyDuid + "=" + BypassHolder.valueDuid + "; " + BypassHolder.cookieKeyClearance + "=" + BypassHolder.valueClearance);
         conn.setRequestProperty("User-Agent", BypassHolder.getUserAgent());
+        conn.setInstanceFollowRedirects(true);
         return conn;
     }
 }
