@@ -250,8 +250,8 @@ public class CacheManager {
                                 }
                             });
                         } else {
-                            Log.e("Portada", "Searching in page: " + "http://animeflv.net/uploads/animes/covers/" + aid + ".jpg");
-                            PicassoCache.getPicassoInstance(context).load("http://animeflv.net/uploads/animes/covers/" + aid + ".jpg").noFade().noPlaceholder().into(imageView, new Callback() {
+                            Log.e("Portada", "Searching in page: " + "https://animeflv.net/uploads/animes/covers/" + aid + ".jpg");
+                            PicassoCache.getPicassoInstance(context).load("https://animeflv.net/uploads/animes/covers/" + aid + ".jpg").noFade().noPlaceholder().into(imageView, new Callback() {
                                 @Override
                                 public void onSuccess() {
                                     if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("save_portada", true))
@@ -280,7 +280,8 @@ public class CacheManager {
             if (localFile.exists()) {
                 PicassoCache.getPicassoInstance(context).load(localFile).into(imageView);
             } else {
-                RequestCreator creator = PicassoCache.getPicassoInstance(context).load("http://animeflv.net/uploads/animes/covers/" + aid + ".jpg").error(R.drawable.ic_block_r);
+                //Log.e("Mini", "Searching in page: " + "https://animeflv.net/uploads/animes/covers/" + aid + ".jpg");
+                RequestCreator creator = PicassoCache.getPicassoInstance(context).load("https://animeflv.net/uploads/animes/covers/" + aid + ".jpg").error(R.drawable.ic_block_r);
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP && ((imageView.getMeasuredWidth() > 0) || (imageView.getMeasuredHeight() > 0)))
                     creator.centerCrop().resize(imageView.getMeasuredWidth(), imageView.getMeasuredHeight());
                 creator.into(imageView, new Callback() {

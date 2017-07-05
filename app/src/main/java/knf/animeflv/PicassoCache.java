@@ -39,6 +39,7 @@ public class PicassoCache {
         }
 
         Picasso.Builder builder = new Picasso.Builder(context);
+        //builder.loggingEnabled(true);
         builder.downloader(downloader);
 
         picassoInstance = builder.build();
