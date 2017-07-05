@@ -4,4 +4,4 @@
 <p></p>
 <p><a href="https://jordyamc.github.io/Animeflv/"><b><h2>Página Web</h2></b></a></p>
 <p></p>
-<p><a href="https://github.com/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true"><b><h2>Descargar app</h2></b></a></p>
+<p><a href="https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/app-release.apk"><b><h2>Descargar app</h2></b></a></p>
