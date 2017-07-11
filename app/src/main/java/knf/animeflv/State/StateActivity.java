@@ -72,6 +72,7 @@ public class StateActivity extends AppCompatActivity {
     @BindView(R.id.useragent)
     TextView useragent;
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         ThemeUtils.setThemeOn(this);
@@ -104,7 +105,7 @@ public class StateActivity extends AppCompatActivity {
         });
         cardView_bypass.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View v) {
+            public boolean onLongClick(View view) {
                 Bypass.check(StateActivity.this, new Bypass.onBypassCheck() {
                     @Override
                     public void onFinish() {

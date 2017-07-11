@@ -506,22 +506,24 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             String url = "";
             try {
                 String num = caps.get(0).substring(caps.get(0).lastIndexOf(" ") + 1);
-                url = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(DirectoryHelper.get(this).getEpUrl(aid, num, eps.getJSONObject(0).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
+                String ep_url = DirectoryHelper.get(this).getEpUrl(aid, num, eps.getJSONObject(0).getString("sid"));
+                url = "https://www.facebook.com/plugins/comments.php?api_key=156149244424100&channel_url=https%3A%2F%2Fstaticxx.facebook.com%2Fconnect%2Fxd_arbiter%2Fr%2FXBwzv5Yrm_1.js%3Fversion%3D42%23cb%3Df29a45da9909%26domain%3Danimeflv.net%26origin%3Dhttps%253A%252F%252Fanimeflv.net%252Ff388549d580a978%26relation%3Dparent.parent&href=" + URLEncoder.encode(ep_url, "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.9&width=100%25";
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            Log.d("Comentarios", url);
+            Log.e("Comentarios", url);
             webView.loadUrl(url);
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     String urlch = "";
                     try {
-                        urlch = "https://www.facebook.com/plugins/comments.php?api_key=133687500123077&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2Fjb3BUxkAISL.js%3Fversion%3D41%23cb%3Dfbb6634b4%26domain%3Danimeflv.com%26origin%3Dhttp%253A%252F%252Fanimeflv.com%252Ff1449cd23c%26relation%3Dparent.parent&href=" + URLEncoder.encode(DirectoryHelper.get(InfoFragments.this).getEpUrl(aid, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1), eps.getJSONObject(position).getString("sid")), "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.3&width=1000";
+                        String ep_url = DirectoryHelper.get(InfoFragments.this).getEpUrl(aid, caps.get(position).substring(caps.get(position).lastIndexOf(" ") + 1), eps.getJSONObject(position).getString("sid"));
+                        urlch = "https://www.facebook.com/plugins/comments.php?api_key=156149244424100&channel_url=https%3A%2F%2Fstaticxx.facebook.com%2Fconnect%2Fxd_arbiter%2Fr%2FXBwzv5Yrm_1.js%3Fversion%3D42%23cb%3Df29a45da9909%26domain%3Danimeflv.net%26origin%3Dhttps%253A%252F%252Fanimeflv.net%252Ff388549d580a978%26relation%3Dparent.parent&href=" + URLEncoder.encode(ep_url, "UTF-8") + "&locale=es_LA&numposts=15&sdk=joey&version=v2.9&width=100%25";
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    Log.d("Comentarios", urlch);
+                    Log.e("Comentarios", urlch);
                     webView.loadUrl(urlch);
                 }
 

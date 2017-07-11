@@ -570,6 +570,91 @@ public class SelfGetter {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
+    public static String getAnimeSync(final Context context, final ANIME anime) {
+        try {
+            Log.e("Get Anime Info", DirectoryHelper.get(context).getAnimeUrl(anime.getAidString()));
+            Document document = Jsoup.connect(DirectoryHelper.get(context).getAnimeUrl(anime.getAidString())).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(TIMEOUT).get();
+            String imgUrl = document.select("div.Image").first().select("img[src]").first().attr("src");
+            String aid = imgUrl.substring(imgUrl.lastIndexOf("/") + 1, imgUrl.lastIndexOf("."));
+            String tid = document.select("div.Ficha").first().select("div.Container").first().select("span").first().attr("class");
+            String state = getState(document.select("aside.SidebarA.BFixed").first().select("p").last().attr("class"));
+            String rate_stars = document.select("meta[itemprop='ratingValue']").first().attr("content");
+            String rate_count = document.select("meta[itemprop='ratingCount']").first().attr("content");
+            Elements categories = document.select("nav.Nvgnrs").first().select("a");
+            String generos = "";
+            String gens = "";
+            for (Element gen : categories) {
+                gens += gen.ownText();
+                gens += ", ";
+            }
+            if (!gens.trim().equals(""))
+                generos = gens.substring(0, gens.lastIndexOf(","));
+            String start = "Sin Fecha";
+
+            String title = document.select("h1.Title").first().text();
+            if (title.trim().equals("") || title.contains("protected"))
+                title = document.select("meta[property='og:title']").attr("content").replace(" Online", "");
+            String sinopsis = Parser.InValidateSinopsis(document.select("div.Description").first().select("p").first().text().trim());
+            JSONArray array = new JSONArray();
+            try {
+                try {
+                    tryNewEpMethod(document, aid, array);
+                } catch (NullPointerException e) {
+                    tryOldEpMethod(document, aid, title, array);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Crashlytics.logException(e);
+                Log.e("Get Anime Info", "No Ep List");
+            }
+            JSONArray j_rels = new JSONArray();
+            try {
+                Elements rels = document.select("ul.ListAnmRel").first().select("li");
+                for (Element rel : rels) {
+                    //FIXME: Buscar diferencia de Precuela/Secuela
+                    //String t_tid = rel.select("b").first().ownText();
+                    Element link = rel.select("a").first();
+                    String full_link = "http://animeflv.net" + link.attr("href");
+                    String name = link.ownText();
+                    String t_rel_t = rel.ownText();
+                    String type = t_rel_t.substring(t_rel_t.indexOf("(") + 1, t_rel_t.lastIndexOf(")")).trim();
+                    Document t_document = Jsoup.connect(full_link).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
+                    String t_imgUrl = t_document.select("div.Image").first().select("img[src]").first().attr("src");
+                    String t_aid = t_imgUrl.substring(t_imgUrl.lastIndexOf("/") + 1, t_imgUrl.lastIndexOf("."));
+                    String rel_t = t_document.select("div.Ficha").first().select("div.Container").first().select("span").first().attr("class");
+                    JSONObject object = new JSONObject();
+                    object.put("aid", t_aid);
+                    object.put("tid", rel_t);
+                    object.put("titulo", name);
+                    object.put("rel_tipo", type);
+                    j_rels.put(object);
+                }
+            } catch (Exception e) {
+                Log.e("Get Anime Info", "No Rel List");
+            }
+            JSONObject fobject = new JSONObject();
+            fobject.put("cache", "0");
+            fobject.put("aid", aid);
+            fobject.put("tid", tid);
+            fobject.put("titulo", title);
+            fobject.put("sinopsis", sinopsis);
+            fobject.put("fecha_inicio", start);
+            fobject.put("fecha_fin", state);
+            fobject.put("rating_value", rate_stars);
+            fobject.put("rating_count", rate_count);
+            fobject.put("generos", generos);
+            fobject.put("episodios", array);
+            fobject.put("relacionados", j_rels);
+            OfflineGetter.backupJson(fobject, new File(OfflineGetter.animecache, anime.getAidString() + ".txt"));
+            return fobject.toString();
+        } catch (HttpStatusException he) {
+            return "error:" + he.getStatusCode();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return OfflineGetter.getAnime(anime);
+        }
+    }
+
     private static void tryNewEpMethod(Document document, String aid, JSONArray array) throws Exception {
         Elements epis = document.select("ul.ListCaps").first().select("li");
         for (Element ep : epis) {
@@ -616,7 +701,7 @@ public class SelfGetter {
                 try {
                     if (!db.isDBEmpty(false)) {
                         try {
-                            Document init = Jsoup.connect("http://animeflv.net/browse?order=added").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
+                            Document init = Jsoup.connect("https://animeflv.net/browse?order=added").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
                             Element last = init.select("article").first();
                             String last_url = last.select("img[src]").first().attr("src");
                             String last_aid = last_url.substring(last_url.lastIndexOf("/") + 1, last_url.lastIndexOf("."));
@@ -635,7 +720,7 @@ public class SelfGetter {
                             return null;
                         }
                     }
-                    Document init = Jsoup.connect("http://animeflv.net/browse?order=added&page=1").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
+                    Document init = Jsoup.connect("https://animeflv.net/browse?order=added&page=1").userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
                     Elements pages = init.select("ul.pagination").first().select("a");
                     Element last_page = pages.get(pages.size() - 2);
                     last_page_num = Integer.parseInt(last_page.ownText().trim());
@@ -643,7 +728,7 @@ public class SelfGetter {
                     if (asyncInterface != null)
                         asyncInterface.onProgress(0);
                     for (int index = 1; index <= last_page_num; index++) {
-                        Document page = Jsoup.connect("http://animeflv.net/browse?order=added&page=" + index).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
+                        Document page = Jsoup.connect("https://animeflv.net/browse?order=added&page=" + index).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
                         Elements animes = page.select("article");
                         for (Element element : animes) {
                             String img = element.select("img[src]").first().attr("src");
@@ -656,7 +741,7 @@ public class SelfGetter {
                             }
                             Element info = element.select("h3.Title").first();
                             String b = info.ownText();
-                            String c = getType(element.select("span").first().attr("class"));
+                            String c = getType(element.select("span[class^=Type]").first().attr("class"));
                             String link = element.select("a").first().attr("href");
                             String[] semi = link.split("/");
                             String d = semi[3];
@@ -665,7 +750,7 @@ public class SelfGetter {
                             String gens = "";
                             if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_tags", false))
                                 try {
-                                    Document tags = Jsoup.connect("http://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
+                                    Document tags = Jsoup.connect("https://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
                                     for (Element g : tags.select("nav.Nvgnrs").first().select("a")) {
                                         gens += g.ownText().trim();
                                         gens += ", ";
@@ -677,7 +762,7 @@ public class SelfGetter {
                                     Log.e("Dir DEBUG", "No Tags");
                                 }
                             if (b.trim().equals(""))
-                                b = Jsoup.connect("http://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get().select("meta[property='og:title']").first().attr("content").replace(" Capítulos Online", "").replace(" Ver ", "").trim();
+                                b = Jsoup.connect("https://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get().select("meta[property='og:title']").first().attr("content").replace(" Capítulos Online", "").replace(" Ver ", "").trim();
                             db.addAnime(new DirectoryDB.DirectoryItem(a, b, c, d, e, f));
                             progress++;
                             if (asyncInterface != null)

@@ -24,11 +24,6 @@ import knf.animeflv.JsonFactory.ServerGetter;
 import knf.animeflv.Utils.ExecutorManager;
 import xdroid.toaster.Toaster;
 
-/**
- * Created by Jordy on 02/03/2017.
- */
-
-//TODO: Find a solution
 public class Bypass {
 
     public static void check(final Context context, @Nullable final onBypassCheck check) {
@@ -63,9 +58,9 @@ public class Bypass {
                                 @Override
                                 public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
                                     Log.e("CloudflareBypass", "Redirect to: " + url);
-                                    if (url.startsWith("http://animeflv.net") && !url.contains("cdn-cgi")) {
+                                    if (url.startsWith("https://animeflv.net") && !url.contains("cdn-cgi")) {
                                         Log.e("CloudflareBypass", "Getting Cookies");
-                                        String cookies = CookieManager.getInstance().getCookie("http://animeflv.net");
+                                        String cookies = CookieManager.getInstance().getCookie("https://animeflv.net");
                                         if (cookies != null)
                                             Log.e("CloudflareBypass", "Getting Cookies: " + cookies);
                                         if (cookies != null && (cookies.contains(BypassHolder.cookieKeyClearance) || cookies.contains(BypassHolder.cookieKeyDuid))) {
@@ -88,9 +83,9 @@ public class Bypass {
                                 public void onPageFinished(WebView view, String url) {
                                     super.onPageFinished(view, url);
                                     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                                        if (url.startsWith("http://animeflv.net") && !url.contains("cdn-cgi")) {
+                                        if (url.startsWith("https://animeflv.net") && !url.contains("cdn-cgi")) {
                                             Log.e("CloudflareBypass", "Getting Cookies");
-                                            String cookies = CookieManager.getInstance().getCookie("http://animeflv.net");
+                                            String cookies = CookieManager.getInstance().getCookie("https://animeflv.net");
                                             if (cookies != null)
                                                 Log.e("CloudflareBypass", "Getting Cookies: " + cookies);
                                             if (cookies != null && (cookies.contains(BypassHolder.cookieKeyClearance) && cookies.contains(BypassHolder.cookieKeyDuid))) {
@@ -103,7 +98,7 @@ public class Bypass {
                                     }
                                 }
                             });
-                            webView.loadUrl("http://animeflv.net");
+                            webView.loadUrl("https://animeflv.net");
                         }
                     });
                 }
@@ -112,7 +107,7 @@ public class Bypass {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 Log.e("CloudflareBypass", "Trying again");
-                ServerGetter.getClient().get("http://animeflv.net", null, new TextHttpResponseHandler() {
+                ServerGetter.getClient().get("https://animeflv.net", null, new TextHttpResponseHandler() {
                     @Override
                     public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                         Log.e("CloudflareBypass", "ENABLED Keep bypass");
@@ -156,7 +151,26 @@ public class Bypass {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    Jsoup.connect("http://animeflv.net").cookies(BypassHolder.getBasicCookieMap()).userAgent(BypassHolder.getUserAgent()).timeout(SelfGetter.TIMEOUT).get();
+                    Jsoup.connect("https://animeflv.net").cookies(BypassHolder.getBasicCookieMap()).userAgent(BypassHolder.getUserAgent()).timeout(SelfGetter.TIMEOUT).get();
+                    result.onResult(false);
+                } catch (HttpStatusException ex) {
+                    Log.e("CloudflareBypass", "Jsoup Test failed Code: " + ex.getStatusCode());
+                    result.onResult(true);
+                } catch (Exception e) {
+                    Log.e("CloudflareBypass", "Jsoup Test failed", e);
+                    result.onResult(false);
+                }
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    public static void runJsoupTest(final Context context, final onTestResult result) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    Jsoup.connect("https://animeflv.net").cookies(BypassHolder.getBasicCookieMap(context)).userAgent(BypassHolder.getUserAgent(context)).timeout(SelfGetter.TIMEOUT).get();
                     result.onResult(false);
                 } catch (HttpStatusException ex) {
                     Log.e("CloudflareBypass", "Jsoup Test failed Code: " + ex.getStatusCode());

@@ -1,7 +1,10 @@
 package knf.animeflv.AutoEmision;
 
 import android.annotation.SuppressLint;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -14,7 +17,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import knf.animeflv.R;
 import knf.animeflv.Utils.ExecutorManager;
+import knf.animeflv.Widget.WidgetProvider;
 import knf.animeflv.info.EmisionEditDialog;
 
 public class AutoEmisionHelper {
@@ -57,9 +62,17 @@ public class AutoEmisionHelper {
 
     @SuppressLint("ApplySharedPref")
     private static void saveListCommit(Context context, JSONObject object) {
-        Log.e("Emision Save", "Start Saving Commit");
         PreferenceManager.getDefaultSharedPreferences(context).edit().putString(KEY_PREFS_JSON, object.toString()).commit();
-        Log.e("Emision Save", "Finish Saving Commit");
+        refreshWidgets(context);
+    }
+
+    private static void refreshWidgets(Context context) {
+        AppWidgetManager manager = AppWidgetManager.getInstance(context);
+        Intent intent = new Intent(context, WidgetProvider.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, manager.getAppWidgetIds(new ComponentName(context, WidgetProvider.class)));
+        context.sendBroadcast(intent);
+        manager.notifyAppWidgetViewDataChanged(manager.getAppWidgetIds(new ComponentName(context, WidgetProvider.class)), R.id.words);
     }
 
     private static String getSavedList(Context context) {
@@ -69,35 +82,6 @@ public class AutoEmisionHelper {
     @SuppressLint("ApplySharedPref")
     public static void updateSavedList(Context context, JSONObject object) {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putString(KEY_PREFS_JSON, object.toString()).commit();
-    }
-
-    public static void asyncAddAnimetoList(final Context context, final String aid, final int daycode, final EmisionEditDialog.SearchListener listener) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    JSONObject object = getJson(context);
-                    JSONArray array = object.getJSONArray(KEY_JSON_LIST).getJSONObject(daycode - 1).getJSONArray(KEY_JSON_AIDS);
-                    JSONArray n_list = new JSONArray();
-                    for (int i = 0; i < array.length(); i++) {
-                        if (array.getString(i).equals(aid)) {
-                            listener.OnError();
-                            return null;
-                        }
-                        n_list.put(array.getString(i));
-                    }
-                    n_list.put(aid);
-                    object.getJSONArray(KEY_JSON_LIST).getJSONObject(daycode - 1).put(KEY_JSON_AIDS, n_list);
-                    saveList(context, object);
-                    listener.OnResponse(null);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e("ADD Emision", "Error Adding " + aid);
-                    listener.OnError();
-                }
-                return null;
-            }
-        }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
     public static void addAnimetoList(final Context context, final String aid, final int daycode, final EmisionEditDialog.SearchListener listener) {
@@ -122,59 +106,6 @@ public class AutoEmisionHelper {
             Log.e("ADD Emision", "Error Adding " + aid);
             listener.OnError();
         }
-    }
-
-    public static void editAnimetoList(final Context context, final EmObj from, final EmObj to, final EmisionEditDialog.SearchListener listener) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                removeAnimeFromList(context, from.getAid(), from.getDaycode(), new EmisionEditDialog.SearchListener() {
-                    @Override
-                    public void OnResponse(EmObj obj) {
-                        addAnimetoList(context, to.getAid(), to.getDaycode(), new EmisionEditDialog.SearchListener() {
-                            @Override
-                            public void OnResponse(EmObj obj) {
-                                listener.OnResponse(to);
-                            }
-
-                            @Override
-                            public void OnError() {
-                                listener.OnError();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void OnError() {
-                        listener.OnError();
-                    }
-                });
-                return null;
-            }
-        }.executeOnExecutor(ExecutorManager.getExecutor());
-    }
-
-    public static void asyncRemoveAnimeFromList(final Context context, final String aid, final int daycode, EmisionEditDialog.SearchListener listener) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    JSONObject object = getJson(context);
-                    JSONArray array = object.getJSONArray(KEY_JSON_LIST).getJSONObject(daycode - 1).getJSONArray(KEY_JSON_AIDS);
-                    JSONArray n_list = new JSONArray();
-                    for (int i = 0; i < array.length(); i++) {
-                        if (!array.getString(i).equals(aid))
-                            n_list.put(array.getString(i));
-                    }
-                    object.getJSONArray(KEY_JSON_LIST).getJSONObject(daycode - 1).put(KEY_JSON_AIDS, n_list);
-                    saveList(context, object);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e("ADD Emision", "Error Removing " + aid);
-                }
-                return null;
-            }
-        }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
     public static void removeAnimeFromList(final Context context, final String aid, final int daycode, @Nullable EmisionEditDialog.SearchListener listener) {
@@ -218,6 +149,36 @@ public class AutoEmisionHelper {
             if (listener != null)
                 listener.OnError();
         }
+    }
+
+    public static void editAnimetoList(final Context context, final EmObj from, final EmObj to, final EmisionEditDialog.SearchListener listener) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                removeAnimeFromList(context, from.getAid(), from.getDaycode(), new EmisionEditDialog.SearchListener() {
+                    @Override
+                    public void OnResponse(EmObj obj) {
+                        addAnimetoList(context, to.getAid(), to.getDaycode(), new EmisionEditDialog.SearchListener() {
+                            @Override
+                            public void OnResponse(EmObj obj) {
+                                listener.OnResponse(to);
+                            }
+
+                            @Override
+                            public void OnError() {
+                                listener.OnError();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void OnError() {
+                        listener.OnError();
+                    }
+                });
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
     public static int getListCount(Context context) {
@@ -288,6 +249,10 @@ public class AutoEmisionHelper {
             e.printStackTrace();
             return new ArrayList<>();
         }
+    }
+
+    public static List<EmObj> getDirectListDay(Context context, int day) {
+        return getDayList(context, getDayJson(getJson(context), day).toString(), day);
     }
 
     public static JSONArray getDayJson(JSONObject json, int daycode) {

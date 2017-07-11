@@ -223,7 +223,7 @@ public class DirectoryDB {
         }, KEY_AID_A + "='" + aid + "'", null, null, null, null);
         if (c.getCount() > 0) {
             c.moveToFirst();
-            url = "http://animeflv.net/ver/" + sid + "/" + c.getString(1) + "-" + numero;
+            url = "https://animeflv.net/ver/" + sid + "/" + c.getString(1) + "-" + numero;
         }
         c.close();
         close();
@@ -255,7 +255,7 @@ public class DirectoryDB {
         }, KEY_AID_A + "='" + aid + "'", null, null, null, null);
         if (c.getCount() > 0) {
             c.moveToFirst();
-            url = "http://animeflv.net/" + c.getString(1).toLowerCase() + "/" + c.getString(2) + "/" + c.getString(3);
+            url = "https://animeflv.net/" + c.getString(1).toLowerCase() + "/" + c.getString(2) + "/" + c.getString(3);
         }
         c.close();
         close();

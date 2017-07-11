@@ -178,26 +178,26 @@
             android:name=".Style.ThemeFragmentAdvanced"
             android:label="@string/app_name">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
-                <data android:scheme="file" />
-                <data android:host="*" />
-                <data android:mimeType="*/*" />
-                <data android:pathPattern=".*\\.aflvtheme" />
+                <data android:scheme="file"/>
+                <data android:host="*"/>
+                <data android:mimeType="*/*"/>
+                <data android:pathPattern=".*\\.aflvtheme"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
-                <data android:scheme="content" />
-                <data android:host="*" />
-                <data android:mimeType="*/*" />
-                <data android:pathPattern=".*\\.aflvtheme" />
+                <data android:scheme="content"/>
+                <data android:host="*"/>
+                <data android:mimeType="*/*"/>
+                <data android:pathPattern=".*\\.aflvtheme"/>
             </intent-filter>
         </activity>
         <activity
@@ -376,7 +376,7 @@
         <activity android:name=".TV.Main"/>
         <activity
             android:name=".AdminControl.PushManager"
-            android:configChanges="orientation|screenSize|keyboard" />
+            android:configChanges="orientation|screenSize|keyboard"/>
 
         <service
             android:name=".Tile.QuickSetting"
@@ -441,6 +441,20 @@
         <meta-data
             android:name="com.onesignal.NotificationOpened.DEFAULT"
             android:value="DISABLE"/>
+
+        <receiver
+            android:name="knf.animeflv.Widget.WidgetProvider"
+            android:label="Emision">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info"/>
+        </receiver>
+        <service
+            android:name="knf.animeflv.Widget.WidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
 
     </application>
 

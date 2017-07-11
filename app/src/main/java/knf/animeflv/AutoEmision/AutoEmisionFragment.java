@@ -26,9 +26,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.OfflineGetter;
+import knf.animeflv.JsonFactory.SelfGetter;
 import knf.animeflv.R;
 import knf.animeflv.Utils.ExecutorManager;
 
@@ -129,40 +129,21 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
                     new_list.addAll(list);
                     for (final EmObj obj : list) {
                         Log.e("Emision Check", "Day: " + day + "  Title: " + obj.getTitle());
-                        String off_json = OfflineGetter.getAnime(new ANIME(Integer.parseInt(obj.getAid())));
-                        if (!off_json.equals("null")) {
-                            try {
-                                JSONObject object = new JSONObject(off_json);
-                                if (!isEmision(object)) {
-                                    Log.e("AutoEmision", "Deleting from list: " + obj.getTitle());
-                                    AutoEmisionListHolder.deleteFromList(new_list, obj.getAid(), day);
-                                    AutoEmisionHelper.removeAnimeFromList(getActivity(), obj.getAid(), day, null);
-                                    edited = true;
-                                    removeCount++;
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                        String f_json = SelfGetter.getAnimeSync(getActivity(), new ANIME(Integer.parseInt(obj.getAid())));
+                        if (f_json.equals("null") || f_json.startsWith("error")) {
+                            f_json = OfflineGetter.getAnime(new ANIME(Integer.parseInt(obj.getAid())));
+                        }
+                        try {
+                            JSONObject object = new JSONObject(f_json);
+                            if (!isEmision(object)) {
+                                Log.e("AutoEmision", "Deleting from list: " + obj.getTitle());
+                                AutoEmisionListHolder.deleteFromList(new_list, obj.getAid(), day);
+                                AutoEmisionHelper.removeAnimeFromList(getActivity(), obj.getAid(), day, null);
+                                edited = true;
+                                removeCount++;
                             }
-                        } else {
-                            BaseGetter.getJson(getActivity(), new ANIME(Integer.parseInt(obj.getAid())), new BaseGetter.AsyncInterface() {
-                                @Override
-                                public void onFinish(String json) {
-                                    if (!json.equals("null")) {
-                                        try {
-                                            JSONObject object = new JSONObject(json);
-                                            if (!isEmision(object)) {
-                                                Log.e("AutoEmision", "Deleting from list: " + obj.getTitle());
-                                                AutoEmisionListHolder.deleteFromList(new_list, obj.getAid(), day);
-                                                AutoEmisionHelper.removeAnimeFromList(getActivity(), obj.getAid(), day, null);
-                                                edited = true;
-                                                removeCount++;
-                                            }
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }
-                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
                     if (edited) {

@@ -1,5 +1,6 @@
 package knf.animeflv.Widget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
@@ -8,22 +9,17 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import knf.animeflv.R;
+import java.util.Calendar;
 
-/**
- * Created by Jordy on 07/05/2016.
- */
+import knf.animeflv.AutoEmision.AutoEmisionActivity;
+import knf.animeflv.AutoEmision.AutoEmisionHelper;
+import knf.animeflv.R;
+import knf.animeflv.Utils.ThemeUtils;
+
 public class WidgetProvider extends AppWidgetProvider {
 
-    /*
-     * this method is called every 30 mins as specified on widgetinfo.xml
-     * this method is also called on every phone reboot
-     */
     @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager,
-                         int[] appWidgetIds) {
-        /*int[] appWidgetIds holds ids of multiple instance of your widget
-		 * meaning you are placing more than one widgets on your homescreen*/
+    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         for (int i : appWidgetIds) {
             RemoteViews remoteViews = updateWidgetListView(context,
                     i);
@@ -34,24 +30,68 @@ public class WidgetProvider extends AppWidgetProvider {
     }
 
     private RemoteViews updateWidgetListView(Context context, int appWidgetId) {
-
-        //which layout to show on widget
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-                R.layout.layout_widget);
-
-        //RemoteViews Service needed to provide adapter for ListView
-        Intent svcIntent = new Intent(context, StackWidgetService.class);
-        //passing app widget id to that RemoteViews Service
+                R.layout.emision_widget);
+        Intent svcIntent = new Intent(context, WidgetService.class);
         svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        //setting a unique Uri to the intent
-        //don't know its purpose to me right now
         svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
-        //setting adapter to listview of the widget
-        remoteViews.setRemoteAdapter(R.id.main_list,
+        remoteViews.setRemoteAdapter(R.id.words,
                 svcIntent);
-        //setting an empty view in case of no data
+        Intent clickIntent = new Intent(context, AutoEmisionActivity.class);
+        PendingIntent clickPI = PendingIntent
+                .getActivity(context, 0,
+                        clickIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setTextViewText(R.id.title_day, getActualDay());
+        remoteViews.setTextViewText(R.id.title_count, String.valueOf(AutoEmisionHelper.getDirectListDay(context, getActualDayCode()).size()));
+        remoteViews.setPendingIntentTemplate(R.id.words, clickPI);
+        ThemeUtils.Theme theme = ThemeUtils.Theme.create(context);
+        remoteViews.setInt(R.id.back_layout, "setBackgroundColor", theme.primary);
+        remoteViews.setTextColor(R.id.title_day, theme.textColorToolbar);
+        remoteViews.setTextColor(R.id.title_count, theme.textColorToolbar);
         remoteViews.setEmptyView(R.id.main_list, R.id.empty);
         return remoteViews;
+    }
+
+    private String getActualDay() {
+        switch (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
+            case Calendar.MONDAY:
+                return "LUNES";
+            case Calendar.TUESDAY:
+                return "MARTES";
+            case Calendar.WEDNESDAY:
+                return "MIERCOLES";
+            case Calendar.THURSDAY:
+                return "JUEVES";
+            case Calendar.FRIDAY:
+                return "VIERNES";
+            case Calendar.SATURDAY:
+                return "SABADO";
+            case Calendar.SUNDAY:
+                return "DOMINGO";
+            default:
+                return "DESCONOCIDO(LUNES POR DEFECTO)";
+        }
+    }
+
+    private int getActualDayCode() {
+        switch (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
+            default:
+            case Calendar.MONDAY:
+                return 1;
+            case Calendar.TUESDAY:
+                return 2;
+            case Calendar.WEDNESDAY:
+                return 3;
+            case Calendar.THURSDAY:
+                return 4;
+            case Calendar.FRIDAY:
+                return 5;
+            case Calendar.SATURDAY:
+                return 6;
+            case Calendar.SUNDAY:
+                return 7;
+        }
     }
 
 }
