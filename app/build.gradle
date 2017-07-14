@@ -23,8 +23,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 223
-        versionName "5.2.9"
+        versionCode 224
+        versionName "5.2.10"
         multiDexEnabled = true
     }
     buildTypes {
@@ -189,7 +189,7 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
         transitive = true
     }
-    compile('com.zendesk:sdk:1.9.2.1@aar') {
+    compile('com.zendesk:sdk:1.10.0.1@aar') {
         transitive = true
     }
 }

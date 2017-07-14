@@ -38,6 +38,7 @@ import knf.animeflv.BackDownload;
 import knf.animeflv.Favorites.FavoriteHelper;
 import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
+import knf.animeflv.JsonFactory.ServerGetter;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
@@ -86,7 +87,7 @@ public class startBackground {
     public static void checkUpdate(final Context context) throws Exception {
         if (NetworkUtils.isNetworkAvailable() && PreferenceManager.getDefaultSharedPreferences(context).getBoolean("update_nots", true)) {
             try {
-                AsyncHttpClient client = new AsyncHttpClient();
+                AsyncHttpClient client = ServerGetter.getClient();
                 client.setConnectTimeout(15000);
                 client.setLogInterface(new NoLogInterface());
                 client.setLoggingEnabled(false);
@@ -102,6 +103,7 @@ public class startBackground {
                     }
                 });
             } catch (Exception e) {
+                e.printStackTrace();
                 Log.e("Conexion", "No hay internet  -- Error Async Update");
             }
         }

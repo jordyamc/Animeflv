@@ -313,6 +313,7 @@ public class Splash extends AwesomeSplash {
                             @Override
                             public void onFinish() {
                                 handler.removeCallbacks(runnable);
+                                PicassoCache.recreate(getApplicationContext());
                                 proceed();
                             }
                         });

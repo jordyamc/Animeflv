@@ -19,16 +19,15 @@ import knf.animeflv.Utils.FastActivity;
 public class Alarm extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
-        Log.e("Received", intent.getAction());
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "notifications");
         wl.acquire(10000);
-        Boolean not= PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones",true);
+        Boolean not = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
         if (not) {
             Bypass.runJsoupTest(context, new Bypass.onTestResult() {
                 @Override
                 public void onResult(boolean needBypass) {
-                    if (needBypass) {
+                    if (needBypass && checkBypass(context)) {
                         Intent intent = new Intent(context, FastActivity.class);
                         intent.putExtra("key", FastActivity.RECREATE_BYPASS);
                         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, startBackground.CHANNEL_UPDATES)
@@ -50,6 +49,10 @@ public class Alarm extends BroadcastReceiver {
             Log.e("Service", "Servicio Desactivado");
         }
         wl.release();
+    }
+
+    private boolean checkBypass(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("bypass_check", true);
     }
 
     private void startService(Context context) {
@@ -75,27 +78,25 @@ public class Alarm extends BroadcastReceiver {
         wl.release();
     }
 
-    public void SetAlarm(Context context)
-    {
-        AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+    public void SetAlarm(Context context) {
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent("knf.animeflv.START_ALARM");
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
-        int time=Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("tiempo", "60000"));
-        Log.d("Timer",Integer.toString(time));
+        int time = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("tiempo", "60000"));
+        Log.d("Timer", Integer.toString(time));
         am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), time, pi); //1000*60*10
     }
-    public void SetAlarm(Context context,int tiempo)
-    {
-        AlarmManager am =( AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+
+    public void SetAlarm(Context context, int tiempo) {
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent("knf.animeflv.START_ALARM");
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
-        Log.d("Timer",Integer.toString(tiempo));
+        Log.d("Timer", Integer.toString(tiempo));
         am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), tiempo, pi); //1000*60*10
     }
 
-    public void CancelAlarm(Context context)
-    {
-        Log.d("Alarma","Cancelado");
+    public void CancelAlarm(Context context) {
+        Log.d("Alarma", "Cancelado");
         Intent intent = new Intent("knf.animeflv.START_ALARM");
         PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

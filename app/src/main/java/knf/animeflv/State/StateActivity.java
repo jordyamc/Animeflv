@@ -23,6 +23,7 @@ import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.Cloudflare.DebugBypass;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.JsonFactory.ServerGetter;
+import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
@@ -153,6 +154,7 @@ public class StateActivity extends AppCompatActivity {
     }
 
     private void checkBypass() {
+        PicassoCache.recreate(getApplicationContext());
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

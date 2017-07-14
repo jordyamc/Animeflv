@@ -54,11 +54,15 @@ public class PicassoCache {
     public static Picasso getPicassoInstance (Context context) {
 
         if (picassoInstance == null) {
-
             new PicassoCache(context);
             return picassoInstance;
         }
         return picassoInstance;
+    }
+
+    public static void recreate(Context context) {
+        picassoInstance = null;
+        new PicassoCache(context);
     }
 
 

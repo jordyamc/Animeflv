@@ -1,8 +1,11 @@
 package knf.animeflv.Utils;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -14,6 +17,7 @@ import com.afollestad.materialdialogs.Theme;
 
 import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.Configuracion;
+import knf.animeflv.R;
 
 public class FastActivity extends AestheticActivity {
     public static final int STOP_SOUND = 1;
@@ -24,7 +28,11 @@ public class FastActivity extends AestheticActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Aesthetic.get().colorAccent(ThemeUtils.getAcentColor(this)).apply();
+        Aesthetic.get()
+                .activityTheme(R.style.Translucent)
+                .colorAccent(ThemeUtils.getAcentColor(this))
+                .isDark(true)
+                .apply();
         try {
             Bundle bundle = getIntent().getExtras();
             if (bundle != null) {
@@ -74,15 +82,41 @@ public class FastActivity extends AestheticActivity {
                                 .content("Recreando bypass")
                                 .progress(true, 0)
                                 .theme(ThemeUtils.isAmoled(this) ? Theme.DARK : Theme.LIGHT)
-                                .cancelable(false)
+                                .cancelable(true)
+                                .canceledOnTouchOutside(true)
+                                .cancelListener(new DialogInterface.OnCancelListener() {
+                                    @Override
+                                    public void onCancel(DialogInterface dialogInterface) {
+                                        finish();
+                                    }
+                                })
                                 .build();
                         dialog.show();
+                        final Handler handler = new Handler();
+                        final Runnable runnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            dialog.dismiss();
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                        finish();
+                                    }
+                                });
+                            }
+                        };
+                        handler.postDelayed(runnable, Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString("bypass_time", "30000")));
                         Bypass.check(this, new Bypass.onBypassCheck() {
                             @Override
                             public void onFinish() {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        handler.removeCallbacks(runnable);
                                         dialog.dismiss();
                                         finish();
                                     }

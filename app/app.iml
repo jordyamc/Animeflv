@@ -107,6 +107,7 @@
     <orderEntry type="library" exported="" name="floatingactionbutton-1.3.0" level="project" />
     <orderEntry type="library" exported="" name="rx-preferences-2.0.0-RC2" level="project" />
     <orderEntry type="library" exported="" name="infinity-loading-0.4" level="project" />
+    <orderEntry type="library" exported="" name="sdk-providers-1.10.0.1" level="project" />
     <orderEntry type="library" exported="" name="stickyheaders-0.7.6" level="project" />
     <orderEntry type="library" exported="" name="support-vector-drawable-26.0.0-beta2" level="project" />
     <orderEntry type="library" exported="" name="audiowidget-1.0.0" level="project" />
@@ -130,6 +131,7 @@
     <orderEntry type="library" exported="" name="fastadapter-2.6.2" level="project" />
     <orderEntry type="library" exported="" name="logging-interceptor-3.5.0" level="project" />
     <orderEntry type="library" exported="" name="material-intro-screen-0.0.5" level="project" />
+    <orderEntry type="library" exported="" name="dagger-2.8" level="project" />
     <orderEntry type="library" exported="" name="MaterialPreferenceLibrary-10" level="project" />
     <orderEntry type="library" exported="" name="Encryption-1.4.0" level="project" />
     <orderEntry type="library" exported="" name="firebase-common-11.0.2" level="project" />
@@ -142,6 +144,7 @@
     <orderEntry type="library" exported="" name="bolts-tasks-1.4.0" level="project" />
     <orderEntry type="library" exported="" name="android-gif-drawable-1.2.5" level="project" />
     <orderEntry type="library" exported="" name="core-0.9.4.3" level="project" />
+    <orderEntry type="library" exported="" name="disklrucache-2.0.2" level="project" />
     <orderEntry type="library" exported="" name="crashlytics-core-2.3.17" level="project" />
     <orderEntry type="library" exported="" name="renderscript-v8" level="project" />
     <orderEntry type="library" exported="" name="library-1.6.1" level="project" />
@@ -158,7 +161,7 @@
     <orderEntry type="library" exported="" name="Color-O-Matic-1.1.5" level="project" />
     <orderEntry type="library" exported="" name="multidex-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-cast-11.0.2" level="project" />
-    <orderEntry type="library" exported="" name="java-common-1.11" level="project" />
+    <orderEntry type="library" exported="" name="java-common-1.12" level="project" />
     <orderEntry type="library" exported="" name="optroundcardview-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-analytics-11.0.2" level="project" />
     <orderEntry type="library" exported="" name="persistentsearchview-1.0.4" level="project" />
@@ -175,6 +178,7 @@
     <orderEntry type="library" exported="" name="materialize-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="fastscroll-0.2.5" level="project" />
     <orderEntry type="library" exported="" name="rxandroid-2.0.1" level="project" />
+    <orderEntry type="library" exported="" name="sdk-1.10.0.1" level="project" />
     <orderEntry type="library" exported="" name="material-activity-chooser-0.2.1" level="project" />
     <orderEntry type="library" exported="" name="filepicker-2.5.2" level="project" />
     <orderEntry type="library" exported="" name="bolts-android-1.4.0" level="project" />
@@ -206,14 +210,13 @@
     <orderEntry type="library" exported="" name="ThinDownloadManager-1.2.5" level="project" />
     <orderEntry type="library" exported="" name="trace" level="project" />
     <orderEntry type="library" exported="" name="library-1.4.1" level="project" />
-    <orderEntry type="library" exported="" name="sdk-1.9.2.1" level="project" />
     <orderEntry type="library" exported="" name="transition-26.0.0-beta2" level="project" />
     <orderEntry type="library" exported="" name="dropbox-core-sdk-3.0.3" level="project" />
     <orderEntry type="library" exported="" name="AndroidUtilities-1.6.0" level="project" />
     <orderEntry type="library" exported="" name="library-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="support-fragment-26.0.0-beta2" level="project" />
-    <orderEntry type="library" exported="" name="sdk-providers-1.9.2.1" level="project" />
     <orderEntry type="library" exported="" name="community-material-typeface-1.9.32.2" level="project" />
+    <orderEntry type="library" exported="" name="javax.inject-1" level="project" />
     <orderEntry type="library" exported="" name="beta-1.2.5" level="project" />
     <orderEntry type="library" exported="" name="okhttp-3.8.1" level="project" />
     <orderEntry type="library" exported="" name="firebase-analytics-11.0.2" level="project" />
