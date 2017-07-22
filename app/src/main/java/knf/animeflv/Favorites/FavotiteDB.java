@@ -29,9 +29,9 @@ import knf.animeflv.Utils.ExecutorManager;
 import xdroid.toaster.Toaster;
 
 public class FavotiteDB {
-    static final int TYPE_SECTION = 0;
-    static final int TYPE_FAV = 1;
-    static final String NO_SECTION = "Sin Clasificar";
+    public static final int TYPE_SECTION = 0;
+    public static final int TYPE_FAV = 1;
+    public static final String NO_SECTION = "Sin Clasificar";
     private static final String TABLE_NAME = "FavsTable";
     private static final String KEY_TABLE_ID = "_table_id";
     private static final String KEY_TYPE_ID = "_type";

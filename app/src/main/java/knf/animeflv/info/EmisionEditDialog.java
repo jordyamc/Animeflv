@@ -96,16 +96,20 @@ public class EmisionEditDialog extends DialogFragment {
 
                             @Override
                             public void OnError() {
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (dialog != null)
-                                            dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
-                                    }
-                                });
-                                Toaster.toast("Error al editar");
-                                if (listener != null)
-                                    listener.onEdit();
+                                try {
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (dialog != null)
+                                                dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
+                                        }
+                                    });
+                                    Toaster.toast("Error al editar");
+                                    if (listener != null)
+                                        listener.onEdit();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         });
                     }

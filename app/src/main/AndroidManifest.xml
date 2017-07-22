@@ -377,6 +377,9 @@
         <activity
             android:name=".AdminControl.PushManager"
             android:configChanges="orientation|screenSize|keyboard"/>
+        <activity android:name=".LoginActivity.LoginActivity"/>
+        <activity android:name=".FavSync.SyncActivity"/>
+        <activity android:name=".About.DonationActivity"/>
 
         <service
             android:name=".Tile.QuickSetting"
@@ -441,6 +444,10 @@
         <meta-data
             android:name="com.onesignal.NotificationOpened.DEFAULT"
             android:value="DISABLE"/>
+
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1"/>
 
         <receiver
             android:name="knf.animeflv.Widget.WidgetProvider"

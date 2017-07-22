@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,6 +31,7 @@ import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -108,6 +110,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     Spinner spinner;
     Activity context;
     WebView webView;
+    ProgressBar progressBar;
     String aid;
     int position = -1;
     String u;
@@ -487,6 +490,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                     .positiveText("SALIR")
                     .build();
             spinner = dialog.getCustomView().findViewById(R.id.comentarios_box_cap);
+            progressBar = dialog.getCustomView().findViewById(R.id.loading);
             final List<String> caps = parser.parseNumerobyEID(getJsonStringfromFile());
             String[] array = new String[caps.size()];
             caps.toArray(array);
@@ -497,13 +501,27 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             String newUA = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
             webView.getSettings().setUserAgentString(newUA);
             webView.setWebViewClient(new WebViewClient() {
-                @Override
+                /*@Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
                     view.loadUrl(url);
                     return true;
+                }*/
+
+                @Override
+                public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                    super.onPageStarted(view, url, favicon);
+                    progressBar.setVisibility(View.VISIBLE);
+                    view.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onPageFinished(WebView view, String url) {
+                    super.onPageFinished(view, url);
+                    progressBar.setVisibility(View.GONE);
+                    view.setVisibility(View.VISIBLE);
                 }
             });
-            String url = "";
+            /*String url = "";
             try {
                 String num = caps.get(0).substring(caps.get(0).lastIndexOf(" ") + 1);
                 String ep_url = DirectoryHelper.get(this).getEpUrl(aid, num, eps.getJSONObject(0).getString("sid"));
@@ -512,7 +530,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 e.printStackTrace();
             }
             Log.e("Comentarios", url);
-            webView.loadUrl(url);
+            webView.loadUrl(url);*/
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -579,7 +597,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
                 case R.id.emision:
                     if (AutoEmisionHelper.isAnimeAdded(this, aid)) {
                         new MaterialDialog.Builder(this)
-                                .content("¿Quieres eliminar este anime de la lista de emision?")
+                                .content("¿Quieres eliminar este anime de la lista de seguidos?")
                                 .positiveText("aceptar")
                                 .negativeText("cancelar")
                                 .neutralText("editar")

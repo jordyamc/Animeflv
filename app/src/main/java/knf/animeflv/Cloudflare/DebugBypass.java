@@ -62,7 +62,7 @@ public class DebugBypass extends AppCompatActivity {
                 })
                 .build();
         dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
-        CookieManager.getInstance().removeAllCookie();
+        Bypass.clearCookies(this, ".animeflv.net");
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient() {
             @Override

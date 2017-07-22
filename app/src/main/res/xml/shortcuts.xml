@@ -4,7 +4,7 @@
         android:enabled="true"
         android:icon="@drawable/alarm"
         android:shortcutDisabledMessage="@string/no_open"
-        android:shortcutId="emision"
+        android:shortcutId="siguiendo"
         android:shortcutLongLabel="@string/shortcut_em_long"
         android:shortcutShortLabel="@string/shortcut_em">
         <intent

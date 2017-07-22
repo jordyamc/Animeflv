@@ -136,6 +136,20 @@ public class AboutActivity extends MaterialAboutActivity {
                         .build());
         info.addItem(
                 new MaterialAboutActionItem.Builder()
+                        .text("Donar")
+                        .icon(new IconicsDrawable(context)
+                                .icon(CommunityMaterial.Icon.cmd_gift)
+                                .color(iconColor(context))
+                                .sizeDp(18))
+                        .setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+                            @Override
+                            public void onClick() {
+                                startActivity(new Intent(context, DonationActivity.class));
+                            }
+                        })
+                        .build());
+        info.addItem(
+                new MaterialAboutActionItem.Builder()
                         .text("Ayuda")
                         .icon(new IconicsDrawable(context)
                                 .icon(CommunityMaterial.Icon.cmd_help)

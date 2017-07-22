@@ -21,6 +21,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -31,6 +32,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import knf.animeflv.Explorer.Models.ModelFactory;
@@ -318,6 +320,12 @@ public class FileUtil {
         return sb.toString();
     }
 
+    public static String formatSize(long v) {
+        if (v < 1024) return v + " B";
+        int z = (63 - Long.numberOfLeadingZeros(v)) / 10;
+        return String.format(Locale.US, "%.1f %sB", (double) v / (1L << (z * 10)), " KMGTPE".charAt(z));
+    }
+
     public String getSDPath() {
         String sSDpath = null;
         File fileCur = null;
@@ -579,11 +587,45 @@ public class FileUtil {
         }
     }
 
+    @Nullable
+    public FileDescriptor getFileDescriptorFromAccess(String eid, boolean append) {
+        String[] data = eid.replace("E", "").split("_");
+        Uri treeUri = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null));
+        if (treeUri != null) {
+            DocumentFile sdFile = DocumentFile.fromTreeUri(context, treeUri);
+            DocumentFile animeFile = findFileFromAccess(findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), data[0]), eid.replace("E", "") + ".mp4");
+            if (animeFile != null && !append) {
+                animeFile.delete();
+                animeFile = null;
+            }
+            if (animeFile == null) {
+                animeFile = findFileFromAccess(findFileFromAccess(findFileFromAccess(sdFile, "Animeflv"), "download"), data[0]).createFile("video/mp4", eid.replace("E", ""));
+            }
+            try {
+                return context.getContentResolver().openFileDescriptor(animeFile.getUri(), "rw").getFileDescriptor();
+            } catch (Exception e) {
+                animeFile.delete();
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
     public OutputStream getOutputStream(String eid) throws FileNotFoundException {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return getOutputStreamFromAccess(eid);
         } else {
             return new FileOutputStream(getFileNormal(eid));
+        }
+    }
+
+    public FileOutputStream getFileOutputStream(String eid, boolean append) throws FileNotFoundException {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return new FileOutputStream(getFileDescriptorFromAccess(eid, append));
+        } else {
+            return new FileOutputStream(getFileNormal(eid), append);
         }
     }
 

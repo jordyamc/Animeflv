@@ -139,14 +139,20 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
                                             context.runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    dialogProg.dismiss();
-                                                    if (list.get(holder.getAdapterPosition()).getFile(context).list().length == 0) {
-                                                        FileUtil.init(context).DeleteAnimeDir(list.get(holder.getAdapterPosition()).getID());
-                                                        list.remove(holder.getAdapterPosition());
-                                                        notifyItemRemoved(holder.getAdapterPosition());
-                                                        Toaster.toast("Archivos eliminados");
-                                                        recreateList();
-                                                    } else {
+                                                    try {
+                                                        dialogProg.dismiss();
+                                                        if (list.get(holder.getAdapterPosition()).getFile(context).list().length == 0) {
+                                                            FileUtil.init(context).DeleteAnimeDir(list.get(holder.getAdapterPosition()).getID());
+                                                            list.remove(holder.getAdapterPosition());
+                                                            notifyItemRemoved(holder.getAdapterPosition());
+                                                            Toaster.toast("Archivos eliminados");
+                                                            recreateList();
+                                                        } else {
+                                                            Toaster.toast("Error al eliminar");
+                                                            recreateList();
+                                                        }
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
                                                         Toaster.toast("Error al eliminar");
                                                         recreateList();
                                                     }

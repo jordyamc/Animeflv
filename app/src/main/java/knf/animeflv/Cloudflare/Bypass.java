@@ -51,7 +51,7 @@ public class Bypass {
                     ((AppCompatActivity) context).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            CookieManager.getInstance().removeAllCookie();
+                            clearCookies(context, ".animeflv.net");
                             final WebView webView = new WebView(context);
                             webView.getSettings().setJavaScriptEnabled(true);
                             webView.setWebViewClient(new WebViewClient() {
@@ -143,6 +143,16 @@ public class Bypass {
             Toaster.toast("Bypass de Cloudflare Activado");
             if (check != null)
                 check.onFinish();
+        }
+    }
+
+    public static void clearCookies(Context context, String domain) {
+        CookieManager cookieManager = CookieManager.getInstance();
+        String cookiestring = cookieManager.getCookie(domain);
+        String[] cookies = cookiestring.split(";");
+        for (String cookie : cookies) {
+            String[] cookieparts = cookie.split("=");
+            cookieManager.setCookie(domain, cookieparts[0].trim() + "=; Expires=Wed, 31 Dec 2025 23:59:59 GMT");
         }
     }
 

@@ -49,13 +49,11 @@ public class InternalManager {
     public static boolean isDownloading(Context context, String eid) {
         switch (getDownloadSate(context, eid)) {
             case DownloadManager.STATUS_RUNNING:
-                return true;
-            case DownloadManager.STATUS_SUCCESSFUL:
-                return false;
             case DownloadManager.STATUS_PENDING:
                 return true;
+            case DownloadManager.STATUS_SUCCESSFUL:
             case DownloadManager.STATUS_PAUSED:
-                return true;
+                return false;
             default:
                 return false;
         }

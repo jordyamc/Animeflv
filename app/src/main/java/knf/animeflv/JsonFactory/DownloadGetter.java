@@ -35,6 +35,7 @@ import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Suggestions.Algoritm.SuggestionAction;
 import knf.animeflv.Suggestions.Algoritm.SuggestionHelper;
 import knf.animeflv.Utils.ExecutorManager;
+import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
@@ -121,9 +122,9 @@ public class DownloadGetter {
                                         .title(actionsInterface.isStream() ? "Streaming" : "Descarga")
                                         .titleGravity(GravityEnum.CENTER)
                                         .items(nombres)
-                                        .autoDismiss(true)
-                                        .positiveText(actionsInterface.isStream() ? "Reproducir" : "Descargar")
-                                        .negativeText("Cancelar")
+                                        .autoDismiss(false)
+                                        .negativeText("cerrar")
+                                        .positiveText("iniciar")
                                         .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                         .itemsCallbackSingleChoice(last_pos, new MaterialDialog.ListCallbackSingleChoice() {
                                             @Override
@@ -165,6 +166,7 @@ public class DownloadGetter {
                                                         actionsInterface.onStartDownload();
                                                         break;
                                                 }
+                                                materialDialog.dismiss();
                                                 return true;
                                             }
                                         })
@@ -173,6 +175,7 @@ public class DownloadGetter {
                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                                 MainStates.setProcessing(false, null);
                                                 actionsInterface.onCancelDownload();
+                                                dialog.dismiss();
                                             }
                                         })
                                         .cancelListener(new DialogInterface.OnCancelListener() {
@@ -203,6 +206,36 @@ public class DownloadGetter {
                                                     }
                                                 }.executeOnExecutor(ExecutorManager.getExecutor());
                                             }
+                                            dialog.dismiss();
+                                        }
+                                    });
+                                } else if (!actionsInterface.isStream()) {
+                                    d.neutralText("Tamaño");
+                                    d.onNeutral(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(@NonNull final MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                            new AsyncTask<Void, Void, Void>() {
+                                                @Override
+                                                protected Void doInBackground(Void... voids) {
+                                                    switch (nombres.get(materialDialog.getSelectedIndex()).toLowerCase()) {
+                                                        case "zippyshare":
+                                                        case "zippyshare fast":
+                                                        case "openload":
+                                                        case "mega":
+                                                            Toaster.toast("Desconocido");
+                                                            break;
+                                                        default:
+                                                            long size = Long.parseLong(SelfGetter.getSize(urls.get(materialDialog.getSelectedIndex())));
+                                                            if (size == -1) {
+                                                                Toaster.toast("Desconocido");
+                                                            } else {
+                                                                Toaster.toast(FileUtil.formatSize(size));
+                                                            }
+                                                            break;
+                                                    }
+                                                    return null;
+                                                }
+                                            }.executeOnExecutor(ExecutorManager.getExecutor());
                                         }
                                     });
                                 }

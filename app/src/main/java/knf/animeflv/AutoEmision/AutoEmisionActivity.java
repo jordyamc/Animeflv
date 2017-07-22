@@ -74,7 +74,7 @@ public class AutoEmisionActivity extends AppCompatActivity implements AutoEmisio
         setContentView(R.layout.layout_emision);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Emision");
+        getSupportActionBar().setTitle("Siguiendo");
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);

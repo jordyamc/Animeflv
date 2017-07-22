@@ -187,6 +187,32 @@ public class ThemeUtils {
         return R.style.AppThemeDark;
     }
 
+    @StyleRes
+    public static int getThemeLigth(Activity context) {
+        int accent = getAcentColor(context);
+
+        if (accent == ColorsRes.Rojo(context)) {
+            return (R.style.AppThemeRojo);
+        }
+        if (accent == ColorsRes.Naranja(context)) {
+            return (R.style.AppThemeNaranja);
+        }
+        if (accent == ColorsRes.Gris(context)) {
+            return (R.style.AppThemeGris);
+        }
+        if (accent == ColorsRes.Verde(context)) {
+            return (R.style.AppThemeVerde);
+        }
+        if (accent == ColorsRes.Rosa(context)) {
+            return (R.style.AppThemeRosa);
+        }
+        if (accent == ColorsRes.Morado(context)) {
+            return (R.style.AppThemeMorado);
+        }
+
+        return R.style.AppThemeDark;
+    }
+
     public static void setThemeDark(Activity context) {
         int accent = getAcentColor(context);
         if (accent == ColorsRes.Rojo(context)) {

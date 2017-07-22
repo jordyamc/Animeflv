@@ -280,7 +280,6 @@ public class CacheManager {
             if (localFile.exists()) {
                 PicassoCache.getPicassoInstance(context).load(localFile).into(imageView);
             } else {
-                //Log.e("Mini", "Searching in page: " + "https://animeflv.net/uploads/animes/covers/" + aid + ".jpg");
                 RequestCreator creator = PicassoCache.getPicassoInstance(context).load("https://animeflv.net/uploads/animes/covers/" + aid + ".jpg").error(R.drawable.ic_block_r);
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP && ((imageView.getMeasuredWidth() > 0) || (imageView.getMeasuredHeight() > 0)))
                     creator.centerCrop().resize(imageView.getMeasuredWidth(), imageView.getMeasuredHeight());
@@ -298,7 +297,8 @@ public class CacheManager {
 
                     @Override
                     public void onError() {
-
+                        if (context != null && NetworkUtils.isNetworkAvailable())
+                            PicassoCache.recreate(context);
                     }
                 });
             }

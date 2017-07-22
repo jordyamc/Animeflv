@@ -159,7 +159,7 @@ public class NetworkUtils {
                                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull final MaterialDialog dialog, @NonNull DialogAction which) {
-                                        TrackingHelper.track(context, TrackingHelper.UPDATING + update_ver);
+                                        TrackingHelper.track(context, TrackingHelper.UPDATING + versionCode + " --> " + update_ver);
                                         Tcontext.startService(new Intent(Tcontext, UpdateService.class));
                                         dialog.dismiss();
                                     }

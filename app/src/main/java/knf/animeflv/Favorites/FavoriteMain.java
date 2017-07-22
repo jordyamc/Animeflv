@@ -1,5 +1,6 @@
 package knf.animeflv.Favorites;
 
+import android.content.Intent;
 import android.graphics.drawable.NinePatchDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,6 +35,8 @@ import org.cryse.widget.persistentsearch.PersistentSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
+import knf.animeflv.FavSync.FavSyncHelper;
+import knf.animeflv.FavSync.SyncActivity;
 import knf.animeflv.FavSyncro;
 import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.Parser;
@@ -42,6 +45,7 @@ import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.TrackingHelper;
+import xdroid.toaster.Toaster;
 
 public class FavoriteMain extends AppCompatActivity {
     @BindView(R.id.toolbar)
@@ -300,12 +304,28 @@ public class FavoriteMain extends AppCompatActivity {
                 break;
             case R.id.sync:
                 final MaterialDialog d = new MaterialDialog.Builder(this)
-                        .content("Actualizando Favoritos...")
+                        .content("Obteniendo favoritos...")
                         .progress(true, 0)
                         .cancelable(false)
                         .build();
                 d.show();
-                FavSyncro.updateLocal(this, new FavSyncro.UpdateCallback() {
+                FavSyncHelper.recreate(this, new FavSyncHelper.SyncListener() {
+                    @Override
+                    public void onSync() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                d.dismiss();
+                                if (FavSyncHelper.isSame) {
+                                    Toaster.toast("Los favoritos son iguales!!!");
+                                } else {
+                                    startActivityForResult(new Intent(FavoriteMain.this, SyncActivity.class), 55447);
+                                }
+                            }
+                        });
+                    }
+                });
+                /*FavSyncro.updateLocal(this, new FavSyncro.UpdateCallback() {
                     @Override
                     public void onUpdate() {
                         runOnUiThread(new Runnable() {
@@ -317,7 +337,7 @@ public class FavoriteMain extends AppCompatActivity {
                             }
                         });
                     }
-                });
+                });*/
                 break;
             case R.id.search:
                 toogleSearch();
@@ -344,6 +364,14 @@ public class FavoriteMain extends AppCompatActivity {
             setAdapter(new FavoriteAdapter(this));
         } else {
             finish();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 55447) {
+            recreate();
         }
     }
 

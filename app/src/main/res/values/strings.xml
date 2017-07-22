@@ -15,6 +15,10 @@
     <string name="presents">Sugerido</string>
     <string name="custom">Modificar</string>
 
+    <string name="paypal_desc">Hacer una donacion por paypal, puedes dar la cantidad que quieras!</string>
+    <string name="patreon_desc">Unete al patreon, puedes donar mensualmente la cantidad que quieras :D</string>
+    <string name="bitcoin_desc">Si tienes algun bitcoin que te sobre puedes enviarmelo ;)</string>
+
     <string-array name="time_bypass">
         <item>30 segundos</item>
         <item>1 minuto</item>
@@ -208,8 +212,8 @@
     <string name="shortcut_favs">Favoritos</string>
     <string name="shortcut_favs_long">Abrir Favoritos</string>
 
-    <string name="shortcut_em">Emision</string>
-    <string name="shortcut_em_long">Abrir Emision</string>
+    <string name="shortcut_em">Siguiendo</string>
+    <string name="shortcut_em_long">Abrir Siguiendo</string>
 
     <string name="no_open">No se puede abrir</string>
 

@@ -74,7 +74,9 @@ public class DownloaderService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        int count;
+        int count = 0;
+        long total = 0;
+        long lenghtOfFile = -1;
         Bundle bundle = intent.getExtras();
         String eid = "error";
         try {
@@ -102,14 +104,22 @@ public class DownloaderService extends IntentService {
                 conection.setRequestProperty("Referer", bundle.getString("referer"));
                 conection.setRequestProperty("User-Agent", bundle.getString("useragent"));
             }
+            /*total=intent.getLongExtra("count",0);
+            if (total>0)
+                conection.setRequestProperty("Range", "bytes=" + total + "-");*/
             conection.connect();
-            long lenghtOfFile = conection.getContentLength();
+            lenghtOfFile = conection.getContentLength();
+            /*if (total>0){
+                lenghtOfFile=intent.getLongExtra("total",-1);
+                Log.e("Download Resume","Total: "+lenghtOfFile+"\nNormal: "+intent.getLongExtra("total",-1));
+            }else {
+                Log.e("Download Normal", "Total: "+lenghtOfFile);
+            }*/
             if (lenghtOfFile > getAvailableSpace())
                 throw new NoSpaceException(null);
             InputStream input = conection.getInputStream();
             OutputStream output = FileUtil.init(this).getOutputStream(eid);
             byte data[] = new byte[1024 * 6];
-            long total = 0;
             int prog = 0;
             while ((count = input.read(data)) != -1) {
                 if (preferences.getLong(eid + "_downloadID", -1) != downloadID)
@@ -134,7 +144,7 @@ public class DownloaderService extends IntentService {
             onSuccess(eid);
         } catch (FileNotFoundException fnfe) {
             Log.e("DownloadService", fnfe.getMessage());
-            onDownloadFailed(eid, intent, CAUSE_NOT_FOUND);
+            onDownloadFailed(eid, intent, total, lenghtOfFile, CAUSE_NOT_FOUND);
         } catch (DownloadCanceledException canceled) {
             Log.e("DownloadService", "Canceled - Eid: " + eid + " ID: " + canceled.getMessage());
             FileUtil.init(this).DeleteAnime(eid);
@@ -142,45 +152,45 @@ public class DownloaderService extends IntentService {
             new SQLiteHelperDownloads(this).delete(eid).close();
         } catch (NoInternetException nie) {
             Log.e("DownloadService", nie.getMessage());
-            onDownloadFailed(eid, intent, CAUSE_INTERNET);
+            onDownloadFailed(eid, intent, total, lenghtOfFile, CAUSE_INTERNET);
         } catch (NoSDAccessDetectedException nsad) {
             Log.e("DownloadService", nsad.getMessage());
-            onDownloadFailed(eid, intent, CAUSE_SD_ACCESS);
+            onDownloadFailed(eid, intent, total, lenghtOfFile, CAUSE_SD_ACCESS);
         } catch (WrongAccessPermissionException wap) {
             Log.e("DownloadService", wap.getMessage());
-            onDownloadFailed(eid, intent, CAUSE_WRONG_SD);
+            onDownloadFailed(eid, intent, total, lenghtOfFile, CAUSE_WRONG_SD);
         } catch (NoSpaceException nse) {
             Log.e("DownloadService", nse.getMessage());
-            onDownloadFailed(eid, intent, CAUSE_NO_SPACE);
+            onDownloadFailed(eid, intent, total, lenghtOfFile, CAUSE_NO_SPACE);
         } catch (NoInternetFoundException nife) {
             Log.e("DownloadService", nife.getMessage());
-            onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
+            onDownloadFailed(eid, intent, total, lenghtOfFile, CAUSE_DISCONNECTION);
         } catch (SocketException se) {
             Log.e("DownloadService", se.getMessage());
-            onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
+            onDownloadFailed(eid, intent, total, lenghtOfFile, CAUSE_DISCONNECTION);
         } catch (ProtocolException pe) {
             Log.e("DownloadService", pe.getMessage());
-            onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
+            onDownloadFailed(eid, intent, total, lenghtOfFile, CAUSE_DISCONNECTION);
         } catch (SSLException ssl) {
             Log.e("DownloadService", ssl.getMessage());
-            onDownloadFailed(eid, intent, CAUSE_SSL);
+            onDownloadFailed(eid, intent, total, lenghtOfFile, CAUSE_SSL);
         } catch (IOException ioe) {
             Log.e("DownloadService", ioe.getMessage());
             if (ioe.getMessage().trim().equalsIgnoreCase("unexpected end of stream")) {
-                onDownloadFailed(eid, intent, CAUSE_DISCONNECTION);
+                onDownloadFailed(eid, intent, total, lenghtOfFile, CAUSE_DISCONNECTION);
             } else {
-                onDownloadFailed(eid, intent, ioe);
+                onDownloadFailed(eid, intent, total, lenghtOfFile, ioe);
             }
         } catch (RuntimeException rte) {
             Log.e("DownloadService", rte.getMessage());
             if (rte.getMessage().toLowerCase().contains("cursor")) {
-                onDownloadFailed(eid, intent, CAUSE_DATABASE);
+                onDownloadFailed(eid, intent, total, lenghtOfFile, CAUSE_DATABASE);
             } else {
-                onDownloadFailed(eid, intent, rte);
+                onDownloadFailed(eid, intent, total, lenghtOfFile, rte);
             }
         } catch (Exception e) {
             Log.e("DownloadService", "error on try", e);
-            onDownloadFailed(eid, intent, e);
+            onDownloadFailed(eid, intent, total, lenghtOfFile, e);
             CrashlyticsCore.getInstance().logException(e);
         }
     }
@@ -275,13 +285,11 @@ public class DownloaderService extends IntentService {
         new SQLiteHelperDownloads(this).updateProgress(eid, progress).close();
     }
 
-    private void onDownloadFailed(String eid, Intent intent, Exception e) {
-        onDownloadFailed(eid, intent, CAUSE_UNKNOWN + "\n\n" + Log.getStackTraceString(e));
+    private void onDownloadFailed(String eid, Intent intent, long progress, long total, Exception e) {
+        onDownloadFailed(eid, intent, progress, total, CAUSE_UNKNOWN + "\n\n" + Log.getStackTraceString(e));
     }
 
-    private void onDownloadFailed(String eid, Intent intent, String cause) {
-        FileUtil.init(this).DeleteAnime(eid);
-        DownloadListManager.delete(this, eid + "_" + getSharedPreferences("data", MODE_PRIVATE).getLong(eid + "_downloadID", -1));
+    private void onDownloadFailed(String eid, Intent intent, long progress, long total, String cause) {
         String[] semi = eid.replace("E", "").split("_");
         Intent n_intent = new Intent(DownloadBroadCaster.ACTION_RETRY);
         n_intent.putExtras(intent.getExtras());
@@ -296,10 +304,20 @@ public class DownloaderService extends IntentService {
                 .setContentText("ERROR AL DESCARGAR")
                 .setStyle(bigTextStyle)
                 .setOngoing(false);
-        if (retryFromCause(cause))
+        if (retryFromCause(cause)) {
+            n_intent.putExtra("count", progress);
+            n_intent.putExtra("total", total);
             builder.addAction(R.drawable.redo, "REINTENTAR", PendingIntent.getBroadcast(this, new Random().nextInt(), n_intent, PendingIntent.FLAG_UPDATE_CURRENT));
-        showNotification(getDownloadID(eid), builder);
+            new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_PAUSED).close();
+        } else {
+            DownloadListManager.delete(this, eid + "_" + getSharedPreferences("data", MODE_PRIVATE).getLong(eid + "_downloadID", -1));
+            FileUtil.init(this).DeleteAnime(eid);
+            new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_FAILED).delete(eid);
+        }
+        DownloadListManager.delete(this, eid + "_" + getSharedPreferences("data", MODE_PRIVATE).getLong(eid + "_downloadID", -1));
+        FileUtil.init(this).DeleteAnime(eid);
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_FAILED).delete(eid);
+        showNotification(getDownloadID(eid), builder);
         sendBroadcast(new Intent(RECEIVER_ACTION_ERROR));
     }
 
@@ -308,7 +326,7 @@ public class DownloaderService extends IntentService {
             case CAUSE_INTERNET:
             case CAUSE_NO_SPACE:
             case CAUSE_DISCONNECTION:
-            case CAUSE_NOT_FOUND:
+            case CAUSE_SSL:
             case CAUSE_DATABASE:
                 return true;
             default:

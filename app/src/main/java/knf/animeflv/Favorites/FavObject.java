@@ -14,7 +14,7 @@ public class FavObject {
     public int id;
     public int order;
     public List<FavObject> sectionList = new ArrayList<>();
-    boolean isSection = false;
+    public boolean isSection = false;
 
     public FavObject(String name, String aid, String section, int order) {
         this.name = name;

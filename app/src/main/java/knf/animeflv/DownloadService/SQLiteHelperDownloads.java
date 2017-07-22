@@ -1,6 +1,7 @@
 package knf.animeflv.DownloadService;
 
 import android.annotation.SuppressLint;
+import android.app.DownloadManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -107,11 +108,12 @@ public class SQLiteHelperDownloads {
 
     public boolean downloadExist(String eid) {
         Cursor c = db.query(DOWNLOAD_TABLE_NAME, new String[]{
-                KEY_DOWNLOAD_ID
+                KEY_DOWNLOAD_ID,
+                KEY_STATE
         }, KEY_EID + "='" + eid + "'", null, null, null, null);
         if (c.getCount() > 0) {
             while (c.moveToNext()) {
-                if (c.getLong(0) == context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + KEY_DOWNLOAD_PREFS, -1))
+                if (c.getLong(0) == context.getSharedPreferences("data", Context.MODE_PRIVATE).getLong(eid + KEY_DOWNLOAD_PREFS, -1) && c.getInt(1) != DownloadManager.STATUS_PAUSED)
                     return true;
             }
         }

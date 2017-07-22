@@ -97,6 +97,7 @@ import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
 import knf.animeflv.JsonFactory.SelfGetter;
 import knf.animeflv.LoginActivity.DropboxManager;
+import knf.animeflv.LoginActivity.LoginActivity;
 import knf.animeflv.LoginActivity.LoginBase;
 import knf.animeflv.LoginActivity.LoginUser;
 import knf.animeflv.PlayBack.CastPlayBackManager;
@@ -152,7 +153,6 @@ public class newMain extends AppCompatActivity implements
     private String versionName;
     private String androidID;
     private AccountHeader headerResult;
-    private String headerTit;
     private Context context;
     private FloatingActionButton actionButton;
     private Parser parser = new Parser();
@@ -349,24 +349,26 @@ public class newMain extends AppCompatActivity implements
         builder.withOnAccountHeaderProfileImageListener(new AccountHeader.OnAccountHeaderProfileImageListener() {
             @Override
             public boolean onProfileImageClick(View view, IProfile profile, boolean current) {
-                return false;
+                startActivityForResult(new Intent(newMain.this, LoginActivity.class), 57894);
+                if (result != null)
+                    result.closeDrawer();
+                return true;
             }
 
             @Override
             public boolean onProfileImageLongClick(View view, IProfile profile, boolean current) {
                 result.closeDrawer();
                 startActivity(new Intent(newMain.this, StateActivity.class));
-                return false;
+                return true;
             }
         });
         if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(this)) {
             builder.addProfiles(
-                    new ProfileDrawerItem().withName("Versión " + versionName + " (" + Integer.toString(versionCode) + ")" + (UpdateUtil.isBeta ? " - BETA" : "")).withEmail(headerTit).withIcon(ic_main).withIdentifier(9),
+                    new ProfileDrawerItem().withName("Versión " + versionName + " (" + Integer.toString(versionCode) + ")" + (UpdateUtil.isBeta ? " - BETA" : "")).withEmail(FavSyncro.getEmail(this)).withIcon(ic_main).withIdentifier(9),
                     new ProfileSettingDrawerItem().withName("Cambiar colores").withIcon(CommunityMaterial.Icon.cmd_palette).withIdentifier(22),
                     new ProfileSettingDrawerItem().withName("Actualizar vistos").withIcon(MaterialDesignIconic.Icon.gmi_cloud_upload).withIdentifier(87),
-                    new ProfileSettingDrawerItem().withName("Sincronizar vistos").withIcon(CommunityMaterial.Icon.cmd_cloud_sync).withIdentifier(88),
-                    new ProfileSettingDrawerItem().withName("Dropbox (" + (DropboxManager.islogedIn() ? "DESCONECTAR" : "CONECTAR") + ")").withIcon(CommunityMaterial.Icon.cmd_dropbox).withIdentifier(120)
-                    //new ProfileSettingDrawerItem().withName("Configurar cuenta").withIcon(CommunityMaterial.Icon.cmd_account_settings_variant).withIdentifier(99)
+                    new ProfileSettingDrawerItem().withName("Sincronizar vistos").withIcon(CommunityMaterial.Icon.cmd_cloud_sync).withIdentifier(88)
+                    //new ProfileSettingDrawerItem().withName("Dropbox (" + (DropboxManager.islogedIn() ? "DESCONECTAR" : "CONECTAR") + ")").withIcon(CommunityMaterial.Icon.cmd_dropbox).withIdentifier(120)
             ).withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                 @Override
                 public boolean onProfileChanged(View view, IProfile profile, boolean current) {
@@ -433,12 +435,11 @@ public class newMain extends AppCompatActivity implements
             });
         } else {
             builder.addProfiles(
-                    new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")" + (UpdateUtil.isBeta ? " - BETA" : "")).withIcon(ic_main).withIdentifier(9),
+                    new ProfileDrawerItem().withName(FavSyncro.getEmail(this)).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")" + (UpdateUtil.isBeta ? " - BETA" : "")).withIcon(ic_main).withIdentifier(9),
                     new ProfileSettingDrawerItem().withName("Cambiar colores").withIcon(CommunityMaterial.Icon.cmd_palette).withIdentifier(22),
                     new ProfileSettingDrawerItem().withName("Actualizar vistos").withIcon(MaterialDesignIconic.Icon.gmi_cloud_upload).withIdentifier(87),
-                    new ProfileSettingDrawerItem().withName("Sincronizar vistos").withIcon(CommunityMaterial.Icon.cmd_cloud_sync).withIdentifier(88),
-                    new ProfileSettingDrawerItem().withName("Dropbox").withEmail(DropboxManager.islogedIn() ? "DESCONECTAR" : "CONECTAR").withIcon(CommunityMaterial.Icon.cmd_dropbox).withIdentifier(120)
-                    //new ProfileSettingDrawerItem().withName("Iniciar sesión").withIcon(CommunityMaterial.Icon.cmd_account_key).withIdentifier(110)
+                    new ProfileSettingDrawerItem().withName("Sincronizar vistos").withIcon(CommunityMaterial.Icon.cmd_cloud_sync).withIdentifier(88)
+                    //new ProfileSettingDrawerItem().withName("Dropbox").withEmail(DropboxManager.islogedIn() ? "DESCONECTAR" : "CONECTAR").withIcon(CommunityMaterial.Icon.cmd_dropbox).withIdentifier(120)
             ).withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                 @Override
                 public boolean onProfileChanged(View view, final IProfile profile, boolean current) {
@@ -467,7 +468,7 @@ public class newMain extends AppCompatActivity implements
                             result.closeDrawer();
                             break;
                         case 120:
-                            if (DropboxManager.islogedIn()) {
+                            /*if (DropboxManager.islogedIn()) {
                                 new MaterialDialog.Builder(newMain.this)
                                         .content("¿Cerrar sesión de Dropbox?")
                                         .positiveText("cerrar")
@@ -492,7 +493,8 @@ public class newMain extends AppCompatActivity implements
 
                                     }
                                 });
-                            }
+                            }*/
+                            startActivityForResult(new Intent(newMain.this, LoginActivity.class), 57894);
                             result.closeDrawer();
                             break;
                         case 22:
@@ -518,7 +520,7 @@ public class newMain extends AppCompatActivity implements
                         new PrimaryDrawerItem().withName("Recientes").withIcon(FontAwesome.Icon.faw_home).withIdentifier(0),
                         new PrimaryDrawerItem().withName("Favoritos").withIcon(MaterialDesignIconic.Icon.gmi_star).withIdentifier(1),
                         new PrimaryDrawerItem().withName("Directorio").withIcon(MaterialDesignIconic.Icon.gmi_view_list_alt).withIdentifier(2),
-                        new PrimaryDrawerItem().withName("Emision").withIcon(MaterialDesignIconic.Icon.gmi_alarm_check).withIdentifier(3),
+                        new PrimaryDrawerItem().withName("Siguiendo").withIcon(MaterialDesignIconic.Icon.gmi_alarm_check).withIdentifier(3),
                         new PrimaryDrawerItem().withName("Sugeridos").withIcon(CommunityMaterial.Icon.cmd_account_network).withIdentifier(13),
                         new PrimaryDrawerItem().withName("Random").withIcon(MaterialDesignIconic.Icon.gmi_shuffle).withIdentifier(11),
                         new PrimaryDrawerItem().withName("Explorador").withIcon(MaterialDesignIconic.Icon.gmi_folder).withIdentifier(9),
@@ -774,11 +776,10 @@ public class newMain extends AppCompatActivity implements
 
     private int getHDraw(final Boolean set) {
         int drawable = ThemeUtils.getAccentColorDrawable(this);
-        headerTit = FavSyncro.getEmail(this);
 
         if (set) {
             ArrayList<IProfile> profile = new ArrayList<>();
-            profile.add(new ProfileDrawerItem().withName(headerTit).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withIcon(getHeaderDrawable()).withIdentifier(9));
+            profile.add(new ProfileDrawerItem().withName(FavSyncro.getEmail(this)).withEmail("Versión " + versionName + " (" + Integer.toString(versionCode) + ")").withIcon(getHeaderDrawable()).withIdentifier(9));
             headerResult.setBackgroundRes(drawable);
             headerResult.setProfiles(profile);
         }
@@ -1355,6 +1356,8 @@ public class newMain extends AppCompatActivity implements
             recreate();
         } else if (resultCode == 9988) {
             recreate();
+        } else if (requestCode == 57894) {
+            setUpDrawer();
         }
     }
 

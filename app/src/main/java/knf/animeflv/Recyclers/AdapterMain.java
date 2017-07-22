@@ -114,20 +114,20 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         new CacheManager().mini(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getAid(), holder.iv_main);
         holder.tv_tit.setText(Animes.get(position).getTitulo());
         holder.tv_num.setText(getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
-        if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
+        if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())
+                || ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
             showPlay(holder.ib_ver);
             showDelete(holder.ib_des);
-        } else {
-            if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
-                showPlay(holder.ib_ver);
-                showDelete(holder.ib_des);
-            } else {
+            if (ManageDownload.getDownloadSate(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid()) == DownloadManager.STATUS_PAUSED) {
                 showDownload(holder.ib_des, holder.getAdapterPosition());
-                if (CastPlayBackManager.get(context).isCasting(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
-                    showCastPlay(holder.ib_ver);
-                } else {
-                    showCloudPlay(holder.ib_ver);
-                }
+                showCloudPlay(holder.ib_ver);
+            }
+        } else {
+            showDownload(holder.ib_des, holder.getAdapterPosition());
+            if (CastPlayBackManager.get(context).isCasting(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
+                showCastPlay(holder.ib_ver);
+            } else {
+                showCloudPlay(holder.ib_ver);
             }
         }
         if (MainStates.isProcessing()) {
@@ -201,7 +201,8 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 if (UpdateUtil.getState() == UpdateState.WAITING_TO_UPDATE) {
                     Toaster.toast("Actualizacion descargada, instalar para continuar");
                 } else {
-                    if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid()) && !ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
+                    if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid()) && !ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())
+                            || ManageDownload.getDownloadSate(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid()) == DownloadManager.STATUS_PAUSED) {
                         if (!MainStates.isProcessing()) {
                             if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                                 final int pos = holder.getAdapterPosition();

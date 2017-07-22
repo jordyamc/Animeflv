@@ -21,6 +21,8 @@ import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -321,7 +323,6 @@ public class SelfGetter {
                         hyperiondirect = new JSONObject(Jsoup.connect(down_link.replace("embed_hyperion", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("direct");
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Log.e("No Hyperion", down_link.replace("embed_hyperion", "check"));
                     }
                 } else if (el.contains("ok.ru")) {
                     try {
@@ -568,6 +569,25 @@ public class SelfGetter {
                 return null;
             }
         }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
+    public static String getSize(String fileUrl) {
+        try {
+            URLConnection connection = new URL(fileUrl).openConnection();
+            connection.connect();
+            String size = connection.getHeaderField("content-length");
+            switch (size) {
+                case "empty":
+                case "null":
+                    return "-1";
+                default:
+                    return size;
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "-1";
+        }
     }
 
     public static String getAnimeSync(final Context context, final ANIME anime) {

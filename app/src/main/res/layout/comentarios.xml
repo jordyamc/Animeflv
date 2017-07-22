@@ -1,15 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
     <Spinner
+        android:id="@+id/comentarios_box_cap"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/comentarios_box_cap"/>
+        android:layout_height="wrap_content"/>
 
-    <WebView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/comentarios_box"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <WebView
+            android:id="@+id/comentarios_box"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+
+        <ProgressBar
+            android:id="@+id/loading"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:padding="5dp"/>
+    </RelativeLayout>
 
 </LinearLayout>

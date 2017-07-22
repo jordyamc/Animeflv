@@ -100,9 +100,9 @@ public class DropboxManager {
                         DropboxClientFactory.init(accessToken);
                         client = DropboxClientFactory.getClient();
                     }
-                    calbackSources.onFavs(client.files().search("", "favs").getMatches().size() > 0);
-                    calbackSources.onSeen(client.files().search("", "seen").getMatches().size() > 0);
-                    calbackSources.onEmision(client.files().search("", "emision").getMatches().size() > 0);
+                    calbackSources.onFavs(!client.files().search("", "favs").getMatches().isEmpty());
+                    calbackSources.onSeen(!client.files().search("", "seen").getMatches().isEmpty());
+                    calbackSources.onEmision(!client.files().search("", "emision").getMatches().isEmpty());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
