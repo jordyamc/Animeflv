@@ -27,6 +27,7 @@ import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.Utils.TrackingHelper;
 import xdroid.toaster.Toaster;
 
 public class DonationActivity extends AppCompatActivity {
@@ -146,5 +147,6 @@ public class DonationActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         warmUpTabs();
+        TrackingHelper.track(this, TrackingHelper.DONATE);
     }
 }

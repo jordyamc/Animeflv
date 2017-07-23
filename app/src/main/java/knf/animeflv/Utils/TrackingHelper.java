@@ -19,6 +19,7 @@ public class TrackingHelper {
     public static final String RANDOM = "Random";
     public static final String UPDATING = "Actualizando: ";
     public static final String THEME = "Cambiando tema";
+    public static final String DONATE = "Considerando donar";
 
     public static final String ACTION_SHARE = "Share: ";
 

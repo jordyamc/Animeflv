@@ -52,7 +52,7 @@ public class Alarm extends BroadcastReceiver {
     }
 
     private boolean checkBypass(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("bypass_check", true);
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("bypass_check", false);
     }
 
     private void startService(Context context) {

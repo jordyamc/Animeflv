@@ -85,7 +85,7 @@ public class startBackground {
     }
 
     public static void checkUpdate(final Context context) throws Exception {
-        if (NetworkUtils.isNetworkAvailable() && PreferenceManager.getDefaultSharedPreferences(context).getBoolean("update_nots", true)) {
+        if (NetworkUtils.isNetworkAvailable() && PreferenceManager.getDefaultSharedPreferences(context).getBoolean("update_nots", false)) {
             try {
                 AsyncHttpClient client = ServerGetter.getClient();
                 client.setConnectTimeout(15000);
