@@ -73,18 +73,21 @@ public class DonationActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 openChromeTab(PaypalUri(), Color.parseColor("#003087"));
+                TrackingHelper.action(DonationActivity.this, "Donation", TrackingHelper.ACTION_DONATE_PAYPAL);
             }
         });
         patreon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openChromeTab(PatreonUri(), Color.parseColor("#F96854"));
+                TrackingHelper.action(DonationActivity.this, "Donation", TrackingHelper.ACTION_DONATE_PATREON);
             }
         });
         bitcoin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openBitcoin();
+                TrackingHelper.action(DonationActivity.this, "Donation", TrackingHelper.ACTION_DONATE_BITCOIN);
             }
         });
     }

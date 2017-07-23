@@ -279,7 +279,7 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
     }
 
     private void shareAid() {
-        TrackingHelper.action(this, aid);
+        TrackingHelper.action(this, TrackingHelper.INFO + aid, TrackingHelper.ACTION_SHARE + ": " + aid);
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_TEXT, u);

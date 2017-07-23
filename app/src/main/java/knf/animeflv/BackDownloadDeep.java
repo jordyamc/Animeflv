@@ -3,6 +3,7 @@ package knf.animeflv;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -36,6 +37,7 @@ import knf.animeflv.JsonFactory.DownloadGetter;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.zippy.zippyHelper;
 import xdroid.toaster.Toaster;
 
 /**
@@ -158,14 +160,16 @@ public class BackDownloadDeep extends AppCompatActivity {
                 .titleGravity(GravityEnum.CENTER)
                 .content("Deseas descargar el capitulo " + num + " de " + titulo + "?")
                 .positiveText("DESCARGAR")
-                .negativeText("Streaming")
+                .negativeText("STREAMING")
                 .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
+                .autoDismiss(false)
                 .cancelable(true)
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                    public void onClick(@NonNull final MaterialDialog dialog, @NonNull DialogAction which) {
                         if (!animeExist() && !ManageDownload.isDownloading(BackDownloadDeep.this, eid)) {
-                            DownloadGetter.search(BackDownloadDeep.this, eid, new DownloadGetter.ActionsInterface() {
+                            dialog.dismiss();
+                            DownloadGetter.search(BackDownloadDeep.this, eid, new DownloadGetter.ActionsInterfaceDeep() {
                                 @Override
                                 public boolean isStream() {
                                     return false;
@@ -178,10 +182,21 @@ public class BackDownloadDeep extends AppCompatActivity {
 
                                 @Override
                                 public void onStartZippy(final String url) {
-                                    web.post(new Runnable() {
+                                    zippyHelper.calculate(url, new zippyHelper.OnZippyResult() {
                                         @Override
-                                        public void run() {
-                                            web.loadUrl(url);
+                                        public void onSuccess(zippyHelper.zippyObject object) {
+                                            ManageDownload.chooseDownDir(context, eid, object.download_url, object.cookieConstructor);
+                                        }
+
+                                        @Override
+                                        public void onError() {
+                                            Toaster.toast("Error al obtener link, reintentando en modo nativo");
+                                            web.post(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    web.loadUrl(url);
+                                                }
+                                            });
                                         }
                                     });
                                 }
@@ -203,16 +218,17 @@ public class BackDownloadDeep extends AppCompatActivity {
                             });
                         } else {
                             options.dismiss();
-                            Toaster.toast("El anime ya existe o se esta descargando");
+                            Toaster.toast("El archivo ya existe o se esta descargando");
                             finish();
                         }
                     }
                 })
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                    public void onClick(@NonNull final MaterialDialog dialog, @NonNull DialogAction which) {
                         if (!animeExist()) {
-                            DownloadGetter.search(BackDownloadDeep.this, eid, new DownloadGetter.ActionsInterface() {
+                            dialog.dismiss();
+                            DownloadGetter.search(BackDownloadDeep.this, eid, new DownloadGetter.ActionsInterfaceDeep() {
                                 @Override
                                 public boolean isStream() {
                                     return true;
@@ -225,10 +241,35 @@ public class BackDownloadDeep extends AppCompatActivity {
 
                                 @Override
                                 public void onStartZippy(final String url) {
-                                    web.post(new Runnable() {
+                                    zippyHelper.calculate(url, new zippyHelper.OnZippyResult() {
                                         @Override
-                                        public void run() {
-                                            web.loadUrl(url);
+                                        public void onSuccess(zippyHelper.zippyObject object) {
+                                            int type = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("t_streaming", "0"));
+                                            if (type == 1) {
+                                                StreamManager.mx(context).Stream(eid, object.download_url, object.cookieConstructor);
+                                            } else {
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                                    StreamManager.internal(context).Stream(eid, object.download_url, object.cookieConstructor);
+                                                } else {
+                                                    if (FileUtil.init(context).isMXinstalled()) {
+                                                        Toaster.toast("Version de android por debajo de lo requerido, reproduciendo en MXPlayer");
+                                                        StreamManager.mx(context).Stream(eid, object.download_url, object.cookieConstructor);
+                                                    } else {
+                                                        Toaster.toast("No hay reproductor adecuado disponible");
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onError() {
+                                            Toaster.toast("Error al obtener link, reintentando en modo nativo");
+                                            web.post(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    web.loadUrl(url);
+                                                }
+                                            });
                                         }
                                     });
                                 }
@@ -249,7 +290,7 @@ public class BackDownloadDeep extends AppCompatActivity {
                                 }
                             });
                         } else {
-                            Toaster.toast("El anime ya existe, reproduciendo");
+                            Toaster.toast("El archivo ya existe, reproduciendo...");
                             StreamManager.Play(BackDownloadDeep.this, eid);
                             options.dismiss();
                             finish();
@@ -452,6 +493,7 @@ public class BackDownloadDeep extends AppCompatActivity {
     }
 
     public void Minimize() {
+        Log.e("DeepLink", "onClose");
         if (options.isShowing()) {
             options.dismiss();
         }

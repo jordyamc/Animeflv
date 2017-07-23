@@ -44,7 +44,19 @@ import xdroid.toaster.Toaster;
 public class DownloadGetter {
 
     public static void search(final Activity context, final String eid, final ActionsInterface actionsInterface) {
+        final MaterialDialog progress = new MaterialDialog.Builder(context)
+                .content("Obteniendo links...")
+                .progress(true, 0)
+                .cancelable(false)
+                .build();
         if (eid.contains("_") && eid.endsWith("E")) {
+            if (actionsInterface instanceof ActionsInterfaceDeep)
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progress.show();
+                    }
+                });
             BypassHolder.savedToLocal(context);
             BaseGetter.getJson(context, new DOWNLOAD(eid), new BaseGetter.AsyncInterface() {
                 @Override
@@ -75,6 +87,13 @@ public class DownloadGetter {
                             Log.e("Default Server", "No default");
                         }
                         if (nombres.size() != 0) {
+                            if (actionsInterface instanceof ActionsInterfaceDeep)
+                                context.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        progress.dismiss();
+                                    }
+                                });
                             String last = PreferenceManager.getDefaultSharedPreferences(context).getString(actionsInterface.isStream() ? "last_download" : "last_download", "null");
                             final int last_pos = nombres.contains(last) ? nombres.indexOf(last) : 0;
                             int pref = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("def_download", "0"));
@@ -118,6 +137,13 @@ public class DownloadGetter {
                                 }
                                 SuggestionHelper.register(context, eid.trim().split("_")[0], SuggestionAction.PLAY);
                             } else {
+                                if (actionsInterface instanceof ActionsInterfaceDeep)
+                                    context.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            progress.dismiss();
+                                        }
+                                    });
                                 final MaterialDialog.Builder d = new MaterialDialog.Builder(context)
                                         .title(actionsInterface.isStream() ? "Streaming" : "Descarga")
                                         .titleGravity(GravityEnum.CENTER)
@@ -213,7 +239,7 @@ public class DownloadGetter {
                                     d.neutralText("Tamaño");
                                     d.onNeutral(new MaterialDialog.SingleButtonCallback() {
                                         @Override
-                                        public void onClick(@NonNull final MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                        public void onClick(@NonNull final MaterialDialog materialDialog, @NonNull final DialogAction dialogAction) {
                                             new AsyncTask<Void, Void, Void>() {
                                                 @Override
                                                 protected Void doInBackground(Void... voids) {
@@ -226,10 +252,13 @@ public class DownloadGetter {
                                                             break;
                                                         default:
                                                             long size = Long.parseLong(SelfGetter.getSize(urls.get(materialDialog.getSelectedIndex())));
+                                                            String formated = FileUtil.formatSize(size);
                                                             if (size == -1) {
                                                                 Toaster.toast("Desconocido");
+                                                            } else if (formated.endsWith(" B")) {
+                                                                Toaster.toast("Error en archivo(evitar servidor)");
                                                             } else {
-                                                                Toaster.toast(FileUtil.formatSize(size));
+                                                                Toaster.toast(formated);
                                                             }
                                                             break;
                                                     }
@@ -323,5 +352,9 @@ public class DownloadGetter {
         void onStartCasting();
 
         void onLogError(Exception e);
+    }
+
+    public interface ActionsInterfaceDeep extends ActionsInterface {
+
     }
 }
