@@ -34,7 +34,7 @@ public class DonationActivity extends AppCompatActivity {
     public static final String CUSTOM_TAB_PACKAGE_NAME = "com.android.chrome";
     private static final String PAYPAL_EMAIL = "jordyamc@hotmail.com";
     private static final String PATREON_LINK = "https://www.patreon.com/animeflvapp";
-    private static final String BITCOIN_WALLET = "1CnXhvFX3ixv12mw5ipPgwBqLWkGPUuKGp";
+    private static final String BITCOIN_WALLET = "1AVXBGokw8gjEY5E3PV8B93E4ZT5APrzq7";
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.paypal_donate)
