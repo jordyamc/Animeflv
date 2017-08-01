@@ -24,6 +24,7 @@ public class Alarm extends BroadcastReceiver {
         wl.acquire(10000);
         Boolean not = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
         if (not) {
+            checkUpdate(context);
             Bypass.runJsoupTest(context, new Bypass.onTestResult() {
                 @Override
                 public void onResult(boolean needBypass) {
@@ -57,6 +58,9 @@ public class Alarm extends BroadcastReceiver {
     private void startService(Context context) {
         Log.e("Service", "Servicio Iniciado");
         startBackground.compareNots(context);
+    }
+
+    private void checkUpdate(Context context) {
         try {
             startBackground.checkUpdate(context);
         } catch (Exception e) {
