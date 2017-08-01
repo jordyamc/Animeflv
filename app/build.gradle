@@ -18,13 +18,13 @@ apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.0'
+    buildToolsVersion '26.0.1'
     defaultConfig {
         applicationId "knf.animeflv"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 227
-        versionName "5.3.2"
+        versionCode 228
+        versionName "5.3.3"
         multiDexEnabled = true
     }
     buildTypes {
@@ -88,7 +88,9 @@ configurations.all {
         def requested = details.requested
         if (requested.group == 'com.android.support') {
             if (!requested.name.startsWith("multidex")) {
-                details.useVersion '26.0.0-beta2'
+                details.useVersion '26.0.0'
+            }else {
+                details.useVersion '1.0.2'
             }
         }
     }
@@ -100,6 +102,9 @@ dependencies {
     /*compile('com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:0.10.6@aar') {
         transitive = true
     }*/
+    compile('com.mikepenz:aboutlibraries:5.9.7@aar') {
+        transitive = true
+    }
     compile('com.mikepenz:materialdrawer:5.9.3@aar') {
         transitive = true
     }
@@ -108,7 +113,7 @@ dependencies {
     compile files('src/SOMAAndroidSDK5.0.9.jar')
     compile project(':multidisplaycast')
     compile project(':library')
-    compile 'com.mikepenz:iconics-core:2.8.7@aar'
+    compile 'com.mikepenz:iconics-core:2.9.0@aar'
     compile 'com.mikepenz:google-material-typeface:3.0.1.1.original@aar'
     compile 'com.mikepenz:material-design-iconic-typeface:2.2.0.3@aar'
     compile 'com.mikepenz:fontawesome-typeface:4.7.0.1@aar'
@@ -160,7 +165,7 @@ dependencies {
     compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
     compile 'com.dropbox.core:dropbox-core-sdk:3.0.3'
     compile 'org.nanohttpd:nanohttpd:2.3.1'
-    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.android.support:multidex:1.0.2'
     compile 'com.github.zawadz88:material-activity-chooser:0.2.1'
     compile 'agency.tango.android:material-intro-screen:0.0.5'
     compile 'org.adw.library:discrete-seekbar:1.0.1'
@@ -178,6 +183,7 @@ dependencies {
     compile 'org.zakariya.stickyheaders:stickyheaders:0.7.6'
     compile 'com.github.captain-miao:optroundcardview:1.0.0'
     compile 'com.makeramen:roundedimageview:2.3.0'
+    compile 'com.evernote:android-job:1.2.0-alpha3'
     compile ('com.github.ViksaaSkool:AwesomeSplash:v1.0.0'){
         exclude module: 'CircularReveal'
     }

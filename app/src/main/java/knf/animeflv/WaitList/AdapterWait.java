@@ -52,6 +52,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
     private Parser parser = new Parser();
     private WaitDownloadCallback callback;
     private ThemeUtils.Theme theme;
+    private ListCreatedListener listener;
 
     AdapterWait(Activity context, RecyclerViewExpandableItemManager manager, RecyclerViewSwipeManager swipeManager) {
         setHasStableIds(true);
@@ -62,6 +63,8 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
         animesCapList = WaitManager.getNumerosList();
         callback = (WaitDownloadCallback) context;
         theme = ThemeUtils.Theme.create(context);
+        listener = (ListCreatedListener) context;
+        listener.onListCreated(animes);
     }
 
     @Override
@@ -146,6 +149,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
                     animes = WaitManager.getAnimesList();
                     animesCapList = WaitManager.getNumerosList();
                     notifyDataSetChanged();
+                    listener.onListCreated(animes);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -201,8 +205,10 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
                 holder.card.setVisibility(View.GONE);
                 MainStates.init(context).delFromWaitList(animes.get(groupPosition) + "_" + animesCapList.get(groupPosition).get(childPosition) + "E");
                 WaitManager.Refresh();
+                animes = WaitManager.getAnimesList();
                 animesCapList = WaitManager.getNumerosList();
                 notifyDataSetChanged();
+                listener.onListCreated(animes);
             }
         });
         holder.download.setOnClickListener(new View.OnClickListener() {
@@ -218,6 +224,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
         animes = WaitManager.getAnimesList();
         animesCapList = WaitManager.getNumerosList();
         notifyDataSetChanged();
+        listener.onListCreated(animes);
     }
 
     @Override
@@ -324,6 +331,14 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
         void onChildItemPinned(int groupPosition, int childPosition);
 
         void onItemViewClicked(View v, boolean pinned);
+    }
+
+    public interface ListListener {
+        void onListCreated(List<WaitDownloadElement> list);
+    }
+
+    public interface ListCreatedListener {
+        void onListCreated(List<WaitDBHelper.WaitObject> list);
     }
 
 }

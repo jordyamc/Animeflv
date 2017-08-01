@@ -566,7 +566,7 @@ public class FavotiteDB {
             List<FavObject> animes = getAllSections(false);
             JSONArray array = new JSONArray();
             for (FavObject list : animes) {
-                if (list.isSection) {
+                if (list.isSection && list.sectionList.size() > 0) {
                     JSONObject section = new JSONObject();
                     section.put("name", list.name);
                     JSONArray favs = new JSONArray();

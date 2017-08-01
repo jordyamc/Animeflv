@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import knf.animeflv.Jobs.CheckJob;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.ThemeUtils;
 
@@ -37,6 +38,7 @@ public class AutoStart extends BroadcastReceiver
             if (activate) {
                 alarm.StartAlarm(context);
                 alarm.SetAlarm(context);
+                CheckJob.shedule(context);
                 File inicio = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "inicio.txt");
                 int nCaps = context.getSharedPreferences("data", Context.MODE_PRIVATE).getInt("nCaps", 0);
                 if (nCaps > 0 && inicio.exists()) {

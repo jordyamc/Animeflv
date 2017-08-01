@@ -14,6 +14,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
@@ -24,6 +26,8 @@ import com.h6ah4i.android.widget.advrecyclerview.touchguard.RecyclerViewTouchAct
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.DownloadManager.ManageDownload;
@@ -38,9 +42,14 @@ import knf.animeflv.WaitList.Costructor.WaitManager;
 public class WaitList extends AppCompatActivity implements
         RecyclerViewExpandableItemManager.OnGroupCollapseListener,
         RecyclerViewExpandableItemManager.OnGroupExpandListener,
-        WaitDownloadCallback {
+        WaitDownloadCallback,
+        AdapterWait.ListCreatedListener {
     Toolbar toolbar;
     RecyclerView recyclerView;
+    @BindView(R.id.no_data)
+    LinearLayout no_data;
+    @BindView(R.id.img_no_data)
+    ImageView img_no_data;
     private RecyclerView.Adapter mWrappedAdapter;
     private RecyclerViewExpandableItemManager mRecyclerViewExpandableItemManager;
     private RecyclerViewDragDropManager mRecyclerViewDragDropManager;
@@ -78,6 +87,7 @@ public class WaitList extends AppCompatActivity implements
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wait_list_lay);
+        ButterKnife.bind(this);
         context = this;
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
         toolbar = (Toolbar) findViewById(R.id.toolbar_wait);
@@ -89,6 +99,7 @@ public class WaitList extends AppCompatActivity implements
         }
         recyclerView = (RecyclerView) findViewById(R.id.rv_wait_list);
         setSupportActionBar(toolbar);
+        img_no_data.setImageResource(ThemeUtils.getFlatImage(this));
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -157,6 +168,20 @@ public class WaitList extends AppCompatActivity implements
     }
 
     @Override
+    public void onListCreated(final List<WaitDBHelper.WaitObject> list) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (list.size() == 0) {
+                    no_data.setVisibility(View.VISIBLE);
+                } else {
+                    no_data.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
@@ -195,11 +220,6 @@ public class WaitList extends AppCompatActivity implements
         new startSingleDownload(aid, list).executeOnExecutor(ExecutorManager.getExecutor());
     }
 
-
-    public interface ListListener {
-        void onListCreated(List<WaitDownloadElement> list);
-    }
-
     private class startAllDownloads extends AsyncTask<String, String, String> {
         String aid;
         List<Integer> list;
@@ -216,7 +236,7 @@ public class WaitList extends AppCompatActivity implements
                 final String eid = aid + "_" + curr + "E";
                 eids.add(eid);
             }
-            SelfGetter.getDownloadList(WaitList.this, aid, eids, new ListListener() {
+            SelfGetter.getDownloadList(WaitList.this, aid, eids, new AdapterWait.ListListener() {
                 @Override
                 public void onListCreated(List<WaitDownloadElement> list) {
                     startDownloads(list);
@@ -242,7 +262,7 @@ public class WaitList extends AppCompatActivity implements
                 final String eid = aid + "_" + curr + "E";
                 eids.add(eid);
             }
-            SelfGetter.getDownloadList(WaitList.this, aid, eids, new ListListener() {
+            SelfGetter.getDownloadList(WaitList.this, aid, eids, new AdapterWait.ListListener() {
                 @Override
                 public void onListCreated(List<WaitDownloadElement> list) {
                     startDownloads(list);

@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
@@ -31,16 +33,17 @@ import knf.animeflv.JsonFactory.OfflineGetter;
 import knf.animeflv.JsonFactory.SelfGetter;
 import knf.animeflv.R;
 import knf.animeflv.Utils.ExecutorManager;
-
-/**
- * Created by Jordy on 09/01/2017.
- */
+import knf.animeflv.Utils.ThemeUtils;
 
 public class AutoEmisionFragment extends Fragment implements OnListInteraction {
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.progress)
     ProgressBar progressBar;
+    @BindView(R.id.no_data)
+    LinearLayout no_data;
+    @BindView(R.id.img_no_data)
+    ImageView no_data_img;
     private RecyclerViewDragDropManager dragDropManager;
     private RecyclerView.Adapter wraped;
     private AutoEmisionAdapter adapter;
@@ -85,7 +88,7 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
         asyncStart();
     }
 
-    private void setRecycler(List<EmObj> list, int day) {
+    private void setRecycler(final List<EmObj> list, int day) {
         try {
             AutoEmisionListHolder.setList(day, list);
             dragDropManager = new RecyclerViewDragDropManager();
@@ -104,11 +107,14 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
                         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                         recyclerView.setAdapter(wraped);
                         recyclerView.setItemAnimator(animator);
-
                         if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
                             recyclerView.addItemDecoration(new ItemShadowDecorator((NinePatchDrawable) ContextCompat.getDrawable(getContext(), R.drawable.material_shadow_z1)));
                         }
                         dragDropManager.attachRecyclerView(recyclerView);
+                        if (list.size() == 0) {
+                            no_data_img.setImageResource(ThemeUtils.getFlatImage(getActivity()));
+                            no_data.setVisibility(View.VISIBLE);
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

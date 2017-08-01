@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,12 +46,14 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private boolean editing = false;
     private boolean searching = false;
     private ThemeUtils.Theme theme;
+    private ListListener listener;
 
     public FavoriteAdapter(Activity context) {
         this.context = context;
         this.sectionsEnabled = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("section_favs", false);
         this.list = new FavotiteDB(context).getAllSectionsExtended(true, sectionsEnabled);
         this.theme = ThemeUtils.Theme.create(context);
+        ((ListListener) context).onListCreated(list, null);
         setHasStableIds(true);
     }
 
@@ -59,6 +62,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.sectionsEnabled = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("section_favs", false);
         this.list = new FavotiteDB(context).getAllSectionsExtended(true, sectionsEnabled, search);
         this.theme = ThemeUtils.Theme.create(context);
+        ((ListListener) context).onListCreated(list, search);
         setHasStableIds(true);
     }
 
@@ -326,6 +330,10 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private interface Draggable extends DraggableItemConstants {
+    }
+
+    interface ListListener {
+        void onListCreated(List<FavObject> list, @Nullable String search);
     }
 
     public static class FavViewHolder extends AbstractDraggableItemViewHolder {

@@ -74,11 +74,12 @@
                         android:ellipsize="end"
                         android:lines="1"
                         android:maxLines="1"
+                        android:paddingEnd="5dp"
                         android:paddingLeft="5dp"
                         android:paddingStart="5dp"
                         android:scrollHorizontally="true"
                         android:text="Título"
-                        android:textColor="#4d4d4d" />
+                        android:textColor="#4d4d4d"/>
 
                 </LinearLayout>
 

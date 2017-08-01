@@ -8,7 +8,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager;
 
@@ -24,8 +25,10 @@ public class HistoryActivity extends AppCompatActivity implements HistoryAdapter
     Toolbar toolbar;
     @BindView(R.id.recycler)
     RecyclerView recyclerView;
-    @BindView(R.id.noHistory)
-    TextView noHistory;
+    @BindView(R.id.no_data)
+    LinearLayout no_data;
+    @BindView(R.id.img_no_data)
+    ImageView img_no_data;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,6 +51,7 @@ public class HistoryActivity extends AppCompatActivity implements HistoryAdapter
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(swipeMgr.createWrappedAdapter(new HistoryAdapter(this)));
         swipeMgr.attachRecyclerView(recyclerView);
+        img_no_data.setImageResource(ThemeUtils.getFlatImage(this));
         checkList();
     }
 
@@ -57,18 +61,21 @@ public class HistoryActivity extends AppCompatActivity implements HistoryAdapter
         toolbar.getRootView().setBackgroundColor(theme.background);
         toolbar.setTitleTextColor(theme.textColorToolbar);
         ThemeUtils.setNavigationColor(toolbar, theme.toolbarNavigation);
-        noHistory.setTextColor(theme.secondaryTextColor);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(theme.primaryDark);
             getWindow().setNavigationBarColor(theme.primary);
         }
     }
 
-    private void checkList(){
+    private void checkList() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (HistoryHelper.getHistoryArray(HistoryActivity.this).length()==0)noHistory.setVisibility(View.VISIBLE);
+                if (HistoryHelper.getHistoryArray(HistoryActivity.this).length() == 0) {
+                    no_data.setVisibility(View.VISIBLE);
+                } else {
+                    no_data.setVisibility(View.GONE);
+                }
             }
         });
     }

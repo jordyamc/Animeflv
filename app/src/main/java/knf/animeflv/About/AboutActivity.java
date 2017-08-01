@@ -20,6 +20,9 @@ import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem;
 import com.danielstone.materialaboutlibrary.items.MaterialAboutTitleItem;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutCard;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList;
+import com.mikepenz.aboutlibraries.Libs;
+import com.mikepenz.aboutlibraries.LibsBuilder;
+import com.mikepenz.aboutlibraries.util.Colors;
 import com.mikepenz.community_material_typeface_library.CommunityMaterial;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -145,6 +148,25 @@ public class AboutActivity extends MaterialAboutActivity {
                             @Override
                             public void onClick() {
                                 startActivity(new Intent(context, DonationActivity.class));
+                            }
+                        })
+                        .build());
+        info.addItem(
+                new MaterialAboutActionItem.Builder()
+                        .text("Librerias")
+                        .icon(new IconicsDrawable(context)
+                                .icon(CommunityMaterial.Icon.cmd_library_books)
+                                .color(iconColor(context))
+                                .sizeDp(18))
+                        .setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+                            @Override
+                            public void onClick() {
+                                ThemeUtils.Theme theme = ThemeUtils.Theme.create(AboutActivity.this);
+                                new LibsBuilder()
+                                        .withActivityStyle(ThemeUtils.isAmoled(AboutActivity.this) ? Libs.ActivityStyle.DARK : Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
+                                        .withActivityTitle("Librerias")
+                                        .withActivityColor(new Colors(theme.primary, theme.primary))
+                                        .start(AboutActivity.this);
                             }
                         })
                         .build());

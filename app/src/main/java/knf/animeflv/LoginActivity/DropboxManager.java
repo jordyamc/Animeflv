@@ -248,6 +248,7 @@ public class DropboxManager {
                 }
                 try {
                     File tmpFile = new File(Keys.Dirs.CACHE, "emision.save");
+                    if (!tmpFile.exists()) tmpFile.createNewFile();
                     OutputStream outputStream = new FileOutputStream(tmpFile);
                     DbxClientV2 client = DropboxClientFactory.getClient();
                     if (client == null) {
@@ -327,6 +328,7 @@ public class DropboxManager {
                 }
                 try {
                     File tmpFile = new File(Keys.Dirs.CACHE, "favs.save");
+                    if (!tmpFile.exists()) tmpFile.createNewFile();
                     OutputStream outputStream = new FileOutputStream(tmpFile);
                     DbxClientV2 client = DropboxClientFactory.getClient();
                     if (client == null) {
@@ -367,6 +369,7 @@ public class DropboxManager {
                 }
                 try {
                     File tmpFile = new File(Keys.Dirs.CACHE, "seen.save");
+                    if (!tmpFile.exists()) tmpFile.createNewFile();
                     OutputStream outputStream = new FileOutputStream(tmpFile);
                     DbxClientV2 client = DropboxClientFactory.getClient();
                     if (client == null) {

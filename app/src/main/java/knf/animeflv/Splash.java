@@ -47,6 +47,7 @@ import io.branch.referral.util.LinkProperties;
 import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.CustomSettingsIntro.CustomIntro;
+import knf.animeflv.Jobs.CheckJob;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.OnlineDataHelper;
 import knf.animeflv.Utils.ThemeUtils;
@@ -79,6 +80,7 @@ public class Splash extends AwesomeSplash {
     public void initSplash(ConfigSplash configSplash) {
         context = this;
         new Alarm().SetAlarm(this);
+        CheckJob.shedule(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setNavigationBarColor(ContextCompat.getColor(this, getSplashColor()));
             getWindow().setStatusBarColor(ContextCompat.getColor(this, getSplashColor()));

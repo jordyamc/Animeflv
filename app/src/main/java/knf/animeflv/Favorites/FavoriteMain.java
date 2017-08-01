@@ -22,6 +22,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -31,6 +33,8 @@ import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropM
 
 import org.cryse.widget.persistentsearch.HomeButton;
 import org.cryse.widget.persistentsearch.PersistentSearchView;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,7 +51,7 @@ import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.TrackingHelper;
 import xdroid.toaster.Toaster;
 
-public class FavoriteMain extends AppCompatActivity {
+public class FavoriteMain extends AppCompatActivity implements FavoriteAdapter.ListListener {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.recyclerView)
@@ -57,6 +61,13 @@ public class FavoriteMain extends AppCompatActivity {
 
     @BindView(R.id.searchview)
     PersistentSearchView searchView;
+
+    @BindView(R.id.no_data)
+    LinearLayout no_data;
+    @BindView(R.id.img_no_data)
+    ImageView img_no_data;
+    @BindView(R.id.txt_no_data)
+    TextView txt_no_data;
 
     private RecyclerViewDragDropManager dragDropManager;
     private RecyclerView.Adapter wraped;
@@ -355,6 +366,26 @@ public class FavoriteMain extends AppCompatActivity {
             searchView.openSearch();
             search_opened = true;
         }
+    }
+
+    @Override
+    public void onListCreated(final List<FavObject> list, @Nullable final String search) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (list.size() == 0) {
+                    no_data.setVisibility(View.VISIBLE);
+                    img_no_data.setImageResource(ThemeUtils.getFlatImage(FavoriteMain.this));
+                    if (search == null) {
+                        txt_no_data.setText("No tienes animes favoritos");
+                    } else {
+                        txt_no_data.setText("No se encontró el anime: \"" + search + "\"");
+                    }
+                } else {
+                    no_data.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     @Override

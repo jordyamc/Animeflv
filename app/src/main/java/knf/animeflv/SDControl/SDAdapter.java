@@ -37,7 +37,7 @@ public class SDAdapter extends RecyclerView.Adapter<SDAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(final SDAdapter.ViewHolder holder, final int position) {
-        String name = items.list().get(holder.getAdapterPosition());
+        String name = items.list().get(Gposition(holder, position));
         if (name.contains("_noWrite_")) {
             holder.button.setBackgroundColor(ColorsRes.Rojo(activity));
         } else {
@@ -46,7 +46,7 @@ public class SDAdapter extends RecyclerView.Adapter<SDAdapter.ViewHolder> {
         holder.button.setText(name.replace("_noWrite_", ""));
         String path = FileUtil.init(activity).getSDPath();
         if (path != null) {
-            if (path.equals(items.listDisrs().get(holder.getAdapterPosition()))) {
+            if (path.equals(items.listDisrs().get(Gposition(holder, position)))) {
                 holder.check.setChecked(true);
                 if (!name.contains("_noWrite_")) {
                     clicklistener.onOptionOK();
@@ -58,8 +58,8 @@ public class SDAdapter extends RecyclerView.Adapter<SDAdapter.ViewHolder> {
         holder.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PreferenceManager.getDefaultSharedPreferences(activity).edit().putString("SDPath", items.list().get(holder.getAdapterPosition()).replace("_noWrite_", "")).commit();
-                if (items.list().get(holder.getAdapterPosition()).contains("_noWrite_") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                PreferenceManager.getDefaultSharedPreferences(activity).edit().putString("SDPath", items.list().get(Gposition(holder, position)).replace("_noWrite_", "")).commit();
+                if (items.list().get(Gposition(holder, position)).contains("_noWrite_") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
                     activity.startActivityForResult(intent, SDSearcher.GRANT_WRITE_PERMISSION_CODE);
                 } else {
@@ -78,6 +78,10 @@ public class SDAdapter extends RecyclerView.Adapter<SDAdapter.ViewHolder> {
                 return false;
             }
         });
+    }
+
+    private int Gposition(ViewHolder holder, int position) {
+        return holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition();
     }
 
     @Override

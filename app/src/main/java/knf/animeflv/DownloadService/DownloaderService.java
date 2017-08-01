@@ -69,6 +69,7 @@ public class DownloaderService extends IntentService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         startForeground(DOWNLOAD_NOTIFICATION_ID, getDownloadingBuilder().build());
+
         return IntentService.START_REDELIVER_INTENT;
     }
 

@@ -18,6 +18,8 @@ import android.widget.Toast;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.core.CrashlyticsCore;
+import com.evernote.android.job.JobConfig;
+import com.evernote.android.job.JobManager;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.onesignal.OSNotificationOpenResult;
@@ -29,6 +31,7 @@ import es.munix.multidisplaycast.CastManager;
 import io.branch.referral.Branch;
 import io.fabric.sdk.android.Fabric;
 import knf.animeflv.DownloadService.SSLCertificateHandler;
+import knf.animeflv.Jobs.JobsCreator;
 import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.Utils.FastActivity;
 import knf.animeflv.Utils.Logger;
@@ -62,6 +65,8 @@ public class Application extends MultiDexApplication {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             initChannels();
         UtilsInit.init(this);
+        JobManager.create(this).addJobCreator(new JobsCreator());
+        JobConfig.setLogcatEnabled(true);
         android.webkit.CookieSyncManager.createInstance(this);
         android.webkit.CookieManager.getInstance().setAcceptCookie(true);
         WebkitCookieManagerProxy coreCookieManager = new WebkitCookieManagerProxy(null, java.net.CookiePolicy.ACCEPT_ALL);

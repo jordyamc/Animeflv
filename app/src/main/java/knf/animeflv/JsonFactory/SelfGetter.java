@@ -40,8 +40,8 @@ import knf.animeflv.JsonFactory.JsonTypes.INICIO;
 import knf.animeflv.Parser;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.WaitList.AdapterWait;
 import knf.animeflv.WaitList.WaitDownloadElement;
-import knf.animeflv.WaitList.WaitList;
 import xdroid.toaster.Toaster;
 
 public class SelfGetter {
@@ -148,7 +148,7 @@ public class SelfGetter {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
-    public static void getDownloadList(final Context context, final String aid, final List<String> eids, final WaitList.ListListener listListener) {
+    public static void getDownloadList(final Context context, final String aid, final List<String> eids, final AdapterWait.ListListener listListener) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -524,8 +524,6 @@ public class SelfGetter {
                     try {
                         Elements rels = document.select("ul.ListAnmRel").first().select("li");
                         for (Element rel : rels) {
-                            //FIXME: Buscar diferencia de Precuela/Secuela
-                            //String t_tid = rel.select("b").first().ownText();
                             Element link = rel.select("a").first();
                             String full_link = "http://animeflv.net" + link.attr("href");
                             String name = link.ownText();

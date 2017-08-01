@@ -78,6 +78,11 @@ public class ThemeUtils {
         view.setPadding(0, 0, 0, getNavigationBarHeight(activity));
     }
 
+    @DrawableRes
+    public static int getFlatImage(Context context) {
+        return isAmoled(context) ? R.drawable.darkumaru_flat : R.drawable.umaru_flat;
+    }
+
     private static int getStatusBarHeight(Activity activity) {
         int result = 0;
         int resourceId = activity.getResources().getIdentifier("status_bar_height", "dimen", "android");

@@ -72,8 +72,8 @@ public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.
                 InfoHelper.open(
                         context,
                         new InfoHelper.SharedItem(holder.imageView, "img"),
-                        new InfoHelper.BundleItem("aid", list.get(holder.getAdapterPosition()).getAid()),
-                        new InfoHelper.BundleItem("title", list.get(holder.getAdapterPosition()).getTitle())
+                        new InfoHelper.BundleItem("aid", list.get(getPosition(holder.getAdapterPosition(), position)).getAid()),
+                        new InfoHelper.BundleItem("title", list.get(getPosition(holder.getAdapterPosition(), position)).getTitle())
                 );
             }
         });

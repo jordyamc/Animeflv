@@ -28,6 +28,7 @@
 -dontwarn com.github.siyamed.**
 -dontwarn com.zendesk.**
 -dontwarn io.codetail.animation.**
+-dontwarn com.mikepenz.materialdrawer.**
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
 -keepattributes JavascriptInterface
@@ -51,5 +52,9 @@ public *;
 -keep public class * implements knf.animeflv.JsonFactory$UrlGetter
 -keepclassmembers class knf.animeflv.JsonFactory$UrlGetter {
     <methods>;
+}
+-keep class .R
+-keep class **.R$* {
+    <fields>;
 }
 

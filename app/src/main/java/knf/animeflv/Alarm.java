@@ -44,7 +44,6 @@ public class Alarm extends BroadcastReceiver {
                     }
                 }
             });
-            startService(context);
         } else {
             Log.e("Service", "Servicio Desactivado");
         }

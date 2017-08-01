@@ -8,18 +8,21 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.R;
+import knf.animeflv.Utils.ThemeUtils;
 
-/**
- * Created by Jordy on 19/07/2017.
- */
-
-public class ListFragment extends Fragment {
+public class ListFragment extends Fragment implements FavSyncAdapter.ListCountInterface {
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.no_data)
+    LinearLayout linearLayout;
+    @BindView(R.id.img_no_data)
+    ImageView img_no_data;
 
     public ListFragment() {
     }
@@ -36,7 +39,20 @@ public class ListFragment extends Fragment {
         View view = inflater.inflate(R.layout.layout_fragment_sync, container, false);
         ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new FavSyncAdapter(getContext(), getArguments().getInt("type")));
+        recyclerView.setAdapter(new FavSyncAdapter(getContext(), getArguments().getInt("type"), this));
+        img_no_data.setImageResource(ThemeUtils.getFlatImage(getContext()));
         return view;
+    }
+
+    @Override
+    public void onListCount(int count) {
+        if (count == 0) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    linearLayout.setVisibility(View.VISIBLE);
+                }
+            });
+        }
     }
 }

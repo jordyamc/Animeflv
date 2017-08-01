@@ -60,13 +60,13 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
 
     @Override
     public void onBindViewHolder(final DirectoryAdapter.ViewHolder holder, final int position) {
-        if (list.get(holder.getAdapterPosition()).getFilesNumber().startsWith("0")) {
+        if (list.get(Gposition(holder, position)).getFilesNumber().startsWith("0")) {
             holder.root.setVisibility(View.GONE);
         }
-        new CacheManager().mini(context,list.get(holder.getAdapterPosition()).getID(),holder.img);
+        new CacheManager().mini(context, list.get(Gposition(holder, position)).getID(), holder.img);
         holder.iV_visto.setVisibility(View.GONE);
-        holder.titulo.setText(list.get(holder.getAdapterPosition()).getTitle());
-        String caps = list.get(holder.getAdapterPosition()).getFilesNumber();
+        holder.titulo.setText(list.get(Gposition(holder, position)).getTitle());
+        String caps = list.get(Gposition(holder, position)).getFilesNumber();
         if (caps.startsWith("1 ")) {
             caps = caps.replace("archivos", "archivo");
         }
@@ -78,14 +78,14 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
         holder.root.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                interfaces.OnDirectoryClicked(list.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getFile(context), list.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getTitle());
+                interfaces.OnDirectoryClicked(list.get(Gposition(holder, position)).getFile(context), list.get(Gposition(holder, position)).getTitle());
             }
         });
         holder.del.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new MaterialDialog.Builder(context)
-                        .content("Esta seguro que desea eliminar todos los capitulos descargados de " + list.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getTitle() + "?")
+                        .content("Esta seguro que desea eliminar todos los capitulos descargados de " + list.get(Gposition(holder, position)).getTitle() + "?")
                         .positiveText("Eliminar")
                         .negativeText("cancelar")
                         .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
@@ -100,7 +100,7 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
                                     @Override
                                     protected void onPreExecute() {
                                         try {
-                                            int length = list.get(holder.getAdapterPosition()).getFile(context).list().length;
+                                            int length = list.get(Gposition(holder, position)).getFile(context).list().length;
                                             dialogProg = new MaterialDialog.Builder(context)
                                                     .content("Eliminando...")
                                                     .progress(false, length, true)
@@ -125,7 +125,7 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
                                         if (empty)
                                             return null;
                                         try {
-                                            for (String file : list.get(holder.getAdapterPosition()).getFile(context).list()) {
+                                            for (String file : list.get(Gposition(holder, position)).getFile(context).list()) {
                                                 ManageDownload.cancel(context, file.replace(".mp4", "E"));
                                                 FileUtil.init(context).DeleteAnime(file.replace(".mp4", "E"));
                                                 progress++;
@@ -141,10 +141,10 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
                                                 public void run() {
                                                     try {
                                                         dialogProg.dismiss();
-                                                        if (list.get(holder.getAdapterPosition()).getFile(context).list().length == 0) {
-                                                            FileUtil.init(context).DeleteAnimeDir(list.get(holder.getAdapterPosition()).getID());
-                                                            list.remove(holder.getAdapterPosition());
-                                                            notifyItemRemoved(holder.getAdapterPosition());
+                                                        if (list.get(Gposition(holder, position)).getFile(context).list().length == 0) {
+                                                            FileUtil.init(context).DeleteAnimeDir(list.get(Gposition(holder, position)).getID());
+                                                            list.remove(Gposition(holder, position));
+                                                            notifyItemRemoved(Gposition(holder, position));
                                                             Toaster.toast("Archivos eliminados");
                                                             recreateList();
                                                         } else {
@@ -182,31 +182,19 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
                 InfoHelper.open(
                         context,
                         new InfoHelper.SharedItem(holder.img, "img"),
-                        new InfoHelper.BundleItem("aid", list.get(holder.getAdapterPosition()).getID()),
-                        new InfoHelper.BundleItem("title", list.get(holder.getAdapterPosition()).getTitle())
+                        new InfoHelper.BundleItem("aid", list.get(Gposition(holder, position)).getID()),
+                        new InfoHelper.BundleItem("title", list.get(Gposition(holder, position)).getTitle())
                 );
                 return true;
             }
         });
     }
 
-    private void recreateList() {
-        ModelFactory.createDirectoryListAsync(context, new ModelFactory.AsyncDirectoryListener() {
-            @Override
-            public void onCreated(List<Directory> l) {
-                list = l;
-                context.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        notifyDataSetChanged();
-                    }
-                });
-            }
-        });
+    private int Gposition(ViewHolder holder, int position) {
+        return holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition();
     }
 
-    public void recreateList(Activity activity) {
-        context = activity;
+    private void recreateList() {
         ModelFactory.createDirectoryListAsync(context, new ModelFactory.AsyncDirectoryListener() {
             @Override
             public void onCreated(List<Directory> l) {

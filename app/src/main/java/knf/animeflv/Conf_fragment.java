@@ -54,6 +54,7 @@ import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.CustomSettingsIntro.CustomIntro;
 import knf.animeflv.Directorio.DB.DirectoryDB;
 import knf.animeflv.Directorio.Directorio;
+import knf.animeflv.Jobs.CheckJob;
 import knf.animeflv.JsonFactory.SelfGetter;
 import knf.animeflv.LoginActivity.LoginBase;
 import knf.animeflv.LoginActivity.LoginUser;
@@ -767,18 +768,21 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                     getPreferenceScreen().findPreference(Conf.INDICADOR_SONIDOS).setEnabled(false);
                     getPreferenceScreen().findPreference(Conf.RECHARGE_SOUNDS).setEnabled(false);
                     new Alarm().CancelAlarm(context);
+                    CheckJob.stopShedule();
                 } else {
                     getPreferenceScreen().findPreference("tiempo").setEnabled(true);
                     getPreferenceScreen().findPreference("sonido").setEnabled(true);
                     getPreferenceScreen().findPreference(Conf.INDICADOR_SONIDOS).setEnabled(true);
                     getPreferenceScreen().findPreference(Conf.RECHARGE_SOUNDS).setEnabled(true);
                     new Alarm().SetAlarm(context);
+                    CheckJob.shedule(context);
                 }
                 break;
             case "tiempo":
                 int tiempo = Integer.parseInt(sharedPreferences.getString(key, "60000"));
                 new Alarm().CancelAlarm(context);
                 new Alarm().SetAlarm(context, tiempo);
+                CheckJob.reshedule(context);
                 break;
             case "nCuenta_Status":
                 String status = sharedPreferences.getString("nCuenta_Status", "NULL");

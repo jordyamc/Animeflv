@@ -128,8 +128,10 @@ public class DonationActivity extends AppCompatActivity {
             public void onCustomTabsServiceConnected(ComponentName componentName, CustomTabsClient customTabsClient) {
                 customTabsClient.warmup(0);
                 session = customTabsClient.newSession(null);
-                session.mayLaunchUrl(PaypalUri(), null, null);
-                session.mayLaunchUrl(PatreonUri(), null, null);
+                if (session != null) {
+                    session.mayLaunchUrl(PaypalUri(), null, null);
+                    session.mayLaunchUrl(PatreonUri(), null, null);
+                }
             }
 
             @Override

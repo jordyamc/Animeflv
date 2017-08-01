@@ -35,10 +35,11 @@ public class FavSyncAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private List<FavObject> list = new ArrayList<>();
     private ThemeUtils.Theme theme;
 
-    public FavSyncAdapter(Context context, int type) {
+    public FavSyncAdapter(Context context, int type, ListCountInterface countInterface) {
         this.context = context;
         this.list = FavSyncHelper.getResolved(type == 0 ? FavSyncHelper.local : FavSyncHelper.cloud);
         this.theme = ThemeUtils.Theme.create(context);
+        countInterface.onListCount(list.size());
         setHasStableIds(true);
     }
 
@@ -122,6 +123,10 @@ public class FavSyncAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     private interface Draggable extends DraggableItemConstants {
+    }
+
+    interface ListCountInterface {
+        void onListCount(int count);
     }
 
     public static class FavViewHolder extends AbstractDraggableItemViewHolder {

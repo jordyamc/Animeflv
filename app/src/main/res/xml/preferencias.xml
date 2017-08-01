@@ -55,7 +55,7 @@
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="bypass_check"
-            android:title="Revisar bypass al buscar capitulos recientes"/>
+            android:title="Verificar bypass en segundo plano"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Actualizaciones">
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
