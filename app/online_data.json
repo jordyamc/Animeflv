@@ -10,6 +10,13 @@
   },
   "contributors": [
     {
+      "name": "Sam",
+      "description": "Financiador",
+      "onclick_message": 0,
+      "message": "",
+      "alias": ""
+    },
+    {
       "name": "Bowen_gfla",
       "description": "Buscador de imagenes",
       "onclick_message": 0,
