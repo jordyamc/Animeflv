@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
@@ -12,6 +13,7 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
+import android.text.format.Formatter;
 import android.util.Log;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -27,6 +29,8 @@ import knf.animeflv.ColorsRes;
 import knf.animeflv.Utils.eNums.UpdateState;
 import knf.animeflv.newMain;
 import xdroid.toaster.Toaster;
+
+import static android.content.Context.WIFI_SERVICE;
 
 /**
  * Created by Jordy on 28/03/2016.
@@ -46,6 +50,11 @@ public class NetworkUtils {
         } catch (Exception e) {
             Toaster.toast("ERROR");
         }
+    }
+
+    public static String getIPAddress(Context context) {
+        WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
+        return Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
     }
 
     public static boolean isNetworkAvailable() {

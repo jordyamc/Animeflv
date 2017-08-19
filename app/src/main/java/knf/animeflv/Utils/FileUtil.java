@@ -144,7 +144,7 @@ public class FileUtil {
     }
 
     @Nullable
-    public static InputStream getInputStreamFromAccess(Activity activity, DocumentFile sdFile) {
+    public static InputStream getInputStreamFromAccess(Context activity, DocumentFile sdFile) {
         if (sdFile != null) {
             try {
                 return activity.getContentResolver().openInputStream(sdFile.getUri());

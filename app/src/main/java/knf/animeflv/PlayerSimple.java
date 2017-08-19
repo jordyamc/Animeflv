@@ -6,11 +6,14 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -40,6 +43,7 @@ public class PlayerSimple extends AppCompatActivity {
     Map<String, String> options;
     Handler handler = new Handler();
     Context context;
+    MediaController controller;
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -51,6 +55,7 @@ public class PlayerSimple extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e("OnCreate", "oncreate saved: " + (savedInstanceState != null));
         if (savedInstanceState != null) {
             stopPosition = savedInstanceState.getInt("position");
         }
@@ -61,10 +66,11 @@ public class PlayerSimple extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        load = (RelativeLayout) findViewById(R.id.loading);
+        load = findViewById(R.id.loading);
         if (load != null) load.bringToFront();
-        videoView = (VideoView) findViewById(R.id.video_simple);
-        videoView.setMediaController(new MediaController(this));
+        videoView = findViewById(R.id.video_simple);
+        controller = new MediaController(this);
+        videoView.setMediaController(controller);
         videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
@@ -79,7 +85,6 @@ public class PlayerSimple extends AppCompatActivity {
                         finish();
                         break;
                 }
-                finish();
                 return false;
             }
         });
@@ -89,6 +94,44 @@ public class PlayerSimple extends AppCompatActivity {
                 handler.postDelayed(runnable, 3000);
                 load.setVisibility(View.GONE);
                 mp.start();
+                if (stopPosition > 0)
+                    mp.seekTo(stopPosition);
+            }
+        });
+        final GestureDetector detector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent event) {
+                try {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                        if (isInPictureInPictureMode()) {
+                            Intent startIntent = new Intent(PlayerSimple.this, PlayerSimple.class);
+                            startIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                            startActivity(startIntent);
+                        } else {
+                            enterPictureInPictureMode();
+                        }
+                } catch (IllegalStateException e) {
+                    e.fillInStackTrace();
+                    Toaster.toast("El dispositivo no soporta el modo Picture in picture");
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                if (controller.isShowing()) {
+                    controller.hide();
+                } else {
+                    controller.show(3000);
+                }
+                return true;
+            }
+        });
+        videoView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                detector.onTouchEvent(motionEvent);
+                return true;
             }
         });
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {

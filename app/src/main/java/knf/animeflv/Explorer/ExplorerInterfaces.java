@@ -9,6 +9,8 @@ import java.io.File;
 public interface ExplorerInterfaces {
     void OnDirectoryClicked(File file, String name);
 
+    void OnCastFile(File file, String eid);
+
     void OnFileClicked(File file);
 
     void OnDirectoryFileChange();

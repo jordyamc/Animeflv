@@ -96,35 +96,45 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 26 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="support-core-ui-26.0.1" level="project" />
     <orderEntry type="library" name="support-core-ui-26.0.0" level="project" />
+    <orderEntry type="library" name="support-media-compat-26.0.1" level="project" />
+    <orderEntry type="library" name="play-services-basement-11.2.0" level="project" />
     <orderEntry type="library" name="support-media-compat-26.0.0" level="project" />
     <orderEntry type="library" name="gson-2.8.1" level="project" />
-    <orderEntry type="library" name="play-services-cast-11.0.4" level="project" />
+    <orderEntry type="library" name="recyclerview-v7-26.0.1" level="project" />
     <orderEntry type="library" name="support-vector-drawable-26.0.0" level="project" />
     <orderEntry type="library" name="support-core-utils-26.0.0" level="project" />
-    <orderEntry type="library" name="recyclerview-v7-26.0.0" level="project" />
+    <orderEntry type="library" name="support-vector-drawable-26.0.1" level="project" />
+    <orderEntry type="library" name="support-core-utils-26.0.1" level="project" />
     <orderEntry type="library" name="support-v13-25.0.0" level="project" />
     <orderEntry type="library" name="AndroidUtilities-1.6.0" level="project" />
     <orderEntry type="library" name="core-0.9.1.0" level="project" />
-    <orderEntry type="library" name="play-services-basement-11.0.4" level="project" />
     <orderEntry type="library" name="library-1.3.0" level="project" />
     <orderEntry type="library" name="glide-3.7.0" level="project" />
-    <orderEntry type="library" name="transition-26.0.0" level="project" />
-    <orderEntry type="library" name="play-services-base-11.0.4" level="project" />
+    <orderEntry type="library" name="transition-26.0.1" level="project" />
     <orderEntry type="library" name="mediarouter-v7-26.0.0" level="project" />
+    <orderEntry type="library" name="play-services-base-11.2.0" level="project" />
+    <orderEntry type="library" name="mediarouter-v7-26.0.1" level="project" />
     <orderEntry type="library" name="support-fragment-26.0.0" level="project" />
     <orderEntry type="library" name="animated-vector-drawable-26.0.0" level="project" />
     <orderEntry type="library" name="java-websocket-1.3.1" level="project" />
+    <orderEntry type="library" name="support-compat-26.0.1" level="project" />
     <orderEntry type="library" name="support-compat-26.0.0" level="project" />
+    <orderEntry type="library" name="support-annotations-26.0.1" level="project" />
+    <orderEntry type="library" name="support-v4-26.0.1" level="project" />
+    <orderEntry type="library" name="support-fragment-26.0.1" level="project" />
+    <orderEntry type="library" name="animated-vector-drawable-26.0.1" level="project" />
+    <orderEntry type="library" name="palette-v7-26.0.1" level="project" />
     <orderEntry type="library" name="support-v4-26.0.0" level="project" />
     <orderEntry type="library" name="palette-v7-26.0.0" level="project" />
     <orderEntry type="library" name="AmazonFling" level="project" />
     <orderEntry type="library" name="WhisperPlay" level="project" />
-    <orderEntry type="library" name="support-annotations-26.0.0" level="project" />
-    <orderEntry type="library" name="design-26.0.0" level="project" />
+    <orderEntry type="library" name="appcompat-v7-26.0.1" level="project" />
+    <orderEntry type="library" name="play-services-cast-11.2.0" level="project" />
     <orderEntry type="library" name="appcompat-v7-26.0.0" level="project" />
-    <orderEntry type="library" name="multidex-1.0.2" level="project" />
-    <orderEntry type="library" name="play-services-tasks-11.0.4" level="project" />
+    <orderEntry type="library" name="play-services-tasks-11.2.0" level="project" />
+    <orderEntry type="library" name="design-26.0.1" level="project" />
     <orderEntry type="library" name="javax.jmdns_3.4.1-patch2" level="project" />
     <orderEntry type="library" name="org.apache.http.legacy-android-26" level="project" />
   </component>

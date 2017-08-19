@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import knf.animeflv.BackgroundChecker.startBackground;
 import knf.animeflv.R;
 import knf.animeflv.Utils.logs.LogViewer;
 
@@ -58,7 +59,7 @@ public class Logger {
 
     private static void ShowNot(File file) {
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
+                new NotificationCompat.Builder(context, startBackground.CHANNEL_ERROR)
                         .setSmallIcon(R.drawable.ic_not_r)
                         .setContentTitle("Informe de error capturado")
                         .setContentText("Presiona para enviar");

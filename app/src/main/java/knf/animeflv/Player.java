@@ -8,10 +8,13 @@ import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -27,6 +30,7 @@ import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.playerSources.ResizeSurfaceView;
 import knf.animeflv.playerSources.VideoControllerView;
+import xdroid.toaster.Toaster;
 
 
 public class Player extends AppCompatActivity implements VideoControllerView.MediaPlayerControlListener, SurfaceHolder.Callback, MediaPlayer.OnVideoSizeChangedListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
@@ -43,6 +47,7 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
     private int mVideoHeight;
     private View mContentView;
     private View mLoadingView;
+    private GestureDetectorCompat detector;
 
     public static int getDeviceWidth(Context context) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -58,6 +63,15 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
         return mDisplayMetrics.heightPixels;
     }
 
+    private void setOrientation(final int orientation) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                setRequestedOrientation(orientation);
+            }
+        });
+    }
+
     @TargetApi(21)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +81,7 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-        mVideoSurface = (ResizeSurfaceView) findViewById(R.id.videoSurface);
+        mVideoSurface = findViewById(R.id.videoSurface);
         mContentView = findViewById(R.id.video_container);
         mLoadingView = findViewById(R.id.loading);
 
@@ -75,7 +89,7 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
         mLoadingView.setVisibility(View.VISIBLE);
         decorView = getWindow().getDecorView();
         hideSystemUI();
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        setOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 
         intent = getIntent();
         setMediaPlayer();
@@ -86,11 +100,39 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
             controller = new VideoControllerView(this);
             SurfaceHolder videoHolder = mVideoSurface.getHolder();
             videoHolder.addCallback(this);
+            final GestureDetector detector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onDoubleTap(MotionEvent event) {
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                            if (isInPictureInPictureMode()) {
+                                Intent startIntent = new Intent(Player.this, Player.class);
+                                startIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                startActivity(startIntent);
+                                setOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                            } else {
+                                enterPictureInPictureMode();
+                                setOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                            }
+                    } catch (IllegalStateException e) {
+                        e.fillInStackTrace();
+                        Toaster.toast("El dispositivo no soporta el modo Picture in picture");
+                    }
+                    return true;
+                }
+
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    controller.toggleContollerView();
+                    return true;
+                }
+
+            });
             mVideoSurface.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
-                    controller.toggleContollerView();
-                    return false;
+                    detector.onTouchEvent(event);
+                    return true;
                 }
             });
             mMediaPlayer = new MediaPlayer();
@@ -347,4 +389,6 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
             finish();
         }
     }
+
+
 }

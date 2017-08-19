@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="knf.animeflv"
-    android:installLocation="auto"
-    tools:ignore="InnerclassSeparator">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          package="knf.animeflv"
+          android:installLocation="auto"
+          tools:ignore="InnerclassSeparator">
 
     <uses-feature
         android:name="android.software.leanback"
         android:required="false"/>
-
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false"/>
@@ -43,6 +41,7 @@
         <activity
             android:name=".newMain"
             android:configChanges="orientation|screenSize|keyboard"
+            android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/AppThemeNoAn"/>
         <activity
@@ -71,6 +70,7 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
             </intent-filter>
             <intent-filter>
@@ -91,7 +91,6 @@
                     android:host="raw.githubusercontent.com"
                     android:pathPrefix="/jordyamc/Animeflv/master/app/app-release.apk"
                     android:scheme="https"/>
-
             </intent-filter>
 
             <!-- Branch URI scheme -->
@@ -99,6 +98,7 @@
                 <data
                     android:host="open"
                     android:scheme="knf-animeflv"/>
+
                 <action android:name="android.intent.action.VIEW"/>
 
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -170,10 +170,14 @@
             android:label="@string/app_name"/>
         <activity
             android:name=".Player"
-            android:label="@string/app_name"/>
+            android:label="@string/app_name"
+            android:resizeableActivity="true"
+            android:supportsPictureInPicture="true"/>
         <activity
             android:name=".PlayerSimple"
-            android:label="@string/app_name"/>
+            android:label="@string/app_name"
+            android:resizeableActivity="true"
+            android:supportsPictureInPicture="true"/>
         <activity
             android:name=".Style.ThemeFragmentAdvanced"
             android:label="@string/app_name">
@@ -202,10 +206,14 @@
         </activity>
         <activity
             android:name=".PlayerExo"
-            android:label="@string/app_name"/>
+            android:label="@string/app_name"
+            android:resizeableActivity="true"
+            android:supportsPictureInPicture="true"/>
         <activity
             android:name=".PlayerExoSimple"
-            android:label="@string/app_name"/>
+            android:label="@string/app_name"
+            android:resizeableActivity="true"
+            android:supportsPictureInPicture="true"/>
         <activity
             android:name=".Utils.FastActivity"
             android:excludeFromRecents="true"
@@ -258,6 +266,7 @@
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
+
                 <category android:name="android.intent.category.DEFAULT"/>
 
                 <data
@@ -313,7 +322,6 @@
         <activity
             android:name=".LoginActivity.LoginUser"
             android:label="@string/app_name"/>
-
         <activity
             android:name=".info.InfoFragments"
             android:configChanges="orientation|screenSize|keyboard"
@@ -352,20 +360,19 @@
                     android:scheme="https"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name="com.dropbox.core.android.AuthActivity"
             android:configChanges="orientation|keyboard"
             android:launchMode="singleTask">
             <intent-filter>
                 <data android:scheme="db-stz1g2qeh9nldga"/>
+
                 <action android:name="android.intent.action.VIEW"/>
 
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name="com.github.zawadz88.activitychooser.MaterialActivityChooserActivity"
             android:theme="@style/MACTheme"/>
@@ -373,7 +380,6 @@
             android:name=".Suggestions.SuggestionsActivity"
             android:configChanges="orientation|screenSize|keyboard"
             android:label="@string/app_name"/>
-        <activity android:name=".TV.Main"/>
         <activity
             android:name=".AdminControl.PushManager"
             android:configChanges="orientation|screenSize|keyboard"/>
@@ -390,7 +396,6 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE"/>
             </intent-filter>
         </service>
-
         <service
             android:name=".DownloadService.DownloaderService"
             android:exported="false"
@@ -407,7 +412,6 @@
                 <action android:name="download.retry"/>
             </intent-filter>
         </receiver>
-
         <receiver
             android:name="io.branch.referral.InstallListener"
             android:exported="true">
@@ -429,40 +433,47 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="8971b3733a2fd699ebd101e18ce228d80baeab92"/>
-
         <meta-data
             android:name="io.branch.sdk.BranchKey"
             android:value="key_live_cnrrfYDdPE4pGR1yV14rUlpnDAbUqNQj"/>
         <meta-data
             android:name="io.branch.sdk.BranchKey.test"
             android:value="key_test_anDEj1EmHr0cJLWFL32ZldlpEDiVDUME"/>
-
         <meta-data
             android:name="io.branch.sdk.TestMode"
             android:value="false"/>
-
         <meta-data
             android:name="com.onesignal.NotificationOpened.DEFAULT"
             android:value="DISABLE"/>
-
         <meta-data
             android:name="android.max_aspect"
             android:value="2.1"/>
 
         <receiver
-            android:name="knf.animeflv.Widget.WidgetProvider"
+            android:name=".Widget.WidgetProvider"
             android:label="Emision">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
+
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info"/>
         </receiver>
+
         <service
-            android:name="knf.animeflv.Widget.WidgetService"
+            android:name=".Widget.WidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS"/>
 
+        <activity
+            android:name=".TV.TVMain"
+            android:label="@string/title_activity_tvmain"
+            android:theme="@style/AppTheme">
+        </activity>
+        <activity
+            android:name=".TV.TVChapterDetails"
+            android:theme="@style/Theme.AppCompat.Translucent"/>
+        <activity android:name=".TV.TVAnimeInfo"/>
     </application>
 
 </manifest>

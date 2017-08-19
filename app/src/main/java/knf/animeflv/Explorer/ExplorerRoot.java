@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -28,19 +29,23 @@ import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import es.munix.multidisplaycast.CastControlsActivity;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Configuracion;
 import knf.animeflv.Directorio.DB.DirectoryHelper;
+import knf.animeflv.DownloadService.WebServer;
 import knf.animeflv.Explorer.Fragments.DirectoryFragment;
 import knf.animeflv.Explorer.Fragments.VideoFilesFragment;
 import knf.animeflv.Explorer.Models.ModelFactory;
 import knf.animeflv.FavSyncro;
 import knf.animeflv.FileMover;
 import knf.animeflv.Parser;
+import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.FragmentExtras;
 import knf.animeflv.Utils.Keys;
+import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.TrackingHelper;
 import xdroid.toaster.Toaster;
@@ -52,12 +57,16 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
     Toolbar toolbar;
     @BindView(R.id.fileDir)
     TextView textView;
+    @BindView(R.id.fab)
+    FloatingActionButton floatingActionButton;
     DirectoryFragment directoryFragment;
     VideoFilesFragment videoFilesFragment;
     boolean waitForResult = false;
     private boolean isDirectory = true;
     private String TAG_DIRECTORY = "directorio";
     private String TAG_ANIME = "anime";
+
+    private WebServer server;
 
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
@@ -83,6 +92,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
             }
         });
         toolbar.setTitleTextColor(theme.textColorToolbar);
+        floatingActionButton.hide();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(theme.primaryDark);
             getWindow().setNavigationBarColor(theme.primary);
@@ -115,6 +125,12 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
                 }
             }
         }
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(ExplorerRoot.this, CastControlsActivity.class));
+            }
+        });
         if (!waitForResult) {
             textView.setText(ModelFactory.getDirectoryFile(this).getAbsolutePath());
             directoryFragment = new DirectoryFragment();
@@ -194,6 +210,26 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
     @Override
     public void OnFileClicked(File file) {
 
+    }
+
+    private String getIpWport(int port, boolean formatted) {
+        return (formatted ? "http://" : "") + NetworkUtils.getIPAddress(this) + ":" + port;
+    }
+
+    @Override
+    public void OnCastFile(File file, String eid) {
+        try {
+            if (server != null && server.isAlive())
+                server.stop();
+            server = new WebServer(this, file);
+            server.start();
+            CastPlayBackManager.get(this).play(getIpWport(8880, true), eid);
+            if (CastPlayBackManager.get(this).isDeviceConnected())
+                floatingActionButton.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toaster.toast("Error al activar webserver");
+        }
     }
 
     @Override
@@ -436,6 +472,9 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
     protected void onDestroy() {
         new Parser().saveBackup(this);
         FavSyncro.updateServer(this);
+        if (server != null)
+            server.stop();
+        CastPlayBackManager.get(this).stop();
         super.onDestroy();
     }
 }

@@ -57,11 +57,13 @@ public class startBackground {
     public static final String CHANNEL_UPDATES = "animeflv_app_channel_updates";
     public static final String CHANNEL_CURR_DOWNLOAD = "animeflv_app_channel_download_current";
     public static final String CHANNEL_COM_DOWNLOAD = "animeflv_app_channel_download_complete";
+    public static final String CHANNEL_ERROR = "animeflv_app_channel_error";
 
     public static final String CHANNEL_ANIMES_DESC = "Notificaciones de nuevos capitulos";
     public static final String CHANNEL_UPDATES_DESC = "Actualizaciones de la app";
     public static final String CHANNEL_CURR_DOWNLOAD_DESC = "Descargas en progreso";
     public static final String CHANNEL_COM_DOWNLOAD_DESC = "Descargas completadas";
+    public static final String CHANNEL_ERROR_DESC = "Notificacion de errores";
 
     public static void compareNots(final Context context) {
         if (NetworkUtils.isNetworkAvailable()) {

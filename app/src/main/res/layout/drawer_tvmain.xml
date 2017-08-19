@@ -1,0 +1,8 @@
+<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+                                        xmlns:tools="http://schemas.android.com/tools"
+                                        android:layout_width="@dimen/navigation_drawer_width"
+                                        android:layout_height="match_parent"
+                                        android:paddingEnd="5dp"
+                                        android:paddingStart="25dp"
+                                        android:paddingTop="50dp"
+                                        tools:context="knf.animeflv.TV.NavigationDrawerFragment"/>

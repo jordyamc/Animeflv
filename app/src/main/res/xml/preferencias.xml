@@ -161,7 +161,7 @@
     <PreferenceCategory android:title="Descargas">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
-            android:key="def_download"
+            android:key="def_download_serv"
             android:summary="%s"
             android:title="Servidor de descarga preferido" />
     </PreferenceCategory>
@@ -250,10 +250,9 @@
             android:defaultValue="false"
             android:key="betaSounds"
             android:title="Sonidos Beta" />
-        <!--Open Intro-->
-        <!--<com.lb.material_preferences_library.custom_preferences.Preference
-            android:defaultValue="0"
-            android:key="open_intro"
-            android:title="Abrir into" />-->
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="tv_layout"
+            android:title="Interfaz para TV"/>
     </PreferenceCategory>
 </PreferenceScreen>

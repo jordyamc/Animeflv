@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.app.UiModeManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
@@ -289,7 +291,9 @@ public class ThemeUtils {
     }
 
     public static boolean isTV(Context context) {
-        return (((UiModeManager) context.getSystemService(UI_MODE_SERVICE)).getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION);
+        return (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEVISION)
+                || (Build.VERSION.SDK_INT >= 21 && context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_LEANBACK))
+                || (((UiModeManager) context.getSystemService(UI_MODE_SERVICE)).getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION));
     }
 
     public static void setOrientation(Activity activity) {

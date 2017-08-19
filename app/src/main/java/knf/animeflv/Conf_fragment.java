@@ -491,11 +491,11 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
-        getPreferenceScreen().findPreference("def_download").setSummary(getStringfromResourse(SelfGetter.getDownloadServersOptions(), "def_download", "0"));
-        getPreferenceScreen().findPreference("def_download").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        getPreferenceScreen().findPreference("def_download_serv").setSummary(getStringfromResourse(SelfGetter.getDownloadServersOptions(), "def_download_serv", "0"));
+        getPreferenceScreen().findPreference("def_download_serv").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                UtilDialogPref.init(SelfGetter.getDownloadServersOptions(), "%s", "def_download", "0", "Selecciona", getPreferenceScreen().findPreference("def_download"));
+                UtilDialogPref.init(SelfGetter.getDownloadServersOptions(), "%s", "def_download_serv", "0", "Selecciona", getPreferenceScreen().findPreference("def_download_serv"));
                 PrefDialogSimple.create().show(myContext.getSupportFragmentManager(), "PrefSimple");
                 return false;
             }

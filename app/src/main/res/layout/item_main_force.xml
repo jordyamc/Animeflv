@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.github.captain_miao.optroundcardview.OptRoundCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.github.captain_miao.optroundcardview.OptRoundCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_main"
     android:layout_width="match_parent"
@@ -15,6 +16,7 @@
     android:elevation="8dp"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
+    android:nextFocusRight="@+id/ib_main_ver"
     android:tag=":aesthetic_ignore"
     app:optRoundCardCornerRadius="5dp"
     app:optRoundCardElevation="8dp"
@@ -31,7 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:alpha="0.2"
-            android:background="@color/negro" />
+            android:background="@color/negro"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -43,7 +45,7 @@
                 android:id="@+id/wv_main"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:visibility="gone" />
+                android:visibility="gone"/>
 
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/img_main"
@@ -58,7 +60,7 @@
                 android:padding="5dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_block_r"
-                android:transitionName="img" />
+                android:transitionName="img"/>
 
             <LinearLayout
                 android:id="@+id/text"
@@ -87,7 +89,7 @@
                     android:scrollHorizontally="true"
                     android:tag=":aesthetic_ignore"
                     android:text="Título"
-                    android:transitionName="title" />
+                    android:transitionName="title"/>
 
                 <TextView
                     android:id="@+id/tv_main_Cap"
@@ -99,7 +101,7 @@
                     android:maxLines="1"
                     android:tag=":aesthetic_ignore"
                     android:text="N Capítulo"
-                    android:textColor="?attr/colorAccent" />
+                    android:textColor="?attr/colorAccent"/>
 
             </LinearLayout>
 
@@ -122,8 +124,10 @@
                     android:layout_height="60dp"
                     android:clickable="true"
                     android:foreground="?android:attr/selectableItemBackground"
+                    android:nextFocusLeft="@+id/card_main"
+                    android:nextFocusRight="@+id/ib_main_descargar"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_cloud_play" />
+                    android:src="@drawable/ic_cloud_play"/>
 
                 <pl.droidsonroids.gif.GifImageButton
                     android:id="@+id/ib_main_descargar"
@@ -132,8 +136,9 @@
                     android:layout_height="60dp"
                     android:clickable="true"
                     android:foreground="?android:attr/selectableItemBackground"
+                    android:nextFocusLeft="@+id/ib_main_ver"
                     android:scaleType="fitEnd"
-                    android:src="@drawable/ic_get_r" />
+                    android:src="@drawable/ic_get_r"/>
             </LinearLayout>
 
         </RelativeLayout>
@@ -148,6 +153,6 @@
             android:layout_marginRight="5dp"
             android:layout_marginStart="5dp"
             android:indeterminate="true"
-            android:visibility="visible" />
+            android:visibility="visible"/>
     </LinearLayout>
 </com.github.captain_miao.optroundcardview.OptRoundCardView>

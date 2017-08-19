@@ -53,7 +53,6 @@ public class CheckJob extends Job {
     @NonNull
     @Override
     protected Result onRunJob(Params params) {
-        Log.e("Job", "Start Job");
         Boolean not = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean("notificaciones", true);
         if (not) {
             Bypass.runJsoupTest(getContext(), new Bypass.onTestResult() {

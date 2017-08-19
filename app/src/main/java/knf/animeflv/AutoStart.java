@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import knf.animeflv.BackgroundChecker.startBackground;
 import knf.animeflv.Jobs.CheckJob;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.ThemeUtils;
@@ -75,7 +76,7 @@ public class AutoStart extends BroadcastReceiver
                     bigTextStyle.setBigContentTitle("Animes:");
                     bigTextStyle.bigText(temp);
                     NotificationCompat.Builder mBuilder =
-                            new NotificationCompat.Builder(context)
+                            new NotificationCompat.Builder(context, startBackground.CHANNEL_ANIMES)
                                     .setSmallIcon(R.drawable.ic_not_r)
                                     .setContentTitle(NotTit)
                                     .setContentText(mess);

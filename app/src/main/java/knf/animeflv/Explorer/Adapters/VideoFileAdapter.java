@@ -147,6 +147,13 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
                     }
                 }
             });
+            holder.ver.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    interfaces.OnCastFile(list.get(holder.getAdapterPosition()).getFile(), list.get(holder.getAdapterPosition()).getEID());
+                    return true;
+                }
+            });
             holder.del.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

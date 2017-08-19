@@ -27,6 +27,7 @@ import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -37,12 +38,25 @@ import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
+import knf.animeflv.JsonFactory.Objects.Option;
+import knf.animeflv.JsonFactory.Objects.Server;
 import knf.animeflv.Parser;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.WaitList.AdapterWait;
 import knf.animeflv.WaitList.WaitDownloadElement;
 import xdroid.toaster.Toaster;
+
+import static knf.animeflv.JsonFactory.Objects.Server.Names.CLUP;
+import static knf.animeflv.JsonFactory.Objects.Server.Names.HYPERION;
+import static knf.animeflv.JsonFactory.Objects.Server.Names.IZANAGI;
+import static knf.animeflv.JsonFactory.Objects.Server.Names.MEGA;
+import static knf.animeflv.JsonFactory.Objects.Server.Names.MINHATECA;
+import static knf.animeflv.JsonFactory.Objects.Server.Names.MP4UPLOAD;
+import static knf.animeflv.JsonFactory.Objects.Server.Names.OKRU;
+import static knf.animeflv.JsonFactory.Objects.Server.Names.YOTTA;
+import static knf.animeflv.JsonFactory.Objects.Server.Names.YOURUPLOAD;
+import static knf.animeflv.JsonFactory.Objects.Server.Names.ZIPPYSHARE;
 
 public class SelfGetter {
     public static final int TIMEOUT = 10000;
@@ -148,6 +162,44 @@ public class SelfGetter {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
+    public static void getDownload(final Context context, final DOWNLOAD download, final BaseGetter.AsyncDownloadInterface asyncInterface) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                getAnime(context, new ANIME(download.eid.split("_")[0]), new BaseGetter.AsyncInterface() {
+                    @Override
+                    public void onFinish(String json) {
+                        try {
+                            JSONArray array = new JSONObject(json).getJSONArray("episodios");
+                            for (int i = 0; i < array.length(); i++) {
+                                JSONObject object = array.getJSONObject(i);
+                                if (object.getString("eid").equals(download.eid)) {
+                                    List<Server> servers = getDownloadServers(context, DirectoryHelper.get(context).getEpUrl(download.eid, object.getString("sid")));
+                                    if (servers != null) {
+                                        asyncInterface.onFinish(servers);
+                                    } else {
+                                        asyncInterface.onError("null");
+                                    }
+                                    return;
+                                }
+                            }
+                            asyncInterface.onError("Ep not found");
+                            Crashlytics.logException(new FileNotFoundException("Not found: " + download.eid + " in:\n\n" + array.toString()));
+                        } catch (Exception e) {
+                            Crashlytics.logException(e);
+                            if (json.startsWith("error") && json.contains("503")) {
+                                asyncInterface.onError(json);
+                            } else {
+                                asyncInterface.onError(e.getMessage());
+                            }
+                        }
+                    }
+                });
+                return null;
+            }
+        }.executeOnExecutor(ExecutorManager.getExecutor());
+    }
+
     public static void getDownloadList(final Context context, final String aid, final List<String> eids, final AdapterWait.ListListener listListener) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -200,7 +252,7 @@ public class SelfGetter {
 
     public static String[] getDownloadServersOptions() {
         ArrayList<String> arrayList = new ArrayList<String>(Arrays.asList(new String[]{"Ninguno"}));
-        arrayList.addAll(Arrays.asList(getDownloadServers()));
+        arrayList.addAll(Arrays.asList(Server.Names.getDownloadServers()));
         return arrayList.toArray(new String[0]);
     }
 
@@ -473,11 +525,217 @@ public class SelfGetter {
         }
     }
 
-    private static JSONObject getdownloadObject(String name, String url) throws JSONException {
-        JSONObject object = new JSONObject();
-        object.put("name", name);
-        object.put("url", url);
-        return object;
+    private static List<Server> getDownloadServers(final Context context, final String url) {
+        try {
+            Log.e("Url", url);
+            Document main = Jsoup.connect(url).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(TIMEOUT).get();
+            Elements descargas = main.select("table.RTbl.Dwnl").first().select("a.Button.Sm.fa-download");
+            List<Server> servers = new ArrayList<>();
+            for (Element e : descargas) {
+                String z = e.attr("href");
+                z = z.substring(z.lastIndexOf("http"));
+                if (z.contains("zippyshare")) {
+                    try {
+                        z = URLDecoder.decode(z, "utf-8");
+                        Document zi = Jsoup.connect(z).timeout(TIMEOUT).get();
+                        String t = zi.select("meta[property='og:title']").attr("content");
+                        if (!t.trim().equals(""))
+                            servers.add(new Server(ZIPPYSHARE, new Option(null, z)));
+                    } catch (Exception ze) {
+                        ze.printStackTrace();
+                    }
+                } else if (z.contains("mega.nz")) {
+                    try {
+                        servers.add(new Server(MEGA, new Option(null, URLDecoder.decode(z, "utf-8"))));
+                    } catch (Exception zee) {
+                        zee.printStackTrace();
+                    }
+                } else if (z.contains("cldup.com")) {
+                    try {
+                        servers.add(new Server(CLUP, new Option(null, URLDecoder.decode(z, "utf-8"))));
+                    } catch (Exception ze) {
+                        ze.printStackTrace();
+                    }
+                }
+            }
+            Elements s_script = main.select("script");
+            String j = "";
+            for (Element element : s_script) {
+                String s_el = element.outerHtml();
+                if (s_el.contains("var video = [];")) {
+                    j = s_el;
+                    break;
+                }
+            }
+            String json = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()"));
+            String[] parts = json.split("video[^a-z]");
+            for (String el : parts) {
+                if (el.contains("server=izanagi")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
+                        servers.add(new Server(IZANAGI, new Option(null, new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file"))));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (el.contains("server=hyperion")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
+                        JSONArray array = new JSONObject(Jsoup.connect(down_link.replace("embed_hyperion", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getJSONArray("streams");
+                        Server server = new Server(HYPERION);
+                        for (int i = 0; i < array.length(); i++) {
+                            switch (array.getJSONObject(i).getInt("label")) {
+                                case 360:
+                                    server.addOption(new Option("360p", array.getJSONObject(i).getString("file")));
+                                    break;
+                                case 480:
+                                    server.addOption(new Option("480p", array.getJSONObject(i).getString("file")));
+                                    break;
+                                case 720:
+                                    server.addOption(new Option("720p", array.getJSONObject(i).getString("file")));
+                                    break;
+                            }
+                        }
+                        server.addOption(new Option("Direct", new JSONObject(Jsoup.connect(down_link.replace("embed_hyperion", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("direct")));
+                        servers.add(server);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (el.contains("ok.ru")) {
+                    try {
+                        String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                        String down_link = "http:" + Jsoup.parse(frame).select("iframe").first().attr("src");
+                        String e_json = Jsoup.connect(down_link).get().select("div[data-module='OKVideo']").first().attr("data-options");
+                        String cut_json = "{" + e_json.substring(e_json.lastIndexOf("\\\"videos"), e_json.indexOf(",\\\"metadataEmbedded")).replace("\\&quot;", "\"").replace("\\u0026", "&").replace("\\", "") + "}";
+                        JSONArray array = new JSONObject(cut_json).getJSONArray("videos");
+                        Server server = new Server(OKRU);
+                        for (int i = 0; i < array.length(); i++) {
+                            JSONObject object = array.getJSONObject(i);
+                            if (object.getString("name").equals("sd")) {
+                                server.addOption(new Option("SD", object.getString("url")));
+                            } else if (object.getString("name").equals("hd")) {
+                                server.addOption(new Option("HD", object.getString("url")));
+                            }
+                        }
+                        servers.add(server);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (el.contains("drive.google.com")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    String id = down_link.substring(down_link.indexOf("/d/") + 3, down_link.lastIndexOf("/preview"));
+                    try {
+                        String d_link = "https://drive.google.com/uc?id=" + id + "&export=download";
+                        Log.e("Yotta", d_link);
+                        Document d_document = Jsoup.connect(d_link).get();
+                        servers.add(new Server(YOTTA, new Option(null, "https://drive.google.com" + d_document.select("a#uc-download-link").first().attr("href"))));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (el.contains("server=yotta")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
+                        JSONArray ja = new JSONObject(Jsoup.connect(down_link.replace("embed", "check_yotta")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getJSONArray("sources");
+                        Server server = new Server(YOTTA);
+                        if (ja.length() > 1) {
+                            for (int i = 0; i <= ja.length(); i++) {
+                                int label = ja.getJSONObject(i).getInt("label");
+                                String link_self = ja.getJSONObject(i).getString("file");
+                                switch (label) {
+                                    case 360:
+                                        server.addOption(new Option("360p", link_self));
+                                        break;
+                                    case 480:
+                                        server.addOption(new Option("480p", link_self));
+                                        break;
+                                    case 720:
+                                        server.addOption(new Option("720p", link_self));
+                                        break;
+                                }
+                            }
+                        } else {
+                            int label = ja.getJSONObject(0).getInt("label");
+                            String link_self = ja.getJSONObject(0).getString("file");
+                            switch (label) {
+                                case 360:
+                                    server.addOption(new Option("360p", link_self));
+                                    break;
+                                case 480:
+                                    server.addOption(new Option("480p", link_self));
+                                    break;
+                                case 720:
+                                    server.addOption(new Option("720p", link_self));
+                                    break;
+                                default:
+                                    server.addOption(new Option("Unico", link_self));
+                            }
+                        }
+                        servers.add(server);
+                    } catch (Exception e) {
+                        Log.e("Yotta", "Error getting Yotta: " + down_link.replace("embed", "check_yotta"));
+                    }
+                } else if (el.contains("cldup.com")) {
+                    try {
+                        servers.add(new Server(CLUP, new Option(null, el.substring(el.indexOf("https://cldup.com"), el.lastIndexOf(".mp4") + 4))));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (el.contains("server=minhateca")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
+                        servers.add(new Server(MINHATECA, new Option(null, new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file"))));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (el.contains("server=mp4upload")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
+                        servers.add(new Server(MP4UPLOAD, new Option(null, new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file"))));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (el.contains("mp4upload.com")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
+                        Connection.Response response = Jsoup.connect(down_link.replace("embed-", ""))
+                                .data("op", "download2")
+                                .data("id", down_link.substring(down_link.lastIndexOf("/") + 1, down_link.lastIndexOf(".")))
+                                .data("rand", "")
+                                .data("referer", "")
+                                .data("method_free", "")
+                                .data("method_premium", "")
+                                .method(Connection.Method.POST)
+                                .followRedirects(false)
+                                .execute();
+                        String location = response.header("Location");
+                        if (location != null && !location.trim().equals(""))
+                            servers.add(new Server(MP4UPLOAD, new Option(null, location)));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (el.contains("server=yourupload")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+                    try {
+                        servers.add(new Server(YOURUPLOAD, new Option(null, new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file"))));
+                    } catch (Exception e) {
+                        Log.e("No YourUpload", down_link.replace("embed", "check"));
+                    }
+                }
+            }
+            servers = Server.filter(servers);
+            Collections.sort(servers, new Server.Sorter());
+            return servers;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static void getAnime(final Context context, final ANIME anime, final BaseGetter.AsyncInterface asyncInterface) {

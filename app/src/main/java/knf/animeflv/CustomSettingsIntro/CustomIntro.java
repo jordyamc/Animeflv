@@ -17,6 +17,7 @@ import knf.animeflv.CustomSettingsIntro.fragments.BackupFragment;
 import knf.animeflv.CustomSettingsIntro.fragments.CloudFragment;
 import knf.animeflv.CustomSettingsIntro.fragments.ThemeFragment;
 import knf.animeflv.R;
+import knf.animeflv.TV.TVMain;
 import knf.animeflv.ThemeHolder;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.newMain;
@@ -175,12 +176,11 @@ public class CustomIntro extends MaterialIntroActivity implements ColorChooserDi
     @Override
     public void onFinish() {
         getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("intro", true).apply();
-        /*if (ThemeUtils.isTV(this)){
-            startActivity(new Intent(this, Main.class));
+        if (ThemeUtils.isTV(this) && PreferenceManager.getDefaultSharedPreferences(this).getBoolean("tv_layout", false)) {
+            startActivity(new Intent(this, TVMain.class));
         }else {
             startActivity(new Intent(this, newMain.class));
-        }*/
-        startActivity(new Intent(this, newMain.class));
+        }
     }
 
 }

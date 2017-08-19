@@ -44,6 +44,8 @@ import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_COM_DOWNLOA
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_COM_DOWNLOAD_DESC;
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_CURR_DOWNLOAD;
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_CURR_DOWNLOAD_DESC;
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_ERROR;
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_ERROR_DESC;
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_UPDATES;
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_UPDATES_DESC;
 
@@ -122,6 +124,7 @@ public class Application extends MultiDexApplication {
         createChannel(manager, CHANNEL_UPDATES, CHANNEL_UPDATES_DESC, "Actualizaciones", NotificationManager.IMPORTANCE_MAX, Color.BLUE, true);
         createChannel(manager, CHANNEL_CURR_DOWNLOAD, CHANNEL_CURR_DOWNLOAD_DESC, "Descargas en progreso", NotificationManager.IMPORTANCE_DEFAULT, -1, false);
         createChannel(manager, CHANNEL_COM_DOWNLOAD, CHANNEL_COM_DOWNLOAD_DESC, "Descargas terminadas", NotificationManager.IMPORTANCE_DEFAULT, Color.parseColor("#8BC34A"), false);
+        createChannel(manager, CHANNEL_ERROR, CHANNEL_ERROR_DESC, "Errores", NotificationManager.IMPORTANCE_MAX, Color.RED, false);
     }
 
     @TargetApi(Build.VERSION_CODES.O)

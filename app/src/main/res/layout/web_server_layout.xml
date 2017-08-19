@@ -1,27 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/ip_adress"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="0.0.0.0:0000"
-        android:textColor="?attr/colorAccent"
-        android:textSize="24sp"/>
+        android:layout_centerInParent="true"
+        android:orientation="horizontal"
+        android:padding="50dp">
 
-    <com.melnykov.fab.FloatingActionButton
-        android:id="@+id/action_start"
+        <ProgressBar
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_width="76dp"
+            android:layout_height="76dp"
+            android:indeterminate="true"/>
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:layout_weight="1"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="WebServer"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textColor="@color/blanco"
+            android:textSize="24sp"/>
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_play"
-        fab:fab_colorNormal="?attr/colorAccent"
-        fab:fab_colorPressed="@color/prim"
-        fab:fab_colorRipple="@color/dark"/>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="18dp"
+        app:fab_type="normal"
+        app:srcCompat="@drawable/cast_c"/>
 
-</FrameLayout>
+</RelativeLayout>

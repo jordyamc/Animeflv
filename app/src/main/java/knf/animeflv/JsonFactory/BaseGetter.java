@@ -1,6 +1,7 @@
 package knf.animeflv.JsonFactory;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import knf.animeflv.JsonFactory.JsonTypes.DIRECTORIO;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
 import knf.animeflv.JsonFactory.JsonTypes.EMISION;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
+import knf.animeflv.JsonFactory.Objects.Server;
 import knf.animeflv.Utils.NetworkUtils;
 
 
@@ -68,8 +70,22 @@ public class BaseGetter {
         }
     }
 
+    public static void getJson(Context context, DOWNLOAD download, AsyncDownloadInterface asyncInterface) {
+        if (NetworkUtils.isNetworkAvailable()) {
+            SelfGetter.getDownload(context, download, asyncInterface);
+        } else {
+            asyncInterface.onError("Network");
+        }
+    }
+
     public interface AsyncInterface {
         void onFinish(String json);
+    }
+
+    public interface AsyncDownloadInterface {
+        void onFinish(@NonNull List<Server> servers);
+
+        void onError(String error);
     }
 
     public interface AsyncProgressInterface {

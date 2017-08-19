@@ -63,7 +63,7 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
     }
 
     public boolean isDeviceConnected() {
-        return isConnected;
+        return isConnected || CastManager.getInstance().isConnected();
     }
 
     public void play(String url, String eid) {
