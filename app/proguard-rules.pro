@@ -34,6 +34,8 @@
 -keepattributes JavascriptInterface
 -keep public class * extends java.lang.Exception
 -keep class com.crashlytics.** { *; }
+-keep class com.connectsdk.** { *; }
+-keep class es.munix.multidisplaycast.** { *; }
 -dontwarn com.crashlytics.**
 -keep public class org.jsoup.** {
 public *;

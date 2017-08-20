@@ -4,13 +4,13 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,12 +24,13 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.mikepenz.community_material_typeface_library.CommunityMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 
 import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import es.munix.multidisplaycast.CastControlsActivity;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Configuracion;
 import knf.animeflv.Directorio.DB.DirectoryHelper;
@@ -57,14 +58,13 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
     Toolbar toolbar;
     @BindView(R.id.fileDir)
     TextView textView;
-    @BindView(R.id.fab)
-    FloatingActionButton floatingActionButton;
     DirectoryFragment directoryFragment;
     VideoFilesFragment videoFilesFragment;
     boolean waitForResult = false;
     private boolean isDirectory = true;
     private String TAG_DIRECTORY = "directorio";
     private String TAG_ANIME = "anime";
+    private boolean isCastMode = false;
 
     private WebServer server;
 
@@ -92,7 +92,6 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
             }
         });
         toolbar.setTitleTextColor(theme.textColorToolbar);
-        floatingActionButton.hide();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(theme.primaryDark);
             getWindow().setNavigationBarColor(theme.primary);
@@ -125,12 +124,6 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
                 }
             }
         }
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(ExplorerRoot.this, CastControlsActivity.class));
-            }
-        });
         if (!waitForResult) {
             textView.setText(ModelFactory.getDirectoryFile(this).getAbsolutePath());
             directoryFragment = new DirectoryFragment();
@@ -178,11 +171,18 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
         videoFilesFragment = new VideoFilesFragment();
         Bundle bundle = new Bundle();
         bundle.putString("path", file.getAbsolutePath());
+        bundle.putBoolean("castMode", isCastMode);
         videoFilesFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .add(R.id.root, videoFilesFragment, TAG_ANIME)
                 .commit();
+    }
+
+    private void recreateVideoFragment() {
+        if (!isDirectory && videoFilesFragment != null) {
+            videoFilesFragment.setAdapter(isCastMode);
+        }
     }
 
     @Override
@@ -224,8 +224,6 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
             server = new WebServer(this, file);
             server.start();
             CastPlayBackManager.get(this).play(getIpWport(8880, true), eid);
-            if (CastPlayBackManager.get(this).isDeviceConnected())
-                floatingActionButton.show();
         } catch (Exception e) {
             e.printStackTrace();
             Toaster.toast("Error al activar webserver");
@@ -318,6 +316,14 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
                 }
             }
         }
+        if (CastPlayBackManager.get(this).isDeviceConnected()) {
+            MenuItem item = menu.add(0, R.id.cast_icon, 0, "Cast Mode");
+            item.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            item.setIcon(new IconicsDrawable(ExplorerRoot.this)
+                    .icon(isCastMode ? CommunityMaterial.Icon.cmd_play : CommunityMaterial.Icon.cmd_cast_connected)
+                    .color(Color.WHITE)
+                    .sizeDp(24));
+        }
         ThemeUtils.setMenuColor(menu, ThemeUtils.Theme.get(this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
         return true;
     }
@@ -344,6 +350,20 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
                                 dialog.dismiss();
                             }
                         }).build().show();
+                break;
+            case R.id.cast_icon:
+                if (isCastMode) {
+                    if (server != null)
+                        server.stop();
+                    CastPlayBackManager.get(ExplorerRoot.this).stop();
+                    isCastMode = false;
+                    Toaster.toast("Modo cast desactivado");
+                } else {
+                    isCastMode = true;
+                    Toaster.toast("Modo cast activado");
+                }
+                recreateVideoFragment();
+                supportInvalidateOptionsMenu();
                 break;
         }
         return true;

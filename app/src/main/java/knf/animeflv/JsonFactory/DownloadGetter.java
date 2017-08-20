@@ -379,7 +379,7 @@ public class DownloadGetter {
                             final int last_pos = Server.findPosition(servers, last);
                             int pref = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("def_download_serv", "0"));
                             if (pref > 0 && Server.existServer(servers, pref - 1) && !(CastPlayBackManager.get(context).isDeviceConnected() && actionsInterface.isStream())) {
-                                Server server = servers.get(pref - 1);
+                                Server server = Server.findServer(servers, pref);
                                 String des = server.name;
                                 if (server.haveOptions()) {
                                     showOptions(context, eid, server.name, server.options, null, actionsInterface);

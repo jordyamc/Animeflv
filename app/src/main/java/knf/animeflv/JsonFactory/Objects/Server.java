@@ -60,6 +60,11 @@ public class Server {
         return false;
     }
 
+    public static Server findServer(List<Server> servers, int position) {
+        String name = Names.getDownloadServers()[position - 1];
+        return servers.get(findPosition(servers, name));
+    }
+
     public void addOption(Option option) {
         options.add(option);
     }

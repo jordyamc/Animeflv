@@ -2,8 +2,10 @@ package knf.animeflv.Explorer.Adapters;
 
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -21,6 +23,9 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
+import com.mikepenz.community_material_typeface_library.CommunityMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 import com.squareup.picasso.Callback;
 
 import java.io.File;
@@ -28,12 +33,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import es.munix.multidisplaycast.CastControlsActivity;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.ManageDownload;
 import knf.animeflv.Explorer.ExplorerInterfaces;
 import knf.animeflv.Explorer.Models.ModelFactory;
 import knf.animeflv.Explorer.Models.VideoFile;
 import knf.animeflv.PicassoCache;
+import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.R;
 import knf.animeflv.StreamManager.StreamManager;
 import knf.animeflv.Utils.ExecutorManager;
@@ -41,7 +48,7 @@ import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.ThemeUtils;
 import xdroid.toaster.Toaster;
 
-public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.ViewHolder> {
+public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.ViewHolder> implements SectionTitleProvider {
 
     private final int UPDATE_FREQUENCY = 1000;
     List<VideoFile> list;
@@ -51,12 +58,14 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
     private Handler handler;
     private DirectoryAdapter.OnFinishListListener listListener;
     private ThemeUtils.Theme theme;
+    private boolean castMode;
 
-    public VideoFileAdapter(Activity context, File file, List<VideoFile> list, DirectoryAdapter.OnFinishListListener listListener) {
+    public VideoFileAdapter(Activity context, File file, List<VideoFile> list, boolean castMode, DirectoryAdapter.OnFinishListListener listListener) {
         this.context = context;
         this.list = list;
         this.interfaces = (ExplorerInterfaces) context;
         this.current = file;
+        this.castMode = castMode;
         this.listListener = listListener;
         this.theme = ThemeUtils.Theme.create(context);
     }
@@ -109,6 +118,8 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
             holder.titulo.setTextColor(theme.textColor);
             holder.ver.setColorFilter(theme.iconFilter);
             holder.del.setColorFilter(theme.iconFilter);
+            if (castMode)
+                holder.ver.setImageDrawable(getCastDrawable(isCasting(list.get(holder.getAdapterPosition()).getEID())));
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
                 holder.progress.getProgressDrawable().setColorFilter(theme.accent, PorterDuff.Mode.SRC_ATOP);
             holder.root.setOnLongClickListener(new View.OnLongClickListener() {
@@ -140,18 +151,24 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
                 @Override
                 public void onClick(View v) {
                     showAsSeen(holder);
-                    try {
-                        StreamManager.Play(context, list.get(holder.getAdapterPosition()).getEID());
-                    } catch (Exception e) {
-                        Toaster.toast("Error al reproducir");
+                    if (isCasting(list.get(holder.getAdapterPosition()).getEID())) {
+                        context.startActivity(new Intent(context, CastControlsActivity.class));
+                    } else if (castMode) {
+                        context.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                holder.ver.setImageDrawable(getCastDrawable(true));
+                            }
+                        });
+                        interfaces.OnCastFile(list.get(holder.getAdapterPosition()).getFile(), list.get(holder.getAdapterPosition()).getEID());
+                        notifyData();
+                    } else {
+                        try {
+                            StreamManager.Play(context, list.get(holder.getAdapterPosition()).getEID());
+                        } catch (Exception e) {
+                            Toaster.toast("Error al reproducir");
+                        }
                     }
-                }
-            });
-            holder.ver.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    interfaces.OnCastFile(list.get(holder.getAdapterPosition()).getFile(), list.get(holder.getAdapterPosition()).getEID());
-                    return true;
                 }
             });
             holder.del.setOnClickListener(new View.OnClickListener() {
@@ -206,6 +223,24 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void notifyData() {
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged();
+            }
+        });
+    }
+
+    @Override
+    public String getSectionTitle(int i) {
+        return "";
+    }
+
+    public void setMode(boolean isCastMode) {
+        this.castMode = isCastMode;
     }
 
     private Handler getProgressHandler() {
@@ -306,15 +341,22 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
             @Override
             public void onCreated(List<VideoFile> l) {
                 list = l;
-                context.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        notifyDataSetChanged();
-                    }
-                });
+                notifyData();
                 listListener.onFinish(l.size());
             }
         });
+    }
+
+    private boolean isCasting(String eid) {
+        return CastPlayBackManager.get(context).isCasting(eid);
+    }
+
+    private Drawable getCastDrawable(boolean isCasting) {
+        return new IconicsDrawable(context)
+                .icon(isCasting ? CommunityMaterial.Icon.cmd_cast_connected : CommunityMaterial.Icon.cmd_cast)
+                .color(theme.iconFilter)
+                .paddingDp(3)
+                .sizeDp(24);
     }
 
     public void performDestroy() {

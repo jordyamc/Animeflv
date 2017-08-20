@@ -223,6 +223,7 @@ public class CastDiscoveryProvider implements DiscoveryProvider {
         public void onRouteAdded(MediaRouter router, RouteInfo route) {
             super.onRouteAdded(router, route);
             try {
+                Log.e("Cast", "RouteAdded: " + route.getName());
                 CastDevice castDevice = CastDevice.getFromBundle(route.getExtras());
                 String uuid = castDevice.getDeviceId();
 
@@ -263,6 +264,8 @@ public class CastDiscoveryProvider implements DiscoveryProvider {
             super.onRouteRemoved(router, route);
 
             try {
+
+                Log.e("Cast", "RouteRemoved: " + route.getName());
                 CastDevice castDevice = CastDevice.getFromBundle(route.getExtras());
                 String uuid = castDevice.getDeviceId();
                 removedUUID.add(uuid);
@@ -280,13 +283,7 @@ public class CastDiscoveryProvider implements DiscoveryProvider {
                 }
             } catch (NoSuchMethodError noSuchMethodError) {
                 noSuchMethodError.printStackTrace();
-                /*try {
-                    File disable=new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/disable_cast.conf");
-                    if (!disable.exists())
-                        disable.createNewFile();
-                }catch (Exception e){
-                    Log.e("DISABLE CAST","Error creating disable file");
-                }*/
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

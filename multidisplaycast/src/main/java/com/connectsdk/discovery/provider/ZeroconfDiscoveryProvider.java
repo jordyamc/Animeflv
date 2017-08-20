@@ -61,6 +61,7 @@ public class ZeroconfDiscoveryProvider implements DiscoveryProvider {
         @Override
         public void serviceResolved(ServiceEvent ev) {
             @SuppressWarnings("deprecation") String ipAddress = ev.getInfo().getHostAddress();
+            Log.e("ZeroConf", "ServiceAdded: " + ev.getInfo().getName());
             if (!Util.isIPv4Address(ipAddress)) {
                 // Currently, we only support ipv4
                 return;
@@ -107,7 +108,7 @@ public class ZeroconfDiscoveryProvider implements DiscoveryProvider {
         public void serviceRemoved(ServiceEvent ev) {
             @SuppressWarnings("deprecation") String uuid = ev.getInfo().getHostAddress();
             final ServiceDescription service = foundServices.get(uuid);
-
+            Log.e("ZeroConf", "ServiceRemoved: " + ev.getInfo().getName());
             if (service != null) {
                 Util.runOnUI(new Runnable() {
 

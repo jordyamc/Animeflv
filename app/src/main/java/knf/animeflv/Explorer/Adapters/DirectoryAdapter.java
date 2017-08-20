@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
 
 import java.util.List;
 
@@ -37,7 +38,7 @@ import xdroid.toaster.Toaster;
 /**
  * Created by Jordy on 22/08/2015.
  */
-public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.ViewHolder> {
+public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.ViewHolder> implements SectionTitleProvider {
 
     List<Directory> list;
     private Activity context;
@@ -224,6 +225,11 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
                 listener.onFinish(l.size());
             }
         });
+    }
+
+    @Override
+    public String getSectionTitle(int i) {
+        return "";
     }
 
     @Override

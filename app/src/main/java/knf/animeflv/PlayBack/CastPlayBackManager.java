@@ -13,7 +13,6 @@ import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Parser;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.TaskType;
-import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.history.adapter.HistoryHelper;
 import xdroid.toaster.Toaster;
@@ -28,12 +27,10 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
 
     public CastPlayBackManager(Activity activity) {
         this.activity = activity;
-        if (!Keys.Dirs.DISABLE_CAST.exists()) {
-            CastManager.getInstance().setTheme(ThemeUtils.isAmoled(activity) ? DevicePicker.Theme.DARK : DevicePicker.Theme.LIGTH);
-            CastManager.getInstance().setDiscoveryManager();
-            CastManager.getInstance().setCastListener(TAG, this);
-            CastManager.getInstance().setPlayStatusListener(TAG, this);
-        }
+        CastManager.getInstance().setTheme(ThemeUtils.isAmoled(activity) ? DevicePicker.Theme.DARK : DevicePicker.Theme.LIGTH);
+        CastManager.getInstance().setDiscoveryManager();
+        CastManager.getInstance().setCastListener(TAG, this);
+        CastManager.getInstance().setPlayStatusListener(TAG, this);
     }
 
     public static CastPlayBackManager get(Activity activity) {
@@ -47,19 +44,13 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
     }
 
     public void registrerMenu(Menu menu, int id) {
-        if (!Keys.Dirs.DISABLE_CAST.exists()) {
-            CastManager.getInstance().registerForActivity(activity, menu, id);
-        } else {
-            menu.removeItem(id);
-        }
+        CastManager.getInstance().registerForActivity(activity, menu, id);
     }
 
     public void destroyManager() {
-        if (!Keys.Dirs.DISABLE_CAST.exists()) {
-            CastManager.getInstance().unsetCastListener(TAG);
-            CastManager.getInstance().unsetPlayStatusListener(TAG);
-            CastManager.getInstance().onDestroy();
-        }
+        CastManager.getInstance().unsetCastListener(TAG);
+        CastManager.getInstance().unsetPlayStatusListener(TAG);
+        CastManager.getInstance().onDestroy();
     }
 
     public boolean isDeviceConnected() {

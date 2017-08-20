@@ -47,6 +47,11 @@ public class VideoFilesFragment extends Fragment {
         noAnime.setTextColor(theme.secondaryTextColor);
         loading.setProgressColor(theme.accent);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        setAdapter(getArguments().getBoolean("castMode", false));
+        return root;
+    }
+
+    public void setAdapter(final boolean castMode) {
         final File file = new File(getArguments().getString("path"));
         ModelFactory.createVideosListAsync(getActivity(), file, new ModelFactory.AsyncFileListener() {
             @Override
@@ -56,7 +61,7 @@ public class VideoFilesFragment extends Fragment {
                         @Override
                         public void run() {
                             loading.setVisibility(View.GONE);
-                            recyclerView.setAdapter(new VideoFileAdapter(getActivity(), file, list, new DirectoryAdapter.OnFinishListListener() {
+                            recyclerView.setAdapter(new VideoFileAdapter(getActivity(), file, list, castMode, new DirectoryAdapter.OnFinishListListener() {
                                 @Override
                                 public void onFinish(final int count) {
                                     try {
@@ -87,7 +92,25 @@ public class VideoFilesFragment extends Fragment {
                 }
             }
         });
-        return root;
+    }
+
+    public void setMode(boolean isCastMode) {
+        try {
+            if (recyclerView != null) {
+                final VideoFileAdapter adapter = (VideoFileAdapter) recyclerView.getAdapter();
+                if (adapter != null) {
+                    adapter.setMode(isCastMode);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

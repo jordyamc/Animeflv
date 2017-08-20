@@ -30,7 +30,6 @@ public class Keys {
         public static final File UPDATE = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache", "Animeflv_Nver.apk");
         public static final File SOUNDS_NOMEDIA = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/.sounds/.nomedia");
         public static final File BACKUP_DATA = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/data.save");
-        public static final File DISABLE_CAST = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache/disable_cast.conf");
 
         public static File getUpdateFile() {
             File file = new File(Dirs.CACHE, "Animeflv_Nver.apk");
