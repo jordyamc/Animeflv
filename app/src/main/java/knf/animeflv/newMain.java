@@ -1145,7 +1145,6 @@ public class newMain extends AppCompatActivity implements
 
     @Override
     public void onRefresh() {
-        NetworkUtils.testUpdate(this);
         if (NetworkUtils.isNetworkAvailable()) {
             getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", new HashSet<String>()).apply();
