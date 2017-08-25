@@ -108,6 +108,80 @@ public class Directorio extends AppCompatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.re_make:
+                new MaterialDialog.Builder(Directorio.this)
+                        .content("Se recreara el directorio, esto puede tardar unos minutos")
+                        .positiveText("continuar")
+                        .negativeText("cancelar")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                try {
+                                    Keys.Dirs.CACHE_DIRECTORIO.delete();
+                                    new DirectoryDB(Directorio.this).reset();
+                                    recreate();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    recreate();
+                                }
+
+                            }
+                        }).build().show();
+                break;
+            case R.id.buscar_borrar:
+                if (editText.getText().length() > 0) {
+                    editText.setText("");
+                    menuGlobal.clear();
+                    if (!isXLargeScreen(context)) {
+                        getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
+                    } else {
+                        getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                    }
+                    ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
+                    List<AnimeClass> animes = SearchUtils.Search(Directorio.this, null);
+                    AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
+                    recyclerView.setAdapter(adapterBusqueda);
+                }
+                break;
+            case R.id.buscar_cancelar:
+                if (getIntent().getExtras() == null) {
+                    cancelar();
+                } else {
+                    finish();
+                }
+                break;
+            case R.id.search:
+                getSupportActionBar().setTitle("");
+                editText.setVisibility(View.VISIBLE);
+                editText.setText("");
+                editText.requestFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(editText, 0);
+                menuGlobal.clear();
+                if (!isXLargeScreen(context)) {
+                    getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
+                } else {
+                    getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
+                }
+                ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
+                if (!isXLargeScreen(context)) {
+                    linearLayout.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    frameLayout.setVisibility(View.VISIBLE);
+                } else {
+                    viewPager.setVisibility(View.GONE);
+                    viewPagerTab.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    frameLayout.setVisibility(View.VISIBLE);
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         ThemeUtils.setThemeOn(this);
         super.onCreate(savedInstanceState);
@@ -306,61 +380,13 @@ public class Directorio extends AppCompatActivity {
                         }).build().show();
             }
         });
-        toolbarS.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+        /*toolbarS.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.buscar_borrar:
-                        if (editText.getText().length() > 0) {
-                            editText.setText("");
-                            menuGlobal.clear();
-                            if (!isXLargeScreen(context)) {
-                                getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                            } else {
-                                getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
-                            }
-                            ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
-                            List<AnimeClass> animes = SearchUtils.Search(Directorio.this, null);
-                            AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
-                            recyclerView.setAdapter(adapterBusqueda);
-                        }
-                        break;
-                    case R.id.buscar_cancelar:
-                        if (bundle == null) {
-                            cancelar();
-                        } else {
-                            finish();
-                        }
-                        break;
-                    case R.id.search:
-                        getSupportActionBar().setTitle("");
-                        editText.setVisibility(View.VISIBLE);
-                        editText.setText("");
-                        editText.requestFocus();
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.showSoftInput(editText, 0);
-                        menuGlobal.clear();
-                        if (!isXLargeScreen(context)) {
-                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                        } else {
-                            getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
-                        }
-                        ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
-                        if (!isXLargeScreen(context)) {
-                            linearLayout.setVisibility(View.GONE);
-                            recyclerView.setVisibility(View.VISIBLE);
-                            frameLayout.setVisibility(View.VISIBLE);
-                        } else {
-                            viewPager.setVisibility(View.GONE);
-                            viewPagerTab.setVisibility(View.GONE);
-                            recyclerView.setVisibility(View.VISIBLE);
-                            frameLayout.setVisibility(View.VISIBLE);
-                        }
-                        break;
-                }
+
                 return true;
             }
-        });
+        });*/
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(final Editable s) {
@@ -671,84 +697,6 @@ public class Directorio extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                toolbarS.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.re_make:
-                                new MaterialDialog.Builder(Directorio.this)
-                                        .content("Se recreara el directorio, esto puede tardar unos minutos")
-                                        .positiveText("continuar")
-                                        .negativeText("cancelar")
-                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                            @Override
-                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                try {
-                                                    Keys.Dirs.CACHE_DIRECTORIO.delete();
-                                                    new DirectoryDB(Directorio.this).reset();
-                                                    recreate();
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                    recreate();
-                                                }
-
-                                            }
-                                        }).build().show();
-                                break;
-                            case R.id.buscar_borrar:
-                                if (editText.getText().length() > 0) {
-                                    editText.setText("");
-                                    menuGlobal.clear();
-                                    if (!isXLargeScreen(context)) {
-                                        getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                                    } else {
-                                        getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
-                                    }
-                                    List<AnimeClass> animes = SearchUtils.Search(Directorio.this, null);
-                                    AdapterBusquedaNew adapterBusqueda = new AdapterBusquedaNew(context, animes);
-                                    recyclerView.setAdapter(adapterBusqueda);
-                                }
-                                break;
-                            case R.id.buscar_cancelar:
-                                if (bundle == null) {
-                                    cancelar();
-                                } else {
-                                    finish();
-                                }
-                                break;
-                            case R.id.search:
-                                try {
-                                    getSupportActionBar().setTitle("");
-                                    editText.setVisibility(View.VISIBLE);
-                                    editText.setText("");
-                                    editText.requestFocus();
-                                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                    imm.showSoftInput(editText, 0);
-                                    menuGlobal.clear();
-                                    if (!isXLargeScreen(context)) {
-                                        getMenuInflater().inflate(R.menu.menu_buscar_cancelar, menuGlobal);
-                                    } else {
-                                        getMenuInflater().inflate(R.menu.menu_buscar_cancelar_d, menuGlobal);
-                                    }
-                                    ThemeUtils.setMenuColor(menuGlobal, ThemeUtils.Theme.get(Directorio.this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
-                                    if (!isXLargeScreen(context)) {
-                                        linearLayout.setVisibility(View.GONE);
-                                        recyclerView.setVisibility(View.VISIBLE);
-                                        frameLayout.setVisibility(View.VISIBLE);
-                                    } else {
-                                        viewPager.setVisibility(View.GONE);
-                                        viewPagerTab.setVisibility(View.GONE);
-                                        recyclerView.setVisibility(View.VISIBLE);
-                                        frameLayout.setVisibility(View.VISIBLE);
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                break;
-                        }
-                        return true;
-                    }
-                });
                 editText.setEnabled(true);
                 editText.setClickable(true);
                 editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);

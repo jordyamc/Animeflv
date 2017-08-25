@@ -48,6 +48,8 @@ import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_ERROR;
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_ERROR_DESC;
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_UPDATES;
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_UPDATES_DESC;
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_UPDATES_RUNNING;
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_UPDATES_RUNNING_DESC;
 
 
 public class Application extends MultiDexApplication {
@@ -102,6 +104,7 @@ public class Application extends MultiDexApplication {
             OneSignal.syncHashedEmail(email);
     }
 
+
     synchronized public Tracker getDefaultTracker() {
         if (mTracker == null) {
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
@@ -122,6 +125,7 @@ public class Application extends MultiDexApplication {
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         createChannel(manager, CHANNEL_ANIMES, CHANNEL_ANIMES_DESC, "Animes", NotificationManager.IMPORTANCE_MAX, Color.argb(0, 255, 128, 0), true, true);
         createChannel(manager, CHANNEL_UPDATES, CHANNEL_UPDATES_DESC, "Actualizaciones", NotificationManager.IMPORTANCE_MAX, Color.BLUE, true);
+        createChannel(manager, CHANNEL_UPDATES_RUNNING, CHANNEL_UPDATES_RUNNING_DESC, "Descarga de actualizacion", NotificationManager.IMPORTANCE_LOW, Color.BLUE, false);
         createChannel(manager, CHANNEL_CURR_DOWNLOAD, CHANNEL_CURR_DOWNLOAD_DESC, "Descargas en progreso", NotificationManager.IMPORTANCE_DEFAULT, -1, false);
         createChannel(manager, CHANNEL_COM_DOWNLOAD, CHANNEL_COM_DOWNLOAD_DESC, "Descargas terminadas", NotificationManager.IMPORTANCE_DEFAULT, Color.parseColor("#8BC34A"), false);
         createChannel(manager, CHANNEL_ERROR, CHANNEL_ERROR_DESC, "Errores", NotificationManager.IMPORTANCE_MAX, Color.RED, false);

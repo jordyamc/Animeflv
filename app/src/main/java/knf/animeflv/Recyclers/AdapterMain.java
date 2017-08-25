@@ -40,6 +40,7 @@ import es.munix.multidisplaycast.CastControlsActivity;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
+import knf.animeflv.DownloadService.ServerHolder;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
 import knf.animeflv.JsonFactory.DownloadGetter;
 import knf.animeflv.Parser;
@@ -152,6 +153,9 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 showDelete(holder.ib_des);
                 MainStates.init(context).delFromWaitList(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
             }
+        }
+        if (CastPlayBackManager.get(context).isCasting(Animes.get(getPosition(holder.getAdapterPosition(), position)).getEid())) {
+            showCastPlay(holder.ib_ver);
         }
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -284,15 +288,14 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 if (UpdateUtil.getState() == UpdateState.WAITING_TO_UPDATE) {
                     Toaster.toast("Actualizacion descargada, instalar para continuar");
                 } else {
-                    if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
+                    if (CastPlayBackManager.get(context).isCasting(Animes.get(getPosition(holder.getAdapterPosition(), position)).getEid())) {
+                        context.startActivity(new Intent(context, CastControlsActivity.class));
+                    } else if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                         StreamManager.Play(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
                     } else {
                         if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                             Toaster.toast("Descarga en proceso");
                         } else {
-                            if (CastPlayBackManager.get(context).getCastingEid().equals(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
-                                context.startActivity(new Intent(context, CastControlsActivity.class));
-                            } else {
                                 if (NetworkUtils.isNetworkAvailable()) {
                                     if (!MainStates.isProcessing()) {
                                         if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
@@ -323,10 +326,23 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                         }
                                     }
                                 }
-                            }
                         }
                     }
                 }
+            }
+        });
+        holder.ib_ver.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                String eid = Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid();
+                if (FileUtil.init(context).ExistAnime(eid) && CastPlayBackManager.get(context).isDeviceConnected() && !CastPlayBackManager.get(context).isCasting(eid)) {
+                    showDelete(holder.ib_des);
+                    showCastPlay(holder.ib_ver);
+                    ServerHolder.getInstance().startServer(context, FileUtil.init(context).getSimpleFile(eid), eid);
+                    MainStates.setProcessing(false, null);
+                    refresh();
+                }
+                return true;
             }
         });
         if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid()) && showProgress()) {
@@ -334,6 +350,15 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         } else {
             holder.progressBar.setVisibility(View.GONE);
         }
+    }
+
+    private void refresh() {
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged();
+            }
+        });
     }
 
     private boolean showProgress() {

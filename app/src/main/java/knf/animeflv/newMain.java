@@ -88,6 +88,7 @@ import knf.animeflv.Directorio.AnimeClass;
 import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.DownloadService.DownloaderService;
+import knf.animeflv.DownloadService.ServerHolder;
 import knf.animeflv.Explorer.ExplorerRoot;
 import knf.animeflv.Favorites.FavoriteMain;
 import knf.animeflv.Favorites.FavotiteDB;
@@ -1144,8 +1145,8 @@ public class newMain extends AppCompatActivity implements
 
     @Override
     public void onRefresh() {
+        NetworkUtils.testUpdate(this);
         if (NetworkUtils.isNetworkAvailable()) {
-//            ActualizarFavoritos();
             getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
             context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", new HashSet<String>()).apply();
             parser.refreshUrls(context);
@@ -1176,7 +1177,6 @@ public class newMain extends AppCompatActivity implements
         getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
         context.getSharedPreferences("data", Context.MODE_PRIVATE).edit().putStringSet("eidsNot", new HashSet<String>()).apply();
         parser.refreshUrls(context);
-//        ActualizarFavoritos();
         UtilNotBlocker.setPaused(false);
         if (shouldExecuteOnResume) {
             Bypass.check(this, null);
@@ -1345,6 +1345,7 @@ public class newMain extends AppCompatActivity implements
     protected void onStop() {
         super.onStop();
         PlayBackManager.get(this).removeCallbacks();
+        ServerHolder.getInstance().stopServer(this);
     }
 
     @Override

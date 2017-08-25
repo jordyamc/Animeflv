@@ -18,6 +18,7 @@ import com.thin.downloadmanager.ThinDownloadManager;
 import java.io.File;
 import java.util.Random;
 
+import knf.animeflv.BackgroundChecker.startBackground;
 import knf.animeflv.R;
 import knf.animeflv.Utils.eNums.UpdateState;
 
@@ -86,24 +87,26 @@ public class UpdateService extends IntentService {
         getManager().notify(DOWNLOAD_NOTIFICATION_ID, builder.build());
     }
 
-    private void onFinishDownload(boolean sucess) {
+    private void onFinishDownload(boolean success) {
         UpdateUtil.setState(UpdateState.FINISHED);
         Log.e("Download Service", "onFinishDownload");
         getManager().cancel(DOWNLOAD_NOTIFICATION_ID);
         downloading = null;
         NotificationCompat.Builder builder = getDownloadingBuilder()
                 .setContentTitle("Animeflv App - Actualizacion")
-                .setContentText(sucess ? "CLICK PARA INSTALAR" : "ERROR AL DESCARGAR")
+                .setContentText(success ? "CLICK PARA INSTALAR" : "ERROR AL DESCARGAR")
+                .setChannelId(startBackground.CHANNEL_UPDATES)
                 .setPriority(Notification.PRIORITY_MAX)
+                .setAutoCancel(true)
                 .setVibrate(new long[]{100, 200, 100, 500})
                 .setOngoing(false)
                 .setLights(Color.BLUE, 5000, 2000);
-        if (sucess) {
+        if (success) {
             builder.setSmallIcon(android.R.drawable.stat_sys_download_done);
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(FileUtil.init(this).getUriForFile(updateFile), "application/vnd.android.package-archive");
+            Intent intent = new Intent(Intent.ACTION_INSTALL_PACKAGE, FileUtil.init(this).getUriForFile(updateFile));
+            intent.putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, getPackageName());
+            intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, false);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, new Random().nextInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(pendingIntent);
         } else {
@@ -124,7 +127,7 @@ public class UpdateService extends IntentService {
 
     private NotificationCompat.Builder getDownloadingBuilder() {
         if (downloading == null)
-            downloading = new NotificationCompat.Builder(this)
+            downloading = new NotificationCompat.Builder(this, startBackground.CHANNEL_UPDATES_RUNNING)
                     .setSmallIcon(android.R.drawable.stat_sys_download)
                     .setOngoing(true);
         return downloading;

@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.text.format.Formatter;
@@ -102,7 +103,11 @@ public class NetworkUtils {
         }
     }
 
-    private static class checkAct extends AsyncTask<String, String, String> {
+    public static void testUpdate(Context context) {
+        context.startService(new Intent(context, UpdateService.class));
+    }
+
+    public static class checkAct extends AsyncTask<String, String, String> {
         Context Tcontext;
         String update_ver;
         boolean notify = false;
@@ -116,6 +121,7 @@ public class NetworkUtils {
             Tcontext = tcontext;
             descarga = Keys.Dirs.getUpdateFile();
             this.notify = notify;
+
         }
 
         @Override
@@ -142,7 +148,7 @@ public class NetworkUtils {
                         }
                     }
                     update_ver = vers;
-                    Log.d("Version", Integer.toString(versionCode) + " >> " + vers.trim());
+                    Log.e("Version", Integer.toString(versionCode) + " >> " + vers.trim());
                     if (versionCode >= Integer.parseInt(vers.trim())) {
                         UpdateUtil.isBeta = versionCode > Integer.parseInt(vers.trim());
                         if (Integer.parseInt(vers.trim()) == 0) {
@@ -169,8 +175,17 @@ public class NetworkUtils {
                                     @Override
                                     public void onClick(@NonNull final MaterialDialog dialog, @NonNull DialogAction which) {
                                         TrackingHelper.track(context, TrackingHelper.UPDATING + versionCode + " --> " + update_ver);
-                                        Tcontext.startService(new Intent(Tcontext, UpdateService.class));
-                                        dialog.dismiss();
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                            if (context.getPackageManager().canRequestPackageInstalls()) {
+                                                Tcontext.startService(new Intent(Tcontext, UpdateService.class));
+                                                dialog.dismiss();
+                                            } else {
+                                                context.startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse(context.getPackageName())));
+                                            }
+                                        } else {
+                                            Tcontext.startService(new Intent(Tcontext, UpdateService.class));
+                                            dialog.dismiss();
+                                        }
                                     }
                                 })
                                 .onNegative(new MaterialDialog.SingleButtonCallback() {

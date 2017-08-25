@@ -22,6 +22,7 @@ import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.Utils.eNums.SDStatus;
 import xdroid.toaster.Toaster;
 
 public class SDManager extends IntroActivity {
@@ -60,9 +61,14 @@ public class SDManager extends IntroActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SDSearcher.GRANT_WRITE_PERMISSION_CODE && resultCode == Activity.RESULT_OK) {
             if (havePermission(data)) {
-                Log.d("Permission granted", "OK");
-                setCustomResult(SDSearcher.SD_SELECTED);
-                searcher.resetResponse();
+                if (FileUtil.checkIfSDCardRoot(data.getData()) == SDStatus.OK) {
+                    Log.d("Permission granted", "OK");
+                    setCustomResult(SDSearcher.SD_SELECTED);
+                    searcher.resetResponse();
+                } else {
+                    PreferenceManager.getDefaultSharedPreferences(SDManager.this).edit().putString("SDPath", "null").commit();
+                    Toaster.toast(FileUtil.checkIfSDCardRoot(data.getData()).getErrorMessage());
+                }
             } else {
                 PreferenceManager.getDefaultSharedPreferences(SDManager.this).edit().putString("SDPath", "null").commit();
                 Toaster.toast("Error al obtener permisos");

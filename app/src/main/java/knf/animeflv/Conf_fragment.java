@@ -75,6 +75,7 @@ import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.UpdateUtil;
 import knf.animeflv.Utils.UtilDialogPref;
 import knf.animeflv.Utils.UtilSound;
+import knf.animeflv.Utils.eNums.SDStatus;
 import knf.animeflv.Utils.eNums.UpdateState;
 import xdroid.toaster.Toaster;
 
@@ -1014,7 +1015,11 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         }
         if (requestCode == 15890) {
             if (resultCode == Activity.RESULT_OK) {
-                takePermission(data);
+                if (FileUtil.checkIfSDCardRoot(data.getData()) == SDStatus.OK) {
+                    takePermission(data);
+                } else {
+                    getActivity().setResult(-1, new Intent().putExtra("error", FileUtil.checkIfSDCardRoot(data.getData()).getErrorMessage()));
+                }
                 getActivity().finish();
             }
         }

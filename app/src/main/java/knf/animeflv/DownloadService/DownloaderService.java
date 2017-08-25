@@ -40,6 +40,7 @@ import knf.animeflv.Explorer.Models.ModelFactory;
 import knf.animeflv.R;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.NetworkUtils;
+import knf.animeflv.Utils.eNums.SDStatus;
 
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_COM_DOWNLOAD;
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_CURR_DOWNLOAD;
@@ -91,8 +92,8 @@ public class DownloaderService extends IntentService {
             if (!NetworkUtils.isNetworkAvailable())
                 throw new NoInternetException(null);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                if (FileUtil.init(this).RootFileHaveAccess()) {
-                    if (!FileUtil.init(this).RootFileHaveAccess(null))
+                if (FileUtil.checkIfSDCardRoot(this) != SDStatus.ERROR_UNKNOWN) {
+                    if (FileUtil.checkIfSDCardRoot(this) != SDStatus.OK)
                         throw new WrongAccessPermissionException(ModelFactory.getRootSDFile(this).getName());
                 } else {
                     throw new NoSDAccessDetectedException(null);

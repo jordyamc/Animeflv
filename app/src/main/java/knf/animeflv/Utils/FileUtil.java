@@ -1,5 +1,6 @@
 package knf.animeflv.Utils;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -9,8 +10,10 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
+import android.provider.DocumentsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.FileProvider;
 import android.support.v4.provider.DocumentFile;
 import android.util.Log;
@@ -38,6 +41,7 @@ import java.util.regex.Pattern;
 import knf.animeflv.Explorer.Models.ModelFactory;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.Utils.Files.FileSearchResponse;
+import knf.animeflv.Utils.eNums.SDStatus;
 
 public class FileUtil {
     private static FileUtil util;
@@ -326,6 +330,44 @@ public class FileUtil {
         return String.format(Locale.US, "%.1f %sB", (double) v / (1L << (z * 10)), " KMGTPE".charAt(z));
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static SDStatus checkIfSDCardRoot(Context context) {
+        String uri = PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, null);
+        if (uri != null) {
+            return checkIfSDCardRoot(Uri.parse(uri));
+        } else {
+            return SDStatus.ERROR_UNKNOWN;
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static SDStatus checkIfSDCardRoot(Uri uri) {
+        if (isInternalStorage(uri)) {
+            return SDStatus.ERROR_INTERNAL;
+        } else if (!isRootUri(uri)) {
+            return SDStatus.ERROR_NOT_ROOT;
+        } else if (!isExternalStorageDocument(uri)) {
+            return SDStatus.ERROR_NOT_EXTERNAL;
+        } else {
+            return SDStatus.OK;
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private static boolean isRootUri(Uri uri) {
+        String docId = DocumentsContract.getTreeDocumentId(uri);
+        return docId.endsWith(":");
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private static boolean isInternalStorage(Uri uri) {
+        return isExternalStorageDocument(uri) && DocumentsContract.getTreeDocumentId(uri).contains("primary");
+    }
+
+    private static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
     public String getSDPath() {
         String sSDpath = null;
         File fileCur = null;
@@ -421,6 +463,15 @@ public class FileUtil {
         File internal = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + data[0], eid.replace("E", "") + ".mp4");
         File external = new File(getSDPath() + "/Animeflv/download/" + data[0], eid.replace("E", "") + ".mp4");
         return internal.exists() || external.exists();
+    }
+
+    public File getSimpleFile(String eid) {
+        String[] data = eid.replace("E", "").split("_");
+        File internal = new File(Environment.getExternalStorageDirectory() + "/Animeflv/download/" + data[0], eid.replace("E", "") + ".mp4");
+        File external = new File(getSDPath() + "/Animeflv/download/" + data[0], eid.replace("E", "") + ".mp4");
+        if (internal.exists()) return internal;
+        if (external.exists()) return external;
+        return null;
     }
 
     public boolean DeleteAnime(String eid) {

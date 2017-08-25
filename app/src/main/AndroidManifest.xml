@@ -24,7 +24,7 @@
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <application
         android:name=".Application"
         android:allowBackup="true"

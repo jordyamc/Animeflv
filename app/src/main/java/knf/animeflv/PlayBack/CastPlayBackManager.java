@@ -1,6 +1,8 @@
 package knf.animeflv.PlayBack;
 
 import android.app.Activity;
+import android.content.Context;
+import android.os.Looper;
 import android.view.Menu;
 
 import com.connectsdk.device.DevicePicker;
@@ -20,12 +22,12 @@ import xdroid.toaster.Toaster;
 public class CastPlayBackManager implements CastListener, PlayStatusListener {
     private static final String TAG = "CastPlayBackManager";
     private static CastPlayBackManager manager;
-    private Activity activity;
+    private Context activity;
     private boolean isConnected = false;
     private PlayBackInterface playBackInterface;
     private String castingEid = "null";
 
-    public CastPlayBackManager(Activity activity) {
+    public CastPlayBackManager(Context activity) {
         this.activity = activity;
         CastManager.getInstance().setTheme(ThemeUtils.isAmoled(activity) ? DevicePicker.Theme.DARK : DevicePicker.Theme.LIGTH);
         CastManager.getInstance().setDiscoveryManager();
@@ -44,7 +46,7 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
     }
 
     public void registrerMenu(Menu menu, int id) {
-        CastManager.getInstance().registerForActivity(activity, menu, id);
+        CastManager.getInstance().registerForActivity((Activity) activity, menu, id);
     }
 
     public void destroyManager() {
@@ -58,6 +60,10 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
     }
 
     public void play(String url, String eid) {
+        try {
+            Looper.prepare();
+        } catch (Exception e) {
+        }
         if (isDeviceConnected()) {
             castingEid = eid;
             SeenManager.get(activity).setSeenState(eid, true);
@@ -69,6 +75,10 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
         } else {
             isConnected = false;
             Toaster.toast("No hay dispositivos conectados");
+        }
+        try {
+            Looper.loop();
+        } catch (Exception e) {
         }
     }
 
@@ -106,7 +116,7 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
             case STATUS_START_PLAYING:
                 if (playBackInterface != null)
                     playBackInterface.onPlay();
-                CastManager.getInstance().startControlsActivity(activity, CastControlsActivity.class);
+                CastManager.getInstance().startControlsActivity((Activity) activity, CastControlsActivity.class);
                 break;
             case STATUS_FINISHED:
             case STATUS_STOPPED:

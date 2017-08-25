@@ -3,6 +3,7 @@ package knf.animeflv.Recyclers;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -39,9 +40,11 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import es.munix.multidisplaycast.CastControlsActivity;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
+import knf.animeflv.DownloadService.ServerHolder;
 import knf.animeflv.Interfaces.MainRecyclerCallbacks;
 import knf.animeflv.JsonFactory.DownloadGetter;
 import knf.animeflv.Parser;
@@ -319,7 +322,9 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                     if (UpdateUtil.getState() == UpdateState.WAITING_TO_UPDATE) {
                         Toaster.toast("Actualizacion descargada, instalar para continuar");
                     } else {
-                        if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
+                        if (CastPlayBackManager.get(context).isCasting(Animes.get(getPosition(holder.getAdapterPosition(), position)).getEid())) {
+                            context.startActivity(new Intent(context, CastControlsActivity.class));
+                        } else if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                             StreamManager.Play(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
                         } else {
                             if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
@@ -363,11 +368,34 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                 }
             }
         });
+        holder.ib_ver.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                String eid = Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid();
+                if (FileUtil.init(context).ExistAnime(eid) && CastPlayBackManager.get(context).isDeviceConnected() && !CastPlayBackManager.get(context).isCasting(eid)) {
+                    showDelete(holder.ib_des);
+                    showCastPlay(holder.ib_ver);
+                    ServerHolder.getInstance().startServer(context, FileUtil.init(context).getSimpleFile(eid), eid);
+                    MainStates.setProcessing(false, null);
+                    refresh();
+                }
+                return true;
+            }
+        });
         if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid()) && showProgress()) {
             startDownload(holder);
         } else {
             holder.progressBar.setVisibility(View.GONE);
         }
+    }
+
+    private void refresh() {
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged();
+            }
+        });
     }
 
     private boolean showProgress() {

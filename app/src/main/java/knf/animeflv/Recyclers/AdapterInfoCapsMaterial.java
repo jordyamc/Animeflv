@@ -2,6 +2,7 @@ package knf.animeflv.Recyclers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -29,10 +30,12 @@ import com.github.captain_miao.optroundcardview.OptRoundCardView;
 import java.io.File;
 import java.util.List;
 
+import es.munix.multidisplaycast.CastControlsActivity;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.DownloadManager.CookieConstructor;
 import knf.animeflv.DownloadManager.ManageDownload;
+import knf.animeflv.DownloadService.ServerHolder;
 import knf.animeflv.JsonFactory.DownloadGetter;
 import knf.animeflv.Parser;
 import knf.animeflv.PlayBack.CastPlayBackManager;
@@ -104,6 +107,8 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                 showDownload(holder.ib_des);
             }
         }
+        if (CastPlayBackManager.get(context).isCasting(eids.get(getPosition(holder, position))))
+            showCastPlay(holder.ib_ver);
         holder.tv_capitulo.setText(capitulo.get(position));
         holder.tv_capitulo.setTextColor(theme.textColorNormal);
         holder.card.setCardBackgroundColor(theme.card_normal);
@@ -194,14 +199,10 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                     } else {
                         if (!MainStates.isProcessing()) {
                             if (!MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                                if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
+                                if (CastPlayBackManager.get(context).isCasting(eids.get(getPosition(holder, position)))) {
+                                    context.startActivity(new Intent(context, CastControlsActivity.class));
+                                } else if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
                                     holder.tv_capitulo.setTextColor(getColor());
-                                    /*if (CastPlayBackManager.get(context).isDeviceConnected()){
-                                        String e=eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition());
-                                        CastPlayBackManager.get(context).play(ServerManager.get().startStream(context,FileUtil.init(context).getFile(e)),e);
-                                    }else {
-                                        StreamManager.Play(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
-                                    }*/
                                     StreamManager.Play(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
                                 } else if (ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
                                     Toaster.toast("Descarga en proceso");
@@ -240,6 +241,20 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                         }
                     }
                 }
+            }
+        });
+        holder.ib_ver.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                String eid = eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition());
+                if (FileUtil.init(context).ExistAnime(eid) && CastPlayBackManager.get(context).isDeviceConnected() && !CastPlayBackManager.get(context).isCasting(eids.get(getPosition(holder, position)))) {
+                    showDelete(holder.ib_des);
+                    showCastPlay(holder.ib_ver);
+                    ServerHolder.getInstance().startServer(context, FileUtil.init(context).getSimpleFile(eid), eid);
+                    MainStates.setProcessing(false, null);
+                    refresh();
+                }
+                return true;
             }
         });
         holder.card.setOnLongClickListener(new View.OnLongClickListener() {
@@ -289,6 +304,15 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+        });
+    }
+
+    private void refresh() {
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                notifyDataSetChanged();
             }
         });
     }
@@ -494,7 +518,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                         @Override
                         public void run() {
                             showDownload(holder.ib_des);
-                            holder.ib_ver.setImageResource(es.munix.multidisplaycast.R.drawable.cast_on);
+                            showCastPlay(holder.ib_ver);
                         }
                     });
                 }

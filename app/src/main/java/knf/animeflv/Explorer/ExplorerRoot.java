@@ -34,7 +34,7 @@ import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
 import knf.animeflv.Configuracion;
 import knf.animeflv.Directorio.DB.DirectoryHelper;
-import knf.animeflv.DownloadService.WebServer;
+import knf.animeflv.DownloadService.ServerHolder;
 import knf.animeflv.Explorer.Fragments.DirectoryFragment;
 import knf.animeflv.Explorer.Fragments.VideoFilesFragment;
 import knf.animeflv.Explorer.Models.ModelFactory;
@@ -65,8 +65,6 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
     private String TAG_DIRECTORY = "directorio";
     private String TAG_ANIME = "anime";
     private boolean isCastMode = false;
-
-    private WebServer server;
 
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
@@ -218,16 +216,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
 
     @Override
     public void OnCastFile(File file, String eid) {
-        try {
-            if (server != null && server.isAlive())
-                server.stop();
-            server = new WebServer(this, file);
-            server.start();
-            CastPlayBackManager.get(this).play(getIpWport(8880, true), eid);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toaster.toast("Error al activar webserver");
-        }
+        ServerHolder.getInstance().startServer(this, file, eid);
     }
 
     @Override
@@ -353,9 +342,7 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
                 break;
             case R.id.cast_icon:
                 if (isCastMode) {
-                    if (server != null)
-                        server.stop();
-                    CastPlayBackManager.get(ExplorerRoot.this).stop();
+                    ServerHolder.getInstance().stopServer(this);
                     isCastMode = false;
                     Toaster.toast("Modo cast desactivado");
                 } else {
@@ -473,13 +460,22 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
             showDirectory();
         }
         if (requestCode == 1547 && resultCode == -1) {
-            Toaster.toast("Error al obtener permisos");
+            Toaster.toast(getIntentMessage(data));
             commitDownloadInSD(false);
             textView.setText(ModelFactory.getDirectoryFile(this).getAbsolutePath());
             directoryFragment = new DirectoryFragment();
             videoFilesFragment = new VideoFilesFragment();
             showDirectory();
         }
+    }
+
+    private String getIntentMessage(Intent intent) {
+        String message = null;
+        if (intent != null)
+            message = intent.getStringExtra("error");
+        if (message == null)
+            message = "Error al obtener permisos";
+        return message;
     }
 
     @Override
@@ -492,9 +488,6 @@ public class ExplorerRoot extends AppCompatActivity implements ExplorerInterface
     protected void onDestroy() {
         new Parser().saveBackup(this);
         FavSyncro.updateServer(this);
-        if (server != null)
-            server.stop();
-        CastPlayBackManager.get(this).stop();
         super.onDestroy();
     }
 }
