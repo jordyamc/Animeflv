@@ -116,7 +116,7 @@ public class CastPlayBackManager implements CastListener, PlayStatusListener {
             case STATUS_START_PLAYING:
                 if (playBackInterface != null)
                     playBackInterface.onPlay();
-                CastManager.getInstance().startControlsActivity((Activity) activity, CastControlsActivity.class);
+                CastControlsActivity.open(activity, ThemeUtils.getAcentColor(activity));
                 break;
             case STATUS_FINISHED:
             case STATUS_STOPPED:

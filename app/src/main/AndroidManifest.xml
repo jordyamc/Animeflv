@@ -223,9 +223,6 @@
             android:name=".ServerReload.manualServerReload"
             android:label="@string/app_name"/>
         <activity
-            android:name=".AdminControl.ControlActivity"
-            android:label="@string/app_name"/>
-        <activity
             android:name=".Explorer.ExplorerRoot"
             android:configChanges="orientation|screenSize|keyboard"
             android:label="@string/app_name"/>
@@ -313,15 +310,6 @@
             </intent-filter>
         </receiver>
 
-        <activity
-            android:name=".ADS"
-            android:label="@string/title_activity_ads"/>
-        <activity
-            android:name=".LoginActivity.LoginBase"
-            android:label="@string/app_name"/>
-        <activity
-            android:name=".LoginActivity.LoginUser"
-            android:label="@string/app_name"/>
         <activity
             android:name=".info.InfoFragments"
             android:configChanges="orientation|screenSize|keyboard"

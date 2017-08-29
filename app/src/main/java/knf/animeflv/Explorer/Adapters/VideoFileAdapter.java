@@ -2,7 +2,6 @@ package knf.animeflv.Explorer.Adapters;
 
 import android.app.Activity;
 import android.app.DownloadManager;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -152,7 +151,7 @@ public class VideoFileAdapter extends RecyclerView.Adapter<VideoFileAdapter.View
                 public void onClick(View v) {
                     showAsSeen(holder);
                     if (isCasting(list.get(holder.getAdapterPosition()).getEID())) {
-                        context.startActivity(new Intent(context, CastControlsActivity.class));
+                        CastControlsActivity.open(context, theme.accent);
                     } else if (castMode) {
                         context.runOnUiThread(new Runnable() {
                             @Override

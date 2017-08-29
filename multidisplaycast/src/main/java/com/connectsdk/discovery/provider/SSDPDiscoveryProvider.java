@@ -248,7 +248,7 @@ public class SSDPDiscoveryProvider implements DiscoveryProvider {
 
                 if (executorService.isTerminated() || executorService.isShutdown()) {
                     if (serviceFilters != null && !serviceFilters.isEmpty()) {
-                        int poolSize = serviceFilters.size() * 3;
+                        int poolSize = serviceFilters.size() * 4;
                         executorService = Executors.newScheduledThreadPool(poolSize);
                     }
                 }

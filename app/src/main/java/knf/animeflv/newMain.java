@@ -18,7 +18,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -43,8 +42,6 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.Theme;
-import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.dropbox.core.android.Auth;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -99,8 +96,7 @@ import knf.animeflv.JsonFactory.JsonTypes.INICIO;
 import knf.animeflv.JsonFactory.SelfGetter;
 import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.LoginActivity.LoginActivity;
-import knf.animeflv.LoginActivity.LoginBase;
-import knf.animeflv.LoginActivity.LoginUser;
+import knf.animeflv.LoginActivity.LoginServer;
 import knf.animeflv.PlayBack.CastPlayBackManager;
 import knf.animeflv.PlayBack.PlayBackManager;
 import knf.animeflv.Random.RandomActivity;
@@ -124,7 +120,6 @@ import knf.animeflv.Utils.TrackingHelper;
 import knf.animeflv.Utils.UpdateUtil;
 import knf.animeflv.Utils.UtilDialogPref;
 import knf.animeflv.Utils.UtilNotBlocker;
-import knf.animeflv.Utils.UtilSound;
 import knf.animeflv.Utils.admin.adminListeners;
 import knf.animeflv.Utils.objects.User;
 import knf.animeflv.WaitList.WaitList;
@@ -135,9 +130,6 @@ import static knf.animeflv.Utils.Keys.Url.ADMINS;
 
 public class newMain extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener,
-        LoginServer.callback,
-        DirGetter.callback,
-        ColorChooserDialog.ColorCallback,
         MainRecyclerCallbacks {
     public Drawer result;
     private boolean isAmoled;
@@ -363,7 +355,7 @@ public class newMain extends AppCompatActivity implements
                 return true;
             }
         });
-        if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(this)) {
+        if (LoginServer.isLogedIn(this)) {
             builder.addProfiles(
                     new ProfileDrawerItem().withName("Versión " + versionName + " (" + Integer.toString(versionCode) + ")" + (UpdateUtil.isBeta ? " - BETA" : "")).withEmail(FavSyncro.getEmail(this)).withIcon(ic_main).withIdentifier(9),
                     new ProfileSettingDrawerItem().withName("Cambiar colores").withIcon(CommunityMaterial.Icon.cmd_palette).withIdentifier(22),
@@ -382,7 +374,7 @@ public class newMain extends AppCompatActivity implements
                             result.closeDrawer();
                             break;
                         case 87:
-                            if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(newMain.this) || DropboxManager.islogedIn()) {
+                            if (LoginServer.isLogedIn(newMain.this) || DropboxManager.islogedIn()) {
                                 startSeenUpdate();
                                 result.closeDrawer();
                             } else {
@@ -390,7 +382,7 @@ public class newMain extends AppCompatActivity implements
                             }
                             break;
                         case 88:
-                            if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(newMain.this) || DropboxManager.islogedIn()) {
+                            if (LoginServer.isLogedIn(newMain.this) || DropboxManager.islogedIn()) {
                                 startSeenSync();
                                 result.closeDrawer();
                             } else {
@@ -426,10 +418,6 @@ public class newMain extends AppCompatActivity implements
                             }
                             result.closeDrawer();
                             break;
-                        case 99:
-                            startActivityForResult(new Intent(newMain.this, LoginUser.class), 1147);
-                            result.closeDrawer();
-                            break;
                     }
                     return false;
                 }
@@ -449,7 +437,7 @@ public class newMain extends AppCompatActivity implements
                             headerResult.toggleSelectionList(newMain.this);
                             break;
                         case 87:
-                            if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(newMain.this) || DropboxManager.islogedIn()) {
+                            if (LoginServer.isLogedIn(newMain.this) || DropboxManager.islogedIn()) {
                                 startSeenUpdate();
                                 result.closeDrawer();
                             } else {
@@ -457,16 +445,12 @@ public class newMain extends AppCompatActivity implements
                             }
                             break;
                         case 88:
-                            if (knf.animeflv.LoginActivity.LoginServer.isLogedIn(newMain.this) || DropboxManager.islogedIn()) {
+                            if (LoginServer.isLogedIn(newMain.this) || DropboxManager.islogedIn()) {
                                 startSeenSync();
                                 result.closeDrawer();
                             } else {
                                 Toaster.toast("Por favor inicia sesión en la app o en Dropbox");
                             }
-                            break;
-                        case 110:
-                            startActivityForResult(new Intent(newMain.this, LoginBase.class), 1147);
-                            result.closeDrawer();
                             break;
                         case 120:
                             /*if (DropboxManager.islogedIn()) {
@@ -571,11 +555,6 @@ public class newMain extends AppCompatActivity implements
                                 break;
                             case 7:
                                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://discord.gg/6hzpua6")));
-                                result.setSelection(0, false);
-                                result.closeDrawer();
-                                break;
-                            case 8:
-                                startActivity(new Intent(context, ADS.class));
                                 result.setSelection(0, false);
                                 result.closeDrawer();
                                 break;
@@ -1106,44 +1085,6 @@ public class newMain extends AppCompatActivity implements
     }
 
     @Override
-    public void onColorSelection(@NonNull ColorChooserDialog dialog, @ColorInt int selectedColor) {
-        if (selectedColor == ColorsRes.Prim(this) || selectedColor == ColorsRes.GrisLigth(context)) {
-            ThemeHolder.isDark = selectedColor == ColorsRes.Prim(this);
-            int[] colorl = new int[]{
-                    ColorsRes.Naranja(this),
-                    ColorsRes.Rojo(this),
-                    ColorsRes.Gris(this),
-                    ColorsRes.Verde(this),
-                    ColorsRes.Rosa(this),
-                    ColorsRes.Morado(this)
-            };
-            new ColorChooserDialog.Builder(this, R.string.color_chooser)
-                    .theme(ThemeUtils.isAmoled(this) ? Theme.DARK : Theme.LIGHT)
-                    .customColors(colorl, null)
-                    .dynamicButtonColor(true)
-                    .allowUserColorInput(false)
-                    .allowUserColorInputAlpha(false)
-                    .doneButton(android.R.string.ok)
-                    .cancelButton(R.string.back)
-                    .preselect(PreferenceManager.getDefaultSharedPreferences(context).getInt("accentColor", ColorsRes.Naranja(context)))
-                    .accentMode(true)
-                    .build().show(this);
-        } else {
-            ThemeHolder.accentColor = selectedColor;
-            ThemeHolder.applyTheme(this);
-            if (UtilSound.getAudioWidget().isShown()) UtilSound.getAudioWidget().hide();
-            if (UtilSound.isNotSoundShow)
-                UtilSound.toogleNotSound(UtilSound.getCurrentMediaPlayerInt());
-            recreate();
-        }
-    }
-
-    @Override
-    public void onColorChooserDismissed(@NonNull ColorChooserDialog colorChooserDialog) {
-
-    }
-
-    @Override
     public void onRefresh() {
         if (NetworkUtils.isNetworkAvailable()) {
             getSharedPreferences("data", MODE_PRIVATE).edit().putInt("nCaps", 0).apply();
@@ -1158,16 +1099,6 @@ public class newMain extends AppCompatActivity implements
         NotificationManager notificationManager = (NotificationManager) this
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(6991);
-    }
-
-    @Override
-    public void response(String data, TaskType taskType) {
-
-    }
-
-    @Override
-    public void ReqDirs(String data, TaskType taskType) {
-
     }
 
     @Override
@@ -1252,6 +1183,7 @@ public class newMain extends AppCompatActivity implements
     protected void onDestroy() {
         super.onDestroy();
         CastPlayBackManager.get(this).destroyManager();
+        ServerHolder.getInstance().stopServer(this);
         MainStates.setProcessing(false, "destroyed");
         MainStates.setLoadingEmision(false);
         if (UtilDialogPref.getPlayer() != null) {
@@ -1344,7 +1276,6 @@ public class newMain extends AppCompatActivity implements
     protected void onStop() {
         super.onStop();
         PlayBackManager.get(this).removeCallbacks();
-        ServerHolder.getInstance().stopServer(this);
     }
 
     @Override

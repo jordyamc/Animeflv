@@ -163,7 +163,6 @@ public class CastManager implements DiscoveryManagerListener, MenuItem.OnMenuIte
     }
 
     public void setCastMenuVisible(Boolean visible) {
-        log("setCastMenuVisible(" + visible + ")");
         if (castMenuItem != null) {
             castMenuItem.setVisible(visible);
         }

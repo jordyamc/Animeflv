@@ -2,7 +2,6 @@ package knf.animeflv.Recyclers;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -12,9 +11,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.DownloadListener;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
@@ -200,7 +201,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                         if (!MainStates.isProcessing()) {
                             if (!MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
                                 if (CastPlayBackManager.get(context).isCasting(eids.get(getPosition(holder, position)))) {
-                                    context.startActivity(new Intent(context, CastControlsActivity.class));
+                                    CastControlsActivity.open(context, theme.accent);
                                 } else if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
                                     holder.tv_capitulo.setTextColor(getColor());
                                     StreamManager.Play(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
@@ -253,8 +254,10 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                     ServerHolder.getInstance().startServer(context, FileUtil.init(context).getSimpleFile(eid), eid);
                     MainStates.setProcessing(false, null);
                     refresh();
+                    return true;
+                } else {
+                    return false;
                 }
-                return true;
             }
         });
         holder.card.setOnLongClickListener(new View.OnLongClickListener() {
@@ -563,6 +566,12 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.loadUrl(url);
+                return true;
+            }
+        });
+        web.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
                 return true;
             }
         });

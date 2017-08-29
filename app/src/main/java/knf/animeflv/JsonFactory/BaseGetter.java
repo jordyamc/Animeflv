@@ -10,7 +10,6 @@ import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DIRECTORIO;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
-import knf.animeflv.JsonFactory.JsonTypes.EMISION;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
 import knf.animeflv.JsonFactory.Objects.Server;
 import knf.animeflv.Utils.NetworkUtils;
@@ -51,14 +50,6 @@ public class BaseGetter {
             SelfGetter.getAnime(context, anime, asyncInterface);
         } else {
             asyncInterface.onFinish(OfflineGetter.getAnime(anime));
-        }
-    }
-
-    public static void getJson(Context context, EMISION emision, AsyncInterface asyncInterface) {
-        if (NetworkUtils.isNetworkAvailable()) {
-            ServerGetter.getEmision(context, asyncInterface);
-        } else {
-            asyncInterface.onFinish(OfflineGetter.getEmision());
         }
     }
 

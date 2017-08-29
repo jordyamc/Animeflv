@@ -20,7 +20,7 @@ import com.onesignal.OneSignal;
 
 import knf.animeflv.Utils.ThemeUtils;
 
-public class Configuracion extends AppCompatActivity implements LoginServer.callback {
+public class Configuracion extends AppCompatActivity {
     public static final int OPEN_SOUNDS = 1;
     public static final int GET_WRITE_PERMISSIONS = 2;
     public static boolean isXLargeScreen(Context context) {
@@ -74,11 +74,6 @@ public class Configuracion extends AppCompatActivity implements LoginServer.call
         if (getIntent().getExtras() != null) {
             setResult(getIntent().getIntExtra("return", -1));
         }
-    }
-
-    @Override
-    public void response(String data, TaskType taskType) {
-
     }
 
     @Override

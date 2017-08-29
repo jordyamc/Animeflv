@@ -34,12 +34,11 @@ public class NotificationsHelper {
 
     public static void showNotification(final Context context, String title, String subtitle, final String icon, Boolean isPaused) {
 
-        final NotificationCompat.Builder notification = new NotificationCompat.Builder(context).setOngoing(true)
+        final NotificationCompat.Builder notification = new NotificationCompat.Builder(context, "animeflv_app_channel_cast").setOngoing(true)
                 .setAutoCancel(false)
                 .setContentTitle(title)
                 .setContentText(subtitle)
                 .setSmallIcon(R.drawable.cast_on);
-
 
         Intent castActivityIntent = new Intent(context, CastControlsActivity.class);
         PendingIntent castActivityPendingIntent = PendingIntent.getActivity(context, NOTIFICATION_ID, castActivityIntent, 0);

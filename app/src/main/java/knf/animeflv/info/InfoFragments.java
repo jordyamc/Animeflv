@@ -67,12 +67,10 @@ import knf.animeflv.JsonFactory.BaseGetter;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DIRECTORIO;
 import knf.animeflv.JsonFactory.OfflineGetter;
-import knf.animeflv.LoginServer;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Suggestions.Algoritm.SuggestionAction;
 import knf.animeflv.Suggestions.Algoritm.SuggestionHelper;
-import knf.animeflv.TaskType;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.FileUtil;
 import knf.animeflv.Utils.Keys;
@@ -85,7 +83,7 @@ import knf.animeflv.info.fragments.FragmentInfo;
 import xdroid.toaster.Toaster;
 
 @SuppressWarnings("WeakerAccess")
-public class InfoFragments extends AppCompatActivity implements LoginServer.callback {
+public class InfoFragments extends AppCompatActivity {
     public static String ACTION_EDITED = "knf.animeflv.emision.EMISION_EDITED";
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbarLayout;
@@ -583,11 +581,6 @@ public class InfoFragments extends AppCompatActivity implements LoginServer.call
             finish();
         }
         return true;
-    }
-
-    @Override
-    public void response(String data, TaskType taskType) {
-
     }
 
     @Override

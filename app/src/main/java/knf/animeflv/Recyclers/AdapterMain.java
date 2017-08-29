@@ -3,7 +3,6 @@ package knf.animeflv.Recyclers;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -15,9 +14,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
@@ -289,7 +290,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     Toaster.toast("Actualizacion descargada, instalar para continuar");
                 } else {
                     if (CastPlayBackManager.get(context).isCasting(Animes.get(getPosition(holder.getAdapterPosition(), position)).getEid())) {
-                        context.startActivity(new Intent(context, CastControlsActivity.class));
+                        CastControlsActivity.open(context, theme.accent);
                     } else if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
                         StreamManager.Play(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
                     } else {
@@ -341,8 +342,10 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     ServerHolder.getInstance().startServer(context, FileUtil.init(context).getSimpleFile(eid), eid);
                     MainStates.setProcessing(false, null);
                     refresh();
+                    return true;
+                } else {
+                    return false;
                 }
-                return true;
             }
         });
         if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition()).getEid()) && showProgress()) {
@@ -764,6 +767,12 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.loadUrl(url);
+                return true;
+            }
+        });
+        web.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
                 return true;
             }
         });

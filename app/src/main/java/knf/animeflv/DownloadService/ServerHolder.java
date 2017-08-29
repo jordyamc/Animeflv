@@ -15,6 +15,7 @@ import xdroid.toaster.Toaster;
 
 public class ServerHolder {
     private static final ServerHolder ourInstance = new ServerHolder();
+    private static final int HTTP_PORT = 8880;
     private WebServer server;
 
     private ServerHolder() {
@@ -30,7 +31,7 @@ public class ServerHolder {
                 server.stop();
             server = new WebServer(context, file);
             server.start();
-            CastPlayBackManager.get((Activity) context).play(getIpWport(context, 8880, true), eid);
+            CastPlayBackManager.get((Activity) context).play(getIpWport(context), eid);
         } catch (Exception e) {
             e.printStackTrace();
             Toaster.toast("Error al iniciar webserver");
@@ -38,12 +39,13 @@ public class ServerHolder {
     }
 
     public void stopServer(Context context) {
-        if (server != null)
+        if (server != null && server.isAlive()) {
             server.stop();
-        CastPlayBackManager.get((Activity) context).stop();
+            CastPlayBackManager.get((Activity) context).stop();
+        }
     }
 
-    private String getIpWport(Context context, int port, boolean formatted) {
-        return (formatted ? "http://" : "") + NetworkUtils.getIPAddress(context) + ":" + port;
+    private String getIpWport(Context context) {
+        return "http://" + NetworkUtils.getIPAddress(context) + ":" + HTTP_PORT;
     }
 }

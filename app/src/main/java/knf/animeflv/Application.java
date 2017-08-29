@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,7 +19,6 @@ import android.widget.Toast;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.core.CrashlyticsCore;
-import com.evernote.android.job.JobConfig;
 import com.evernote.android.job.JobManager;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
@@ -40,6 +40,8 @@ import xdroid.toaster.Toaster;
 
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_ANIMES;
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_ANIMES_DESC;
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_CAST;
+import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_CAST_DESC;
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_COM_DOWNLOAD;
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_COM_DOWNLOAD_DESC;
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_CURR_DOWNLOAD;
@@ -70,7 +72,6 @@ public class Application extends MultiDexApplication {
             initChannels();
         UtilsInit.init(this);
         JobManager.create(this).addJobCreator(new JobsCreator());
-        JobConfig.setLogcatEnabled(true);
         android.webkit.CookieSyncManager.createInstance(this);
         android.webkit.CookieManager.getInstance().setAcceptCookie(true);
         WebkitCookieManagerProxy coreCookieManager = new WebkitCookieManagerProxy(null, java.net.CookiePolicy.ACCEPT_ALL);
@@ -104,6 +105,11 @@ public class Application extends MultiDexApplication {
             OneSignal.syncHashedEmail(email);
     }
 
+    @Override
+    protected void attachBaseContext(Context base) {
+        MultiDex.install(this);
+        super.attachBaseContext(base);
+    }
 
     synchronized public Tracker getDefaultTracker() {
         if (mTracker == null) {
@@ -129,6 +135,7 @@ public class Application extends MultiDexApplication {
         createChannel(manager, CHANNEL_CURR_DOWNLOAD, CHANNEL_CURR_DOWNLOAD_DESC, "Descargas en progreso", NotificationManager.IMPORTANCE_DEFAULT, -1, false);
         createChannel(manager, CHANNEL_COM_DOWNLOAD, CHANNEL_COM_DOWNLOAD_DESC, "Descargas terminadas", NotificationManager.IMPORTANCE_DEFAULT, Color.parseColor("#8BC34A"), false);
         createChannel(manager, CHANNEL_ERROR, CHANNEL_ERROR_DESC, "Errores", NotificationManager.IMPORTANCE_MAX, Color.RED, false);
+        createChannel(manager, CHANNEL_CAST, CHANNEL_CAST_DESC, "Notificacion de CAST", NotificationManager.IMPORTANCE_DEFAULT, Color.GREEN, false);
     }
 
     @TargetApi(Build.VERSION_CODES.O)

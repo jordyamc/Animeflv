@@ -212,10 +212,11 @@
                 android:layout_height="80dp"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
+                android:adjustViewBounds="false"
                 android:background="@drawable/shape_buttons"
                 android:clickable="true"
                 android:padding="12dp"
-                android:src="@drawable/ic_pause_white_36dp" />
+                android:src="@drawable/ic_pause_white_36dp"/>
 
             <ImageView
                 android:id="@+id/volume"

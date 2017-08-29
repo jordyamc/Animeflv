@@ -57,26 +57,6 @@
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-            <!--<android.support.design.widget.TabLayout
-                android:id="@+id/tabs"
-                android:layout_width="wrap_content"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_gravity="bottom|start"
-                app:tabMode="fixed"
-                app:tabMinWidth="100dp"
-                app:tabGravity="fill"
-                app:tabContentStart="72dp" >
-                <android.support.design.widget.TabItem
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-
-                    android:text="Info"/>
-                <android.support.design.widget.TabItem
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Capitulos"/>
-            </android.support.design.widget.TabLayout>-->
-
             <com.ogaclejapan.smarttablayout.SmartTabLayout
                 android:id="@+id/viewpagertab"
                 android:layout_width="match_parent"
@@ -92,7 +72,7 @@
                 app:stl_indicatorCornerRadius="1.5dp"
                 app:stl_indicatorInterpolation="smart"
                 app:stl_indicatorThickness="3dp"
-                app:stl_underlineColor="@color/transparent" />
+                app:stl_underlineColor="@android:color/transparent"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
 

@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -20,12 +19,10 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.ArrayRes;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.provider.DocumentFile;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,19 +42,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-import es.dmoral.coloromatic.ColorOMaticDialog;
-import es.dmoral.coloromatic.ColorOMaticUtil;
-import es.dmoral.coloromatic.IndicatorMode;
-import es.dmoral.coloromatic.OnColorSelectedListener;
-import es.dmoral.coloromatic.colormode.ColorMode;
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.CustomSettingsIntro.CustomIntro;
 import knf.animeflv.Directorio.DB.DirectoryDB;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.Jobs.CheckJob;
 import knf.animeflv.JsonFactory.SelfGetter;
-import knf.animeflv.LoginActivity.LoginBase;
-import knf.animeflv.LoginActivity.LoginUser;
 import knf.animeflv.SDControl.SDManager;
 import knf.animeflv.SDControl.SDResultContainer;
 import knf.animeflv.SDControl.SDSearcher;
@@ -83,7 +73,6 @@ import xdroid.toaster.Toaster;
 public class Conf_fragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, FolderChooserDialog.FolderCallback {
     Activity context;
     MediaPlayer mp;
-    Login login = new Login();
     private int REQUEST_CODE_LOGIN = 58458;
     private FragmentActivity myContext;
 
@@ -141,76 +130,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         });
     }
 
-    private void setColorsPrefs() {
-        final Preference color_favs = getPreferenceScreen().findPreference("color_favs");
-        final Preference color_new = getPreferenceScreen().findPreference("color_new");
-        final int def_color_favs = PreferenceManager.getDefaultSharedPreferences(getActivity()).getInt("color_favs", Color.argb(100, 26, 206, 246));
-        final int def_color_new = PreferenceManager.getDefaultSharedPreferences(getActivity()).getInt("color_new", Color.argb(100, 253, 250, 93));
-        color_favs.setSummary(ColorOMaticUtil.getFormattedColorString(def_color_favs, true));
-        color_new.setSummary(ColorOMaticUtil.getFormattedColorString(def_color_new, true));
-        color_favs.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                new ColorOMaticDialog.Builder()
-                        .initialColor(def_color_favs)
-                        .colorMode(ColorMode.ARGB) // RGB, ARGB, HVS
-                        .indicatorMode(IndicatorMode.HEX) // HEX or DECIMAL; Note that using HSV with IndicatorMode.HEX is not recommended
-                        .onColorSelected(new OnColorSelectedListener() {
-                            @Override
-                            public void onColorSelected(@ColorInt int i) {
-                                color_favs.setSummary(ColorOMaticUtil.getFormattedColorString(i, true));
-                                PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putInt("color_favs", i).apply();
-                            }
-                        })
-                        .showColorIndicator(true)
-                        .create()
-                        .show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "ColorOMaticDialog");
-                return false;
-            }
-        });
-        color_new.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                new ColorOMaticDialog.Builder()
-                        .initialColor(def_color_new)
-                        .colorMode(ColorMode.ARGB) // RGB, ARGB, HVS
-                        .indicatorMode(IndicatorMode.HEX) // HEX or DECIMAL; Note that using HSV with IndicatorMode.HEX is not recommended
-                        .onColorSelected(new OnColorSelectedListener() {
-                            @Override
-                            public void onColorSelected(@ColorInt int i) {
-                                color_new.setSummary(ColorOMaticUtil.getFormattedColorString(i, true));
-                                PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putInt("color_new", i).apply();
-                            }
-                        })
-                        .showColorIndicator(true)
-                        .create()
-                        .show(((AppCompatActivity) getActivity()).getSupportFragmentManager(), "ColorOMaticDialog");
-                return false;
-            }
-        });
-        getPreferenceScreen().findPreference("color_default").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                new MaterialDialog.Builder(getActivity())
-                        .content("¿Restaurar colores predeterminados?")
-                        .positiveText("Continuar")
-                        .negativeText("cancelar")
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                color_favs.setSummary(ColorOMaticUtil.getFormattedColorString(Color.argb(100, 26, 206, 246), true));
-                                color_new.setSummary(ColorOMaticUtil.getFormattedColorString(Color.argb(100, 253, 250, 93), true));
-                                PreferenceManager.getDefaultSharedPreferences(getActivity()).edit()
-                                        .putInt("color_favs", Color.argb(100, 26, 206, 246))
-                                        .putInt("color_new", Color.argb(100, 253, 250, 93))
-                                        .apply();
-                            }
-                        }).build().show();
-                return false;
-            }
-        });
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
@@ -233,8 +152,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             e.printStackTrace();
         }
         //<----------
-
-        setColorsPrefs();
 
         Boolean activado = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("notificaciones", true);
         if (!activado) {
@@ -785,72 +702,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 new Alarm().SetAlarm(context, tiempo);
                 CheckJob.reshedule(context);
                 break;
-            case "nCuenta_Status":
-                String status = sharedPreferences.getString("nCuenta_Status", "NULL");
-                switch (status) {
-                    case "exito":
-                        sharedPreferences.edit().putString("nCuenta_Status", "NEUTRAL").apply();
-                        login.dismiss();
-                        Toast.makeText(getActivity(), "Usuario Creado!!", Toast.LENGTH_SHORT).show();
-                        String login_email = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null");
-                        getPreferenceScreen().findPreference("login").setSummary(login_email);
-                        break;
-                    case "error":
-                        sharedPreferences.edit().putString("nCuenta_Status", "NEUTRAL").apply();
-                        login.dismiss();
-                        Toast.makeText(getActivity(), "Error!!", Toast.LENGTH_SHORT).show();
-                        break;
-                    case "existe":
-                        sharedPreferences.edit().putString("nCuenta_Status", "NEUTRAL").apply();
-                        login.dismiss();
-                        Toast.makeText(getActivity(), "Usuario ya existe!!", Toast.LENGTH_SHORT).show();
-                        break;
-                }
-                break;
-            case "GET_Status":
-                String state = sharedPreferences.getString("GET_Status", "NEUTRAL");
-                Log.d("GET_STATUS", state);
-                switch (state.trim()) {
-                    case "contraseña":
-                        login.LoginErrors(1);
-                        break;
-                    case "noexiste":
-                        login.LoginErrors(2);
-                        break;
-                }
-                break;
-            case "cCorreo_Status":
-                String Cstate = sharedPreferences.getString("cCorreo_Status", "NEUTRAL");
-                Log.d("cCorreo_STATUS", Cstate);
-                switch (Cstate.trim()) {
-                    case "contraseña":
-                        login.cCorreoErrors(1);
-                        break;
-                    case "noexiste":
-                        login.cCorreoErrors(2);
-                        break;
-                }
-                break;
-            case "cPass_Status":
-                String CPstate = sharedPreferences.getString("cPass_Status", "NEUTRAL");
-                Log.d("cPass_STATUS", CPstate);
-                switch (CPstate.trim()) {
-                    case "contraseña":
-                        login.cPassErrors(1);
-                        break;
-                    case "noexiste":
-                        login.cPassErrors(2);
-                        break;
-                }
-                break;
-            case "login_email":
-                String login_email = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null");
-                if (!login_email.equals("null")) {
-                    getPreferenceScreen().findPreference("login").setSummary(login_email);
-                } else {
-                    getPreferenceScreen().findPreference("login").setSummary("Iniciar Sesion");
-                }
-                break;
             case "sd_down":
                 if (sharedPreferences.getBoolean(key, false)) {
                     if (FileUtil.init(context).getSDPath() == null) {
@@ -1021,33 +872,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                     getActivity().setResult(-1, new Intent().putExtra("error", FileUtil.checkIfSDCardRoot(data.getData()).getErrorMessage()));
                 }
                 getActivity().finish();
-            }
-        }
-        if (requestCode == REQUEST_CODE_LOGIN && resultCode == LoginBase.LOGIN_RESPONSE_CODE) {
-            String login_email = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null");
-            if (!login_email.equals("null")) {
-                getPreferenceScreen().findPreference("login").setSummary(login_email);
-            }
-            Toaster.toast("Sesion Iniciada!!");
-        }
-
-        if (requestCode == REQUEST_CODE_LOGIN && resultCode == LoginBase.SIGNUP_RESPONSE_CODE) {
-            String login_email = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null");
-            if (!login_email.equals("null")) {
-                getPreferenceScreen().findPreference("login").setSummary(login_email);
-            }
-            Toaster.toast("Cuenta Creada!!");
-        }
-
-        if (requestCode == REQUEST_CODE_LOGIN && resultCode == LoginUser.LOGOFF_RESPONSE_CODE) {
-            getPreferenceScreen().findPreference("login").setSummary("Iniciar Sesion");
-            Toaster.toast("Sesion Cerrada!!");
-        }
-
-        if (requestCode == REQUEST_CODE_LOGIN && resultCode == LoginUser.CHANGE_EMAIL_RESPONSE_CODE) {
-            String login_email = PreferenceManager.getDefaultSharedPreferences(context).getString("login_email", "null");
-            if (!login_email.equals("null")) {
-                getPreferenceScreen().findPreference("login").setSummary(login_email);
             }
         }
         if (requestCode == SDManager.REQUEST_CODE && SDResultContainer.getResult() == SDSearcher.SD_SELECTED) {
