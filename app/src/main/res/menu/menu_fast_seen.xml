@@ -11,7 +11,7 @@
         app:showAsAction="always" />
     <item
         android:id="@+id/fast"
-        android:icon="@drawable/ic_fast_seen"
+        android:icon="@drawable/fast_seen"
         android:orderInCategory="200"
         android:title="Buscar"
         app:showAsAction="always">

@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import knf.animeflv.AutoEmision.AutoEmisionActivity;
 import knf.animeflv.AutoEmision.AutoEmisionHelper;
 import knf.animeflv.AutoEmision.EmObj;
 import knf.animeflv.R;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.info.Helper.InfoHelper;
 
 /**
  * Created by Jordy on 09/05/2016.
@@ -33,6 +33,7 @@ public class ListProvider implements RemoteViewsFactory {
         for (EmObj obj : list) {
             ListItem listItem = new ListItem();
             listItem.title = obj.getTitle();
+            listItem.aid = obj.getAid();
             listItemList.add(listItem);
         }
 
@@ -59,7 +60,10 @@ public class ListProvider implements RemoteViewsFactory {
                 context.getPackageName(), R.layout.list_row);
         ListItem listItem = listItemList.get(position);
         remoteView.setTextViewText(R.id.heading, listItem.title);
-        Intent clickIntent = new Intent(context, AutoEmisionActivity.class);
+        Intent clickIntent = InfoHelper.get(context,
+                new InfoHelper.BundleItem("aid", listItem.aid),
+                new InfoHelper.BundleItem("title", listItem.title),
+                new InfoHelper.BundleItem("position", "0"));
         remoteView.setOnClickFillInIntent(R.id.linear, clickIntent);
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(context);
         remoteView.setInt(R.id.linear, "setBackgroundColor", theme.card_normal);

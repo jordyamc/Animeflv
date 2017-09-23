@@ -15,20 +15,19 @@ import butterknife.ButterKnife;
 import knf.animeflv.R;
 import knf.animeflv.Recientes.MainAnimeModel;
 import knf.animeflv.Utils.CacheManager;
+import knf.animeflv.Utils.ThemeUtils;
 
 
 public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
 
     private Activity context;
     private List<MainAnimeModel> Animes = new ArrayList<>();
-
-    public AdapterMain(Activity context) {
-        this.context = context;
-    }
+    private ThemeUtils.Theme theme;
 
     public AdapterMain(Activity context, List<MainAnimeModel> data) {
         this.context = context;
         this.Animes = data;
+        this.theme = ThemeUtils.Theme.create(context);
     }
 
     @Override
@@ -46,6 +45,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         new CacheManager().portada(context, Animes.get(getP(holder, position)).getAid(), holder.cardView.getMainImageView());
         holder.cardView.setTitleText(Animes.get(getP(holder, position)).getTitulo());
         holder.cardView.setContentText(Animes.get(getP(holder, position)).getNumero());
+
     }
 
     private int getP(AdapterMain.ViewHolder holder, int position) {

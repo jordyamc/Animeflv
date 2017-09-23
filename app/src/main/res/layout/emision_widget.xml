@@ -11,6 +11,7 @@
         android:layout_height="60dp"
         android:layout_marginBottom="5dp"
         android:background="@android:color/white"
+        android:clickable="true"
         android:padding="10dp">
 
         <TextView

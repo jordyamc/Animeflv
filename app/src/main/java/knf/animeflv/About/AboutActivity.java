@@ -17,6 +17,7 @@ import com.danielstone.materialaboutlibrary.ConvenienceBuilder;
 import com.danielstone.materialaboutlibrary.MaterialAboutActivity;
 import com.danielstone.materialaboutlibrary.R.id;
 import com.danielstone.materialaboutlibrary.items.MaterialAboutActionItem;
+import com.danielstone.materialaboutlibrary.items.MaterialAboutItemOnClickAction;
 import com.danielstone.materialaboutlibrary.items.MaterialAboutTitleItem;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutCard;
 import com.danielstone.materialaboutlibrary.model.MaterialAboutList;
@@ -106,7 +107,7 @@ public class AboutActivity extends MaterialAboutActivity {
                             .sizeDp(18),
                     "Versión",
                     true));
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         info.addItem(
@@ -116,7 +117,7 @@ public class AboutActivity extends MaterialAboutActivity {
                                 .icon(CommunityMaterial.Icon.cmd_history)
                                 .color(iconColor(context))
                                 .sizeDp(18))
-                        .setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+                        .setOnClickAction(new MaterialAboutItemOnClickAction() {
                             @Override
                             public void onClick() {
                                 startActivity(new Intent(context, ChangelogActivity.class));
@@ -130,7 +131,7 @@ public class AboutActivity extends MaterialAboutActivity {
                                 .icon(CommunityMaterial.Icon.cmd_alert)
                                 .color(iconColor(context))
                                 .sizeDp(18))
-                        .setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+                        .setOnClickAction(new MaterialAboutItemOnClickAction() {
                             @Override
                             public void onClick() {
                                 startActivity(new Intent(context, StateActivity.class));
@@ -144,7 +145,7 @@ public class AboutActivity extends MaterialAboutActivity {
                                 .icon(CommunityMaterial.Icon.cmd_gift)
                                 .color(iconColor(context))
                                 .sizeDp(18))
-                        .setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+                        .setOnClickAction(new MaterialAboutItemOnClickAction() {
                             @Override
                             public void onClick() {
                                 startActivity(new Intent(context, DonationActivity.class));
@@ -158,7 +159,7 @@ public class AboutActivity extends MaterialAboutActivity {
                                 .icon(CommunityMaterial.Icon.cmd_library_books)
                                 .color(iconColor(context))
                                 .sizeDp(18))
-                        .setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+                        .setOnClickAction(new MaterialAboutItemOnClickAction() {
                             @Override
                             public void onClick() {
                                 ThemeUtils.Theme theme = ThemeUtils.Theme.create(AboutActivity.this);
@@ -177,7 +178,7 @@ public class AboutActivity extends MaterialAboutActivity {
                                 .icon(CommunityMaterial.Icon.cmd_help)
                                 .color(iconColor(context))
                                 .sizeDp(18))
-                        .setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+                        .setOnClickAction(new MaterialAboutItemOnClickAction() {
                             @Override
                             public void onClick() {
                                 ZendeskConfig.INSTANCE.init(context,
@@ -223,7 +224,7 @@ public class AboutActivity extends MaterialAboutActivity {
                         .icon(CommunityMaterial.Icon.cmd_telegram)
                         .color(iconColor(context))
                         .sizeDp(18))
-                .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://t.me/UnbarredStream")))
+                .setOnClickAction(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://t.me/UnbarredStream")))
                 .build());
 
         builder.addItem(new MaterialAboutActionItem.Builder()
@@ -233,7 +234,7 @@ public class AboutActivity extends MaterialAboutActivity {
                         .icon(CommunityMaterial.Icon.cmd_github_circle)
                         .color(iconColor(context))
                         .sizeDp(18))
-                .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://github.com/jordyamc/Animeflv")))
+                .setOnClickAction(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://github.com/jordyamc/Animeflv")))
                 .build());
         return builder;
     }
@@ -279,7 +280,7 @@ public class AboutActivity extends MaterialAboutActivity {
                                         .color(iconColor(context))
                                         .sizeDp(18)
                         )
-                        .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, facebookUri()))
+                        .setOnClickAction(ConvenienceBuilder.createWebsiteOnClickAction(context, facebookUri()))
                         .build()
         );
 
@@ -293,7 +294,7 @@ public class AboutActivity extends MaterialAboutActivity {
                                         .color(iconColor(context))
                                         .sizeDp(18)
                         )
-                        .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://discordapp.com/invite/6hzpua6")))
+                        .setOnClickAction(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://discordapp.com/invite/6hzpua6")))
                         .build()
         );
 
@@ -307,7 +308,7 @@ public class AboutActivity extends MaterialAboutActivity {
                                         .color(iconColor(context))
                                         .sizeDp(18)
                         )
-                        .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse(Parser.getNormalUrl(context))))
+                        .setOnClickAction(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse(Parser.getNormalUrl(context))))
                         .build()
         );
 
@@ -328,7 +329,7 @@ public class AboutActivity extends MaterialAboutActivity {
                                         .color(iconColor(context))
                                         .sizeDp(18)
                         )
-                        .setOnClickListener(ConvenienceBuilder.createEmailOnClickAction(context, "animeflvapp@hotmail.com", "Contacto - AnimeflvApp", "Eviar correo"))
+                        .setOnClickAction(ConvenienceBuilder.createEmailOnClickAction(context, "animeflvapp@hotmail.com", "Contacto - AnimeflvApp", "Eviar correo"))
                         .build()
         );
 
@@ -349,7 +350,7 @@ public class AboutActivity extends MaterialAboutActivity {
                                         .color(iconColor(context))
                                         .sizeDp(18)
                         )
-                        .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://betas.to/hQdpp7RG")))
+                        .setOnClickAction(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://betas.to/hQdpp7RG")))
                         .build()
         );
         builder.addItem(
@@ -362,7 +363,7 @@ public class AboutActivity extends MaterialAboutActivity {
                                         .color(iconColor(context))
                                         .sizeDp(18)
                         )
-                        .setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://t.me/joinchat/AAAAAEKOzGU7YaW4Pc14_Q")))
+                        .setOnClickAction(ConvenienceBuilder.createWebsiteOnClickAction(context, Uri.parse("https://t.me/joinchat/AAAAAEKOzGU7YaW4Pc14_Q")))
                         .build()
         );
         return builder;
@@ -411,7 +412,7 @@ public class AboutActivity extends MaterialAboutActivity {
                                 .color(iconColor(this))
                                 .sizeDp(18)
                         );
-        action.setOnClickListener(new MaterialAboutActionItem.OnClickListener() {
+        action.setOnClickAction(new MaterialAboutItemOnClickAction() {
             @Override
             public void onClick() {
                 Log.e("Beta", "Onclick");
@@ -434,7 +435,7 @@ public class AboutActivity extends MaterialAboutActivity {
                                 .sizeDp(18)
                         );
         if (!item.alias.trim().equals(""))
-            action.setOnClickListener(ConvenienceBuilder.createWebsiteOnClickAction(this, Uri.parse("https://t.me/" + item.alias)));
+            action.setOnClickAction(ConvenienceBuilder.createWebsiteOnClickAction(this, Uri.parse("https://t.me/" + item.alias)));
         builder.addItem(action.build());
     }
 

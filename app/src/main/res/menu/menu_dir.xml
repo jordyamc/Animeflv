@@ -10,7 +10,7 @@
         app:showAsAction="always"/>
     <item
         android:id="@+id/re_make"
-        android:icon="@drawable/re_make"
+        android:icon="@drawable/biohazard"
         android:orderInCategory="200"
         android:title="Recrear"
         app:showAsAction="always"/>

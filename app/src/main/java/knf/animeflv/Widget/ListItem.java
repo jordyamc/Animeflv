@@ -5,4 +5,5 @@ package knf.animeflv.Widget;
  */
 public class ListItem {
     public String title;
+    public String aid;
 }

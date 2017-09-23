@@ -141,7 +141,7 @@ public class InfoFragments extends AppCompatActivity {
             aid = getIntent().getExtras().getString("aid");
             if (aid == null) {
                 u = getIntent().getDataString();
-                String url = u.replace("http://animeflv.net/", "");
+                String url = u.substring(u.indexOf(".net/") + 5);
                 String[] data = url.split("/");
                 Log.e("Debug", data[2]);
                 aid = DirectoryHelper.get(this).getAid(data[2]);

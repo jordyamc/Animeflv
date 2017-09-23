@@ -140,6 +140,7 @@ public class FragmentCaps extends Fragment {
                 int position = bundle.getInt("position", -1);
                 if (position != -1)
                     layoutManager.scrollToPositionWithOffset(position, 20);
+
             }
         });
     }

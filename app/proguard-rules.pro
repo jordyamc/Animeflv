@@ -19,6 +19,7 @@
 -dontwarn com.google.common.**
 -dontwarn org.apache.**
 -dontwarn com.smaato.soma.**
+-dontwarn io.branch.**
 -dontwarn com.dropbox.**
 -dontwarn com.cleveroad.audiowidget.**
 -dontwarn com.daimajia.androidanimations.library.**

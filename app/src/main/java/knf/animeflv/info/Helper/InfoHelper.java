@@ -1,6 +1,7 @@
 package knf.animeflv.info.Helper;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -39,6 +40,17 @@ public class InfoHelper {
             intent.putExtras(bundleInfo);
             activity.startActivity(intent);
         }
+    }
+
+    public static Intent get(Context context, BundleItem... items) {
+        Bundle bundleInfo = new Bundle();
+        for (BundleItem item : items) {
+            bundleInfo.putString(item.key, item.value);
+        }
+        Intent intent = new Intent(context, InfoFragments.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtras(bundleInfo);
+        return intent;
     }
 
     public static void openResult(Activity activity, SharedItem sharedItem, BundleItem... items) {

@@ -10,10 +10,10 @@
 
     <item
         android:id="@+id/sync"
-        android:icon="@drawable/sync"
+        android:icon="@drawable/cloud_sync"
         android:orderInCategory="100"
         android:title="Sincronizar con la nube"
-        app:showAsAction="always" />
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/search"

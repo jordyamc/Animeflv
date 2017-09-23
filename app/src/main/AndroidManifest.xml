@@ -292,6 +292,10 @@
                     android:host="animeflv.net"
                     android:pathPrefix="/ver/"
                     android:scheme="https"/>
+                <data
+                    android:host="animeflv.net"
+                    android:pathPrefix="/ver/"
+                    android:scheme="http"/>
             </intent-filter>
         </activity>
 
@@ -324,6 +328,10 @@
                     android:host="animeflv.net"
                     android:pathPrefix="/anime/"
                     android:scheme="https"/>
+                <data
+                    android:host="animeflv.net"
+                    android:pathPrefix="/anime/"
+                    android:scheme="http"/>
             </intent-filter>
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.VIEW"/>

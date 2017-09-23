@@ -115,7 +115,7 @@ public class Player extends AppCompatActivity implements VideoControllerView.Med
                                 setOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
                             }
                     } catch (IllegalStateException e) {
-                        e.fillInStackTrace();
+                        e.printStackTrace();
                         Toaster.toast("El dispositivo no soporta el modo Picture in picture");
                     }
                     return true;

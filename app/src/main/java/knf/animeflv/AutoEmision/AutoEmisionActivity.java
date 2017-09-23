@@ -13,9 +13,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -221,37 +223,52 @@ public class AutoEmisionActivity extends AppCompatActivity implements AutoEmisio
     public boolean onOptionsItemSelected(MenuItem item) {
         if (DropboxManager.islogedIn()) {
             switch (item.getItemId()) {
-                case R.id.download:
-                    final MaterialDialog dialog = getLoadingDialog(0);
-                    dialog.show();
-                    DropboxManager.downloadEmision(this, new DropboxManager.DownloadCallback() {
+                case R.id.sync:
+                    PopupMenu popupMenu = new PopupMenu(new ContextThemeWrapper(this, R.style.PopupMenu), findViewById(item.getItemId()));
+                    popupMenu.inflate(R.menu.menu_emision_sync);
+                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
-                        public void onDownload(JSONObject result, boolean success) {
-                            dialog.dismiss();
-                            if (success) {
-                                AutoEmisionHelper.updateSavedList(AutoEmisionActivity.this, result);
-                                Toaster.toast("Descarga exitosa");
-                                invalidateCurrentList();
-                            } else {
-                                Toaster.toast("Error al descargar");
+                        public boolean onMenuItemClick(MenuItem menuItem) {
+                            if (DropboxManager.islogedIn()) {
+                                switch (menuItem.getItemId()) {
+                                    case R.id.download:
+                                        final MaterialDialog dialog = getLoadingDialog(0);
+                                        dialog.show();
+                                        DropboxManager.downloadEmision(AutoEmisionActivity.this, new DropboxManager.DownloadCallback() {
+                                            @Override
+                                            public void onDownload(JSONObject result, boolean success) {
+                                                dialog.dismiss();
+                                                if (success) {
+                                                    AutoEmisionHelper.updateSavedList(AutoEmisionActivity.this, result);
+                                                    Toaster.toast("Descarga exitosa");
+                                                    invalidateCurrentList();
+                                                } else {
+                                                    Toaster.toast("Error al descargar");
+                                                }
+                                            }
+                                        });
+                                        break;
+                                    case R.id.upload:
+                                        final MaterialDialog dialog_up = getLoadingDialog(1);
+                                        dialog_up.show();
+                                        DropboxManager.updateEmision(AutoEmisionActivity.this, new DropboxManager.UploadCallback() {
+                                            @Override
+                                            public void onUpload(boolean success) {
+                                                dialog_up.dismiss();
+                                                if (success) {
+                                                    Toaster.toast("Subida exitosamente");
+                                                } else {
+                                                    Toaster.toast("Error al subir lista");
+                                                }
+                                            }
+                                        });
+                                        break;
+                                }
                             }
+                            return true;
                         }
                     });
-                    break;
-                case R.id.upload:
-                    final MaterialDialog dialog_up = getLoadingDialog(1);
-                    dialog_up.show();
-                    DropboxManager.updateEmision(this, new DropboxManager.UploadCallback() {
-                        @Override
-                        public void onUpload(boolean success) {
-                            dialog_up.dismiss();
-                            if (success) {
-                                Toaster.toast("Subida exitosamente");
-                            } else {
-                                Toaster.toast("Error al subir lista");
-                            }
-                        }
-                    });
+                    popupMenu.show();
                     break;
             }
         } else {

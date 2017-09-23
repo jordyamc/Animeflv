@@ -6,7 +6,6 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import java.util.Calendar;
@@ -15,6 +14,7 @@ import knf.animeflv.AutoEmision.AutoEmisionActivity;
 import knf.animeflv.AutoEmision.AutoEmisionHelper;
 import knf.animeflv.R;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.animeflv.info.InfoFragments;
 
 public class WidgetProvider extends AppWidgetProvider {
 
@@ -25,7 +25,6 @@ public class WidgetProvider extends AppWidgetProvider {
                     i);
             appWidgetManager.updateAppWidget(i, remoteViews);
         }
-        Log.d("Widget", "onUpdate");
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
@@ -38,13 +37,10 @@ public class WidgetProvider extends AppWidgetProvider {
         remoteViews.setRemoteAdapter(R.id.words,
                 svcIntent);
         Intent clickIntent = new Intent(context, AutoEmisionActivity.class);
-        PendingIntent clickPI = PendingIntent
-                .getActivity(context, 0,
-                        clickIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setTextViewText(R.id.title_day, getActualDay());
         remoteViews.setTextViewText(R.id.title_count, String.valueOf(AutoEmisionHelper.getDirectListDay(context, getActualDayCode()).size()));
-        remoteViews.setPendingIntentTemplate(R.id.words, clickPI);
+        remoteViews.setOnClickPendingIntent(R.id.back_layout, PendingIntent.getActivity(context, 555, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT));
+        remoteViews.setPendingIntentTemplate(R.id.words, PendingIntent.getActivity(context, appWidgetId, new Intent(context, InfoFragments.class), PendingIntent.FLAG_UPDATE_CURRENT));
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(context);
         remoteViews.setInt(R.id.back_layout, "setBackgroundColor", theme.primary);
         remoteViews.setTextColor(R.id.title_day, theme.textColorToolbar);

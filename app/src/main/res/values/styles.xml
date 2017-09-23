@@ -13,6 +13,24 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
+    </style>
+
+    <style name="PopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:itemBackground">?attr/colorPrimary</item>
+        <item name="android:textAppearanceSmallPopupMenu">@style/PopupMenu.TextAppearance.Small
+        </item>
+        <item name="android:textAppearanceLargePopupMenu">@style/PopupMenu.TextAppearance.Large
+        </item>
+    </style>
+
+    <style name="PopupMenu.TextAppearance.Small" parent="TextAppearance.AppCompat.Widget.PopupMenu.Small">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="PopupMenu.TextAppearance.Large" parent="TextAppearance.AppCompat.Widget.PopupMenu.Large">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
     <style name="AestethicThemeLigth" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -71,6 +89,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeDarkNo" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -89,6 +109,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeNoAn" parent="AppTheme">
@@ -199,6 +221,8 @@
         <item name="material_drawer_selected_text">@android:color/holo_red_dark</item>
         <item name="material_drawer_divider">@android:color/holo_red_dark</item>
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeDarkNoNaranja" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -220,6 +244,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeDarkNoGris" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -241,6 +267,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeDarkNoVerde" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -262,6 +290,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeDarkNoRosa" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -283,6 +313,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeDarkNoMorado" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -304,6 +336,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeDarkRojo" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -325,6 +359,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeDarkNaranja" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -346,6 +382,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeDarkGris" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -367,6 +405,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeDarkVerde" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -388,6 +428,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeDarkRosa" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -409,6 +451,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeDarkMorado" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -430,6 +474,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
 
@@ -448,6 +494,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeNoRojo" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -465,6 +513,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeNoGris" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -481,6 +531,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeNoVerde" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -498,6 +550,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeNoRosa" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -515,6 +569,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeNoMorado" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -532,6 +588,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/AnimationsNo</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeNaranja" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -549,6 +607,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeRojo" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -565,6 +625,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeGris" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -581,6 +643,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeVerde" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -597,6 +661,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeRosa" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -613,6 +679,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="AppThemeMorado" parent="MaterialDrawerTheme.Light.DarkToolbar">
@@ -629,6 +697,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/Animations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="TranslucentNaranja" parent="Theme.AppCompat.Light.NoActionBar">
@@ -649,6 +719,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="TranslucentRojo" parent="Theme.AppCompat.Light.NoActionBar">
@@ -669,6 +741,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="TranslucentGris" parent="Theme.AppCompat.Light.NoActionBar">
@@ -688,6 +762,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="TranslucentVerde" parent="Theme.AppCompat.Light.NoActionBar">
@@ -707,6 +783,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="TranslucentRosa" parent="Theme.AppCompat.Light.NoActionBar">
@@ -726,6 +804,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="TranslucentMorado" parent="Theme.AppCompat.Light.NoActionBar">
@@ -745,6 +825,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyle</item>
         <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="TranslucentDarkRojo" parent="Theme.AppCompat.Light.NoActionBar">
@@ -769,6 +851,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="TranslucentDarkNaranja" parent="Theme.AppCompat.Light.NoActionBar">
@@ -793,6 +877,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="TranslucentDarkGris" parent="Theme.AppCompat.Light.NoActionBar">
@@ -817,6 +903,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="TranslucentDarkVerde" parent="Theme.AppCompat.Light.NoActionBar">
@@ -841,6 +929,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="TranslucentDarkRosa" parent="Theme.AppCompat.Light.NoActionBar">
@@ -865,6 +955,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="TranslucentDarkMorado" parent="Theme.AppCompat.Light.NoActionBar">
@@ -889,6 +981,8 @@
         <item name="android:textColorHint">@color/dark</item>
         <item name="searchViewStyle">@style/CustomSearchViewStyleDark</item>
         <item name="android:windowAnimationStyle">@style/NoAnimations</item>
+        <item name="popupMenuStyle">@style/PopupMenu</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
     </style>
 
     <style name="DemoButton">
@@ -955,7 +1049,7 @@
         <item name="colorAccent">@color/rojo</item>
     </style>
 
-    <style name="AboutDark" parent="Theme.Mal.Dark.DarkActionBar">
+    <style name="AboutDark" parent="Theme.Mal.Dark">
         <item name="colorPrimary">@color/negro</item>
         <item name="colorPrimaryDark">@color/negro</item>
         <item name="colorAccent">@color/rojo</item>

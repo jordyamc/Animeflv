@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
-        android:id="@+id/download"
-        android:icon="@drawable/cloud_download"
-        android:orderInCategory="200"
-        android:title="Descargar"
+        android:id="@+id/sync"
+        android:icon="@drawable/cloud_sync"
+        android:orderInCategory="100"
+        android:title="Sincronizar"
         app:showAsAction="always"/>
-    <item
-        android:id="@+id/upload"
-        android:icon="@drawable/cloud_upload"
-        android:orderInCategory="300"
-        android:title="Subir"
-        app:showAsAction="always"/>
+
     <item
         android:id="@+id/count"
         android:orderInCategory="300"
