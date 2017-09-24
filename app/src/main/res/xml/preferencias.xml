@@ -119,6 +119,10 @@
     <PreferenceCategory
         android:key="design"
         android:title="Diseño">
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="variant_launcher"
+            android:title="Variante de icono de la app"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="list_style"

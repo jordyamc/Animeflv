@@ -4,10 +4,12 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -792,6 +794,23 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 break;
             case "list_style":
                 getActivity().setResult(9988);
+                break;
+            case "variant_launcher":
+                if (sharedPreferences.getBoolean(key, false)) {
+                    context.getPackageManager().setComponentEnabledSetting(
+                            new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashVariant"),
+                            PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+                    context.getPackageManager().setComponentEnabledSetting(
+                            new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashNormal"),
+                            PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+                } else {
+                    context.getPackageManager().setComponentEnabledSetting(
+                            new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashNormal"),
+                            PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+                    context.getPackageManager().setComponentEnabledSetting(
+                            new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashVariant"),
+                            PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+                }
         }
     }
 
