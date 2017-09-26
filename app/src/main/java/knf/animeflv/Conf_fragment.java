@@ -35,6 +35,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
+import com.afollestad.materialdialogs.simplelist.MaterialSimpleListItem;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.io.File;
@@ -46,6 +47,7 @@ import java.util.Locale;
 
 import knf.animeflv.Changelog.ChangelogActivity;
 import knf.animeflv.CustomSettingsIntro.CustomIntro;
+import knf.animeflv.CustomViews.LauncherIconAdapter;
 import knf.animeflv.Directorio.DB.DirectoryDB;
 import knf.animeflv.Directorio.Directorio;
 import knf.animeflv.Jobs.CheckJob;
@@ -468,6 +470,70 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 return false;
             }
         });
+        getPreferenceScreen().findPreference("launcher_icon").setSummary(PreferenceManager.getDefaultSharedPreferences(context).getString("launcher_icon", "Normal"));
+        getPreferenceScreen().findPreference("launcher_icon").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(final Preference preference) {
+                final LauncherIconAdapter adapter = new LauncherIconAdapter(new LauncherIconAdapter.Callback() {
+                    @Override
+                    public void onMaterialListItemSelected(MaterialDialog dialog, int index, MaterialSimpleListItem item) {
+                        String name = item.getContent().toString();
+                        getPreferenceScreen().findPreference("launcher_icon").setSummary(name);
+                        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("launcher_icon", name).apply();
+                        disableIcons();
+                        switch (index) {
+                            case 0:
+                                context.getPackageManager().setComponentEnabledSetting(
+                                        new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashNormal"),
+                                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+                                break;
+                            case 1:
+                                context.getPackageManager().setComponentEnabledSetting(
+                                        new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashVariant"),
+                                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+                                break;
+                            case 2:
+                                context.getPackageManager().setComponentEnabledSetting(
+                                        new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashHamnster"),
+                                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+                                break;
+                            case 3:
+                                context.getPackageManager().setComponentEnabledSetting(
+                                        new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashText"),
+                                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+                                break;
+                            case 4:
+                                context.getPackageManager().setComponentEnabledSetting(
+                                        new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashWeb"),
+                                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+                                break;
+                        }
+                        Toaster.toast("Puede tomar unos segundos en cambiar el icono");
+                        dialog.dismiss();
+                    }
+                });
+                adapter.add(new MaterialSimpleListItem.Builder(context)
+                        .content("Normal")
+                        .icon(R.mipmap.ic_launcher).build());
+                adapter.add(new MaterialSimpleListItem.Builder(context)
+                        .content("Variante")
+                        .icon(R.mipmap.ic_launcher_variant).build());
+                adapter.add(new MaterialSimpleListItem.Builder(context)
+                        .content("Hamnster")
+                        .icon(R.mipmap.ic_launcher_hamnster).build());
+                adapter.add(new MaterialSimpleListItem.Builder(context)
+                        .content("Texto")
+                        .icon(R.mipmap.ic_launcher_text).build());
+                adapter.add(new MaterialSimpleListItem.Builder(context)
+                        .content("Web")
+                        .icon(R.mipmap.ic_launcher_web).build());
+                new MaterialDialog.Builder(context)
+                        .title("Icono de la app")
+                        .adapter(adapter, null)
+                        .show();
+                return false;
+            }
+        });
 
         if (FileUtil.init(context).getSDPath() == null) {
             getPreferenceScreen().findPreference("b_move").setEnabled(false);
@@ -592,6 +658,24 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
         } else {
             Log.d("Conf", "No Extras");
         }
+    }
+
+    private void disableIcons() {
+        context.getPackageManager().setComponentEnabledSetting(
+                new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashNormal"),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        context.getPackageManager().setComponentEnabledSetting(
+                new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashVariant"),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        context.getPackageManager().setComponentEnabledSetting(
+                new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashHamnster"),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        context.getPackageManager().setComponentEnabledSetting(
+                new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashText"),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        context.getPackageManager().setComponentEnabledSetting(
+                new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashWeb"),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
     }
 
     private String getStringfromResourse(@ArrayRes int array, String key, String def) {
@@ -795,22 +879,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             case "list_style":
                 getActivity().setResult(9988);
                 break;
-            case "variant_launcher":
-                if (sharedPreferences.getBoolean(key, false)) {
-                    context.getPackageManager().setComponentEnabledSetting(
-                            new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashVariant"),
-                            PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-                    context.getPackageManager().setComponentEnabledSetting(
-                            new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashNormal"),
-                            PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-                } else {
-                    context.getPackageManager().setComponentEnabledSetting(
-                            new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashNormal"),
-                            PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-                    context.getPackageManager().setComponentEnabledSetting(
-                            new ComponentName(context.getPackageName(), context.getPackageName() + ".SplashVariant"),
-                            PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-                }
         }
     }
 

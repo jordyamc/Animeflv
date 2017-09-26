@@ -342,7 +342,7 @@ public class DiscoveryManager implements ConnectableDeviceListener, DiscoveryPro
             try {
                 registerDeviceService((Class<DeviceService>) Class.forName(key), (Class<DiscoveryProvider>) Class
                         .forName(value));
-            } catch (ClassNotFoundException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

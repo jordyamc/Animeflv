@@ -85,6 +85,8 @@ public class Splash extends AwesomeSplash {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setNavigationBarColor(ContextCompat.getColor(this, getSplashColor()));
             getWindow().setStatusBarColor(ContextCompat.getColor(this, getSplashColor()));
+        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+            sendBroadcast(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME));
         }
         //Customize Circular Reveal
         configSplash.setBackgroundColor(getSplashColor()); //any color you want form colors.xml

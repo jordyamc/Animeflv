@@ -102,7 +102,6 @@
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
@@ -164,6 +163,204 @@
             android:configChanges="orientation|screenSize|keyboard"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_variant"
+            android:targetActivity=".Splash"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data
+                    android:host="github.com"
+                    android:pathPrefix="/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true"
+                    android:scheme="http"/>
+                <data
+                    android:host="open"
+                    android:pathPrefix="/main"
+                    android:scheme="http"/>
+                <data
+                    android:host="raw.githubusercontent.com"
+                    android:pathPrefix="/jordyamc/Animeflv/master/app/app-release.apk"
+                    android:scheme="https"/>
+            </intent-filter>
+
+            <!-- Branch URI scheme -->
+            <intent-filter>
+                <data
+                    android:host="open"
+                    android:scheme="knf-animeflv"/>
+
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+            </intent-filter>
+
+            <!-- Branch App Links -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="animeflv.app.link"
+                    android:scheme="https"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts"/>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".SplashHamnster"
+            android:configChanges="orientation|screenSize|keyboard"
+            android:enabled="false"
+            android:icon="@mipmap/ic_launcher_hamnster"
+            android:targetActivity=".Splash"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data
+                    android:host="github.com"
+                    android:pathPrefix="/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true"
+                    android:scheme="http"/>
+                <data
+                    android:host="open"
+                    android:pathPrefix="/main"
+                    android:scheme="http"/>
+                <data
+                    android:host="raw.githubusercontent.com"
+                    android:pathPrefix="/jordyamc/Animeflv/master/app/app-release.apk"
+                    android:scheme="https"/>
+            </intent-filter>
+
+            <!-- Branch URI scheme -->
+            <intent-filter>
+                <data
+                    android:host="open"
+                    android:scheme="knf-animeflv"/>
+
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+            </intent-filter>
+
+            <!-- Branch App Links -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="animeflv.app.link"
+                    android:scheme="https"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts"/>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".SplashText"
+            android:configChanges="orientation|screenSize|keyboard"
+            android:enabled="false"
+            android:icon="@mipmap/ic_launcher_text"
+            android:targetActivity=".Splash"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data
+                    android:host="github.com"
+                    android:pathPrefix="/jordyamc/Animeflv/blob/master/app/app-release.apk?raw=true"
+                    android:scheme="http"/>
+                <data
+                    android:host="open"
+                    android:pathPrefix="/main"
+                    android:scheme="http"/>
+                <data
+                    android:host="raw.githubusercontent.com"
+                    android:pathPrefix="/jordyamc/Animeflv/master/app/app-release.apk"
+                    android:scheme="https"/>
+            </intent-filter>
+
+            <!-- Branch URI scheme -->
+            <intent-filter>
+                <data
+                    android:host="open"
+                    android:scheme="knf-animeflv"/>
+
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+            </intent-filter>
+
+            <!-- Branch App Links -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="animeflv.app.link"
+                    android:scheme="https"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts"/>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".SplashWeb"
+            android:configChanges="orientation|screenSize|keyboard"
+            android:enabled="false"
+            android:icon="@mipmap/ic_launcher_web"
             android:targetActivity=".Splash"
             android:theme="@style/AppTheme">
             <intent-filter>

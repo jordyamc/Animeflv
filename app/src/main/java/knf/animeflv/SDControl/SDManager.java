@@ -83,13 +83,13 @@ public class SDManager extends IntroActivity {
 
     @TargetApi(19)
     private boolean havePermission(Intent data) {
-        Uri treeUri = data.getData();
-        final int takeFlags = (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
-        PreferenceManager.getDefaultSharedPreferences(this).edit().putString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, treeUri.toString()).apply();
-        DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
-        DocumentFile newFile = pickedDir.createFile("text/plain", "Prueba");
         try {
+            Uri treeUri = data.getData();
+            final int takeFlags = (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
+            PreferenceManager.getDefaultSharedPreferences(this).edit().putString(Keys.Extra.EXTERNAL_SD_ACCESS_URI, treeUri.toString()).apply();
+            DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
+            DocumentFile newFile = pickedDir.createFile("text/plain", "Prueba");
             OutputStream out = getContentResolver().openOutputStream(newFile.getUri());
             out.write("Prueba".getBytes());
             out.close();
