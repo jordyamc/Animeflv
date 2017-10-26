@@ -48,12 +48,14 @@ import knf.animeflv.WaitList.WaitDownloadElement;
 import xdroid.toaster.Toaster;
 
 import static knf.animeflv.JsonFactory.Objects.Server.Names.CLUP;
+import static knf.animeflv.JsonFactory.Objects.Server.Names.FIRE;
 import static knf.animeflv.JsonFactory.Objects.Server.Names.HYPERION;
 import static knf.animeflv.JsonFactory.Objects.Server.Names.IZANAGI;
 import static knf.animeflv.JsonFactory.Objects.Server.Names.MEGA;
 import static knf.animeflv.JsonFactory.Objects.Server.Names.MINHATECA;
 import static knf.animeflv.JsonFactory.Objects.Server.Names.MP4UPLOAD;
 import static knf.animeflv.JsonFactory.Objects.Server.Names.OKRU;
+import static knf.animeflv.JsonFactory.Objects.Server.Names.RV;
 import static knf.animeflv.JsonFactory.Objects.Server.Names.YOTTA;
 import static knf.animeflv.JsonFactory.Objects.Server.Names.YOURUPLOAD;
 import static knf.animeflv.JsonFactory.Objects.Server.Names.ZIPPYSHARE;
@@ -568,7 +570,7 @@ public class SelfGetter {
                 }
             }
             String json = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()"));
-            String[] parts = json.split("video[^a-z]");
+            String[] parts = json.split("video\\[[^a-z]*\\]");
             for (String el : parts) {
                 if (el.contains("server=izanagi")) {
                     String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
@@ -576,7 +578,6 @@ public class SelfGetter {
                     try {
                         servers.add(new Server(IZANAGI, new Option(null, new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file"))));
                     } catch (Exception e) {
-                        e.printStackTrace();
                     }
                 } else if (el.contains("server=hyperion")) {
                     String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
@@ -602,6 +603,24 @@ public class SelfGetter {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else if (el.contains("efire.php")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String func = Jsoup.parse(frame).select("img").first().attr("onclick");
+                    String download_link = func.substring(func.indexOf("open(\"") + 6, func.indexOf("\","));
+                    String media_func = Jsoup.connect(download_link).get().select("script").last().outerHtml();
+                    String download = Jsoup.connect(media_func.substring(media_func.indexOf("get('") + 5, media_func.indexOf("', function"))).get().select("div.download_link a").first().attr("href");
+                    servers.add(new Server(FIRE, new Option(null, download)));
+                } else if (el.contains("rapidvideo")) {
+                    String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));
+                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src").replace("&q=720p", "");
+                    String jsoup720 = Jsoup.connect(down_link + "&q=720p").get().select("video source").first().attr("src");
+                    String jsoup480 = Jsoup.connect(down_link + "&q=480p").get().select("video source").first().attr("src");
+                    String jsoup360 = Jsoup.connect(down_link + "&q=360p").get().select("video source").first().attr("src");
+                    Server server = new Server(RV);
+                    server.addOption(new Option("720p", jsoup720));
+                    server.addOption(new Option("480p", jsoup480));
+                    server.addOption(new Option("360p", jsoup360));
+                    servers.add(server);
                 } else if (el.contains("ok.ru")) {
                     try {
                         String frame = el.substring(el.indexOf("'") + 1, el.lastIndexOf("'"));

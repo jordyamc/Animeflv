@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -66,6 +67,8 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
     private Boolean streaming = false;
     private Activity context;
     private ThemeUtils.Theme theme;
+
+    private Handler handler = new Handler();
 
     public AdapterInfoCapsMaterial(Activity context, List<String> capitulos, String aid, List<String> eid) {
         this.capitulo = capitulos;
@@ -429,6 +432,13 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                                     holder.web.loadUrl(url);
                                 }
                             });
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    MainStates.setProcessing(false, null);
+                                    showDownload(holder.ib_des);
+                                }
+                            }, 5000);
                         }
                     });
                 }
@@ -579,6 +589,7 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
             public void onDownloadStart(String url, String userAgent,
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
+                handler.removeCallbacks(null);
                 try {
                     String fileName = url.substring(url.lastIndexOf("/") + 1);
                     web.loadUrl("about:blank");

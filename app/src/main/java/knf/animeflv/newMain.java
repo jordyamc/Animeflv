@@ -11,7 +11,6 @@ import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -45,8 +44,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.dropbox.core.android.Auth;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.SyncHttpClient;
-import com.loopj.android.http.TextHttpResponseHandler;
 import com.melnykov.fab.FloatingActionButton;
 import com.mikepenz.community_material_typeface_library.CommunityMaterial;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
@@ -114,7 +111,6 @@ import knf.animeflv.Utils.Keys;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.NetworkUtils;
-import knf.animeflv.Utils.NoLogInterface;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.TrackingHelper;
 import knf.animeflv.Utils.UpdateUtil;
@@ -943,7 +939,6 @@ public class newMain extends AppCompatActivity implements
         } catch (Exception e) {
             e.printStackTrace();
         }
-        new Registrer().execute();
     }
 
     public void setDir(Boolean search) {
@@ -1109,6 +1104,7 @@ public class newMain extends AppCompatActivity implements
         parser.refreshUrls(context);
         UtilNotBlocker.setPaused(false);
         if (shouldExecuteOnResume) {
+            supportInvalidateOptionsMenu();
             Bypass.check(this, null);
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
             if (preferences.getBoolean("is_amoled", false) != isAmoled || preferences.getBoolean("use_space", false) != isSpaced) {
@@ -1289,27 +1285,6 @@ public class newMain extends AppCompatActivity implements
             recreate();
         } else if (requestCode == 57894) {
             setUpDrawer();
-        }
-    }
-
-    private class Registrer extends AsyncTask<String, String, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            SyncHttpClient client = new SyncHttpClient();
-            client.setLogInterface(new NoLogInterface());
-            client.setLoggingEnabled(false);
-            client.get(new Parser().getBaseUrl(TaskType.NORMAL, context) + "contador.php?id=" + androidID.trim() + "&version=" + Integer.toString(versionCode), null, new TextHttpResponseHandler() {
-                @Override
-                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    //Logger.Error(Registrer.this.getClass(), throwable);
-                }
-
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                    Log.d("Registrer", "OK");
-                }
-            });
-            return null;
         }
     }
 }

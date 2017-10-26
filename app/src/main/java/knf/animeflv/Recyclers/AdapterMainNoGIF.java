@@ -30,12 +30,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.captain_miao.optroundcardview.OptRoundCardView;
 import com.makeramen.roundedimageview.RoundedImageView;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,6 +72,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
     private List<MainAnimeModel> Animes = new ArrayList<>();
     private MainRecyclerCallbacks callbacks;
     private Handler handler;
+    private Handler c_handler;
     private ThemeUtils.Theme theme;
 
     public AdapterMainNoGIF(Activity context) {
@@ -91,43 +86,6 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         this.callbacks = (MainRecyclerCallbacks) context;
         this.Animes = data;
         this.theme = ThemeUtils.Theme.create(context);
-    }
-
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-
-    public static String getStringFromFile(String filePath) {
-        String ret = "";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        } catch (IOException e) {
-        } catch (Exception e) {
-        }
-        return ret;
-    }
-
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
     }
 
     @Override
@@ -434,6 +392,11 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         return handler;
     }
 
+    private Handler getCancellableHandler() {
+        if (c_handler == null) c_handler = new Handler();
+        return c_handler;
+    }
+
     private Runnable getProgressRunnable(final AdapterMainNoGIF.ViewHolder holder) {
         return new Runnable() {
             @Override
@@ -640,6 +603,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
             public void onDownloadStart(String url, String userAgent,
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
+                getCancellableHandler().removeCallbacks(null);
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
                 String eid = fileName.replace(".mp4", "") + "E";
                 if (MainStates.getDowloadTask() == DownloadTask.DESCARGA) {
@@ -731,6 +695,13 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                     holder.webView.loadUrl(url);
                                 }
                             });
+                            getCancellableHandler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    MainStates.setProcessing(false, null);
+                                    showDownload(holder.ib_des, getPosition(holder.getAdapterPosition(), position));
+                                }
+                            }, 5000);
                         }
                     });
                 }
@@ -807,6 +778,13 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
                                     holder.webView.loadUrl(url);
                                 }
                             });
+                            getCancellableHandler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    MainStates.setProcessing(false, null);
+                                    showDownload(holder.ib_des, getPosition(holder.getAdapterPosition(), position));
+                                }
+                            }, 5000);
                         }
                     });
                 }

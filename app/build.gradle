@@ -17,14 +17,14 @@ repositories {
 apply plugin: 'io.fabric'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.1'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.0'
     defaultConfig {
         applicationId "knf.animeflv"
         minSdkVersion 17
-        targetSdkVersion 26
-        versionCode 237
-        versionName "5.4.7"
+        targetSdkVersion 27
+        versionCode 238
+        versionName "5.4.8"
         multiDexEnabled = true
     }
     buildTypes {
@@ -88,7 +88,7 @@ configurations.all {
         def requested = details.requested
         if (requested.group == 'com.android.support') {
             if (!requested.name.startsWith("multidex")) {
-                details.useVersion '26.0.0'
+                details.useVersion '26.1.0'
             }else {
                 details.useVersion '1.0.2'
             }
@@ -133,19 +133,19 @@ dependencies {
     implementation 'com.shamanland:xdroid-toaster:0.3.0'
     implementation 'com.karumi:dexter:4.1.0'
     //Support
-    implementation "com.android.support:appcompat-v7:26.1.0"
-    implementation "com.android.support:support-core-ui:26.1.0"
-    implementation "com.android.support:leanback-v17:26.1.0"
-    implementation "com.android.support:recyclerview-v7:26.1.0"
-    implementation "com.android.support:cardview-v7:26.1.0"
-    implementation "com.android.support:design:26.1.0"
-    implementation "com.android.support:customtabs:26.1.0"
-    implementation 'com.android.support:support-vector-drawable:26.1.0'
+    implementation "com.android.support:appcompat-v7:27.0.0"
+    implementation "com.android.support:support-core-ui:27.0.0"
+    implementation "com.android.support:leanback-v17:27.0.0"
+    implementation "com.android.support:recyclerview-v7:27.0.0"
+    implementation "com.android.support:cardview-v7:27.0.0"
+    implementation "com.android.support:design:27.0.0"
+    implementation "com.android.support:customtabs:27.0.0"
+    implementation 'com.android.support:support-vector-drawable:27.0.0'
     //Support
     implementation 'com.jakewharton:butterknife:8.8.1'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.squareup.okhttp:okhttp:2.4.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.8.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
     implementation 'com.squareup.okio:okio:1.13.0'
     implementation 'com.ogaclejapan.smarttablayout:library:1.6.1@aar'
     implementation 'com.ogaclejapan.smarttablayout:utils-v4:1.6.1@aar'
@@ -159,9 +159,9 @@ dependencies {
     implementation 'com.devbrackets.android:exomedia:3.0.1'
     implementation 'com.joanfuentes:HintCase:1.0.4'
     implementation 'com.joanfuentes:HintCaseAssets:1.0.4'
-    //implementation 'com.google.guava:guava:20.0'
+    implementation 'com.google.guava:guava:23.0-android'
     implementation 'agency.tango.android:material-intro-screen:0.0.5'
-    implementation 'com.wdullaer:materialdatetimepicker:3.3.0'
+    implementation 'com.wdullaer:materialdatetimepicker:3.3.1'
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
     implementation 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
     implementation 'com.dropbox.core:dropbox-core-sdk:3.0.3'
@@ -174,7 +174,7 @@ dependencies {
     implementation "com.google.android.gms:play-services-iid:$project.p_services"
     implementation "com.google.android.gms:play-services-gcm:$project.p_services"
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-    implementation 'me.zhanghai.android.materialratingbar:library:1.0.2'
+    implementation 'me.zhanghai.android.materialratingbar:library:1.1.1'
     implementation 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
     implementation 'com.onesignal:OneSignal:3.6.2'
     implementation 'org.cryse.widget:persistentsearchview:1.0.4@aar'

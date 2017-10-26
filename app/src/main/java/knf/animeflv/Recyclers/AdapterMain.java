@@ -75,6 +75,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     private List<MainAnimeModel> Animes = new ArrayList<>();
     private MainRecyclerCallbacks callbacks;
     private Handler handler;
+    private Handler c_handler;
     private ThemeUtils.Theme theme;
 
     public AdapterMain(Activity context) {
@@ -396,6 +397,11 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
         return handler;
     }
 
+    private Handler getCancellableHandler() {
+        if (c_handler == null) c_handler = new Handler();
+        return c_handler;
+    }
+
     private Runnable getProgressRunnable(final ViewHolder holder) {
         return new Runnable() {
             @Override
@@ -533,6 +539,13 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                     holder.webView.loadUrl(url);
                                 }
                             });
+                            getCancellableHandler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    MainStates.setProcessing(false, null);
+                                    showDownload(holder.ib_des, getPosition(holder.getAdapterPosition(), position));
+                                }
+                            }, 5000);
                         }
                     });
                 }
@@ -609,6 +622,13 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                                     holder.webView.loadUrl(url);
                                 }
                             });
+                            getCancellableHandler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    MainStates.setProcessing(false, null);
+                                    showDownload(holder.ib_des, getPosition(holder.getAdapterPosition(), position));
+                                }
+                            }, 5000);
                         }
                     });
                 }
@@ -780,6 +800,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
             public void onDownloadStart(String url, String userAgent,
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
+                getCancellableHandler().removeCallbacks(null);
                 Log.e("Start Download", url);
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
                 String eid = fileName.replace(".mp4", "") + "E";

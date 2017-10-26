@@ -91,6 +91,8 @@ public class Server {
         public static final String HYPERION = "Hyperion";
         public static final String OKRU = "Okru";
         public static final String CLUP = "Clup";
+        public static final String FIRE = "Fire";
+        public static final String RV = "RV";
         public static final String MP4UPLOAD = "Mp4Upload";
         public static final String YOURUPLOAD = "YourUpload";
         public static final String ZIPPYSHARE = "Zippyshare";
@@ -107,6 +109,8 @@ public class Server {
                     HYPERION,
                     OKRU,
                     CLUP,
+                    FIRE,
+                    RV,
                     MP4UPLOAD,
                     YOURUPLOAD,
                     ZIPPYSHARE,
