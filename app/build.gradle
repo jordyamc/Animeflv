@@ -23,8 +23,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 238
-        versionName "5.4.8"
+        versionCode 239
+        versionName "5.4.9"
         multiDexEnabled = true
     }
     buildTypes {
@@ -159,7 +159,7 @@ dependencies {
     implementation 'com.devbrackets.android:exomedia:3.0.1'
     implementation 'com.joanfuentes:HintCase:1.0.4'
     implementation 'com.joanfuentes:HintCaseAssets:1.0.4'
-    implementation 'com.google.guava:guava:23.0-android'
+    /*implementation 'com.google.guava:guava:23.0-android'*/
     implementation 'agency.tango.android:material-intro-screen:0.0.5'
     implementation 'com.wdullaer:materialdatetimepicker:3.3.1'
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
@@ -181,7 +181,7 @@ dependencies {
     implementation 'org.zakariya.stickyheaders:stickyheaders:0.7.6'
     implementation 'com.github.captain-miao:optroundcardview:1.0.0'
     implementation 'com.makeramen:roundedimageview:2.3.0'
-    implementation 'com.evernote:android-job:1.2.0-RC4'
+    implementation 'com.evernote:android-job:1.2.0'
     implementation ('com.github.ViksaaSkool:AwesomeSplash:v1.0.0'){
         exclude module: 'CircularReveal'
     }
