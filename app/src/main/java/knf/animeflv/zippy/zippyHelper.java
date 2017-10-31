@@ -10,6 +10,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.net.URLDecoder;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cz.msebera.android.httpclient.Header;
 import knf.animeflv.DownloadManager.CookieConstructor;
@@ -43,17 +45,13 @@ public class zippyHelper {
                         Element script = center.select("script").get(1);
                         String script_text = script.outerHtml().replace("<script type=\"text/javascript\">", "");
 
-                        String nums = script_text.substring(script_text.indexOf("/d/") + 3, script_text.indexOf(";"));
-                        String result = nums.substring(nums.indexOf("(") + 1, nums.lastIndexOf(")")).replace(" ", "");
-                        String[] both = result.replace("+", "/").split("/");
-                        String[] ab = both[0].split("%");
-                        String[] ac = both[1].split("%");
-
-                        int a = Integer.parseInt(ab[0]);
-                        int b = Integer.parseInt(ab[1]);
-                        int c = Integer.parseInt(ac[1]);
-                        String pre = script_text.substring(script_text.indexOf("/d/") + 3, script_text.indexOf("/\""));
-                        String d_url = url.substring(0, url.indexOf("/v/")) + "/d/" + pre + "/" + generateNumber(a, b, c) + "/" + script_text.substring(script_text.indexOf("+ \"/") + 4, script_text.indexOf(".mp4\";")) + ".mp4";
+                        Matcher matcher = Pattern.compile("\\D*(\\d*)%(\\d*)\\D*").matcher(script_text);
+                        matcher.find();
+                        String a = String.valueOf((Integer.parseInt(matcher.group(1)) % Integer.parseInt(matcher.group(2))));
+                        Matcher name = Pattern.compile(".*\\/d\\/([a-zA-Z]*)\\/.*\\/(\\d+_\\d+\\.mp4).*").matcher(script_text);
+                        name.find();
+                        String pre = name.group(1);
+                        String d_url = url.substring(0, url.indexOf("/v/")) + "/d/" + pre + "/" + a + "/" + name.group(2);
                         Log.e("Zippy Download", d_url);
                         callback.onSuccess(new zippyObject(d_url, new CookieConstructor(cookies, System.getProperty("http.agent"), url)));
                     } catch (Exception e) {
