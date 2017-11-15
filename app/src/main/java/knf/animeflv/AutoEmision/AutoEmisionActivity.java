@@ -116,10 +116,10 @@ public class AutoEmisionActivity extends AppCompatActivity implements AutoEmisio
                                 getSupportFragmentManager(), FragmentPagerItems.with(AutoEmisionActivity.this)
                                 .add("LUNES", AutoEmisionFragment.class, getDayBundle(1))
                                 .add("MARTES", AutoEmisionFragment.class, getDayBundle(2))
-                                .add("MIERCOLES", AutoEmisionFragment.class, getDayBundle(3))
+                                .add("MIÉRCOLES", AutoEmisionFragment.class, getDayBundle(3))
                                 .add("JUEVES", AutoEmisionFragment.class, getDayBundle(4))
                                 .add("VIERNES", AutoEmisionFragment.class, getDayBundle(5))
-                                .add("SABADO", AutoEmisionFragment.class, getDayBundle(6))
+                                .add("SÁBADO", AutoEmisionFragment.class, getDayBundle(6))
                                 .add("DOMINGO", AutoEmisionFragment.class, getDayBundle(7))
                                 .create());
                         viewPager.invalidate();

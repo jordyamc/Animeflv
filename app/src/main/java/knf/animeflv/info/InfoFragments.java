@@ -176,7 +176,7 @@ public class InfoFragments extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toaster.toast("Favorito " + (isFav ? "Eliminado" : "Agregado"));
+                                Toaster.toast((isFav ? "Eliminado de" : "Agregado a") + " favoritos");
                                 button.setImageResource(FavoriteHelper.isFav(InfoFragments.this, aid) ? R.drawable.star_on : R.drawable.star_off);
                             }
                         });

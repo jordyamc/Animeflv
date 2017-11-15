@@ -302,7 +302,7 @@ public class FavoriteMain extends AppCompatActivity implements FavoriteAdapter.L
                 MaterialDialog dialog = new MaterialDialog.Builder(this)
                         .title("Nombre")
                         .titleGravity(GravityEnum.CENTER)
-                        .input("Nombre de seccion", "", false, new MaterialDialog.InputCallback() {
+                        .input("Nombre de sección", "", false, new MaterialDialog.InputCallback() {
                             @Override
                             public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                                 new FavotiteDB(FavoriteMain.this).addSection(new FavObject(input.toString())).close();

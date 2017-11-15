@@ -14,12 +14,6 @@ import android.widget.TextView;
 import com.github.captain_miao.optroundcardview.OptRoundCardView;
 import com.makeramen.roundedimageview.RoundedImageView;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
 
 import butterknife.BindView;
@@ -45,43 +39,6 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
         this.context = context;
         this.Animes = animes;
         this.theme = ThemeUtils.Theme.create(context);
-    }
-
-    public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        reader.close();
-        return sb.toString();
-    }
-
-    public static String getStringFromFile(String filePath) {
-        String ret = "";
-        try {
-            File fl = new File(filePath);
-            FileInputStream fin = new FileInputStream(fl);
-            ret = convertStreamToString(fin);
-            fin.close();
-        } catch (IOException e) {
-        } catch (Exception e) {
-        }
-        return ret;
-    }
-
-    public static String byte2HexFormatted(byte[] arr) {
-        StringBuilder str = new StringBuilder(arr.length * 2);
-        for (int i = 0; i < arr.length; i++) {
-            String h = Integer.toHexString(arr[i]);
-            int l = h.length();
-            if (l == 1) h = "0" + h;
-            if (l > 2) h = h.substring(l - 2, l);
-            str.append(h.toUpperCase());
-            if (i < (arr.length - 1)) str.append(':');
-        }
-        return str.toString();
     }
 
     @Override
@@ -123,7 +80,7 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
 
     public void restartViews(AdapterBusquedaNew.ViewHolder holder) {
         if (Animes.get(holder.getAdapterPosition()).getTipo().equals("none")) {
-            holder.tv_noC.setText("Sin Coincidencias");
+            holder.tv_noC.setText("Sin resultados");
         }
         if (Animes.get(holder.getAdapterPosition()).getTipo().equals("_aid_")) {
             holder.tv_noC.setText("Escribe un ID");

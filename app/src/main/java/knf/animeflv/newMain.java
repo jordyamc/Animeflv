@@ -354,9 +354,9 @@ public class newMain extends AppCompatActivity implements
         if (LoginServer.isLogedIn(this)) {
             builder.addProfiles(
                     new ProfileDrawerItem().withName("Versión " + versionName + " (" + Integer.toString(versionCode) + ")" + (UpdateUtil.isBeta ? " - BETA" : "")).withEmail(FavSyncro.getEmail(this)).withIcon(ic_main).withIdentifier(9),
-                    new ProfileSettingDrawerItem().withName("Cambiar colores").withIcon(CommunityMaterial.Icon.cmd_palette).withIdentifier(22),
+                    new ProfileSettingDrawerItem().withName("Personalizar apariencia").withIcon(CommunityMaterial.Icon.cmd_palette).withIdentifier(22),
                     new ProfileSettingDrawerItem().withName("Actualizar vistos").withIcon(MaterialDesignIconic.Icon.gmi_cloud_upload).withIdentifier(87),
-                    new ProfileSettingDrawerItem().withName("Sincronizar vistos").withIcon(CommunityMaterial.Icon.cmd_cloud_sync).withIdentifier(88)
+                    new ProfileSettingDrawerItem().withName("Sincronizar historial").withIcon(CommunityMaterial.Icon.cmd_cloud_sync).withIdentifier(88)
                     //new ProfileSettingDrawerItem().withName("Dropbox (" + (DropboxManager.islogedIn() ? "DESCONECTAR" : "CONECTAR") + ")").withIcon(CommunityMaterial.Icon.cmd_dropbox).withIdentifier(120)
             ).withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                 @Override
@@ -374,7 +374,7 @@ public class newMain extends AppCompatActivity implements
                                 startSeenUpdate();
                                 result.closeDrawer();
                             } else {
-                                Toaster.toast("Por favor inicia sesión en la app o en Dropbox");
+                                Toaster.toast("Por favor, inicia sesión en Dropbox");
                             }
                             break;
                         case 88:
@@ -382,7 +382,7 @@ public class newMain extends AppCompatActivity implements
                                 startSeenSync();
                                 result.closeDrawer();
                             } else {
-                                Toaster.toast("Por favor inicia sesión en la app o en Dropbox");
+                                Toaster.toast("Por favor, inicia sesión en Dropbox");
                             }
                             break;
                         case 120:
@@ -503,11 +503,11 @@ public class newMain extends AppCompatActivity implements
                         new PrimaryDrawerItem().withName("Directorio").withIcon(MaterialDesignIconic.Icon.gmi_view_list_alt).withIdentifier(2),
                         new PrimaryDrawerItem().withName("Siguiendo").withIcon(MaterialDesignIconic.Icon.gmi_alarm_check).withIdentifier(3),
                         new PrimaryDrawerItem().withName("Sugeridos").withIcon(CommunityMaterial.Icon.cmd_account_network).withIdentifier(13),
-                        new PrimaryDrawerItem().withName("Random").withIcon(MaterialDesignIconic.Icon.gmi_shuffle).withIdentifier(11),
+                        new PrimaryDrawerItem().withName("Aleatorio").withIcon(MaterialDesignIconic.Icon.gmi_shuffle).withIdentifier(11),
                         new PrimaryDrawerItem().withName("Explorador").withIcon(MaterialDesignIconic.Icon.gmi_folder).withIdentifier(9),
                         new PrimaryDrawerItem().withName("Historial").withIcon(MaterialDesignIconic.Icon.gmi_eye).withIdentifier(10),
-                        new PrimaryDrawerItem().withName("Lista").withIcon(MaterialDesignIconic.Icon.gmi_assignment_returned).withIdentifier(4),
-                        new PrimaryDrawerItem().withName("Sobre la app").withIcon(CommunityMaterial.Icon.cmd_information_outline).withIdentifier(20)
+                        new PrimaryDrawerItem().withName("En espera").withIcon(MaterialDesignIconic.Icon.gmi_assignment_returned).withIdentifier(4),
+                        new PrimaryDrawerItem().withName("Acerca de").withIcon(CommunityMaterial.Icon.cmd_information_outline).withIdentifier(20)
                         //new PrimaryDrawerItem().withName("Publicidad").withIcon(MaterialDesignIconic.Icon.gmi_cloud).withIdentifier(8)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -594,7 +594,7 @@ public class newMain extends AppCompatActivity implements
                     }
                 })
                 .addStickyDrawerItems(
-                        new SecondaryDrawerItem().withName("Configuracion").withIcon(FontAwesome.Icon.faw_cog).withIdentifier(-1)
+                        new SecondaryDrawerItem().withName("Configuración").withIcon(FontAwesome.Icon.faw_cog).withIdentifier(-1)
                 )
                 .withOnDrawerListener(new Drawer.OnDrawerListener() {
                     @Override

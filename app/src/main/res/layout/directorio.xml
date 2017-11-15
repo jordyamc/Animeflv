@@ -145,7 +145,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_search_text"
-                    fab:fab_label="Nombre"
+                    fab:fab_label="Por nombre"
                     fab:fab_size="mini"/>
 
                 <com.github.clans.fab.FloatingActionButton
@@ -153,7 +153,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_search_generos"
-                    fab:fab_label="Generos"
+                    fab:fab_label="Por generos"
                     fab:fab_size="mini"/>
 
                 <com.github.clans.fab.FloatingActionButton
@@ -161,7 +161,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_search_id"
-                    fab:fab_label="ID"
+                    fab:fab_label="Por ID"
                     fab:fab_size="mini"/>
 
             </com.github.clans.fab.FloatingActionMenu>

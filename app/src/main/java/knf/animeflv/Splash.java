@@ -346,7 +346,7 @@ public class Splash extends AwesomeSplash {
                 public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
                     if (!permissionDeniedResponse.isPermanentlyDenied()) {
                         String titulo = "Leer/Escribir archivos";
-                        String desc = "Este permiso es necesario para descargar los animes, asi como para funcionar sin conexion";
+                        String desc = "Este permiso es necesario para descargar los animes, así como para funcionar sin conexión a internet.";
                         new MaterialDialog.Builder(context)
                                 .title(titulo)
                                 .content(desc)
@@ -373,7 +373,7 @@ public class Splash extends AwesomeSplash {
 
                 @Override
                 public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-                    String titulo = "Leer/Escribir archivos";
+                    String titulo = "Leer / escribir archivos";
                     String desc = "Este permiso es necesario para descargar los animes, asi como para funcionar sin conexion";
                     try {
                         new MaterialDialog.Builder(context)

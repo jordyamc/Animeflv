@@ -3,6 +3,7 @@ package knf.animeflv.Style;
 import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -907,6 +908,7 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
             @Override
             public void onAnimationUpdate(final ValueAnimator animation) {
                 getA().runOnUiThread(new Runnable() {
+                    @SuppressLint("RestrictedApi")
                     @Override
                     public void run() {
                         if (cap1 != null && cap2 != null && cap3 != null && accent != null && button != null && switchCompat != null && button_apply != null) {
@@ -1184,6 +1186,7 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
             @Override
             public void onAnimationUpdate(final ValueAnimator animation) {
                 getA().runOnUiThread(new Runnable() {
+                    @SuppressLint("RestrictedApi")
                     @Override
                     public void run() {
                         if (cap1 != null && cap2 != null && cap3 != null && accent != null && button != null && switchCompat != null && button_apply != null) {
@@ -1359,7 +1362,7 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
 
     private void showSaveDialog(@Nullable String current, final boolean send) {
         new MaterialDialog.Builder(this)
-                .title("Nombre")
+                .title("Nombre del tema")
                 .titleGravity(GravityEnum.CENTER)
                 .inputType(InputType.TYPE_CLASS_TEXT)
                 .autoDismiss(false)
@@ -1375,6 +1378,7 @@ public class ThemeFragmentAdvanced extends AppCompatActivity implements ColorCho
                         }
                     }
                 })
+                .positiveText("Guardar")
                 .negativeText("cancelar")
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override

@@ -64,7 +64,7 @@ public class AboutActivity extends MaterialAboutActivity {
             setTheme(R.style.AboutLight);
         }
         super.onCreate(savedInstanceState);
-        Toolbar toolbar = ((Toolbar) findViewById(id.mal_toolbar));
+        Toolbar toolbar = findViewById(id.mal_toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,7 +112,7 @@ public class AboutActivity extends MaterialAboutActivity {
         }
         info.addItem(
                 new MaterialAboutActionItem.Builder()
-                        .text("Changelog")
+                        .text("Registro de cambios")
                         .icon(new IconicsDrawable(context)
                                 .icon(CommunityMaterial.Icon.cmd_history)
                                 .color(iconColor(context))
@@ -154,7 +154,7 @@ public class AboutActivity extends MaterialAboutActivity {
                         .build());
         info.addItem(
                 new MaterialAboutActionItem.Builder()
-                        .text("Librerias")
+                        .text("Librerías")
                         .icon(new IconicsDrawable(context)
                                 .icon(CommunityMaterial.Icon.cmd_library_books)
                                 .color(iconColor(context))
@@ -202,7 +202,7 @@ public class AboutActivity extends MaterialAboutActivity {
 
     private MaterialAboutCard.Builder getAuthorBuilder(final Context context) {
         MaterialAboutCard.Builder builder = new MaterialAboutCard.Builder();
-        builder.title("Autor");
+        builder.title("Desarrollador");
         builder.addItem(
                 new MaterialAboutActionItem.Builder()
                         .text("Jordy Mendoza")
@@ -268,7 +268,7 @@ public class AboutActivity extends MaterialAboutActivity {
 
     private MaterialAboutCard.Builder getAppBuilder(final Context context) {
         MaterialAboutCard.Builder builder = new MaterialAboutCard.Builder();
-        builder.title("Sitios");
+        builder.title("Sitios web");
 
         builder.addItem(
                 new MaterialAboutActionItem.Builder()
@@ -408,7 +408,7 @@ public class AboutActivity extends MaterialAboutActivity {
                         .text(item.name)
                         .subText(item.description)
                         .icon(new IconicsDrawable(this)
-                                .icon(type == 1 ? CommunityMaterial.Icon.cmd_account_star : GoogleMaterial.Icon.gmd_person)
+                                .icon(type == 1 ? CommunityMaterial.Icon.cmd_account_star : CommunityMaterial.Icon.cmd_crown)
                                 .color(iconColor(this))
                                 .sizeDp(18)
                         );

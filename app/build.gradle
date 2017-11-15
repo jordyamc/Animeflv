@@ -23,8 +23,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 240
-        versionName "5.4.10"
+        versionCode 241
+        versionName "5.5"
         multiDexEnabled = true
     }
     buildTypes {
@@ -102,10 +102,10 @@ dependencies {
     /*compile('com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:0.10.6@aar') {
         transitive = true
     }*/
-    compile('com.mikepenz:aboutlibraries:5.9.7@aar') {
+    implementation('com.mikepenz:aboutlibraries:6.0.0@aar') {
         transitive = true
     }
-    compile('com.mikepenz:materialdrawer:5.9.3@aar') {
+    implementation("com.mikepenz:materialdrawer:6.0.1@aar") {
         transitive = true
     }
     implementation files('jsoup-1.9.2.jar')

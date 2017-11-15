@@ -56,6 +56,7 @@ public class EmisionEditDialog extends DialogFragment {
         super.onCreateDialog(savedInstanceState);
         root = LayoutInflater.from(getActivity()).inflate(R.layout.edit_emision, null);
         dialog = new MaterialDialog.Builder(getActivity())
+                .title("Seguir anime")
                 .customView(root, true)
                 .positiveText("Aceptar")
                 .autoDismiss(false)

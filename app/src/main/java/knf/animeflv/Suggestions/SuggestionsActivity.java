@@ -82,7 +82,7 @@ public class SuggestionsActivity extends AppCompatActivity {
                     .cancelable(false)
                     .build();
             new MaterialDialog.Builder(this)
-                    .content("Para crear sugerencias se necesita la busqueda por generos activada, se recreara el directorio (puede tardar hasta 10 minutos)")
+                    .content("Para recibir sugerencias, se necesita la búsqueda por géneros activada. Ten presente que se tendrá que elaborar de nuevo el directorio de animes, esta operación puede tomar hasta diez minutos")
                     .positiveText("Activar")
                     .negativeText("Cancelar")
                     .onPositive(new MaterialDialog.SingleButtonCallback() {

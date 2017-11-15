@@ -26,10 +26,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="15dp"
                 android:paddingTop="10dp"
-                android:text="Crear Tema"
+                android:text="Crear tema"
                 android:textAlignment="center"
                 android:textColor="@color/blanco"
-                android:textSize="24sp" />
+                android:textSize="24sp"/>
 
             <ImageView
                 android:id="@+id/sync"
@@ -75,10 +75,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:paddingBottom="10dp"
-                android:text="Modo Obscuro"
+                android:text="Modo obscuro"
                 android:textColor="@color/mi_text_color_primary_dark"
-                android:textSize="20sp" />
+                android:textSize="20sp"/>
         </LinearLayout>
 
         <RelativeLayout

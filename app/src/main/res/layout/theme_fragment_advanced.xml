@@ -27,10 +27,10 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="15dp"
                 android:paddingTop="10dp"
-                android:text="Crear Tema"
+                android:text="Crear tema"
                 android:textAlignment="center"
                 android:textColor="@color/blanco"
-                android:textSize="24sp" />
+                android:textSize="24sp"/>
 
             <ImageView
                 android:id="@+id/sync"
@@ -58,6 +58,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:orientation="horizontal">
 
             <android.support.v7.widget.AppCompatButton
@@ -69,17 +70,16 @@
                 android:layout_marginEnd="10dp"
                 android:elevation="5dp"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:text="Original" />
+                android:text="Original"/>
 
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/dark_theme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:paddingBottom="10dp"
-                android:text="Modo Obscuro"
+                android:text="Modo obscuro"
                 android:textColor="@color/mi_text_color_primary_dark"
-                android:textSize="20sp" />
+                android:textSize="20sp"/>
         </LinearLayout>
 
         <RelativeLayout

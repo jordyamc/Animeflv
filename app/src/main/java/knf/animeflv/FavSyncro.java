@@ -44,7 +44,7 @@ public class FavSyncro {
                 }
             }
         }
-        return "Animeflv";
+        return "AnimeFLV";
     }
 
     public static String getEmailHelp(Context context) {

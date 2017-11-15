@@ -124,7 +124,7 @@ public class CustomIntro extends MaterialIntroActivity implements ColorChooserDi
                 .allowUserColorInput(false)
                 .allowUserColorInputAlpha(false)
                 .doneButton(R.string.next)
-                .cancelButton(android.R.string.cancel)
+                .cancelButton(R.string.cancel)
                 .preselect(ThemeUtils.isAmoled(this) ? ColorsRes.Dark(this) : ColorsRes.Gris(this))
                 .accentMode(true)
                 .build();
@@ -150,7 +150,7 @@ public class CustomIntro extends MaterialIntroActivity implements ColorChooserDi
                     .dynamicButtonColor(true)
                     .allowUserColorInput(false)
                     .allowUserColorInputAlpha(false)
-                    .doneButton(android.R.string.ok)
+                    .doneButton(R.string.ok)
                     .cancelButton(R.string.back)
                     .preselect(PreferenceManager.getDefaultSharedPreferences(this).getInt("accentColor", ColorsRes.Naranja(this)))
                     .accentMode(true)

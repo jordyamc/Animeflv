@@ -24,8 +24,8 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:text="Dia:"
-                android:textSize="24sp" />
+                android:text="Día:"
+                android:textSize="24sp"/>
 
             <android.support.v7.widget.AppCompatSpinner
                 android:id="@+id/spinner_emision"

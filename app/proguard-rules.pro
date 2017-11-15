@@ -30,6 +30,7 @@
 -dontwarn com.zendesk.**
 -dontwarn io.codetail.animation.**
 -dontwarn com.mikepenz.materialdrawer.**
+-dontwarn com.mikepenz.fastadapter.**
 -dontwarn com.google.errorprone.annotations.**
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable

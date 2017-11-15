@@ -30,13 +30,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="Sincronizacion en la nube"
+            android:text="Sincroniza tus datos"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Guarda favoritos, capitulos vistos, animes en emision y sincronizalo entre dispositivos"
+            android:text="Sincroniza tu lista de favoritos y los episodios vistos entre todos tus dispositivos"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"/>
 
@@ -49,7 +49,7 @@
             android:background="#007ee5"
             android:foreground="?attr/selectableItemBackground"
             android:padding="10dp"
-            android:text="Entrar / Registrar"
+            android:text="INGRESAR / REGISTRARSE"
             android:textColor="@color/blanco"
             android:visibility="visible"/>
 

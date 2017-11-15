@@ -145,7 +145,6 @@
     <orderEntry type="library" name="com.jakewharton:butterknife-annotations:8.8.1@jar" level="project" />
     <orderEntry type="library" name="com.google.dagger:dagger:2.8@jar" level="project" />
     <orderEntry type="library" name="com.daimajia.easing:library-2.0" level="project" />
-    <orderEntry type="library" name="com.mikepenz:fastadapter-2.6.2" level="project" />
     <orderEntry type="library" name="com.google.firebase:firebase-common-11.4.2" level="project" />
     <orderEntry type="library" name="__local_aars__:C.\Users\Jordy\Desktop\Proyectos\java\Animeflv2\multidisplaycast\libs\javax.jmdns_3.4.1-patch2.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="com.futuremind.recyclerfastscroll:fastscroll-0.2.5" level="project" />
@@ -162,10 +161,12 @@
     <orderEntry type="library" name="com.android.support:design-26.1.0" level="project" />
     <orderEntry type="library" name="pl.droidsonroids.gif:android-gif-drawable-1.2.5" level="project" />
     <orderEntry type="library" name="com.github.ndczz:infinity-loading-0.4" level="project" />
+    <orderEntry type="library" name="com.mikepenz:fastadapter-3.0.1" level="project" />
     <orderEntry type="library" name="com.google.firebase:firebase-analytics-impl-11.4.2" level="project" />
     <orderEntry type="library" name="com.github.clans:fab-1.6.4" level="project" />
     <orderEntry type="library" name="com.wdullaer:materialdatetimepicker-3.3.1" level="project" />
     <orderEntry type="library" name="com.google.firebase:firebase-iid-license-11.4.2" level="project" />
+    <orderEntry type="library" name="com.mikepenz:materialdrawer-6.0.1" level="project" />
     <orderEntry type="library" name="com.devbrackets.android:exomedia-3.0.1" level="project" />
     <orderEntry type="library" name="com.makeramen:roundedimageview-2.3.0" level="project" />
     <orderEntry type="library" name="com.android.support:palette-v7-26.1.0" level="project" />
@@ -173,7 +174,6 @@
     <orderEntry type="library" name="com.android.support:support-fragment-26.1.0" level="project" />
     <orderEntry type="library" name="com.parse.bolts:bolts-applinks:1.4.0@jar" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-basement-11.4.2" level="project" />
-    <orderEntry type="library" name="com.mikepenz:materialize-1.0.2" level="project" />
     <orderEntry type="library" name="com.jakewharton:disklrucache:2.0.2@jar" level="project" />
     <orderEntry type="library" name="com.f2prateek.rx.preferences2:rx-preferences-2.0.0-RC2" level="project" />
     <orderEntry type="library" name="com.google.firebase:firebase-analytics-11.4.2" level="project" />
@@ -181,6 +181,7 @@
     <orderEntry type="library" name="com.github.ViksaaSkool:AwesomeSplash-v1.0.0" level="project" />
     <orderEntry type="library" name="com.squareup.retrofit2:converter-gson:2.1.0@jar" level="project" />
     <orderEntry type="library" name="com.github.captain-miao:optroundcardview-1.0.0" level="project" />
+    <orderEntry type="library" name="com.mikepenz:aboutlibraries-6.0.0" level="project" />
     <orderEntry type="library" name="com.jakewharton:butterknife-8.8.1" level="project" />
     <orderEntry type="library" name="__local_aars__:C.\Users\Jordy\Desktop\Proyectos\java\Animeflv2\app\src\trace.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="io.reactivex.rxjava2:rxandroid-2.0.1" level="project" />
@@ -197,16 +198,15 @@
     <orderEntry type="library" name="com.loopj.android:android-async-http:1.4.9@jar" level="project" />
     <orderEntry type="library" name="com.dropbox.core:dropbox-core-sdk:3.0.3@jar" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-gcm-11.4.2" level="project" />
+    <orderEntry type="library" name="io.branch.sdk.android:library-2.13.1" level="project" />
     <orderEntry type="library" name="com.shamanland:xdroid-core-0.3.0" level="project" />
     <orderEntry type="library" name="com.crashlytics.sdk.android:answers-shim-0.0.6" level="project" />
     <orderEntry type="library" name="com.crashlytics.sdk.android:crashlytics-core-2.3.17" level="project" />
-    <orderEntry type="library" name="io.branch.sdk.android:library-2.13.0" level="project" />
     <orderEntry type="library" name="com.google.firebase:firebase-analytics-impl-license-11.4.2" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-location-11.2.2" level="project" />
     <orderEntry type="library" name="com.google.firebase:firebase-analytics-license-11.4.2" level="project" />
     <orderEntry type="library" name="com.afollestad:aesthetic-0.4.7" level="project" />
     <orderEntry type="library" name="com.android.support:multidex-1.0.2" level="project" />
-    <orderEntry type="library" name="com.mikepenz:aboutlibraries-5.9.7" level="project" />
     <orderEntry type="library" name="com.crashlytics.sdk.android:answers-1.3.13" level="project" />
     <orderEntry type="library" name="com.heinrichreimersoftware:material-intro-1.6" level="project" />
     <orderEntry type="library" name="com.android.support:support-media-compat-26.1.0" level="project" />
@@ -217,9 +217,11 @@
     <orderEntry type="library" name="com.nineoldandroids:library:2.4.0@jar" level="project" />
     <orderEntry type="library" name="com.parse.bolts:bolts-tasks:1.4.0@jar" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-basement-license-11.4.2" level="project" />
+    <orderEntry type="library" name="com.mikepenz:materialize-1.1.2" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-iid-11.4.2" level="project" />
     <orderEntry type="library" name="com.google.firebase:firebase-iid-11.4.2" level="project" />
     <orderEntry type="library" name="com.afollestad.material-dialogs:core-0.9.4.6" level="project" />
+    <orderEntry type="library" name="com.mikepenz:fastadapter-extensions-expandable-3.0.0" level="project" />
     <orderEntry type="library" name="com.google.code.gson:gson:2.8.2@jar" level="project" />
     <orderEntry type="library" name="com.mikepenz:community-material-typeface-1.9.32.2" level="project" />
     <orderEntry type="library" name="com.google.android.exoplayer:exoplayer-r1.5.9" level="project" />
@@ -261,11 +263,10 @@
     <orderEntry type="library" name="com.evernote:android-job-1.2.0" level="project" />
     <orderEntry type="library" name="com.github.AndroidDeveloperLB:MaterialPreferenceLibrary-10" level="project" />
     <orderEntry type="library" name="com.mani:ThinDownloadManager-1.2.5" level="project" />
-    <orderEntry type="library" name="com.mikepenz:iconics-core-2.9.0" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-analytics-license-11.4.2" level="project" />
     <orderEntry type="library" name="__local_aars__:C.\Users\Jordy\Desktop\Proyectos\java\Animeflv2\app\src\SOMAAndroidSDK5.0.9.jar:unspecified@jar" level="project" />
+    <orderEntry type="library" name="com.mikepenz:iconics-core-2.9.5" level="project" />
     <orderEntry type="library" name="com.crashlytics.sdk.android:beta-1.2.5" level="project" />
-    <orderEntry type="library" name="com.mikepenz:materialdrawer-5.9.3" level="project" />
     <orderEntry type="library" name="com.mikepenz:fontawesome-typeface-4.7.0.1" level="project" />
     <orderEntry type="library" name="com.cleveroad:audiowidget-1.0.0" level="project" />
     <orderEntry type="library" name="com.nononsenseapps:filepicker-2.5.2" level="project" />

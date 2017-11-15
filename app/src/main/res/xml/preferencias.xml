@@ -4,48 +4,53 @@
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="notificaciones"
-            android:title="Activar Notificaciones" />
+            android:title="Activar las notificaciones"/>
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
+            android:dependency="notificaciones"
             android:key="notFavs"
-            android:summary="Solo notificara capitulos nuevos de animes en favoritos"
-            android:title="Solo notificar capitulos nuevos en favoritos" />
+            android:summary="Se te avisará cuando haya un nuevo episodio de uno de tus animes en tu lista de favoritos"
+            android:title="Solo notificar capitulos nuevos en favoritos"/>
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
+            android:dependency="notificaciones"
             android:key="autoDesc"
             android:summary="Genera una notificacion para descargar capitulos nuevos de animes en favoritos"
-            android:title="Notificar descarga de capitulos en favoritos" />
+            android:title="Notificar descarga de capitulos en favoritos"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="60000"
+            android:dependency="notificaciones"
             android:enabled="true"
             android:key="tiempo"
             android:summary="Revisar actualizaciones cada %s"
-            android:title="Actualizaciones" />
+            android:title="Frecuencia de consulta"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
+            android:dependency="notificaciones"
             android:enabled="true"
             android:key="sonido"
             android:summary="%s"
-            android:title="Sonido de Notificacion" />
+            android:title="Tono de notificaciones"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
+            android:dependency="notificaciones"
             android:enabled="true"
             android:key="ind_sounds"
             android:summary="%s"
-            android:title="Indicador" />
+            android:title="Indicador"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:enabled="true"
             android:key="r_sounds"
-            android:summary="(Los sonidos pueden tardar en funcionar en la lista)"
-            android:title="Recargar cache de sonidos" />
+            android:summary="Los sonidos pueden tardar en funcionar en la lista"
+            android:title="Recargar cache de sonidos"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Conexiones">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="2"
             android:key="t_conexion"
             android:summary="%s"
-            android:title="Usar Conexion" />
+            android:title="Tipo de conexión"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="30000"
             android:enabled="true"
@@ -66,43 +71,48 @@
             android:defaultValue="true"
             android:key="update_check_start"
             android:title="Buscar actualizaciones al iniciar" />
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="false"
+            android:key="autoUpdate"
+            android:summary="Descarga la actualización en segundo plano y luego te avisa para instalarla"
+            android:title="Autodescargar Actualizaciones"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="update_check_now"
-            android:title="Comprobar actualizaciones" />
+            android:title="Buscar actualizaciones"/>
     </PreferenceCategory>
-    <PreferenceCategory android:title="Busqueda">
+    <PreferenceCategory android:title="Búsqueda">
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="use_tags"
-            android:title="Activar busqueda por generos" />
+            android:title="Búsqueda por generos"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_busqueda"
             android:summary="%s"
-            android:title="Tipo de busqueda" />
+            android:title="Tipo de búsqueda"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="ord_busqueda"
             android:summary="%s"
-            android:title="Orden de busqueda" />
+            android:title="Orden de resultados"/>
     </PreferenceCategory>
-    <PreferenceCategory android:title="Reproductores">
+    <PreferenceCategory android:title="Reproducción">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_video"
             android:summary="Reproductor: %s"
-            android:title="Anime descargado" />
+            android:title="Anime descargado"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_streaming"
             android:summary="Reproductor: %s"
-            android:title="Streaming" />
+            android:title="Streaming"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="t_player"
             android:summary="Tipo: %s"
-            android:title="Reproductor Interno" />
+            android:title="Reproductor Interno"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Favoritos">
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
@@ -132,8 +142,8 @@
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="use_space"
-            android:summary="Se aplicara a toda la app donde aparezca la miniatura del anime"
-            android:title="Miniaturas espaciadas" />
+            android:summary="Afectará a todas las miniaturas de los animes"
+            android:title="Miniaturas espaciadas"/>
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="noGif"
@@ -141,8 +151,8 @@
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="prog_rec"
-            android:summary="Recientes"
-            android:title="Progreso de descarga" />
+            android:summary="Visualizar el progreso en recientes"
+            android:title="Progreso de descarga"/>
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="true"
             android:key="resaltar"
@@ -165,47 +175,42 @@
             android:defaultValue="0"
             android:key="sug_order"
             android:summary="%s"
-            android:title="Orden de animes" />
+            android:title="Orden de sugerencias"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Extras">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:key="b_log"
-            android:title="ChangeLog" />
+            android:title="Registro de cambios"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="null"
             android:key="open_tutorial"
             android:title="Tutorial" />
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
-            android:key="autoUpdate"
-            android:summary="Descarga la actualizacion en segundo plano, y crea una notificacion para instalarla"
-            android:title="Autodescargar Actualizaciones" />
-        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
-            android:defaultValue="false"
             android:key="statusShown"
-            android:title="Ocultar informacion de Server" />
+            android:title="Ocultar información del servidor"/>
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="force_phone"
-            android:summary="Esta opcion podria crashear la app"
-            android:title="Forzar vista de telefono" />
+            android:summary="Esta opción podría crashear la app"
+            android:title="Usar la interfaz para teléfonos"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Almacenamiento">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:id="@+id/preference"
             android:defaultValue="0"
             android:key="b_cache"
-            android:title="Administrador de Cache" />
+            android:title="Gestionar almacenamiento"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="b_video"
             android:summary="Espacio usado: %s MB"
-            android:title="Borrar todos los videos" />
+            android:title="Borrar animes descargados"/>
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
             android:key="b_vistos"
-            android:summary="Borrar historial de capitulos vistos"
-            android:title="Capítulos vistos" />
+            android:summary="Borrar el historial de los animes vistos"
+            android:title="Borrar historial"/>
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="use_ext_downloader"
@@ -240,7 +245,7 @@
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="betaSounds"
-            android:title="Sonidos Beta" />
+            android:title="Tonos Beta"/>
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference
             android:defaultValue="false"
             android:key="tv_layout"

@@ -48,7 +48,7 @@
             android:layout_marginEnd="25dp"
             android:layout_marginStart="25dp"
             android:layout_marginTop="10dp"
-            android:text="No sigues ningun anime"
+            android:text="No sigues ningún anime"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
     </LinearLayout>
 
