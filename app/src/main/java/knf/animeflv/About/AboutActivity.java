@@ -430,7 +430,7 @@ public class AboutActivity extends MaterialAboutActivity {
                         .text(item.name)
                         .subText(item.description)
                         .icon(new IconicsDrawable(this)
-                                .icon(type == 1 ? CommunityMaterial.Icon.cmd_account_star : GoogleMaterial.Icon.gmd_person)
+                                .icon(type == 1 ? CommunityMaterial.Icon.cmd_account_star : CommunityMaterial.Icon.cmd_crown)
                                 .color(iconColor(this))
                                 .sizeDp(18)
                         );
