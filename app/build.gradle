@@ -18,13 +18,13 @@ apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.0'
+    buildToolsVersion '27.0.1'
     defaultConfig {
         applicationId "knf.animeflv"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 241
-        versionName "5.5"
+        versionCode 242
+        versionName "5.5.1"
         multiDexEnabled = true
     }
     buildTypes {
@@ -99,9 +99,6 @@ configurations.all {
 dependencies {
     def g_apps='26.1.0'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    /*compile('com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:0.10.6@aar') {
-        transitive = true
-    }*/
     implementation('com.mikepenz:aboutlibraries:6.0.0@aar') {
         transitive = true
     }
@@ -113,11 +110,11 @@ dependencies {
     implementation files('src/SOMAAndroidSDK5.0.9.jar')
     implementation project(':multidisplaycast')
     implementation project(':library')
-    implementation 'com.mikepenz:iconics-core:2.9.0@aar'
+    implementation 'com.mikepenz:iconics-core:2.9.5@aar'
     implementation 'com.mikepenz:google-material-typeface:3.0.1.1.original@aar'
     implementation 'com.mikepenz:material-design-iconic-typeface:2.2.0.3@aar'
     implementation 'com.mikepenz:fontawesome-typeface:4.7.0.1@aar'
-    implementation 'com.mikepenz:community-material-typeface:1.9.32.2@aar'
+    implementation 'com.mikepenz:community-material-typeface:2.0.46.1@aar'
     implementation 'com.afollestad.material-dialogs:core:0.9.4.6'
     implementation 'com.afollestad.material-dialogs:commons:0.9.4.6'
     implementation 'com.afollestad:aesthetic:0.4.7'
@@ -133,14 +130,14 @@ dependencies {
     implementation 'com.shamanland:xdroid-toaster:0.3.0'
     implementation 'com.karumi:dexter:4.1.0'
     //Support
-    implementation "com.android.support:appcompat-v7:27.0.0"
-    implementation "com.android.support:support-core-ui:27.0.0"
-    implementation "com.android.support:leanback-v17:27.0.0"
-    implementation "com.android.support:recyclerview-v7:27.0.0"
-    implementation "com.android.support:cardview-v7:27.0.0"
-    implementation "com.android.support:design:27.0.0"
-    implementation "com.android.support:customtabs:27.0.0"
-    implementation 'com.android.support:support-vector-drawable:27.0.0'
+    implementation "com.android.support:appcompat-v7:27.0.1"
+    implementation "com.android.support:support-core-ui:27.0.1"
+    implementation "com.android.support:leanback-v17:27.0.1"
+    implementation "com.android.support:recyclerview-v7:27.0.1"
+    implementation "com.android.support:cardview-v7:27.0.1"
+    implementation "com.android.support:design:27.0.1"
+    implementation "com.android.support:customtabs:27.0.1"
+    implementation 'com.android.support:support-vector-drawable:27.0.1'
     //Support
     implementation 'com.jakewharton:butterknife:8.8.1'
     implementation 'com.squareup.picasso:picasso:2.5.2'
@@ -164,13 +161,14 @@ dependencies {
     implementation 'com.wdullaer:materialdatetimepicker:3.3.1'
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
     implementation 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
-    implementation 'com.dropbox.core:dropbox-core-sdk:3.0.3'
+    implementation 'com.dropbox.core:dropbox-core-sdk:3.0.5'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation 'com.android.support:multidex:1.0.2'
     implementation 'com.github.zawadz88:material-activity-chooser:0.2.1'
     implementation 'org.adw.library:discrete-seekbar:1.0.1'
-    implementation "com.github.daniel-stoneuk:material-about-library:2.2.3-support$g_apps"
+    implementation "com.github.daniel-stoneuk:material-about-library:2.2.3"
     implementation "com.google.android.gms:play-services-analytics:$project.p_services"
+    implementation "com.google.android.gms:play-services-location:$project.p_services"
     implementation "com.google.android.gms:play-services-iid:$project.p_services"
     implementation "com.google.android.gms:play-services-gcm:$project.p_services"
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
