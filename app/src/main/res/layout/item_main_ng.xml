@@ -43,7 +43,7 @@
                 android:layout_height="0dp"
                 android:visibility="gone" />
 
-            <com.makeramen.roundedimageview.RoundedImageView
+            <com.github.siyamed.shapeimageview.RoundedImageView
                 android:id="@+id/img_main"
                 android:layout_width="70dp"
                 android:layout_height="70dp"

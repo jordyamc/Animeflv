@@ -45,10 +45,10 @@ public class zippyHelper {
                         Element script = center.select("script").get(1);
                         String script_text = script.outerHtml().replace("<script type=\"text/javascript\">", "");
 
-                        Matcher matcher = Pattern.compile("\\D*(\\d*)%(\\d*)\\D*").matcher(script_text);
+                        Matcher matcher = Pattern.compile("(\\d+).?%.?(\\d+).?\\+.?(\\d+).?%.?(\\d+)").matcher(script_text);
                         matcher.find();
-                        String a = String.valueOf((Integer.parseInt(matcher.group(1)) % Integer.parseInt(matcher.group(2))));
-                        Matcher name = Pattern.compile(".*\\/d\\/([a-zA-Z]*)\\/.*\\/(\\d+_\\d+\\.mp4).*").matcher(script_text);
+                        String a = String.valueOf(generateNumber(matcher.group(1), matcher.group(2), matcher.group(4)));
+                        Matcher name = Pattern.compile(".*\\/d\\/([a-zA-Z0-9]*)\\/.*\\/(\\d+_\\d+\\.mp4).*").matcher(script_text);
                         name.find();
                         String pre = name.group(1);
                         String d_url = url.substring(0, url.indexOf("/v/")) + "/d/" + pre + "/" + a + "/" + name.group(2);
@@ -59,6 +59,7 @@ public class zippyHelper {
                         callback.onError();
                     }
                 } else {
+                    Log.e("Zippy", "No cookie");
                     callback.onError();
                 }
             }
@@ -67,6 +68,10 @@ public class zippyHelper {
 
     private static int generateNumber(int a, int b, int c) {
         return ((int) ((a % b) + (a % c)));
+    }
+
+    private static int generateNumber(String a, String b, String c) {
+        return (((Integer.parseInt(a) % Integer.parseInt(b)) + (Integer.parseInt(a) % Integer.parseInt(c))));
     }
 
     public interface OnZippyResult {
