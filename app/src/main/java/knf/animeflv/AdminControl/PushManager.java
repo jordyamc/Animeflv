@@ -361,10 +361,14 @@ public class PushManager extends AppCompatActivity {
         return object;
     }
 
+    /**
+     * To the people trying to make profit from my app: FUCK YOU
+     */
+
     private Header[] getHeaders() {
         return new Header[]{
                 new BasicHeader("Content-Type", "application/json; charset=UTF-8"),
-                new BasicHeader("Authorization", "Basic ZWNkNjQ3YmMtOGVmNC00NjY1LWIwZDQtMmQ2N2NlMzYyMmQ5")
+                new BasicHeader("Authorization", getString(R.string.one_signal_key))
         };
     }
 
@@ -382,7 +386,7 @@ public class PushManager extends AppCompatActivity {
         try {
             JSONObject object = new JSONObject();
             object
-                    .put("app_id", "81c836a4-a6ff-48b7-b696-c411fa59ab39")
+                    .put("app_id", getString(R.string.one_signal_id))
                     .put("included_segments", getSegments())
                     .put("data", getActions())
                     .put("headings", getNotificationTitle())
