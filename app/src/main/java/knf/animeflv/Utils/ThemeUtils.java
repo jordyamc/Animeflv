@@ -381,8 +381,7 @@ public class ThemeUtils {
             toolbarNavigation = preferences.getInt(KEY_TOOLBAR_NAVIGATION, isTablet(context) ? (isDark ? ColorsRes.Blanco(context) : Color.parseColor("#4d4d4d")) : ColorsRes.Blanco(context));
 
             textColor = textColorCard;
-
-            separator = (isDark ? Color.parseColor("#26ffffff") : Color.parseColor("26000000"));
+            separator = (isDark ? Color.WHITE : Color.BLACK);
 
             tablet_background = preferences.getInt(KEY_BACKGROUND_T, isDark ? ColorsRes.Negro(context) : ColorsRes.Blanco(context));
             tablet_toolbar = preferences.getInt(KEY_TOOLBAR_T, isDark ? ColorsRes.Negro(context) : ColorsRes.Prim(context));
