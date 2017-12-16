@@ -164,7 +164,7 @@ public class InfoFragments extends AppCompatActivity {
         }
         button.setImageResource(FavoriteHelper.isFav(this, aid) ? R.drawable.star_on : R.drawable.star_off);
         TrackingHelper.track(this, TrackingHelper.INFO + aid);
-        new CacheManager().portada(this, aid, imageView);
+        CacheManager.portada(this, aid, imageView);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -214,12 +214,11 @@ public class InfoFragments extends AppCompatActivity {
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                final CacheManager cacheManager = new CacheManager();
-                cacheManager.invalidatePortada(aid);
+                CacheManager.invalidatePortada(aid);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        cacheManager.portada(InfoFragments.this, aid, imageView);
+                        CacheManager.portada(InfoFragments.this, aid, imageView);
                         Toaster.toast("Portada recreada");
                     }
                 });

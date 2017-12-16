@@ -64,7 +64,7 @@ public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.ViewHolder
                 public void run() {
                     holder.tv_tit.setText(object.title);
                     holder.tv_tipo.setText(object.tid);
-                    new CacheManager().mini(activity, object.aid, holder.iv_rel);
+                    CacheManager.mini(activity, object.aid, holder.iv_rel);
                 }
             });
             doOnlySlideOut(holder, holder.getAdapterPosition());
@@ -123,7 +123,7 @@ public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.ViewHolder
                     public void run() {
                         holder.tv_tit.setText(object.title);
                         holder.tv_tipo.setText(object.tid);
-                        new CacheManager().mini(activity, object.aid, holder.iv_rel);
+                        CacheManager.mini(activity, object.aid, holder.iv_rel);
                         holder.card.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -172,7 +172,7 @@ public class RandomAdapter extends RecyclerView.Adapter<RandomAdapter.ViewHolder
                     public void run() {
                         holder.tv_tit.setText(object.title);
                         holder.tv_tipo.setText(object.tid);
-                        new CacheManager().mini(activity, object.aid, holder.iv_rel);
+                        CacheManager.mini(activity, object.aid, holder.iv_rel);
                         holder.card.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {

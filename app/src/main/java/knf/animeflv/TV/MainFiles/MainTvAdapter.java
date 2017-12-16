@@ -47,7 +47,7 @@ public class MainTvAdapter extends RecyclerView.Adapter<MainTvAdapter.ViewHolder
         holder.title.setText(list.get(holder.getAdapterPosition()).getTitulo());
         holder.chapter.setText("Capítulo " + list.get(holder.getAdapterPosition()).getNumero());
         holder.chapter.setTextColor(theme.accent);
-        new CacheManager().portada(context, list.get(holder.getAdapterPosition()).getAid(), holder.img);
+        CacheManager.portada(context, list.get(holder.getAdapterPosition()).getAid(), holder.img);
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

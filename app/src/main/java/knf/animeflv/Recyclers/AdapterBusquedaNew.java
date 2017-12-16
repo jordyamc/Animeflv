@@ -56,7 +56,7 @@ public class AdapterBusquedaNew extends RecyclerView.Adapter<AdapterBusquedaNew.
         holder.tv_noC.setTextColor(theme.textColor);
         holder.tv_tipo.setTextColor(theme.accent);
         DesignUtils.setCardStyle(context, getItemCount(), getPosition(holder.getAdapterPosition(), position), holder.card, holder.separator, holder.iv_rel);
-        new CacheManager().mini(context,Animes.get(holder.getAdapterPosition()).getAid(),holder.iv_rel);
+        CacheManager.mini(context, Animes.get(holder.getAdapterPosition()).getAid(), holder.iv_rel);
         holder.tv_tit.setText(Animes.get(holder.getAdapterPosition()).getNombre());
         holder.tv_tipo.setText(Animes.get(holder.getAdapterPosition()).getTipo());
         holder.card.setOnClickListener(new View.OnClickListener() {

@@ -75,7 +75,7 @@ public class SuggestionsAdapterSticky extends SectioningAdapter {
         holder.card.setCardBackgroundColor(theme.card_normal);
         holder.tv_tit.setTextColor(theme.textColor);
         holder.tv_tipo.setTextColor(theme.accent);
-        new CacheManager().mini(activity, animes.get(sectionIndex).objects.get(itemIndex).aid, holder.iv_rel);
+        CacheManager.mini(activity, animes.get(sectionIndex).objects.get(itemIndex).aid, holder.iv_rel);
         holder.tv_tit.setText(animes.get(sectionIndex).objects.get(itemIndex).title);
         holder.tv_tipo.setText(animes.get(sectionIndex).objects.get(itemIndex).tid);
         holder.card.setOnClickListener(new View.OnClickListener() {

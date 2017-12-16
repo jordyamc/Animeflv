@@ -64,7 +64,7 @@ public class DirectoryAdapter extends RecyclerView.Adapter<DirectoryAdapter.View
         if (list.get(Gposition(holder, position)).getFilesNumber().startsWith("0")) {
             holder.root.setVisibility(View.GONE);
         }
-        new CacheManager().mini(context, list.get(Gposition(holder, position)).getID(), holder.img);
+        CacheManager.mini(context, list.get(Gposition(holder, position)).getID(), holder.img);
         holder.iV_visto.setVisibility(View.GONE);
         holder.titulo.setText(list.get(Gposition(holder, position)).getTitle());
         String caps = list.get(Gposition(holder, position)).getFilesNumber();

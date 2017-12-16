@@ -28,7 +28,6 @@ import java.util.Locale;
 
 import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.JsonFactory.MALGetter;
-import knf.animeflv.Parser;
 import knf.animeflv.PicassoCache;
 import knf.animeflv.R;
 import xdroid.toaster.Toaster;
@@ -40,7 +39,9 @@ public class CacheManager {
     public static final File miniCacheNoMedia = new File(miniCache, ".nomedia");
     public static final File portadaCacheNoMedia = new File(portadaCache, ".nomedia");
     public static final File hallCacheNoMedia = new File(hallImgs, ".nomedia");
-    private Parser parser = new Parser();
+
+    private CacheManager() {
+    }
 
     public static void invalidateCache(final File file, final boolean withDirectory, final boolean exclude, final OnInvalidateCache inter) {
         new AsyncTask<String, String, String>() {
@@ -143,7 +144,7 @@ public class CacheManager {
         return String.format(Locale.US, "%.1f %sB", (double) v / (1L << (z * 10)), " KMGTPE".charAt(z));
     }
 
-    public static long getcachesize(Activity activity) {
+    public static long getcachesize(Context activity) {
         long size = 0;
         File[] files = activity.getCacheDir().listFiles();
         File[] mediaStorage = new File(Environment.getExternalStorageDirectory() + "/Animeflv/cache").listFiles();
@@ -158,7 +159,7 @@ public class CacheManager {
         return size;
     }
 
-    public static void asyncGetFormatedCacheSize(final Activity activity, final OnFinishCount onFinishCount) {
+    public static void asyncGetFormatedCacheSize(final Context activity, final OnFinishCount onFinishCount) {
         new AsyncTask<String, String, String>() {
             @Override
             protected String doInBackground(String... params) {
@@ -212,12 +213,12 @@ public class CacheManager {
         return number;
     }
 
-    public void invalidatePortada(String aid) {
+    public static void invalidatePortada(String aid) {
         new File(portadaCache, aid + ".jpg").delete();
     }
 
     @UiThread
-    public void portada(final Activity context, final String aid, final ImageView imageView) {
+    public static void portada(final Activity context, final String aid, final ImageView imageView) {
         checkCacheDirs();
         final File localFile = new File(portadaCache, aid + ".jpg");
         boolean isHD = false;
@@ -272,7 +273,7 @@ public class CacheManager {
         }
     }
 
-    public void mini(final Context context, final String aid, final ImageView imageView) {
+    public static void mini(final Context context, final String aid, final ImageView imageView) {
         checkCacheDirs();
         final File localFile = new File(miniCache, aid + ".jpg");
         imageView.setImageResource(android.R.color.transparent);
@@ -307,7 +308,7 @@ public class CacheManager {
         }
     }
 
-    public void hallMini(final Activity activity, String id, String link, final CircularImageView imageView) {
+    public static void hallMini(final Activity activity, String id, String link, final CircularImageView imageView) {
         checkCacheDirs();
         final File localFile = new File(hallImgs, id + "_mini.png");
         if (localFile.exists()) {
@@ -328,28 +329,7 @@ public class CacheManager {
         }
     }
 
-    public void hallLarge(final Activity activity, String id, String link, final CircularImageView imageView) {
-        checkCacheDirs();
-        final File localFile = new File(hallImgs, id + "_large.png");
-        if (localFile.exists()) {
-            PicassoCache.getPicassoInstance(activity).load(localFile).into(imageView);
-        } else {
-            if (NetworkUtils.isNetworkAvailable())
-                PicassoCache.getPicassoInstance(activity).load(link).error(R.drawable.ic_block_r).into(imageView, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
-                    }
-
-                    @Override
-                    public void onError() {
-
-                    }
-                });
-        }
-    }
-
-    private void checkCacheDirs() {
+    private static void checkCacheDirs() {
         if (!miniCache.exists()) miniCache.mkdirs();
         if (!portadaCache.exists()) portadaCache.mkdirs();
         if (!hallImgs.exists()) hallImgs.mkdirs();
@@ -371,7 +351,7 @@ public class CacheManager {
         }
     }
 
-    private boolean isHD(File file) {
+    private static boolean isHD(File file) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(file.getAbsolutePath(), options);
@@ -379,7 +359,7 @@ public class CacheManager {
         return options.outWidth > 100;
     }
 
-    private void saveBitmap(final Bitmap bitmap, final File file) {
+    private static void saveBitmap(final Bitmap bitmap, final File file) {
         try {
             new AsyncTask<String, String, String>() {
                 @Override
@@ -405,6 +385,27 @@ public class CacheManager {
             }.executeOnExecutor(ExecutorManager.getExecutor());
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void hallLarge(final Activity activity, String id, String link, final CircularImageView imageView) {
+        checkCacheDirs();
+        final File localFile = new File(hallImgs, id + "_large.png");
+        if (localFile.exists()) {
+            PicassoCache.getPicassoInstance(activity).load(localFile).into(imageView);
+        } else {
+            if (NetworkUtils.isNetworkAvailable())
+                PicassoCache.getPicassoInstance(activity).load(link).error(R.drawable.ic_block_r).into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        saveBitmap(((BitmapDrawable) imageView.getDrawable()).getBitmap(), localFile);
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
         }
     }
 

@@ -56,7 +56,7 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             holder.card.setCardBackgroundColor(theme.card_normal);
             holder.tv_tit.setTextColor(theme.textColor);
             holder.tv_tipo.setTextColor(theme.accent);
-            new CacheManager().mini(activity, animes.get(getPosition(holder, position)).aid, holder.iv_rel);
+            CacheManager.mini(activity, animes.get(getPosition(holder, position)).aid, holder.iv_rel);
             holder.tv_tit.setText(animes.get(getPosition(holder, position)).title);
             holder.tv_tipo.setText(animes.get(getPosition(holder, position)).tid);
             holder.card.setOnClickListener(new View.OnClickListener() {

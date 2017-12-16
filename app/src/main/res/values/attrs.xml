@@ -10,4 +10,11 @@
         <attr name="tvea_textShrink" format="string"/>
         <attr name="tvea_textExpand" format="string"/>
     </declare-styleable>
+    <declare-styleable name="MemoryStatusView">
+        <attr name="msv_img" format="reference"/>
+        <attr name="msv_title" format="string"/>
+        <attr name="msv_description" format="string"/>
+        <attr name="msv_id" format="string"/>
+        <attr name="msv_showSwitch" format="boolean"/>
+    </declare-styleable>
 </resources>

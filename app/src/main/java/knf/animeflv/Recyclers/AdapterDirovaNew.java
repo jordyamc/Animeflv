@@ -65,7 +65,7 @@ public class AdapterDirovaNew extends RecyclerView.Adapter<AdapterDirovaNew.View
         DesignUtils.setCardStyle(context, getItemCount(), getPosition(holder.getAdapterPosition(), position), holder.card, holder.separator, holder.iv_rel);
         holder.card.setCardBackgroundColor(theme.card_normal);
         holder.tv_tit.setTextColor(theme.textColor);
-        new CacheManager().mini(context,Animes.get(holder.getAdapterPosition()).getAid(),holder.iv_rel);
+        CacheManager.mini(context, Animes.get(holder.getAdapterPosition()).getAid(), holder.iv_rel);
         holder.tv_tit.setText(Animes.get(holder.getAdapterPosition()).getNombre());
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override

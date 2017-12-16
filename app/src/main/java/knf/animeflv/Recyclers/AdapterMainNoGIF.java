@@ -114,7 +114,7 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
             holder.card.setCardBackgroundColor(theme.card_normal);
         }
         setUpWeb(holder.webView);
-        new CacheManager().mini(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getAid(), holder.iv_main);
+        CacheManager.mini(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getAid(), holder.iv_main);
         holder.tv_tit.setText(Animes.get(position).getTitulo());
         holder.tv_num.setText(getCap(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
         if (FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())

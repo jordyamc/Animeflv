@@ -71,7 +71,7 @@ public class HallAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 holder.name.setTextColor(ColorsRes.Negro(activity));
                 holder.card.setBackgroundColor(ColorsRes.Blanco(activity));
             }
-            new CacheManager().hallMini(activity, items.get(holder.getAdapterPosition()).id, getImageLink(holder.getAdapterPosition()), holder.imageView);
+            CacheManager.hallMini(activity, items.get(holder.getAdapterPosition()).id, getImageLink(holder.getAdapterPosition()), holder.imageView);
             holder.name.setText(items.get(holder.getAdapterPosition()).name);
             holder.description.setText(items.get(holder.getAdapterPosition()).description);
         }

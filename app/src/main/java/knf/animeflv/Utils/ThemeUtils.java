@@ -353,6 +353,8 @@ public class ThemeUtils {
         public int textColorNormal;
         public int textColorI;
 
+        public int separator;
+
         public int secondaryTextColor;
 
         public int indicatorColor;
@@ -379,6 +381,8 @@ public class ThemeUtils {
             toolbarNavigation = preferences.getInt(KEY_TOOLBAR_NAVIGATION, isTablet(context) ? (isDark ? ColorsRes.Blanco(context) : Color.parseColor("#4d4d4d")) : ColorsRes.Blanco(context));
 
             textColor = textColorCard;
+
+            separator = (isDark ? Color.parseColor("#26ffffff") : Color.parseColor("26000000"));
 
             tablet_background = preferences.getInt(KEY_BACKGROUND_T, isDark ? ColorsRes.Negro(context) : ColorsRes.Blanco(context));
             tablet_toolbar = preferences.getInt(KEY_TOOLBAR_T, isDark ? ColorsRes.Negro(context) : ColorsRes.Prim(context));

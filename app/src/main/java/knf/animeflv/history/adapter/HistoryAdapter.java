@@ -67,7 +67,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         holder.tv_current.setTextColor(theme.accent);
         holder.tv_tit.setText(HistoryHelper.getTitFrom(jsonArray,holder.getAdapterPosition()));
         holder.tv_current.setText(HistoryHelper.getLastFrom(jsonArray,holder.getAdapterPosition()));
-        new CacheManager().mini(activity,HistoryHelper.getAidFrom(jsonArray,holder.getAdapterPosition()),holder.img);
+        CacheManager.mini(activity, HistoryHelper.getAidFrom(jsonArray, holder.getAdapterPosition()), holder.img);
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

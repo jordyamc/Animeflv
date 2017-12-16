@@ -107,7 +107,7 @@ public class AdapterWait extends AbstractExpandableItemAdapter<GroupHolder, Chil
         holder.titulo.setTextColor(theme.textColor);
         holder.delete.setColorFilter(theme.iconFilter);
         holder.start.setColorFilter(theme.iconFilter);
-        new CacheManager().mini(context, animes.get(groupPosition).aid, holder.image);
+        CacheManager.mini(context, animes.get(groupPosition).aid, holder.image);
         holder.titulo.setText(DirectoryHelper.get(context).getTitle(animes.get(groupPosition).aid));
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override

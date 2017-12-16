@@ -1,60 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:ignore="HardcodedText">
 
         <android.support.v7.widget.Toolbar
-            android:background="?attr/colorPrimary"
             android:id="@+id/toolbar"
-            android:layout_height="?attr/actionBarSize"
             android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme"/>
 
-        <TextView
-            android:id="@+id/total"
+        <knf.animeflv.CustomViews.MemoryTotalView
+            android:id="@+id/memory_total"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <knf.animeflv.CustomViews.MemoryStatusView
+            android:id="@+id/memory_mini"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:msv_description="Cache local de miniaturas."
+            app:msv_id="mini"
+            app:msv_img="@drawable/memory_mini"
+            app:msv_title="Miniaturas"/>
+
+        <knf.animeflv.CustomViews.MemoryStatusView
+            android:id="@+id/memory_portrait"
             android:layout_width="match_parent"
-            android:text="Espacio Utilizado: ..."
-            android:textSize="24sp"
-            android:textStyle="normal|bold"
-            android:paddingEnd="5dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:paddingStart="5dp"/>
+            android:layout_height="wrap_content"
+            app:msv_description="Cache local de portadas."
+            app:msv_id="portada"
+            app:msv_img="@drawable/memory_portrait"
+            app:msv_title="Portadas"/>
 
-        <View
-            android:alpha="0.12"
-            android:background="@android:color/black"
-            android:layout_height="1dp"
+        <knf.animeflv.CustomViews.MemoryStatusView
+            android:id="@+id/memory_thumbs"
             android:layout_width="match_parent"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"/>
+            android:layout_height="wrap_content"
+            app:msv_description="Preview de videos."
+            app:msv_img="@drawable/memory_preview"
+            app:msv_showSwitch="false"
+            app:msv_title="Thumbnails"/>
 
-        <include layout="@layout/memory_control_mini"/>
+        <knf.animeflv.CustomViews.MemoryStatusView
+            android:id="@+id/memory_cache"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:msv_description="Informacion de animes."
+            app:msv_img="@drawable/memory_cache"
+            app:msv_showSwitch="false"
+            app:msv_title="Cache de animes"/>
 
-        <include layout="@layout/memory_control_portada"/>
+        <knf.animeflv.CustomViews.MemoryStatusView
+            android:id="@+id/memory_logs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:msv_description="Reporte de errores."
+            app:msv_img="@drawable/memory_logs"
+            app:msv_showSwitch="false"
+            app:msv_title="Logs"/>
 
-        <include layout="@layout/memory_control_thumbs"/>
+        <knf.animeflv.CustomViews.MemoryUpdateView
+            android:id="@+id/memory_apk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
-        <include layout="@layout/memory_control_animes"/>
+        <knf.animeflv.CustomViews.MemoryStatusView
+            android:id="@+id/memory_cache_android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:msv_description="Cache interno."
+            app:msv_img="@drawable/memory_internal"
+            app:msv_showSwitch="false"
+            app:msv_title="Cache de Android"/>
 
-        <include layout="@layout/memory_control_log"/>
-
-        <include layout="@layout/memory_control_apk"/>
-
-        <include layout="@layout/memory_control_android"/>
-
-        <include layout="@layout/memory_control_clear_all"/>
+        <knf.animeflv.CustomViews.MemoryClearView
+            android:id="@+id/memory_clear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 </ScrollView>
-

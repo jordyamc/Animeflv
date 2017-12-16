@@ -1,73 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:id="@+id/lay_apk"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              tools:ignore="HardcodedText">
-
-    <TextView
-        android:id="@+id/tit_apk"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingEnd="5dp"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:paddingStart="5dp"
-        android:text="Apk Descargado"
-        android:textSize="20sp"
-        android:textStyle="normal|bold"/>
-
-    <TextView
-        android:id="@+id/desc_apk"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingEnd="5dp"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:paddingStart="5dp"
-        android:text="Apk descargado en la actualización:\n\nVersion actual: %intver%\n\nVersion APK: %extver%"
-        android:textSize="18sp"/>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="2">
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/clear_apk"
-            style="?android:attr/borderlessButtonStyle"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="20dp"
-            android:paddingTop="20dp"
-            android:text="Borrar (...)"
-            android:textColor="?android:attr/textColorTertiary"
-            android:textSize="16sp"
-            android:layout_weight="1"/>
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/install_apk"
-            style="?android:attr/borderlessButtonStyle"
+            <ImageView
+                android:id="@+id/img"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="20dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/memory_apk"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="15dp"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="5dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:paddingStart="5dp"
+                    android:text="Actualización"
+                    android:textSize="20sp"
+                    android:textStyle="normal|bold"/>
+
+                <TextView
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="10dp"
+                    android:paddingStart="5dp"
+                    android:text="APK"
+                    android:textSize="18sp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:animateLayoutChanges="true">
+
+                        <TextView
+                            android:id="@+id/size"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:padding="5dp"
+                            android:text="..."
+                            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                            android:textSize="30sp"
+                            android:visibility="gone"/>
+
+                        <ProgressBar
+                            android:id="@+id/loading"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"/>
+                    </RelativeLayout>
+
+                    <Button
+                        android:id="@+id/clear"
+                        style="@style/Widget.AppCompat.Button.Colored"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:elevation="2dp"
+                        android:enabled="false"
+                        android:text="Borrar"/>
+
+                    <Button
+                        android:id="@+id/update"
+                        style="@style/Widget.AppCompat.Button.Colored"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:elevation="2dp"
+                        android:text="Actualizar"
+                        android:visibility="gone"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/separator"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="20dp"
-            android:paddingTop="20dp"
-            android:text="Actualizar"
-            android:textColor="?android:attr/textColorTertiary"
-            android:textSize="16sp"
-            android:layout_weight="1"
-            />
-
+            android:layout_height="1dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:alpha="0.12"
+            android:background="@android:color/black"/>
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
-        android:alpha="0.12"
-        android:background="@android:color/black"/>
-</LinearLayout>
+</merge>

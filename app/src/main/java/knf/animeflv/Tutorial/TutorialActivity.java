@@ -211,7 +211,7 @@ public class TutorialActivity extends AppCompatActivity implements SwipeRefreshL
                         @Override
                         public void run() {
                             if (refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
-                            new CacheManager().mini(TutorialActivity.this, id, images[position]);
+                            CacheManager.mini(TutorialActivity.this, id, images[position]);
                             tits[position].setText(title);
                             caps[position].setText(result);
                             if (!PreferenceManager.getDefaultSharedPreferences(TutorialActivity.this).getBoolean("use_space", false))

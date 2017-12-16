@@ -60,7 +60,7 @@ public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.
     @Override
     public void onBindViewHolder(final AutoEmisionAdapter.ViewHolder holder, final int position) {
         DesignUtils.setCardStyle(context, getItemCount(), getPosition(holder.getAdapterPosition(), position), holder.cardView, holder.separator, holder.imageView);
-        new CacheManager().mini(context, list.get(position).getAid(), holder.imageView);
+        CacheManager.mini(context, list.get(position).getAid(), holder.imageView);
         holder.title.setTextColor(theme.textColor);
         holder.cardView.setCardBackgroundColor(theme.card_normal);
         holder.state.setColorFilter(theme.accent);

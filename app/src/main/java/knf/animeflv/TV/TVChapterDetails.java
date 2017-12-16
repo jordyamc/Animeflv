@@ -66,7 +66,7 @@ public class TVChapterDetails extends AestheticActivity {
                     .textColorSecondaryInverseRes(theme.isDark ? android.R.color.secondary_text_light : android.R.color.secondary_text_dark)
                     .colorAccent(theme.accent).apply();
         details.setCardBackgroundColor(theme.accent);
-        new CacheManager().portada(this, getIntent().getStringExtra("aid"), img);
+        CacheManager.portada(this, getIntent().getStringExtra("aid"), img);
         title.setText(getIntent().getStringExtra("title"));
         chapter.setText("Capítulo " + getIntent().getStringExtra("chapter"));
         info.setOnClickListener(new View.OnClickListener() {

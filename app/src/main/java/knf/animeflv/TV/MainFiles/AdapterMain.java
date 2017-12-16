@@ -42,7 +42,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
 
     @Override
     public void onBindViewHolder(final AdapterMain.ViewHolder holder, final int position) {
-        new CacheManager().portada(context, Animes.get(getP(holder, position)).getAid(), holder.cardView.getMainImageView());
+        CacheManager.portada(context, Animes.get(getP(holder, position)).getAid(), holder.cardView.getMainImageView());
         holder.cardView.setTitleText(Animes.get(getP(holder, position)).getTitulo());
         holder.cardView.setContentText(Animes.get(getP(holder, position)).getNumero());
 

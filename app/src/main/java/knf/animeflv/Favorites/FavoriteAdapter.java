@@ -174,7 +174,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 });
         } else if (h.getItemViewType() == FavotiteDB.TYPE_FAV) {
             final FavViewHolder holder = (FavViewHolder) h;
-            new CacheManager().mini(context, list.get(position).aid, holder.imageView);
+            CacheManager.mini(context, list.get(position).aid, holder.imageView);
             holder.name.setText(list.get(position).name);
             holder.name.setTextColor(theme.textColor);
             DesignUtils.setCardStyle(context, getItemCount(), getPosition(holder.getAdapterPosition(), position), holder.cardView, holder.separator, holder.imageView);

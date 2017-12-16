@@ -25,6 +25,11 @@
         </item>
     </style>
 
+    <style name="AppTheme.ClearAllStyle" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/md_red_800</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
     <style name="PopupMenu.TextAppearance.Small" parent="TextAppearance.AppCompat.Widget.PopupMenu.Small">
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>

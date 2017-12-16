@@ -56,7 +56,7 @@ public class AdapterRel extends RecyclerView.Adapter<AdapterRel.ViewHolder> {
         holder.card.setCardBackgroundColor(theme.card_normal);
         holder.tv_tit.setTextColor(theme.textColor);
         holder.tv_tipo.setTextColor(theme.accent);
-        new CacheManager().mini(context,aids[position],holder.iv_rel);
+        CacheManager.mini(context, aids[position], holder.iv_rel);
         holder.tv_tit.setText(titulosCard.get(position));
         holder.tv_tipo.setText(tiposCard.get(position));
         holder.card.setOnClickListener(new View.OnClickListener() {
