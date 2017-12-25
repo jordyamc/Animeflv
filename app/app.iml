@@ -238,7 +238,7 @@
     <orderEntry type="library" name="com.onesignal:OneSignal-3.6.2" level="project" />
     <orderEntry type="library" name="org.reactivestreams:reactive-streams:1.0.0@jar" level="project" />
     <orderEntry type="library" name="__local_aars__:C.\Users\Jordy\AppData\Local\Android\sdk1\build-tools\27.0.2\renderscript\lib\renderscript-v8.jar:unspecified@jar" level="project" />
-    <orderEntry type="library" name="io.branch.sdk.android:library-2.14.2" level="project" />
+    <orderEntry type="library" name="io.branch.sdk.android:library-2.14.3" level="project" />
     <orderEntry type="library" name="com.android.support:support-v13-26.1.0" level="project" />
     <orderEntry type="library" name="com.github.zawadz88:material-activity-chooser-0.2.1" level="project" />
     <orderEntry type="library" name="com.android.support:transition-26.1.0" level="project" />

@@ -4,7 +4,7 @@ import cfscrape
 
 app = Flask(__name__)
 
-# When localhost access through 'http://127.0.0.1:5000/api/v1/content?url=http://animeflv.net/ver/one-piece-1.html'
+# When localhost access through 'http://127.0.0.1:5000/api/v1/content?url=http://animeflv.net/ver/one-piece-1.baseLink'
 @app.route('/v1/content', methods=('get', 'post'))
 def get_tasks():
     page='null';
@@ -12,7 +12,7 @@ def get_tasks():
         url = request.args.get('url')
         type = request.args.get('type')
 
-        if type == 'html':
+        if type == 'baseLink':
             scraper = cfscrape.create_scraper()
             page = scraper.get(url).content
             return page

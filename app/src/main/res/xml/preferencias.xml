@@ -162,9 +162,15 @@
     <PreferenceCategory android:title="Descargas">
         <com.lb.material_preferences_library.custom_preferences.Preference
             android:defaultValue="0"
+            android:dependency="no_skip_check"
             android:key="def_download_serv"
             android:summary="%s"
-            android:title="Servidor de descarga preferido" />
+            android:title="Servidor de descarga preferido"/>
+        <com.lb.material_preferences_library.custom_preferences.SwitchPreference
+            android:defaultValue="true"
+            android:key="no_skip_check"
+            android:summary="Crear lista de descargas mas lento pero todos los servidores funcionaran"
+            android:title="Verificar servidores"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Sugerencias">
         <com.lb.material_preferences_library.custom_preferences.SwitchPreference

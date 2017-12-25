@@ -11,8 +11,8 @@ import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DIRECTORIO;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
-import knf.animeflv.JsonFactory.Objects.Server;
 import knf.animeflv.Utils.NetworkUtils;
+import knf.animeflv.VideoServers.Server;
 
 
 public class BaseGetter {
@@ -72,6 +72,12 @@ public class BaseGetter {
     public interface AsyncInterface {
         void onFinish(String json);
     }
+
+    /*public interface AsyncDownloadInterface {
+        void onFinish(@NonNull List<VideoServer> videoServers);
+
+        void onError(String error);
+    }*/
 
     public interface AsyncDownloadInterface {
         void onFinish(@NonNull List<Server> servers);
