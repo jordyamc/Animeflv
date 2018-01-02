@@ -21,7 +21,7 @@ public class BypassHolder {
 
     public static Map<String, String> getBasicCookieMap() {
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("mobile_detect", "computer");
+        map.put("device", "computer");
         if (isActive) {
             if (!valueDuid.equals(""))
                 map.put(cookieKeyDuid, valueDuid);
@@ -33,7 +33,7 @@ public class BypassHolder {
 
     public static Map<String, String> getBasicCookieMap(Context context) {
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("mobile_detect", "computer");
+        map.put("device", "computer");
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isBypassActive", false)) {
             String duid = PreferenceManager.getDefaultSharedPreferences(context).getString("bypassDuid", "");
             if (!duid.equals(""))

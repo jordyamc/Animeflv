@@ -265,8 +265,7 @@ public class DownloadGetter {
                                     context.runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            if (!materialDialog.isShowing())
-                                                materialDialog.show();
+                                            showDownload(context, eid, last_pos, videoServers, actionsInterface);
                                         }
                                     });
                                 }
