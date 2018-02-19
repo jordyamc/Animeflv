@@ -180,7 +180,7 @@ public class NetworkUtils {
                                                 Tcontext.startService(new Intent(Tcontext, UpdateService.class));
                                                 dialog.dismiss();
                                             } else {
-                                                context.startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse(context.getPackageName())));
+                                                context.startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + context.getPackageName())));
                                             }
                                         } else {
                                             Tcontext.startService(new Intent(Tcontext, UpdateService.class));

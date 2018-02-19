@@ -1,5 +1,6 @@
 package knf.animeflv.JsonFactory;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -821,6 +822,7 @@ public class SelfGetter {
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     public static void getAnime(final Context context, final ANIME anime, final BaseGetter.AsyncInterface asyncInterface) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -845,9 +847,7 @@ public class SelfGetter {
                         generos = gens.substring(0, gens.lastIndexOf(","));
                     String start = "Sin Fecha";
 
-                    String title = document.select("h1.Title").first().text();
-                    if (title.trim().equals("") || title.contains("protected"))
-                        title = document.select("meta[property='og:title']").attr("content").replace(" Online", "");
+                    String title = document.select("meta[property='og:title']").attr("content").replace(" Online", "");
                     String sinopsis = Parser.InValidateSinopsis(document.select("div.Description").first().select("p").first().text().trim());
                     JSONArray array = new JSONArray();
                     try {
