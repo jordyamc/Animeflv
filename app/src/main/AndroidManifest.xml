@@ -752,6 +752,14 @@
             android:name=".TV.TVChapterDetails"
             android:theme="@style/Theme.AppCompat.Translucent"/>
         <activity android:name=".TV.TVAnimeInfo"/>
+        <activity
+            android:name=".LoginActivity.MigrationActivity"
+            android:theme="@style/Theme.Transparent">
+            <intent-filter>
+                <action android:name="knf.kuma.MIGRATE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
