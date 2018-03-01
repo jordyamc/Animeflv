@@ -18,13 +18,13 @@ apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.2'
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "knf.animeflv"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 252
-        versionName "5.6"
+        versionCode 253
+        versionName "5.6.1"
         multiDexEnabled = true
     }
     buildTypes {
@@ -89,9 +89,9 @@ configurations.all {
         def requested = details.requested
         if (requested.group == 'com.android.support') {
             if (!requested.name.startsWith("multidex")) {
-                details.useVersion '26.1.0'
+                details.useVersion '27.1.0'
             }else {
-                details.useVersion '1.0.2'
+                details.useVersion '1.0.3'
             }
         }
     }
@@ -116,8 +116,8 @@ dependencies {
     implementation 'com.mikepenz:material-design-iconic-typeface:2.2.0.3@aar'
     implementation 'com.mikepenz:fontawesome-typeface:4.7.0.1@aar'
     implementation 'com.mikepenz:community-material-typeface:2.0.46.1@aar'
-    implementation 'com.afollestad.material-dialogs:core:0.9.4.6'
-    implementation 'com.afollestad.material-dialogs:commons:0.9.4.6'
+    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+    implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
     implementation 'com.afollestad:aesthetic:0.4.7'
     implementation 'jp.wasabeef:recyclerview-animators:2.2.3'
     implementation 'com.cleveroad:audiowidget:1.0.0'
@@ -131,14 +131,14 @@ dependencies {
     implementation 'com.shamanland:xdroid-toaster:0.3.0'
     implementation 'com.karumi:dexter:4.1.0'
     //Support
-    implementation "com.android.support:appcompat-v7:27.0.2"
-    implementation "com.android.support:support-core-ui:27.0.2"
-    implementation "com.android.support:leanback-v17:27.0.2"
-    implementation "com.android.support:recyclerview-v7:27.0.2"
-    implementation "com.android.support:cardview-v7:27.0.2"
-    implementation "com.android.support:design:27.0.2"
-    implementation "com.android.support:customtabs:27.0.2"
-    implementation 'com.android.support:support-vector-drawable:27.0.2'
+    implementation "com.android.support:appcompat-v7:27.1.0"
+    implementation "com.android.support:support-core-ui:27.1.0"
+    implementation "com.android.support:leanback-v17:27.1.0"
+    implementation "com.android.support:recyclerview-v7:27.1.0"
+    implementation "com.android.support:cardview-v7:27.1.0"
+    implementation "com.android.support:design:27.1.0"
+    implementation "com.android.support:customtabs:27.1.0"
+    implementation 'com.android.support:support-vector-drawable:27.1.0'
     //Support
     implementation 'com.jakewharton:butterknife:8.8.1'
     implementation 'com.squareup.picasso:picasso:2.5.2'
@@ -149,7 +149,7 @@ dependencies {
     implementation 'com.ogaclejapan.smarttablayout:utils-v4:1.6.1@aar'
     implementation 'com.github.AndroidDeveloperLB:MaterialPreferenceLibrary:+'
     implementation 'com.loopj.android:android-async-http:1.4.9'
-    implementation 'com.mani:ThinDownloadManager:1.2.5'
+    implementation 'com.mani:ThinDownloadManager:1.4.0'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.5'
     implementation 'com.heinrichreimersoftware:material-intro:1.6'
     implementation 'com.parse.bolts:bolts-android:1.+'
@@ -162,9 +162,9 @@ dependencies {
     implementation 'com.wdullaer:materialdatetimepicker:3.3.1'
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
     implementation 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
-    implementation 'com.dropbox.core:dropbox-core-sdk:3.0.5'
+    implementation 'com.dropbox.core:dropbox-core-sdk:3.0.6'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
-    implementation 'com.android.support:multidex:1.0.2'
+    implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.github.zawadz88:material-activity-chooser:0.2.1'
     implementation 'org.adw.library:discrete-seekbar:1.0.1'
     implementation "com.github.daniel-stoneuk:material-about-library:2.2.3"
@@ -180,7 +180,7 @@ dependencies {
     implementation 'org.zakariya.stickyheaders:stickyheaders:0.7.6'
     implementation 'com.github.captain-miao:optroundcardview:1.0.0'
     implementation 'com.makeramen:roundedimageview:2.3.0'
-    implementation 'com.evernote:android-job:1.2.0'
+    implementation 'com.evernote:android-job:1.2.1'
     implementation ('com.github.ViksaaSkool:AwesomeSplash:v1.0.0'){
         exclude module: 'CircularReveal'
     }
