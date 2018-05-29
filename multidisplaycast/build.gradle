@@ -1,13 +1,13 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 3
         versionName "2.01"
         /**
@@ -64,18 +64,18 @@ task deleteJar(type: Delete) {
 createJar.dependsOn(deleteJar, build)
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile files('libs/java-websocket-1.3.1.jar')
-    compile files('libs/javax.jmdns_3.4.1-patch2.jar')
-    compile files('libs/AmazonFling.jar')
-    compile files('libs/WhisperPlay.jar')
-    compile "com.android.support:support-v4:$project.g_apps"
-    compile "com.android.support:appcompat-v7:$project.g_apps"
-    compile "com.android.support:mediarouter-v7:$project.g_apps"
-    compile "com.android.support:design:$project.g_apps"
-    compile "com.google.android.gms:play-services-cast:$project.p_services"
-    compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'com.google.code.gson:gson:+'
-    compile 'com.github.munix:AndroidUtilities:1.6.0'
-    compile 'com.afollestad.material-dialogs:core:0.9.1.0'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation files('libs/java-websocket-1.3.1.jar')
+    implementation files('libs/javax.jmdns_3.4.1-patch2.jar')
+    implementation files('libs/AmazonFling.jar')
+    implementation files('libs/WhisperPlay.jar')
+    implementation "com.android.support:support-v4:$project.g_apps"
+    implementation "com.android.support:appcompat-v7:$project.g_apps"
+    implementation "com.android.support:mediarouter-v7:$project.g_apps"
+    implementation "com.android.support:design:$project.g_apps"
+    implementation "com.google.android.gms:play-services-cast:$project.p_services"
+    implementation 'com.github.bumptech.glide:glide:4.7.1'
+    implementation 'com.google.code.gson:gson:+'
+    implementation 'com.github.munix:AndroidUtilities:1.6.0'
+    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
 }

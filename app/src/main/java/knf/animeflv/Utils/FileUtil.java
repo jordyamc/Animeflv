@@ -210,17 +210,11 @@ public class FileUtil {
     public static void writeToFile(String body, File file) {
         FileOutputStream fos = null;
         try {
+            if (!file.exists())
+                file.createNewFile();
             fos = new FileOutputStream(file);
             fos.write(body.getBytes());
             fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            try {
-                file.createNewFile();
-                writeToFile(body, file);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }

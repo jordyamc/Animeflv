@@ -847,7 +847,8 @@ public class SelfGetter {
                         generos = gens.substring(0, gens.lastIndexOf(","));
                     String start = "Sin Fecha";
 
-                    String title = document.select("meta[property='og:title']").attr("content").replace(" Online", "");
+                    String title = document.select("meta[property='og:title']").attr("content");
+                    title = title.substring(0, title.lastIndexOf(" Online"));
                     String sinopsis = Parser.InValidateSinopsis(document.select("div.Description").first().select("p").first().text().trim());
                     JSONArray array = new JSONArray();
                     try {
@@ -1110,10 +1111,12 @@ public class SelfGetter {
                             if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_tags", false))
                                 try {
                                     Document tags = Jsoup.connect("https://animeflv.net/" + c.trim().toLowerCase() + "/" + e + "/" + d).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(10000).get();
+                                    StringBuilder builder = new StringBuilder();
                                     for (Element g : tags.select("nav.Nvgnrs").first().select("a")) {
-                                        gens += g.ownText().trim();
-                                        gens += ", ";
+                                        builder.append(g.ownText().trim())
+                                                .append(", ");
                                     }
+                                    gens = builder.toString();
                                     if (!gens.equals(""))
                                         f = gens.substring(0, gens.lastIndexOf(","));
                                     Log.e("Dir DEBUG", "Tags: " + f);

@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
@@ -71,12 +72,11 @@ public class NotificationsHelper {
             @Override
             public void run() {
                 try {
-                    Bitmap largeIcon = Glide.
+                    Bitmap largeIcon = ((BitmapDrawable) Glide.
                             with(context).
                             load(icon).
-                            asBitmap().
-                            into(100, 100).
-                            get();
+                            submit(100, 100).
+                            get()).getBitmap();
                     notification.setLargeIcon(largeIcon);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

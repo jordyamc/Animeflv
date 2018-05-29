@@ -130,17 +130,15 @@ public class DirectoryDB {
                 KEY_LID_D,
                 KEY_SID_E,
                 KEY_GENRES_F
-        }, KEY_GENRES_F + " LIKE ?", new String[]{"%" + query + "%"}, null, null, null);
-        if (c.getCount() > 0) {
-            while (c.moveToNext()) {
-                items.add(new DirectoryItem(
-                        c.getString(0),
-                        c.getString(1),
-                        c.getString(2),
-                        c.getString(3),
-                        c.getString(4),
-                        c.getString(5)));
-            }
+        }, KEY_GENRES_F + " LIKE '%" + query + "%'", null, null, null, null);
+        while (c.moveToNext()) {
+            items.add(new DirectoryItem(
+                    c.getString(0),
+                    c.getString(1),
+                    c.getString(2),
+                    c.getString(3),
+                    c.getString(4),
+                    c.getString(5)));
         }
         c.close();
         if (close)
@@ -419,6 +417,16 @@ public class DirectoryDB {
             this.lid = lid;
             this.sid = sid;
             this.genres = genres;
+        }
+
+        @Override
+        public int hashCode() {
+            return aid.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof DirectoryItem && ((DirectoryItem) obj).aid.equals(aid);
         }
     }
 }

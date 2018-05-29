@@ -7,6 +7,7 @@ import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -393,12 +394,12 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
     }
 
     private Handler getHandler() {
-        if (handler == null) handler = new Handler();
+        if (handler == null) handler = new Handler(Looper.getMainLooper());
         return handler;
     }
 
     private Handler getCancellableHandler() {
-        if (c_handler == null) c_handler = new Handler();
+        if (c_handler == null) c_handler = new Handler(Looper.getMainLooper());
         return c_handler;
     }
 

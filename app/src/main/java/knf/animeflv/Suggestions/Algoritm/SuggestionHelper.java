@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import knf.animeflv.Directorio.AnimeClass;
@@ -59,7 +60,14 @@ public class SuggestionHelper {
                     List<SuggestionDB.Suggestion> list = getGenresCount(context);
                     if (list.size() < 3) throw new IllegalStateException("List minor of 3");
                     Collections.sort(list, new SuggestionCompare());
-                    List<DirectoryDB.DirectoryItem> items = new DirectoryDB(context).getAllAnimesCGen(list.get(0).name, true);
+                    List<DirectoryDB.DirectoryItem> items = new ArrayList<>();
+                    items.addAll(new DirectoryDB(context).getAllAnimesCGen(list.get(0).name, true));
+                    items.addAll(new DirectoryDB(context).getAllAnimesCGen(list.get(1).name, true));
+                    items.addAll(new DirectoryDB(context).getAllAnimesCGen(list.get(2).name, true));
+                    HashSet<DirectoryDB.DirectoryItem> hashSet = new HashSet<>(items);
+                    items.clear();
+                    items.addAll(hashSet);
+                    Log.e("Suggestions", "From dir: " + items.size());
                     List<AnimeObject> finalList = PreferenceManager.getDefaultSharedPreferences(context).getString("sug_order", "0").equals("0") ? searchNew(context, list, items) : searchOld(context, list, items);
                     Log.e("Suggestions", "Found " + finalList.size() + " Animes");
                     suggestionCreate.onListCreated(finalList, list);
@@ -115,12 +123,22 @@ public class SuggestionHelper {
                     }
                 }
         }
+        Collections.sort(abc, new SuggestionNameCompare());
+        Collections.sort(ab, new SuggestionNameCompare());
+        Collections.sort(ac, new SuggestionNameCompare());
+        Collections.sort(bc, new SuggestionNameCompare());
+        Collections.sort(a_b_c, new SuggestionNameCompare());
         List<AnimeObject> finalList = new ArrayList<>();
-        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name, list.get(2).name), true, abc));
-        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name), true, ab));
-        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(2).name), true, ac));
-        finalList.add(new AnimeObject(getSuggestionGenres(list.get(1).name, list.get(2).name), true, bc));
-        finalList.add(new AnimeObject(getSuggestionGenresFinals(list.get(0).name, list.get(1).name, list.get(2).name), true, a_b_c));
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name, list.get(2).name), true, new ArrayList<AnimeObject>()));
+        finalList.addAll(abc);
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name), true, new ArrayList<AnimeObject>()));
+        finalList.addAll(ab);
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(2).name), true, new ArrayList<AnimeObject>()));
+        finalList.addAll(ac);
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(1).name, list.get(2).name), true, new ArrayList<AnimeObject>()));
+        finalList.addAll(bc);
+        finalList.add(new AnimeObject(getSuggestionGenresFinals(list.get(0).name, list.get(1).name, list.get(2).name), true, new ArrayList<AnimeObject>()));
+        finalList.addAll(a_b_c);
         return finalList;
     }
 
@@ -151,12 +169,22 @@ public class SuggestionHelper {
                     }
                 }
         }
+        Collections.sort(abc, new SuggestionNameCompare());
+        Collections.sort(ab, new SuggestionNameCompare());
+        Collections.sort(ac, new SuggestionNameCompare());
+        Collections.sort(bc, new SuggestionNameCompare());
+        Collections.sort(a_b_c, new SuggestionNameCompare());
         List<AnimeObject> finalList = new ArrayList<>();
-        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name, list.get(2).name), true, abc));
-        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name), true, ab));
-        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(2).name), true, ac));
-        finalList.add(new AnimeObject(getSuggestionGenres(list.get(1).name, list.get(2).name), true, bc));
-        finalList.add(new AnimeObject(getSuggestionGenresFinals(list.get(0).name, list.get(1).name, list.get(2).name), true, a_b_c));
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name, list.get(2).name), true, new ArrayList<AnimeObject>()));
+        finalList.addAll(abc);
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(1).name), true, new ArrayList<AnimeObject>()));
+        finalList.addAll(ab);
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(0).name, list.get(2).name), true, new ArrayList<AnimeObject>()));
+        finalList.addAll(ac);
+        finalList.add(new AnimeObject(getSuggestionGenres(list.get(1).name, list.get(2).name), true, new ArrayList<AnimeObject>()));
+        finalList.addAll(bc);
+        finalList.add(new AnimeObject(getSuggestionGenresFinals(list.get(0).name, list.get(1).name, list.get(2).name), true, new ArrayList<AnimeObject>()));
+        finalList.addAll(a_b_c);
         return finalList;
     }
 

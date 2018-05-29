@@ -405,7 +405,7 @@ public class DownloadGetter {
                 .autoDismiss(false)
                 .positiveText("iniciar")
                 .negativeText("atras")
-                .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
                     public boolean onSelection(MaterialDialog materialDialog, View view, final int i, CharSequence charSequence) {
                         if (cast) {

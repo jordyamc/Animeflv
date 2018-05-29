@@ -95,7 +95,6 @@ import knf.animeflv.LoginActivity.DropboxManager;
 import knf.animeflv.LoginActivity.LoginActivity;
 import knf.animeflv.LoginActivity.LoginServer;
 import knf.animeflv.PlayBack.CastPlayBackManager;
-import knf.animeflv.PlayBack.PlayBackManager;
 import knf.animeflv.Random.RandomActivity;
 import knf.animeflv.Recientes.MainOrganizer;
 import knf.animeflv.Recientes.Status;
@@ -1260,18 +1259,6 @@ public class newMain extends AppCompatActivity implements
         if (!isXLargeScreen()) {
             return;
         }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        PlayBackManager.get(this).addCallbacks();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        PlayBackManager.get(this).removeCallbacks();
     }
 
     @Override

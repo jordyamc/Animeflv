@@ -21,7 +21,7 @@ public class MegaServer extends Server {
 
     @Override
     public boolean isValid() {
-        return baseLink.contains("mega.nz");
+        return baseLink.contains("mega.nz") && !baseLink.contains("embed");
     }
 
     @Override

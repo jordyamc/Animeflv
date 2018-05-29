@@ -25,13 +25,10 @@ import knf.animeflv.CustomViews.TextViewExpandableAnimation;
 import knf.animeflv.JsonFactory.MALGetter;
 import knf.animeflv.Parser;
 import knf.animeflv.R;
-import knf.animeflv.Rate.RateDB;
-import knf.animeflv.Rate.RateHelper;
 import knf.animeflv.Recyclers.AdapterRel;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.AnimeDetail;
 import me.zhanghai.android.materialratingbar.MaterialRatingBar;
-import xdroid.toaster.Toaster;
 
 public class FragmentInfo extends Fragment {
     @BindView(R.id.info_descripcion)
@@ -135,8 +132,9 @@ public class FragmentInfo extends Fragment {
                 txt_generos.setText(animeDetail.getGeneros());
                 txt_debug.setText(aid);
                 ratingBar.setRating(animeDetail.getRate());
+                ratingBar.setIsIndicator(true);
                 txt_rate_count.setText(animeDetail.getRate_count());
-                ratingBar.setOnRatingChangeListener(new MaterialRatingBar.OnRatingChangeListener() {
+                /*ratingBar.setOnRatingChangeListener(new MaterialRatingBar.OnRatingChangeListener() {
                     @Override
                     public void onRatingChanged(MaterialRatingBar materialRatingBar, final float v) {
                         if (!RateDB.get(getActivity()).isRated(aid))
@@ -158,7 +156,7 @@ public class FragmentInfo extends Fragment {
                                 }
                             });
                     }
-                });
+                });*/
                 final String[] urls = parser.urlsRel(json);
                 if (urls.length == 0) {
                     rv_rel.setVisibility(View.GONE);

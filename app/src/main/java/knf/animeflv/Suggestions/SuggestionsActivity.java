@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -17,8 +18,6 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-
-import org.zakariya.stickyheaders.StickyHeaderLayoutManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -156,8 +155,9 @@ public class SuggestionsActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        SuggestionsAdapterSticky adapter = new SuggestionsAdapterSticky(SuggestionsActivity.this, animes);
-                        recyclerView.setLayoutManager(new StickyHeaderLayoutManager());
+                        SuggestionsAdapter adapter = new SuggestionsAdapter(SuggestionsActivity.this, animes);
+                        //recyclerView.setLayoutManager(new StickyHeaderLayoutManager());
+                        recyclerView.setLayoutManager(new LinearLayoutManager(SuggestionsActivity.this));
                         recyclerView.setAdapter(adapter);
                         dialog.dismiss();
                     }

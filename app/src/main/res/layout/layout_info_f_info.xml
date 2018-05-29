@@ -192,7 +192,7 @@
 
             <me.zhanghai.android.materialratingbar.MaterialRatingBar
                 android:id="@+id/rating_bar"
-                style="@style/Widget.MaterialRatingBar.RatingBar"
+                style="@style/Widget.MaterialRatingBar.RatingBar.Indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:mrb_progressTint="?attr/colorAccent"

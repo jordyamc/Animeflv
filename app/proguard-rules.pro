@@ -32,6 +32,7 @@
 -dontwarn com.mikepenz.materialdrawer.**
 -dontwarn com.mikepenz.fastadapter.**
 -dontwarn com.google.errorprone.annotations.**
+-dontwarn com.google.gson.Gson$6
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
 -keepattributes JavascriptInterface

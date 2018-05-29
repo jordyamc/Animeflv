@@ -23,8 +23,8 @@ android {
         applicationId "knf.animeflv"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 253
-        versionName "5.6.1"
+        versionCode 254
+        versionName "5.6.2"
         multiDexEnabled = true
     }
     buildTypes {
@@ -81,6 +81,7 @@ allprojects {
         maven {
             url "https://maven.google.com"
         }
+        google()
     }
 }
 
@@ -98,7 +99,6 @@ configurations.all {
 }
 
 dependencies {
-    def g_apps='26.1.0'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation('com.mikepenz:aboutlibraries:6.0.0@aar') {
         transitive = true
@@ -131,19 +131,19 @@ dependencies {
     implementation 'com.shamanland:xdroid-toaster:0.3.0'
     implementation 'com.karumi:dexter:4.1.0'
     //Support
-    implementation "com.android.support:appcompat-v7:27.1.0"
-    implementation "com.android.support:support-core-ui:27.1.0"
-    implementation "com.android.support:leanback-v17:27.1.0"
-    implementation "com.android.support:recyclerview-v7:27.1.0"
-    implementation "com.android.support:cardview-v7:27.1.0"
-    implementation "com.android.support:design:27.1.0"
-    implementation "com.android.support:customtabs:27.1.0"
-    implementation 'com.android.support:support-vector-drawable:27.1.0'
+    implementation "com.android.support:appcompat-v7:27.1.1"
+    implementation "com.android.support:support-core-ui:27.1.1"
+    implementation "com.android.support:leanback-v17:27.1.1"
+    implementation "com.android.support:recyclerview-v7:27.1.1"
+    implementation "com.android.support:cardview-v7:27.1.1"
+    implementation "com.android.support:design:27.1.1"
+    implementation "com.android.support:customtabs:27.1.1"
+    implementation 'com.android.support:support-vector-drawable:27.1.1'
     //Support
     implementation 'com.jakewharton:butterknife:8.8.1'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.squareup.okhttp:okhttp:2.4.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.squareup.okio:okio:1.13.0'
     implementation 'com.ogaclejapan.smarttablayout:library:1.6.1@aar'
     implementation 'com.ogaclejapan.smarttablayout:utils-v4:1.6.1@aar'
@@ -167,8 +167,8 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.github.zawadz88:material-activity-chooser:0.2.1'
     implementation 'org.adw.library:discrete-seekbar:1.0.1'
-    implementation "com.github.daniel-stoneuk:material-about-library:2.2.3"
-    implementation "com.google.android.gms:play-services-analytics:$project.p_services"
+    implementation "com.github.daniel-stoneuk:material-about-library:2.2.5"
+    implementation "com.google.android.gms:play-services-analytics:15.0.2"
     implementation "com.google.android.gms:play-services-location:$project.p_services"
     implementation "com.google.android.gms:play-services-iid:$project.p_services"
     implementation "com.google.android.gms:play-services-gcm:$project.p_services"
@@ -181,19 +181,23 @@ dependencies {
     implementation 'com.github.captain-miao:optroundcardview:1.0.0'
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.evernote:android-job:1.2.1'
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.3'
     implementation ('com.github.ViksaaSkool:AwesomeSplash:v1.0.0'){
         exclude module: 'CircularReveal'
     }
-    compile('io.branch.sdk.android:library:2.+') {
+    implementation('io.branch.sdk.android:library:2.+') {
         exclude module: 'answers-shim'
     }
-    compile('io.fabric.sdk.android:fabric:1.3.17@aar') {
+    implementation('com.crashlytics.sdk.android:answers:1.4.2@aar') {
         transitive = true
     }
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.3@aar') {
         transitive = true
     }
-    compile('com.zendesk:sdk:1.10.0.1@aar') {
+    implementation('com.zendesk:sdk:1.11.0.1@aar') {
+        transitive = true
+    }
+    implementation('io.fabric.sdk.android:fabric:1.4.3@aar') {
         transitive = true
     }
 }
