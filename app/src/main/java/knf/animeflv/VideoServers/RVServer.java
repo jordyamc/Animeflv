@@ -5,6 +5,9 @@ import android.support.annotation.Nullable;
 
 import org.jsoup.Jsoup;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import knf.animeflv.JsonFactory.Objects.Option;
 import knf.animeflv.JsonFactory.Objects.VideoServer;
 
@@ -19,14 +22,21 @@ public class RVServer extends Server {
         super(context, baseLink);
     }
 
-    @Override
-    public boolean isValid() {
-        return baseLink.contains("rapidvideo");
+    private static String getRapidLink(String link) {
+        Pattern pattern = Pattern.compile("\"(.*rapidvideo.*)\"");
+        Matcher matcher = pattern.matcher(link);
+        matcher.find();
+        return matcher.group(1);
     }
 
     @Override
     public String getName() {
         return VideoServer.Names.RV;
+    }
+
+    @Override
+    public boolean isValid() {
+        return baseLink.contains("rapidvideo") || baseLink.contains("&server=rv");
     }
 
     @Nullable
@@ -35,8 +45,9 @@ public class RVServer extends Server {
         try {
             String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
             String down_link = Jsoup.parse(frame).select("iframe").first().attr("src").replace("&q=720p", "");
+            if (down_link.contains("&server=rv"))
+                down_link = getRapidLink(Jsoup.connect(down_link).get().outerHtml()).replace("&q=720p", "");
             VideoServer videoServer = new VideoServer(RV);
-
             try {
                 String jsoup720 = Jsoup.connect(down_link + "&q=720p").get().select("video source").first().attr("src");
                 videoServer.addOption(new Option("720p", jsoup720));
