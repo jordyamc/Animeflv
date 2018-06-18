@@ -1039,7 +1039,7 @@ public class SelfGetter {
         Elements epis = document.select("ul.ListEpisodes").first().select("li");
         for (Element ep : epis) {
             JSONObject object = new JSONObject();
-            String name = ep.select("a").first().ownText().trim();
+            String name = ep.select("a").first().text().trim();
             String num = name.replace(title, "").trim();
             String s_id = ep.select("a").first().attr("href").split("/")[2];
             if (num.contains(":")) {

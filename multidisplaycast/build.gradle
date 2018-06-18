@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.3'
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
@@ -41,6 +40,7 @@ android {
 allprojects {
     repositories {
         jcenter()
+        google()
         maven {
             url "https://jitpack.io"
         }
