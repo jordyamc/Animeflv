@@ -36,12 +36,19 @@ public class Keys {
             file.mkdirs();
             return file;
         }
+
+        public static File getUpgradeFile() {
+            File file = new File(Dirs.CACHE, "Ukiku.apk");
+            file.mkdirs();
+            return file;
+        }
     }
 
     public static class Url {
         public static final String VERSION_INT = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version.html";
         public static final String VERSION_INT_TEST = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/version_test.html";
         public static final String UPDATE = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/app-release.apk";
+        public static final String UPGRADE = "https://github.com/jordyamc/UKIKU/raw/master/app/release/app-release.apk";
         public static final String SOUNDS = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/sounds/";
         public static final String SOUNDS_JSON = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/sounds.json";
         public static final String SOUNDS_JSON_BETA = "https://raw.githubusercontent.com/jordyamc/Animeflv/master/app/sounds-beta.json";

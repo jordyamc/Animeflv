@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.Directorio.DB.DirectoryDB;
@@ -39,6 +40,7 @@ import knf.animeflv.Directorio.DB.DirectoryHelper;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
+import knf.animeflv.JsonFactory.Objects.AnimeInfo;
 import knf.animeflv.JsonFactory.Objects.Option;
 import knf.animeflv.JsonFactory.Objects.VideoServer;
 import knf.animeflv.Parser;
@@ -1015,23 +1017,27 @@ public class SelfGetter {
         }
     }
 
+    private static Element findDataScript(Elements scripts) {
+        try {
+            for (Element element : scripts)
+                if (element.html().contains("var anime_info"))
+                    return element;
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private static void tryNewEpMethod(Document document, String aid, JSONArray array) throws Exception {
-        Elements epis = document.select("ul.ListCaps").first().select("li");
-        for (Element ep : epis) {
-            String link = ep.select("a").first().attr("href");
-            if (!link.trim().equals("#")) {
-                JSONObject object = new JSONObject();
-                String name = ep.select("a").first().select("p").first().ownText();
-                String num = name.substring(name.lastIndexOf(" ")).trim();
-                String s_id = ep.select("a").first().attr("href").split("/")[2];
-                if (num.contains(":")) {
-                    num = num.replace(" ", "").split(":")[0];
-                }
-                object.put("num", num);
-                object.put("eid", aid + "_" + num + "E");
-                object.put("sid", s_id);
-                array.put(object);
-            }
+        AnimeInfo info = new AnimeInfo(findDataScript(document.select("script[type=text/javascript]:not([src])")).html());
+        for (Map.Entry<String, String> entry : info.epMap.entrySet()) {
+            JSONObject object = new JSONObject();
+            String num = entry.getKey();
+            String s_id = entry.getValue();
+            object.put("num", num);
+            object.put("eid", aid + "_" + num + "E");
+            object.put("sid", s_id);
+            array.put(object);
         }
     }
 

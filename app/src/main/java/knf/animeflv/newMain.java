@@ -113,6 +113,7 @@ import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.Utils.TrackingHelper;
 import knf.animeflv.Utils.UpdateUtil;
+import knf.animeflv.Utils.UpgradeService;
 import knf.animeflv.Utils.UtilDialogPref;
 import knf.animeflv.Utils.UtilNotBlocker;
 import knf.animeflv.Utils.admin.adminListeners;
@@ -724,22 +725,6 @@ public class newMain extends AppCompatActivity implements
     }
 
     private void cambiarColor() {
-        /*int[] colorl = new int[]{
-                ColorsRes.GrisLigth(this),
-                ColorsRes.Prim(this)
-        };
-        ColorChooserDialog dialog = new ColorChooserDialog.Builder(this, R.string.color_chooser_prim)
-                .theme(ThemeUtils.isAmoled(this) ? Theme.DARK : Theme.LIGHT)
-                .customColors(colorl, null)
-                .dynamicButtonColor(true)
-                .allowUserColorInput(false)
-                .allowUserColorInputAlpha(false)
-                .doneButton(R.string.next)
-                .cancelButton(android.R.string.cancel)
-                .preselect(ThemeUtils.isAmoled(this) ? ColorsRes.Dark(this) : ColorsRes.Gris(this))
-                .accentMode(true)
-                .build();
-        dialog.show(this);*/
         startActivityForResult(new Intent(this, ThemeFragmentAdvanced.class), 6699);
     }
 
@@ -933,10 +918,42 @@ public class newMain extends AppCompatActivity implements
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                 startActivity(new Intent(newMain.this, ChangelogActivity.class));
                             }
+                        })
+                        .onAny(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                dialog.dismiss();
+                                checkUpgrade();
+                            }
                         }).build().show();
-            }
+            } else checkUpgrade();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void checkUpgrade() {
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("show_upgrade_sug", true) &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            new MaterialDialog.Builder(this)
+                    .title("UKIKU")
+                    .content("¿Deseas instalar la version mejorada de Animeflv App?")
+                    .positiveText("instalar")
+                    .negativeText("ignorar")
+                    .neutralText("despues")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            ContextCompat.startForegroundService(newMain.this, new Intent(newMain.this, UpgradeService.class));
+                            PreferenceManager.getDefaultSharedPreferences(newMain.this).edit().putBoolean("show_upgrade_sug", false).apply();
+                        }
+                    })
+                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            PreferenceManager.getDefaultSharedPreferences(newMain.this).edit().putBoolean("show_upgrade_sug", false).apply();
+                        }
+                    }).build().show();
         }
     }
 
