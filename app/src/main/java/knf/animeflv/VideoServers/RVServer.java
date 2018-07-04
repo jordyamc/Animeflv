@@ -8,6 +8,7 @@ import org.jsoup.Jsoup;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.JsonFactory.Objects.Option;
 import knf.animeflv.JsonFactory.Objects.VideoServer;
 
@@ -22,8 +23,15 @@ public class RVServer extends Server {
         super(context, baseLink);
     }
 
-    private static String getRapidLink(String link) {
+    private String getRapidLink(String link) {
         Pattern pattern = Pattern.compile("\"(.*rapidvideo.*)\"");
+        Matcher matcher = pattern.matcher(link);
+        matcher.find();
+        return matcher.group(1);
+    }
+
+    private String getRapidVideoLink(String link) {
+        Pattern pattern = Pattern.compile("\"(http.*\\.mp4)\"");
         Matcher matcher = pattern.matcher(link);
         matcher.find();
         return matcher.group(1);
@@ -44,26 +52,27 @@ public class RVServer extends Server {
     VideoServer getVideoServer() {
         try {
             String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-            String down_link = Jsoup.parse(frame).select("iframe").first().attr("src").replace("&q=720p", "");
+            String down_link = Jsoup.parse(frame).select("iframe").first().attr("src").replaceAll("&q=720p|&q=480p|&q=360p", "");
             if (down_link.contains("&server=rv"))
-                down_link = getRapidLink(Jsoup.connect(down_link).get().outerHtml()).replace("&q=720p", "");
+                down_link = getRapidLink(Jsoup.connect(down_link).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().outerHtml()).replace("&q=720p", "");
             VideoServer videoServer = new VideoServer(RV);
             try {
-                String jsoup720 = Jsoup.connect(down_link + "&q=720p").get().select("video source").first().attr("src");
+                String jsoup720 = getRapidVideoLink(Jsoup.connect(down_link + "&q=720p").get().html());
                 videoServer.addOption(new Option("720p", jsoup720));
             } catch (Exception e) {
+                e.printStackTrace();
             }
-
             try {
-                String jsoup480 = Jsoup.connect(down_link + "&q=480p").get().select("video source").first().attr("src");
+                String jsoup480 = getRapidVideoLink(Jsoup.connect(down_link + "&q=480p").get().html());
                 videoServer.addOption(new Option("480p", jsoup480));
             } catch (Exception e) {
+                e.printStackTrace();
             }
-
             try {
-                String jsoup360 = Jsoup.connect(down_link + "&q=360p").get().select("video source").first().attr("src");
+                String jsoup360 = getRapidVideoLink(Jsoup.connect(down_link + "&q=360p").get().html());
                 videoServer.addOption(new Option("360p", jsoup360));
             } catch (Exception e) {
+                e.printStackTrace();
             }
             if (videoServer.options.size() > 0)
                 return videoServer;

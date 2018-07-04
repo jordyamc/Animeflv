@@ -31,6 +31,7 @@
 -dontwarn io.codetail.animation.**
 -dontwarn com.mikepenz.materialdrawer.**
 -dontwarn com.mikepenz.fastadapter.**
+-dontwarn com.h6ah4i.android.widget.advrecyclerview.**
 -dontwarn com.google.errorprone.annotations.**
 -dontwarn com.google.gson.Gson$6
 -keepattributes *Annotation*

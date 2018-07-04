@@ -5,6 +5,10 @@ import android.support.annotation.Nullable;
 
 import org.jsoup.Jsoup;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.JsonFactory.Objects.Option;
 import knf.animeflv.JsonFactory.Objects.VideoServer;
 
@@ -35,13 +39,18 @@ public class FireServer extends Server {
         try {
             String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
             String func = Jsoup.parse(frame).select("iframe").first().attr("src");
-            //String download_link = func.substring(func.indexOf("open(\"") + 6, func.indexOf("\","));
-            String media_func = Jsoup.connect(func).get().select("script").last().outerHtml();
-            String download = Jsoup.connect(media_func.substring(media_func.indexOf("get('") + 5, media_func.indexOf("', function"))).get().select("div.download_link a").first().attr("href");
+            String media_func = Jsoup.connect(func).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().select("script").last().outerHtml();
+            String download = Jsoup.connect(extractMediaLink(media_func)).get().select("a[href~=http://download.*]").first().attr("href");
             return new VideoServer(FIRE, new Option(null, download));
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private String extractMediaLink(String html) {
+        Matcher matcher = Pattern.compile("www\\.mediafire[a-zA-Z0-a.=?/&%]+").matcher(html);
+        matcher.find();
+        return "https://" + matcher.group().replace("%2F", "/");
     }
 }

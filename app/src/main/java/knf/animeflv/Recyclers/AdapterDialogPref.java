@@ -148,22 +148,11 @@ public class AdapterDialogPref extends RecyclerView.Adapter<AdapterDialogPref.Vi
                     UtilSound.UpdateNotSound(pos);
                 }
                 break;
-            case 2:
-                if (!UtilSound.getAudioWidget().isShown()) {
-                    UtilSound.getAudioWidget().show(100, 100);
-                }
-                break;
         }
     }
 
     private void showHideWidget() {
-        if (!UtilSound.getCurrentMediaPlayer().isPlaying()) {
-            UtilSound.getAudioWidget().hide();
-            UtilSound.getAudioWidget().controller().stop();
-        } else {
-            UtilSound.getAudioWidget().show(100, 100);
-            UtilSound.getAudioWidget().controller().start();
-        }
+        //
     }
 
     private void checkRadios(int selected) {

@@ -12,14 +12,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.annotation.ArrayRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -806,32 +804,18 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
                 break;
             case Conf.INDICADOR_SONIDOS:
                 if (sharedPreferences.getString(key, "0").equals("0")) {
-                    if (UtilSound.getAudioWidget().isShown()) UtilSound.getAudioWidget().hide();
                     if (UtilSound.isNotSoundShow) {
                         UtilSound.NotManager().cancel(UtilSound.NOT_SOUND_ID);
                         UtilSound.isNotSoundShow = false;
                     }
                 }
                 if (sharedPreferences.getString(key, "0").equals("1")) {
-                    if (UtilSound.getAudioWidget().isShown()) UtilSound.getAudioWidget().hide();
                     UtilSound.toogleNotSound(UtilSound.getCurrentMediaPlayerInt());
                 }
                 if (sharedPreferences.getString(key, "0").equals("2")) {
                     if (UtilSound.isNotSoundShow) {
                         UtilSound.NotManager().cancel(UtilSound.NOT_SOUND_ID);
                         UtilSound.isNotSoundShow = false;
-                    }
-                    if (!UtilSound.getAudioWidget().isShown()) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            if (!Settings.canDrawOverlays(context)) {
-                                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));
-                                startActivityForResult(intent, 5260);
-                            } else {
-                                UtilSound.getAudioWidget().show(100, 100);
-                            }
-                        } else {
-                            UtilSound.getAudioWidget().show(100, 100);
-                        }
                     }
                 }
                 break;
@@ -975,10 +959,6 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
             }
 
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            if (requestCode == 5260 & Settings.canDrawOverlays(context)) {
-                UtilSound.getAudioWidget().show(100, 100);
-            }
     }
 
     @Override

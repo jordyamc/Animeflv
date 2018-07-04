@@ -4,19 +4,15 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
-
-import com.cleveroad.audiowidget.AudioWidget;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,7 +21,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 import xdroid.toaster.Toaster;
 
@@ -36,7 +31,6 @@ public class UtilSound {
     public static boolean isNotSoundShow = false;
     public static int NOT_SOUND_ID = 58984;
     private static Context context;
-    private static AudioWidget widget;
     private static int currentMediaPlayerInt = 0;
 
     public static void initial(Context context) {
@@ -126,131 +120,6 @@ public class UtilSound {
 
     public static void setCurrentMediaPlayer(MediaPlayer currentMediaPlayer) {
         UtilDialogPref.setPlayer(currentMediaPlayer);
-    }
-
-    public static AudioWidget getAudioWidget() {
-        if (widget == null) {
-            Drawable stop = context.getResources().getDrawable(R.drawable.stop);
-            widget = new AudioWidget.Builder(context)
-                    .pauseDrawable(stop)
-                    .darkColor(ThemeUtils.getAcentColor(context))
-                    .lightColor(ColorsRes.Prim(context))
-                    .expandWidgetColor(ThemeUtils.getAcentColor(context))
-                    .crossOverlappedColor(ColorsRes.Prim(context))
-                    .crossColor(ThemeUtils.getAcentColor(context))
-                    .shadowColor(ColorsRes.Prim(context))
-                    .build();
-            widget.controller().start();
-            widget.controller().albumCover(getAppIcon());
-            widget.controller().onWidgetStateChangedListener(new AudioWidget.OnWidgetStateChangedListener() {
-                @Override
-                public void onWidgetStateChanged(@NonNull AudioWidget.State state) {
-                    try {
-                        if (state == AudioWidget.State.REMOVED) {
-                            if (getCurrentMediaPlayer().isPlaying()) {
-                                getCurrentMediaPlayer().stop();
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onWidgetPositionChanged(int cx, int cy) {
-
-                }
-            });
-            widget.controller().onControlsClickListener(new AudioWidget.OnControlsClickListener() {
-                @Override
-                public boolean onPlaylistClicked() {
-                    return false;
-                }
-
-                @Override
-                public void onPreviousClicked() {
-                    int current = getCurrentMediaPlayerInt();
-                    current--;
-                    if (current < 0) {
-                        current = getSoundsNameList().length - 1;
-                    }
-                    Toaster.toast(getSoundName(current));
-                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sonido", String.valueOf(current)).apply();
-                    setCurrentMediaPlayerInt(current);
-                    getCurrentMediaPlayer().stop();
-                    setCurrentMediaPlayer(getMediaPlayer(context, current));
-                    getCurrentMediaPlayer().start();
-                }
-
-                @Override
-                public boolean onPlayPauseClicked() {
-                    try {
-                        if (getCurrentMediaPlayer().isPlaying()) {
-                            getCurrentMediaPlayer().stop();
-                            getAudioWidget().hide();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return false;
-                }
-
-                @Override
-                public void onNextClicked() {
-                    int current = getCurrentMediaPlayerInt();
-                    current++;
-                    if (current > getSoundsNameList().length) {
-                        current = 0;
-                    }
-                    Toaster.toast(getSoundName(current));
-                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("sonido", String.valueOf(current)).apply();
-                    setCurrentMediaPlayerInt(current);
-                    if (getCurrentMediaPlayer() != null)
-                    getCurrentMediaPlayer().stop();
-                    setCurrentMediaPlayer(getMediaPlayer(context, current));
-                    if (getCurrentMediaPlayer() != null)
-                    getCurrentMediaPlayer().start();
-                }
-
-                @Override
-                public void onAlbumClicked() {
-                    Intent configurations = new Intent(context, FastActivity.class);
-                    configurations.putExtra("key", FastActivity.OPEN_CONF_SOUNDS);
-                    configurations.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(configurations);
-                }
-
-                @Override
-                public void onPlaylistLongClicked() {
-
-                }
-
-                @Override
-                public void onPreviousLongClicked() {
-
-                }
-
-                @Override
-                public void onPlayPauseLongClicked() {
-
-                }
-
-                @Override
-                public void onNextLongClicked() {
-
-                }
-
-                @Override
-                public void onAlbumLongClicked() {
-                    widget.collapse();
-                }
-            });
-        }
-        return widget;
-    }
-
-    public static Drawable getAppIcon() {
-        return context.getResources().getDrawable(R.mipmap.ic_launcher);
     }
 
     public static Uri getSoundUri(int not) {
