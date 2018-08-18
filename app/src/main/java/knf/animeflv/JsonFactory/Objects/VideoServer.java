@@ -91,9 +91,11 @@ public class VideoServer {
         public static final String HYPERION = "Hyperion";
         public static final String OKRU = "Okru";
         public static final String CLUP = "Clup";
+        public static final String FENIX = "Fenix";
         public static final String FIRE = "Fire";
         public static final String RV = "RV";
         public static final String MP4UPLOAD = "Mp4Upload";
+        public static final String NATSUKI = "Natsuki";
         public static final String YOURUPLOAD = "YourUpload";
         public static final String ZIPPYSHARE = "Zippyshare";
         public static final String _4SYNC = "4Sync";
@@ -106,8 +108,10 @@ public class VideoServer {
                     IZANAGI,
                     HYPERION,
                     OKRU,
+                    FENIX,
                     FIRE,
                     RV,
+                    NATSUKI,
                     YOURUPLOAD,
                     ZIPPYSHARE,
                     MEGA,

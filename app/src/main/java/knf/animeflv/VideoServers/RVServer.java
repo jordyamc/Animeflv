@@ -14,14 +14,11 @@ import knf.animeflv.JsonFactory.Objects.VideoServer;
 
 import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.RV;
 
-/**
- * Created by Jordy on 24/12/2017.
- */
-
 public class RVServer extends Server {
     public RVServer(Context context, String baseLink) {
         super(context, baseLink);
     }
+
 
     private String getRapidLink(String link) {
         Pattern pattern = Pattern.compile("\"(.*rapidvideo.*)\"");
@@ -38,23 +35,23 @@ public class RVServer extends Server {
     }
 
     @Override
-    public String getName() {
-        return VideoServer.Names.RV;
-    }
-
-    @Override
     public boolean isValid() {
         return baseLink.contains("rapidvideo") || baseLink.contains("&server=rv");
     }
 
+    @Override
+    public String getName() {
+        return RV;
+    }
+
     @Nullable
     @Override
-    VideoServer getVideoServer() {
+    public VideoServer getVideoServer() {
         try {
             String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
             String down_link = Jsoup.parse(frame).select("iframe").first().attr("src").replaceAll("&q=720p|&q=480p|&q=360p", "");
             if (down_link.contains("&server=rv"))
-                down_link = getRapidLink(Jsoup.connect(down_link).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().outerHtml()).replace("&q=720p", "");
+                down_link = getRapidLink(Jsoup.connect(down_link).cookies(BypassHolder.getBasicCookieMap()).userAgent(BypassHolder.getUserAgent()).get().outerHtml()).replaceAll("&q=720p|&q=480p|&q=360p", "");
             VideoServer videoServer = new VideoServer(RV);
             try {
                 String jsoup720 = getRapidVideoLink(Jsoup.connect(down_link + "&q=720p").get().html());
@@ -78,6 +75,7 @@ public class RVServer extends Server {
                 return videoServer;
             return null;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

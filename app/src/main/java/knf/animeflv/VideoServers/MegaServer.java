@@ -3,12 +3,10 @@ package knf.animeflv.VideoServers;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
-import java.net.URLDecoder;
+import org.jsoup.Jsoup;
 
 import knf.animeflv.JsonFactory.Objects.Option;
 import knf.animeflv.JsonFactory.Objects.VideoServer;
-
-import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.MEGA;
 
 /**
  * Created by Jordy on 24/12/2017.
@@ -21,7 +19,7 @@ public class MegaServer extends Server {
 
     @Override
     public boolean isValid() {
-        return baseLink.contains("mega.nz") && !baseLink.contains("embed");
+        return baseLink.contains("server=mega");
     }
 
     @Override
@@ -33,7 +31,10 @@ public class MegaServer extends Server {
     @Override
     VideoServer getVideoServer() {
         try {
-            return new VideoServer(MEGA, new Option(null, URLDecoder.decode(baseLink, "utf-8")));
+            String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
+            String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+            String link = "https://mega.nz/#" + down_link.substring(down_link.lastIndexOf("!"));
+            return new VideoServer(getName(), new Option(null, link));
         } catch (Exception e) {
             return null;
         }

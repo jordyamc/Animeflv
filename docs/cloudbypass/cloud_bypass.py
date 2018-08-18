@@ -12,7 +12,7 @@ def get_tasks():
         url = request.args.get('url')
         type = request.args.get('type')
 
-        if type == 'baseLink':
+        if type == 'html':
             scraper = cfscrape.create_scraper()
             page = scraper.get(url).content
             return page

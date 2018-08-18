@@ -8,18 +8,16 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 
-import com.afollestad.aesthetic.Aesthetic;
-import com.afollestad.aesthetic.AestheticActivity;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 
 import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.Configuracion;
-import knf.animeflv.R;
 
-public class FastActivity extends AestheticActivity {
+public class FastActivity extends AppCompatActivity {
     public static final int STOP_SOUND = 1;
     public static final int OPEN_CONF_SOUNDS = 2;
     public static final int SHOW_DIALOG = 3;
@@ -28,11 +26,6 @@ public class FastActivity extends AestheticActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Aesthetic.get()
-                .activityTheme(R.style.Translucent)
-                .colorAccent(ThemeUtils.getAcentColor(this))
-                .isDark(true)
-                .apply();
         try {
             Bundle bundle = getIntent().getExtras();
             if (bundle != null) {

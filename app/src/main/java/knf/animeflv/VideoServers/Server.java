@@ -30,12 +30,14 @@ public abstract class Server implements Comparable<Server> {
 
     private static List<Server> getServers(Context context, String base) {
         return Arrays.asList(
+                new FenixServer(context, base),
                 new FireServer(context, base),
                 new HyperionServer(context, base),
                 new IzanagiServer(context, base),
                 new MegaServer(context, base),
                 new OkruServer(context, base),
                 new RVServer(context, base),
+                new NatsukiServer(context, base),
                 new YUServer(context, base),
                 new ZippyServer(context, base)
         );

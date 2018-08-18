@@ -49,7 +49,6 @@ import knf.animeflv.R;
 import knf.animeflv.Recientes.MainAnimeModel;
 import knf.animeflv.Seen.SeenManager;
 import knf.animeflv.StreamManager.StreamManager;
-import knf.animeflv.TV.TvUtils;
 import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.DesignUtils;
 import knf.animeflv.Utils.ExecutorManager;
@@ -103,7 +102,6 @@ public class AdapterMainNoGIF extends RecyclerView.Adapter<AdapterMainNoGIF.View
         holder.tv_num.setTextColor(theme.accent);
         holder.ib_ver.setColorFilter(theme.iconFilter);
         holder.ib_des.setColorFilter(theme.iconFilter);
-        TvUtils.setFocusable(context, holder.ib_ver, holder.ib_des);
         DesignUtils.setCardStyle(context, getItemCount(), getPosition(holder.getAdapterPosition(), position), holder.card, holder.separator, holder.iv_main);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
             holder.progressBar.getProgressDrawable().setColorFilter(theme.accent, PorterDuff.Mode.SRC_ATOP);

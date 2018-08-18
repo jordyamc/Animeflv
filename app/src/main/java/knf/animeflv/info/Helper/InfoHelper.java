@@ -6,10 +6,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
 import android.view.View;
 
-import knf.animeflv.TV.TVChapterDetails;
 import knf.animeflv.info.InfoFragments;
 
 /**
@@ -101,22 +99,9 @@ public class InfoHelper {
         }
     }
 
-    public static void open(Activity activity, Pair[] sharedItems, BundleItem... items) {
-
-        ActivityOptionsCompat compat = ActivityOptionsCompat.makeSceneTransitionAnimation(activity, sharedItems[0], sharedItems[1], sharedItems[2]);
-
-        Bundle bundleInfo = new Bundle();
-        for (BundleItem item : items) {
-            bundleInfo.putString(item.key, item.value);
-        }
-        Intent intent = new Intent(activity, TVChapterDetails.class);
-        intent.putExtras(bundleInfo);
-        activity.startActivity(intent, compat.toBundle());
-    }
-
     public static class BundleItem {
-        public static final String KEY_AID="aid";
-        public static final String KEY_TITLE="title";
+        public static final String KEY_AID = "aid";
+        public static final String KEY_TITLE = "title";
         public String key;
         public String value;
 

@@ -48,7 +48,6 @@ import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.CustomSettingsIntro.CustomIntro;
 import knf.animeflv.Jobs.CheckJob;
-import knf.animeflv.TV.TVMain;
 import knf.animeflv.Utils.NetworkUtils;
 import knf.animeflv.Utils.OnlineDataHelper;
 import knf.animeflv.Utils.ThemeUtils;
@@ -294,11 +293,7 @@ public class SplashHamnster extends AwesomeSplash {
     private void proceed() {
         if (getSharedPreferences("data", MODE_PRIVATE).getBoolean("intro", false)) {
             finish();
-            if (ThemeUtils.isTV(this) && PreferenceManager.getDefaultSharedPreferences(this).getBoolean("tv_layout", false)) {
-                startActivity(new Intent(this, TVMain.class));
-            } else {
-                startActivity(new Intent(this, newMain.class));
-            }
+            startActivity(new Intent(this, newMain.class));
         } else {
             finish();
             startActivity(new Intent(context, CustomIntro.class));
