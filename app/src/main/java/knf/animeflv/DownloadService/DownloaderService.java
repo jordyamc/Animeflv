@@ -6,7 +6,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -67,22 +66,14 @@ public class DownloaderService extends IntentService {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        startForeground(DOWNLOAD_NOTIFICATION_ID, getDownloadingBuilder().build());
-
-        return IntentService.START_REDELIVER_INTENT;
-    }
-
-    @Override
     protected void onHandleIntent(Intent intent) {
+        startForeground(DOWNLOAD_NOTIFICATION_ID, getDownloadingBuilder().build());
         int count = 0;
         long total = 0;
         long lenghtOfFile = -1;
         Bundle bundle = intent.getExtras();
         String eid = "error";
         try {
-            SharedPreferences preferences = getSharedPreferences("data", MODE_PRIVATE);
             eid = bundle.getString("eid");
             long downloadID = bundle.getLong("downloadID");
             if (new SQLiteHelperDownloads(this).getDownloadInfo(eid, true)._download_id != downloadID)
@@ -106,17 +97,8 @@ public class DownloaderService extends IntentService {
                 conection.setRequestProperty("Referer", bundle.getString("referer"));
                 conection.setRequestProperty("User-Agent", bundle.getString("useragent"));
             }
-            /*total=intent.getLongExtra("count",0);
-            if (total>0)
-                conection.setRequestProperty("Range", "bytes=" + total + "-");*/
             conection.connect();
             lenghtOfFile = conection.getContentLength();
-            /*if (total>0){
-                lenghtOfFile=intent.getLongExtra("total",-1);
-                Log.e("Download Resume","Total: "+lenghtOfFile+"\nNormal: "+intent.getLongExtra("total",-1));
-            }else {
-                Log.e("Download Normal", "Total: "+lenghtOfFile);
-            }*/
             if (lenghtOfFile > getAvailableSpace())
                 throw new NoSpaceException(null);
             InputStream input = conection.getInputStream();
@@ -124,7 +106,7 @@ public class DownloaderService extends IntentService {
             byte data[] = new byte[1024 * 6];
             int prog = 0;
             while ((count = input.read(data)) != -1) {
-                if (preferences.getLong(eid + "_downloadID", -1) != downloadID)
+                if (getSharedPreferences("data", MODE_PRIVATE).getLong(eid + "_downloadID", -1) != downloadID)
                     throw new DownloadCanceledException(String.valueOf(downloadID));
                 if (!NetworkUtils.isNetworkAvailable())
                     throw new NoInternetFoundException(null);
@@ -152,6 +134,7 @@ public class DownloaderService extends IntentService {
             FileUtil.init(this).DeleteAnime(eid);
             DownloadListManager.delete(this, eid + "_" + bundle.getLong("downloadID"));
             new SQLiteHelperDownloads(this).delete(eid).close();
+            stop();
         } catch (NoInternetException nie) {
             Log.e("DownloadService", nie.getMessage());
             onDownloadFailed(eid, intent, total, lenghtOfFile, CAUSE_INTERNET);
@@ -321,6 +304,7 @@ public class DownloaderService extends IntentService {
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_FAILED).delete(eid);
         showNotification(getDownloadID(eid), builder);
         sendBroadcast(new Intent(RECEIVER_ACTION_ERROR));
+        stop();
     }
 
     private boolean retryFromCause(String cause) {
@@ -350,6 +334,16 @@ public class DownloaderService extends IntentService {
         return manager;
     }
 
+    private void stop() {
+        try {
+            stopForeground(true);
+            stopSelf();
+            getManager().cancel(DOWNLOAD_NOTIFICATION_ID);
+        } catch (Exception e) {
+            //
+        }
+    }
+
     private void onSuccess(String eid) {
         DownloadListManager.delete(this, eid + "_" + getSharedPreferences("data", MODE_PRIVATE).getLong(eid + "_downloadID", -1));
         String title = DirectoryHelper.get(this).getTitle(eid.replace("E", "").split("_")[0]);
@@ -369,6 +363,7 @@ public class DownloaderService extends IntentService {
         }
         showNotification(getDownloadID(eid), builder);
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_SUCCESSFUL).delete(eid);
+        stop();
     }
 
     @Override

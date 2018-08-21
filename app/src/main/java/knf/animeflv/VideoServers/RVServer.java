@@ -54,19 +54,19 @@ public class RVServer extends Server {
                 down_link = getRapidLink(Jsoup.connect(down_link).cookies(BypassHolder.getBasicCookieMap()).userAgent(BypassHolder.getUserAgent()).get().outerHtml()).replaceAll("&q=720p|&q=480p|&q=360p", "");
             VideoServer videoServer = new VideoServer(RV);
             try {
-                String jsoup720 = getRapidVideoLink(Jsoup.connect(down_link + "&q=720p").get().html());
+                String jsoup720 = getRapidVideoLink(Jsoup.connect(down_link + "&q=720p#").data("block", "1").post().html());
                 videoServer.addOption(new Option("720p", jsoup720));
             } catch (Exception e) {
                 e.printStackTrace();
             }
             try {
-                String jsoup480 = getRapidVideoLink(Jsoup.connect(down_link + "&q=480p").get().html());
+                String jsoup480 = getRapidVideoLink(Jsoup.connect(down_link + "&q=480p#").data("block", "1").post().html());
                 videoServer.addOption(new Option("480p", jsoup480));
             } catch (Exception e) {
                 e.printStackTrace();
             }
             try {
-                String jsoup360 = getRapidVideoLink(Jsoup.connect(down_link + "&q=360p").get().html());
+                String jsoup360 = getRapidVideoLink(Jsoup.connect(down_link + "&q=360p#").data("block", "1").post().html());
                 videoServer.addOption(new Option("360p", jsoup360));
             } catch (Exception e) {
                 e.printStackTrace();

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 
 import knf.animeflv.DManager;
 import knf.animeflv.Directorio.DB.DirectoryHelper;
@@ -50,7 +51,7 @@ public class ExternalManager {
                 .addElement(new DownloadObject(downloadID, url, eid))
                 .updateState(eid, DownloadManager.STATUS_PENDING)
                 .close();
-        context.startService(intent);
+        ContextCompat.startForegroundService(context, intent);
     }
 
     public void startDownload(String eid, String url, CookieConstructor constructor) {
@@ -72,7 +73,7 @@ public class ExternalManager {
                 .addElement(new DownloadObject(downloadID, url, eid))
                 .updateState(eid, DownloadManager.STATUS_PENDING)
                 .close();
-        context.startService(intent);
+        ContextCompat.startForegroundService(context, intent);
     }
 
     public void cancelDownload(String eid) {

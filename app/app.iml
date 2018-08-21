@@ -254,5 +254,7 @@
     <orderEntry type="library" name="Gradle: com.android.support:multidex:1.0.3@aar" level="project" />
     <orderEntry type="module" module-name="library" />
     <orderEntry type="module" module-name="multidisplaycast" />
+    <orderEntry type="module" module-name="library" />
+    <orderEntry type="module" module-name="multidisplaycast" />
   </component>
 </module>

@@ -33,6 +33,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.Directorio.DB.DirectoryDB;
@@ -836,8 +838,18 @@ public class SelfGetter {
                     String aid = imgUrl.substring(imgUrl.lastIndexOf("/") + 1, imgUrl.lastIndexOf("."));
                     String tid = document.select("div.Ficha").first().select("div.Container").first().select("span").first().attr("class");
                     String state = getState(document.select("aside.SidebarA.BFixed").first().select("p").last().attr("class"));
-                    String rate_stars = document.select("meta[itemprop='ratingValue']").first().attr("content");
-                    String rate_count = document.select("meta[itemprop='ratingCount']").first().attr("content");
+                    String rate_stars;
+                    String rate_count;
+                    try {
+                        rate_stars = document.select("span.vtprmd").first().text();
+                    } catch (Exception e) {
+                        rate_stars = "0.0";
+                    }
+                    try {
+                        rate_count = document.select("span#votes_nmbr").first().text();
+                    } catch (Exception e) {
+                        rate_count = "0";
+                    }
                     Elements categories = document.select("nav.Nvgnrs").first().select("a");
                     String generos = "";
                     String gens = "";
@@ -848,9 +860,10 @@ public class SelfGetter {
                     if (!gens.trim().equals(""))
                         generos = gens.substring(0, gens.lastIndexOf(","));
                     String start = "Sin Fecha";
-
                     String title = document.select("meta[property='og:title']").attr("content");
-                    title = title.substring(0, title.lastIndexOf(" Online"));
+                    Matcher matcher = Pattern.compile("^ ?V?e?r? ?A?n?i?m?e? ?(.+ ?O?n?l?i?n?e?) Online").matcher(title);
+                    matcher.find();
+                    title = matcher.group(1).trim();
                     String sinopsis = Parser.InValidateSinopsis(document.select("div.Description").first().select("p").first().text().trim());
                     JSONArray array = new JSONArray();
                     try {
