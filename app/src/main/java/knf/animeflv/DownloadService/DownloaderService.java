@@ -134,7 +134,6 @@ public class DownloaderService extends IntentService {
             FileUtil.init(this).DeleteAnime(eid);
             DownloadListManager.delete(this, eid + "_" + bundle.getLong("downloadID"));
             new SQLiteHelperDownloads(this).delete(eid).close();
-            stop();
         } catch (NoInternetException nie) {
             Log.e("DownloadService", nie.getMessage());
             onDownloadFailed(eid, intent, total, lenghtOfFile, CAUSE_INTERNET);
@@ -304,7 +303,6 @@ public class DownloaderService extends IntentService {
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_FAILED).delete(eid);
         showNotification(getDownloadID(eid), builder);
         sendBroadcast(new Intent(RECEIVER_ACTION_ERROR));
-        stop();
     }
 
     private boolean retryFromCause(String cause) {
@@ -363,7 +361,6 @@ public class DownloaderService extends IntentService {
         }
         showNotification(getDownloadID(eid), builder);
         new SQLiteHelperDownloads(this).updateState(eid, DownloadManager.STATUS_SUCCESSFUL).delete(eid);
-        stop();
     }
 
     @Override
@@ -371,6 +368,7 @@ public class DownloaderService extends IntentService {
         stopForeground(true);
         getManager().cancel(DOWNLOAD_NOTIFICATION_ID);
         new SQLiteHelperDownloads(this).reset();
+        stopSelf();
         super.onDestroy();
     }
 }
