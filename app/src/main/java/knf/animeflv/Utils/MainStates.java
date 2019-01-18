@@ -5,13 +5,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.widget.ImageButton;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import knf.animeflv.Utils.eNums.DownloadTask;
-import knf.animeflv.WaitList.WaitDBHelper;
 import pl.droidsonroids.gif.GifImageButton;
 
 /**
@@ -111,98 +105,5 @@ public class MainStates {
 
     public static boolean isProcessing() {
         return isprocessing;
-    }
-
-    public List<String> getGlobalWaitList() {
-        Set<String> set = preferences.getStringSet("GlobalWaiting", new HashSet<String>());
-        List<String> list = new ArrayList<>();
-        list.addAll(set);
-        return list;
-    }
-
-    public List<String> getWaitList(String aid) {
-        Set<String> set = preferences.getStringSet(aid + "waiting", new HashSet<String>());
-        List<String> list = new ArrayList<>();
-        list.addAll(set);
-        return list;
-    }
-
-    public void UpdateWaitList(String key, List<WaitDBHelper.WaitObject> list) {
-        Set<String> set = new HashSet<>();
-        for (WaitDBHelper.WaitObject object : list) {
-            set.add(object.aid);
-        }
-        preferences.edit().putStringSet(key, set).apply();
-    }
-
-    public void UpdateWaitList(String key, List<String> list, @Nullable String i) {
-        Set<String> set = new HashSet<>();
-        set.addAll(list);
-        preferences.edit().putStringSet(key, set).apply();
-    }
-
-    public void addToWaitList(String eid) {
-        try {
-            String[] data = eid.replace("E", "").split("_");
-            String key = data[0] + "waiting";
-            Set<String> set = preferences.getStringSet(key, new HashSet<String>());
-            List<String> list = new ArrayList<>();
-            list.addAll(set);
-            if (!list.contains(data[1])) {
-                list.add(data[1]);
-                UpdateWaitList(key, list, null);
-            }
-            set = preferences.getStringSet("GlobalWaiting", new HashSet<String>());
-            list.clear();
-            list.addAll(set);
-            if (!list.contains(data[0])) {
-                list.add(data[0]);
-                UpdateWaitList("GlobalWaiting", list, null);
-            }
-            new WaitDBHelper(context).addToList(eid);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void delFromWaitList(String eid) {
-        try {
-            String[] data = eid.replace("E", "").split("_");
-            String key = data[0] + "waiting";
-            Set<String> set = preferences.getStringSet(key, new HashSet<String>());
-            List<String> list = new ArrayList<>();
-            list.addAll(set);
-            if (list.contains(data[1])) {
-                list.remove(list.indexOf(data[1]));
-                UpdateWaitList(key, list, null);
-            }
-            if (list.isEmpty()) {
-                set = preferences.getStringSet("GlobalWaiting", new HashSet<String>());
-                list.clear();
-                list.addAll(set);
-                list.remove(list.indexOf(data[0]));
-                UpdateWaitList("GlobalWaiting", list, null);
-            }
-            new WaitDBHelper(context).delFromList(eid);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void delFromGlobalWaitList(String aid) {
-        Set<String> set = preferences.getStringSet("GlobalWaiting", new HashSet<String>());
-        List<String> list = new ArrayList<>();
-        list.addAll(set);
-        if (list.contains(aid)) {
-            list.remove(list.indexOf(aid));
-            UpdateWaitList("GlobalWaiting", list, null);
-            list.clear();
-            UpdateWaitList(aid + "waiting", list, null);
-        }
-    }
-
-    public boolean WaitContains(String eid) {
-        String[] data = eid.replace("E", "").split("_");
-        return getGlobalWaitList().contains(data[0]) && getWaitList(data[0]).contains(data[1]);
     }
 }

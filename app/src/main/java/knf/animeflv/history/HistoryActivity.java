@@ -7,11 +7,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.RecyclerViewSwipeManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,6 +28,7 @@ public class HistoryActivity extends AppCompatActivity implements HistoryAdapter
     LinearLayout no_data;
     @BindView(R.id.img_no_data)
     ImageView img_no_data;
+    private HistoryAdapter adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,10 +47,21 @@ public class HistoryActivity extends AppCompatActivity implements HistoryAdapter
                 finish();
             }
         });
-        RecyclerViewSwipeManager swipeMgr = new RecyclerViewSwipeManager();
+        adapter = new HistoryAdapter(this);
+        ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                adapter.onRemoved(viewHolder.getAdapterPosition());
+            }
+        });
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(swipeMgr.createWrappedAdapter(new HistoryAdapter(this)));
-        swipeMgr.attachRecyclerView(recyclerView);
+        recyclerView.setAdapter(adapter);
+        helper.attachToRecyclerView(recyclerView);
         img_no_data.setImageResource(ThemeUtils.getFlatImage(this));
         checkList();
     }

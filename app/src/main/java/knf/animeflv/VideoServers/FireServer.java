@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.JsonFactory.Objects.Option;
 import knf.animeflv.JsonFactory.Objects.VideoServer;
+import knf.animeflv.Utils.KUtilsKt;
 
 import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.FIRE;
 
@@ -37,8 +38,7 @@ public class FireServer extends Server {
     @Override
     VideoServer getVideoServer() {
         try {
-            String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-            String func = Jsoup.parse(frame).select("iframe").first().attr("src");
+            String func = KUtilsKt.extractLink(baseLink);
             String media_func = Jsoup.connect(func).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().select("script").last().outerHtml();
             String download = Jsoup.connect(extractMediaLink(media_func)).get().select("a[href~=http://download.*]").first().attr("href");
             return new VideoServer(FIRE, new Option(null, download));

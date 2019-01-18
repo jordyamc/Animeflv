@@ -1,1 +1,2 @@
-include ':app', ':multidisplaycast', ':library'
+include ':app', ':multidisplaycast', ':advrecyclerview'
+project(':advrecyclerview').projectDir = new File('library')

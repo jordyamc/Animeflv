@@ -1,24 +1,25 @@
 package knf.animeflv.Favorites;
 
 import android.content.Intent;
-import android.graphics.drawable.NinePatchDrawable;
+import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,9 +28,6 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
-import com.h6ah4i.android.widget.advrecyclerview.decoration.ItemShadowDecorator;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
 
 import org.cryse.widget.persistentsearch.HomeButton;
 import org.cryse.widget.persistentsearch.PersistentSearchView;
@@ -69,8 +67,6 @@ public class FavoriteMain extends AppCompatActivity implements FavoriteAdapter.L
     @BindView(R.id.txt_no_data)
     TextView txt_no_data;
 
-    private RecyclerViewDragDropManager dragDropManager;
-    private RecyclerView.Adapter wraped;
     private FavoriteAdapter adapter;
 
     private boolean cloud_updated = false;
@@ -208,31 +204,83 @@ public class FavoriteMain extends AppCompatActivity implements FavoriteAdapter.L
         }
     }
 
-    private void setAdapter(FavoriteAdapter favoriteAdapter) {
+    private void setAdapter(final FavoriteAdapter favoriteAdapter) {
         try {
-            dragDropManager = new RecyclerViewDragDropManager();
-            dragDropManager.setInitiateOnLongPress(true);
-            dragDropManager.setInitiateOnMove(false);
-            dragDropManager.setDraggingItemShadowDrawable(
-                    (NinePatchDrawable) ContextCompat.getDrawable(this, R.drawable.material_shadow_z3));
+            final ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+                private ThemeUtils.Theme theme = ThemeUtils.Theme.create(FavoriteMain.this);
+                private boolean first = true;
+                private boolean last = false;
+
+                @Override
+                public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                    favoriteAdapter.onMoveItem(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                    return true;
+                }
+
+                @Override
+                public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+                }
+
+                @Override
+                public int getDragDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                    if (viewHolder.getAdapterPosition() == 0 || adapter.list.get(viewHolder.getAdapterPosition()).isSection)
+                        return 0;
+                    return ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+                }
+
+                @Override
+                public boolean canDropOver(RecyclerView recyclerView, RecyclerView.ViewHolder current, RecyclerView.ViewHolder target) {
+                    return target.getAdapterPosition() != 0;
+                }
+
+                @Override
+                public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                    FavoriteAdapter.FavViewHolder holder = (FavoriteAdapter.FavViewHolder) viewHolder;
+                    if (first) {
+                        ViewPropertyAnimator animator = holder.cardView.animate();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            holder.cardView.setCardElevation(8);
+                            animator.start();
+                        } else {
+                            holder.cardView.setCardBackgroundColor(theme.accent);
+                            holder.name.setTextColor(ColorsRes.Blanco(FavoriteMain.this));
+                        }
+                        first = false;
+                    }
+                    if (last) {
+                        ViewPropertyAnimator animator = holder.cardView.animate();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            holder.cardView.setCardElevation(1);
+                            animator.start();
+                        } else {
+                            holder.cardView.setCardBackgroundColor(theme.card_normal);
+                            holder.name.setTextColor(theme.textColor);
+                        }
+                        last = false;
+                        first = true;
+                    }
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                }
+
+                @Override
+                public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                    super.clearView(recyclerView, viewHolder);
+                    last = true;
+                }
+            });
             adapter = favoriteAdapter;
-            wraped = dragDropManager.createWrappedAdapter(favoriteAdapter);
-            final DraggableItemAnimator animator = new DraggableItemAnimator();
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     recyclerView.setLayoutManager(new LinearLayoutManager(FavoriteMain.this));
-                    recyclerView.setAdapter(wraped);
-                    recyclerView.setItemAnimator(animator);
+                    recyclerView.setAdapter(adapter);
                     if (ThemeUtils.isTablet(FavoriteMain.this)) {
                         recyclerView.setPadding(0, (int) Parser.toPx(FavoriteMain.this, 10), 0, Keys.getNavBarSize(FavoriteMain.this));
                         recyclerView.setClipToPadding(false);
                     }
                     try {
-                        if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
-                            recyclerView.addItemDecoration(new ItemShadowDecorator((NinePatchDrawable) ContextCompat.getDrawable(FavoriteMain.this, R.drawable.material_shadow_z1)));
-                        }
-                        dragDropManager.attachRecyclerView(recyclerView);
+                        helper.attachToRecyclerView(recyclerView);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

@@ -1,25 +1,25 @@
 package knf.animeflv.AutoEmision;
 
-import android.graphics.drawable.NinePatchDrawable;
+import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-
-import com.h6ah4i.android.widget.advrecyclerview.animator.DraggableItemAnimator;
-import com.h6ah4i.android.widget.advrecyclerview.decoration.ItemShadowDecorator;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
 
 import org.json.JSONObject;
 
@@ -28,6 +28,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import knf.animeflv.ColorsRes;
 import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.OfflineGetter;
 import knf.animeflv.JsonFactory.SelfGetter;
@@ -44,8 +45,6 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
     LinearLayout no_data;
     @BindView(R.id.img_no_data)
     ImageView no_data_img;
-    private RecyclerViewDragDropManager dragDropManager;
-    private RecyclerView.Adapter wraped;
     private AutoEmisionAdapter adapter;
     private EmisionRemoveListener listener;
 
@@ -91,26 +90,68 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
     private void setRecycler(final List<EmObj> list, int day) {
         try {
             AutoEmisionListHolder.setList(day, list);
-            dragDropManager = new RecyclerViewDragDropManager();
-            dragDropManager.setInitiateOnLongPress(true);
-            dragDropManager.setInitiateOnMove(false);
-            dragDropManager.setDraggingItemShadowDrawable(
-                    (NinePatchDrawable) ContextCompat.getDrawable(getContext(), R.drawable.material_shadow_z3));
+            final ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+                private ThemeUtils.Theme theme = ThemeUtils.Theme.create(getContext());
+                private boolean first = true;
+                private boolean last = false;
+
+                @Override
+                public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                    adapter.onMoveItem(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                    return true;
+                }
+
+                @Override
+                public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+                }
+
+                @Override
+                public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                    AutoEmisionAdapter.ViewHolder holder = (AutoEmisionAdapter.ViewHolder) viewHolder;
+                    if (first) {
+                        ViewPropertyAnimator animator = holder.cardView.animate();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            holder.cardView.setCardElevation(8);
+                            animator.start();
+                        } else {
+                            holder.cardView.setCardBackgroundColor(theme.accent);
+                            holder.state.setColorFilter(theme.card_normal);
+                            holder.title.setTextColor(ColorsRes.Blanco(getContext()));
+                        }
+                        first = false;
+                    }
+                    if (last) {
+                        ViewPropertyAnimator animator = holder.cardView.animate();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            holder.cardView.setCardElevation(1);
+                            animator.start();
+                        } else {
+                            holder.cardView.setCardBackgroundColor(theme.card_normal);
+                            holder.state.setColorFilter(theme.accent);
+                            holder.title.setTextColor(theme.textColor);
+                        }
+                        last = false;
+                        first = true;
+                    }
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                }
+
+                @Override
+                public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                    super.clearView(recyclerView, viewHolder);
+                    last = true;
+                }
+            });
             adapter = new AutoEmisionAdapter(getActivity(), list, day, AutoEmisionFragment.this);
-            wraped = dragDropManager.createWrappedAdapter(adapter);
-            final DraggableItemAnimator animator = new DraggableItemAnimator();
-            getActivity().runOnUiThread(new Runnable() {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         progressBar.setVisibility(View.GONE);
                         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                        recyclerView.setAdapter(wraped);
-                        recyclerView.setItemAnimator(animator);
-                        if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
-                            recyclerView.addItemDecoration(new ItemShadowDecorator((NinePatchDrawable) ContextCompat.getDrawable(getContext(), R.drawable.material_shadow_z1)));
-                        }
-                        dragDropManager.attachRecyclerView(recyclerView);
+                        recyclerView.setAdapter(adapter);
+                        helper.attachToRecyclerView(recyclerView);
                         if (list.size() == 0) {
                             no_data_img.setImageResource(ThemeUtils.getFlatImage(getActivity()));
                             no_data.setVisibility(View.VISIBLE);
@@ -128,6 +169,7 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
     private void startVerification(final List<EmObj> list, final int day) {
         new AsyncTask<Void, Void, Void>() {
             private boolean edited = false;
+
             @Override
             protected Void doInBackground(Void... params) {
                 try {
@@ -187,17 +229,10 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
 
     @Override
     public void onDestroyView() {
-        if (dragDropManager != null) {
-            dragDropManager.release();
-            dragDropManager = null;
-        }
         if (recyclerView != null) {
             recyclerView.setAdapter(null);
             recyclerView.setItemAnimator(null);
             recyclerView = null;
-        }
-        if (wraped != null) {
-            wraped = null;
         }
         super.onDestroyView();
     }

@@ -10,12 +10,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.captain_miao.optroundcardview.OptRoundCardView;
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemAdapter;
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.SwipeableItemConstants;
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultAction;
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionDefault;
-import com.h6ah4i.android.widget.advrecyclerview.swipeable.action.SwipeResultActionRemoveItem;
-import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractSwipeableItemViewHolder;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import org.json.JSONArray;
@@ -29,22 +23,23 @@ import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
 
 
-public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> implements SwipeableItemAdapter<HistoryAdapter.ViewHolder> {
+public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
     HistoryAdapterInterface historyInterface;
     private Activity activity;
     private JSONArray jsonArray;
     private ThemeUtils.Theme theme;
+
     public HistoryAdapter(Activity activity) {
         this.activity = activity;
         jsonArray = HistoryHelper.getHistoryArray(activity);
-        historyInterface = (HistoryAdapterInterface)activity;
+        historyInterface = (HistoryAdapterInterface) activity;
         theme = ThemeUtils.Theme.create(activity);
         setHasStableIds(true);
     }
 
     @Override
     public long getItemId(int position) {
-        return Long.parseLong(HistoryHelper.getAidFrom(jsonArray,position));
+        return Long.parseLong(HistoryHelper.getAidFrom(jsonArray, position));
     }
 
     @Override
@@ -65,8 +60,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         holder.card.setCardBackgroundColor(theme.card_normal);
         holder.tv_tit.setTextColor(theme.textColor);
         holder.tv_current.setTextColor(theme.accent);
-        holder.tv_tit.setText(HistoryHelper.getTitFrom(jsonArray,holder.getAdapterPosition()));
-        holder.tv_current.setText(HistoryHelper.getLastFrom(jsonArray,holder.getAdapterPosition()));
+        holder.tv_tit.setText(HistoryHelper.getTitFrom(jsonArray, holder.getAdapterPosition()));
+        holder.tv_current.setText(HistoryHelper.getLastFrom(jsonArray, holder.getAdapterPosition()));
         CacheManager.mini(activity, HistoryHelper.getAidFrom(jsonArray, holder.getAdapterPosition()), holder.img);
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,8 +69,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                 InfoHelper.open(
                         activity,
                         new InfoHelper.SharedItem(holder.img, "img"),
-                        new InfoHelper.BundleItem("aid", HistoryHelper.getAidFrom(jsonArray,holder.getAdapterPosition())),
-                        new InfoHelper.BundleItem("title", HistoryHelper.getTitFrom(jsonArray,holder.getAdapterPosition())),
+                        new InfoHelper.BundleItem("aid", HistoryHelper.getAidFrom(jsonArray, holder.getAdapterPosition())),
+                        new InfoHelper.BundleItem("title", HistoryHelper.getTitFrom(jsonArray, holder.getAdapterPosition())),
                         new InfoHelper.BundleItem("position", HistoryHelper.getLastNumFrom(jsonArray, holder.getAdapterPosition()))
                 );
             }
@@ -86,33 +81,17 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         return holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition();
     }
 
-    @Override
-    public SwipeResultAction onSwipeItem(ViewHolder holder, int position, int result) {
-        if (result == Swipeable.RESULT_CANCELED) {
-            return new SwipeResultActionDefault();
-        } else {
-            return new OnRemove(this, position, historyInterface);
-        }
-    }
-
-    @Override
-    public int onGetSwipeReactionType(ViewHolder holder, int position, int x, int y) {
-        return Swipeable.REACTION_CAN_SWIPE_BOTH_H;
-    }
-
-    @Override
-    public void onSetSwipeBackground(ViewHolder holder, int position, int type) {
-
-    }
-
-    interface Swipeable extends SwipeableItemConstants {
+    public void onRemoved(int position) {
+        jsonArray = HistoryHelper.delFromList(jsonArray, position, activity);
+        notifyItemRemoved(position);
+        historyInterface.onDelete();
     }
 
     public interface HistoryAdapterInterface {
         void onDelete();
     }
 
-    public static class ViewHolder extends AbstractSwipeableItemViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.card)
         public OptRoundCardView card;
         @BindView(R.id.img)
@@ -133,30 +112,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("use_space", false))
                 img.setPadding(0, 0, 0, 0);
             DesignUtils.setCardSpaceStyle(context, card);
-        }
-
-        @Override
-        public View getSwipeableContainerView() {
-            return card;
-        }
-    }
-
-    static class OnRemove extends SwipeResultActionRemoveItem {
-        private HistoryAdapter adapter;
-        private int position;
-        private HistoryAdapterInterface adapterInterface;
-
-        public OnRemove(HistoryAdapter adapter, int position, HistoryAdapterInterface adapterInterface) {
-            this.adapter = adapter;
-            this.position = position;
-            this.adapterInterface = adapterInterface;
-        }
-
-        @Override
-        protected void onPerformAction() {
-            adapter.jsonArray = HistoryHelper.delFromList(adapter.jsonArray,position,adapter.activity);
-            adapter.notifyItemRemoved(position);
-            adapterInterface.onDelete();
         }
     }
 

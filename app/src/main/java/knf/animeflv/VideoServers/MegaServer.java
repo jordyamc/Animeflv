@@ -7,6 +7,7 @@ import org.jsoup.Jsoup;
 
 import knf.animeflv.JsonFactory.Objects.Option;
 import knf.animeflv.JsonFactory.Objects.VideoServer;
+import knf.animeflv.Utils.KUtilsKt;
 
 /**
  * Created by Jordy on 24/12/2017.
@@ -31,8 +32,7 @@ public class MegaServer extends Server {
     @Override
     VideoServer getVideoServer() {
         try {
-            String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-            String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+            String down_link = KUtilsKt.extractLink(baseLink);
             String link = "https://mega.nz/#" + down_link.substring(down_link.lastIndexOf("!"));
             return new VideoServer(getName(), new Option(null, link));
         } catch (Exception e) {

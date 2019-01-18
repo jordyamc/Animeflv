@@ -19,10 +19,6 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.captain_miao.optroundcardview.OptRoundCardView;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemConstants;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange;
-import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
@@ -38,9 +34,9 @@ import knf.animeflv.Utils.DesignUtils;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
 
-public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements DraggableItemAdapter<RecyclerView.ViewHolder> {
+public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Activity context;
-    private List<FavObject> list = new ArrayList<>();
+    List<FavObject> list = new ArrayList<>();
     private boolean moving = false;
     private boolean sectionsEnabled = false;
     private boolean editing = false;
@@ -225,15 +221,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     }
                 }
             });
-            final int dragState = holder.getDragStateFlags();
-            if (((dragState & FavoriteAdapter.Draggable.STATE_FLAG_IS_UPDATED) != 0)) {
-                if ((dragState & FavoriteAdapter.Draggable.STATE_FLAG_IS_ACTIVE) != 0) {
-                    holder.cardView.setCardBackgroundColor(theme.accent);
-                    holder.name.setTextColor(ColorsRes.Blanco(context));
-                } else {
-                    holder.cardView.setCardBackgroundColor(theme.card_normal);
-                }
-            }
         }
     }
 
@@ -253,17 +240,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         searching = s;
     }
 
-    @Override
-    public boolean onCheckCanStartDrag(RecyclerView.ViewHolder holder, int position, int x, int y) {
-        return (!list.get(holder.getAdapterPosition()).isSection) && !moving && sectionsEnabled && !searching;
-    }
-
-    @Override
-    public ItemDraggableRange onGetItemDraggableRange(RecyclerView.ViewHolder holder, int position) {
-        return new ItemDraggableRange(1, list.size() - 1);
-    }
-
-    @Override
     public void onMoveItem(final int fromPosition, final int toPosition) {
         if (fromPosition != toPosition && !list.get(fromPosition).isSection) {
             moving = true;
@@ -303,12 +279,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-
-    @Override
-    public boolean onCheckCanDrop(int draggingPosition, int dropPosition) {
-        return dropPosition != 0;
-    }
-
     @Override
     public long getItemId(int position) {
         return list.get(position).id;
@@ -329,14 +299,11 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         });
     }
 
-    private interface Draggable extends DraggableItemConstants {
-    }
-
     interface ListListener {
         void onListCreated(List<FavObject> list, @Nullable String search);
     }
 
-    public static class FavViewHolder extends AbstractDraggableItemViewHolder {
+    public static class FavViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.card)
         OptRoundCardView cardView;
         @BindView(R.id.img)
@@ -355,7 +322,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public static class SectionViewHolder extends AbstractDraggableItemViewHolder {
+    public static class SectionViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.header_text)
         TextView name;
         @BindView(R.id.selectable)

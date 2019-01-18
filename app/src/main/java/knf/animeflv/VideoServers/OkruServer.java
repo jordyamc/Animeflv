@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.JsonFactory.Objects.Option;
 import knf.animeflv.JsonFactory.Objects.VideoServer;
+import knf.animeflv.Utils.KUtilsKt;
 
 import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.OKRU;
 
@@ -39,8 +40,7 @@ public class OkruServer extends Server {
     @Override
     VideoServer getVideoServer() {
         try {
-            String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-            String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+            String down_link = KUtilsKt.extractLink(baseLink);
             String true_link = extractOkruLink(Jsoup.connect(down_link).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().select("script").last().html());
             String e_json = Jsoup.connect(true_link).get().select("div[data-module='OKVideo']").first().attr("data-options");
             String cut_json = "{" + e_json.substring(e_json.lastIndexOf("\\\"videos"), e_json.indexOf(",\\\"metadataEmbedded")).replace("\\&quot;", "\"").replace("\\u0026", "&").replace("\\", "").replace("%3B", ";") + "}";

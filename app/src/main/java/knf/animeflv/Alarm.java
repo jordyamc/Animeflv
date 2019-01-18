@@ -20,7 +20,7 @@ public class Alarm extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "notifications");
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Animeflv:notifications");
         wl.acquire(10000);
         Boolean not = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
         if (not) {
@@ -70,7 +70,7 @@ public class Alarm extends BroadcastReceiver {
 
     public void StartAlarm(Context context) {
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Animeflv:");
         wl.acquire(10000);
         Boolean not = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("notificaciones", true);
         if (not) {

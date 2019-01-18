@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.github.captain_miao.optroundcardview.OptRoundCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/card"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:layout_marginBottom="3dp"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp"
-    android:layout_marginTop="3dp"
-    android:clickable="true"
-    android:foreground="?android:attr/selectableItemBackground"
-    app:optRoundCardCornerRadius="5dp"
-    app:optRoundCardElevation="8dp"
-    app:optRoundCardPreventCornerOverlap="false"
-    app:optRoundCardUseCompatPadding="false">
+                                                           xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                           android:id="@+id/card"
+                                                           android:layout_width="match_parent"
+                                                           android:layout_height="wrap_content"
+                                                           android:layout_gravity="center_horizontal"
+                                                           android:layout_marginLeft="10dp"
+                                                           android:layout_marginTop="3dp"
+                                                           android:layout_marginRight="10dp"
+                                                           android:layout_marginBottom="3dp"
+                                                           android:clickable="true"
+                                                           android:foreground="?android:attr/selectableItemBackground"
+                                                           app:optRoundCardCornerRadius="5dp"
+                                                           app:optRoundCardElevation="1dp"
+                                                           app:optRoundCardPreventCornerOverlap="false"
+                                                           app:optRoundCardUseCompatPadding="false">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,7 +26,8 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:alpha="0.2"
-            android:background="@color/negro" />
+            android:background="@color/negro"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -39,7 +40,7 @@
                 android:cropToPadding="true"
                 android:padding="5dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_block_r" />
+                android:src="@drawable/ic_block_r"/>
 
             <TextView
                 android:id="@+id/title"
@@ -51,11 +52,11 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:maxLines="1"
-                android:paddingLeft="5dp"
                 android:paddingStart="5dp"
+                android:paddingLeft="5dp"
                 android:scrollHorizontally="true"
                 android:text="Título"
-                android:textColor="#4d4d4d" />
+                android:textColor="#4d4d4d"/>
 
         </LinearLayout>
     </LinearLayout>

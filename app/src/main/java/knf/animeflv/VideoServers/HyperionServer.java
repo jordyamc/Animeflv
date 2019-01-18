@@ -10,6 +10,7 @@ import org.jsoup.Jsoup;
 import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.JsonFactory.Objects.Option;
 import knf.animeflv.JsonFactory.Objects.VideoServer;
+import knf.animeflv.Utils.KUtilsKt;
 
 import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.HYPERION;
 
@@ -35,8 +36,7 @@ public class HyperionServer extends Server {
     @Nullable
     @Override
     VideoServer getVideoServer() {
-        String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-        String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+        String down_link = KUtilsKt.extractLink(baseLink);
         try {
             JSONArray array = new JSONObject(Jsoup.connect(down_link.replace("embed_hyperion", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getJSONArray("streams");
             VideoServer videoServer = new VideoServer(HYPERION);

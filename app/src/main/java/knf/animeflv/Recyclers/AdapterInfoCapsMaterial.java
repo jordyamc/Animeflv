@@ -92,20 +92,13 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
         if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
             showDelete(holder.ib_des);
             showPlay(holder.ib_ver);
-            if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition())))
-                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
         } else {
             if (ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
                 showDelete(holder.ib_des);
                 showPlay(holder.ib_ver);
-            } else if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                if (CastPlayBackManager.get(context).getCastingEid().equals(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                    showDownload(holder.ib_des);
-                    showCastPlay(holder.ib_ver);
-                } else {
-                    showCloudPlay(holder.ib_ver);
-                    holder.ib_des.setImageResource(R.drawable.ic_waiting);
-                }
+            } else if (CastPlayBackManager.get(context).getCastingEid().equals(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
+                showDownload(holder.ib_des);
+                showCastPlay(holder.ib_ver);
             } else {
                 showCloudPlay(holder.ib_ver);
                 showDownload(holder.ib_des);
@@ -132,60 +125,36 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                         Toaster.toast("Actualizacion descargada, instalar para continuar");
                     } else {
                         if (!MainStates.isProcessing()) {
-                            if (!MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                                if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition())) && !ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                                    showLoading(holder.ib_des);
-                                    searchDownload(holder);
-                                } else {
-                                    final String item = capitulo.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).replace("Capítulo ", "").trim();
-                                    MaterialDialog borrar = new MaterialDialog.Builder(context)
-                                            .title("Eliminar")
-                                            .titleGravity(GravityEnum.CENTER)
-                                            .content("Desea eliminar el capitulo " + item + "?")
-                                            .positiveText("Eliminar")
-                                            .negativeText("Cancelar")
-                                            .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                                @Override
-                                                public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
-                                                    FileUtil.init(context).DeleteAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
-                                                    showDownload(holder.ib_des);
-                                                    showCloudPlay(holder.ib_ver);
-                                                    ManageDownload.cancel(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
-                                                    Toast.makeText(context, "Archivo Eliminado", Toast.LENGTH_SHORT).show();
-                                                }
-                                            })
-                                            .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                                @Override
-                                                public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
-                                                    materialDialog.dismiss();
-                                                }
-                                            })
-                                            .build();
-                                    borrar.show();
-                                }
+                            if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition())) && !ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
+                                showLoading(holder.ib_des);
+                                searchDownload(holder);
                             } else {
-                                String[] data = eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).replace("E", "").split("_");
-                                String aid = data[0];
-                                String num = data[1];
-                                new MaterialDialog.Builder(context)
-                                        .content(
-                                                "El capitulo " + num +
-                                                        " de " + DirectoryHelper.get(context).getTitle(aid) +
-                                                        " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
-                                        .autoDismiss(true)
-                                        .positiveText("Continuar")
+                                final String item = capitulo.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).replace("Capítulo ", "").trim();
+                                MaterialDialog borrar = new MaterialDialog.Builder(context)
+                                        .title("Eliminar")
+                                        .titleGravity(GravityEnum.CENTER)
+                                        .content("Desea eliminar el capitulo " + item + "?")
+                                        .positiveText("Eliminar")
                                         .negativeText("Cancelar")
                                         .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
                                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                                             @Override
-                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
-                                                showLoading(holder.ib_des);
-                                                searchDownload(holder);
+                                            public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                                FileUtil.init(context).DeleteAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
+                                                showDownload(holder.ib_des);
+                                                showCloudPlay(holder.ib_ver);
+                                                ManageDownload.cancel(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
+                                                Toast.makeText(context, "Archivo Eliminado", Toast.LENGTH_SHORT).show();
                                             }
                                         })
-                                        .build().show();
+                                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                            @Override
+                                            public void onClick(@NonNull MaterialDialog materialDialog, @NonNull DialogAction dialogAction) {
+                                                materialDialog.dismiss();
+                                            }
+                                        })
+                                        .build();
+                                borrar.show();
                             }
                         } else {
                             toast("Procesando...");
@@ -202,45 +171,16 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                         Toaster.toast("Actualizacion descargada, instalar para continuar");
                     } else {
                         if (!MainStates.isProcessing()) {
-                            if (!MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                                if (CastPlayBackManager.get(context).isCasting(eids.get(getPosition(holder, position)))) {
-                                    CastControlsActivity.open(context, theme.accent);
-                                } else if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                                    holder.tv_capitulo.setTextColor(getColor());
-                                    StreamManager.Play(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
-                                } else if (ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                                    Toaster.toast("Descarga en proceso");
-                                } else {
-                                    showLoading(holder.ib_des);
-                                    searchStream(holder);
-                                }
+                            if (CastPlayBackManager.get(context).isCasting(eids.get(getPosition(holder, position)))) {
+                                CastControlsActivity.open(context, theme.accent);
+                            } else if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
+                                holder.tv_capitulo.setTextColor(getColor());
+                                StreamManager.Play(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
+                            } else if (ManageDownload.isDownloading(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
+                                Toaster.toast("Descarga en proceso");
                             } else {
-                                String[] data = eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).replace("E", "").split("_");
-                                String aid = data[0];
-                                String num = data[1];
-                                new MaterialDialog.Builder(context)
-                                        .content(
-                                                "El capitulo " + num +
-                                                        " de " + DirectoryHelper.get(context).getTitle(aid) +
-                                                        " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
-                                        .autoDismiss(true)
-                                        .positiveText("Continuar")
-                                        .negativeText("Cancelar")
-                                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                            @Override
-                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
-                                                if (FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                                                    holder.tv_capitulo.setTextColor(getColor());
-                                                    StreamManager.Play(context, eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
-                                                } else {
-                                                    showLoading(holder.ib_des);
-                                                    searchStream(holder);
-                                                }
-                                            }
-                                        })
-                                        .build().show();
+                                showLoading(holder.ib_des);
+                                searchStream(holder);
                             }
                         }
                     }
@@ -263,48 +203,19 @@ public class AdapterInfoCapsMaterial extends RecyclerView.Adapter<AdapterInfoCap
                 }
             }
         });
-        holder.card.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                if (!MainStates.isListing()) {
-                    if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                        if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                            MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
-                            showDownload(holder.ib_des);
-                        } else {
-                            MainStates.init(context).addToWaitList(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
-                            holder.ib_des.setImageResource(R.drawable.ic_waiting);
-                        }
-                    }
-                }
-                return true;
-            }
-        });
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    if (!MainStates.isListing()) {
-                        if (!FileUtil.init(context).isInSeen(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                            FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()), true);
-                            holder.tv_capitulo.setTextColor(getColor());
-                        } else {
-                            FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()), false);
-                            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
-                                holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.blanco));
-                            } else {
-                                holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
-                            }
-                        }
+                    if (!FileUtil.init(context).isInSeen(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
+                        FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()), true);
+                        holder.tv_capitulo.setTextColor(getColor());
                     } else {
-                        if (!FileUtil.init(context).ExistAnime(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                            if (MainStates.init(context).WaitContains(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()))) {
-                                MainStates.init(context).delFromWaitList(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
-                                showDownload(holder.ib_des);
-                            } else {
-                                MainStates.init(context).addToWaitList(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()));
-                                holder.ib_des.setImageResource(R.drawable.ic_waiting);
-                            }
+                        FileUtil.init(context).setSeenState(eids.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()), false);
+                        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("is_amoled", false)) {
+                            holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.blanco));
+                        } else {
+                            holder.tv_capitulo.setTextColor(context.getResources().getColor(R.color.black));
                         }
                     }
                 } catch (Exception e) {

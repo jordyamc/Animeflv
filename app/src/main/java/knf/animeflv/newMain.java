@@ -118,7 +118,6 @@ import knf.animeflv.Utils.UtilDialogPref;
 import knf.animeflv.Utils.UtilNotBlocker;
 import knf.animeflv.Utils.admin.adminListeners;
 import knf.animeflv.Utils.objects.User;
-import knf.animeflv.WaitList.WaitList;
 import knf.animeflv.history.HistoryActivity;
 import xdroid.toaster.Toaster;
 
@@ -506,7 +505,6 @@ public class newMain extends AppCompatActivity implements
                         new PrimaryDrawerItem().withName("Aleatorio").withIcon(MaterialDesignIconic.Icon.gmi_shuffle).withIdentifier(11),
                         new PrimaryDrawerItem().withName("Explorador").withIcon(MaterialDesignIconic.Icon.gmi_folder).withIdentifier(9),
                         new PrimaryDrawerItem().withName("Historial").withIcon(MaterialDesignIconic.Icon.gmi_eye).withIdentifier(10),
-                        new PrimaryDrawerItem().withName("En espera").withIcon(MaterialDesignIconic.Icon.gmi_assignment_returned).withIdentifier(4),
                         new PrimaryDrawerItem().withName("Acerca de").withIcon(CommunityMaterial.Icon.cmd_information_outline).withIdentifier(20)
                         //new PrimaryDrawerItem().withName("Publicidad").withIcon(MaterialDesignIconic.Icon.gmi_cloud).withIdentifier(8)
                 )
@@ -528,11 +526,6 @@ public class newMain extends AppCompatActivity implements
                                 break;
                             case 3:
                                 startActivity(new Intent(context, AutoEmisionActivity.class));
-                                result.setSelection(0, false);
-                                result.closeDrawer();
-                                break;
-                            case 4:
-                                startActivity(new Intent(context, WaitList.class));
                                 result.setSelection(0, false);
                                 result.closeDrawer();
                                 break;

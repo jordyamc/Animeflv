@@ -24,6 +24,8 @@ public class ListFragment extends Fragment implements FavSyncAdapter.ListCountIn
     @BindView(R.id.img_no_data)
     ImageView img_no_data;
 
+    private FavSyncAdapter adapter;
+
     public ListFragment() {
     }
 
@@ -38,8 +40,9 @@ public class ListFragment extends Fragment implements FavSyncAdapter.ListCountIn
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.layout_fragment_sync, container, false);
         ButterKnife.bind(this, view);
+        adapter=new FavSyncAdapter(getContext(), getArguments().getInt("type"), this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new FavSyncAdapter(getContext(), getArguments().getInt("type"), this));
+        recyclerView.setAdapter(adapter);
         img_no_data.setImageResource(ThemeUtils.getFlatImage(getContext()));
         return view;
     }

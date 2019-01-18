@@ -9,6 +9,7 @@ import org.jsoup.Jsoup;
 import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.JsonFactory.Objects.Option;
 import knf.animeflv.JsonFactory.Objects.VideoServer;
+import knf.animeflv.Utils.KUtilsKt;
 
 import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.NATSUKI;
 
@@ -31,8 +32,7 @@ public class NatsukiServer extends Server {
     @Override
     public VideoServer getVideoServer() {
         try {
-            String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-            String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
+            String down_link = KUtilsKt.extractLink(baseLink);
             String link = new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).cookies(BypassHolder.getBasicCookieMap()).userAgent(BypassHolder.getUserAgent()).get().body().text()).getString("file");
             return new VideoServer(NATSUKI, new Option(null, link));
         } catch (Exception e) {

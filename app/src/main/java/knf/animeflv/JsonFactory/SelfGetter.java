@@ -43,28 +43,14 @@ import knf.animeflv.JsonFactory.JsonTypes.ANIME;
 import knf.animeflv.JsonFactory.JsonTypes.DOWNLOAD;
 import knf.animeflv.JsonFactory.JsonTypes.INICIO;
 import knf.animeflv.JsonFactory.Objects.AnimeInfo;
-import knf.animeflv.JsonFactory.Objects.Option;
 import knf.animeflv.JsonFactory.Objects.VideoServer;
 import knf.animeflv.Parser;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.FileUtil;
+import knf.animeflv.Utils.KUtilsKt;
 import knf.animeflv.VideoServers.Server;
-import knf.animeflv.WaitList.AdapterWait;
-import knf.animeflv.WaitList.WaitDownloadElement;
-import xdroid.toaster.Toaster;
-
-import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.CLUP;
-import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.FIRE;
-import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.HYPERION;
-import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.IZANAGI;
-import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.MEGA;
-import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.MINHATECA;
-import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.MP4UPLOAD;
-import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.OKRU;
-import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.RV;
-import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.YOTTA;
-import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.YOURUPLOAD;
-import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.ZIPPYSHARE;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 public class SelfGetter {
     public static final int TIMEOUT = 10000;
@@ -127,49 +113,6 @@ public class SelfGetter {
         }.executeOnExecutor(ExecutorManager.getExecutor());
     }
 
-    public static void getDownload(final Context context, final String url, final BaseGetter.AsyncInterface asyncInterface) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                asyncInterface.onFinish(getDownloadInfo(context, url));
-                return null;
-            }
-        }.executeOnExecutor(ExecutorManager.getExecutor());
-    }
-
-    public static void getDownload(final Context context, final DOWNLOAD download, final BaseGetter.AsyncInterface asyncInterface) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                getAnime(context, new ANIME(download.eid.split("_")[0]), new BaseGetter.AsyncInterface() {
-                    @Override
-                    public void onFinish(String json) {
-                        try {
-                            JSONArray array = new JSONObject(json).getJSONArray("episodios");
-                            for (int i = 0; i < array.length(); i++) {
-                                JSONObject object = array.getJSONObject(i);
-                                if (object.getString("eid").equals(download.eid)) {
-                                    asyncInterface.onFinish(getDownloadInfo(context, DirectoryHelper.get(context).getEpUrl(download.eid, object.getString("sid"))));
-                                    return;
-                                }
-                            }
-                            asyncInterface.onFinish("null1");
-                            Crashlytics.logException(new FileNotFoundException("Not found: " + download.eid + " in:\n\n" + array.toString()));
-                        } catch (Exception e) {
-                            Crashlytics.logException(e);
-                            if (json.startsWith("error") && json.contains("503")) {
-                                asyncInterface.onFinish(json);
-                            } else {
-                                asyncInterface.onFinish("null");
-                            }
-                        }
-                    }
-                });
-                return null;
-            }
-        }.executeOnExecutor(ExecutorManager.getExecutor());
-    }
-
     public static void getDownload(final Context context, final DOWNLOAD download, final BaseGetter.AsyncDownloadInterface asyncInterface) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -206,56 +149,6 @@ public class SelfGetter {
                             } else {
                                 asyncInterface.onError(e.getMessage());
                             }
-                        }
-                    }
-                });
-                return null;
-            }
-        }.executeOnExecutor(ExecutorManager.getExecutor());
-    }
-
-    public static void getDownloadList(final Context context, final String aid, final List<String> eids, final AdapterWait.ListListener listListener) {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                getAnime(context, new ANIME(aid), new BaseGetter.AsyncInterface() {
-                    @Override
-                    public void onFinish(String json) {
-                        List<WaitDownloadElement> list = new ArrayList<>();
-                        try {
-                            JSONArray array = new JSONObject(json).getJSONArray("episodios");
-                            for (int i = 0; i < array.length(); i++) {
-                                JSONObject object = array.getJSONObject(i);
-                                if (eids.contains(object.getString("eid"))) {
-                                    String url = DirectoryHelper.get(context).getEpUrl(object.getString("eid"), object.getString("sid"));
-                                    JSONObject obj = new JSONObject(getDownloadInfo(context, url));
-                                    JSONArray links = obj.getJSONArray("downloads");
-                                    int pref = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(context).getString("def_download", "0"));
-                                    String prefLink = "null";
-                                    if (pref > 0)
-                                        prefLink = links.getJSONObject(pref - 1).getString("url");
-                                    if (pref > 0 && !prefLink.equals("null") && !(prefLink.contains("mega") || prefLink.contains("zippy"))) {
-                                        list.add(new WaitDownloadElement(object.getString("eid"), links.getJSONObject(pref - 1).getString("url")));
-                                    } else {
-                                        boolean found = false;
-                                        for (int a = 0; a <= links.length(); a++) {
-                                            JSONObject link = links.getJSONObject(a);
-                                            String ur = link.getString("url");
-                                            if (!ur.trim().equals("null") && (!ur.contains("mega") || !ur.contains("zippy"))) {
-                                                list.add(new WaitDownloadElement(object.getString("eid"), ur));
-                                                found = true;
-                                                break;
-                                            }
-                                        }
-                                        if (!found)
-                                            Toaster.toast("Error al encontrar link: " + object.getString("eid"));
-                                    }
-                                }
-                            }
-                            listListener.onListCreated(list);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            listListener.onListCreated(list);
                         }
                     }
                 });
@@ -539,263 +432,12 @@ public class SelfGetter {
         }
     }
 
-    private static List<VideoServer> getDownloadServers(final Context context, final String url) {
-        try {
-            Log.e("Url", url);
-            Document main = Jsoup.connect(url).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(TIMEOUT).get();
-            Elements descargas = main.select("table.RTbl.Dwnl").first().select("a.Button.Sm.fa-download");
-            List<VideoServer> videoServers = new ArrayList<>();
-            for (Element e : descargas) {
-                String z = e.attr("href");
-                z = z.substring(z.lastIndexOf("http"));
-                if (z.contains("zippyshare")) {
-                    try {
-                        z = URLDecoder.decode(z, "utf-8");
-                        Document zi = Jsoup.connect(z).timeout(TIMEOUT).get();
-                        String t = zi.select("meta[property='og:title']").attr("content");
-                        if (!t.trim().equals(""))
-                            videoServers.add(new VideoServer(ZIPPYSHARE, new Option(null, z)));
-                    } catch (Exception ze) {
-                        ze.printStackTrace();
-                    }
-                } else if (z.contains("mega.nz")) {
-                    try {
-                        videoServers.add(new VideoServer(MEGA, new Option(null, URLDecoder.decode(z, "utf-8"))));
-                    } catch (Exception zee) {
-                        zee.printStackTrace();
-                    }
-                } else if (z.contains("cldup.com")) {
-                    try {
-                        videoServers.add(new VideoServer(CLUP, new Option(null, URLDecoder.decode(z, "utf-8"))));
-                    } catch (Exception ze) {
-                        ze.printStackTrace();
-                    }
-                }
-            }
-            Elements s_script = main.select("script");
-            String j = "";
-            for (Element element : s_script) {
-                String s_el = element.outerHtml();
-                if (s_el.contains("var video = [];")) {
-                    j = s_el;
-                    break;
-                }
-            }
-            String json = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()"));
-            String[] parts = json.split("video\\[[^a-z]*\\]");
-            for (String baseLink : parts) {
-                if (baseLink.contains("server=izanagi")) {
-                    String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
-                    try {
-                        videoServers.add(new VideoServer(IZANAGI, new Option(null, new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file"))));
-                    } catch (Exception e) {
-                    }
-                } else if (baseLink.contains("server=hyperion")) {
-                    String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
-                    try {
-                        JSONArray array = new JSONObject(Jsoup.connect(down_link.replace("embed_hyperion", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getJSONArray("streams");
-                        VideoServer videoServer = new VideoServer(HYPERION);
-                        for (int i = 0; i < array.length(); i++) {
-                            switch (array.getJSONObject(i).getInt("label")) {
-                                case 360:
-                                    videoServer.addOption(new Option("360p", array.getJSONObject(i).getString("file")));
-                                    break;
-                                case 480:
-                                    videoServer.addOption(new Option("480p", array.getJSONObject(i).getString("file")));
-                                    break;
-                                case 720:
-                                    videoServer.addOption(new Option("720p", array.getJSONObject(i).getString("file")));
-                                    break;
-                            }
-                        }
-                        videoServer.addOption(new Option("Direct", new JSONObject(Jsoup.connect(down_link.replace("embed_hyperion", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("direct")));
-                        videoServers.add(videoServer);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (baseLink.contains("efire.php")) {
-                    try {
-                        String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-                        String func = Jsoup.parse(frame).select("img").first().attr("onclick");
-                        String download_link = func.substring(func.indexOf("open(\"") + 6, func.indexOf("\","));
-                        String media_func = Jsoup.connect(download_link).get().select("script").last().outerHtml();
-                        String download = Jsoup.connect(media_func.substring(media_func.indexOf("get('") + 5, media_func.indexOf("', function"))).get().select("div.download_link a").first().attr("href");
-                        videoServers.add(new VideoServer(FIRE, new Option(null, download)));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (baseLink.contains("rapidvideo")) {
-                    try {
-                        String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-                        String down_link = Jsoup.parse(frame).select("iframe").first().attr("src").replace("&q=720p", "");
-                        VideoServer videoServer = new VideoServer(RV);
-
-                        try {
-                            String jsoup720 = Jsoup.connect(down_link + "&q=720p").get().select("video source").first().attr("src");
-                            videoServer.addOption(new Option("720p", jsoup720));
-                        } catch (Exception e) {
-                        }
-
-                        try {
-                            String jsoup480 = Jsoup.connect(down_link + "&q=480p").get().select("video source").first().attr("src");
-                            videoServer.addOption(new Option("480p", jsoup480));
-                        } catch (Exception e) {
-                        }
-
-                        try {
-                            String jsoup360 = Jsoup.connect(down_link + "&q=360p").get().select("video source").first().attr("src");
-                            videoServer.addOption(new Option("360p", jsoup360));
-                        } catch (Exception e) {
-                        }
-                        if (videoServer.options.size() > 0)
-                            videoServers.add(videoServer);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (baseLink.contains("ok.ru")) {
-                    try {
-                        String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-                        String down_link = "http:" + Jsoup.parse(frame).select("iframe").first().attr("src");
-                        String e_json = Jsoup.connect(down_link).get().select("div[data-module='OKVideo']").first().attr("data-options");
-                        String cut_json = "{" + e_json.substring(e_json.lastIndexOf("\\\"videos"), e_json.indexOf(",\\\"metadataEmbedded")).replace("\\&quot;", "\"").replace("\\u0026", "&").replace("\\", "") + "}";
-                        JSONArray array = new JSONObject(cut_json).getJSONArray("videos");
-                        VideoServer videoServer = new VideoServer(OKRU);
-                        for (int i = 0; i < array.length(); i++) {
-                            JSONObject object = array.getJSONObject(i);
-                            if (object.getString("name").equals("sd")) {
-                                videoServer.addOption(new Option("SD", object.getString("url")));
-                            } else if (object.getString("name").equals("hd")) {
-                                videoServer.addOption(new Option("HD", object.getString("url")));
-                            }
-                        }
-                        videoServers.add(videoServer);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (baseLink.contains("drive.google.com")) {
-                    String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
-                    String id = down_link.substring(down_link.indexOf("/d/") + 3, down_link.lastIndexOf("/preview"));
-                    try {
-                        String d_link = "https://drive.google.com/uc?id=" + id + "&export=download";
-                        Log.e("Yotta", d_link);
-                        Document d_document = Jsoup.connect(d_link).get();
-                        videoServers.add(new VideoServer(YOTTA, new Option(null, "https://drive.google.com" + d_document.select("a#uc-download-link").first().attr("href"))));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (baseLink.contains("server=yotta")) {
-                    String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
-                    try {
-                        JSONArray ja = new JSONObject(Jsoup.connect(down_link.replace("embed", "check_yotta")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getJSONArray("sources");
-                        VideoServer videoServer = new VideoServer(YOTTA);
-                        if (ja.length() > 1) {
-                            for (int i = 0; i <= ja.length(); i++) {
-                                int label = ja.getJSONObject(i).getInt("label");
-                                String link_self = ja.getJSONObject(i).getString("file");
-                                switch (label) {
-                                    case 360:
-                                        videoServer.addOption(new Option("360p", link_self));
-                                        break;
-                                    case 480:
-                                        videoServer.addOption(new Option("480p", link_self));
-                                        break;
-                                    case 720:
-                                        videoServer.addOption(new Option("720p", link_self));
-                                        break;
-                                }
-                            }
-                        } else {
-                            int label = ja.getJSONObject(0).getInt("label");
-                            String link_self = ja.getJSONObject(0).getString("file");
-                            switch (label) {
-                                case 360:
-                                    videoServer.addOption(new Option("360p", link_self));
-                                    break;
-                                case 480:
-                                    videoServer.addOption(new Option("480p", link_self));
-                                    break;
-                                case 720:
-                                    videoServer.addOption(new Option("720p", link_self));
-                                    break;
-                                default:
-                                    videoServer.addOption(new Option("Unico", link_self));
-                            }
-                        }
-                        videoServers.add(videoServer);
-                    } catch (Exception e) {
-                        Log.e("Yotta", "Error getting Yotta: " + down_link.replace("embed", "check_yotta"));
-                    }
-                } else if (baseLink.contains("cldup.com")) {
-                    try {
-                        videoServers.add(new VideoServer(CLUP, new Option(null, baseLink.substring(baseLink.indexOf("https://cldup.com"), baseLink.lastIndexOf(".mp4") + 4))));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (baseLink.contains("server=minhateca")) {
-                    String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
-                    try {
-                        videoServers.add(new VideoServer(MINHATECA, new Option(null, new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file"))));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (baseLink.contains("server=mp4upload")) {
-                    String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
-                    try {
-                        videoServers.add(new VideoServer(MP4UPLOAD, new Option(null, new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file"))));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (baseLink.contains("mp4upload.com")) {
-                    String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
-                    try {
-                        Connection.Response response = Jsoup.connect(down_link.replace("embed-", ""))
-                                .data("op", "download2")
-                                .data("id", down_link.substring(down_link.lastIndexOf("/") + 1, down_link.lastIndexOf(".")))
-                                .data("rand", "")
-                                .data("referer", "")
-                                .data("method_free", "")
-                                .data("method_premium", "")
-                                .method(Connection.Method.POST)
-                                .followRedirects(false)
-                                .execute();
-                        String location = response.header("Location");
-                        if (location != null && !location.trim().equals(""))
-                            videoServers.add(new VideoServer(MP4UPLOAD, new Option(null, location)));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (baseLink.contains("server=yourupload")) {
-                    String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-                    String down_link = Jsoup.parse(frame).select("iframe").first().attr("src");
-                    try {
-                        videoServers.add(new VideoServer(YOURUPLOAD, new Option(null, new JSONObject(Jsoup.connect(down_link.replace("embed", "check")).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().body().text()).getString("file"))));
-                    } catch (Exception e) {
-                        Log.e("No YourUpload", down_link.replace("embed", "check"));
-                    }
-                }
-            }
-            videoServers = VideoServer.filter(videoServers);
-            Collections.sort(videoServers, new VideoServer.Sorter());
-            return videoServers;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     private static List<Server> getServers(final Context context, final String url) {
         try {
             Log.e("Url", url);
             Document main = Jsoup.connect(url).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).timeout(TIMEOUT).get();
             Elements descargas = main.select("table.RTbl.Dwnl").first().select("a.Button.Sm.fa-download");
-            List<Server> servers = new ArrayList<>();
+            final List<Server> servers = new ArrayList<>();
             for (Element e : descargas) {
                 String z = e.attr("href");
                 z = z.substring(z.lastIndexOf("http"));
@@ -807,17 +449,27 @@ public class SelfGetter {
             String j = "";
             for (Element element : s_script) {
                 String s_el = element.outerHtml();
-                if (s_el.contains("var video = [];")) {
+                if (s_el.contains("var videos = {\"SUB\":")) {
                     j = s_el;
                     break;
                 }
             }
-            String[] parts = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()")).split("video\\[[^a-z]*\\]");
+            JSONArray array = new JSONObject(KUtilsKt.regexFindFirst("\\{\"SUB\":\\[.*\\]\\}", j)).getJSONArray("SUB");
+            KUtilsKt.forEachJsonArray(array, new Function1<JSONObject, Unit>() {
+                @Override
+                public Unit invoke(JSONObject jsonObject) {
+                    Server server = Server.check(context, jsonObject.optString("code"));
+                    if (server != null)
+                        servers.add(server);
+                    return Unit.INSTANCE;
+                }
+            });
+            /*String[] parts = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()")).split("video\\[[^a-z]*\\]");
             for (String baseLink : parts) {
                 Server server = Server.check(context, baseLink);
                 if (server != null)
                     servers.add(server);
-            }
+            }*/
             Collections.sort(servers);
             return servers;
         } catch (Exception e) {
@@ -864,7 +516,7 @@ public class SelfGetter {
                     Matcher matcher = Pattern.compile("^ ?V?e?r? ?A?n?i?m?e? ?(.+ ?O?n?l?i?n?e?) Online").matcher(title);
                     matcher.find();
                     title = matcher.group(1).trim();
-                    String sinopsis = Parser.InValidateSinopsis(document.select("div.Description").first().select("p").first().text().trim());
+                    String sinopsis = Parser.InValidateSinopsis(document.select("div.Description").text().trim());
                     JSONArray array = new JSONArray();
                     try {
                         try {

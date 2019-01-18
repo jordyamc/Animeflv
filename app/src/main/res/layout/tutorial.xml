@@ -376,16 +376,6 @@
             </LinearLayout>
         </android.support.v4.widget.SwipeRefreshLayout>
 
-        <com.melnykov.fab.FloatingActionButton
-            android:id="@+id/action_list"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="20dp"
-            android:src="@drawable/ic_add_list"
-            fab:fab_colorNormal="@color/dark"
-            fab:fab_colorPressed="@color/prim"
-            fab:fab_colorRipple="@color/dark"/>
     </FrameLayout>
 
 </LinearLayout>

@@ -139,22 +139,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 showLoading(holder.ib_des);
             }
         }
-        if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
-            if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
-                if (ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
-                    showPlay(holder.ib_ver);
-                    showDelete(holder.ib_des);
-                    MainStates.init(context).delFromWaitList(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
-                } else {
-                    showCloudPlay(holder.ib_ver);
-                    holder.ib_des.setImageResource(R.drawable.ic_waiting);
-                }
-            } else {
-                showPlay(holder.ib_ver);
-                showDelete(holder.ib_des);
-                MainStates.init(context).delFromWaitList(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
-            }
-        }
         if (CastPlayBackManager.get(context).isCasting(Animes.get(getPosition(holder.getAdapterPosition(), position)).getEid())) {
             showCastPlay(holder.ib_ver);
         }
@@ -182,26 +166,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                 }
             }
         });
-        holder.card.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                MainStates.setListing(true);
-                if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
-                    MainStates.init(context).delFromWaitList(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
-                    showDownload(holder.ib_des, holder.getAdapterPosition());
-                    callbacks.onDelFromList();
-                } else {
-                    if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid()) && !ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
-                        MainStates.init(context).addToWaitList(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
-                        holder.ib_des.setImageResource(R.drawable.ic_waiting);
-                        callbacks.onPutInList();
-                    } else {
-                        MainStates.setListing(false);
-                    }
-                }
-                return false;
-            }
-        });
         holder.ib_des.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -211,32 +175,9 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                     if (!FileUtil.init(context).ExistAnime(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid()) && !ManageDownload.isDownloading(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())
                             || ManageDownload.getDownloadSate(context, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid()) == DownloadManager.STATUS_PAUSED) {
                         if (!MainStates.isProcessing()) {
-                            if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
-                                final int pos = holder.getAdapterPosition();
-                                new MaterialDialog.Builder(context)
-                                        .content(
-                                                "El " + getCap(Animes.get(pos).getNumero()).toLowerCase() +
-                                                        " de " + Animes.get(pos).getTitulo() +
-                                                        " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
-                                        .autoDismiss(true)
-                                        .positiveText("Continuar")
-                                        .negativeText("Cancelar")
-                                        .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                            @Override
-                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                MainStates.init(context).delFromWaitList(Animes.get(pos).getEid());
-                                                MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
-                                                showLoading(holder.ib_des);
-                                                searchDownload(holder, position);
-                                            }
-                                        })
-                                        .build().show();
-                            } else {
-                                MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
-                                showLoading(holder.ib_des);
-                                searchDownload(holder, position);
-                            }
+                            MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
+                            showLoading(holder.ib_des);
+                            searchDownload(holder, position);
                         } else {
                             Toaster.toast("Procesando");
                         }
@@ -299,32 +240,9 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolder> {
                         } else {
                             if (NetworkUtils.isNetworkAvailable()) {
                                 if (!MainStates.isProcessing()) {
-                                    if (MainStates.init(context).WaitContains(Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid())) {
-                                        final int pos = holder.getAdapterPosition();
-                                        new MaterialDialog.Builder(context)
-                                                .content(
-                                                        "El " + getCap(Animes.get(pos).getNumero()).toLowerCase() +
-                                                                " de " + Animes.get(pos).getTitulo() +
-                                                                " se encuentra en lista de espera, si continua, sera removido de la lista, desea continuar?")
-                                                .autoDismiss(true)
-                                                .positiveText("Continuar")
-                                                .negativeText("Cancelar")
-                                                .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                                    @Override
-                                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                        MainStates.init(context).delFromWaitList(Animes.get(pos).getEid());
-                                                        MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
-                                                        showLoading(holder.ib_des);
-                                                        searchStream(holder, position);
-                                                    }
-                                                })
-                                                .build().show();
-                                    } else {
-                                        MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
-                                        showLoading(holder.ib_des);
-                                        searchStream(holder, position);
-                                    }
+                                    MainStates.setProcessing(true, Animes.get(holder.getAdapterPosition() == -1 ? position : holder.getAdapterPosition()).getEid());
+                                    showLoading(holder.ib_des);
+                                    searchStream(holder, position);
                                 }
                             }
                         }

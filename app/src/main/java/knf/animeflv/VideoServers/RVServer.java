@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import knf.animeflv.Cloudflare.BypassHolder;
 import knf.animeflv.JsonFactory.Objects.Option;
 import knf.animeflv.JsonFactory.Objects.VideoServer;
+import knf.animeflv.Utils.KUtilsKt;
 
 import static knf.animeflv.JsonFactory.Objects.VideoServer.Names.RV;
 
@@ -48,8 +49,7 @@ public class RVServer extends Server {
     @Override
     public VideoServer getVideoServer() {
         try {
-            String frame = baseLink.substring(baseLink.indexOf("'") + 1, baseLink.lastIndexOf("'"));
-            String down_link = Jsoup.parse(frame).select("iframe").first().attr("src").replaceAll("&q=720p|&q=480p|&q=360p", "");
+            String down_link = KUtilsKt.extractLink(baseLink).replaceAll("&q=720p|&q=480p|&q=360p", "");
             if (down_link.contains("&server=rv"))
                 down_link = getRapidLink(Jsoup.connect(down_link).cookies(BypassHolder.getBasicCookieMap()).userAgent(BypassHolder.getUserAgent()).get().outerHtml()).replaceAll("&q=720p|&q=480p|&q=360p", "");
             VideoServer videoServer = new VideoServer(RV);

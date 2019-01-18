@@ -11,10 +11,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.captain_miao.optroundcardview.OptRoundCardView;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemConstants;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange;
-import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
@@ -22,7 +18,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import knf.animeflv.ColorsRes;
 import knf.animeflv.Favorites.FavObject;
 import knf.animeflv.Favorites.FavotiteDB;
 import knf.animeflv.R;
@@ -30,7 +25,7 @@ import knf.animeflv.Utils.CacheManager;
 import knf.animeflv.Utils.DesignUtils;
 import knf.animeflv.Utils.ThemeUtils;
 
-public class FavSyncAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements DraggableItemAdapter<RecyclerView.ViewHolder> {
+public class FavSyncAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;
     private List<FavObject> list = new ArrayList<>();
     private ThemeUtils.Theme theme;
@@ -75,41 +70,11 @@ public class FavSyncAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             holder.name.setTextColor(theme.textColor);
             DesignUtils.setCardStyle(context, getItemCount(), getPosition(holder.getAdapterPosition(), position), holder.cardView, holder.separator, holder.imageView);
             holder.cardView.setCardBackgroundColor(theme.card_normal);
-            final int dragState = holder.getDragStateFlags();
-            if (((dragState & FavSyncAdapter.Draggable.STATE_FLAG_IS_UPDATED) != 0)) {
-                if ((dragState & FavSyncAdapter.Draggable.STATE_FLAG_IS_ACTIVE) != 0) {
-                    holder.cardView.setCardBackgroundColor(theme.accent);
-                    holder.name.setTextColor(ColorsRes.Blanco(context));
-                } else {
-                    holder.cardView.setCardBackgroundColor(theme.card_normal);
-                }
-            }
         }
     }
 
     private int getPosition(int holder, int pos) {
         return holder == -1 ? pos : holder;
-    }
-
-    @Override
-    public boolean onCheckCanStartDrag(RecyclerView.ViewHolder holder, int position, int x, int y) {
-        return false;
-    }
-
-    @Override
-    public ItemDraggableRange onGetItemDraggableRange(RecyclerView.ViewHolder holder, int position) {
-        return new ItemDraggableRange(1, list.size() - 1);
-    }
-
-    @Override
-    public void onMoveItem(final int fromPosition, final int toPosition) {
-
-    }
-
-
-    @Override
-    public boolean onCheckCanDrop(int draggingPosition, int dropPosition) {
-        return false;
     }
 
     @Override
@@ -122,14 +87,11 @@ public class FavSyncAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return list.size();
     }
 
-    private interface Draggable extends DraggableItemConstants {
-    }
-
     interface ListCountInterface {
         void onListCount(int count);
     }
 
-    public static class FavViewHolder extends AbstractDraggableItemViewHolder {
+    public static class FavViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.card)
         OptRoundCardView cardView;
         @BindView(R.id.img)
@@ -148,7 +110,7 @@ public class FavSyncAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    public static class SectionViewHolder extends AbstractDraggableItemViewHolder {
+    public static class SectionViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.header_text)
         TextView name;
         @BindView(R.id.selectable)

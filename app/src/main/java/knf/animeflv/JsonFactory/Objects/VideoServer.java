@@ -94,6 +94,7 @@ public class VideoServer {
         public static final String FENIX = "Fenix";
         public static final String FIRE = "Fire";
         public static final String RV = "RV";
+        public static final String MANGO = "Mango";
         public static final String MP4UPLOAD = "Mp4Upload";
         public static final String NATSUKI = "Natsuki";
         public static final String YOURUPLOAD = "YourUpload";
@@ -111,6 +112,8 @@ public class VideoServer {
                     FENIX,
                     FIRE,
                     RV,
+                    MANGO,
+                    MP4UPLOAD,
                     NATSUKI,
                     YOURUPLOAD,
                     ZIPPYSHARE,

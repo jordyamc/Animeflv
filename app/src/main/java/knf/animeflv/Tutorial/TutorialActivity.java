@@ -96,8 +96,6 @@ public class TutorialActivity extends AppCompatActivity implements SwipeRefreshL
     TextView tit3;
     @BindView(R.id.titulo4)
     TextView tit4;
-    @BindView(R.id.action_list)
-    FloatingActionButton button;
     @BindView(R.id.refresh)
     SwipeRefreshLayout refreshLayout;
     @BindView(R.id.botones1)
@@ -177,20 +175,7 @@ public class TutorialActivity extends AppCompatActivity implements SwipeRefreshL
         tit4.setTextColor(ThemeUtils.getAcentColor(this));
         card2.setCardBackgroundColor(Color.argb(100, 253, 250, 93));
         card3.setCardBackgroundColor(Color.argb(100, 26, 206, 246));
-        button.setBackgroundColor(ThemeUtils.getAcentColor(this));
         MainStates.setListing(false);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (MainStates.isListing()) {
-                    button.setImageResource(R.drawable.ic_add_list);
-                    MainStates.setListing(false);
-                } else {
-                    button.setImageResource(R.drawable.ic_done);
-                    MainStates.setListing(true);
-                }
-            }
-        });
         refreshLayout.setOnRefreshListener(this);
     }
 
@@ -216,48 +201,16 @@ public class TutorialActivity extends AppCompatActivity implements SwipeRefreshL
                             caps[position].setText(result);
                             if (!PreferenceManager.getDefaultSharedPreferences(TutorialActivity.this).getBoolean("use_space", false))
                                 images[position].setPadding(0, 0, 0, 0);
-                            String eid = id + "_1E";
-                            if (MainStates.init(TutorialActivity.this).WaitContains(eid)) {
-                                dButtons[position].setImageResource(R.drawable.ic_waiting);
-                            }else {
-                                dButtons[position].setImageResource(R.drawable.ic_get_r);
-                            }
+                            dButtons[position].setImageResource(R.drawable.ic_get_r);
                             cards[position].setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    if (MainStates.isListing()) {
-                                        String eid = id + "_1E";
-                                        if (MainStates.init(TutorialActivity.this).WaitContains(eid)) {
-                                            MainStates.init(TutorialActivity.this).delFromWaitList(eid);
-                                            dButtons[position].setImageResource(R.drawable.ic_get_r);
-                                        } else {
-                                            MainStates.init(TutorialActivity.this).addToWaitList(eid);
-                                            dButtons[position].setImageResource(R.drawable.ic_waiting);
-                                        }
-                                    } else {
-                                        InfoHelper.open(
-                                                TutorialActivity.this,
-                                                new InfoHelper.SharedItem(images[position], "img"),
-                                                new InfoHelper.BundleItem(InfoHelper.BundleItem.KEY_AID, id),
-                                                new InfoHelper.BundleItem(InfoHelper.BundleItem.KEY_TITLE, title)
-                                        );
-                                    }
-                                }
-                            });
-                            cards[position].setOnLongClickListener(new View.OnLongClickListener() {
-                                @Override
-                                public boolean onLongClick(View view) {
-                                    if (!MainStates.isListing()) {
-                                        String eid = id + "_1E";
-                                        if (MainStates.init(TutorialActivity.this).WaitContains(eid)) {
-                                            MainStates.init(TutorialActivity.this).delFromWaitList(eid);
-                                            dButtons[position].setImageResource(R.drawable.ic_get_r);
-                                        } else {
-                                            MainStates.init(TutorialActivity.this).addToWaitList(eid);
-                                            dButtons[position].setImageResource(R.drawable.ic_waiting);
-                                        }
-                                    }
-                                    return true;
+                                    InfoHelper.open(
+                                            TutorialActivity.this,
+                                            new InfoHelper.SharedItem(images[position], "img"),
+                                            new InfoHelper.BundleItem(InfoHelper.BundleItem.KEY_AID, id),
+                                            new InfoHelper.BundleItem(InfoHelper.BundleItem.KEY_TITLE, title)
+                                    );
                                 }
                             });
                             Animation animation = AnimationUtils.loadAnimation(TutorialActivity.this, R.anim.in_animation);
@@ -382,28 +335,6 @@ public class TutorialActivity extends AppCompatActivity implements SwipeRefreshL
                 .setBackgroundColor(Color.argb(230, 65, 65, 65))
                 .setTarget(layout, new RectangularShape(), HintCase.TARGET_IS_NOT_CLICKABLE)
                 .setShapeAnimators(ShapeAnimator.NO_ANIMATOR, new UnrevealRectangularShapeAnimator())
-                .setCloseOnTouchView(true)
-                .setOnClosedListener(new HintCase.OnClosedListener() {
-                    @Override
-                    public void onClosed() {
-                        showWaitButtonHint();
-                    }
-                }).show();
-    }
-
-    private void showWaitButtonHint() {
-        new HintCase(getDecor())
-                .setHintBlock(
-                        new SimpleHintContentHolder.Builder(this)
-                                .setContentTitle("")
-                                .setContentText("O haciendo click en el boton flotante, y despues clicks sencillos en las tarjetas\n(Solo en informacion de anime)")
-                                .setContentStyle(R.style.ContentStyle)
-                                .setTitleStyle(R.style.TitleStyle)
-                                .build()
-                )
-                .setBackgroundColor(Color.argb(230, 65, 65, 65))
-                .setTarget(button, new CircularShape(), HintCase.TARGET_IS_NOT_CLICKABLE)
-                .setShapeAnimators(new RevealCircleShapeAnimator(), new UnrevealCircleShapeAnimator())
                 .setCloseOnTouchView(true)
                 .setOnClosedListener(new HintCase.OnClosedListener() {
                     @Override

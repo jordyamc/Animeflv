@@ -22,7 +22,7 @@ import knf.animeflv.R;
 
 public class LauncherIconAdapter extends RecyclerView.Adapter<LauncherIconAdapter.SimpleListVH> implements MDAdapter {
     private MaterialDialog dialog;
-    private List<MaterialSimpleListItem> items = new ArrayList(4);
+    private List<MaterialSimpleListItem> items = new ArrayList<>();
     private LauncherIconAdapter.Callback callback;
 
     public LauncherIconAdapter(Callback callback) {
@@ -40,7 +40,7 @@ public class LauncherIconAdapter extends RecyclerView.Adapter<LauncherIconAdapte
     }
 
     public MaterialSimpleListItem getItem(int index) {
-        return (MaterialSimpleListItem) this.items.get(index);
+        return this.items.get(index);
     }
 
     public void setDialog(MaterialDialog dialog) {
@@ -56,7 +56,7 @@ public class LauncherIconAdapter extends RecyclerView.Adapter<LauncherIconAdapte
     @Override
     public void onBindViewHolder(SimpleListVH holder, int position) {
         if (this.dialog != null) {
-            MaterialSimpleListItem item = (MaterialSimpleListItem) this.items.get(position);
+            MaterialSimpleListItem item = this.items.get(position);
             if (item.getIcon() != null) {
                 holder.icon.setImageDrawable(item.getIcon());
                 holder.icon.setPadding(item.getIconPadding(), item.getIconPadding(), item.getIconPadding(), item.getIconPadding());
@@ -85,8 +85,8 @@ public class LauncherIconAdapter extends RecyclerView.Adapter<LauncherIconAdapte
 
         SimpleListVH(View itemView, LauncherIconAdapter adapter) {
             super(itemView);
-            this.icon = (ImageView) itemView.findViewById(android.R.id.icon);
-            this.title = (TextView) itemView.findViewById(android.R.id.title);
+            this.icon = itemView.findViewById(android.R.id.icon);
+            this.title = itemView.findViewById(android.R.id.title);
             this.adapter = adapter;
             itemView.setOnClickListener(this);
         }

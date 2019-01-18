@@ -12,10 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.captain_miao.optroundcardview.OptRoundCardView;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemAdapter;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.DraggableItemConstants;
-import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange;
-import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.Calendar;
@@ -33,7 +29,7 @@ import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.ThemeUtils;
 import knf.animeflv.info.Helper.InfoHelper;
 
-public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.ViewHolder> implements DraggableItemAdapter<AutoEmisionAdapter.ViewHolder> {
+public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.ViewHolder> {
     private Activity context;
     private List<EmObj> list;
     private int daycode;
@@ -77,16 +73,6 @@ public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.
                 );
             }
         });
-        final int dragState = holder.getDragStateFlags();
-        if (((dragState & Draggable.STATE_FLAG_IS_UPDATED) != 0)) {
-            if ((dragState & Draggable.STATE_FLAG_IS_ACTIVE) != 0) {
-                holder.cardView.setCardBackgroundColor(theme.accent);
-                holder.state.setColorFilter(theme.card_normal);
-                holder.title.setTextColor(ColorsRes.Blanco(context));
-            } else {
-                holder.cardView.setCardBackgroundColor(theme.card_normal);
-            }
-        }
     }
 
     private int getPosition(int holder, int pos) {
@@ -124,17 +110,6 @@ public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.
         }
     }
 
-    @Override
-    public boolean onCheckCanStartDrag(ViewHolder holder, int position, int x, int y) {
-        return !isUpdating;
-    }
-
-    @Override
-    public ItemDraggableRange onGetItemDraggableRange(ViewHolder holder, int position) {
-        return null;
-    }
-
-    @Override
     public void onMoveItem(final int fromPosition, final int toPosition) {
         if (fromPosition != toPosition) {
             EmObj tmp = list.get(fromPosition);
@@ -148,11 +123,6 @@ public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.
             });
             interaction.onListEdited(list);
         }
-    }
-
-    @Override
-    public boolean onCheckCanDrop(int draggingPosition, int dropPosition) {
-        return true;
     }
 
     @Override
@@ -232,10 +202,7 @@ public class AutoEmisionAdapter extends RecyclerView.Adapter<AutoEmisionAdapter.
         }
     }
 
-    private interface Draggable extends DraggableItemConstants {
-    }
-
-    public static class ViewHolder extends AbstractDraggableItemViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.cardRel)
         OptRoundCardView cardView;
         @BindView(R.id.imgCardInfoRel)

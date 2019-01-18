@@ -39,8 +39,6 @@ public class FragmentCaps extends Fragment {
     RecyclerView recyclerView;
     @BindView(R.id.fastscroll)
     FastScroller fastScroller;
-    @BindView(R.id.action_list)
-    FloatingActionButton button_list;
     private boolean blocked = false;
 
     private AdapterInfoCapsMaterial adapter_caps;
@@ -74,34 +72,6 @@ public class FragmentCaps extends Fragment {
         ButterKnife.bind(this, view);
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(getActivity());
         recyclerView.getRootView().setBackgroundColor(theme.background);
-        button_list.setColorNormal(theme.accent);
-        button_list.setColorPressed(theme.accent);
-        button_list.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!blocked) {
-                    if (MainStates.isListing()) {
-                        button_list.setImageResource(R.drawable.ic_add_list);
-                        MainStates.setListing(false);
-                        adapter_caps.onStopList();
-                    } else {
-                        button_list.setImageResource(R.drawable.ic_done);
-                        MainStates.setListing(true);
-                        adapter_caps.onStartList();
-                    }
-                } else {
-                    blocked = false;
-                }
-            }
-        });
-        button_list.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                button_list.hide(true);
-                blocked = true;
-                return true;
-            }
-        });
         setCaps();
 
         return view;
@@ -121,22 +91,6 @@ public class FragmentCaps extends Fragment {
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setAdapter(adapter_caps);
                 fastScroller.setRecyclerView(recyclerView);
-                fastScroller.addScrollerListener(new RecyclerViewScrollListener.ScrollerListener() {
-                    @Override
-                    public void onScroll(final float v) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!MainStates.isListing())
-                                    if (v >= 0.9f) {
-                                        button_list.hide(true);
-                                    } else {
-                                        button_list.show(true);
-                                    }
-                            }
-                        });
-                    }
-                });
                 int position = bundle.getInt("position", -1);
                 if (position != -1)
                     layoutManager.scrollToPositionWithOffset(position, 20);
@@ -145,21 +99,8 @@ public class FragmentCaps extends Fragment {
         });
     }
 
-    public void setReference(Activity activity) {
-        activityWeakReference = new WeakReference<Activity>(activity);
-    }
-
     private Activity activity() {
         return getActivity();
-    }
-
-    public void resetListButton() {
-        try {
-            button_list.show();
-            blocked = false;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void resetList() {
