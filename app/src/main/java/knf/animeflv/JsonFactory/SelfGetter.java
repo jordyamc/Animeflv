@@ -429,7 +429,7 @@ public class SelfGetter {
     }
 
     private static void tryNewEpMethod(Document document, String aid, JSONArray array) throws Exception {
-        AnimeInfo info = new AnimeInfo(findDataScript(document.select("script[type=text/javascript]:not([src])")).html());
+        AnimeInfo info = new AnimeInfo(findDataScript(document.select("script:not([src])")).html());
         for (Map.Entry<String, String> entry : info.epMap.entrySet()) {
             JSONObject object = new JSONObject();
             String num = entry.getKey();
