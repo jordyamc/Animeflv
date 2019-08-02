@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <android.support.v17.leanback.widget.ImageCardView
+    <androidx.leanback.widget.ImageCardView
         android:id="@+id/card"
         android:layout_width="125dp"
         android:layout_height="150dp"

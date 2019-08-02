@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -13,7 +13,6 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -24,7 +23,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -190,14 +188,11 @@ public class SelfGetter {
                 }
             }
             JSONArray array = new JSONObject(KUtilsKt.regexFindFirst("\\{\"[SUBLAT]+\":\\[.*\\]\\}", j)).getJSONArray("SUB");
-            KUtilsKt.forEachJsonArray(array, new Function1<JSONObject, Unit>() {
-                @Override
-                public Unit invoke(JSONObject jsonObject) {
-                    Server server = Server.check(context, jsonObject.optString("code"));
-                    if (server != null)
-                        servers.add(server);
-                    return Unit.INSTANCE;
-                }
+            KUtilsKt.forEachJsonArray(array, jsonObject -> {
+                Server server = Server.check(context, jsonObject.optString("code"));
+                if (server != null)
+                    servers.add(server);
+                return Unit.INSTANCE;
             });
             /*String[] parts = j.substring(j.indexOf("var video = [];") + 14, j.indexOf("$(document).ready(function()")).split("video\\[[^a-z]*\\]");
             for (String baseLink : parts) {
@@ -237,15 +232,21 @@ public class SelfGetter {
                     } catch (Exception e) {
                         rate_count = "0";
                     }
-                    Elements categories = document.select("nav.Nvgnrs").first().select("a");
                     String generos = "";
-                    String gens = "";
-                    for (Element gen : categories) {
-                        gens += gen.ownText();
-                        gens += ", ";
+                    try {
+                        Elements categories = document.select("nav.Nvgnrs").first().select("a");
+                        if (categories != null && !categories.isEmpty()){
+                            StringBuilder gens = new StringBuilder();
+                            for (Element gen : categories) {
+                                gens.append(gen.ownText());
+                                gens.append(", ");
+                            }
+                            if (!gens.toString().trim().equals(""))
+                                generos = gens.substring(0, gens.lastIndexOf(","));
+                        }
+                    }catch (Exception e){
+                        //
                     }
-                    if (!gens.trim().equals(""))
-                        generos = gens.substring(0, gens.lastIndexOf(","));
                     String start = "Sin Fecha";
                     String title = document.select("meta[property='og:title']").attr("content");
                     Matcher matcher = Pattern.compile("^ ?V?e?r? ?A?n?i?m?e? ?(.+ ?O?n?l?i?n?e?) Online").matcher(title);
@@ -340,23 +341,39 @@ public class SelfGetter {
             String aid = imgUrl.substring(imgUrl.lastIndexOf("/") + 1, imgUrl.lastIndexOf("."));
             String tid = document.select("div.Ficha").first().select("div.Container").first().select("span").first().attr("class");
             String state = getState(document.select("aside.SidebarA.BFixed").first().select("p").last().attr("class"));
-            String rate_stars = document.select("meta[itemprop='ratingValue']").first().attr("content");
-            String rate_count = document.select("meta[itemprop='ratingCount']").first().attr("content");
-            Elements categories = document.select("nav.Nvgnrs").first().select("a");
-            String generos = "";
-            String gens = "";
-            for (Element gen : categories) {
-                gens += gen.ownText();
-                gens += ", ";
+            String rate_stars;
+            String rate_count;
+            try {
+                rate_stars = document.select("span.vtprmd").first().text();
+            } catch (Exception e) {
+                rate_stars = "0.0";
             }
-            if (!gens.trim().equals(""))
-                generos = gens.substring(0, gens.lastIndexOf(","));
+            try {
+                rate_count = document.select("span#votes_nmbr").first().text();
+            } catch (Exception e) {
+                rate_count = "0";
+            }
+            String generos = "";
+            try {
+                Elements categories = document.select("nav.Nvgnrs").first().select("a");
+                if (categories != null && !categories.isEmpty()){
+                    StringBuilder gens = new StringBuilder();
+                    for (Element gen : categories) {
+                        gens.append(gen.ownText());
+                        gens.append(", ");
+                    }
+                    if (!gens.toString().trim().equals(""))
+                        generos = gens.substring(0, gens.lastIndexOf(","));
+                }
+            }catch (Exception e){
+                //
+            }
             String start = "Sin Fecha";
-
-            String title = document.select("h1.Title").first().text();
-            if (title.trim().equals("") || title.contains("protected"))
-                title = document.select("meta[property='og:title']").attr("content").replace(" Online", "");
-            String sinopsis = Parser.InValidateSinopsis(document.select("div.Description").first().select("p").first().text().trim());
+            String title = document.select("meta[property='og:title']").attr("content");
+            Matcher matcher = Pattern.compile("^ ?V?e?r? ?A?n?i?m?e? ?(.+ ?O?n?l?i?n?e?) Online").matcher(title);
+            matcher.find();
+            title = matcher.group(1).trim();
+            String sinopsis = Parser.InValidateSinopsis(document.select("div.Description").text().trim());
             JSONArray array = new JSONArray();
             try {
                 try {
@@ -373,8 +390,6 @@ public class SelfGetter {
             try {
                 Elements rels = document.select("ul.ListAnmRel").first().select("li");
                 for (Element rel : rels) {
-                    //FIXME: Buscar diferencia de Precuela/Secuela
-                    //String t_tid = rel.select("b").first().ownText();
                     Element link = rel.select("a").first();
                     String full_link = "http://animeflv.net" + link.attr("href");
                     String name = link.ownText();

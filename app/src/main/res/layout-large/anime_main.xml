@@ -15,7 +15,7 @@
             android:id="@+id/ltoolbar"
             layout="@layout/ltoolbar" />
 
-        <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/cardMain"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -49,13 +49,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
                         android:id="@+id/swiperefresh"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
 
 
-                        <android.support.v7.widget.RecyclerView
+                        <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/rv_main"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
@@ -65,7 +65,7 @@
                             android:paddingTop="10dp" />
 
 
-                    </android.support.v4.widget.SwipeRefreshLayout>
+                    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
                     <com.melnykov.fab.FloatingActionButton
                         android:id="@+id/action_info"
@@ -79,7 +79,7 @@
                         fab:fab_colorRipple="@color/dark" />
                 </FrameLayout>
             </LinearLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
     </FrameLayout>
 
 

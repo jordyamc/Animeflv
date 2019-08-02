@@ -2,7 +2,7 @@ package knf.animeflv.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.widget.ImageButton;
 
 import knf.animeflv.Utils.eNums.DownloadTask;

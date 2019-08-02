@@ -6,9 +6,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -103,19 +103,11 @@ public class FastActivity extends AppCompatActivity {
                             }
                         };
                         handler.postDelayed(runnable, Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString("bypass_time", "30000")));
-                        Bypass.check(this, new Bypass.onBypassCheck() {
-                            @Override
-                            public void onFinish() {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        handler.removeCallbacks(runnable);
-                                        dialog.dismiss();
-                                        finish();
-                                    }
-                                });
-                            }
-                        });
+                        Bypass.check(this, needScreen -> runOnUiThread(() -> {
+                            handler.removeCallbacks(runnable);
+                            dialog.dismiss();
+                            finish();
+                        }));
                         break;
                 }
             } else {

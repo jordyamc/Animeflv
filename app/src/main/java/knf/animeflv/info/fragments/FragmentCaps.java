@@ -3,10 +3,10 @@ package knf.animeflv.info.fragments;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +14,6 @@ import android.view.ViewGroup;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.futuremind.recyclerviewfastscroll.FastScroller;
-import com.futuremind.recyclerviewfastscroll.RecyclerViewScrollListener;
-import com.melnykov.fab.FloatingActionButton;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -26,7 +24,6 @@ import knf.animeflv.Parser;
 import knf.animeflv.R;
 import knf.animeflv.Recyclers.AdapterInfoCapsMaterial;
 import knf.animeflv.Seen.SeenManager;
-import knf.animeflv.Utils.MainStates;
 import knf.animeflv.Utils.ThemeUtils;
 
 /**

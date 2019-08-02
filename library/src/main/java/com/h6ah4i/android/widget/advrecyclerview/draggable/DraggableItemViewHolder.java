@@ -16,6 +16,8 @@
 
 package com.h6ah4i.android.widget.advrecyclerview.draggable;
 
+import android.support.v7.widget.RecyclerView;
+
 import com.h6ah4i.android.widget.advrecyclerview.draggable.annotation.DraggableItemStateFlags;
 
 /**

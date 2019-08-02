@@ -7,11 +7,11 @@ import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.UiThread;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.Nullable;
+import androidx.annotation.UiThread;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
@@ -80,12 +80,7 @@ public class AutoEmisionActivity extends AppCompatActivity implements AutoEmisio
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
         toolbar.getRootView().setBackgroundColor(theme.background);
         toolbar.setBackgroundColor(theme.primary);
         toolbar.setTitleTextColor(theme.textColorToolbar);
@@ -109,27 +104,24 @@ public class AutoEmisionActivity extends AppCompatActivity implements AutoEmisio
             protected Void doInBackground(Void... params) {
                 count = 0;
                 AutoEmisionListHolder.reloadEpisodes(AutoEmisionActivity.this);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
-                                getSupportFragmentManager(), FragmentPagerItems.with(AutoEmisionActivity.this)
-                                .add("LUNES", AutoEmisionFragment.class, getDayBundle(1))
-                                .add("MARTES", AutoEmisionFragment.class, getDayBundle(2))
-                                .add("MIÉRCOLES", AutoEmisionFragment.class, getDayBundle(3))
-                                .add("JUEVES", AutoEmisionFragment.class, getDayBundle(4))
-                                .add("VIERNES", AutoEmisionFragment.class, getDayBundle(5))
-                                .add("SÁBADO", AutoEmisionFragment.class, getDayBundle(6))
-                                .add("DOMINGO", AutoEmisionFragment.class, getDayBundle(7))
-                                .create());
-                        viewPager.invalidate();
-                        viewPager.setOffscreenPageLimit(7);
-                        viewPager.setAdapter(adapter);
-                        smartTabLayout.setViewPager(viewPager);
-                        viewPager.setCurrentItem(Math.abs(getActualDayCode() - 1), true);
-                        setFragmentsListener(adapter);
-                        supportInvalidateOptionsMenu();
-                    }
+                runOnUiThread(() -> {
+                    FragmentPagerItemAdapter adapter = new FragmentPagerItemAdapter(
+                            getSupportFragmentManager(), FragmentPagerItems.with(AutoEmisionActivity.this)
+                            .add("LUNES", AutoEmisionFragment.class, getDayBundle(1))
+                            .add("MARTES", AutoEmisionFragment.class, getDayBundle(2))
+                            .add("MIÉRCOLES", AutoEmisionFragment.class, getDayBundle(3))
+                            .add("JUEVES", AutoEmisionFragment.class, getDayBundle(4))
+                            .add("VIERNES", AutoEmisionFragment.class, getDayBundle(5))
+                            .add("SÁBADO", AutoEmisionFragment.class, getDayBundle(6))
+                            .add("DOMINGO", AutoEmisionFragment.class, getDayBundle(7))
+                            .create());
+                    viewPager.invalidate();
+                    viewPager.setOffscreenPageLimit(7);
+                    viewPager.setAdapter(adapter);
+                    smartTabLayout.setViewPager(viewPager);
+                    viewPager.setCurrentItem(Math.abs(getActualDayCode() - 1), true);
+                    setFragmentsListener(adapter);
+                    supportInvalidateOptionsMenu();
                 });
                 return null;
             }
@@ -161,8 +153,6 @@ public class AutoEmisionActivity extends AppCompatActivity implements AutoEmisio
 
     private int getActualDayCode() {
         switch (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
-            case Calendar.MONDAY:
-                return 1;
             case Calendar.TUESDAY:
                 return 2;
             case Calendar.WEDNESDAY:
@@ -184,23 +174,13 @@ public class AutoEmisionActivity extends AppCompatActivity implements AutoEmisio
     public void onEmisionRemove(int removeCount) {
         count -= removeCount;
         if (count_text != null)
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    count_text.setOnClickListener(getCountListener());
-                }
-            });
+            runOnUiThread(() -> count_text.setOnClickListener(getCountListener()));
     }
 
     @UiThread
     private View.OnClickListener getCountListener() {
         count_text.setText(String.valueOf(count));
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toaster.toast("Actualmente sigues " + count + " " + (count == 1 ? "anime" : "animes") + " de la temporada");
-            }
-        };
+        return view -> Toaster.toast("Actualmente sigues " + count + " " + (count == 1 ? "anime" : "animes") + " de la temporada");
     }
 
     @Override
@@ -226,47 +206,38 @@ public class AutoEmisionActivity extends AppCompatActivity implements AutoEmisio
                 case R.id.sync:
                     PopupMenu popupMenu = new PopupMenu(new ContextThemeWrapper(this, R.style.PopupMenu), findViewById(item.getItemId()));
                     popupMenu.inflate(R.menu.menu_emision_sync);
-                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem menuItem) {
-                            if (DropboxManager.islogedIn()) {
-                                switch (menuItem.getItemId()) {
-                                    case R.id.download:
-                                        final MaterialDialog dialog = getLoadingDialog(0);
-                                        dialog.show();
-                                        DropboxManager.downloadEmision(AutoEmisionActivity.this, new DropboxManager.DownloadCallback() {
-                                            @Override
-                                            public void onDownload(JSONObject result, boolean success) {
-                                                dialog.dismiss();
-                                                if (success) {
-                                                    AutoEmisionHelper.updateSavedList(AutoEmisionActivity.this, result);
-                                                    Toaster.toast("Descarga exitosa");
-                                                    invalidateCurrentList();
-                                                } else {
-                                                    Toaster.toast("Error al descargar");
-                                                }
-                                            }
-                                        });
-                                        break;
-                                    case R.id.upload:
-                                        final MaterialDialog dialog_up = getLoadingDialog(1);
-                                        dialog_up.show();
-                                        DropboxManager.updateEmision(AutoEmisionActivity.this, new DropboxManager.UploadCallback() {
-                                            @Override
-                                            public void onUpload(boolean success) {
-                                                dialog_up.dismiss();
-                                                if (success) {
-                                                    Toaster.toast("Subida exitosamente");
-                                                } else {
-                                                    Toaster.toast("Error al subir lista");
-                                                }
-                                            }
-                                        });
-                                        break;
-                                }
+                    popupMenu.setOnMenuItemClickListener(menuItem -> {
+                        if (DropboxManager.islogedIn()) {
+                            switch (menuItem.getItemId()) {
+                                case R.id.download:
+                                    final MaterialDialog dialog = getLoadingDialog(0);
+                                    dialog.show();
+                                    DropboxManager.downloadEmision(AutoEmisionActivity.this, (result, success) -> {
+                                        dialog.dismiss();
+                                        if (success) {
+                                            AutoEmisionHelper.updateSavedList(AutoEmisionActivity.this, result);
+                                            Toaster.toast("Descarga exitosa");
+                                            invalidateCurrentList();
+                                        } else {
+                                            Toaster.toast("Error al descargar");
+                                        }
+                                    });
+                                    break;
+                                case R.id.upload:
+                                    final MaterialDialog dialog_up = getLoadingDialog(1);
+                                    dialog_up.show();
+                                    DropboxManager.updateEmision(AutoEmisionActivity.this, success -> {
+                                        dialog_up.dismiss();
+                                        if (success) {
+                                            Toaster.toast("Subida exitosamente");
+                                        } else {
+                                            Toaster.toast("Error al subir lista");
+                                        }
+                                    });
+                                    break;
                             }
-                            return true;
                         }
+                        return true;
                     });
                     popupMenu.show();
                     break;

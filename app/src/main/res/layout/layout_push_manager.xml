@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
                                 android:text="Tipo:"
                                 android:textSize="18sp"/>
 
-                            <android.support.v7.widget.AppCompatSpinner
+                            <androidx.appcompat.widget.AppCompatSpinner
                                 android:id="@+id/options"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
 
                         </LinearLayout>
 
-                        <android.support.v7.widget.SwitchCompat
+                        <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/test"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
                             android:textSize="18sp"/>
                     </RelativeLayout>
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/title_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -85,16 +85,16 @@
                         android:layout_marginStart="10dp"
                         android:layout_marginTop="5dp">
 
-                        <android.support.design.widget.TextInputEditText
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Titulo"
                             android:inputType="textNoSuggestions|textShortMessage|textPersonName"
                             android:singleLine="true"/>
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/subtitle_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -105,16 +105,16 @@
                         android:layout_marginStart="10dp"
                         android:layout_marginTop="5dp">
 
-                        <android.support.design.widget.TextInputEditText
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/subtitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Subtitulo"
                             android:inputType="textNoSuggestions|textPersonName"
                             android:singleLine="true"/>
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/dialog_text_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -126,15 +126,15 @@
                         android:layout_marginTop="5dp"
                         android:visibility="gone">
 
-                        <android.support.design.widget.TextInputEditText
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/dialog_text"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Texto del dialogo"
                             android:inputType="textShortMessage|textLongMessage"/>
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/dialog_web_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -146,13 +146,13 @@
                         android:layout_marginTop="5dp"
                         android:visibility="gone">
 
-                        <android.support.design.widget.TextInputEditText
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/input_web"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="URL"
                             android:inputType="textNoSuggestions|textShortMessage|textLongMessage|textWebEditText"/>
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <Button
                         android:id="@+id/send"
@@ -162,9 +162,9 @@
                         android:foreground="?attr/selectableItemBackgroundBorderless"
                         android:text="ENVIAR"/>
                 </LinearLayout>
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/card_fast"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -217,7 +217,7 @@
                         android:text="Aviso (WEB)"/>
                 </LinearLayout>
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
 
     </ScrollView>

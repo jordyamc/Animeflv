@@ -2,8 +2,8 @@ package knf.animeflv.VideoServers;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +32,7 @@ public abstract class Server implements Comparable<Server> {
         return Arrays.asList(
                 new FenixServer(context, base),
                 new FireServer(context, base),
+                new FembedServer(context,base),
                 new HyperionServer(context, base),
                 new IzanagiServer(context, base),
                 new MangoServer(context,base),

@@ -3,9 +3,9 @@ package knf.animeflv.CustomSettingsIntro;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.afollestad.materialdialogs.Theme;
 import com.afollestad.materialdialogs.color.ColorChooserDialog;
@@ -28,14 +28,11 @@ public class CustomIntro extends MaterialIntroActivity implements ColorChooserDi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         enableLastSlideAlphaExitTransition(true);
-        addSlide(BackupFragment.get(this, new BackupFragment.BackupCallback() {
-            @Override
-            public void onBackup() {
-                setSkipButtonVisible();
-                ThemeHolder.isDark = ThemeUtils.isAmoled(CustomIntro.this);
-                ThemeHolder.accentColor = ThemeUtils.getAcentColor(CustomIntro.this);
-                themeFragment.onColorChange();
-            }
+        addSlide(BackupFragment.get(this, () -> {
+            setSkipButtonVisible();
+            ThemeHolder.isDark = ThemeUtils.isAmoled(CustomIntro.this);
+            ThemeHolder.accentColor = ThemeUtils.getAcentColor(CustomIntro.this);
+            themeFragment.onColorChange();
         }));
         addSlide(
                 new SlideFragmentBuilder()
@@ -53,12 +50,7 @@ public class CustomIntro extends MaterialIntroActivity implements ColorChooserDi
                         .buttonsColor(R.color.intro_3_dark)
                         .image(R.drawable.desc_stream_rez)
                         .build());
-        themeFragment = ThemeFragment.get(this, new ThemeFragment.ClickCallback() {
-            @Override
-            public void onClick() {
-                onColorChoose();
-            }
-        });
+        themeFragment = ThemeFragment.get(this, this::onColorChoose);
         addSlide(themeFragment);
         addSlide(CloudFragment.get());
         addSlide(
@@ -92,6 +84,14 @@ public class CustomIntro extends MaterialIntroActivity implements ColorChooserDi
                         .backgroundColor(R.color.intro_8)
                         .buttonsColor(R.color.intro_8_dark)
                         .image(R.drawable.nots)
+                        .build());
+        addSlide(
+                new SlideFragmentBuilder()
+                        .title(getString(R.string.intro_title_9))
+                        .description(getString(R.string.intro_desc_9))
+                        .backgroundColor(R.color.intro_9)
+                        .buttonsColor(R.color.intro_9_dark)
+                        .image(R.drawable.conf)
                         .build());
         addSlide(
                 new SlideFragmentBuilder()

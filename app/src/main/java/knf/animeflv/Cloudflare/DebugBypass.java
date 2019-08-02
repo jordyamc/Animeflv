@@ -5,9 +5,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
@@ -20,6 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.R;
 import knf.animeflv.Utils.ThemeUtils;
+import knf.kuma.uagen.UAGeneratorKt;
 import xdroid.toaster.Toaster;
 
 /**
@@ -33,12 +34,9 @@ public class DebugBypass extends AppCompatActivity {
     String log = "-Comenzando...\n\n";
     MaterialDialog dialog;
     Handler handler = new Handler();
-    Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            addLog("Error TIMEOUT!!!!");
-            enableExit();
-        }
+    Runnable runnable = () -> {
+        addLog("Error TIMEOUT!!!!");
+        enableExit();
     };
 
     @Override
@@ -53,17 +51,17 @@ public class DebugBypass extends AppCompatActivity {
                 .cancelable(false)
                 .autoDismiss(false)
                 .positiveText("Salir")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        dialog.dismiss();
-                        finish();
-                    }
+                .onPositive((dialog, which) -> {
+                    dialog.dismiss();
+                    finish();
                 })
                 .build();
         dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
         Bypass.clearCookies(this, ".animeflv.net");
+        String ua = UAGeneratorKt.randomUA();
+        BypassHolder.setUserAgent(this, ua);
         webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setUserAgentString(ua);
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -74,10 +72,7 @@ public class DebugBypass extends AppCompatActivity {
                     String cookies = CookieManager.getInstance().getCookie("http://animeflv.net");
                     if (cookies != null && (cookies.contains(BypassHolder.cookieKeyClearance) || cookies.contains(BypassHolder.cookieKeyDuid))) {
                         addLog("-Cookies detectadas: " + cookies);
-                        String ua = webView.getSettings().getUserAgentString();
-                        addLog("-User-Agent: " + ua);
                         Log.e("Detected Cookies", cookies);
-                        BypassHolder.setUserAgent(DebugBypass.this, ua);
                         saveCookie(DebugBypass.this, cookies);
                     } else {
                         Toaster.toast("Error al activar Bypass");
@@ -100,10 +95,7 @@ public class DebugBypass extends AppCompatActivity {
                         String cookies = CookieManager.getInstance().getCookie("http://animeflv.net");
                         if (cookies != null && (cookies.contains(BypassHolder.cookieKeyClearance) && cookies.contains(BypassHolder.cookieKeyDuid))) {
                             addLog("-Cookies detectadas: " + cookies);
-                            String ua = webView.getSettings().getUserAgentString();
-                            addLog("-User-Agent: " + ua);
                             Log.e("Detected Cookies", cookies);
-                            BypassHolder.setUserAgent(DebugBypass.this, ua);
                             saveCookie(DebugBypass.this, cookies);
                         }
                     }
@@ -113,48 +105,32 @@ public class DebugBypass extends AppCompatActivity {
         dialog.show();
         addLog("-Reiniciando valores guardados");
         BypassHolder.clear(this);
-        Bypass.runJsoupTest(new Bypass.onTestResult() {
-            @Override
-            public void onResult(boolean needBypass) {
-                if (needBypass) {
-                    addLog("-Abriendo pagina: http://animeflv.net");
-                    handler.postDelayed(runnable, Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(DebugBypass.this).getString("bypass_time", "30000")));
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            webView.loadUrl("http://animeflv.net");
-                        }
-                    });
-                } else {
-                    addLog("-Bypass no es necesario");
-                    enableExit();
-                }
+        Bypass.runJsoupTest(needBypass -> {
+            if (needBypass) {
+                addLog("-Abriendo pagina: http://animeflv.net");
+                handler.postDelayed(runnable, Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(DebugBypass.this).getString("bypass_time", "30000")));
+                runOnUiThread(() -> webView.loadUrl("http://animeflv.net"));
+            } else {
+                addLog("-Bypass no es necesario");
+                enableExit();
             }
         });
     }
 
     private void addLog(final String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    log += message;
-                    log += "\n\n";
-                    dialog.setContent(log);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        runOnUiThread(() -> {
+            try {
+                log += message;
+                log += "\n\n";
+                dialog.setContent(log);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
 
     private void enableExit() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
-            }
-        });
+        runOnUiThread(() -> dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true));
     }
 
     private void saveCookie(Context context, String cookies) {

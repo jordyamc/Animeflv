@@ -21,6 +21,11 @@ public class VideoServer {
         addOption(option);
     }
 
+    public VideoServer(String name, List<Option> options) {
+        this.name = name;
+        this.options = options;
+    }
+
     public static List<VideoServer> filter(List<VideoServer> videoServers) {
         List<String> names = new ArrayList<>();
         List<VideoServer> filtered = new ArrayList<>();
@@ -92,6 +97,7 @@ public class VideoServer {
         public static final String OKRU = "Okru";
         public static final String CLUP = "Clup";
         public static final String FENIX = "Fenix";
+        public static final String FEMBED = "Fembed";
         public static final String FIRE = "Fire";
         public static final String RV = "RV";
         public static final String MANGO = "Mango";
@@ -110,6 +116,7 @@ public class VideoServer {
                     HYPERION,
                     OKRU,
                     FENIX,
+                    FEMBED,
                     FIRE,
                     RV,
                     MANGO,

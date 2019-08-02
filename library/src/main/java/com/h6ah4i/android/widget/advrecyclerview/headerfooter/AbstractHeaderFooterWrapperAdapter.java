@@ -15,8 +15,8 @@
  */
 package com.h6ah4i.android.widget.advrecyclerview.headerfooter;
 
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 

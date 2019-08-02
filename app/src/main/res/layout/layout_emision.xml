@@ -36,7 +36,7 @@
             app:stl_underlineColor="@android:color/transparent"
             app:stl_underlineThickness="0dp"/>
 
-        <android.support.v4.view.ViewPager
+        <androidx.viewpager.widget.ViewPager
             android:id="@+id/vp_emision"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

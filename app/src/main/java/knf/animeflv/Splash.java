@@ -11,9 +11,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.ColorRes;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.ColorRes;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -46,6 +46,7 @@ import io.branch.referral.BranchError;
 import io.branch.referral.util.LinkProperties;
 import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.Cloudflare.BypassHolder;
+import knf.animeflv.Cloudflare.DebugBypassForbidden;
 import knf.animeflv.CustomSettingsIntro.CustomIntro;
 import knf.animeflv.Jobs.CheckJob;
 import knf.animeflv.Utils.NetworkUtils;
@@ -296,30 +297,26 @@ public class Splash extends AwesomeSplash {
             startActivity(new Intent(this, newMain.class));
         } else {
             finish();
-            startActivity(new Intent(context, CustomIntro.class));
+            startActivity(new Intent(context, Intronew.class));
         }
     }
 
     private void checkCloudflare() {
         if (NetworkUtils.isNetworkAvailable()) {
-            Bypass.runJsoupTest(new Bypass.onTestResult() {
-                @Override
-                public void onResult(boolean needBypass) {
-                    if (needBypass) {
-                        Toaster.toast("Activando bypass de Cloudflare");
-                        handler.postDelayed(runnable, Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(Splash.this).getString("bypass_time", "30000")));
-                        Bypass.check(Splash.this, new Bypass.onBypassCheck() {
-                            @Override
-                            public void onFinish() {
-                                handler.removeCallbacks(runnable);
-                                PicassoCache.recreate(getApplicationContext());
-                                proceed();
-                            }
-                        });
-                    } else {
-                        BypassHolder.clear(Splash.this);
+            Bypass.runJsoupTest(needBypass -> {
+                if (needBypass) {
+                    Toaster.toast("Activando bypass de Cloudflare");
+                    handler.postDelayed(runnable, Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(Splash.this).getString("bypass_time", "30000")));
+                    Bypass.check(Splash.this, (needScreen) -> {
+                        handler.removeCallbacks(runnable);
+                        PicassoCache.recreate(getApplicationContext());
                         proceed();
-                    }
+                        if (needScreen)
+                            startActivity(new Intent(context, DebugBypassForbidden.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                    });
+                } else {
+                    BypassHolder.clear(Splash.this);
+                    proceed();
                 }
             });
         } else {
@@ -349,12 +346,7 @@ public class Splash extends AwesomeSplash {
                                 .cancelable(false)
                                 .autoDismiss(true)
                                 .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        checkPermission();
-                                    }
-                                })
+                                .onPositive((dialog, which) -> checkPermission())
                                 .build().show();
                     } else {
                         Toaster.toast("El permiso es necesario, por favor activalo");
@@ -378,16 +370,13 @@ public class Splash extends AwesomeSplash {
                                 .cancelable(false)
                                 .autoDismiss(true)
                                 .backgroundColor(ThemeUtils.isAmoled(context) ? ColorsRes.Prim(context) : ColorsRes.Blanco(context))
-                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        finish();
-                                        Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                        i.addCategory(Intent.CATEGORY_DEFAULT);
-                                        i.setData(Uri.parse("package:" + getPackageName()));
-                                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivityForResult(i, 5548);
-                                    }
+                                .onPositive((dialog, which) -> {
+                                    finish();
+                                    Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                    i.addCategory(Intent.CATEGORY_DEFAULT);
+                                    i.setData(Uri.parse("package:" + getPackageName()));
+                                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivityForResult(i, 5548);
                                 })
                                 .build().show();
                     } catch (Exception e) {
@@ -405,18 +394,10 @@ public class Splash extends AwesomeSplash {
         super.onStart();
         Branch branch = Branch.getInstance();
 
-        branch.initSession(new Branch.BranchUniversalReferralInitListener() {
-            @Override
-            public void onInitFinished(BranchUniversalObject branchUniversalObject, LinkProperties linkProperties, BranchError error) {
-                if (error != null) {
-                    Log.i("MyApp", error.getMessage());
-                }
+        branch.initSession((branchUniversalObject, linkProperties, error) -> {
+            if (error != null) {
+                Log.i("MyApp", error.getMessage());
             }
         }, this.getIntent().getData(), this);
-    }
-
-    @Override
-    public void onNewIntent(Intent intent) {
-        this.setIntent(intent);
     }
 }

@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,13 +14,15 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.onesignal.OneSignal;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import knf.animeflv.Utils.ThemeUtils;
 
 public class Configuracion extends AppCompatActivity {
     public static final int OPEN_SOUNDS = 1;
     public static final int GET_WRITE_PERMISSIONS = 2;
+
     public static boolean isXLargeScreen(Context context) {
         return (context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
@@ -52,7 +52,7 @@ public class Configuracion extends AppCompatActivity {
             getWindow().setStatusBarColor(theme.primaryDark);
             getWindow().setNavigationBarColor(theme.primary);
         }
-        Toolbar toolbar=(Toolbar) findViewById(R.id.conf_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.conf_toolbar);
         toolbar.setBackgroundColor(theme.primary);
         toolbar.getRootView().setBackgroundColor(theme.background);
         setSupportActionBar(toolbar);
@@ -77,44 +77,10 @@ public class Configuracion extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.menu_ayuda, menu);
-        ThemeUtils.setMenuColor(menu, ThemeUtils.Theme.get(this, ThemeUtils.Theme.KEY_TOOLBAR_NAVIGATION));
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        super.onOptionsItemSelected(item);
-        MaterialDialog dialog = new MaterialDialog.Builder(this)
-                .title("Codigo de referencia")
-                .backgroundColor(ThemeUtils.isAmoled(this) ? ColorsRes.Prim(this) : ColorsRes.Blanco(this))
-                .titleGravity(GravityEnum.CENTER)
-                .customView(R.layout.lay_info, false)
-                .build();
-        final String id = OneSignal.getPermissionSubscriptionState().getSubscriptionStatus().getUserId();
-        TextView textView = (TextView) dialog.getCustomView().findViewById(R.id.help_id);
-        textView.setText(id);
-        textView.setTextColor(ThemeUtils.getAcentColor(this));
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("label", id);
-                clipboard.setPrimaryClip(clip);
-                Toast.makeText(Configuracion.this, "Codigo copiado a portapapeles", Toast.LENGTH_SHORT).show();
-            }
-        });
-        dialog.show();
-        return true;
-    }
-
-    @Override
-    public void onConfigurationChanged (Configuration newConfig) {
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        if (!isXLargeScreen(getApplicationContext()) ) {
+        if (!isXLargeScreen(getApplicationContext())) {
             return;
         }
     }

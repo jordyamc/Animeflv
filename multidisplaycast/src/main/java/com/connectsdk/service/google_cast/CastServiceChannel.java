@@ -20,7 +20,7 @@
 
 package com.connectsdk.service.google_cast;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.connectsdk.core.Util;
 import com.connectsdk.service.sessions.CastWebAppSession;

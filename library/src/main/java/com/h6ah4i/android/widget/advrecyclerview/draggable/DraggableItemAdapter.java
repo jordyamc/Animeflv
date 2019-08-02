@@ -17,6 +17,7 @@
 package com.h6ah4i.android.widget.advrecyclerview.draggable;
 
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView;
 
 public interface DraggableItemAdapter<T extends RecyclerView.ViewHolder> {
 

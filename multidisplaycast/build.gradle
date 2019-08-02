@@ -69,12 +69,12 @@ dependencies {
     implementation files('libs/javax.jmdns_3.4.1-patch2.jar')
     implementation files('libs/AmazonFling.jar')
     implementation files('libs/WhisperPlay.jar')
-    implementation "com.android.support:support-v4:$project.g_apps"
-    implementation "com.android.support:appcompat-v7:$project.g_apps"
-    implementation "com.android.support:mediarouter-v7:$project.g_apps"
-    implementation "com.android.support:design:$project.g_apps"
-    implementation "com.google.android.gms:play-services-cast:$project.p_services"
-    implementation 'com.github.bumptech.glide:glide:4.7.1'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.mediarouter:mediarouter:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation "com.google.android.gms:play-services-cast:17.0.0"
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
     implementation 'com.google.code.gson:gson:+'
     implementation 'com.github.munix:AndroidUtilities:1.6.0'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'

@@ -4,39 +4,28 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
-import android.support.multidex.MultiDex;
-import android.support.multidex.MultiDexApplication;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.core.CrashlyticsCore;
 import com.evernote.android.job.JobManager;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
-import com.onesignal.OSNotificationOpenResult;
-import com.onesignal.OneSignal;
 
-import org.json.JSONObject;
-
+import androidx.multidex.MultiDex;
+import androidx.multidex.MultiDexApplication;
 import es.munix.multidisplaycast.CastManager;
 import io.branch.referral.Branch;
 import io.fabric.sdk.android.Fabric;
 import knf.animeflv.DownloadService.SSLCertificateHandler;
 import knf.animeflv.Jobs.JobsCreator;
 import knf.animeflv.LoginActivity.DropboxManager;
-import knf.animeflv.Utils.FastActivity;
 import knf.animeflv.Utils.Logger;
 import knf.animeflv.Utils.UtilsInit;
-import xdroid.toaster.Toaster;
 
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_ANIMES;
 import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_ANIMES_DESC;
@@ -55,8 +44,7 @@ import static knf.animeflv.BackgroundChecker.startBackground.CHANNEL_UPDATES_RUN
 
 
 public class Application extends MultiDexApplication {
-    private static NotificationResponse handler;
-    Context context;
+    public static Context context;
     private Tracker mTracker;
 
     public static Application get(Activity activity) {
@@ -95,14 +83,6 @@ public class Application extends MultiDexApplication {
         Crashlytics.setUserEmail(FavSyncro.getEmail(this));
         CastManager.register(getApplicationContext());
         DropboxManager.init(this);
-        OneSignal.startInit(this)
-                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
-                .unsubscribeWhenNotificationsAreDisabled(true)
-                .setNotificationOpenedHandler(getNotificationHandler())
-                .init();
-        String email = FavSyncro.getEmail(context);
-        if (!email.equals("Animeflv"))
-            OneSignal.syncHashedEmail(email);
     }
 
     @Override
@@ -118,12 +98,6 @@ public class Application extends MultiDexApplication {
             mTracker = analytics.newTracker(R.xml.app_tracker);
         }
         return mTracker;
-    }
-
-    public NotificationResponse getNotificationHandler() {
-        if (handler == null)
-            handler = new NotificationResponse();
-        return handler;
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -160,62 +134,6 @@ public class Application extends MultiDexApplication {
             manager.createNotificationChannel(channel);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    public class NotificationResponse implements OneSignal.NotificationOpenedHandler {
-        @Override
-        public void notificationOpened(OSNotificationOpenResult result) {
-            try {
-                JSONObject data = result.notification.payload.additionalData;
-                if (data == null) {
-                    Log.e("Notification Received", "No data");
-                    Intent intent = new Intent(getApplicationContext(), Splash.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    getApplicationContext().startActivity(intent);
-                } else {
-                    Log.e("Notification Received", "Data: [Action: " + data.getString("action") + "]");
-                    switch (data.getString("action")) {
-                        case "DIALOG":
-                            Bundle bundle = new Bundle();
-                            bundle.putInt("key", FastActivity.SHOW_DIALOG);
-                            bundle.putString("content", data.getString("text"));
-                            Intent intent = new Intent(getApplicationContext(), FastActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            intent.putExtras(bundle);
-                            getApplicationContext().startActivity(intent);
-                            break;
-                        case "DIALOG-WEB":
-                            Bundle bundle_web = new Bundle();
-                            bundle_web.putInt("key", FastActivity.SHOW_DIALOG);
-                            bundle_web.putString("content", data.getString("text"));
-                            bundle_web.putString("web", data.getString("url"));
-                            Intent intent_web = new Intent(getApplicationContext(), FastActivity.class);
-                            intent_web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            intent_web.putExtras(bundle_web);
-                            getApplicationContext().startActivity(intent_web);
-                            break;
-                        case "MAIN":
-                            Intent splash = new Intent(getApplicationContext(), Splash.class);
-                            splash.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            getApplicationContext().startActivity(splash);
-                            break;
-                        case "WEB":
-                            Intent web = new Intent(Intent.ACTION_VIEW, Uri.parse(data.getString("url")));
-                            web.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            getApplicationContext().startActivity(web);
-                            break;
-                        default:
-                            Toaster.toast("La accion " + data.getString("action") + " no esta disponible en esta version!!!");
-                    }
-                }
-            } catch (ActivityNotFoundException e) {
-                e.printStackTrace();
-                Toaster.toast("No se encontro ninguna aplicacion disponible");
-            } catch (Exception e) {
-                e.printStackTrace();
-                CrashlyticsCore.getInstance().logException(e);
-            }
         }
     }
 

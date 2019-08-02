@@ -10,7 +10,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.View;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -111,7 +111,8 @@ public class DownloadGetter {
                                                 }
                                             });
                                             break;
-                                        case "mega":
+                                        case "mega 1":
+                                        case "mega 2":
                                             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ur)));
                                             MainStates.setProcessing(false, null);
                                             actionsInterface.onStartDownload();
@@ -128,12 +129,7 @@ public class DownloadGetter {
                                 String last = PreferenceManager.getDefaultSharedPreferences(context).getString(actionsInterface.isStream() ? "last_stream" : "last_download", "null");
                                 final int last_pos = Server.findPosition(videoServers, last);
                                 if (actionsInterface instanceof ActionsInterfaceDeep)
-                                    context.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            progress.dismiss();
-                                        }
-                                    });
+                                    context.runOnUiThread(() -> progress.dismiss());
                                 showDownload(context, eid, last_pos, videoServers, actionsInterface);
                             }
                         } else {

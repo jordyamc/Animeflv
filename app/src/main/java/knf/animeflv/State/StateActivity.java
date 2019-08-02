@@ -3,11 +3,11 @@ package knf.animeflv.State;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.ColorInt;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -84,37 +84,16 @@ public class StateActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Estado");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
+        toolbar.setNavigationOnClickListener(v -> finish());
+        cardView.setOnLongClickListener(v -> {
+            Toaster.toast("Recargando...");
+            reset();
+            return true;
         });
-        cardView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Toaster.toast("Recargando...");
-                reset();
-                return true;
-            }
-        });
-        cardView_bypass.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(new Intent(StateActivity.this, DebugBypass.class), 55878);
-            }
-        });
-        cardView_bypass.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                Bypass.check(StateActivity.this, new Bypass.onBypassCheck() {
-                    @Override
-                    public void onFinish() {
-                        checkBypass();
-                    }
-                });
-                return true;
-            }
+        cardView_bypass.setOnClickListener(v -> startActivityForResult(new Intent(StateActivity.this, DebugBypass.class), 55878));
+        cardView_bypass.setOnLongClickListener(view -> {
+            Bypass.check(StateActivity.this, needScreen -> checkBypass());
+            return true;
         });
         ThemeUtils.Theme theme = ThemeUtils.Theme.create(this);
         toolbar.setBackgroundColor(theme.primary);

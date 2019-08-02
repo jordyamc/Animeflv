@@ -1,10 +1,9 @@
 package knf.animeflv.Cloudflare;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
@@ -17,11 +16,15 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.impl.cookie.BasicClientCookie;
 import knf.animeflv.JsonFactory.SelfGetter;
 import knf.animeflv.JsonFactory.ServerGetter;
 import knf.animeflv.Utils.ExecutorManager;
+import knf.kuma.uagen.UAGenerator;
+import knf.kuma.uagen.UAGeneratorKt;
 import xdroid.toaster.Toaster;
 
 public class Bypass {
@@ -47,13 +50,21 @@ public class Bypass {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 if (statusCode != 0) {
+                    if (statusCode == 403) {
+                        if (check != null)
+                            check.onFinish(true);
+                        return;
+                    }
                     Log.e("CloudflareBypass", "Failed with code: " + statusCode);
                     ((AppCompatActivity) context).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             clearCookies(context, ".animeflv.net");
-                            final WebView webView = new WebView(context);
+                            String ua = UAGeneratorKt.randomUA();
+                            BypassHolder.setUserAgent(context, ua);
+                            final WebView webView = new WebView(context.getApplicationContext());
                             webView.getSettings().setJavaScriptEnabled(true);
+                            webView.getSettings().setUserAgentString(ua);
                             webView.setWebViewClient(new WebViewClient() {
                                 @Override
                                 public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
@@ -64,14 +75,12 @@ public class Bypass {
                                         if (cookies != null)
                                             Log.e("CloudflareBypass", "Getting Cookies: " + cookies);
                                         if (cookies != null && (cookies.contains(BypassHolder.cookieKeyClearance) || cookies.contains(BypassHolder.cookieKeyDuid))) {
-                                            String ua = webView.getSettings().getUserAgentString();
                                             Log.e("Detected Cookies", cookies);
-                                            BypassHolder.setUserAgent(context, ua);
                                             saveCookie(context, cookies, check);
                                         } else {
                                             Toaster.toast("Error al activar Bypass");
                                             if (check != null)
-                                                check.onFinish();
+                                                check.onFinish(true);
                                         }
                                         return true;
                                     } else {
@@ -89,9 +98,7 @@ public class Bypass {
                                             if (cookies != null)
                                                 Log.e("CloudflareBypass", "Getting Cookies: " + cookies);
                                             if (cookies != null && (cookies.contains(BypassHolder.cookieKeyClearance) && cookies.contains(BypassHolder.cookieKeyDuid))) {
-                                                String ua = webView.getSettings().getUserAgentString();
                                                 Log.e("Detected Cookies", cookies);
-                                                BypassHolder.setUserAgent(context, ua);
                                                 saveCookie(context, cookies, check);
                                             }
                                         }
@@ -112,7 +119,7 @@ public class Bypass {
                     public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                         Log.e("CloudflareBypass", "ENABLED Keep bypass");
                         if (check != null)
-                            check.onFinish();
+                            check.onFinish(false);
                     }
 
                     @Override
@@ -120,7 +127,7 @@ public class Bypass {
                         Log.e("CloudflareBypass", "DISABLED clear bypass");
                         BypassHolder.clear(context);
                         if (check != null)
-                            check.onFinish();
+                            check.onFinish(false);
                     }
                 });
             }
@@ -142,7 +149,7 @@ public class Bypass {
             }
             Toaster.toast("Bypass de Cloudflare Activado");
             if (check != null)
-                check.onFinish();
+                check.onFinish(false);
         }
     }
 
@@ -199,6 +206,6 @@ public class Bypass {
     }
 
     public interface onBypassCheck {
-        void onFinish();
+        void onFinish(boolean needScreen);
     }
 }

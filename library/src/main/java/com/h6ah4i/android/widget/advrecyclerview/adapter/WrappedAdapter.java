@@ -16,6 +16,10 @@
 package com.h6ah4i.android.widget.advrecyclerview.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView;
 
 /**
  * An interface provides better methods for wrapped adapters.

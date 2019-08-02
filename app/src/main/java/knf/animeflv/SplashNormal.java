@@ -11,9 +11,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.ColorRes;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.ColorRes;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -46,6 +46,7 @@ import io.branch.referral.BranchError;
 import io.branch.referral.util.LinkProperties;
 import knf.animeflv.Cloudflare.Bypass;
 import knf.animeflv.Cloudflare.BypassHolder;
+import knf.animeflv.Cloudflare.DebugBypassForbidden;
 import knf.animeflv.CustomSettingsIntro.CustomIntro;
 import knf.animeflv.Jobs.CheckJob;
 import knf.animeflv.Utils.NetworkUtils;
@@ -296,30 +297,26 @@ public class SplashNormal extends AwesomeSplash {
             startActivity(new Intent(this, newMain.class));
         } else {
             finish();
-            startActivity(new Intent(context, CustomIntro.class));
+            startActivity(new Intent(context, Intronew.class));
         }
     }
 
     private void checkCloudflare() {
         if (NetworkUtils.isNetworkAvailable()) {
-            Bypass.runJsoupTest(new Bypass.onTestResult() {
-                @Override
-                public void onResult(boolean needBypass) {
-                    if (needBypass) {
-                        Toaster.toast("Activando bypass de Cloudflare");
-                        handler.postDelayed(runnable, Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(SplashNormal.this).getString("bypass_time", "30000")));
-                        Bypass.check(SplashNormal.this, new Bypass.onBypassCheck() {
-                            @Override
-                            public void onFinish() {
-                                handler.removeCallbacks(runnable);
-                                PicassoCache.recreate(getApplicationContext());
-                                proceed();
-                            }
-                        });
-                    } else {
-                        BypassHolder.clear(SplashNormal.this);
+            Bypass.runJsoupTest(needBypass -> {
+                if (needBypass) {
+                    Toaster.toast("Activando bypass de Cloudflare");
+                    handler.postDelayed(runnable, Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(SplashNormal.this).getString("bypass_time", "30000")));
+                    Bypass.check(SplashNormal.this, (needScreen) -> {
+                        handler.removeCallbacks(runnable);
+                        PicassoCache.recreate(getApplicationContext());
                         proceed();
-                    }
+                        if (needScreen)
+                            startActivity(new Intent(context, DebugBypassForbidden.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                    });
+                } else {
+                    BypassHolder.clear(SplashNormal.this);
+                    proceed();
                 }
             });
         } else {

@@ -21,6 +21,9 @@ import android.support.v7.widget.RecyclerView;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.ItemDraggableRange;
 import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
 
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView;
+
 public interface ExpandableDraggableItemAdapter<GVH extends RecyclerView.ViewHolder, CVH extends RecyclerView.ViewHolder> {
     /**
      * Called when user is attempt to drag the group item.

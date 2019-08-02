@@ -6,12 +6,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +20,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import knf.animeflv.ColorsRes;
@@ -35,6 +35,7 @@ import knf.animeflv.JsonFactory.SelfGetter;
 import knf.animeflv.R;
 import knf.animeflv.Utils.ExecutorManager;
 import knf.animeflv.Utils.ThemeUtils;
+import xdroid.toaster.Toaster;
 
 public class AutoEmisionFragment extends Fragment implements OnListInteraction {
     @BindView(R.id.recyclerView)
@@ -144,21 +145,18 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
                 }
             });
             adapter = new AutoEmisionAdapter(getActivity(), list, day, AutoEmisionFragment.this);
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        progressBar.setVisibility(View.GONE);
-                        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                        recyclerView.setAdapter(adapter);
-                        helper.attachToRecyclerView(recyclerView);
-                        if (list.size() == 0) {
-                            no_data_img.setImageResource(ThemeUtils.getFlatImage(getActivity()));
-                            no_data.setVisibility(View.VISIBLE);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+            new Handler(Looper.getMainLooper()).post(() -> {
+                try {
+                    progressBar.setVisibility(View.GONE);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    recyclerView.setAdapter(adapter);
+                    helper.attachToRecyclerView(recyclerView);
+                    if (list.size() == 0) {
+                        no_data_img.setImageResource(ThemeUtils.getFlatImage(getActivity()));
+                        no_data.setVisibility(View.VISIBLE);
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
         } catch (Exception e) {
@@ -173,26 +171,23 @@ public class AutoEmisionFragment extends Fragment implements OnListInteraction {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    final List<EmObj> new_list = new ArrayList<EmObj>();
-                    new_list.addAll(list);
+                    final List<EmObj> new_list = new ArrayList<>(list);
                     for (final EmObj obj : list) {
                         Log.e("Emision Check", "Day: " + day + "  Title: " + obj.getTitle());
                         String f_json = SelfGetter.getAnimeSync(getActivity(), new ANIME(Integer.parseInt(obj.getAid())));
-                        if (f_json.equals("null") || f_json.startsWith("error")) {
-                            f_json = OfflineGetter.getAnime(new ANIME(Integer.parseInt(obj.getAid())));
-                        }
-                        try {
-                            JSONObject object = new JSONObject(f_json);
-                            if (!isEmision(object)) {
-                                Log.e("AutoEmision", "Deleting from list: " + obj.getTitle());
-                                AutoEmisionListHolder.deleteFromList(new_list, obj.getAid(), day);
-                                AutoEmisionHelper.removeAnimeFromList(getActivity(), obj.getAid(), day, null);
-                                edited = true;
-                                removeCount++;
+                        if (!f_json.equals("null") && !f_json.startsWith("error"))
+                            try {
+                                JSONObject object = new JSONObject(f_json);
+                                if (!isEmision(object)) {
+                                    Log.e("AutoEmision", "Deleting from list: " + obj.getTitle());
+                                    AutoEmisionListHolder.deleteFromList(new_list, obj.getAid(), day);
+                                    AutoEmisionHelper.removeAnimeFromList(getActivity(), obj.getAid(), day, null);
+                                    edited = true;
+                                    removeCount++;
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
                     }
                     if (edited) {
                         setRecycler(new_list, day);

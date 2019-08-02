@@ -2,22 +2,38 @@ package knf.animeflv;
 
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
+import android.preference.PreferenceManager;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.viewpager.widget.ViewPager;
+import knf.animeflv.CustomSettingsIntro.fragments.BackupFragmentNew;
+import knf.animeflv.CustomSettingsIntro.fragments.CloudFragmentNew;
+import knf.animeflv.CustomSettingsIntro.fragments.ThemeFragmentNew;
+import knf.animeflv.Utils.ThemeUtils;
+
+import com.afollestad.materialdialogs.Theme;
+import com.afollestad.materialdialogs.color.ColorChooserDialog;
 import com.heinrichreimersoftware.materialintro.app.IntroActivity;
+import com.heinrichreimersoftware.materialintro.slide.FragmentSlide;
 import com.heinrichreimersoftware.materialintro.slide.SimpleSlide;
 
-public class Intronew extends IntroActivity {
+
+public class Intronew extends IntroActivity implements ColorChooserDialog.ColorCallback {
+    private ThemeFragmentNew themeFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addSlide(new SimpleSlide.Builder()
-                .layout(R.layout.simple_slide)
-                .title(R.string.intro_title_1)
-                .description(R.string.intro_desc_1)
-                .image(R.drawable.app_icon_intro)
+        addSlide(new FragmentSlide.Builder()
+                .fragment(BackupFragmentNew.get(this, () -> {
+                    setButtonBackFunction(BUTTON_BACK_FUNCTION_SKIP);
+                    ThemeHolder.isDark = ThemeUtils.isAmoled(Intronew.this);
+                    ThemeHolder.accentColor = ThemeUtils.getAcentColor(Intronew.this);
+                    themeFragment.onColorChange();
+                }))
                 .background(R.color.intro_1)
                 .backgroundDark(R.color.intro_1_dark)
                 .build());
@@ -37,19 +53,22 @@ public class Intronew extends IntroActivity {
                 .background(R.color.intro_3)
                 .backgroundDark(R.color.intro_3_dark)
                 .build());
-        addSlide(new SimpleSlide.Builder()
-                .layout(R.layout.simple_slide)
-                .title(R.string.intro_title_4)
-                .description(R.string.intro_desc_4)
-                .image(R.drawable.comparacion_rez)
+        themeFragment = ThemeFragmentNew.get(this, this::onColorChoose);
+        addSlide(new FragmentSlide.Builder()
+                .fragment(themeFragment)
                 .background(R.color.intro_4)
                 .backgroundDark(R.color.intro_4_dark)
+                .build());
+        addSlide(new FragmentSlide.Builder()
+                .fragment(CloudFragmentNew.get())
+                .background(R.color.blanco)
+                .backgroundDark(R.color.dropbox)
                 .build());
         addSlide(new SimpleSlide.Builder()
                 .layout(R.layout.simple_slide)
                 .title(R.string.intro_title_5)
                 .description(R.string.intro_desc_5)
-                .image(R.drawable.info_rez_comp)
+                .image(R.drawable.anim_info)
                 .background(R.color.intro_5)
                 .backgroundDark(R.color.intro_5_dark)
                 .build());
@@ -101,7 +120,7 @@ public class Intronew extends IntroActivity {
                 .background(R.color.intro_11)
                 .backgroundDark(R.color.intro_11_dark)
                 .build());
-        setSkipEnabled(false);
+        setButtonBackFunction(BUTTON_BACK_FUNCTION_BACK);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setNavigationBarColor(getResources().getColor(R.color.intro_1));
         }
@@ -109,7 +128,7 @@ public class Intronew extends IntroActivity {
         addOnPageChangeListener(new ViewPager.OnPageChangeListener(){
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if (position==10){
+                if (position==11){
                     colorCase(position);
                     Intronew.this.getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("intro", true).apply();
                 }
@@ -123,6 +142,8 @@ public class Intronew extends IntroActivity {
             }
         });
     }
+
+
     private void colorCase(int c){
         switch (c){
             case 0:
@@ -138,24 +159,27 @@ public class Intronew extends IntroActivity {
                 changeNavigationColor(R.color.intro_4);
                 break;
             case 4:
-                changeNavigationColor(R.color.intro_5);
+                changeNavigationColor(R.color.blanco);
                 break;
             case 5:
-                changeNavigationColor(R.color.intro_6);
+                changeNavigationColor(R.color.intro_5);
                 break;
             case 6:
-                changeNavigationColor(R.color.intro_7);
+                changeNavigationColor(R.color.intro_6);
                 break;
             case 7:
-                changeNavigationColor(R.color.intro_8);
+                changeNavigationColor(R.color.intro_7);
                 break;
             case 8:
-                changeNavigationColor(R.color.intro_9);
+                changeNavigationColor(R.color.intro_8);
                 break;
             case 9:
-                changeNavigationColor(R.color.intro_10);
+                changeNavigationColor(R.color.intro_9);
                 break;
             case 10:
+                changeNavigationColor(R.color.intro_10);
+                break;
+            case 11:
                 changeNavigationColor(R.color.intro_11);
                 break;
         }
@@ -168,25 +192,75 @@ public class Intronew extends IntroActivity {
             int to = getResources().getColor(code);
             ValueAnimator colorAnimation = ValueAnimator.ofArgb(from, to);
             colorAnimation.setDuration(200);
-            colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animator) {
-                    getWindow().setNavigationBarColor((Integer) animator.getAnimatedValue());
-                }
-            });
+            colorAnimation.addUpdateListener(animator -> getWindow().setNavigationBarColor((Integer) animator.getAnimatedValue()));
             colorAnimation.start();
         }
     }
 
+    private void onColorChoose() {
+        int[] colorl = new int[]{
+                ColorsRes.Gris(this),
+                ColorsRes.Prim(this)
+        };
+        ColorChooserDialog dialog = new ColorChooserDialog.Builder(this, R.string.color_chooser_prim)
+                .theme(ThemeUtils.isAmoled(this) ? Theme.DARK : Theme.LIGHT)
+                .customColors(colorl, null)
+                .dynamicButtonColor(true)
+                .allowUserColorInput(false)
+                .allowUserColorInputAlpha(false)
+                .doneButton(R.string.next)
+                .cancelButton(R.string.cancel)
+                .preselect(ThemeUtils.isAmoled(this) ? ColorsRes.Dark(this) : ColorsRes.Gris(this))
+                .accentMode(true)
+                .build();
+        dialog.show(this);
+    }
+
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onColorSelection(@NonNull ColorChooserDialog dialog, @ColorInt int selectedColor) {
+        if (selectedColor == ColorsRes.Prim(this) || selectedColor == ColorsRes.Gris(this)) {
+            ThemeHolder.old_isDark = ThemeHolder.isDark;
+            ThemeHolder.isDark = selectedColor == ColorsRes.Prim(this);
+            int[] colorl = new int[]{
+                    ColorsRes.Naranja(this),
+                    ColorsRes.Rojo(this),
+                    ColorsRes.Gris(this),
+                    ColorsRes.Verde(this),
+                    ColorsRes.Rosa(this),
+                    ColorsRes.Morado(this)
+            };
+            new ColorChooserDialog.Builder(this, R.string.color_chooser)
+                    .theme(ThemeUtils.isAmoled(this) ? Theme.DARK : Theme.LIGHT)
+                    .customColors(colorl, null)
+                    .dynamicButtonColor(true)
+                    .allowUserColorInput(false)
+                    .allowUserColorInputAlpha(false)
+                    .doneButton(R.string.ok)
+                    .cancelButton(R.string.back)
+                    .preselect(PreferenceManager.getDefaultSharedPreferences(this).getInt("accentColor", ColorsRes.Naranja(this)))
+                    .accentMode(true)
+                    .build().show(this);
+        } else {
+            ThemeHolder.old_accentColor = ThemeHolder.accentColor;
+            ThemeHolder.accentColor = selectedColor;
+            ThemeHolder.applyThemeNoReset(this);
+            themeFragment.onColorChange();
+        }
+    }
+
+    @Override
+    public void onColorChooserDismissed(@NonNull ColorChooserDialog colorChooserDialog) {
+
+    }
+
+    @Override
+    public void finish() {
+        startActivity(new Intent(this, newMain.class));
         Intronew.this.getSharedPreferences("data", MODE_PRIVATE).edit().putBoolean("intro", true).apply();
+        super.finish();
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-
     }
 }

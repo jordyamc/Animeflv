@@ -1,6 +1,6 @@
 package knf.animeflv.Rate;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;

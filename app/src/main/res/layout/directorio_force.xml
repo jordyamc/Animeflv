@@ -40,7 +40,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_search"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -62,7 +62,7 @@
                 app:met_floatingLabelText=""
                 app:met_hideUnderline="true"/>
 
-        </android.support.v7.widget.Toolbar>
+        </androidx.appcompat.widget.Toolbar>
 
         <RelativeLayout
             android:id="@+id/LY_dir"
@@ -96,7 +96,7 @@
                     app:stl_underlineColor="@android:color/transparent"
                     app:stl_underlineThickness="0dp"/>
 
-                <android.support.v4.view.ViewPager
+                <androidx.viewpager.widget.ViewPager
                     android:id="@+id/viewpager2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -110,7 +110,7 @@
             android:layout_height="match_parent"
             android:visibility="gone">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_busqueda"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

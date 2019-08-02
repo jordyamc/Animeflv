@@ -2,9 +2,9 @@ package knf.animeflv.playerSources;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.IntRange;
-import android.support.annotation.Nullable;
-import android.support.v4.view.MotionEventCompat;
+import androidx.annotation.IntRange;
+import androidx.annotation.Nullable;
+
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -16,7 +16,6 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.devbrackets.android.exomedia.ui.widget.EMVideoView;
 import com.devbrackets.android.exomedia.ui.widget.VideoControls;
@@ -28,7 +27,6 @@ import java.util.Formatter;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import knf.animeflv.ColorsRes;
 import knf.animeflv.R;
 
 

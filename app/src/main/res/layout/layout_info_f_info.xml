@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nested"
@@ -211,7 +211,7 @@
                 android:textColor="@android:color/darker_gray"/>
         </LinearLayout>
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_relacionados"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -220,4 +220,4 @@
             android:paddingTop="10dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
     </LinearLayout>
-</android.support.v4.widget.NestedScrollView>
+</androidx.core.widget.NestedScrollView>

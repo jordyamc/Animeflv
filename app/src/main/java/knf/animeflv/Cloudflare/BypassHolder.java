@@ -6,6 +6,8 @@ import android.preference.PreferenceManager;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import knf.animeflv.Application;
+
 /**
  * Created by Jordy on 02/03/2017.
  */
@@ -45,16 +47,26 @@ public class BypassHolder {
         return map;
     }
 
+    public static String getBasicCookieString(Context context) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("device=computer; ");
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isBypassActive", false)) {
+            String duid = PreferenceManager.getDefaultSharedPreferences(context).getString("bypassDuid", "");
+            if (!duid.equals(""))
+                builder.append(cookieKeyDuid).append("=").append(duid).append("; ");
+            String clearance = PreferenceManager.getDefaultSharedPreferences(context).getString("bypassClearance", "");
+            if (!clearance.equals(""))
+                builder.append(cookieKeyClearance).append("=").append(clearance);
+        }
+        return builder.toString().trim();
+    }
+
     public static String getUserAgent() {
-        if (isActive)
-            return userAgent;
-        return default_userAgent;
+        return getUserAgent(Application.context);
     }
 
     public static String getUserAgent(Context context) {
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("isBypassActive", false))
-            return PreferenceManager.getDefaultSharedPreferences(context).getString("bypassUserAgent", default_userAgent);
-        return default_userAgent;
+        return PreferenceManager.getDefaultSharedPreferences(context).getString("bypassUserAgent", default_userAgent);
     }
 
     public static void setUserAgent(Context context, String ua) {

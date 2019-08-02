@@ -16,7 +16,11 @@
 
 package com.h6ah4i.android.widget.advrecyclerview.expandable;
 
-import android.support.annotation.IntRange;
+import androidx.annotation.IntRange;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 

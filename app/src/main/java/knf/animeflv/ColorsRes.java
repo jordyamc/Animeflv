@@ -3,8 +3,8 @@ package knf.animeflv;
 import android.content.Context;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
-import android.support.annotation.ColorInt;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.ColorInt;
+import androidx.core.content.ContextCompat;
 
 /**
  * Created by Jordy on 16/03/2016.

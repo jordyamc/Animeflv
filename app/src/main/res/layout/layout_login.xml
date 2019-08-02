@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -61,7 +61,7 @@
                     android:orientation="vertical"
                     android:visibility="gone">
 
-                    <android.support.v7.widget.AppCompatButton
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/sync_favs"
                         style="?attr/borderlessButtonStyle"
                         android:layout_width="match_parent"
@@ -71,7 +71,7 @@
                         android:textColor="#800000"
                         android:visibility="gone"/>
 
-                    <android.support.v7.widget.AppCompatButton
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/sync_seen"
                         style="?attr/borderlessButtonStyle"
                         android:layout_width="match_parent"
@@ -81,7 +81,7 @@
                         android:textColor="#800000"
                         android:visibility="gone"/>
 
-                    <android.support.v7.widget.AppCompatButton
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/sync_emision"
                         style="?attr/borderlessButtonStyle"
                         android:layout_width="match_parent"

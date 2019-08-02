@@ -1,7 +1,7 @@
 package knf.animeflv.VideoServers;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,8 +41,7 @@ public class OkruServer extends Server {
     VideoServer getVideoServer() {
         try {
             String down_link = KUtilsKt.extractLink(baseLink);
-            String true_link = extractOkruLink(Jsoup.connect(down_link).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().select("script").last().html());
-            String e_json = Jsoup.connect(true_link).get().select("div[data-module='OKVideo']").first().attr("data-options");
+            String e_json = Jsoup.connect(down_link).get().select("div[data-module='OKVideo']").first().attr("data-options");
             String cut_json = "{" + e_json.substring(e_json.lastIndexOf("\\\"videos"), e_json.indexOf(",\\\"metadataEmbedded")).replace("\\&quot;", "\"").replace("\\u0026", "&").replace("\\", "").replace("%3B", ";") + "}";
             JSONArray array = new JSONObject(cut_json).getJSONArray("videos");
             VideoServer videoServer = new VideoServer(OKRU);

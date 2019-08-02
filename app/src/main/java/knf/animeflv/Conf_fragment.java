@@ -18,11 +18,11 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.support.annotation.ArrayRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.provider.DocumentFile;
+import androidx.annotation.ArrayRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
+import androidx.documentfile.provider.DocumentFile;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -123,12 +123,9 @@ public class Conf_fragment extends PreferenceFragment implements SharedPreferenc
 
     //FIXME:TEST AREA
     private void doTests() throws Exception {
-        getPreferenceScreen().findPreference("open_intro").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                context.startActivity(new Intent(context, CustomIntro.class));
-                return false;
-            }
+        getPreferenceScreen().findPreference("open_intro").setOnPreferenceClickListener(preference -> {
+            context.startActivity(new Intent(context, Intronew.class));
+            return false;
         });
     }
 

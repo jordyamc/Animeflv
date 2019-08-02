@@ -1,10 +1,10 @@
 /*
  * PairingDialog
  * Connect SDK
- * 
+ *
  * Copyright (c) 2014 LG Electronics.
  * Created by Hyun Kook Khang on 19 Jan 2014
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,6 @@
 package com.connectsdk.device;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
 import android.text.InputType;
 import android.widget.EditText;
 
@@ -30,6 +29,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
 import com.connectsdk.service.DeviceService;
 
+import androidx.annotation.NonNull;
 import es.munix.multidisplaycast.CastManager;
 
 

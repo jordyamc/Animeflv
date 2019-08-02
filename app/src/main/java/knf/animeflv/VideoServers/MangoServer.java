@@ -1,7 +1,7 @@
 package knf.animeflv.VideoServers;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.jsoup.Jsoup;
 
@@ -21,7 +21,7 @@ public class MangoServer extends Server {
 
     @Override
     public boolean isValid() {
-        return baseLink.contains("server=streamango");
+        return baseLink.contains("streamango.com") && !baseLink.contains("%");
     }
 
     @Override
@@ -34,8 +34,7 @@ public class MangoServer extends Server {
     VideoServer getVideoServer() {
         try {
             String down_link = KUtilsKt.extractLink(baseLink);
-            String mangoLink = mangoLink(Jsoup.connect(down_link).userAgent(BypassHolder.getUserAgent()).cookies(BypassHolder.getBasicCookieMap()).get().select("script").last().html());
-            String html = Jsoup.connect(mangoLink).get().html();
+            String html = Jsoup.connect(down_link).get().html();
             Matcher matcher = Pattern.compile("type:\"video/mp4\",src:d\\('([^']+)',(\\d+)\\)").matcher(html);
             matcher.find();
             String hash = matcher.group(1);

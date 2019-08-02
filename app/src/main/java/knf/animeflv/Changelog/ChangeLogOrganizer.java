@@ -2,7 +2,7 @@ package knf.animeflv.Changelog;
 
 import android.app.Activity;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import org.jsoup.Jsoup;
